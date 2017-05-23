@@ -25,7 +25,7 @@ function Umul32(n, m) {
   return res;
 }
 
-export default function slugify(str, seed) {
+export default function slugify(str: string, seed?: number = 0) {
   var m = 0x5bd1e995;
   var r = 24;
   var h = seed ^ str.length;

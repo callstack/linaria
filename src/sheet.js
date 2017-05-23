@@ -12,13 +12,21 @@ export default function sheet() {
   style.appendChild(document.createTextNode(''));
   style.setAttribute('type', 'text/css');
 
-  document.head.appendChild(style);
+  if (document.head != null) {
+    document.head.appendChild(style);
+  } else {
+    throw new Error('Unable to insert stylesheet');
+  }
 
   return {
-    insert: (selector, styles) => {
+    insert: (selector: string, styles: string) => {
       const rules = stylis({ selector, styles });
 
-      if (style.sheet && style.sheet.insertRule) {
+      if (
+        style.sheet &&
+        typeof style.sheet.insertRule === 'function' &&
+        Array.isArray(style.sheet.rules)
+      ) {
         style.sheet.insertRule(rules, style.sheet.rules.length);
       } else {
         style.appendChild(document.createTextNode(rules));

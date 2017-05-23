@@ -5,7 +5,10 @@ import sheet from './sheet';
 
 const all = sheet();
 
-const named = (id, name) => (template, ...expressions) => {
+const named = (id?: string, name?: string) => (
+  template: Array<string>,
+  ...expressions: Array<string>
+) => {
   const styles = template.reduce(
     (accumulator, part, i) => accumulator + expressions[i - 1] + part
   );
@@ -18,7 +21,7 @@ const named = (id, name) => (template, ...expressions) => {
   return slug || name;
 };
 
-const css = (...args) => named()(...args);
+const css = named();
 
 css.named = named;
 
