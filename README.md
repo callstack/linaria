@@ -1,4 +1,4 @@
-# Linara
+# Linaria
 
 Fast zero-runtime CSS in JS library.
 
@@ -19,7 +19,7 @@ CSS rule declarations use tagged template litreals which produce a class name fo
 
 ```js
 import React from 'react';
-import { css, classnames } from 'library';
+import { css, compose } from 'library';
 import fonts from './fonts.js';
 import colors from './colors.js';
 
@@ -47,7 +47,7 @@ const header = css`
 
 export default function Header({ className }) {
   return (
-    <div className={classnames(container, className)}>
+    <div className={compose(container, className)}>
       <h1 className={header} />
     </div>
   );
