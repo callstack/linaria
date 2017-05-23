@@ -187,7 +187,6 @@ You probably should write these CSS chunks to disk and serve them with correct h
 
 ## TODO
 
-1. Make IDs deterministic: same set of rules should always produce the same ID
 1. When the content of two rules are the same, use the same rule instead of adding duplicates
 1. Composing classnames should ensure correct specificity so that class name towards end has higher specificity. We can increase the specificity manually to achieve this, e.g. - `compose('header', 'title')` might produce `.title[data-css=gf63rt], .title.header[data-css=gyt654]` and `.header[data-css=gyt654]` instead of `.title[data-css=gf63rt]` and `.header[data-css=gyt654]`
 1. Babel plugin to inline constants and integrate with libs like `polished`, `color`, `polychrome` and `lodash`
