@@ -1,0 +1,26 @@
+{
+  "name": "linaria",
+  "version": "0.0.1",
+  "description": "Fast zero-runtime CSS in JS library",
+  "main": "src/index.js",
+  "license": "MIT",
+  "dependencies": {
+    "shortid": "^2.2.8",
+    "stylis": "^2.0.12"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "eslint": "^3.19.0",
+    "eslint-config-prettier": "^2.1.1",
+    "eslint-plugin-babel": "^4.1.1",
+    "eslint-plugin-flowtype": "^2.33.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-prettier": "^2.1.1",
+    "flow-bin": "^0.46.0",
+    "prettier": "^1.3.1"
+  },
+  "scripts": {
+    "flow": "flow",
+    "lint": "eslint ."
+  }
+}
