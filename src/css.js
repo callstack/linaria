@@ -1,7 +1,6 @@
 /* @flow */
 
 import shortid from 'shortid';
-import stylis from 'stylis';
 import sheet from './sheet';
 
 const all = sheet();
@@ -12,9 +11,8 @@ const named = (id = shortid(), name) => (template, ...expressions) => {
   );
 
   const selector = name ? `.${name}[data-css~=${id}]` : `.${id}`;
-  const rules = stylis({ selector, styles });
 
-  all.insert(rules);
+  all.insert(selector, styles);
 
   return id || name;
 };
