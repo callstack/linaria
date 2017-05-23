@@ -118,7 +118,7 @@ export function App() {
 }
 ```
 
-In a React app, scoping styles is done by inserting `data-css` attributes in the components. When not using React or when no React component is found in the file, a hash can be prepended to the class name for scoping.
+In a React app, scoping styles is done by inserting `data-css` attributes in the components. When not using React or when no React component is found in the file, a hash can be appended to the class name (.e.g. - `.header-gyt654`) for scoping.
 
 
 ## Animations
