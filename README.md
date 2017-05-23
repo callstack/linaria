@@ -185,8 +185,21 @@ app.listen(3242);
 You probably should write these CSS chunks to disk and serve them with correct headers for caching.
 
 
+## TODO
+
+1. Make IDs deterministic: same set of rules should always produce the same ID
+1. When the content of two rules are the same, use the same rule instead of adding duplicates
+1. Composing classnames should ensure correct specificity so that class name towards end has higher specificity. We can increase the specificity manually to achieve this, e.g. - `compose('header', 'title')` might produce `.title[data-css=gf63rt], .title.header[data-css=gyt654]` and `.header[data-css=gyt654]` instead of `.title[data-css=gf63rt]` and `.header[data-css=gyt654]`
+1. Babel plugin to inline constants and integrate with libs like `polished`, `color`, `polychrome` and `lodash`
+1. Babel plugin to replace `const header = css` with `const header = css.named('ghg54t', 'header')`
+1. Webpack plugin to extract the CSS to a separate file
+1. ESLint plugin to lint styles
+1. Utilities to help with server rendering:
+    - Given some HTML and CSS, we should be able to extract the CSS that's actually used, useful for critical CSS
+1. Add ability to use JS objects instead of tagged template literals for people who prefer that
+
+
 ## Challenges to solve
 
-1. When composing multiple class names, we deliberately need to increase the specificity of the class names towards the end, this can be tricky since we need to track the places using multiple class names by following the component's import.
 1. Theming should have a nicer API, the idea is to specify set of theme names, generate set of rules for each theme automatically and then change an attribute at application root to switch themes
 1. It'll be nicer to figure out common CSS for all pages in server rendering and then ship page specific CSS inline
