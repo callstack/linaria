@@ -5,7 +5,7 @@ import sheet from './sheet';
 
 const all = sheet();
 
-const named = (id?: string, name?: string) => (
+const named = (id?: string) => (
   template: Array<string>,
   ...expressions: Array<string>
 ) => {
@@ -14,11 +14,11 @@ const named = (id?: string, name?: string) => (
   );
 
   const slug = id || slugify(styles);
-  const selector = name ? `.${name}[data-css~=${slug}]` : `.${slug}`;
+  const selector = `.${slug}`;
 
   all.insert(selector, styles);
 
-  return slug || name;
+  return slug;
 };
 
 const css = named();

@@ -7,7 +7,7 @@ Fast zero-runtime CSS in JS library.
 
 1. CSS is extracted out to real CSS files
 1. Familiar CSS syntax
-1. Class names are kept the same as what you wrote (with babel plugin)
+1. Class names are stay recognizable to what you wrote (with babel plugin)
 1. SCSS like shorthand and nesting
 1. Zero runtime in production
 1. Server rendering for critical CSS
@@ -66,32 +66,31 @@ After being transpiled, the code will output following CSS:
 
 
 ```css
-.container.title[data-css~='Header__jdh5rtz'] {
+.container__jdh5rtz.title__jt5ry4 {
   text-transform: uppercase;
 }
 
-.container[data-css~='Header__jdh5rtz'],
-.container[data-css~='Block__jdh5rtz'] {
+.container__jdh5rtz {
   height: 3rem;
 }
 
-.header[data-css~='Header__xy4ertz'] {
+.header__xy4ertz {
   font-family: Helvetica, sans-serif; /* constants are automatically inlined */
   font-size: 3rem;
   margin-bottom: .5rem;
 }
 
 @media (max-width: 320px) {
-  .header[data-css~='Header__xy4ertz'] {
+  .header__xy4ertz {
     font-size: 2rem;
   }
 }
 
-[data-theme=dark] .header[data-css~='Header__xy4ertz'] {
+[data-theme=dark] .header__xy4ertz {
   color: #fff;
 }
 
-[data-theme=light] .header[data-css~='Header__xy4ertz'] {
+[data-theme=light] .header__xy4ertz {
   color: #222;
 }
 ```
@@ -101,24 +100,22 @@ And the following JavaScipt:
 ```js
 import React from 'react';
 
-export default function Header({ className, dataCss }) {
+export default function Header({ className }) {
   return (
-    <div dataCss={'Header__jdh5rtz ' + dataCss} className={'container' + ' ' + className)}>
-      <h1 dataCss="Header__xy4ertz" className="header" />
+    <div className={'container__jdh5rtz' + ' ' + className)}>
+      <h1 className="header__xy4ertz" />
     </div>
   );
 }
 
 export function Block() {
-  return <div dataCss="Block__jdh5rtz" className="container" />;
+  return <div className="container__jdh5rtz" />;
 }
 
 export function App() {
-  return <Header dataCss="Block__jdh5rtz" className="title" />;
+  return <Header className="title__jt5ry4" />;
 }
 ```
-
-In a React app, scoping styles is done by inserting `data-css` attributes in the components. When not using React or when no React component is found in the file, a hash can be appended to the class name (.e.g. - `.header-gyt654`) for scoping.
 
 
 ## Animations
@@ -188,9 +185,9 @@ You probably should write these CSS chunks to disk and serve them with correct h
 ## TODO
 
 1. When the content of two rules are the same, use the same rule instead of adding duplicates
-1. Composing classnames should ensure correct specificity so that class name towards end has higher specificity. We can increase the specificity manually to achieve this, e.g. - `compose('header', 'title')` might produce `.title[data-css=gf63rt], .title.header[data-css=gyt654]` and `.header[data-css=gyt654]` instead of `.title[data-css=gf63rt]` and `.header[data-css=gyt654]`
+1. Composing classnames should ensure correct specificity so that class name towards end has higher specificity. We can increase the specificity manually to achieve this, e.g. - `compose('header', 'title')` might produce `.title__gf63rt, .title__gf63rt.header__gyt654` and `.header__gyt654` instead of `.title__gf63rt` and `.header__gyt654`
 1. Babel plugin to inline constants and integrate with libs like `polished`, `color`, `polychrome` and `lodash`
-1. Babel plugin to replace `const header = css` with `const header = css.named('ghg54t', 'header')`
+1. Babel plugin to replace `const header = css` with `const header = css.named('header__ghg54t')`
 1. Webpack plugin to extract the CSS to a separate file
 1. ESLint plugin to lint styles
 1. Utilities to help with server rendering:
