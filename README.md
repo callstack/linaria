@@ -19,7 +19,7 @@ CSS rule declarations use tagged template litreals which produce a class name fo
 
 ```js
 import React from 'react';
-import { css, compose } from 'library';
+import { css, compose } from 'linaria';
 import fonts from './fonts.js';
 import colors from './colors.js';
 
@@ -120,7 +120,7 @@ export function App() {
 
 ## Animations
 
-You could declare CSS animation like so:
+We could declare CSS animation like so:
 
 ```js
 const box = css`
@@ -136,6 +136,15 @@ const box = css`
 The animation name is always scoped to the selector.
 
 
+## Dynamic styles
+
+Sometimes we have some styles based on component's props or state, or dynamic in some way. urrently dynamic styles could be acheived with inline styles:
+
+```js
+<div style={{ transform: `translateX(${props.index * 100}%)` }}
+```
+
+
 ## Server rendering
 
 Even with fully static CSS, we have an opportunity to improve the initial page load by inlining critical CSS.
@@ -143,7 +152,7 @@ Even with fully static CSS, we have an opportunity to improve the initial page l
 ```js
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { collect, slugify } from 'library';
+import { collect, slugify } from 'linaria';
 import App from './App';
 
 const cache = {};
@@ -179,20 +188,21 @@ app.get('/styles/:slug', (req, res) =>
 app.listen(3242);
 ```
 
-You probably should write these CSS chunks to disk and serve them with correct headers for caching.
+We probably should write these CSS chunks to disk and serve them with correct headers for caching.
 
 
 ## TODO
 
 1. When the content of two rules are the same, use the same rule instead of adding duplicates
 1. Composing classnames should ensure correct specificity so that class name towards end has higher specificity. We can increase the specificity manually to achieve this, e.g. - `compose('header', 'title')` might produce `.title__gf63rt, .title__gf63rt.header__gyt654` and `.header__gyt654` instead of `.title__gf63rt` and `.header__gyt654`
-1. Babel plugin to inline constants and integrate with libs like `polished`, `color`, `polychrome` and `lodash`
+1. Babel plugin to inline constants and integrate with libs like `polished`, `color`, `polychrome` etc.
 1. Babel plugin to replace `const header = css` with `const header = css.named('header__ghg54t')`
 1. Webpack plugin to extract the CSS to a separate file
 1. ESLint plugin to lint styles
 1. Utilities to help with server rendering:
     - Given some HTML and CSS, we should be able to extract the CSS that's actually used, useful for critical CSS
 1. Add ability to use JS objects instead of tagged template literals for people who prefer that
+1. Support dynamic properties in CSS
 
 
 ## Challenges to solve
