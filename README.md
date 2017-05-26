@@ -5,12 +5,13 @@ Fast zero-runtime CSS in JS library.
 
 ## Features
 
-1. CSS is extracted out to real CSS files
 1. Familiar CSS syntax
+1. CSS is extracted out to real CSS files
 1. Class names are stay recognizable to what you wrote (with babel plugin)
 1. SCSS like shorthand and nesting
 1. Zero runtime in production
 1. Server rendering for critical CSS
+1. No configuration or build step required for development
 
 
 ## Usage
@@ -191,21 +192,14 @@ app.listen(3242);
 We probably should write these CSS chunks to disk and serve them with correct headers for caching.
 
 
-## TODO
-
-1. When the content of two rules are the same, use the same rule instead of adding duplicates
-1. Composing classnames should ensure correct specificity so that class name towards end has higher specificity. We can increase the specificity manually to achieve this, e.g. - `compose('header', 'title')` might produce `.title__gf63rt, .title__gf63rt.header__gyt654` and `.header__gyt654` instead of `.title__gf63rt` and `.header__gyt654`
-1. Babel plugin to inline constants and integrate with libs like `polished`, `color`, `polychrome` etc.
-1. Babel plugin to replace `const header = css` with `const header = css.named('header__ghg54t')`
-1. Webpack plugin to extract the CSS to a separate file
-1. ESLint plugin to lint styles
-1. Utilities to help with server rendering:
-    - Given some HTML and CSS, we should be able to extract the CSS that's actually used, useful for critical CSS
-1. Add ability to use JS objects instead of tagged template literals for people who prefer that
-1. Support dynamic properties in CSS
-
-
 ## Challenges to solve
 
 1. Theming should have a nicer API, the idea is to specify set of theme names, generate set of rules for each theme automatically and then change an attribute at application root to switch themes
 1. It'll be nicer to figure out common CSS for all pages in server rendering and then ship page specific CSS inline
+
+
+## Inspiration
+
+1. [glamor](https://github.com/threepointone/glamor)
+1. [styled-components](https://github.com/styled-components/styled-components)
+1. [css-literal-loader](https://github.com/4Catalyzer/css-literal-loader)
