@@ -7,6 +7,7 @@
   "scripts": {
     "flow": "flow",
     "lint": "eslint .",
+    "test": "echo \"No tests yet!\" && exit 0",
     "prepublish": "npm run build:clean && npm run build:transpile && npm run build:flow",
     "build:clean": "del build",
     "build:transpile": "babel src --out-dir build --ignore **/__tests__/**",
