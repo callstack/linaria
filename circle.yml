@@ -1,0 +1,22 @@
+machine:
+  node:
+    version: 6.10.3
+  environment:
+    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
+general:
+  artifacts:
+    - ./coverage
+dependencies:
+  pre:
+    # Installing Yarn
+    - curl -o- -L https://yarnpkg.com/install.sh | bash
+    - export PATH=$HOME/.yarn/bin:$PATH
+  override:
+    - yarn
+  cache_directories:
+    - ~/.cache/yarn
+test:
+  override:
+    - yarn run lint
+    - yarn run flow
+    - yarn run test -- --coverage
