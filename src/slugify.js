@@ -68,5 +68,5 @@ export default function slugify(str: string, seed?: number = 0) {
   h = Umul32(h, m);
   h ^= h >>> 15;
 
-  return h >>> 0;
+  return 'x' + (h >>> 0);
 }

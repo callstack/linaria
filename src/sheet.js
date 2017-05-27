@@ -20,7 +20,7 @@ export default function sheet() {
 
   return {
     insert: (selector: string, styles: string) => {
-      const rules = stylis({ selector, styles });
+      const rules = stylis(selector, styles);
 
       if (
         style.sheet &&
