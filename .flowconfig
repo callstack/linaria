@@ -5,3 +5,5 @@
 [libs]
 
 [options]
+
+module.name_mapper='^linaria$' -> '<PROJECT_ROOT>/src/index.js'
