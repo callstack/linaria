@@ -13,7 +13,7 @@ const named = (id?: string) => (
     (accumulator, part, i) => accumulator + expressions[i - 1] + part
   );
 
-  const slug = id || slugify(styles);
+  const slug = id || `css-${slugify(styles)}`;
   const selector = `.${slug}`;
 
   all.insert(selector, styles);
