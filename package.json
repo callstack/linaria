@@ -17,6 +17,7 @@
     "build"
   ],
   "dependencies": {
+    "short-hash": "^1.0.0",
     "stylis": "^2.0.12"
   },
   "devDependencies": {
@@ -30,8 +31,9 @@
     "eslint-config-prettier": "^2.1.1",
     "eslint-plugin-babel": "^4.1.1",
     "eslint-plugin-flowtype": "^2.33.0",
-    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-prettier": "^2.1.1",
+    "eslint-plugin-react": "^7.0.1",
     "flow-bin": "^0.46.0",
     "flow-copy-source": "^1.1.0",
     "prettier": "^1.3.1"
