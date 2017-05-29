@@ -1,8 +1,8 @@
 import slugify from '../slugify';
 
-const computeClassName = (name, taggedTemplateExpr) => {
+const computeClassName = (name: string, taggedTemplateExpr): string => {
   const classString = taggedTemplateExpr.quasi.quasis
-    .reduce((acc, quasi) => {
+    .reduce((acc: string, quasi): string => {
       return acc.concat(quasi.value.cooked);
     }, '')
     .replace(/(^\s*|\s*$|\s{2,})/g, '');
