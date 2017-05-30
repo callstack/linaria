@@ -1,3 +1,5 @@
+/* eslint-env jest */
+
 import * as babel from 'babel-core';
 import path from 'path';
 

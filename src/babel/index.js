@@ -1,4 +1,20 @@
+/* @flow */
+
 import slugify from '../slugify';
+
+type NodePath = {
+  node: Object,
+  parent: Object,
+  parentPath: NodePath,
+};
+
+type BabelTypes = {
+  isTaggedTemplateExpression: Function,
+  callExpression: Function,
+  memberExpression: Function,
+  identifier: Function,
+  stringLiteral: Function,
+};
 
 const computeClassName = (name: string, taggedTemplateExpr): string => {
   const classString = taggedTemplateExpr.quasi.quasis
@@ -9,9 +25,9 @@ const computeClassName = (name: string, taggedTemplateExpr): string => {
   return `${name}_${slugify(classString)}`;
 };
 
-export default ({ types: t }) => ({
+export default ({ types: t }: { types: BabelTypes }) => ({
   visitor: {
-    VariableDeclarator(path) {
+    VariableDeclarator(path: NodePath) {
       if (
         t.isTaggedTemplateExpression(path.node.init) &&
         path.node.init.tag &&
