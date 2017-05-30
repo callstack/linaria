@@ -7,7 +7,7 @@
   "scripts": {
     "flow": "flow",
     "lint": "eslint .",
-    "test": "echo \"No tests yet!\" && exit 0",
+    "test": "jest",
     "prepublish": "npm run build:clean && npm run build:transpile && npm run build:flow",
     "build:clean": "del build",
     "build:transpile": "babel src --out-dir build --ignore **/__tests__/**",
@@ -22,9 +22,10 @@
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
     "babel-eslint": "^7.2.3",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
-    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-env": "1.5.1",
     "babel-preset-stage-3": "^6.24.1",
     "del-cli": "^1.0.0",
     "eslint": "^3.19.0",
@@ -36,6 +37,7 @@
     "eslint-plugin-react": "^7.0.1",
     "flow-bin": "^0.46.0",
     "flow-copy-source": "^1.1.0",
+    "jest": "^20.0.4",
     "prettier": "^1.3.1"
   }
 }

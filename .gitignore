@@ -48,3 +48,6 @@ android/keystores/debug.keystore
 
 # yarn
 yarn.lock
+
+# jest
+coverage/
