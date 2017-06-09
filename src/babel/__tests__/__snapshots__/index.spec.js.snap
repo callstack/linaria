@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`babel plugin should generate hash and inject it into \`css.named\` call for multiline fixture 1`] = `
+"
+const header = css.named(\\"header_b25fc411\\")\`
+  font-size: 3em;
+  color: red;
+  border: 1px solid #000;
+\`;"
+`;
+
+exports[`babel plugin should generate hash and inject it into \`css.named\` call for multiline fixture 2`] = `
+"
+const header = css.named(\\"header_b25fc411\\")\`
+  font-size: 3em;
+  color: red;
+  border: 1px solid #000;
+\`;"
+`;
+
+exports[`babel plugin should generate hash and inject it into \`css.named\` call for simple fixture 1`] = `
+"
+const header = css.named(\\"header_df78b444\\")\`
+  font-size: 3em;
+\`;"
+`;
+
+exports[`babel plugin should generate hash and inject it into \`css.named\` call for simple fixture 2`] = `
+"
+const header = css.named(\\"header_df78b444\\")\`
+  font-size: 3em;
+\`;"
+`;
