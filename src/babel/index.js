@@ -6,6 +6,7 @@ import type {
   State,
   BabelTaggedTemplateExpression,
   BabelVariableDeclarator,
+  BabelVariableDeclaration,
 } from './types';
 
 import { resolveExpressions } from './resolvers';
@@ -25,32 +26,38 @@ function computeClassName(
 
 export default ({ types: t }: { types: BabelTypes }) => ({
   visitor: {
-    Program(path: NodePath, state: State) {
+    Program(path: NodePath<*>, state: State) {
       state.filename = state.file.opts.filename;
       state.imports = [];
     },
-    ImportDeclaration(path: NodePath, state: State) {
+    ImportDeclaration(path: NodePath<*>, state: State) {
+      // @TODO
       const source: string = path.node.source.value;
       path.traverse({
-        ImportDefaultSpecifier(importPath: NodePath) {
+        ImportDefaultSpecifier(importPath: NodePath<*>) {
           state.imports.push({
-            source,
-            isDefault: true,
             name: importPath.node.local.name,
+            isEsm: true,
+            isDefault: true,
+            sourceFrom: source,
           });
         },
-        ImportSpecifier(importPath: NodePath) {
+        ImportSpecifier(importPath: NodePath<*>) {
           state.imports.push({
-            source,
-            isDefault: false,
             name: importPath.node.local
               ? importPath.node.local.name
               : importPath.node.imported.name,
+            isEsm: true,
+            isDefault: false,
+            sourceFrom: source,
           });
         },
       });
     },
-    VariableDeclaration(path: NodePath, state: State) {
+    VariableDeclaration(
+      path: NodePath<BabelVariableDeclaration>,
+      state: State
+    ) {
       path.node.declarations.forEach((decl: BabelVariableDeclarator) => {
         if (
           t.isCallExpression(decl.init) &&
@@ -59,9 +66,11 @@ export default ({ types: t }: { types: BabelTypes }) => ({
           typeof decl.init.arguments[0].value === 'string'
         ) {
           state.imports.push({
-            source: decl.init.arguments[0].value,
-            isDefault: t.isIdentifier(decl.id),
             name: decl.id.name,
+            isEsm: false,
+            isDefault: t.isIdentifier(decl.id),
+            // $FlowFixMe
+            sourceFile: decl.init.arguments[0].value,
           });
         } else if (
           t.isCallExpression(decl.init) &&
@@ -72,16 +81,17 @@ export default ({ types: t }: { types: BabelTypes }) => ({
           const requireImport = decl.init.arguments[0].name;
           if (state.imports.find(({ name }) => name === requireImport)) {
             state.imports.push({
-              source: requireImport,
-              isDefault: t.isIdentifier(decl.id),
               name: decl.id.name,
-              esmInterop: true,
+              isEsm: false,
+              isDefault: t.isIdentifier(decl.id),
+              isEsmInterop: true,
+              sourceFrom: requireImport,
             });
           }
         }
       });
     },
-    VariableDeclarator(path: NodePath, state: State) {
+    VariableDeclarator(path: NodePath<BabelVariableDeclarator>, state: State) {
       if (
         t.isTaggedTemplateExpression(path.node.init) &&
         path.node.init.tag &&

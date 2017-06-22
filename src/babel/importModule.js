@@ -18,11 +18,17 @@ export default function importModule(
     return null;
   }
 
-  const { source } =
-    imports.find(({ name }) => name === importStatement.source) ||
+  const { sourceFile } =
+    imports.find(({ name }) => name === importStatement.sourceFrom) ||
     importStatement;
 
-  let filePath = join(dirname(relativeTo), source);
+  if (!sourceFile) {
+    throw new Error(
+      `Could not find require statement for ${importStatement.sourceFrom || ''}`
+    );
+  }
+
+  let filePath = join(dirname(relativeTo), sourceFile);
   if (!extname(filePath).length) {
     filePath += '.js';
   }

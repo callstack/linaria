@@ -61,6 +61,7 @@ export function resolveValueFromPath(object: Object, path: string[]): ?any {
  * expressions.
  */
 export function resolveExpressions(
+  // $FlowFixMe taggedTemplateExpr will be BabelTaggedTemplateExpression
   taggedTemplateExpr: BabelTaggedTemplateExpression,
   state: State,
   t: BabelTypes

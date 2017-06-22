@@ -1,9 +1,9 @@
 /* @flow */
 
-export type NodePath = {
-  node: Object,
+export type NodePath<K> = {
+  node: K,
   parent: Object,
-  parentPath: NodePath,
+  parentPath: NodePath<*>,
   traverse: (visitor: { [key: string]: Function }) => void,
 };
 
@@ -41,6 +41,11 @@ export type BabelVariableDeclarator = {
   init: BabelCallExpression | Object,
 };
 
+export type BabelVariableDeclaration = {
+  declarations: BabelVariableDeclarator[],
+  kind: 'var' | 'let' | 'const',
+};
+
 export type BabelStringLiteral = {
   value: string,
 };
@@ -63,10 +68,12 @@ export type BabelTypes = {
 };
 
 export type ImportStatement = {
-  source: string,
-  isDefault: boolean,
   name: string,
-  esmInterop?: boolean,
+  isEsm: boolean,
+  isDefault: boolean,
+  isEsmInterop?: boolean,
+  sourceFile?: string,
+  sourceFrom?: string,
 };
 
 export type State = {
