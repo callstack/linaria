@@ -14,6 +14,7 @@ export default function importModule(
   const importStatement: ?ImportStatement = imports.find(
     importStatement => importStatement.name === name
   );
+
   if (!importStatement) {
     return null;
   }
@@ -39,7 +40,7 @@ export default function importModule(
 
   const importedModule = requireFromString(code, filePath);
 
-  if (typeof importedModule !== 'object') {
+  if (!Object.keys(importedModule).length) {
     throw new Error(`${filePath} must export an object`);
   }
 
