@@ -7,9 +7,11 @@ import type {
   BabelTaggedTemplateExpression,
   BabelVariableDeclarator,
   BabelVariableDeclaration,
+  BabelTaggedTemplateElement,
 } from './types';
 
 import { resolveExpressions } from './resolvers';
+import extract from './extractStyles';
 import slugify from '../slugify';
 
 function computeClassName(
@@ -24,11 +26,40 @@ function computeClassName(
   return `${name}_${slugify(classString)}`;
 }
 
+function joinTaggedTemplateElements(
+  taggedTemplateExpr: BabelTaggedTemplateExpression
+) {
+  taggedTemplateExpr.quasi.quasis = [
+    taggedTemplateExpr.quasi.quasis
+      .slice(0, -1)
+      .reverse()
+      .reduce(
+        (
+          elementAcc: BabelTaggedTemplateElement,
+          currElement: BabelTaggedTemplateElement
+        ): BabelTaggedTemplateElement => {
+          return {
+            ...elementAcc,
+            value: {
+              cooked: `${currElement.value.cooked}${elementAcc.value.cooked}`,
+              raw: `${currElement.value.cooked}${elementAcc.value.cooked}`,
+            },
+          };
+        },
+        taggedTemplateExpr.quasi.quasis[
+          taggedTemplateExpr.quasi.quasis.length - 1
+        ]
+      ),
+  ];
+  return taggedTemplateExpr;
+}
+
 export default ({ types: t }: { types: BabelTypes }) => ({
   visitor: {
     Program(path: NodePath<*>, state: State) {
       state.filename = state.file.opts.filename;
       state.imports = [];
+      // console.log(path.node.body);
     },
     ImportDeclaration(path: NodePath<*>, state: State) {
       // @TODO
@@ -39,7 +70,7 @@ export default ({ types: t }: { types: BabelTypes }) => ({
             name: importPath.node.local.name,
             isEsm: true,
             isDefault: true,
-            sourceFrom: source,
+            sourceFile: source,
           });
         },
         ImportSpecifier(importPath: NodePath<*>) {
@@ -49,7 +80,7 @@ export default ({ types: t }: { types: BabelTypes }) => ({
               : importPath.node.imported.name,
             isEsm: true,
             isDefault: false,
-            sourceFrom: source,
+            sourceFile: source,
           });
         },
       });
@@ -97,6 +128,9 @@ export default ({ types: t }: { types: BabelTypes }) => ({
         path.node.init.tag &&
         path.node.init.tag.name === 'css'
       ) {
+        // console.log(state.imports);
+
+        // @TODO: resolve from variable
         const taggedTemplateExpression: BabelTaggedTemplateExpression = resolveExpressions(
           path.node.init,
           state,
@@ -111,13 +145,15 @@ export default ({ types: t }: { types: BabelTypes }) => ({
 
         const className: string = computeClassName(
           path.node.id.name,
-          taggedTemplateExpression
+          joinTaggedTemplateElements(taggedTemplateExpression)
         );
 
         taggedTemplateExpression.tag = t.callExpression(
           t.memberExpression(t.identifier('css'), t.identifier('named')),
           [t.stringLiteral(className)]
         );
+
+        extract(taggedTemplateExpression, state);
       }
     },
   },
