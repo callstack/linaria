@@ -116,3 +116,20 @@ var _fontSize$color = { fontSize: '14px', color: 'black' },
 
 var header = css.named('header_a6d91e89')(_templateObject);"
 `;
+
+exports[`babel plugin should resolve multiple expressions 1`] = `
+"'use strict';
+
+var _templateObject = _taggedTemplateLiteral(['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n  background-color: black;\\\\n  font-weight: bold;\\\\n'], ['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n  background-color: black;\\\\n  font-weight: bold;\\\\n']);
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+var constants = {
+  color: 'black',
+  fontSize: '14px',
+  backgroundColor: 'black',
+  fontWeight: 'bold'
+};
+
+var header = css.named('header_2add690b')(_templateObject);"
+`;

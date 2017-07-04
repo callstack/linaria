@@ -191,4 +191,39 @@ describe('babel plugin', () => {
     );
     expect(code).toMatchSnapshot();
   });
+  it('should resolve multiple expressions', () => {
+    extractStyles.mockImplementationOnce(tagExpr => {
+      expect(tagExpr.quasi.expressions.length).toBe(0);
+      expect(
+        tagExpr.quasi.quasis[0].value.cooked.includes('font-size: 14px')
+      ).toBeTruthy();
+      expect(
+        tagExpr.quasi.quasis[0].value.cooked.includes('color: black')
+      ).toBeTruthy();
+      expect(
+        tagExpr.quasi.quasis[0].value.cooked.includes('background-color: black')
+      ).toBeTruthy();
+      expect(
+        tagExpr.quasi.quasis[0].value.cooked.includes('font-weight: bold')
+      ).toBeTruthy();
+    });
+    const { code } = transpile(
+      dedent(`
+      const constants = {
+        color: 'black',
+        fontSize: '14px',
+        backgroundColor: 'black',
+        fontWeight: 'bold',
+      };
+
+      const header = css\`
+        font-size: \${constants.fontSize};
+        color: \${constants.color};
+        background-color: \${constants.backgroundColor};
+        font-weight: \${constants.fontWeight};
+      \`;
+      `)
+    );
+    expect(code).toMatchSnapshot();
+  });
 });
