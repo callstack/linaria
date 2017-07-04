@@ -91,9 +91,9 @@ export default ({ types: t }: { types: BabelTypes }) => ({
       path.node.declarations.forEach((decl: BabelVariableDeclarator) => {
         if (
           t.isCallExpression(decl.init) &&
-          // $FlowFixMe decl is explicitly check for being a call expession
+          // $FlowFixMe `decl` is explicitly check for being a call expession
           decl.init.callee.name === 'require' &&
-          // $FlowFixMe decl is explicitly check for being a call expession
+          // $FlowFixMe `decl` is explicitly check for being a call expession
           decl.init.arguments.length &&
           typeof decl.init.arguments[0].value === 'string'
         ) {
@@ -101,14 +101,14 @@ export default ({ types: t }: { types: BabelTypes }) => ({
             name: decl.id.name,
             isEsm: false,
             isDefault: t.isIdentifier(decl.id),
-            // $FlowFixMe
+            // $FlowFixMe `decl` is explicitly check for being a call expession
             sourceFile: decl.init.arguments[0].value,
           });
         } else if (
           t.isCallExpression(decl.init) &&
-          // $FlowFixMe decl is explicitly check for being a call expession
+          // $FlowFixMe `decl` is explicitly check for being a call expession
           decl.init.callee.name === '_interopRequireDefault' &&
-          // $FlowFixMe decl is explicitly check for being a call expession
+          // $FlowFixMe `decl` is explicitly check for being a call expession
           decl.init.arguments.length &&
           typeof decl.init.arguments[0].name === 'string'
         ) {
@@ -133,6 +133,7 @@ export default ({ types: t }: { types: BabelTypes }) => ({
       ) {
         // @TODO: resolve from variable
         const taggedTemplateExpression: BabelTaggedTemplateExpression = resolveExpressions(
+          // $FlowFixMe `init` is explicitly check for being a tagged template expression
           path.node.init,
           state,
           t
