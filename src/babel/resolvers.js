@@ -69,7 +69,7 @@ export function resolveExpressions(
   taggedTemplateExpr.quasi.expressions.forEach(
     (expression: BabelMemberExpression | Object, index: number) => {
       if (!t.isMemberExpression(expression)) {
-        return;
+        throw new Error(`Cannot resolve expression ${expression.type}`);
       }
 
       const baseObjectIdentifier: ?BabelIdentifier = resolveBaseObjectIdentifier(
@@ -96,6 +96,9 @@ export function resolveExpressions(
       }
 
       const propertyPath: string[] = resolvePropertyPath(expression, t);
+      if (associatedModule.__useDefault) {
+        propertyPath.unshift('default');
+      }
       const value: ?any = resolveValueFromPath(associatedModule, propertyPath);
       taggedTemplateExpr.quasi.quasis.splice(
         index + 1,

@@ -19,7 +19,7 @@ export default function importModule(
     return null;
   }
 
-  const { sourceFile } =
+  const { sourceFile, isEsm, isDefault } =
     imports.find(({ name }) => name === importStatement.sourceFrom) ||
     importStatement;
 
@@ -43,6 +43,8 @@ export default function importModule(
   if (!Object.keys(importedModule).length) {
     throw new Error(`${filePath} must export an object`);
   }
+
+  importedModule.__useDefault = isEsm && isDefault;
 
   return importedModule;
 }
