@@ -7,6 +7,16 @@ export type NodePath<K> = {
   traverse: (visitor: { [key: string]: Function }) => void,
 };
 
+export type BabelObjectExpression = {
+  properties: any[],
+  type: string,
+};
+
+export type BabelObjectPattern = {
+  properties: Object[],
+  type: string,
+};
+
 export type BabelTaggedTemplateElement = {
   value: {
     raw: string,
@@ -72,6 +82,9 @@ export type BabelTypes = {
   isCallExpression: BabelIsTypeFunction<BabelCallExpression>,
   isMemberExpression: BabelIsTypeFunction<BabelMemberExpression>,
   isIdentifier: BabelIsTypeFunction<BabelIdentifier>,
+  isVariableDeclaration: BabelIsTypeFunction<BabelVariableDeclaration>,
+  isObjectExpression: BabelIsTypeFunction<BabelObjectExpression>,
+  isObjectPattern: BabelIsTypeFunction<BabelObjectPattern>,
 };
 
 export type ImportStatement = {
@@ -85,6 +98,9 @@ export type ImportStatement = {
 
 export type State = {
   imports: ImportStatement[],
+  constants: {
+    [key: string]: ?() => Object,
+  },
   filename: string,
   file: Object,
 };

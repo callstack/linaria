@@ -73,3 +73,46 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
 
 var header = css.named('header_a6d91e89')(_templateObject);"
 `;
+
+exports[`babel plugin should resolve expressions from an object with constants 1`] = `
+"'use strict';
+
+var _templateObject = _taggedTemplateLiteral(['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n'], ['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n']);
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+var constants = { fontSize: '14px', color: 'black' };
+
+var header = css.named('header_a6d91e89')(_templateObject);"
+`;
+
+exports[`babel plugin should resolve expressions from an object with constants with advanced destructurization 1`] = `
+"'use strict';
+
+var _templateObject = _taggedTemplateLiteral(['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n'], ['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n']);
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+var _color = { color: 'black' },
+    _color$fontSize = _color.fontSize,
+    fontSize = _color$fontSize === undefined ? '14px' : _color$fontSize,
+    fontColor = _color.color;
+
+
+var header = css.named('header_a6d91e89')(_templateObject);"
+`;
+
+exports[`babel plugin should resolve expressions from an object with constants with destructurization 1`] = `
+"'use strict';
+
+var _templateObject = _taggedTemplateLiteral(['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n'], ['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n']);
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+var _fontSize$color = { fontSize: '14px', color: 'black' },
+    fontSize = _fontSize$color.fontSize,
+    color = _fontSize$color.color;
+
+
+var header = css.named('header_a6d91e89')(_templateObject);"
+`;

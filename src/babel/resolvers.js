@@ -15,9 +15,14 @@ import importModule from './importModule';
  *   `object.prop1.prop2.prop3` will return `object`
  */
 export function resolveBaseObjectIdentifier(
-  expression: BabelMemberExpression,
+  expression: BabelMemberExpression | BabelIdentifier,
   t: BabelTypes
 ): ?Object {
+  if (t.isIdentifier(expression)) {
+    return expression;
+  }
+
+  // $FlowFixMe `expression` is a BabelMemberExpression
   let current: BabelMemberExpression | Object = expression.object;
   while (current && t.isMemberExpression(current)) {
     current = current.object;
@@ -30,10 +35,16 @@ export function resolveBaseObjectIdentifier(
  *   `object.prop1.prop2.prop3` will return `['prop1', 'prop2', 'prop3']`
  */
 export function resolvePropertyPath(
-  expression: BabelMemberExpression,
+  expression: BabelMemberExpression | BabelIdentifier,
   t: BabelTypes
 ): string[] {
+  if (t.isIdentifier(expression)) {
+    return [];
+  }
+
+  // $FlowFixMe `expression` is a BabelMemberExpression
   const path: string[] = [expression.property.name];
+  // $FlowFixMe `expression` is a BabelMemberExpression
   let current: BabelMemberExpression | Object = expression.object;
   while (current && t.isMemberExpression(current)) {
     path.unshift(current.property.name);
@@ -65,10 +76,18 @@ export function resolveExpressions(
   state: State,
   t: BabelTypes
 ) {
+  let addedExpressionsLength = 0;
   taggedTemplateExpr.quasi.expressions.forEach(
-    (expression: BabelMemberExpression | Object, index: number) => {
-      if (!t.isMemberExpression(expression)) {
-        throw new Error(`Cannot resolve expression ${expression.type}`);
+    (
+      expression: BabelMemberExpression | BabelIdentifier | Object,
+      index: number
+    ) => {
+      if (!t.isMemberExpression(expression) && !t.isIdentifier(expression)) {
+        throw new Error(
+          // $FlowFixMe `expression` is either BabelMemberExpression or BabelIdentifier
+          `Cannot resolve expression ${expression.type}:${expression.name ||
+            'Unknown'}`
+        );
       }
 
       const baseObjectIdentifier: ?BabelIdentifier = resolveBaseObjectIdentifier(
@@ -82,16 +101,23 @@ export function resolveExpressions(
         );
       }
 
-      const associatedModule: ?Object = importModule(
+      let associatedModule: ?Object = importModule(
         baseObjectIdentifier.name,
         state.imports,
         state.filename
       );
 
       if (!associatedModule) {
-        throw new Error(
-          `Could not find ${baseObjectIdentifier.name} import statement`
-        );
+        const constantsFromObject: ?() => Object =
+          state.constants[baseObjectIdentifier.name];
+        if (constantsFromObject) {
+          associatedModule = constantsFromObject();
+        } else {
+          throw new Error(
+            `Could not find "${baseObjectIdentifier.name}" import statement nor top-level` +
+              ' object with constants'
+          );
+        }
       }
 
       const propertyPath: string[] = resolvePropertyPath(expression, t);
@@ -100,7 +126,7 @@ export function resolveExpressions(
       }
       const value: ?any = resolveValueFromPath(associatedModule, propertyPath);
       taggedTemplateExpr.quasi.quasis.splice(
-        index + 1,
+        index + 1 + addedExpressionsLength++,
         0,
         t.templateElement({ cooked: value, raw: value })
       );

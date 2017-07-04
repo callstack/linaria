@@ -11,6 +11,7 @@ import type {
 } from './types';
 
 import { resolveExpressions } from './resolvers';
+import getConstantFactories from './getConstantFactories';
 import extract from './extractStyles';
 import slugify from '../slugify';
 
@@ -59,6 +60,7 @@ export default ({ types: t }: { types: BabelTypes }) => ({
     Program(path: NodePath<*>, state: State) {
       state.filename = state.file.opts.filename;
       state.imports = [];
+      state.constants = getConstantFactories(t, path);
     },
     ImportDeclaration(path: NodePath<*>, state: State) {
       // @TODO

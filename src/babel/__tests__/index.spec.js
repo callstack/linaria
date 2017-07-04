@@ -106,6 +106,9 @@ describe('babel plugin', () => {
       expect(
         tagExpr.quasi.quasis[0].value.cooked.includes('font-size: 14px')
       ).toBeTruthy();
+      expect(
+        tagExpr.quasi.quasis[0].value.cooked.includes('color: black')
+      ).toBeTruthy();
     });
     const { code } = transpile(
       dedent(`
@@ -114,6 +117,75 @@ describe('babel plugin', () => {
       const header = css\`
         font-size: \${constants.fontSize};
         color: black;
+      \`;
+      `)
+    );
+    expect(code).toMatchSnapshot();
+  });
+
+  it('should resolve expressions from an object with constants', () => {
+    extractStyles.mockImplementationOnce(tagExpr => {
+      expect(tagExpr.quasi.expressions.length).toBe(0);
+      expect(
+        tagExpr.quasi.quasis[0].value.cooked.includes('font-size: 14px')
+      ).toBeTruthy();
+      expect(
+        tagExpr.quasi.quasis[0].value.cooked.includes('color: black')
+      ).toBeTruthy();
+    });
+    const { code } = transpile(
+      dedent(`
+      const constants = { fontSize: '14px', color: 'black' };
+
+      const header = css\`
+        font-size: \${constants.fontSize};
+        color: \${constants.color};
+      \`;
+      `)
+    );
+    expect(code).toMatchSnapshot();
+  });
+
+  it('should resolve expressions from an object with constants with destructurization', () => {
+    extractStyles.mockImplementationOnce(tagExpr => {
+      expect(tagExpr.quasi.expressions.length).toBe(0);
+      expect(
+        tagExpr.quasi.quasis[0].value.cooked.includes('font-size: 14px')
+      ).toBeTruthy();
+      expect(
+        tagExpr.quasi.quasis[0].value.cooked.includes('color: black')
+      ).toBeTruthy();
+    });
+    const { code } = transpile(
+      dedent(`
+      const { fontSize, color } = { fontSize: '14px', color: 'black' };
+
+      const header = css\`
+        font-size: \${fontSize};
+        color: \${color};
+      \`;
+      `)
+    );
+    expect(code).toMatchSnapshot();
+  });
+
+  it('should resolve expressions from an object with constants with advanced destructurization', () => {
+    extractStyles.mockImplementationOnce(tagExpr => {
+      expect(tagExpr.quasi.expressions.length).toBe(0);
+      expect(
+        tagExpr.quasi.quasis[0].value.cooked.includes('font-size: 14px')
+      ).toBeTruthy();
+      expect(
+        tagExpr.quasi.quasis[0].value.cooked.includes('color: black')
+      ).toBeTruthy();
+    });
+    const { code } = transpile(
+      dedent(`
+      const { fontSize = '14px', color: fontColor } = { color: 'black' };
+
+      const header = css\`
+        font-size: \${fontSize};
+        color: \${fontColor};
       \`;
       `)
     );
