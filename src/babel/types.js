@@ -20,34 +20,41 @@ export type BabelTaggedTemplateExpression = {
     expressions: Object[],
     quasis: BabelTaggedTemplateElement[],
   },
+  type: string,
 };
 
 export type BabelIdentifier = {
   name: string,
+  type: string,
 };
 
 export type BabelMemberExpression = {
   object: BabelIdentifier,
   property: BabelIdentifier,
+  type: string,
 };
 
 export type BabelCallExpression = {
   callee: BabelIdentifier,
   arguments: BabelStringLiteral[] | BabelIdentifier[],
+  type: string,
 };
 
 export type BabelVariableDeclarator = {
   id: BabelIdentifier | Object,
-  init: BabelCallExpression | Object,
+  init: BabelCallExpression | BabelTaggedTemplateExpression | Object,
+  type: string,
 };
 
 export type BabelVariableDeclaration = {
   declarations: BabelVariableDeclarator[],
   kind: 'var' | 'let' | 'const',
+  type: string,
 };
 
 export type BabelStringLiteral = {
   value: string,
+  type: string,
 };
 
 export type BabelIsTypeFunction<T> = (value: T | Object) => boolean;

@@ -59,7 +59,6 @@ export default ({ types: t }: { types: BabelTypes }) => ({
     Program(path: NodePath<*>, state: State) {
       state.filename = state.file.opts.filename;
       state.imports = [];
-      // console.log(path.node.body);
     },
     ImportDeclaration(path: NodePath<*>, state: State) {
       // @TODO
@@ -92,7 +91,9 @@ export default ({ types: t }: { types: BabelTypes }) => ({
       path.node.declarations.forEach((decl: BabelVariableDeclarator) => {
         if (
           t.isCallExpression(decl.init) &&
+          // $FlowFixMe decl is explicitly check for being a call expession
           decl.init.callee.name === 'require' &&
+          // $FlowFixMe decl is explicitly check for being a call expession
           decl.init.arguments.length &&
           typeof decl.init.arguments[0].value === 'string'
         ) {
@@ -105,7 +106,9 @@ export default ({ types: t }: { types: BabelTypes }) => ({
           });
         } else if (
           t.isCallExpression(decl.init) &&
+          // $FlowFixMe decl is explicitly check for being a call expession
           decl.init.callee.name === '_interopRequireDefault' &&
+          // $FlowFixMe decl is explicitly check for being a call expession
           decl.init.arguments.length &&
           typeof decl.init.arguments[0].name === 'string'
         ) {
@@ -128,8 +131,6 @@ export default ({ types: t }: { types: BabelTypes }) => ({
         path.node.init.tag &&
         path.node.init.tag.name === 'css'
       ) {
-        // console.log(state.imports);
-
         // @TODO: resolve from variable
         const taggedTemplateExpression: BabelTaggedTemplateExpression = resolveExpressions(
           path.node.init,
