@@ -5,15 +5,17 @@ import sheet from './sheet';
 
 const all = sheet();
 
-const named = (id?: string) => (
-  template: Array<string>,
-  ...expressions: Array<string>
+const named = (id?: string, createSlug?: boolean = false) => (
+  template: string[],
+  ...expressions: string[]
 ) => {
   const styles = template.reduce(
     (accumulator, part, i) => accumulator + expressions[i - 1] + part
   );
 
-  const slug = id || slugify(styles);
+  const slug = `${id || slugify(styles)}${createSlug && id
+    ? `_${slugify(styles)}`
+    : ''}`;
   const selector = `.${slug}`;
 
   all.insert(selector, styles);
@@ -23,6 +25,7 @@ const named = (id?: string) => (
 
 const css = named();
 
+css.title = id => named(id, true);
 css.named = named;
 
 export default css;

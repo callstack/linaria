@@ -22,6 +22,9 @@
   },
   "dependencies": {
     "babel-core": "^6.24.1",
+    "babel-plugin-preval": "^1.4.2",
+    "clone": "^2.1.1",
+    "color": "^2.0.0",
     "require-from-string": "^1.2.1",
     "short-hash": "^1.0.0",
     "stylis": "^2.0.12"

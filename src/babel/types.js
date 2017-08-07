@@ -5,6 +5,11 @@ export type NodePath<K> = {
   parent: Object,
   parentPath: NodePath<*>,
   traverse: (visitor: { [key: string]: Function }) => void,
+  findParent: ((path: NodePath<*>) => boolean) => NodePath<*>,
+  isProgram: () => boolean,
+  isReferenced: () => boolean,
+  getSource: () => string,
+  isVariableDeclarator: () => boolean,
 };
 
 export type BabelObjectExpression = {
@@ -25,7 +30,7 @@ export type BabelTaggedTemplateElement = {
 };
 
 export type BabelTaggedTemplateExpression = {
-  tag: BabelIdentifier | BabelCallExpression | Object,
+  tag: BabelIdentifier | BabelCallExpression,
   quasi: {
     expressions: Object[],
     quasis: BabelTaggedTemplateElement[],
@@ -97,10 +102,7 @@ export type ImportStatement = {
 };
 
 export type State = {
-  imports: ImportStatement[],
-  constants: {
-    [key: string]: ?() => Object,
-  },
+  requirements: string[],
   filename: string,
   file: Object,
 };

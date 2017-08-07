@@ -1,8 +1,7 @@
 /* @flow */
 
-import type { BabelTaggedTemplateExpression, State } from './types';
+// import sheet from '../sheet';
 
-export default function extractStyles(
-  taggedTemplateExpression: BabelTaggedTemplateExpression,
-  state: State
-) {}
+export default function extractStyles() {
+  // @TODO
+}
