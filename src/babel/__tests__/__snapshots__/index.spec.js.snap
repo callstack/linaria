@@ -1,135 +1,51 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`babel plugin should generate hash and inject it into \`css.named\` call for multiline fixture 1`] = `
-"\\"use strict\\";
-
-var _templateObject = _taggedTemplateLiteral([\\"\\\\n  font-size: 3em;\\\\n  color: red;\\\\n  border: 1px solid #000;\\\\n\\"], [\\"\\\\n  font-size: 3em;\\\\n  color: red;\\\\n  border: 1px solid #000;\\\\n\\"]);
-
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-
-var header = css.named(\\"header_b25fc411\\")(_templateObject);"
+exports[`babel plugin should create classname for \`css\` tagged template literal 1`] = `
+"
+font-size: 3em;
+"
 `;
 
-exports[`babel plugin should generate hash and inject it into \`css.named\` call for multiline fixture 2`] = `
-"\\"use strict\\";
-
-var _templateObject = _taggedTemplateLiteral([\\"\\\\n  font-size: 3em;\\\\n  color: red;\\\\n  border: 1px solid #000;\\\\n\\"], [\\"\\\\n  font-size: 3em;\\\\n  color: red;\\\\n  border: 1px solid #000;\\\\n\\"]);
-
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-
-var header = css.named(\\"header_b25fc411\\")(_templateObject);"
+exports[`babel plugin should create classnames for multiple \`css\` tagged template literal 1`] = `
+"
+font-size: 3em;
+"
 `;
 
-exports[`babel plugin should generate hash and inject it into \`css.named\` call for simple fixture 1`] = `
-"\\"use strict\\";
-
-var _templateObject = _taggedTemplateLiteral([\\"\\\\n  font-size: 3em;\\\\n\\"], [\\"\\\\n  font-size: 3em;\\\\n\\"]);
-
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-
-var header = css.named(\\"header_df78b444\\")(_templateObject);"
-`;
-
-exports[`babel plugin should generate hash and inject it into \`css.named\` call for simple fixture 2`] = `
-"\\"use strict\\";
-
-var _templateObject = _taggedTemplateLiteral([\\"\\\\n  font-size: 3em;\\\\n\\"], [\\"\\\\n  font-size: 3em;\\\\n\\"]);
-
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-
-var header = css.named(\\"header_df78b444\\")(_templateObject);"
+exports[`babel plugin should create classnames for multiple \`css\` tagged template literal 2`] = `
+"
+border-radius: 4px;
+"
 `;
 
 exports[`babel plugin should not process tagged template if tag is not \`css\` 1`] = `
-"\\"use strict\\";
-
-var header = \\"\\\\n  font-size: 3em;\\\\n\\";"
-`;
-
-exports[`babel plugin should resolve expressions and generate hash (CommonJS) 1`] = `
 "'use strict';
 
-var _templateObject = _taggedTemplateLiteral(['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n'], ['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n']);
+var _css = require('./build/css');
 
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-
-var constants = require('./src/babel/__tests__/__fixtures__/constants.cjs.js');
-
-var header = css.named('header_a6d91e89')(_templateObject);"
-`;
-
-exports[`babel plugin should resolve expressions and generate hash (ESM) 1`] = `
-"'use strict';
-
-var _templateObject = _taggedTemplateLiteral(['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n'], ['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n']);
-
-var _constantsEsm = require('./src/babel/__tests__/__fixtures__/constants.esm.js');
-
-var _constantsEsm2 = _interopRequireDefault(_constantsEsm);
+var _css2 = _interopRequireDefault(_css);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+var header = '\\\\nfont-size: 3em;\\\\n';
 
-var header = css.named('header_a6d91e89')(_templateObject);"
+"
 `;
 
-exports[`babel plugin should resolve expressions from an object with constants 1`] = `
-"'use strict';
-
-var _templateObject = _taggedTemplateLiteral(['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n'], ['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n']);
-
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-
-var constants = { fontSize: '14px', color: 'black' };
-
-var header = css.named('header_a6d91e89')(_templateObject);"
+exports[`babel plugin with commonjs imports should preval imported constants  1`] = `
+"
+font-size: 14px;
+"
 `;
 
-exports[`babel plugin should resolve expressions from an object with constants with advanced destructurization 1`] = `
-"'use strict';
-
-var _templateObject = _taggedTemplateLiteral(['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n'], ['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n']);
-
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-
-var _color = { color: 'black' },
-    _color$fontSize = _color.fontSize,
-    fontSize = _color$fontSize === undefined ? '14px' : _color$fontSize,
-    fontColor = _color.color;
-
-
-var header = css.named('header_a6d91e89')(_templateObject);"
+exports[`babel plugin with plain objects should preval styles with nested object 1`] = `
+"
+font-size: 3em;
+"
 `;
 
-exports[`babel plugin should resolve expressions from an object with constants with destructurization 1`] = `
-"'use strict';
-
-var _templateObject = _taggedTemplateLiteral(['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n'], ['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n']);
-
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-
-var _fontSize$color = { fontSize: '14px', color: 'black' },
-    fontSize = _fontSize$color.fontSize,
-    color = _fontSize$color.color;
-
-
-var header = css.named('header_a6d91e89')(_templateObject);"
-`;
-
-exports[`babel plugin should resolve multiple expressions 1`] = `
-"'use strict';
-
-var _templateObject = _taggedTemplateLiteral(['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n  background-color: black;\\\\n  font-weight: bold;\\\\n'], ['\\\\n  font-size: 14px;\\\\n  color: black;\\\\n  background-color: black;\\\\n  font-weight: bold;\\\\n']);
-
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-
-var constants = {
-  color: 'black',
-  fontSize: '14px',
-  backgroundColor: 'black',
-  fontWeight: 'bold'
-};
-
-var header = css.named('header_2add690b')(_templateObject);"
+exports[`babel plugin with plain objects should preval styles with shallow object 1`] = `
+"
+font-size: 3em;
+"
 `;
