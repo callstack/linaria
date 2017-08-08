@@ -27,7 +27,7 @@ border-radius: 4px;
 exports[`babel plugin should not process tagged template if tag is not \`css\` 1`] = `
 "'use strict';
 
-var _css = require('./build/css');
+var _css = require('./src/css');
 
 var _css2 = _interopRequireDefault(_css);
 

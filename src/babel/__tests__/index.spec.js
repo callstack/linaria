@@ -7,14 +7,14 @@ import dedent from 'dedent';
 function transpile(source) {
   const { code } = babel.transform(
     dedent`
-      import css from './build/css';
+      import css from './src/css';
 
       ${source}
 
       /* results */
       const results = preval\`
-        import { getCache } from './build/css';
-        module.exports = getCache();
+        import sheet from './src/sheet';
+        module.exports = sheet.styles();
       \`;
     `,
     {
@@ -68,9 +68,9 @@ describe('babel plugin', () => {
 
     const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
-    const { styles } = filterResults(results, match);
-    expect(styles).toMatch('font-size: 3em');
-    expect(styles).toMatchSnapshot();
+    const { css } = filterResults(results, match);
+    expect(css).toMatch('font-size: 3em');
+    expect(css).toMatchSnapshot();
   });
 
   it('should create classnames for multiple `css` tagged template literal', () => {
@@ -88,8 +88,8 @@ describe('babel plugin', () => {
     const bodyMatch = /body = "(body_[a-z0-9]+)"/g.exec(code);
     expect(headerMatch).not.toBeNull();
     expect(bodyMatch).not.toBeNull();
-    const { styles: headerStyles } = filterResults(results, headerMatch);
-    const { styles: bodyStyles } = filterResults(results, bodyMatch);
+    const { css: headerStyles } = filterResults(results, headerMatch);
+    const { css: bodyStyles } = filterResults(results, bodyMatch);
     expect(headerStyles).toMatch('font-size: 3em');
     expect(headerStyles).toMatchSnapshot();
     expect(bodyStyles).toMatch('border-radius: 4px');
@@ -111,9 +111,9 @@ describe('babel plugin', () => {
 
     const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
-    const { styles } = filterResults(results, match);
-    expect(styles).toMatch('font-size: 3em');
-    expect(styles).toMatchSnapshot();
+    const { css } = filterResults(results, match);
+    expect(css).toMatch('font-size: 3em');
+    expect(css).toMatchSnapshot();
   });
 
   describe('with plain objects', () => {
@@ -130,9 +130,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 3em');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 3em');
+      expect(css).toMatchSnapshot();
     });
 
     it('should preval styles with nested object', () => {
@@ -154,9 +154,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 3em');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 3em');
+      expect(css).toMatchSnapshot();
     });
 
     it('should preval styles with shallowly destructurized object', () => {
@@ -176,9 +176,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 3em');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 3em');
+      expect(css).toMatchSnapshot();
     });
 
     it('should preval styles with deeply destructurized object', () => {
@@ -198,9 +198,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 3em');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 3em');
+      expect(css).toMatchSnapshot();
     });
 
     it('should preval styles with deeply destructurized object and aliases', () => {
@@ -220,9 +220,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 3em');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 3em');
+      expect(css).toMatchSnapshot();
     });
 
     it('should preval styles with deeply destructurized object, aliases and defaults', () => {
@@ -240,9 +240,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 3em');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 3em');
+      expect(css).toMatchSnapshot();
     });
   });
 
@@ -258,9 +258,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 14px');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 14px');
+      expect(css).toMatchSnapshot();
     });
 
     it('should preval imported constants with destructurization', () => {
@@ -274,9 +274,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 14px');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 14px');
+      expect(css).toMatchSnapshot();
     });
   });
 
@@ -292,9 +292,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 14px');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 14px');
+      expect(css).toMatchSnapshot();
     });
 
     it('should preval named imports', () => {
@@ -314,8 +314,8 @@ describe('babel plugin', () => {
       const bodyMatch = /body = "(body_[a-z0-9]+)"/g.exec(code);
       expect(headerMatch).not.toBeNull();
       expect(bodyMatch).not.toBeNull();
-      const { styles: headerStyles } = filterResults(results, headerMatch);
-      const { styles: bodyStyles } = filterResults(results, bodyMatch);
+      const { css: headerStyles } = filterResults(results, headerMatch);
+      const { css: bodyStyles } = filterResults(results, bodyMatch);
       expect(headerStyles).toMatch('font-size: 36px');
       expect(headerStyles).toMatchSnapshot();
       expect(bodyStyles).toMatch('font-size: 24px');
@@ -333,9 +333,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 28px');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 28px');
+      expect(css).toMatchSnapshot();
     });
   });
 
@@ -355,9 +355,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 14px');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 14px');
+      expect(css).toMatchSnapshot();
     });
 
     it('should preval with function expression', () => {
@@ -375,9 +375,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 14px');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 14px');
+      expect(css).toMatchSnapshot();
     });
 
     it('should preval with arrow function', () => {
@@ -393,9 +393,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 14px');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 14px');
+      expect(css).toMatchSnapshot();
     });
 
     it('should preval function with external ids', () => {
@@ -410,9 +410,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 14px');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 14px');
+      expect(css).toMatchSnapshot();
     });
   });
 
@@ -429,9 +429,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 28px');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 28px');
+      expect(css).toMatchSnapshot();
     });
 
     it('should preval multiple function calls inside an expression', () => {
@@ -452,9 +452,9 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { styles } = filterResults(results, match);
-      expect(styles).toMatch('font-size: 33px');
-      expect(styles).toMatchSnapshot();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 33px');
+      expect(css).toMatchSnapshot();
     });
   });
 });
