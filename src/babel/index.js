@@ -22,7 +22,6 @@ function ensureTagIsAssignedToAVariable(
   path: NodePath<BabelTaggedTemplateExpression>
 ) {
   const parent = path.parentPath;
-  debugger;
   if (!parent.isVariableDeclarator()) {
     throw new Error(
       "Linaria's template literals must be assigned to a variable"
@@ -34,7 +33,7 @@ const requirementsVisitor = {
   Identifier(path) {
     if (path.isReferenced() && !isExcluded(path)) {
       const source: ?string = resolveSource(path);
-      if (source) {
+      if (source && !this.requirements.find(item => item === source)) {
         this.requirements.push(source);
       }
     }
@@ -46,23 +45,20 @@ export default ({ types: t }: { types: BabelTypes }) => ({
     Program: {
       enter(path: NodePath<*>, state: State) {
         state.filename = state.file.opts.filename;
-        state.requirements = [];
       },
       exit() {
         extractStyles();
       },
     },
-    TaggedTemplateExpression(
-      path: NodePath<BabelTaggedTemplateExpression>,
-      state: State
-    ) {
+    TaggedTemplateExpression(path: NodePath<BabelTaggedTemplateExpression>) {
       if (isLinariaTaggedTemplate(path)) {
         ensureTagIsAssignedToAVariable(path);
         const programPath = path.findParent(item => item.isProgram());
+        const requirements = [];
         programPath.traverse(requirementsVisitor, {
-          requirements: state.requirements,
+          requirements,
         });
-        buildPrevaltemplate(t, path, state.requirements.join('\n'));
+        buildPrevaltemplate(t, path, requirements.join('\n'));
       }
     },
   },

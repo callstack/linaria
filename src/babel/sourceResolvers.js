@@ -12,6 +12,8 @@ export function resolveSource(path): ?string {
   switch (binding.kind) {
     case 'module':
     case 'const':
+    case 'let':
+    case 'var':
       return binding.path.parentPath.getSource();
     default:
       return binding.path.getSource();
