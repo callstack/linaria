@@ -1,0 +1,26 @@
+{
+  "name": "linaria-example",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Example project for linaria",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "webpack -p --env.NODE_ENV production",
+    "prebuild": "yarn run clean",
+    "clean": "del dist"
+  },
+  "dependencies": {
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4"
+  },
+  "devDependencies": {
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "del-cli": "^1.0.0",
+    "webpack": "^2.6.1",
+    "webpack-dev-server": "^2.4.5"
+  }
+}
