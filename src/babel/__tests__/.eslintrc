@@ -1,7 +1,4 @@
 {
-  "env": {
-    "jest": true
-  },
   "rules": {
     "import/imports-first": "off"
   }
