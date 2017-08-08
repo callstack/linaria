@@ -3,8 +3,6 @@
 import slugify from './slugify';
 import sheet from './sheet';
 
-const all = sheet();
-
 const named = (id?: string) => (
   template: Array<string>,
   ...expressions: Array<string>
@@ -16,7 +14,7 @@ const named = (id?: string) => (
   const slug = id || `css-${slugify(styles)}`;
   const selector = `.${slug}`;
 
-  all.insert(selector, styles);
+  sheet.append(selector, styles);
 
   return slug;
 };
