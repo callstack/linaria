@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { css, compose } from 'linaria';
+import colors from './colors';
 
 const container = css`
   height: 100%;
@@ -10,7 +11,7 @@ const container = css`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: salmon;
+  background-image: linear-gradient(135deg, ${colors.accent} 0%, ${colors.primary} 100%);
   color: white;
   font-family: sans-serif;
 `;
@@ -21,12 +22,8 @@ const title = css`
   margin: 0;
 `;
 
-const text = css`
-  font-size: 1.2rem;
-  font-weight: 300;
-`;
-
 const button = css`
+  font-size: 1rem;
   color: inherit;
   text-decoration: none;
   border-radius: 3px;
@@ -34,11 +31,17 @@ const button = css`
   background-color: transparent;
   margin: 1rem;
   padding: .5rem 1rem;
+  transition: 200ms ease-in;
 
   &:hover {
     background-color: white;
-    color: salmon;
+    color: ${colors.primary};
   }
+`;
+
+const text = css`
+  font-size: 1.2rem;
+  font-weight: 300;
 `;
 
 export default function App() {
@@ -50,7 +53,7 @@ export default function App() {
       </p>
       <a
         href="https://github.com/callstack-io/linaria"
-        className={compose(button, text)}
+        className={compose(text, button)}
       >
         Learn more
       </a>

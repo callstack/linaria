@@ -2,14 +2,35 @@
 
 import stylis from 'stylis';
 
-export default function sheet() {
+function sheet() {
+  let ruleCache: ?Array<CSSRule>;
+  let cssText: ?string;
+  let stylesCache: ?Array<{ selector: string, css: string }>;
+
   if (typeof window === 'undefined' || typeof window.document === 'undefined') {
-    // noop in non-browser environment
-    return { insert: () => {} };
+    return {
+      append(selector: string, css: string) {
+        stylesCache = stylesCache || [];
+        stylesCache.push({ selector, css });
+        this.insert(stylis(selector, css));
+      },
+      insert: (text: string) => {
+        cssText = cssText ? cssText + text : text;
+      },
+      rules: () => {
+        throw new Error('Not implemented');
+      },
+      styles: () => stylesCache || [],
+      dump: () => {
+        let result = cssText || '';
+        cssText = null;
+        return result;
+      },
+    };
   }
 
   const style = document.createElement('style');
-  style.appendChild(document.createTextNode(''));
+  const node = style.appendChild(document.createTextNode(''));
   style.setAttribute('type', 'text/css');
 
   if (document.head != null) {
@@ -19,18 +40,25 @@ export default function sheet() {
   }
 
   return {
-    insert: (selector: string, styles: string) => {
-      const rules = stylis(selector, styles);
-
-      if (
-        style.sheet &&
-        typeof style.sheet.insertRule === 'function' &&
-        Array.isArray(style.sheet.rules)
-      ) {
-        style.sheet.insertRule(rules, style.sheet.rules.length);
-      } else {
-        style.appendChild(document.createTextNode(rules));
+    append(selector: string, css: string) {
+      this.insert(stylis(selector, css));
+    },
+    insert: (text: string) => {
+      node.appendData(text);
+      // invalidate the cache since stylesheets have changed
+      ruleCache = null;
+    },
+    rules: () => {
+      if (ruleCache != null) {
+        return ruleCache;
       }
+
+      return (ruleCache = [].concat(
+        /* $FlowFixMe */
+        ...Array.from(document.styleSheets).map(s => Array.from(s.cssRules))
+      ));
     },
   };
 }
+
+export default sheet();
