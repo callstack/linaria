@@ -53,11 +53,13 @@ export default ({ types: t }: { types: BabelTypes }) => ({
     TaggedTemplateExpression(path: NodePath<BabelTaggedTemplateExpression>) {
       if (isLinariaTaggedTemplate(path)) {
         ensureTagIsAssignedToAVariable(path);
+
         const programPath = path.findParent(item => item.isProgram());
         const requirements = [];
         programPath.traverse(requirementsVisitor, {
           requirements,
         });
+
         buildPrevaltemplate(t, path, requirements.join('\n'));
       }
     },

@@ -11,10 +11,13 @@ export function resolveSource(path): ?string {
 
   switch (binding.kind) {
     case 'module':
+      return binding.path.parentPath.getSource();
     case 'const':
     case 'let':
     case 'var':
-      return binding.path.parentPath.getSource();
+      return binding.path.getSource().length === 0
+        ? null
+        : `${binding.kind} ${binding.path.getSource()}`;
     default:
       return binding.path.getSource();
   }
