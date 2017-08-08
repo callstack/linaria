@@ -96,6 +96,26 @@ describe('babel plugin', () => {
     expect(bodyStyles).toMatchSnapshot();
   });
 
+  it('should create classname for non-top-level `css` tagged template literal', () => {
+    const { code, results } = transpile(dedent`
+    const defaults = {
+      fontSize: '3em',
+    };
+
+    function render() {
+      const header = css\`
+        font-size: ${'${defaults.fontSize}'};
+      \`;
+    }
+    `);
+
+    const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+    expect(match).not.toBeNull();
+    const { styles } = filterResults(results, match);
+    expect(styles).toMatch('font-size: 3em');
+    expect(styles).toMatchSnapshot();
+  });
+
   describe('with plain objects', () => {
     it('should preval styles with shallow object', () => {
       const { code, results } = transpile(dedent`
@@ -365,6 +385,23 @@ describe('babel plugin', () => {
       const getConstants = () => ({
         fontSize: '14px',
       });
+
+      const header = css\`
+        font-size: ${'${getConstants().fontSize}'};
+      \`;
+      `);
+
+      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      expect(match).not.toBeNull();
+      const { styles } = filterResults(results, match);
+      expect(styles).toMatch('font-size: 14px');
+      expect(styles).toMatchSnapshot();
+    });
+
+    it('should preval function with external ids', () => {
+      const { code, results } = transpile(dedent`
+      const defaults = { fontSize: '14px' };
+      const getConstants = () => Object.assign({}, defaults);
 
       const header = css\`
         font-size: ${'${getConstants().fontSize}'};

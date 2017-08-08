@@ -6,6 +6,12 @@ font-size: 3em;
 "
 `;
 
+exports[`babel plugin should create classname for non-top-level \`css\` tagged template literal 1`] = `
+"
+  font-size: 3em;
+"
+`;
+
 exports[`babel plugin should create classnames for multiple \`css\` tagged template literal 1`] = `
 "
 font-size: 3em;
@@ -77,6 +83,12 @@ font-size: 33px;
 exports[`babel plugin with function calls should preval with function call inside an expression 1`] = `
 "
 font-size: 28px;
+"
+`;
+
+exports[`babel plugin with function delcarations/expressions should preval function with external ids 1`] = `
+"
+font-size: 14px;
 "
 `;
 
