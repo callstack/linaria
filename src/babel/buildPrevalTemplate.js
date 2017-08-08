@@ -26,6 +26,8 @@ export default function(
   const titile = path.parent.id.name;
 
   const replacement = `
+  require('babel-register')();
+  require('babel-polyfill');
   ${requirements}
   module.exports = ${path.getSource().replace('css', `css.title('${titile}')`)};
   `;

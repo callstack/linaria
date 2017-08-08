@@ -32,6 +32,12 @@ var header = '\\\\nfont-size: 3em;\\\\n';
 "
 `;
 
+exports[`babel plugin with commonjs imports should preval default export 1`] = `
+"
+font-size: 14px;
+"
+`;
+
 exports[`babel plugin with commonjs imports should preval imported constants  1`] = `
 "
 font-size: 14px;
@@ -41,6 +47,24 @@ font-size: 14px;
 exports[`babel plugin with commonjs imports should preval imported constants with destructurization 1`] = `
 "
 font-size: 14px;
+"
+`;
+
+exports[`babel plugin with commonjs imports should preval imported module tree with constants 1`] = `
+"
+font-size: 28px;
+"
+`;
+
+exports[`babel plugin with commonjs imports should preval named imports 1`] = `
+"
+font-size: 36px;
+"
+`;
+
+exports[`babel plugin with commonjs imports should preval named imports 2`] = `
+"
+font-size: 24px;
 "
 `;
 

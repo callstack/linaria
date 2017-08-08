@@ -260,6 +260,65 @@ describe('babel plugin', () => {
     });
   });
 
+  describe('with commonjs imports', () => {
+    it('should preval default export', () => {
+      const { code, results } = transpile(dedent`
+      import constants from './src/babel/__tests__/__fixtures__/esm/constants.js';
+
+      const header = css\`
+        font-size: ${'${constants.fontSize}'};
+      \`;
+      `);
+
+      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      expect(match).not.toBeNull();
+      const { styles } = filterResults(results, match);
+      expect(styles).toMatch('font-size: 14px');
+      expect(styles).toMatchSnapshot();
+    });
+
+    it('should preval named imports', () => {
+      const { code, results } = transpile(dedent`
+      import { base, primary } from './src/babel/__tests__/__fixtures__/esm/named.js';
+
+      const header = css\`
+        font-size: ${'${primary.fontSize}'};
+      \`;
+
+      const body = css\`
+        font-size: ${'${base.fontSize}'};
+      \`;
+      `);
+
+      const headerMatch = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const bodyMatch = /body = "(body_[a-z0-9]+)"/g.exec(code);
+      expect(headerMatch).not.toBeNull();
+      expect(bodyMatch).not.toBeNull();
+      const { styles: headerStyles } = filterResults(results, headerMatch);
+      const { styles: bodyStyles } = filterResults(results, bodyMatch);
+      expect(headerStyles).toMatch('font-size: 36px');
+      expect(headerStyles).toMatchSnapshot();
+      expect(bodyStyles).toMatch('font-size: 24px');
+      expect(bodyStyles).toMatchSnapshot();
+    });
+
+    it('should preval imported module tree with constants', () => {
+      const { code, results } = transpile(dedent`
+      import constants from './src/babel/__tests__/__fixtures__/esm/deep.js';
+
+      const header = css\`
+        font-size: ${'${constants.fontSize}'};
+      \`;
+      `);
+
+      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      expect(match).not.toBeNull();
+      const { styles } = filterResults(results, match);
+      expect(styles).toMatch('font-size: 28px');
+      expect(styles).toMatchSnapshot();
+    });
+  });
+
   describe('with function delcarations/expressions', () => {
     it('should preval with function declaration', () => {
       const { code, results } = transpile(dedent`
