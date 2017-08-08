@@ -13,7 +13,9 @@ function transpile(source) {
 
       /* results */
       const results = preval\`
-        import sheet from './src/sheet';
+        require('babel-register');
+        require('babel-polyfill');
+        const sheet = require('./src/sheet').default;
         module.exports = sheet.styles();
       \`;
     `,
