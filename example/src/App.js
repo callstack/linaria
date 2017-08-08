@@ -48,9 +48,7 @@ export default function App() {
   return (
     <div className={container}>
       <h1 className={title}>Linaria</h1>
-      <p className={text}>
-        Fast zero-runtime CSS in JS library
-      </p>
+      <p className={text}>Fast zero-runtime CSS in JS library</p>
       <a
         href="https://github.com/callstack-io/linaria"
         className={compose(text, button)}
