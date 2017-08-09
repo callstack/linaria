@@ -2,6 +2,7 @@
 <PROJECT_ROOT>/build/.*
 
 [include]
+flow-typed/
 
 [libs]
 

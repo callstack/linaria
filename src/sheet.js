@@ -22,7 +22,7 @@ function sheet() {
       },
       styles: () => stylesCache || [],
       dump: () => {
-        let result = cssText || '';
+        const result = cssText || '';
         cssText = null;
         return result;
       },
@@ -53,6 +53,7 @@ function sheet() {
         return ruleCache;
       }
 
+      /* eslint-disable no-return-assign */
       return (ruleCache = [].concat(
         /* $FlowFixMe */
         ...Array.from(document.styleSheets).map(s => Array.from(s.cssRules))
