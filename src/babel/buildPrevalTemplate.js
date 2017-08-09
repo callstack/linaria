@@ -4,6 +4,8 @@ import type {
   BabelTypes,
   NodePath,
   BabelTaggedTemplateExpression,
+  BabelIdentifier,
+  BabelCallExpression,
 } from './types';
 
 /**
@@ -20,7 +22,9 @@ import type {
 
 export default function(
   t: BabelTypes,
-  path: NodePath<BabelTaggedTemplateExpression>,
+  path: NodePath<
+    BabelTaggedTemplateExpression<BabelIdentifier | BabelCallExpression>
+  >,
   requirements: string
 ) {
   const titile = path.parent.id.name;
@@ -29,7 +33,9 @@ export default function(
   require('babel-register')();
   require('babel-polyfill');
   ${requirements}
-  module.exports = ${path.getSource().replace('css', `css.named('${titile}')`)};
+  module.exports = ${path
+    .getSource()
+    .replace(/css(?!\.named)/g, `css.named('${titile}')`)};
   `;
 
   /* $FlowFixMe */

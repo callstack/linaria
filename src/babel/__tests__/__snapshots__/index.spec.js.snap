@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`babel plugin should create classname for \`css.named()\` tagged template literal 1`] = `
+"
+font-size: 3em;
+"
+`;
+
 exports[`babel plugin should create classname for \`css\` tagged template literal 1`] = `
 "
 font-size: 3em;

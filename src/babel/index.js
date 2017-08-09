@@ -12,14 +12,32 @@ import { isExcluded, resolveSource } from './sourceResolvers';
 import extractStyles from './extractStyles';
 
 function isLinariaTaggedTemplate(
-  path: NodePath<BabelTaggedTemplateExpression>
+  types: BabelTypes,
+  path: NodePath<BabelTaggedTemplateExpression<any>>
 ): boolean {
-  // $FlowFixMe
-  return path.node.tag && path.node.tag.name === 'css';
+  if (
+    (types.isIdentifier(path.node.tag) && path.node.tag.name === 'css') ||
+    (types.isCallExpression(path.node.tag) &&
+      types.isMemberExpression(path.node.tag.callee) &&
+      path.node.tag.callee.object.name === 'css' &&
+      path.node.tag.callee.property.name === 'named')
+  ) {
+    return true;
+  }
+
+  if (
+    types.isMemberExpression(path.node.tag) &&
+    path.node.tag.object.name === 'css' &&
+    path.node.tag.property.name === 'named'
+  ) {
+    throw new Error("Linaria's `css.named` must be called with a classname");
+  }
+
+  return false;
 }
 
 function ensureTagIsAssignedToAVariable(
-  path: NodePath<BabelTaggedTemplateExpression>
+  path: NodePath<BabelTaggedTemplateExpression<any>>
 ) {
   const parent = path.parentPath;
   if (!parent.isVariableDeclarator()) {
@@ -40,7 +58,7 @@ const requirementsVisitor = {
   },
 };
 
-export default ({ types: t }: { types: BabelTypes }) => ({
+export default ({ types }: { types: BabelTypes }) => ({
   visitor: {
     Program: {
       enter(path: NodePath<*>, state: State) {
@@ -50,8 +68,10 @@ export default ({ types: t }: { types: BabelTypes }) => ({
         extractStyles();
       },
     },
-    TaggedTemplateExpression(path: NodePath<BabelTaggedTemplateExpression>) {
-      if (isLinariaTaggedTemplate(path)) {
+    TaggedTemplateExpression(
+      path: NodePath<BabelTaggedTemplateExpression<any>>
+    ) {
+      if (isLinariaTaggedTemplate(types, path)) {
         ensureTagIsAssignedToAVariable(path);
 
         const programPath = path.findParent(item => item.isProgram());
@@ -60,7 +80,7 @@ export default ({ types: t }: { types: BabelTypes }) => ({
           requirements,
         });
 
-        buildPrevaltemplate(t, path, requirements.join('\n'));
+        buildPrevaltemplate(types, path, requirements.join('\n'));
       }
     },
   },
