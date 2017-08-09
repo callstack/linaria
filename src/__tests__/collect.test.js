@@ -1,10 +1,10 @@
 /* @flow */
 
-import collect from '../collect';
 import dedent from 'dedent';
+import collect from '../collect';
 
 const testCollect = (html, css) => {
-  const {critical, other} = collect(html, css);
+  const { critical, other } = collect(html, css);
   test('critical', () => expect(critical).toMatchSnapshot());
   test('other', () => expect(other).toMatchSnapshot());
 };

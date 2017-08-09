@@ -68,10 +68,11 @@ const collect = (html: string, css: string): CollectResult => {
 const extractClassesFromHtml = (html: string): RegExp => {
   const htmlClasses = [];
   const regex = /\s+class="(.*)"/gm;
-  let match;
+  let match = regex.exec(html);
 
-  while ((match = regex.exec(html)) !== null) {
+  while (match !== null) {
     match[1].split(' ').forEach(className => htmlClasses.push(className));
+    match = regex.exec(html);
   }
 
   return new RegExp(htmlClasses.join('|'), 'gm');
