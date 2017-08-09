@@ -56,7 +56,6 @@ export default ({ types: t }: { types: BabelTypes }) => ({
 
         const programPath = path.findParent(item => item.isProgram());
         const requirements = [];
-        /* $FlowFixMe */
         programPath.traverse(requirementsVisitor, {
           requirements,
         });

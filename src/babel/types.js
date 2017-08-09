@@ -4,7 +4,7 @@ export type NodePath<K> = {
   node: K,
   parent: Object,
   parentPath: NodePath<*>,
-  traverse: (visitor: { [key: string]: Function }) => void,
+  traverse: (visitor: { [key: string]: Function }, thisArgs?: any) => void,
   findParent: ((path: NodePath<*>) => boolean) => NodePath<*>,
   isProgram: () => boolean,
   isReferenced: () => boolean,
