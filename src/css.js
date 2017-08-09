@@ -4,19 +4,19 @@ import slugify from './slugify';
 import sheet from './sheet';
 
 const named = (id?: string) => (
-  template: Array<string>,
-  ...expressions: Array<string>
+  template: string[],
+  ...expressions: string[]
 ) => {
   const styles = template.reduce(
     (accumulator, part, i) => accumulator + expressions[i - 1] + part
   );
 
-  const slug = id || `css-${slugify(styles)}`;
-  const selector = `.${slug}`;
+  const slug = slugify(styles);
+  const classname = id ? `${id}_${slug}` : slug;
 
-  sheet.append(selector, styles);
+  sheet.append(`.${classname}`, styles);
 
-  return slug;
+  return classname;
 };
 
 const css = named();

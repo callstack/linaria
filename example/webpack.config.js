@@ -10,13 +10,14 @@ const entry = ['./src/index.js'];
 
 module.exports = (env = { NODE_ENV: 'development' }) => ({
   devtool: 'source-map',
-  entry: env.NODE_ENV === 'production'
-    ? entry
-    : [
-        `webpack-dev-server/client?http://localhost:${PORT}`,
-        'webpack/hot/only-dev-server',
-        ...entry,
-      ],
+  entry:
+    env.NODE_ENV === 'production'
+      ? entry
+      : [
+          `webpack-dev-server/client?http://localhost:${PORT}`,
+          'webpack/hot/only-dev-server',
+          ...entry,
+        ],
   output: {
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/dist/',

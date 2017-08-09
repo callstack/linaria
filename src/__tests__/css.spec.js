@@ -1,0 +1,3 @@
+describe('css modules', () => {
+  it('', () => {});
+});

@@ -1,55 +1,66 @@
 /* @flow */
 
-import slugify from '../slugify';
+import type {
+  BabelTypes,
+  NodePath,
+  State,
+  BabelTaggedTemplateExpression,
+} from './types';
 
-type NodePath = {
-  node: Object,
-  parent: Object,
-  parentPath: NodePath,
-};
+import buildPrevaltemplate from './buildPrevalTemplate';
+import { isExcluded, resolveSource } from './sourceResolvers';
+import extractStyles from './extractStyles';
 
-type BabelTypes = {
-  isTaggedTemplateExpression: Function,
-  callExpression: Function,
-  memberExpression: Function,
-  identifier: Function,
-  stringLiteral: Function,
-};
+function isLinariaTaggedTemplate(
+  path: NodePath<BabelTaggedTemplateExpression>
+): boolean {
+  // $FlowFixMe
+  return path.node.tag && path.node.tag.name === 'css';
+}
 
-const computeClassName = (name: string, taggedTemplateExpr): string => {
-  const classString = taggedTemplateExpr.quasi.quasis
-    .reduce((acc: string, quasi): string => {
-      return acc.concat(quasi.value.cooked);
-    }, '')
-    .replace(/(^\s*|\s*$|\s{2,})/g, '');
-  return `${name}_${slugify(classString)}`;
+function ensureTagIsAssignedToAVariable(
+  path: NodePath<BabelTaggedTemplateExpression>
+) {
+  const parent = path.parentPath;
+  if (!parent.isVariableDeclarator()) {
+    throw new Error(
+      "Linaria's template literals must be assigned to a variable"
+    );
+  }
+}
+
+const requirementsVisitor = {
+  Identifier(path) {
+    if (path.isReferenced() && !isExcluded(path)) {
+      const source: ?string = resolveSource(path);
+      if (source && !this.requirements.find(item => item === source)) {
+        this.requirements.push(source);
+      }
+    }
+  },
 };
 
 export default ({ types: t }: { types: BabelTypes }) => ({
   visitor: {
-    VariableDeclarator(path: NodePath) {
-      if (
-        t.isTaggedTemplateExpression(path.node.init) &&
-        path.node.init.tag &&
-        path.node.init.tag.name === 'css'
-      ) {
-        const taggedTemplateExpression = path.node.init;
+    Program: {
+      enter(path: NodePath<*>, state: State) {
+        state.filename = state.file.opts.filename;
+      },
+      exit() {
+        extractStyles();
+      },
+    },
+    TaggedTemplateExpression(path: NodePath<BabelTaggedTemplateExpression>) {
+      if (isLinariaTaggedTemplate(path)) {
+        ensureTagIsAssignedToAVariable(path);
 
-        if (taggedTemplateExpression.quasi.expressions.length) {
-          throw new Error(
-            'No unresolved expressions in style tagged template literal allowed'
-          );
-        }
+        const programPath = path.findParent(item => item.isProgram());
+        const requirements = [];
+        programPath.traverse(requirementsVisitor, {
+          requirements,
+        });
 
-        const className = computeClassName(
-          path.node.id.name,
-          taggedTemplateExpression
-        );
-
-        taggedTemplateExpression.tag = t.callExpression(
-          t.memberExpression(t.identifier('css'), t.identifier('named')),
-          [t.stringLiteral(className)]
-        );
+        buildPrevaltemplate(t, path, requirements.join('\n'));
       }
     },
   },

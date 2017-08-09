@@ -1,33 +1,147 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`babel plugin should generate hash and inject it into \`css.named\` call for multiline fixture 1`] = `
+exports[`babel plugin should create classname for \`css\` tagged template literal 1`] = `
 "
-const header = css.named(\\"header_b25fc411\\")\`
-  font-size: 3em;
-  color: red;
-  border: 1px solid #000;
-\`;"
+font-size: 3em;
+"
 `;
 
-exports[`babel plugin should generate hash and inject it into \`css.named\` call for multiline fixture 2`] = `
+exports[`babel plugin should create classname for non-top-level \`css\` tagged template literal 1`] = `
 "
-const header = css.named(\\"header_b25fc411\\")\`
   font-size: 3em;
-  color: red;
-  border: 1px solid #000;
-\`;"
+"
 `;
 
-exports[`babel plugin should generate hash and inject it into \`css.named\` call for simple fixture 1`] = `
+exports[`babel plugin should create classnames for multiple \`css\` tagged template literal 1`] = `
 "
-const header = css.named(\\"header_df78b444\\")\`
-  font-size: 3em;
-\`;"
+font-size: 3em;
+"
 `;
 
-exports[`babel plugin should generate hash and inject it into \`css.named\` call for simple fixture 2`] = `
+exports[`babel plugin should create classnames for multiple \`css\` tagged template literal 2`] = `
 "
-const header = css.named(\\"header_df78b444\\")\`
-  font-size: 3em;
-\`;"
+border-radius: 4px;
+"
+`;
+
+exports[`babel plugin should not process tagged template if tag is not \`css\` 1`] = `
+"'use strict';
+
+var _css = require('./src/css');
+
+var _css2 = _interopRequireDefault(_css);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var header = '\\\\nfont-size: 3em;\\\\n';
+
+"
+`;
+
+exports[`babel plugin with commonjs imports should preval default export 1`] = `
+"
+font-size: 14px;
+"
+`;
+
+exports[`babel plugin with commonjs imports should preval imported constants  1`] = `
+"
+font-size: 14px;
+"
+`;
+
+exports[`babel plugin with commonjs imports should preval imported constants with destructurization 1`] = `
+"
+font-size: 14px;
+"
+`;
+
+exports[`babel plugin with commonjs imports should preval imported module tree with constants 1`] = `
+"
+font-size: 28px;
+"
+`;
+
+exports[`babel plugin with commonjs imports should preval named imports 1`] = `
+"
+font-size: 36px;
+"
+`;
+
+exports[`babel plugin with commonjs imports should preval named imports 2`] = `
+"
+font-size: 24px;
+"
+`;
+
+exports[`babel plugin with function calls should preval multiple function calls inside an expression 1`] = `
+"
+font-size: 33px;
+"
+`;
+
+exports[`babel plugin with function calls should preval with function call inside an expression 1`] = `
+"
+font-size: 28px;
+"
+`;
+
+exports[`babel plugin with function delcarations/expressions should preval function with external ids 1`] = `
+"
+font-size: 14px;
+"
+`;
+
+exports[`babel plugin with function delcarations/expressions should preval with arrow function 1`] = `
+"
+font-size: 14px;
+"
+`;
+
+exports[`babel plugin with function delcarations/expressions should preval with function declaration 1`] = `
+"
+font-size: 14px;
+"
+`;
+
+exports[`babel plugin with function delcarations/expressions should preval with function expression 1`] = `
+"
+font-size: 14px;
+"
+`;
+
+exports[`babel plugin with plain objects should preval styles with deeply destructurized object 1`] = `
+"
+font-size: 3em;
+"
+`;
+
+exports[`babel plugin with plain objects should preval styles with deeply destructurized object and aliases 1`] = `
+"
+font-size: 3em;
+"
+`;
+
+exports[`babel plugin with plain objects should preval styles with deeply destructurized object, aliases and defaults 1`] = `
+"
+font-size: 3em;
+"
+`;
+
+exports[`babel plugin with plain objects should preval styles with nested object 1`] = `
+"
+font-size: 3em;
+"
+`;
+
+exports[`babel plugin with plain objects should preval styles with shallow object 1`] = `
+"
+font-size: 3em;
+"
+`;
+
+exports[`babel plugin with plain objects should preval styles with shallowly destructurized object 1`] = `
+"
+font-size: 3em;
+"
 `;
