@@ -19,7 +19,7 @@ export default function compose(...classNames: Array<string | false | void>) {
 
   const rules = sheet.rules();
   const selectors = [].concat(
-    ...rules.map(rule =>
+    ...rules.list.map(rule =>
       /* $FlowFixMe */
       rule.selectorText
         .split(',')
@@ -38,7 +38,7 @@ export default function compose(...classNames: Array<string | false | void>) {
 
     if (typeof lastNumber === 'number' && lastNumber > currentNumber) {
       /* eslint-disable no-loop-func */
-      rules.forEach(rule => {
+      rules.list.forEach(rule => {
         /* $FlowFixMe */
         const { selectorText, cssText } = rule;
         if (selectorText.split(':')[0] === selector) {

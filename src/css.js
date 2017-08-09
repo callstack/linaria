@@ -3,7 +3,7 @@
 import slugify from './slugify';
 import sheet from './sheet';
 
-const named = (id?: string) => (
+const named = (name?: string = 'css') => (
   template: string[],
   ...expressions: string[]
 ) => {
@@ -12,7 +12,7 @@ const named = (id?: string) => (
   );
 
   const slug = slugify(styles);
-  const classname = id ? `${id}_${slug}` : slug;
+  const classname = `${name}_${slug}`;
 
   sheet.append(`.${classname}`, styles);
 
