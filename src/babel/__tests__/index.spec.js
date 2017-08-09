@@ -1,8 +1,8 @@
-jest.mock('../extractStyles', () => ({ __esModule: true, default: jest.fn() }));
-
 import * as babel from 'babel-core';
 import path from 'path';
 import dedent from 'dedent';
+
+jest.mock('../extractStyles', () => ({ __esModule: true, default: jest.fn() }));
 
 function transpile(source) {
   const { code } = babel.transform(
