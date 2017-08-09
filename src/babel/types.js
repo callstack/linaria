@@ -37,8 +37,8 @@ export type BabelTaggedTemplateElement = {
   },
 };
 
-export type BabelTaggedTemplateExpression = {
-  tag: BabelIdentifier | BabelCallExpression,
+export type BabelTaggedTemplateExpression<T> = {
+  tag: T,
   quasi: {
     expressions: Object[],
     quasis: BabelTaggedTemplateElement[],
@@ -63,14 +63,14 @@ export type BabelCallExpression = {
   type: string,
 };
 
-export type BabelVariableDeclarator = {
+export type BabelVariableDeclarator<T> = {
   id: BabelIdentifier | Object,
-  init: BabelCallExpression | BabelTaggedTemplateExpression | Object,
+  init: T,
   type: string,
 };
 
 export type BabelVariableDeclaration = {
-  declarations: BabelVariableDeclarator[],
+  declarations: BabelVariableDeclarator<any>[],
   kind: 'var' | 'let' | 'const',
   type: string,
 };
@@ -90,7 +90,7 @@ export type BabelTypes = {
   stringLiteral: BabelNodeFactory<BabelStringLiteral>,
   memberExpression: BabelNodeFactory<BabelMemberExpression>,
   isTaggedTemplateExpression: BabelIsTypeFunction<
-    BabelTaggedTemplateExpression
+    BabelTaggedTemplateExpression<any>
   >,
   isCallExpression: BabelIsTypeFunction<BabelCallExpression>,
   isMemberExpression: BabelIsTypeFunction<BabelMemberExpression>,

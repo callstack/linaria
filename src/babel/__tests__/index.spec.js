@@ -64,6 +64,16 @@ describe('babel plugin', () => {
     }).toThrow();
   });
 
+  it('should throw error if `css.named` is not called with classname', () => {
+    expect(() => {
+      transpile(dedent`
+      css.named\`
+        font-size: 3em;
+      \`;
+      `);
+    }).toThrow();
+  });
+
   it('should create classname for `css` tagged template literal', () => {
     const { code, results } = transpile(dedent`
     const header = css\`
@@ -72,6 +82,20 @@ describe('babel plugin', () => {
     `);
 
     const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+    expect(match).not.toBeNull();
+    const { css } = filterResults(results, match);
+    expect(css).toMatch('font-size: 3em');
+    expect(css).toMatchSnapshot();
+  });
+
+  it('should create classname for `css.named()` tagged template literal', () => {
+    const { code, results } = transpile(dedent`
+    const header = css.named('my-header')\`
+      font-size: 3em;
+    \`;
+    `);
+
+    const match = /header = "(my-header_[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const { css } = filterResults(results, match);
     expect(css).toMatch('font-size: 3em');
