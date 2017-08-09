@@ -4,7 +4,7 @@ import collect from '../collect';
 import dedent from 'dedent';
 
 const testCollect = (html, css) => {
-  const { critical, other } = collect(html, css);
+  const {critical, other} = collect(html, css);
   test('critical', () => expect(critical).toMatchSnapshot());
   test('other', () => expect(other).toMatchSnapshot());
 };
@@ -149,5 +149,20 @@ describe('classname in @rule', () => {
     @font-feature-values () { .other {} }
   `;
 
+  testCollect(html, css);
+});
+
+describe('works with CSS combinators', () => {
+  const css = dedent`
+    .linaria + span {}
+    .linaria ~ div {}
+    .linaria > a {}
+    .linaria b {}
+
+    .other + span {}
+    .other ~ div {}
+    .other > a {}
+    .other b {}
+  `;
   testCollect(html, css);
 });

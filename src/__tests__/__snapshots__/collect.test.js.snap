@@ -130,3 +130,7 @@ exports[`collects complex css other 1`] = `
 exports[`simple class name critical 1`] = `".linaria {}"`;
 
 exports[`simple class name other 1`] = `".classname {}"`;
+
+exports[`works with CSS combinators critical 1`] = `".linaria + span {}.linaria ~ div {}.linaria > a {}.linaria b {}"`;
+
+exports[`works with CSS combinators other 1`] = `".other + span {}.other ~ div {}.other > a {}.other b {}"`;
