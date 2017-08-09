@@ -177,3 +177,31 @@ describe('works with pseudo-class and pseudo-elements', () => {
   `;
   testCollect(html, css);
 });
+
+describe('works with global css', () => {
+  const css = dedent`
+    .linaria:active {}
+    .linaria::before {}
+
+    .other:active {}
+    .other::before {}
+  `;
+
+  const globalCSS = dedent`
+    body {
+      font-size: 13.37px;
+    }
+
+    html {
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1 {
+      font-weight: bold;
+    }
+  `;
+
+  const { critical, other } = collect(html, css, globalCSS);
+  test('critical', () => expect(critical).toMatchSnapshot());
+  test('other', () => expect(other).toMatchSnapshot());
+});

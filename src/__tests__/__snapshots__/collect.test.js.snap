@@ -135,6 +135,22 @@ exports[`works with CSS combinators critical 1`] = `".linaria + span {}.linaria 
 
 exports[`works with CSS combinators other 1`] = `".other + span {}.other ~ div {}.other > a {}.other b {}"`;
 
+exports[`works with global css critical 1`] = `
+"body {
+  font-size: 13.37px;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  font-weight: bold;
+}.linaria:active {}.linaria::before {}"
+`;
+
+exports[`works with global css other 1`] = `".other:active {}.other::before {}"`;
+
 exports[`works with pseudo-class and pseudo-elements critical 1`] = `".linaria:active {}.linaria::before {}"`;
 
 exports[`works with pseudo-class and pseudo-elements other 1`] = `".other:active {}.other::before {}"`;

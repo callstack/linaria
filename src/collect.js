@@ -7,7 +7,11 @@ type CollectResult = {
   other: string,
 };
 
-const collect = (html: string, css: string): CollectResult => {
+const collect = (
+  html: string,
+  css: string,
+  globalCSS?: string
+): CollectResult => {
   const animations = new Set();
   const other = postcss.root();
   const critical = postcss.root();
@@ -60,7 +64,7 @@ const collect = (html: string, css: string): CollectResult => {
   });
 
   return {
-    critical: critical.toString(),
+    critical: (globalCSS || '') + critical.toString(),
     other: other.toString(),
   };
 };
