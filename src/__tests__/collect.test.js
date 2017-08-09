@@ -166,3 +166,14 @@ describe('works with CSS combinators', () => {
   `;
   testCollect(html, css);
 });
+
+describe('works with pseudo-class and pseudo-elements', () => {
+  const css = dedent`
+    .linaria:active {}
+    .linaria::before {}
+
+    .other:active {}
+    .other::before {}
+  `;
+  testCollect(html, css);
+});

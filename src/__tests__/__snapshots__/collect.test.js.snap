@@ -134,3 +134,7 @@ exports[`simple class name other 1`] = `".classname {}"`;
 exports[`works with CSS combinators critical 1`] = `".linaria + span {}.linaria ~ div {}.linaria > a {}.linaria b {}"`;
 
 exports[`works with CSS combinators other 1`] = `".other + span {}.other ~ div {}.other > a {}.other b {}"`;
+
+exports[`works with pseudo-class and pseudo-elements critical 1`] = `".linaria:active {}.linaria::before {}"`;
+
+exports[`works with pseudo-class and pseudo-elements other 1`] = `".other:active {}.other::before {}"`;
