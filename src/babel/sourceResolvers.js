@@ -1,5 +1,7 @@
 /* @flow */
 
+import type { NodePath } from './types';
+
 export function isExcluded(path: NodePath<*>): boolean {
   const binding = path.scope.getBinding(path.node.name);
   return binding && binding.kind === 'param';
