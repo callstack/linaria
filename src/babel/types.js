@@ -4,12 +4,20 @@ export type NodePath<K> = {
   node: K,
   parent: Object,
   parentPath: NodePath<*>,
+  scope: {
+    getBinding: (id: string) => Binding<any>,
+  },
   traverse: (visitor: { [key: string]: Function }, thisArgs?: any) => void,
   findParent: ((path: NodePath<*>) => boolean) => NodePath<*>,
   isProgram: () => boolean,
   isReferenced: () => boolean,
   getSource: () => string,
   isVariableDeclarator: () => boolean,
+};
+
+export type Binding<K> = {
+  kind: string,
+  path: NodePath<K>,
 };
 
 export type BabelObjectExpression = {
