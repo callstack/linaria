@@ -29,7 +29,7 @@ export default function(
   require('babel-register')();
   require('babel-polyfill');
   ${requirements}
-  module.exports = ${path.getSource().replace('css', `css.title('${titile}')`)};
+  module.exports = ${path.getSource().replace('css', `css.named('${titile}')`)};
   `;
 
   // $FlowFixMe

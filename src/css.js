@@ -3,7 +3,7 @@
 import slugify from './slugify';
 import sheet from './sheet';
 
-const named = (id?: string, createSlug?: boolean = false) => (
+const named = (id?: string) => (
   template: string[],
   ...expressions: string[]
 ) => {
@@ -11,19 +11,16 @@ const named = (id?: string, createSlug?: boolean = false) => (
     (accumulator, part, i) => accumulator + expressions[i - 1] + part
   );
 
-  const slug = `${id || slugify(styles)}${createSlug && id
-    ? `_${slugify(styles)}`
-    : ''}`;
-  const selector = `.${slug}`;
+  const slug = slugify(styles);
+  const classname = id ? `${id}_${slug}` : slug;
 
-  sheet.append(selector, styles);
+  sheet.append(`.${classname}`, styles);
 
-  return slug;
+  return classname;
 };
 
 const css = named();
 
-css.title = id => named(id, true);
 css.named = named;
 
 export default css;
