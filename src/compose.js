@@ -2,7 +2,7 @@
 
 import sheet from './sheet';
 
-let cache: { [key: string]: boolean } = {};
+const cache: { [key: string]: boolean } = {};
 
 export default function compose(...classNames: Array<string | false | void>) {
   const names: Array<string> = (classNames: any).filter(name => name);
@@ -24,18 +24,20 @@ export default function compose(...classNames: Array<string | false | void>) {
       rule.selectorText
         .split(',')
         .filter(c =>
-          /^\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?![^\{]*\})(:[^\s]+)?$/.test(c)
+          /^\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?![^{]*\})(:[^\s]+)?$/.test(c)
         )
     )
   );
 
-  let lastSelector, lastNumber;
+  let lastSelector;
+  let lastNumber;
 
   for (let i = 0, l = names.length; i < l; i++) {
     const selector = `.${names[i]}`;
     const currentNumber = selectors.indexOf(selector);
 
     if (typeof lastNumber === 'number' && lastNumber > currentNumber) {
+      /* eslint-disable no-loop-func */
       rules.forEach(rule => {
         /* $FlowFixMe */
         const { selectorText, cssText } = rule;

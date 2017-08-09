@@ -1,3 +1,6 @@
+/* eslint-disable no-template-curly-in-string */
+/* @flow */
+
 import * as babel from 'babel-core';
 import path from 'path';
 import dedent from 'dedent';
@@ -32,7 +35,7 @@ function transpile(source) {
   const splitIndex = code.indexOf('/* results */');
   return {
     code: code.substr(0, splitIndex),
-    results: eval(`${code.substr(splitIndex)}; results;`),
+    results: eval(`${code.substr(splitIndex)}; results;`), // eslint-disable-line no-eval
   };
 }
 

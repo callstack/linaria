@@ -32,7 +32,7 @@ export default function(
   module.exports = ${path.getSource().replace('css', `css.named('${titile}')`)};
   `;
 
-  // $FlowFixMe
+  /* $FlowFixMe */
   path.node.tag.name = 'preval';
   path.node.quasi.quasis[0].value.cooked = replacement;
   path.node.quasi.quasis[0].value.raw = replacement;
