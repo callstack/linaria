@@ -7,5 +7,7 @@ flow-typed/
 [libs]
 
 [options]
+emoji=true
+unsafe.enable_getters_and_setters=true
 
 module.name_mapper='^linaria$' -> '<PROJECT_ROOT>/src/index.js'

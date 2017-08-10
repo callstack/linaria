@@ -31,7 +31,9 @@ function sheet() {
   }
 
   const style = document.createElement('style');
-  const node = style.appendChild(document.createTextNode(''));
+  const node = document.createTextNode('');
+
+  style.appendChild(node);
   style.setAttribute('type', 'text/css');
 
   if (document.head != null) {
@@ -51,14 +53,15 @@ function sheet() {
     },
     rules: () => {
       if (ruleCache != null) {
-        return ruleCache;
+        return { list: ruleCache, cache: true };
       }
 
-      /* eslint-disable no-return-assign */
-      return (ruleCache = [].concat(
+      ruleCache = [].concat(
         /* $FlowFixMe */
         ...Array.from(document.styleSheets).map(s => Array.from(s.cssRules))
-      ));
+      );
+
+      return { list: ruleCache, cache: false };
     },
   };
 }

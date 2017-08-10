@@ -153,12 +153,13 @@ Even with fully static CSS, we have an opportunity to improve the initial page l
 ```js
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { collect, slugify } from 'linaria';
+import { slugify } from 'linaria';
+import { collect } from 'linaria/server';
 import App from './App';
 
 const cache = {};
 
-const css = fs.readFileSync('./dist/styles.css').toString();
+const css = fs.readFileSync('./dist/styles.css', 'utf8');
 const app = express();
 
 app.get('/', (req, res) => {
