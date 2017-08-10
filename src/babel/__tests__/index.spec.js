@@ -551,7 +551,7 @@ describe('babel plugin', () => {
       );
       expect(write).not.toHaveBeenCalled();
       expect(append).toHaveBeenCalledTimes(2);
-      expect(append.mock.calls).toMatchSnapshot();
+      expect(append.mock.calls.map(call => call[1])).toMatchSnapshot();
     });
 
     it('should extract each style to separate file and include it into source file', () => {
@@ -581,15 +581,13 @@ describe('babel plugin', () => {
       expect(
         code1.includes(`require('${filename1.replace('js', 'css')}')`)
       ).toBeTruthy();
-      expect(code1).toMatchSnapshot();
       expect(
         code2.includes(`require('${filename2.replace('js', 'css')}')`)
       ).toBeTruthy();
-      expect(code1).toMatchSnapshot();
 
       expect(append).not.toHaveBeenCalled();
       expect(write).toHaveBeenCalledTimes(2);
-      expect(write.mock.calls).toMatchSnapshot();
+      expect(write.mock.calls.map(call => call[1])).toMatchSnapshot();
       expect(write.mock.calls[0][0]).toEqual(filename1.replace('js', 'css'));
       expect(write.mock.calls[1][0]).toEqual(filename2.replace('js', 'css'));
     });
