@@ -22,6 +22,7 @@
     "babel-plugin-preval": "^1.4.2",
     "babel-polyfill": "^6.23.0",
     "babel-register": "^6.24.1",
+    "postcss": "^6.0.8",
     "short-hash": "^1.0.0",
     "stylis": "^3.2.8"
   },
