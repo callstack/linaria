@@ -111,8 +111,7 @@ export type ImportStatement = {
 };
 
 export type State = {
-  requirements: string[],
   filename: string,
   file: Object,
-  state: Object,
+  opts: Object,
 };
