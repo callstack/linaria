@@ -4,10 +4,11 @@
 import * as babel from 'babel-core';
 import path from 'path';
 import dedent from 'dedent';
+import extractStyles from '../extractStyles';
 
 jest.mock('../extractStyles', () => ({ __esModule: true, default: jest.fn() }));
 
-function transpile(source) {
+function transpile(source, options = {}) {
   const { code } = babel.transform(
     dedent`
       import css from './src/css';
@@ -25,7 +26,7 @@ function transpile(source) {
     {
       presets: ['es2015'],
       plugins: [
-        path.resolve('src/babel/index.js'),
+        [path.resolve('src/babel/index.js'), options],
         require.resolve('babel-plugin-preval'),
       ],
       babelrc: false,
@@ -44,6 +45,11 @@ function filterResults(results, match) {
 }
 
 describe('babel plugin', () => {
+  beforeEach(() => {
+    /* $FlowFixMe */
+    extractStyles.mockReset();
+  });
+
   it('should not process tagged template if tag is not `css`', () => {
     const { code } = transpile(dedent`
     const header = \`
@@ -484,6 +490,48 @@ describe('babel plugin', () => {
       const { css } = filterResults(results, match);
       expect(css).toMatch('font-size: 33px');
       expect(css).toMatchSnapshot();
+    });
+  });
+
+  describe('with extraction enabled', () => {
+    beforeEach(() => {
+      /* $FlowFixMe */
+      const Module = require('module'); // eslint-disable-line global-require
+      const sheetModule = Module._cache[require.resolve('../../sheet.js')];
+      sheetModule.exports.default.dump();
+
+      /* $FlowFixMe */
+      extractStyles.mockImplementation((...args) => {
+        const filename = require.resolve('../extractStyles.js');
+        const paths = Module._nodeModulePaths(path.dirname(filename));
+
+        const m = new Module(filename, module.parent);
+        m.filename = filename;
+        m.paths = paths;
+        m._compile(
+          `require("${require.resolve('../register')}");
+          ${babel.transformFileSync(filename).code}`,
+          filename
+        );
+
+        m.children.push(sheetModule);
+
+        return m.exports.default(...args);
+      });
+    });
+
+    it('should extract all styles to a single file', () => {
+      transpile(dedent`
+      const header = css\`
+        font-size: 3em;
+      \`;
+      `);
+
+      transpile(dedent`
+      const body = css\`
+        font-weight: bold;
+      \`;
+      `);
     });
   });
 });

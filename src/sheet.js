@@ -24,6 +24,7 @@ function sheet() {
       dump: () => {
         const result = cssText || '';
         cssText = null;
+        stylesCache = null;
         return result;
       },
     };

@@ -41,6 +41,7 @@
     "prettier": "^1.5.3"
   },
   "jest": {
-    "testRegex": "/__tests__/.*\\.(test|spec)\\.js$"
+    "testRegex": "/__tests__/.*\\.(test|spec)\\.js$",
+    "testEnvironment": "node"
   }
 }
