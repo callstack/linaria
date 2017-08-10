@@ -8,7 +8,7 @@ import extractStyles from '../extractStyles';
 
 jest.mock('../extractStyles', () => ({ __esModule: true, default: jest.fn() }));
 
-function transpile(source, options = {}) {
+function transpile(source, pluginOptions = {}, options = {}) {
   const { code } = babel.transform(
     dedent`
       import css from './src/css';
@@ -26,10 +26,11 @@ function transpile(source, options = {}) {
     {
       presets: ['es2015'],
       plugins: [
-        [path.resolve('src/babel/index.js'), options],
+        [path.resolve('src/babel/index.js'), pluginOptions],
         require.resolve('babel-plugin-preval'),
       ],
       babelrc: false,
+      ...options,
     }
   );
 
@@ -494,20 +495,24 @@ describe('babel plugin', () => {
   });
 
   describe('with extraction enabled', () => {
+    const write = jest.fn();
+    const append = jest.fn();
+
     beforeEach(() => {
       /* $FlowFixMe */
       const Module = require('module'); // eslint-disable-line global-require
       const sheetModule = Module._cache[require.resolve('../../sheet.js')];
       sheetModule.exports.default.dump();
 
-      /* $FlowFixMe */
-      extractStyles.mockImplementation((...args) => {
-        const filename = require.resolve('../extractStyles.js');
-        const paths = Module._nodeModulePaths(path.dirname(filename));
+      write.mockClear();
+      append.mockClear();
 
+      /* $FlowFixMe */
+      extractStyles.mockImplementation((t, p, f, o) => {
+        const filename = require.resolve('../extractStyles.js');
         const m = new Module(filename, module.parent);
         m.filename = filename;
-        m.paths = paths;
+        m.paths = Module._nodeModulePaths(path.dirname(filename));
         m._compile(
           `require("${require.resolve('../register')}");
           ${babel.transformFileSync(filename).code}`,
@@ -516,22 +521,77 @@ describe('babel plugin', () => {
 
         m.children.push(sheetModule);
 
-        return m.exports.default(...args);
+        return m.exports.default(t, p, f, o, {
+          appendFileSync: append,
+          writeFileSync: write,
+        });
       });
     });
 
     it('should extract all styles to a single file', () => {
-      transpile(dedent`
-      const header = css\`
-        font-size: 3em;
-      \`;
-      `);
+      const filename = path.join(process.cwd(), 'test.js');
+      transpile(
+        dedent`
+        const header = css\`
+          font-size: 3em;
+        \`;
+        `,
+        { single: true },
+        { filename }
+      );
 
-      transpile(dedent`
-      const body = css\`
-        font-weight: bold;
-      \`;
-      `);
+      transpile(
+        dedent`
+        const body = css\`
+          font-weight: bold;
+        \`;
+        `,
+        { single: true },
+        { filename }
+      );
+      expect(write).not.toHaveBeenCalled();
+      expect(append).toHaveBeenCalledTimes(2);
+      expect(append.mock.calls).toMatchSnapshot();
+    });
+
+    it('should extract each style to separate file and include it into source file', () => {
+      const filename1 = path.join(process.cwd(), 'test1.js');
+      const filename2 = path.join(process.cwd(), 'test2.js');
+
+      const { code: code1 } = transpile(
+        dedent`
+        const header = css\`
+          font-size: 3em;
+        \`;
+        `,
+        {},
+        { filename: filename1 }
+      );
+
+      const { code: code2 } = transpile(
+        dedent`
+        const body = css\`
+          font-weight: bold;
+        \`;
+        `,
+        {},
+        { filename: filename2 }
+      );
+
+      expect(
+        code1.includes(`require('${filename1.replace('js', 'css')}')`)
+      ).toBeTruthy();
+      expect(code1).toMatchSnapshot();
+      expect(
+        code2.includes(`require('${filename2.replace('js', 'css')}')`)
+      ).toBeTruthy();
+      expect(code1).toMatchSnapshot();
+
+      expect(append).not.toHaveBeenCalled();
+      expect(write).toHaveBeenCalledTimes(2);
+      expect(write.mock.calls).toMatchSnapshot();
+      expect(write.mock.calls[0][0]).toEqual(filename1.replace('js', 'css'));
+      expect(write.mock.calls[1][0]).toEqual(filename2.replace('js', 'css'));
     });
   });
 });

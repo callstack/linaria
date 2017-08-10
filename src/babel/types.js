@@ -89,6 +89,7 @@ export type BabelTypes = {
   identifier: BabelNodeFactory<BabelIdentifier>,
   stringLiteral: BabelNodeFactory<BabelStringLiteral>,
   memberExpression: BabelNodeFactory<BabelMemberExpression>,
+  expressionStatement: BabelNodeFactory<any>,
   isTaggedTemplateExpression: BabelIsTypeFunction<
     BabelTaggedTemplateExpression<any>
   >,
@@ -113,4 +114,5 @@ export type State = {
   requirements: string[],
   filename: string,
   file: Object,
+  state: Object,
 };

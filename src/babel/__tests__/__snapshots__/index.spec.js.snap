@@ -80,6 +80,64 @@ font-size: 24px;
 "
 `;
 
+exports[`babel plugin with extraction enabled should extract all styles to a single file 1`] = `
+Array [
+  Array [
+    "/Users/paweltrysla/Documents/linaria/test.css",
+    ".header_5863c124{font-size:3em;}",
+  ],
+  Array [
+    "/Users/paweltrysla/Documents/linaria/test.css",
+    ".body_9296b3df{font-weight:bold;}",
+  ],
+]
+`;
+
+exports[`babel plugin with extraction enabled should extract each style to separate file and include it into source file 1`] = `
+"'use strict';
+
+var _css = require('./src/css');
+
+var _css2 = _interopRequireDefault(_css);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+require('/Users/paweltrysla/Documents/linaria/test1.css');
+
+var header = \\"header_5863c124\\";
+
+"
+`;
+
+exports[`babel plugin with extraction enabled should extract each style to separate file and include it into source file 2`] = `
+"'use strict';
+
+var _css = require('./src/css');
+
+var _css2 = _interopRequireDefault(_css);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+require('/Users/paweltrysla/Documents/linaria/test1.css');
+
+var header = \\"header_5863c124\\";
+
+"
+`;
+
+exports[`babel plugin with extraction enabled should extract each style to separate file and include it into source file 3`] = `
+Array [
+  Array [
+    "/Users/paweltrysla/Documents/linaria/test1.css",
+    ".header_5863c124{font-size:3em;}",
+  ],
+  Array [
+    "/Users/paweltrysla/Documents/linaria/test2.css",
+    ".body_9296b3df{font-weight:bold;}",
+  ],
+]
+`;
+
 exports[`babel plugin with function calls should preval multiple function calls inside an expression 1`] = `
 "
 font-size: 33px;

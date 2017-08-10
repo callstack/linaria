@@ -64,8 +64,8 @@ export default ({ types }: { types: BabelTypes }) => ({
       enter(path: NodePath<*>, state: State) {
         state.filename = state.file.opts.filename;
       },
-      exit() {
-        extractStyles();
+      exit(path: NodePath<*>, state: State) {
+        extractStyles(types, path, state.filename, state.opts);
       },
     },
     TaggedTemplateExpression(
