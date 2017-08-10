@@ -160,12 +160,11 @@ import App from './App';
 const cache = {};
 
 const css = fs.readFileSync('./dist/styles.css', 'utf8');
-const globalCSS = fs.readFileSync('./dist/styles_global.css', 'utf8');
 const app = express();
 
 app.get('/', (req, res) => {
   const html = ReactDOMServer.renderToString(<App />);
-  const { critical, other }  = collect(html, css, globalCSS);
+  const { critical, other }  = collect(html, css);
   const slug = slugify(other);
 
   cache[slug] = other;
