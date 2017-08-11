@@ -152,6 +152,29 @@ describe('babel plugin', () => {
     expect(css).toMatchSnapshot();
   });
 
+  it('should preval const and let without transpilation to var', () => {
+    const { code, results } = transpile(
+      dedent`
+      const size = 3;
+      let color = '#ffffff';
+
+      const header = css\`
+        font-size: ${'${size}'}em;
+        color: ${'${color}'};
+      \`;
+      `,
+      {},
+      { presets: [] }
+    );
+
+    const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+    expect(match).not.toBeNull();
+    const { css } = filterResults(results, match);
+    expect(css).toMatch('font-size: 3em');
+    expect(css).toMatch('color: #ffffff');
+    expect(css).toMatchSnapshot();
+  });
+
   describe('with plain objects', () => {
     it('should preval styles with shallow object', () => {
       const { code, results } = transpile(dedent`

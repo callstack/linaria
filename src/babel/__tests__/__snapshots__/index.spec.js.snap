@@ -44,6 +44,13 @@ var header = '\\\\nfont-size: 3em;\\\\n';
 "
 `;
 
+exports[`babel plugin should preval const and let without transpilation to var 1`] = `
+"
+font-size: 3em;
+color: #ffffff;
+"
+`;
+
 exports[`babel plugin with commonjs imports should preval default export 1`] = `
 "
 font-size: 14px;
