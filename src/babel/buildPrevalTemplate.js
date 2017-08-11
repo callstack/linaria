@@ -30,8 +30,7 @@ export default function(
   const titile = path.parent.id.name;
 
   const replacement = `
-  require('babel-register')();
-  require('babel-polyfill');
+  import '${require.resolve('./register')}';
   ${requirements}
   module.exports = ${path
     .getSource()

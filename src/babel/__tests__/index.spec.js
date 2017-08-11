@@ -4,10 +4,11 @@
 import * as babel from 'babel-core';
 import path from 'path';
 import dedent from 'dedent';
+import extractStyles from '../extractStyles';
 
 jest.mock('../extractStyles', () => ({ __esModule: true, default: jest.fn() }));
 
-function transpile(source) {
+function transpile(source, pluginOptions = {}, options = {}) {
   const { code } = babel.transform(
     dedent`
       import css from './src/css';
@@ -25,10 +26,11 @@ function transpile(source) {
     {
       presets: ['es2015'],
       plugins: [
-        path.resolve('src/babel/index.js'),
+        [path.resolve('src/babel/index.js'), pluginOptions],
         require.resolve('babel-plugin-preval'),
       ],
       babelrc: false,
+      ...options,
     }
   );
 
@@ -44,6 +46,11 @@ function filterResults(results, match) {
 }
 
 describe('babel plugin', () => {
+  beforeEach(() => {
+    /* $FlowFixMe */
+    extractStyles.mockReset();
+  });
+
   it('should not process tagged template if tag is not `css`', () => {
     const { code } = transpile(dedent`
     const header = \`
@@ -142,6 +149,29 @@ describe('babel plugin', () => {
     expect(match).not.toBeNull();
     const { css } = filterResults(results, match);
     expect(css).toMatch('font-size: 3em');
+    expect(css).toMatchSnapshot();
+  });
+
+  it('should preval const and let without transpilation to var', () => {
+    const { code, results } = transpile(
+      dedent`
+      const size = 3;
+      let color = '#ffffff';
+
+      const header = css\`
+        font-size: ${'${size}'}em;
+        color: ${'${color}'};
+      \`;
+      `,
+      {},
+      { presets: [] }
+    );
+
+    const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+    expect(match).not.toBeNull();
+    const { css } = filterResults(results, match);
+    expect(css).toMatch('font-size: 3em');
+    expect(css).toMatch('color: #ffffff');
     expect(css).toMatchSnapshot();
   });
 
@@ -484,6 +514,143 @@ describe('babel plugin', () => {
       const { css } = filterResults(results, match);
       expect(css).toMatch('font-size: 33px');
       expect(css).toMatchSnapshot();
+    });
+  });
+
+  describe('with extraction enabled', () => {
+    const write = jest.fn();
+    const append = jest.fn();
+
+    beforeEach(() => {
+      /* $FlowFixMe */
+      const Module = require('module'); // eslint-disable-line global-require
+      const sheetModule = Module._cache[require.resolve('../../sheet.js')];
+      sheetModule.exports.default.dump();
+
+      write.mockClear();
+      append.mockClear();
+
+      /* $FlowFixMe */
+      extractStyles.mockImplementation((t, p, f, o) => {
+        const filename = require.resolve('../extractStyles.js');
+        const m = new Module(filename, module.parent);
+        m.filename = filename;
+        m.paths = Module._nodeModulePaths(path.dirname(filename));
+        m._compile(
+          `require("${require.resolve('../register')}");
+          ${babel.transformFileSync(filename).code}`,
+          filename
+        );
+
+        m.children.push(sheetModule);
+
+        return m.exports.default(t, p, f, o, {
+          appendFileSync: append,
+          writeFileSync: write,
+        });
+      });
+    });
+
+    it('should extract all styles to a single file', () => {
+      const filename = path.join(process.cwd(), 'test.js');
+      transpile(
+        dedent`
+        const header = css\`
+          font-size: 3em;
+        \`;
+        `,
+        { single: true },
+        { filename }
+      );
+
+      transpile(
+        dedent`
+        const body = css\`
+          font-weight: bold;
+        \`;
+        `,
+        { single: true },
+        { filename }
+      );
+      expect(write).not.toHaveBeenCalled();
+      expect(append).toHaveBeenCalledTimes(2);
+      expect(append.mock.calls.map(call => call[1])).toMatchSnapshot();
+    });
+
+    it('should extract each style to separate file and include it into source file', () => {
+      const filename1 = path.join(process.cwd(), 'test1.js');
+      const filename2 = path.join(process.cwd(), 'test2.js');
+
+      const { code: code1 } = transpile(
+        dedent`
+        const header = css\`
+          font-size: 3em;
+        \`;
+        `,
+        {},
+        { filename: filename1 }
+      );
+
+      const { code: code2 } = transpile(
+        dedent`
+        const body = css\`
+          font-weight: bold;
+        \`;
+        `,
+        {},
+        { filename: filename2 }
+      );
+
+      expect(
+        code1.includes(`require('${filename1.replace('js', 'css')}')`)
+      ).toBeTruthy();
+      expect(
+        code2.includes(`require('${filename2.replace('js', 'css')}')`)
+      ).toBeTruthy();
+
+      expect(append).not.toHaveBeenCalled();
+      expect(write).toHaveBeenCalledTimes(2);
+      expect(write.mock.calls.map(call => call[1])).toMatchSnapshot();
+      expect(write.mock.calls[0][0]).toEqual(filename1.replace('js', 'css'));
+      expect(write.mock.calls[1][0]).toEqual(filename2.replace('js', 'css'));
+    });
+
+    it('extract styles to a given file', () => {
+      const filename = path.join(process.cwd(), 'test.js');
+      transpile(
+        dedent`
+        const header = css\`
+          font-size: 3em;
+        \`;
+        `,
+        { single: true, filename: '[name]-static.css' },
+        { filename }
+      );
+
+      expect(write).not.toHaveBeenCalled();
+      expect(append).toHaveBeenCalledTimes(1);
+      expect(append.mock.calls[0][0]).toEqual(
+        path.join(path.dirname(filename), 'test-static.css')
+      );
+    });
+
+    it('extract styles to a given file with output directry specified', () => {
+      const filename = path.join(process.cwd(), 'test.js');
+      transpile(
+        dedent`
+        const header = css\`
+          font-size: 3em;
+        \`;
+        `,
+        { single: true, filename: '[name]-static.css', outDir: 'output' },
+        { filename }
+      );
+
+      expect(write).not.toHaveBeenCalled();
+      expect(append).toHaveBeenCalledTimes(1);
+      expect(append.mock.calls[0][0]).toEqual(
+        path.join(path.dirname(filename), 'output', 'test-static.css')
+      );
     });
   });
 });

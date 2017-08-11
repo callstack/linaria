@@ -44,6 +44,13 @@ var header = '\\\\nfont-size: 3em;\\\\n';
 "
 `;
 
+exports[`babel plugin should preval const and let without transpilation to var 1`] = `
+"
+font-size: 3em;
+color: #ffffff;
+"
+`;
+
 exports[`babel plugin with commonjs imports should preval default export 1`] = `
 "
 font-size: 14px;
@@ -78,6 +85,20 @@ exports[`babel plugin with commonjs imports should preval named imports 2`] = `
 "
 font-size: 24px;
 "
+`;
+
+exports[`babel plugin with extraction enabled should extract all styles to a single file 1`] = `
+Array [
+  ".header_5863c124{font-size:3em;}",
+  ".body_9296b3df{font-weight:bold;}",
+]
+`;
+
+exports[`babel plugin with extraction enabled should extract each style to separate file and include it into source file 1`] = `
+Array [
+  ".header_5863c124{font-size:3em;}",
+  ".body_9296b3df{font-weight:bold;}",
+]
 `;
 
 exports[`babel plugin with function calls should preval multiple function calls inside an expression 1`] = `
