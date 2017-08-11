@@ -591,5 +591,43 @@ describe('babel plugin', () => {
       expect(write.mock.calls[0][0]).toEqual(filename1.replace('js', 'css'));
       expect(write.mock.calls[1][0]).toEqual(filename2.replace('js', 'css'));
     });
+
+    it('extract styles to a given file', () => {
+      const filename = path.join(process.cwd(), 'test.js');
+      transpile(
+        dedent`
+        const header = css\`
+          font-size: 3em;
+        \`;
+        `,
+        { single: true, filename: '[name]-static.css' },
+        { filename }
+      );
+
+      expect(write).not.toHaveBeenCalled();
+      expect(append).toHaveBeenCalledTimes(1);
+      expect(append.mock.calls[0][0]).toEqual(
+        path.join(path.dirname(filename), 'test-static.css')
+      );
+    });
+
+    it('extract styles to a given file with output directry specified', () => {
+      const filename = path.join(process.cwd(), 'test.js');
+      transpile(
+        dedent`
+        const header = css\`
+          font-size: 3em;
+        \`;
+        `,
+        { single: true, filename: '[name]-static.css', outDir: 'output' },
+        { filename }
+      );
+
+      expect(write).not.toHaveBeenCalled();
+      expect(append).toHaveBeenCalledTimes(1);
+      expect(append.mock.calls[0][0]).toEqual(
+        path.join(path.dirname(filename), 'output', 'test-static.css')
+      );
+    });
   });
 });
