@@ -14,7 +14,7 @@ const named = (name?: string = 'css') => (
   const slug = slugify(styles);
   const classname = `${name}_${slug}`;
 
-  sheet.append(`.${classname}`, styles);
+  sheet.insert(`.${classname}`, styles);
 
   return classname;
 };
