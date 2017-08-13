@@ -2,10 +2,14 @@
 
 import sheet from './sheet';
 
+type ClassName = string | false | void;
+
 const cache: { [key: string]: boolean } = {};
 
-export default function compose(...classNames: Array<string | false | void>) {
-  const names: Array<string> = (classNames: any).filter(name => name);
+export default function compose(...classNames: ClassName[]) {
+  const names: string[] = (classNames.filter(Boolean): any)
+    .join(' ')
+    .split(' ');
 
   if (names.length === 1) {
     return names[0];
@@ -23,6 +27,7 @@ export default function compose(...classNames: Array<string | false | void>) {
       /* $FlowFixMe */
       rule.selectorText
         .split(',')
+        .map(c => c.trim())
         .filter(c =>
           /^\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?![^{]*\})(:[^\s]+)?$/.test(c)
         )
@@ -40,11 +45,10 @@ export default function compose(...classNames: Array<string | false | void>) {
       /* eslint-disable no-loop-func */
       rules.list.forEach(rule => {
         /* $FlowFixMe */
-        const { selectorText, cssText } = rule;
+        const { selectorText } = rule;
         if (selectorText.split(':')[0] === selector) {
-          sheet.insert(
-            cssText.replace(selectorText, `${lastSelector}${selectorText}`)
-          );
+          /* $FlowFixMe */
+          rule.selectorText += `,${lastSelector}${selectorText}`; // eslint-disable-line no-param-reassign
         }
       });
     }

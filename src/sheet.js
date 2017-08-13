@@ -9,19 +9,19 @@ function sheet() {
 
   if (typeof window === 'undefined' || typeof window.document === 'undefined') {
     return {
-      append(selector: string, css: string) {
+      insert(selector: string, css: string) {
+        const text = stylis(selector, css);
         stylesCache = stylesCache || [];
         stylesCache.push({ selector, css });
-        this.insert(stylis(selector, css));
-      },
-      insert: (text: string) => {
         cssText = cssText ? cssText + text : text;
       },
-      rules: () => {
+      rules() {
         throw new Error('Not implemented');
       },
-      styles: () => stylesCache || [],
-      dump: () => {
+      styles() {
+        return stylesCache || [];
+      },
+      dump() {
         const result = cssText || '';
         cssText = null;
         stylesCache = null;
@@ -43,15 +43,13 @@ function sheet() {
   }
 
   return {
-    append(selector: string, css: string) {
-      this.insert(stylis(selector, css));
-    },
-    insert: (text: string) => {
+    insert(selector: string, css: string) {
+      const text = stylis(selector, css);
       node.appendData(text);
       // invalidate the cache since stylesheets have changed
       ruleCache = null;
     },
-    rules: () => {
+    rules() {
       if (ruleCache != null) {
         return { list: ruleCache, cache: true };
       }
