@@ -21,9 +21,9 @@ describe('compose module', () => {
     sheet.insert('.second', '{color:blue;}');
     expect(compose('second', 'first')).toBe('second first');
     expect(sheet.rules().list[0].cssText).toBe(
-      '.first,.second.first{color:red;}'
+      '.first,.second.first {color: red;}'
     );
-    expect(sheet.rules().list[1].cssText).toBe('.second{color:blue;}');
+    expect(sheet.rules().list[1].cssText).toBe('.second {color: blue;}');
   });
 
   it('should return cached version if exists', () => {

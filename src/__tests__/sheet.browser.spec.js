@@ -16,23 +16,34 @@ describe('sheet module (browser)', () => {
 
   it('should insert styles', () => {
     sheet.insert('.some_selector', '{color:blue}');
-    sheet.insert('.foo', '{color:purple;}');
+    sheet.insert('.foo', '{color:purple;font-size:12px;}');
     expect(document.head.children[0].textContent).toBe(
-      '.some_selector{color:blue;}.foo{color:purple;}'
+      '.some_selector{color:blue;}.foo{color:purple;font-size:12px;}'
     );
   });
 
   it('should return list of rules', () => {
-    const list = [
-      {
-        cssText: '.some_selector{color:blue;}',
-        selectorText: '.some_selector',
-      },
-      { cssText: '.foo{color:purple;}', selectorText: '.foo' },
-    ];
+    let rules;
 
-    expect(sheet.rules()).toEqual({ cache: false, list });
-    expect(sheet.rules()).toEqual({ cache: true, list });
+    rules = sheet.rules();
+
+    expect(rules.cache).toBe(false);
+    expect(rules.list[0].selectorText).toEqual('.some_selector');
+    expect(rules.list[0].cssText).toEqual('.some_selector {color: blue;}');
+    expect(rules.list[1].selectorText).toEqual('.foo');
+    expect(rules.list[1].cssText).toEqual(
+      '.foo {color: purple; font-size: 12px;}'
+    );
+
+    rules = sheet.rules();
+
+    expect(rules.cache).toBe(true);
+    expect(rules.list[0].selectorText).toEqual('.some_selector');
+    expect(rules.list[0].cssText).toEqual('.some_selector {color: blue;}');
+    expect(rules.list[1].selectorText).toEqual('.foo');
+    expect(rules.list[1].cssText).toEqual(
+      '.foo {color: purple; font-size: 12px;}'
+    );
   });
 
   it('should throw when `head` is null', () => {
