@@ -3,7 +3,11 @@
 import stylis from 'stylis';
 
 function sheet() {
-  let ruleCache: ?Array<CSSRule>;
+  let ruleCache: ?Array<{
+    selectorText: string,
+    cssText: string,
+    style: Object,
+  }>;
   let cssText: ?string;
   let stylesCache: ?Array<{ selector: string, css: string }>;
 

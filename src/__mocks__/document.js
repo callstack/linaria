@@ -4,7 +4,9 @@
  * @flow
  */
 
-class TextNode {
+import CSSOM from 'cssom'; // eslint-disable-line import/no-extraneous-dependencies
+
+class Text {
   constructor(text: string) {
     this.textContent = text;
     this.nodeName = '#text';
@@ -15,8 +17,9 @@ class TextNode {
   nodeName: string;
 
   appendData(t: string) {
-    if (this.parent instanceof HTMLStyleElement && t.includes('{')) {
-      this.parent.__rules.push(t);
+    if (this.parent instanceof HTMLStyleElement) {
+      const ast = CSSOM.parse(t);
+      this.parent.__ast.cssRules.push(...ast.cssRules);
     }
 
     this.textContent += t;
@@ -53,10 +56,10 @@ class HTMLElement {
 class HTMLStyleElement extends HTMLElement {
   constructor(tag: string) {
     super(tag);
-    this.__rules = [];
+    this.__ast = CSSOM.parse('');
   }
 
-  __rules: string[];
+  __ast: Object;
 }
 
 const document = {
@@ -67,27 +70,12 @@ const document = {
     return new HTMLElement(tag);
   },
   createTextNode(text: string) {
-    return new TextNode(text);
+    return new Text(text);
   },
   get styleSheets() {
     return this.head.children
       .filter(el => el instanceof HTMLStyleElement)
-      .map(el => {
-        const cssRules = el.__rules.map((cssText, i) => ({
-          get selectorText() {
-            return this.cssText.split('{')[0].trim();
-          },
-
-          set selectorText(text: string) {
-            this.cssText = `${text}{${cssText.split('{')[1]}`;
-            el.__rules[i] = this.cssText; // eslint-disable-line no-param-reassign
-          },
-
-          cssText,
-        }));
-
-        return { cssRules };
-      });
+      .map(el => el.__ast);
   },
   head: new HTMLElement('head'),
 };

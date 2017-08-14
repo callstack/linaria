@@ -24,7 +24,6 @@ export default function compose(...classNames: ClassName[]) {
   const rules = sheet.rules();
   const selectors = [].concat(
     ...rules.list.map(rule =>
-      /* $FlowFixMe */
       rule.selectorText
         .split(',')
         .map(c => c.trim())
@@ -44,10 +43,8 @@ export default function compose(...classNames: ClassName[]) {
     if (typeof lastNumber === 'number' && lastNumber > currentNumber) {
       /* eslint-disable no-loop-func */
       rules.list.forEach(rule => {
-        /* $FlowFixMe */
         const { selectorText } = rule;
         if (selectorText.split(':')[0] === selector) {
-          /* $FlowFixMe */
           rule.selectorText += `,${lastSelector}${selectorText}`; // eslint-disable-line no-param-reassign
         }
       });
