@@ -1,6 +1,7 @@
 /* eslint-disable global-require */
 /* @flow */
 
+import dedent from 'dedent';
 import document from '../__mocks__/document';
 
 global.window = global;
@@ -17,9 +18,14 @@ describe('sheet module (browser)', () => {
   it('should insert styles', () => {
     sheet.insert('.some_selector', '{color:blue}');
     sheet.insert('.foo', '{color:purple;font-size:12px;}');
-    expect(document.head.children[0].textContent).toBe(
-      '.some_selector{color:blue;}.foo{color:purple;font-size:12px;}'
-    );
+    expect(document.head.children[0].textContent.trim()).toBe(dedent`
+      .some_selector{color:blue;}
+      .foo{color:purple;font-size:12px;}
+    `);
+    expect(document.head.children[0].textContent.trim()).toBe(dedent`
+      .some_selector{color:blue;}
+      .foo{color:purple;font-size:12px;}
+    `);
   });
 
   it('should return list of rules', () => {
