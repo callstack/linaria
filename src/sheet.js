@@ -17,7 +17,7 @@ function sheet() {
         const text = stylis(selector, css);
         stylesCache = stylesCache || [];
         stylesCache.push({ selector, css });
-        cssText = cssText ? cssText + text : text;
+        cssText = cssText ? `${cssText}\n${text}` : text;
       },
       rules() {
         throw new Error('Not implemented');
@@ -49,7 +49,7 @@ function sheet() {
   return {
     insert(selector: string, css: string) {
       const text = stylis(selector, css);
-      node.appendData(text);
+      node.appendData(`\n${text}`);
       // invalidate the cache since stylesheets have changed
       ruleCache = null;
     },

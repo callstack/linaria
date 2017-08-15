@@ -17,8 +17,8 @@ describe('compose module', () => {
   });
 
   it('should adjust specificity of class name', () => {
-    sheet.insert('.first', '{color:red;}');
-    sheet.insert('.second', '{color:blue;}');
+    sheet.insert('.first', 'color: red;');
+    sheet.insert('.second', 'color:blue;');
     expect(compose('second', 'first')).toBe('second first');
     expect(sheet.rules().list[0].cssText).toBe(
       '.first,.second.first {color: red;}'
