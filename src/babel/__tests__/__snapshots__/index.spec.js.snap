@@ -10,6 +10,25 @@ exports[`babel plugin should create classnames for multiple \`css\` tagged templ
 
 exports[`babel plugin should create classnames for multiple \`css\` tagged template literal 2`] = `"border-radius: 4px;"`;
 
+exports[`babel plugin should not process file if it has \`linaria-preval\` comment 1`] = `
+"'use strict';
+
+var _templateObject = _taggedTemplateLiteral(['\\\\nfont-size: {2 + 1}em;\\\\n'], ['\\\\nfont-size: {2 + 1}em;\\\\n']);
+
+var _css = require('./src/css');
+
+var _css2 = _interopRequireDefault(_css);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+/* linaria-preval */
+var header = (0, _css2.default)(_templateObject);
+
+"
+`;
+
 exports[`babel plugin should not process tagged template if tag is not \`css\` 1`] = `
 "'use strict';
 
