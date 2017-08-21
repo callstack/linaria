@@ -112,6 +112,8 @@ export type ImportStatement = {
 
 export type State = {
   filename: string,
+  skipFile: boolean,
+  foundLinariaTaggedLiterals: boolean,
   file: Object,
   opts: Object,
 };

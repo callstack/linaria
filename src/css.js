@@ -4,12 +4,12 @@ import dedent from 'dedent';
 import slugify from './slugify';
 import sheet from './sheet';
 
-const named = (name?: string = 'css') => (
+const named = (name?: string = 'css', filename: ?string = null) => (
   template: string[],
   ...expressions: string[]
 ) => {
   const styles = dedent(template, ...expressions).trim();
-  const slug = slugify(styles);
+  const slug = slugify(filename || styles);
   const classname = `${name}_${slug}`;
 
   sheet.insert(`.${classname}`, styles);

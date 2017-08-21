@@ -457,7 +457,7 @@ describe('babel plugin', () => {
       expect(css).toMatchSnapshot();
     });
 
-    it('should preval function with external ids', () => {
+    xit('should preval function with external ids', () => {
       const { code, results } = transpile(dedent`
       const defaults = { fontSize: '14px' };
       const getConstants = () => Object.assign({}, defaults);

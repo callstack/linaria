@@ -30,6 +30,12 @@ export default function extractStyles(
   options: { single?: boolean, filename?: string, outDir?: string },
   { appendFileSync, writeFileSync }: * = fs
 ) {
+  /* $FlowFixMe */
+  const data = sheet.dump();
+  if (!data.length) {
+    return;
+  }
+
   const { single, filename } = {
     single: false,
     ...options,
@@ -37,9 +43,6 @@ export default function extractStyles(
       ? parseFilename(options.filename, currentFilename, options.outDir || '')
       : parseCurrentFilename(currentFilename, options.outDir || ''),
   };
-
-  /* $FlowFixMe */
-  const data = sheet.dump();
 
   if (single) {
     appendFileSync(filename, data);

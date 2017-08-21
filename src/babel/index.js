@@ -41,7 +41,7 @@ function ensureTagIsAssignedToAVariable(
 ) {
   const parent = path.parentPath;
   if (!parent.isVariableDeclarator()) {
-    throw new Error(
+    throw path.buildCodeFrameError(
       "Linaria's template literals must be assigned to a variable"
     );
   }
@@ -62,25 +62,38 @@ export default ({ types }: { types: BabelTypes }) => ({
   visitor: {
     Program: {
       enter(path: NodePath<*>, state: State) {
+        state.skipFile =
+          // $FlowFixMe
+          path.container.comments.length &&
+          path.container.comments[0].value.includes('linaria-preval');
+        state.foundLinariaTaggedLiterals = false;
         state.filename = state.file.opts.filename;
       },
       exit(path: NodePath<*>, state: State) {
-        extractStyles(types, path, state.filename, state.opts);
+        if (state.skipFile) {
+          return;
+        }
+
+        if (state.foundLinariaTaggedLiterals) {
+          extractStyles(types, path, state.filename, state.opts);
+        }
       },
     },
     TaggedTemplateExpression(
-      path: NodePath<BabelTaggedTemplateExpression<any>>
+      path: NodePath<BabelTaggedTemplateExpression<any>>,
+      state: State
     ) {
-      if (isLinariaTaggedTemplate(types, path)) {
+      if (!state.skipFile && isLinariaTaggedTemplate(types, path)) {
         ensureTagIsAssignedToAVariable(path);
 
-        const programPath = path.findParent(item => item.isProgram());
+        state.foundLinariaTaggedLiterals = true;
+
         const requirements = [];
-        programPath.traverse(requirementsVisitor, {
+        path.traverse(requirementsVisitor, {
           requirements,
         });
 
-        buildPrevaltemplate(types, path, requirements.join('\n'));
+        buildPrevaltemplate(types, path, state, requirements.join('\n'));
       }
     },
   },

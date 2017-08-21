@@ -2,6 +2,7 @@
 
 import type {
   BabelTypes,
+  State,
   NodePath,
   BabelTaggedTemplateExpression,
   BabelIdentifier,
@@ -14,7 +15,7 @@ import type {
  * `;
  *
  * const header = preval`
- *   module.exports = css`
+ *   module.exports = css.named('header_slug')`
  *     color: ${header.color}
  *   `;
  * `;
@@ -25,16 +26,25 @@ export default function(
   path: NodePath<
     BabelTaggedTemplateExpression<BabelIdentifier | BabelCallExpression>
   >,
+  state: State,
   requirements: string
 ) {
   const titile = path.parent.id.name;
+  const env = process.env.BABEL_ENV || process.env.NODE_ENV;
 
   const replacement = `
+  /* linaria-preval */
+
   import '${require.resolve('./register')}';
   ${requirements}
   module.exports = ${path
     .getSource()
-    .replace(/css(?!\.named)/g, `css.named('${titile}')`)};
+    .replace(
+      /css(?!\.named)/g,
+      env === 'production'
+        ? `css.named('${titile}')`
+        : `css.named('${titile}', '${state.filename}')`
+    )}
   `;
 
   /* $FlowFixMe */
