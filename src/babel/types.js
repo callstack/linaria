@@ -13,6 +13,7 @@ export type NodePath<K> = {
   isReferenced: () => boolean,
   getSource: () => string,
   isVariableDeclarator: () => boolean,
+  buildCodeFrameError: (message: string) => Error,
 };
 
 export type Binding<K> = {

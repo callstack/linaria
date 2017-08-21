@@ -49,6 +49,11 @@ describe('babel plugin', () => {
   beforeEach(() => {
     /* $FlowFixMe */
     extractStyles.mockReset();
+    process.env.BABEL_ENV = 'production';
+  });
+
+  afterEach(() => {
+    process.env.BABEL_ENV = '';
   });
 
   it('should not process tagged template if tag is not `css`', () => {
@@ -58,6 +63,17 @@ describe('babel plugin', () => {
     \`;
     `);
     expect(code.includes('font-size: 3em;')).toBeTruthy();
+    expect(code).toMatchSnapshot();
+  });
+
+  it('should not process file if it has `linaria-preval` comment', () => {
+    const { code } = transpile(dedent`
+    /* linaria-preval */
+    const header = css\`
+      font-size: {2 + 1}em;
+    \`;
+    `);
+    expect(code.includes('font-size: {2 + 1}em;')).toBeTruthy();
     expect(code).toMatchSnapshot();
   });
 
@@ -93,6 +109,39 @@ describe('babel plugin', () => {
     const { css } = filterResults(results, match);
     expect(css).toMatch('font-size: 3em');
     expect(css).toMatchSnapshot();
+  });
+
+  it('in development should use filename for slug creation', () => {
+    const { code: codeWithSlugFromContent } = transpile(dedent`
+    const header = css\`
+      font-size: 3em;
+    \`;
+    `);
+
+    process.env.BABEL_ENV = '';
+    const { code: codeWithSlugFromFilename } = transpile(
+      dedent`
+      const header = css\`
+        font-size: 3em;
+      \`;
+      `,
+      {},
+      { filename: path.join(process.cwd(), 'test.js') }
+    );
+    process.env.BABEL_ENV = 'production';
+
+    const classnameWithSlugFromContent = /header = "(header_[a-z0-9]+)"/g.exec(
+      codeWithSlugFromContent
+    );
+    const classnameWithSlugFromFilename = /header = "(header_[a-z0-9]+)"/g.exec(
+      codeWithSlugFromFilename
+    );
+
+    expect(classnameWithSlugFromContent).not.toBeNull();
+    expect(classnameWithSlugFromFilename).not.toBeNull();
+    expect(classnameWithSlugFromContent[0]).not.toEqual(
+      codeWithSlugFromFilename[0]
+    );
   });
 
   it('should create classname for `css.named()` tagged template literal', () => {

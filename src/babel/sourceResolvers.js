@@ -9,9 +9,6 @@ export function isExcluded(path: NodePath<*>): boolean {
 
 export function resolveSource(path: NodePath<*>): ?string {
   const binding = path.scope.getBinding(path.node.name);
-  if (!binding) {
-    return null;
-  }
 
   switch (binding.kind) {
     case 'module':
