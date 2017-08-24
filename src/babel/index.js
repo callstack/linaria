@@ -23,7 +23,11 @@ const externalRequirementsVisitor = {
     if (path.isReferenced() && getSelfBinding(path) && !isExcluded(path)) {
       const source: ?string = resolveSource(path);
       if (source && !this.requirements.find(item => item === source)) {
-        this.requirements.push(source);
+        this.requirements.splice(this.addBeforeIndex, 0, source);
+        const binding = getSelfBinding(path);
+        if (shouldTraverseExtrnalIds(binding.path)) {
+          binding.path.traverse(externalRequirementsVisitor, this);
+        }
       }
     }
   },
@@ -35,6 +39,7 @@ const cssTaggedTemplateRequirementsVisitor = {
       const source: ?string = resolveSource(path);
       if (source && !this.requirements.find(item => item === source)) {
         this.requirements.push(source);
+        this.addBeforeIndex = this.requirements.length - 1;
         const binding = getSelfBinding(path);
         if (shouldTraverseExtrnalIds(binding.path)) {
           binding.path.traverse(externalRequirementsVisitor, this);
