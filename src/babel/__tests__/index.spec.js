@@ -24,7 +24,7 @@ function transpile(source, pluginOptions = {}, options = {}) {
       \`;
     `,
     {
-      presets: ['es2015'],
+      presets: ['es2015', 'stage-3'],
       plugins: [
         [path.resolve('src/babel/index.js'), pluginOptions],
         require.resolve('babel-plugin-preval'),
@@ -506,7 +506,7 @@ describe('babel plugin', () => {
       expect(css).toMatchSnapshot();
     });
 
-    it('should preval function with external ids', () => {
+    it('should preval function with flat/shallow external ids', () => {
       const { code, results } = transpile(dedent`
       const defaults = { fontSize: '14px' };
       const getConstants = () => Object.assign({}, defaults);
@@ -520,6 +520,47 @@ describe('babel plugin', () => {
       expect(match).not.toBeNull();
       const { css } = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
+      expect(css).toMatchSnapshot();
+    });
+
+    it('should preval function with nested/deep external ids', () => {
+      const { code, results } = transpile(dedent`
+      const base = { color: '#ffffff', fontSize: '15px' };
+      const defaults = { fontSize: '14px', ...base };
+      const getConstants = () => ({ ...defaults });
+
+      const header = css\`
+        font-size: ${'${getConstants().fontSize}'};
+      \`;
+      `);
+
+      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      expect(match).not.toBeNull();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 15px');
+      expect(css).toMatchSnapshot();
+    });
+
+    it('should preval function with multiple nested/deep external ids', () => {
+      const { code, results } = transpile(dedent`
+      function multiply(value, by) {
+        return value * by;
+      }
+
+      const bg = { background: 'none' };
+      const base = { color: '#ffffff', fontSize: multiply(14, 2) + 'px', ...bg };
+      const defaults = { fontSize: '14px', ...base, ...bg };
+      const getConstants = () => ({ ...defaults });
+
+      const header = css\`
+        font-size: ${'${getConstants().fontSize}'};
+      \`;
+      `);
+
+      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      expect(match).not.toBeNull();
+      const { css } = filterResults(results, match);
+      expect(css).toMatch('font-size: 28px');
       expect(css).toMatchSnapshot();
     });
   });

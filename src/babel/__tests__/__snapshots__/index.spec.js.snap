@@ -78,7 +78,11 @@ exports[`babel plugin with function calls should preval multiple function calls 
 
 exports[`babel plugin with function calls should preval with function call inside an expression 1`] = `"font-size: 28px;"`;
 
-exports[`babel plugin with function delcarations/expressions should preval function with external ids 1`] = `"font-size: 14px;"`;
+exports[`babel plugin with function delcarations/expressions should preval function with flat/shallow external ids 1`] = `"font-size: 14px;"`;
+
+exports[`babel plugin with function delcarations/expressions should preval function with multiple nested/deep external ids 1`] = `"font-size: 28px;"`;
+
+exports[`babel plugin with function delcarations/expressions should preval function with nested/deep external ids 1`] = `"font-size: 15px;"`;
 
 exports[`babel plugin with function delcarations/expressions should preval with arrow function 1`] = `"font-size: 14px;"`;
 
