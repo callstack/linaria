@@ -3,5 +3,9 @@
     "es2015",
     "react",
     "stage-3"
+  ],
+  "plugins": [
+    "linaria/babel",
+    "babel-plugin-preval"
   ]
 }
