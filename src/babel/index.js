@@ -7,52 +7,38 @@ import type {
   BabelTaggedTemplateExpression,
 } from './types';
 
+import {
+  shouldTraverseExtrnalIds,
+  isLinariaTaggedTemplate,
+  ensureTagIsAssignedToAVariable,
+  isExcluded,
+} from './validators';
+import { getSelfBinding } from './utils';
 import buildPrevaltemplate from './buildPrevalTemplate';
-import { isExcluded, resolveSource } from './sourceResolvers';
+import resolveSource from './resolveSource';
 import extractStyles from './extractStyles';
 
-function isLinariaTaggedTemplate(
-  types: BabelTypes,
-  path: NodePath<BabelTaggedTemplateExpression<any>>
-): boolean {
-  if (
-    (types.isIdentifier(path.node.tag) && path.node.tag.name === 'css') ||
-    (types.isCallExpression(path.node.tag) &&
-      types.isMemberExpression(path.node.tag.callee) &&
-      path.node.tag.callee.object.name === 'css' &&
-      path.node.tag.callee.property.name === 'named')
-  ) {
-    return true;
-  }
+const externalRequirementsVisitor = {
+  Identifier(path) {
+    if (path.isReferenced() && getSelfBinding(path) && !isExcluded(path)) {
+      const source: ?string = resolveSource(path);
+      if (source && !this.requirements.find(item => item === source)) {
+        this.requirements.push(source);
+      }
+    }
+  },
+};
 
-  if (
-    types.isMemberExpression(path.node.tag) &&
-    path.node.tag.object.name === 'css' &&
-    path.node.tag.property.name === 'named'
-  ) {
-    throw new Error("Linaria's `css.named` must be called with a classname");
-  }
-
-  return false;
-}
-
-function ensureTagIsAssignedToAVariable(
-  path: NodePath<BabelTaggedTemplateExpression<any>>
-) {
-  const parent = path.parentPath;
-  if (!parent.isVariableDeclarator()) {
-    throw path.buildCodeFrameError(
-      "Linaria's template literals must be assigned to a variable"
-    );
-  }
-}
-
-const requirementsVisitor = {
+const cssTaggedTemplateRequirementsVisitor = {
   Identifier(path) {
     if (path.isReferenced() && !isExcluded(path)) {
       const source: ?string = resolveSource(path);
       if (source && !this.requirements.find(item => item === source)) {
         this.requirements.push(source);
+        const binding = getSelfBinding(path);
+        if (shouldTraverseExtrnalIds(binding.path)) {
+          binding.path.traverse(externalRequirementsVisitor, this);
+        }
       }
     }
   },
@@ -89,7 +75,7 @@ export default ({ types }: { types: BabelTypes }) => ({
         state.foundLinariaTaggedLiterals = true;
 
         const requirements = [];
-        path.traverse(requirementsVisitor, {
+        path.traverse(cssTaggedTemplateRequirementsVisitor, {
           requirements,
         });
 
