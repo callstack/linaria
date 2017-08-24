@@ -1,4 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-env node */
 
 const path = require('path');
 const glob = require('glob');
