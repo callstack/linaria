@@ -29,7 +29,7 @@ export default function(
   state: State,
   requirements: string
 ) {
-  const titile = path.parent.id.name;
+  const title = path.parent.id.name;
   const env = process.env.BABEL_ENV || process.env.NODE_ENV;
 
   const replacement = `
@@ -42,8 +42,8 @@ export default function(
     .replace(
       /css(?!\.named)/g,
       env === 'production'
-        ? `css.named('${titile}')`
-        : `css.named('${titile}', '${state.filename}')`
+        ? `css.named('${title}')`
+        : `css.named('${title}', '${state.filename}')`
     )}
   `;
 
