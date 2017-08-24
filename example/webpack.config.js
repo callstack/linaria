@@ -49,12 +49,11 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
         exclude: /node_modules/,
         use: [{ loader: 'babel-loader' }],
       },
+      {
+        test: /\.css$/,
+        use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
+      },
     ],
-  },
-  resolve: {
-    alias: {
-      linaria: path.resolve(__dirname, '../src/index.js'),
-    },
   },
   devServer: {
     contentBase: 'static/',
