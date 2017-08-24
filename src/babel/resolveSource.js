@@ -2,13 +2,10 @@
 
 import type { NodePath } from './types';
 
-export function isExcluded(path: NodePath<*>): boolean {
-  const binding = path.scope.getBinding(path.node.name);
-  return binding && binding.kind === 'param';
-}
+import { getSelfBinding } from './utils';
 
-export function resolveSource(path: NodePath<*>): ?string {
-  const binding = path.scope.getBinding(path.node.name);
+export default function resolveSource(path: NodePath<*>): ?string {
+  const binding = getSelfBinding(path);
 
   switch (binding.kind) {
     case 'module':

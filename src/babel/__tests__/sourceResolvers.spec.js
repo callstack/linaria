@@ -1,6 +1,6 @@
-import { resolveSource } from '../sourceResolvers';
+import resolveSource from '../resolveSource';
 
-test('sourceResolvers#resolveSource should return null if binding source is emoty', () => {
+test('resolveSource should return null if binding source is emoty', () => {
   expect(
     resolveSource({
       node: {

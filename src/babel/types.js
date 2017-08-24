@@ -7,13 +7,15 @@ export type NodePath<K> = {
   scope: {
     getBinding: (id: string) => Binding<any>,
   },
-  traverse: (visitor: { [key: string]: Function }, thisArgs?: any) => void,
-  findParent: ((path: NodePath<*>) => boolean) => NodePath<*>,
   isProgram: () => boolean,
   isReferenced: () => boolean,
-  getSource: () => string,
   isVariableDeclarator: () => boolean,
+  isImportDefaultSpecifier: () => boolean,
+  isImportSpecifier: () => boolean,
+  getSource: () => string,
   buildCodeFrameError: (message: string) => Error,
+  traverse: (visitor: { [key: string]: Function }, thisArgs?: any) => void,
+  findParent: ((path: NodePath<*>) => boolean) => NodePath<*>,
 };
 
 export type Binding<K> = {
