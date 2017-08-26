@@ -20,7 +20,7 @@ CSS rule declarations use tagged template litreals which produce a class name fo
 
 ```js
 import React from 'react';
-import { css, compose } from 'linaria';
+import { css, names } from 'linaria';
 import fonts from './fonts.js';
 import colors from './colors.js';
 
@@ -48,7 +48,7 @@ const header = css`
 
 export default function Header({ className }) {
   return (
-    <div className={compose(container, className)}>
+    <div className={names(container, className)}>
       <h1 className={header} />
     </div>
   );
