@@ -25,4 +25,11 @@ describe('sheet module (node)', () => {
   it('should throw error when getting rules', () => {
     expect(sheet.rules).toThrowError('Not implemented');
   });
+
+  it('should not insert same css multiple times', () => {
+    sheet.insert('.lol', '{color:pink}');
+    sheet.insert('.lol', '{color:pink}');
+
+    expect(sheet.dump()).toBe('.lol{color:pink;}');
+  });
 });
