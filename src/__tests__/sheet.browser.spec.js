@@ -52,6 +52,16 @@ describe('sheet module (browser)', () => {
     );
   });
 
+  it('should not insert same css multiple times', () => {
+    sheet.insert('.lol', '{color:pink}');
+    sheet.insert('.lol', '{color:pink}');
+
+    const rules = sheet.rules();
+
+    expect(rules.list[2].cssText).toBe('.lol {color: pink;}');
+    expect(rules.list[3]).toBe(undefined);
+  });
+
   it('should throw when `head` is null', () => {
     jest.resetModules();
     /* $FlowFixMe */

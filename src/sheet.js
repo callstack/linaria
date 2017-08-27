@@ -14,6 +14,13 @@ function sheet() {
   if (typeof window === 'undefined' || typeof window.document === 'undefined') {
     return {
       insert(selector: string, css: string) {
+        if (
+          stylesCache &&
+          stylesCache.find(item => item.selector === selector)
+        ) {
+          return;
+        }
+
         const text = stylis(selector, css);
         stylesCache = stylesCache || [];
         stylesCache.push({ selector, css });
@@ -48,7 +55,13 @@ function sheet() {
 
   return {
     insert(selector: string, css: string) {
+      if (stylesCache && stylesCache.find(item => item.selector === selector)) {
+        return;
+      }
+
       const text = stylis(selector, css);
+      stylesCache = stylesCache || [];
+      stylesCache.push({ selector, css });
       node.appendData(`\n${text}`);
       // invalidate the cache since stylesheets have changed
       ruleCache = null;
