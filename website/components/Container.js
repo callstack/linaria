@@ -1,12 +1,15 @@
 /* @flow */
 import * as React from 'react';
-import { css } from 'linaria';
+import { css, names } from 'linaria';
 
-type Props = { children: React.Element<*> | Array<React.Element<*>> };
+type Props = {
+  children: React.Element<*> | Array<React.Element<*>>,
+  className: string,
+};
 
-export default function Container({ children }: Props) {
+export default function Container({ className, children }: Props) {
   return (
-    <div className={container}>
+    <div className={names(container, className)}>
       {children}
     </div>
   );

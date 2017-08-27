@@ -3,22 +3,28 @@ import * as React from 'react';
 import { css } from 'linaria';
 import theme from '../styles/theme';
 import Container from '../components/Container';
+import Header from '../components/Header';
 import '../styles/global.css';
 
 export default function Index() {
   return (
-    <div className={hero}>
-      <Container>
-        <h1 className={heading}>Linaria is zero-runtime CSS in JS library.</h1>
-        <button className={button}>Get Started</button>
-      </Container>
+    <div>
+      <Header />
+      <div className={hero}>
+        <Container>
+          <h1 className={heading}>
+            Linaria is zero-runtime CSS in JS library.
+          </h1>
+          <button className={button}>Get Started</button>
+        </Container>
+      </div>
     </div>
   );
 }
 
 const hero = css`
   background: #fffaf6;
-  padding: 100px 0;
+  padding: 150px 0;
 `;
 
 const heading = css`
@@ -36,7 +42,7 @@ const button = css`
   color: ${theme.primary};
   font-size: 1em;
   font-weight: 700;
-  font-family: Montserrat;
+  font-family: ${theme.fontFamily};
   letter-spacing: 0.1em;
   text-transform: uppercase;
   border: 2px solid ${theme.primary};
