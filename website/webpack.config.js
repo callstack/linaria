@@ -3,6 +3,7 @@
 
 const webpack = require('webpack');
 const path = require('path');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const PORT = 3000;
 
@@ -21,7 +22,7 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
   output: {
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/dist/',
-    filename: 'bundle.js',
+    filename: '[name].js',
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -35,6 +36,12 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
             compress: { warnings: false },
             sourceMap: true,
           }),
+          new ExtractTextPlugin('styles.css'),
+          new webpack.optimize.CommonsChunkPlugin({
+            name: 'vendor',
+            minChunks: ({ resource }) => /node_modules/.test(resource),
+          }),
+          new webpack.optimize.CommonsChunkPlugin('manifest'),
         ]
       : [
           new webpack.HotModuleReplacementPlugin(),
@@ -49,11 +56,20 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
         exclude: /node_modules/,
         use: [{ loader: 'babel-loader' }],
       },
-      {
-        test: /\.css$/,
-        use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
-      },
-    ],
+    ].concat(
+      env.NODE_ENV === 'production'
+        ? {
+            test: /\.css$/,
+            use: ExtractTextPlugin.extract({
+              fallback: 'style-loader',
+              use: 'css-loader',
+            }),
+          }
+        : {
+            test: /\.css$/,
+            use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
+          }
+    ),
   },
   devServer: {
     contentBase: 'static',
