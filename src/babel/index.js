@@ -66,6 +66,9 @@ export default ({ types }: { types: BabelTypes }) => ({
         }
 
         if (state.foundLinariaTaggedLiterals) {
+          if (state.opts.extract === false) {
+            return;
+          }
           extractStyles(types, path, state.filename, state.opts);
         }
       },

@@ -1,3 +1,19 @@
 {
-  "presets": ["next/babel"]
+  "presets": [
+    [
+      "env",
+      {
+        "targets": {
+          "browsers": ["last 2 versions"]
+        }
+      }
+    ],
+    "react"
+  ],
+  "plugins": [["linaria/babel", {"extract": false}], "babel-plugin-preval"],
+  "env": {
+    "production": {
+      "plugins": ["linaria/babel", "babel-plugin-preval"]
+    }
+  }
 }
