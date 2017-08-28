@@ -24,7 +24,7 @@ describe('sheet module (node)', () => {
   });
 
   it('should throw error when getting rules', () => {
-    expect(sheet.rules).toThrowError('Not implemented');
+    expect(sheet.rules).toThrow('Not implemented');
   });
 
   it('should not insert same css multiple times', () => {

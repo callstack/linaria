@@ -9,12 +9,12 @@ function sheet() {
     style: Object,
   }>;
   let cache: { [selector: string]: string } = {};
-  let cssText = '';
+  let cssText = null;
 
   if (typeof window === 'undefined' || typeof window.document === 'undefined') {
     return {
       insert(selector: string, css: string) {
-        if (cache.hasOwnProperty(selector)) {
+        if (selector in cache) {
           return;
         }
 
@@ -51,7 +51,7 @@ function sheet() {
 
   return {
     insert(selector: string, css: string) {
-      if (cache.hasOwnProperty(selector)) {
+      if (selector in cache) {
         return;
       }
 
@@ -72,6 +72,12 @@ function sheet() {
       );
 
       return { list: ruleCache, cache: false };
+    },
+    styles() {
+      return cache;
+    },
+    dump() {
+      throw new Error('Not implemented');
     },
   };
 }

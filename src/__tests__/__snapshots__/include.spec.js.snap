@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`include module should include styles from a single class name 1`] = `
+"
+color: orange;
+
+@media (max-width: 100px) {
+  font-family: monospace;
+}"
+`;
+
+exports[`include module should include styles from a single class name 2`] = `
+"
+font-weight: 400;
+color: orange;
+
+@media (max-width: 100px) {
+  font-family: monospace;
+}"
+`;
+
+exports[`include module should include styles from a single class name 3`] = `
+"font-weight: 400;
+color: orange;
+
+@media (max-width: 100px) {
+font-family: monospace;
+}
+
+    font-family: sans-serif;"
+`;
+
+exports[`include module should include styles from a single class name 4`] = `
+".css_4d5cc7ae{font-weight:400;}
+.css_b2c743f8{color:orange;}@media (max-width:100px){.css_b2c743f8{font-family:monospace;}}
+.css_5c4a7019{font-weight:400;color:orange;font-family:sans-serif;}@media (max-width:100px){.css_5c4a7019{font-family:monospace;}}"
+`;
