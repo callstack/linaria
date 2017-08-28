@@ -7,7 +7,8 @@
     "start": "webpack-dev-server",
     "build": "NODE_ENV=production webpack -p --env.NODE_ENV production",
     "prebuild": "yarn run clean",
-    "clean": "del dist"
+    "clean": "del dist",
+    "postinstall": "cd .. && yarn link && cd website && yarn link linaria"
   },
   "dependencies": {
     "babel-plugin-preval": "^1.4.4",
