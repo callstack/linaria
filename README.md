@@ -20,19 +20,21 @@ CSS rule declarations use tagged template litreals which produce a class name fo
 
 ```js
 import React from 'react';
-import { css, names } from 'linaria';
+import { css, include, names } from 'linaria';
 import fonts from './fonts.js';
 import colors from './colors.js';
 
 const title = css`
   text-transform: uppercase;
-`
+`;
 
 const container = css`
   height: 3rem;
-`
+`;
 
 const header = css`
+  ${include(title)}
+
   font-family: ${fonts.heading};
   font-size: 3rem;
   margin-bottom: .5rem;
@@ -67,31 +69,32 @@ After being transpiled, the code will output following CSS:
 
 
 ```css
-.container__jdh5rtz.title__jt5ry4 {
+.title_jt5ry4 {
   text-transform: uppercase;
 }
 
-.container__jdh5rtz {
+.container_jdh5rtz {
   height: 3rem;
 }
 
-.header__xy4ertz {
+.header_xy4ertz {
+  text-transform: uppercase;
   font-family: Helvetica, sans-serif; /* constants are automatically inlined */
   font-size: 3rem;
   margin-bottom: .5rem;
 }
 
 @media (max-width: 320px) {
-  .header__xy4ertz {
+  .header_xy4ertz {
     font-size: 2rem;
   }
 }
 
-[data-theme=dark] .header__xy4ertz {
+[data-theme=dark] .header_xy4ertz {
   color: #fff;
 }
 
-[data-theme=light] .header__xy4ertz {
+[data-theme=light] .header_xy4ertz {
   color: #222;
 }
 ```
@@ -100,21 +103,28 @@ And the following JavaScipt:
 
 ```js
 import React from 'react';
+import names from 'linaria/build/names';
+
+const title = 'title_jt5ry4';
+
+const container = 'container_jdh5rtz';
+
+const header = 'header_xy4ertz';
 
 export default function Header({ className }) {
   return (
-    <div className={'container__jdh5rtz' + ' ' + className)}>
-      <h1 className="header__xy4ertz" />
+    <div className={names(container, className)}>
+      <h1 className={header} />
     </div>
   );
 }
 
 export function Block() {
-  return <div className="container__jdh5rtz" />;
+  return <div className={container} />;
 }
 
 export function App() {
-  return <Header className="title__jt5ry4" />;
+  return <Header className={title} />;
 }
 ```
 
@@ -151,9 +161,9 @@ Sometimes we have some styles based on component's props or state, or dynamic in
 Even with fully static CSS, we have an opportunity to improve the initial page load by inlining critical CSS.
 
 ```js
+import crypto from 'crypto';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { slugify } from 'linaria';
 import { collect } from 'linaria/server';
 import App from './App';
 
@@ -165,7 +175,7 @@ const app = express();
 app.get('/', (req, res) => {
   const html = ReactDOMServer.renderToString(<App />);
   const { critical, other }  = collect(html, css);
-  const slug = slugify(other);
+  const slug = crypto.createHash('md5').update(other).digest('hex');;
 
   cache[slug] = other;
 
