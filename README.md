@@ -196,7 +196,6 @@ We probably should write these CSS chunks to disk and serve them with correct he
 ## Challenges to solve
 
 1. Theming should have a nicer API, the idea is to specify set of theme names, generate set of rules for each theme automatically and then change an attribute at application root to switch themes
-1. It'll be nicer to figure out common CSS for all pages in server rendering and then ship page specific CSS inline
 
 
 ## Inspiration
