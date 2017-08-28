@@ -10,7 +10,7 @@ export default function Header() {
   return (
     <div className={header}>
       <Container className={headerContainer}>
-        <div className={logo}>Linaria</div>
+        <a className={logo} href="/">Linaria</a>
         <ul className={nav}>
           <li>
             <a className={navLink} href="/docs">
@@ -46,6 +46,8 @@ const headerContainer = css`
 `;
 
 const logo = css`
+  display: block;
+  text-decoration: none;
   font-weight: 700;
   text-transform: uppercase;
   padding: ${navSpacing}px 0;
@@ -64,4 +66,9 @@ const navLink = css`
   padding: ${navSpacing}px;
   text-decoration: none;
   color: ${theme.text};
+  transition: color .2s;
+
+  &:hover {
+    color: ${theme.primary}
+  }
 `;
