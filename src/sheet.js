@@ -8,34 +8,30 @@ function sheet() {
     cssText: string,
     style: Object,
   }>;
-  let cssText: ?string;
-  let stylesCache: ?Array<{ selector: string, css: string }>;
+  let cache: { [selector: string]: string } = {};
+  let cssText = '';
 
   if (typeof window === 'undefined' || typeof window.document === 'undefined') {
     return {
       insert(selector: string, css: string) {
-        if (
-          stylesCache &&
-          stylesCache.find(item => item.selector === selector)
-        ) {
+        if (cache.hasOwnProperty(selector)) {
           return;
         }
 
         const text = stylis(selector, css);
-        stylesCache = stylesCache || [];
-        stylesCache.push({ selector, css });
+        cache[selector] = css;
         cssText = cssText ? `${cssText}\n${text}` : text;
       },
       rules() {
         throw new Error('Not implemented');
       },
       styles() {
-        return stylesCache || [];
+        return cache;
       },
       dump() {
         const result = cssText || '';
         cssText = null;
-        stylesCache = null;
+        cache = {};
         return result;
       },
     };
@@ -55,13 +51,12 @@ function sheet() {
 
   return {
     insert(selector: string, css: string) {
-      if (stylesCache && stylesCache.find(item => item.selector === selector)) {
+      if (cache.hasOwnProperty(selector)) {
         return;
       }
 
       const text = stylis(selector, css);
-      stylesCache = stylesCache || [];
-      stylesCache.push({ selector, css });
+      cache[selector] = css;
       node.appendData(`\n${text}`);
       // invalidate the cache since stylesheets have changed
       ruleCache = null;
