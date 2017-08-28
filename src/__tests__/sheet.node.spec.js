@@ -10,16 +10,17 @@ describe('sheet module (node)', () => {
 
   it('should give styles list', () => {
     sheet.insert('some_selector', '{color:rebeccapurple}');
-    expect(sheet.styles()).toEqual([
-      { selector: 'some_selector', css: '{color:rebeccapurple}' },
-    ]);
+    expect(sheet.styles()).toEqual({
+      some_selector: '{color:rebeccapurple}',
+    });
   });
 
   it('should clear cache on dump', () => {
     sheet.insert('.foo', '{color:palevioletred}');
+    expect(sheet.styles()).toEqual({ '.foo': '{color:palevioletred}' });
     sheet.dump();
     expect(sheet.dump()).toBe('');
-    expect(sheet.styles()).toEqual([]);
+    expect(sheet.styles()).toEqual({});
   });
 
   it('should throw error when getting rules', () => {
