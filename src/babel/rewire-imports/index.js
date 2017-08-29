@@ -4,10 +4,7 @@ import type {
   BabelTypes,
   NodePath,
   BabelVariableDeclarator,
-  // BabelImportDeclatation,
 } from '../types';
-
-import splitModuleImports from './splitModuleImports';
 
 type State = {
   shouldSkip: boolean,
