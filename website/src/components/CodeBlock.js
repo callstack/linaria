@@ -11,7 +11,7 @@ type Props = {
 };
 
 type State = {
-  __html: void,
+  __html: *,
 };
 
 export default class CodeBlock extends Component<Props, State> {
@@ -42,7 +42,7 @@ export default class CodeBlock extends Component<Props, State> {
 
 const prism = (code, language) => {
   if (!language || !window.Prism.languages[language]) {
-    return undefined;
+    return code;
   }
 
   return window.Prism.highlight(code, window.Prism.languages[language]);
