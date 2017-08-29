@@ -8,7 +8,11 @@
         }
       }
     ],
-    "react"
+    "react",
+    "linaria/babel"
   ],
-  "plugins": ["linaria/babel", "babel-plugin-preval"]
+  "plugins": [
+    "transform-class-properties",
+    "transform-object-rest-spread"
+  ]
 }

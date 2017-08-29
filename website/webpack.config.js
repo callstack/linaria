@@ -54,20 +54,7 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              [
-                'env',
-                {
-                  modules: false,
-                },
-              ],
-            ],
-            plugins: [require.resolve('../babel'), 'babel-plugin-preval'],
-          },
-        },
+        use: { loader: 'babel-loader' },
       },
     ].concat(
       env.NODE_ENV === 'production'

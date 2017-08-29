@@ -10,7 +10,9 @@ export default function Header() {
   return (
     <div className={header}>
       <Container className={headerContainer}>
-        <a className={logo} href="/">Linaria</a>
+        <a className={logo} href="/">
+          Linaria
+        </a>
         <ul className={nav}>
           <li>
             <a className={navLink} href="/docs">
