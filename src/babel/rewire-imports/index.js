@@ -1,10 +1,6 @@
 /* @flow */
 
-import type {
-  BabelTypes,
-  NodePath,
-  BabelVariableDeclarator,
-} from '../types';
+import type { BabelTypes, NodePath, BabelVariableDeclarator } from '../types';
 
 type State = {
   shouldSkip: boolean,
