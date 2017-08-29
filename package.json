@@ -20,13 +20,13 @@
   ],
   "dependencies": {
     "babel-core": "^6.26.0",
-    "babel-plugin-preval": "^1.4.3",
+    "babel-plugin-preval": "^1.4.4",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0",
     "dedent": "^0.7.0",
-    "postcss": "^6.0.9",
+    "postcss": "^6.0.10",
     "short-hash": "^1.0.0",
-    "stylis": "^3.2.8"
+    "stylis": "^3.2.13"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -38,13 +38,13 @@
     "cli-table": "^0.3.1",
     "cssom": "^0.3.2",
     "del-cli": "^1.1.0",
-    "eslint": "^4.4.1",
+    "eslint": "^4.5.0",
     "eslint-config-callstack-io": "^0.4.1",
-    "flow-bin": "^0.53.0",
-    "flow-copy-source": "^1.2.0",
+    "flow-bin": "^0.53.1",
+    "flow-copy-source": "^1.2.1",
     "glob": "^7.1.2",
     "jest": "^20.0.4",
-    "prettier": "^1.5.3"
+    "prettier": "^1.6.1"
   },
   "jest": {
     "testRegex": "/__tests__/.*\\.(test|spec)\\.js$",
