@@ -45,7 +45,7 @@ function filterResults(results, match) {
   return results[`.${match[1]}`];
 }
 
-describe('babel plugin', () => {
+describe('preval-extract babel plugin', () => {
   beforeEach(() => {
     /* $FlowFixMe */
     extractStyles.mockReset();
