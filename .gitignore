@@ -49,4 +49,3 @@ android/keystores/debug.keystore
 # jest
 coverage/
 example/dist/
-example/**/*.css
