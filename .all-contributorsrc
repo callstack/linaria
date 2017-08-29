@@ -1,0 +1,43 @@
+{
+  "projectName": "linara",
+  "projectOwner": "satya164",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "zamotany",
+      "name": "Paweł Trysła",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/17573635?v=4",
+      "profile": "https://twitter.com/_zamotany",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas"
+      ]
+    },
+    {
+      "login": "satya164",
+      "name": "Satyajit Sahoo",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1174278?v=4",
+      "profile": "https://medium.com/@satya164",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "thymikee",
+      "name": "Michał Pierzchała",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/5106466?v=4",
+      "profile": "https://github.com/thymikee",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas"
+      ]
+    }
+  ]
+}
