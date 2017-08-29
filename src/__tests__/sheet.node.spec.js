@@ -10,19 +10,27 @@ describe('sheet module (node)', () => {
 
   it('should give styles list', () => {
     sheet.insert('some_selector', '{color:rebeccapurple}');
-    expect(sheet.styles()).toEqual([
-      { selector: 'some_selector', css: '{color:rebeccapurple}' },
-    ]);
+    expect(sheet.styles()).toEqual({
+      some_selector: '{color:rebeccapurple}',
+    });
   });
 
   it('should clear cache on dump', () => {
     sheet.insert('.foo', '{color:palevioletred}');
+    expect(sheet.styles()).toEqual({ '.foo': '{color:palevioletred}' });
     sheet.dump();
     expect(sheet.dump()).toBe('');
-    expect(sheet.styles()).toEqual([]);
+    expect(sheet.styles()).toEqual({});
   });
 
   it('should throw error when getting rules', () => {
-    expect(sheet.rules).toThrowError('Not implemented');
+    expect(sheet.rules).toThrow('Not implemented');
+  });
+
+  it('should not insert same css multiple times', () => {
+    sheet.insert('.lol', '{color:pink}');
+    sheet.insert('.lol', '{color:pink}');
+
+    expect(sheet.dump()).toBe('.lol{color:pink;}');
   });
 });

@@ -1,5 +1,5 @@
 /* @flow */
 
 export { default as css } from './css';
-export { default as compose } from './compose';
-export { default as slugify } from './slugify';
+export { default as include } from './include';
+export { default as names } from './names';

@@ -42,7 +42,7 @@ function transpile(source, pluginOptions = {}, options = {}) {
 }
 
 function filterResults(results, match) {
-  return results.find(e => e.selector.includes(match[1])) || {};
+  return results[`.${match[1]}`];
 }
 
 describe('babel plugin', () => {
@@ -106,7 +106,7 @@ describe('babel plugin', () => {
 
     const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
-    const { css } = filterResults(results, match);
+    const css = filterResults(results, match);
     expect(css).toMatch('font-size: 3em');
     expect(css).toMatchSnapshot();
   });
@@ -153,7 +153,7 @@ describe('babel plugin', () => {
 
     const match = /header = "(my-header_[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
-    const { css } = filterResults(results, match);
+    const css = filterResults(results, match);
     expect(css).toMatch('font-size: 3em');
     expect(css).toMatchSnapshot();
   });
@@ -173,8 +173,8 @@ describe('babel plugin', () => {
     const bodyMatch = /body = "(body_[a-z0-9]+)"/g.exec(code);
     expect(headerMatch).not.toBeNull();
     expect(bodyMatch).not.toBeNull();
-    const { css: headerStyles } = filterResults(results, headerMatch);
-    const { css: bodyStyles } = filterResults(results, bodyMatch);
+    const headerStyles = filterResults(results, headerMatch);
+    const bodyStyles = filterResults(results, bodyMatch);
     expect(headerStyles).toMatch('font-size: 3em');
     expect(headerStyles).toMatchSnapshot();
     expect(bodyStyles).toMatch('border-radius: 4px');
@@ -196,7 +196,7 @@ describe('babel plugin', () => {
 
     const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
-    const { css } = filterResults(results, match);
+    const css = filterResults(results, match);
     expect(css).toMatch('font-size: 3em');
     expect(css).toMatchSnapshot();
   });
@@ -218,7 +218,7 @@ describe('babel plugin', () => {
 
     const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
-    const { css } = filterResults(results, match);
+    const css = filterResults(results, match);
     expect(css).toMatch('font-size: 3em');
     expect(css).toMatch('color: #ffffff');
     expect(css).toMatchSnapshot();
@@ -238,7 +238,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 3em');
       expect(css).toMatchSnapshot();
     });
@@ -262,7 +262,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 3em');
       expect(css).toMatchSnapshot();
     });
@@ -284,7 +284,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 3em');
       expect(css).toMatchSnapshot();
     });
@@ -306,7 +306,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 3em');
       expect(css).toMatchSnapshot();
     });
@@ -328,7 +328,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 3em');
       expect(css).toMatchSnapshot();
     });
@@ -348,7 +348,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 3em');
       expect(css).toMatchSnapshot();
     });
@@ -366,7 +366,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
       expect(css).toMatchSnapshot();
     });
@@ -382,7 +382,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
       expect(css).toMatchSnapshot();
     });
@@ -400,7 +400,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
       expect(css).toMatchSnapshot();
     });
@@ -422,8 +422,8 @@ describe('babel plugin', () => {
       const bodyMatch = /body = "(body_[a-z0-9]+)"/g.exec(code);
       expect(headerMatch).not.toBeNull();
       expect(bodyMatch).not.toBeNull();
-      const { css: headerStyles } = filterResults(results, headerMatch);
-      const { css: bodyStyles } = filterResults(results, bodyMatch);
+      const headerStyles = filterResults(results, headerMatch);
+      const bodyStyles = filterResults(results, bodyMatch);
       expect(headerStyles).toMatch('font-size: 36px');
       expect(headerStyles).toMatchSnapshot();
       expect(bodyStyles).toMatch('font-size: 24px');
@@ -441,7 +441,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 28px');
       expect(css).toMatchSnapshot();
     });
@@ -463,7 +463,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
       expect(css).toMatchSnapshot();
     });
@@ -483,7 +483,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
       expect(css).toMatchSnapshot();
     });
@@ -501,7 +501,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
       expect(css).toMatchSnapshot();
     });
@@ -518,7 +518,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
       expect(css).toMatchSnapshot();
     });
@@ -536,7 +536,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 15px');
       expect(css).toMatchSnapshot();
     });
@@ -559,7 +559,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 28px');
       expect(css).toMatchSnapshot();
     });
@@ -578,7 +578,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 28px');
       expect(css).toMatchSnapshot();
     });
@@ -601,7 +601,7 @@ describe('babel plugin', () => {
 
       const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
-      const { css } = filterResults(results, match);
+      const css = filterResults(results, match);
       expect(css).toMatch('font-size: 33px');
       expect(css).toMatchSnapshot();
     });

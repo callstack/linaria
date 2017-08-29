@@ -52,11 +52,33 @@ describe('sheet module (browser)', () => {
     );
   });
 
+  it('should not insert same css multiple times', () => {
+    sheet.insert('.lol', '{color:pink}');
+    sheet.insert('.lol', '{color:pink}');
+
+    const rules = sheet.rules();
+
+    expect(rules.list[2].cssText).toBe('.lol {color: pink;}');
+    expect(rules.list[3]).toBe(undefined);
+  });
+
+  it('should return cache', () => {
+    expect(sheet.styles()).toEqual({
+      '.foo': '{color:purple;font-size:12px;}',
+      '.lol': '{color:pink}',
+      '.some_selector': '{color:blue}',
+    });
+  });
+
+  it('should throw when using dump', () => {
+    expect(sheet.dump).toThrow('Not implemented');
+  });
+
   it('should throw when `head` is null', () => {
     jest.resetModules();
     /* $FlowFixMe */
     document.head = null;
-    expect(() => require('../sheet').default).toThrowError(
+    expect(() => require('../sheet').default).toThrow(
       'Unable to insert stylesheet'
     );
   });

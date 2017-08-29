@@ -2,7 +2,8 @@
   "presets": [
     ["env", {
       "targets": {
-        "node": 4
+        "node": 4,
+        "browsers": ["last 2 versions"]
       }
     }],
     "stage-3"

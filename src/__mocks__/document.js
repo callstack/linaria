@@ -13,13 +13,13 @@ class Text {
   }
 
   textContent: string;
-  parent: any;
+  parentNode: any;
   nodeName: string;
 
   appendData(t: string) {
-    if (this.parent instanceof HTMLStyleElement) {
+    if (this.parentNode instanceof HTMLStyleElement) {
       const ast = CSSOM.parse(t);
-      this.parent.__ast.cssRules.push(...ast.cssRules);
+      this.parentNode.__ast.cssRules.push(...ast.cssRules);
     }
 
     this.textContent += t;
@@ -44,7 +44,7 @@ class HTMLElement {
   }
 
   appendChild(el: *) {
-    el.parent = this; // eslint-disable-line no-param-reassign
+    el.parentNode = this; // eslint-disable-line no-param-reassign
     this.children.push(el);
   }
 

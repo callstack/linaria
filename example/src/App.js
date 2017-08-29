@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { css, compose } from 'linaria';
+import { css } from 'linaria';
 import colors from './colors';
 
 const container = css`
@@ -49,10 +49,7 @@ export default function App() {
     <div className={container}>
       <h1 className={title}>Linaria</h1>
       <p className={text}>Fast zero-runtime CSS in JS library</p>
-      <a
-        href="https://github.com/callstack-io/linaria"
-        className={compose(text, button)}
-      >
+      <a href="https://github.com/callstack-io/linaria" className={button}>
         Learn more
       </a>
     </div>
