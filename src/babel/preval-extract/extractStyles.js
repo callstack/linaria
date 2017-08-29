@@ -3,9 +3,9 @@
 import fs from 'fs';
 import path from 'path';
 
-import type { BabelTypes, NodePath } from './types';
+import type { BabelTypes, NodePath } from '../types';
 
-import sheet from '../sheet';
+import sheet from '../../sheet';
 
 function parseCurrentFilename(filename, outDir) {
   const dirname = path.isAbsolute(filename)

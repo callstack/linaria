@@ -4,7 +4,7 @@ import type {
   BabelTypes,
   NodePath,
   BabelTaggedTemplateExpression,
-} from './types';
+} from '../types';
 
 import { getSelfBinding } from './utils';
 

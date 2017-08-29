@@ -5,7 +5,7 @@ import type {
   NodePath,
   State,
   BabelTaggedTemplateExpression,
-} from './types';
+} from '../types';
 
 import {
   shouldTraverseExternalIds,
