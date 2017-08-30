@@ -8,7 +8,7 @@ import extractStyles from '../extractStyles';
 
 jest.mock('../extractStyles', () => ({ __esModule: true, default: jest.fn() }));
 
-function transpile(source, pluginOptions = {}, options = {}) {
+function transpile(source, pluginOptions = { cache: false }, options = {}) {
   const { code } = babel.transform(
     dedent`
       import css from './src/css';
@@ -125,7 +125,7 @@ describe('preval-extract babel plugin', () => {
         font-size: 3em;
       \`;
       `,
-      {},
+      undefined,
       { filename: path.join(process.cwd(), 'test.js') }
     );
     process.env.BABEL_ENV = 'production';
@@ -212,7 +212,7 @@ describe('preval-extract babel plugin', () => {
         color: ${'${color}'};
       \`;
       `,
-      {},
+      undefined,
       { presets: [] }
     );
 
@@ -609,7 +609,6 @@ describe('preval-extract babel plugin', () => {
 
   describe('with extraction enabled', () => {
     const write = jest.fn();
-    const append = jest.fn();
 
     beforeEach(() => {
       /* $FlowFixMe */
@@ -618,7 +617,6 @@ describe('preval-extract babel plugin', () => {
       sheetModule.exports.default.dump();
 
       write.mockClear();
-      append.mockClear();
 
       /* $FlowFixMe */
       extractStyles.mockImplementation((t, p, f, o) => {
@@ -635,7 +633,6 @@ describe('preval-extract babel plugin', () => {
         m.children.push(sheetModule);
 
         return m.exports.default(t, p, f, o, {
-          appendFileSync: append,
           writeFileSync: write,
         });
       });
@@ -662,9 +659,8 @@ describe('preval-extract babel plugin', () => {
         { single: true },
         { filename }
       );
-      expect(write).not.toHaveBeenCalled();
-      expect(append).toHaveBeenCalledTimes(2);
-      expect(append.mock.calls.map(call => call[1])).toMatchSnapshot();
+      expect(write).toHaveBeenCalledTimes(2);
+      expect(write.mock.calls.map(call => call[1])).toMatchSnapshot();
     });
 
     it('should extract each style to separate file and include it into source file', () => {
@@ -677,7 +673,7 @@ describe('preval-extract babel plugin', () => {
           font-size: 3em;
         \`;
         `,
-        {},
+        undefined,
         { filename: filename1 }
       );
 
@@ -687,7 +683,7 @@ describe('preval-extract babel plugin', () => {
           font-weight: bold;
         \`;
         `,
-        {},
+        undefined,
         { filename: filename2 }
       );
 
@@ -698,7 +694,6 @@ describe('preval-extract babel plugin', () => {
         code2.includes(`require('${filename2.replace('js', 'css')}')`)
       ).toBeTruthy();
 
-      expect(append).not.toHaveBeenCalled();
       expect(write).toHaveBeenCalledTimes(2);
       expect(write.mock.calls.map(call => call[1])).toMatchSnapshot();
       expect(write.mock.calls[0][0]).toEqual(filename1.replace('js', 'css'));
@@ -713,13 +708,12 @@ describe('preval-extract babel plugin', () => {
           font-size: 3em;
         \`;
         `,
-        { single: true, filename: '[name]-static.css' },
+        { single: true, filename: '[name]-static.css', cache: false },
         { filename }
       );
 
-      expect(write).not.toHaveBeenCalled();
-      expect(append).toHaveBeenCalledTimes(1);
-      expect(append.mock.calls[0][0]).toEqual(
+      expect(write).toHaveBeenCalledTimes(1);
+      expect(write.mock.calls[0][0]).toEqual(
         path.join(path.dirname(filename), 'test-static.css')
       );
     });
@@ -732,13 +726,17 @@ describe('preval-extract babel plugin', () => {
           font-size: 3em;
         \`;
         `,
-        { single: true, filename: '[name]-static.css', outDir: 'output' },
+        {
+          single: true,
+          filename: '[name]-static.css',
+          outDir: 'output',
+          cache: false,
+        },
         { filename }
       );
 
-      expect(write).not.toHaveBeenCalled();
-      expect(append).toHaveBeenCalledTimes(1);
-      expect(append.mock.calls[0][0]).toEqual(
+      expect(write).toHaveBeenCalledTimes(1);
+      expect(write.mock.calls[0][0]).toEqual(
         path.join(path.dirname(filename), 'output', 'test-static.css')
       );
     });

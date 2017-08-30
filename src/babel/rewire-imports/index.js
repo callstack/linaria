@@ -7,7 +7,11 @@ type State = {
 };
 
 function isLinariaImport(value) {
-  return require.resolve(value) === require.resolve('linaria');
+  try {
+    return require.resolve(value) === require.resolve('linaria');
+  } catch (e) {
+    return false;
+  }
 }
 
 export default ({ types }: { types: BabelTypes }) => ({
