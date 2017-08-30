@@ -8,11 +8,23 @@
         }
       }
     ],
-    "react",
-    "linaria/babel"
+    "react"
   ],
-  "plugins": [
-    "transform-class-properties",
-    "transform-object-rest-spread"
-  ]
+  "plugins": ["transform-class-properties", "transform-object-rest-spread"],
+  "env": {
+    "production": {
+      "presets": [
+        [
+          "env",
+          {
+            "targets": {
+              "browsers": ["last 2 versions"]
+            }
+          }
+        ],
+        "react",
+        "linaria/babel"
+      ]
+    }
+  }
 }
