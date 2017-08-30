@@ -7,7 +7,7 @@ import type {
   BabelTaggedTemplateExpression,
   BabelIdentifier,
   BabelCallExpression,
-} from './types';
+} from '../types';
 
 /**
  * const header = css`

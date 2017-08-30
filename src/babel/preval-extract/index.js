@@ -5,16 +5,16 @@ import type {
   NodePath,
   State,
   BabelTaggedTemplateExpression,
-} from './types';
+} from '../types';
 
 import {
-  shouldTraverseExtrnalIds,
+  shouldTraverseExternalIds,
   isLinariaTaggedTemplate,
   ensureTagIsAssignedToAVariable,
   isExcluded,
 } from './validators';
 import { getSelfBinding } from './utils';
-import buildPrevaltemplate from './buildPrevalTemplate';
+import buildPrevalTemplate from './buildPrevalTemplate';
 import resolveSource from './resolveSource';
 import extractStyles from './extractStyles';
 
@@ -25,7 +25,7 @@ const externalRequirementsVisitor = {
       if (source && !this.requirements.find(item => item === source)) {
         this.requirements.splice(this.addBeforeIndex, 0, source);
         const binding = getSelfBinding(path);
-        if (shouldTraverseExtrnalIds(binding.path)) {
+        if (shouldTraverseExternalIds(binding.path)) {
           binding.path.traverse(externalRequirementsVisitor, this);
         }
       }
@@ -41,7 +41,7 @@ const cssTaggedTemplateRequirementsVisitor = {
         this.requirements.push(source);
         this.addBeforeIndex = this.requirements.length - 1;
         const binding = getSelfBinding(path);
-        if (shouldTraverseExtrnalIds(binding.path)) {
+        if (shouldTraverseExternalIds(binding.path)) {
           binding.path.traverse(externalRequirementsVisitor, this);
         }
       }
@@ -84,7 +84,7 @@ export default ({ types }: { types: BabelTypes }) => ({
           requirements,
         });
 
-        buildPrevaltemplate(types, path, state, requirements.join('\n'));
+        buildPrevalTemplate(types, path, state, requirements.join('\n'));
       }
     },
   },

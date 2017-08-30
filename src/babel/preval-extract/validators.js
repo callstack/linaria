@@ -4,7 +4,7 @@ import type {
   BabelTypes,
   NodePath,
   BabelTaggedTemplateExpression,
-} from './types';
+} from '../types';
 
 import { getSelfBinding } from './utils';
 
@@ -27,7 +27,7 @@ export function isLinariaTaggedTemplate(
     path.node.tag.object.name === 'css' &&
     path.node.tag.property.name === 'named'
   ) {
-    throw new Error("Linaria's `css.named` must be called with a classname");
+    throw new Error("Linaria's `css.named` must be called with a class name");
   }
 
   return false;
@@ -44,7 +44,7 @@ export function ensureTagIsAssignedToAVariable(
   }
 }
 
-export function shouldTraverseExtrnalIds(path: NodePath<any>) {
+export function shouldTraverseExternalIds(path: NodePath<any>) {
   if (path.isImportDefaultSpecifier() || path.isImportSpecifier()) {
     return false;
   }

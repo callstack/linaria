@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { NodePath } from './types';
+import type { NodePath } from '../types';
 
 import { getSelfBinding } from './utils';
 

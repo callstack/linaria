@@ -26,7 +26,7 @@ function transpile(source, pluginOptions = {}, options = {}) {
     {
       presets: ['es2015', 'stage-3'],
       plugins: [
-        [path.resolve('src/babel/index.js'), pluginOptions],
+        [path.resolve('src/babel/preval-extract'), pluginOptions],
         require.resolve('babel-plugin-preval'),
       ],
       babelrc: false,
@@ -45,7 +45,7 @@ function filterResults(results, match) {
   return results[`.${match[1]}`];
 }
 
-describe('babel plugin', () => {
+describe('preval-extract babel plugin', () => {
   beforeEach(() => {
     /* $FlowFixMe */
     extractStyles.mockReset();
@@ -357,7 +357,7 @@ describe('babel plugin', () => {
   describe('with commonjs imports', () => {
     it('should preval imported constants ', () => {
       const { code, results } = transpile(dedent`
-      const constants = require('./src/babel/__tests__/__fixtures__/commonjs/constants.js');
+      const constants = require('./src/babel/preval-extract/__tests__/__fixtures__/commonjs/constants.js');
 
       const header = css\`
         font-size: ${'${constants.fontSize}'};
@@ -373,7 +373,7 @@ describe('babel plugin', () => {
 
     it('should preval imported constants with destructurization', () => {
       const { code, results } = transpile(dedent`
-      const { fontSize } = require('./src/babel/__tests__/__fixtures__/commonjs/constants.js');
+      const { fontSize } = require('./src/babel/preval-extract/__tests__/__fixtures__/commonjs/constants.js');
 
       const header = css\`
         font-size: ${'${fontSize}'};
@@ -391,7 +391,7 @@ describe('babel plugin', () => {
   describe('with commonjs imports', () => {
     it('should preval default export', () => {
       const { code, results } = transpile(dedent`
-      import constants from './src/babel/__tests__/__fixtures__/esm/constants.js';
+      import constants from './src/babel/preval-extract/__tests__/__fixtures__/esm/constants.js';
 
       const header = css\`
         font-size: ${'${constants.fontSize}'};
@@ -407,7 +407,7 @@ describe('babel plugin', () => {
 
     it('should preval named imports', () => {
       const { code, results } = transpile(dedent`
-      import { base, primary } from './src/babel/__tests__/__fixtures__/esm/named.js';
+      import { base, primary } from './src/babel/preval-extract/__tests__/__fixtures__/esm/named.js';
 
       const header = css\`
         font-size: ${'${primary.fontSize}'};
@@ -432,7 +432,7 @@ describe('babel plugin', () => {
 
     it('should preval imported module tree with constants', () => {
       const { code, results } = transpile(dedent`
-      import constants from './src/babel/__tests__/__fixtures__/esm/deep.js';
+      import constants from './src/babel/preval-extract/__tests__/__fixtures__/esm/deep.js';
 
       const header = css\`
         font-size: ${'${constants.fontSize}'};
@@ -568,8 +568,8 @@ describe('babel plugin', () => {
   describe('with function calls', () => {
     it('should preval with function call inside an expression', () => {
       const { code, results } = transpile(dedent`
-      const constants = require('./src/babel/__tests__/__fixtures__/commonjs/constants.js');
-      const utils = require('./src/babel/__tests__/__fixtures__/commonjs/utils.js');
+      const constants = require('./src/babel/preval-extract/__tests__/__fixtures__/commonjs/constants.js');
+      const utils = require('./src/babel/preval-extract/__tests__/__fixtures__/commonjs/utils.js');
 
       const header = css\`
         font-size: ${'${utils.multiply(constants.unitless.fontSize)}'}px;
@@ -585,8 +585,8 @@ describe('babel plugin', () => {
 
     it('should preval multiple function calls inside an expression', () => {
       const { code, results } = transpile(dedent`
-      const constants = require('./src/babel/__tests__/__fixtures__/commonjs/constants.js');
-      const utils = require('./src/babel/__tests__/__fixtures__/commonjs/utils.js');
+      const constants = require('./src/babel/preval-extract/__tests__/__fixtures__/commonjs/constants.js');
+      const utils = require('./src/babel/preval-extract/__tests__/__fixtures__/commonjs/utils.js');
 
       function compose(...fns) {
         return value => fns.reduce((prev, fn) => {
@@ -614,7 +614,7 @@ describe('babel plugin', () => {
     beforeEach(() => {
       /* $FlowFixMe */
       const Module = require('module'); // eslint-disable-line global-require
-      const sheetModule = Module._cache[require.resolve('../../sheet.js')];
+      const sheetModule = Module._cache[require.resolve('../../../sheet.js')];
       sheetModule.exports.default.dump();
 
       write.mockClear();
