@@ -30,7 +30,7 @@ const container = css`
 `;
 
 const header = css`
-  ${include(title)}
+  ${include(title)};
 
   font-family: ${fonts.heading};
   font-size: ${modularScale(2)};
@@ -65,11 +65,11 @@ After being transpiled, the code will output following CSS:
 
 
 ```css
-.title_jt5ry4 {
+.title__jt5ry4 {
   text-transform: uppercase;
 }
 
-.container_jdh5rtz {
+.container__jdh5rtz {
   padding: 3em;
 }
 
@@ -79,16 +79,16 @@ After being transpiled, the code will output following CSS:
   font-size: 2.66em;
 }
 
-[data-theme=dark] .header_xy4ertz {
+[data-theme=dark] .header__xy4ertz {
   color: #fff;
 }
 
-[data-theme=light] .header_xy4ertz {
+[data-theme=light] .header__xy4ertz {
   color: #222;
 }
 
 @media only screen and (min-resolution: 144dpi), only screen and (min-resolution: 1.5dppx) {
-  .header_xy4ertz {
+  .header__xy4ertz {
     font-size: 3.3325em;
   }
 }
@@ -100,11 +100,11 @@ And the following JavaScipt:
 import React from 'react';
 import names from 'linaria/build/names';
 
-const title = 'title_jt5ry4';
+const title = 'title__jt5ry4';
 
-const container = 'container_jdh5rtz';
+const container = 'container__jdh5rtz';
 
-const header = 'header_xy4ertz';
+const header = 'header__xy4ertz';
 
 export default function Header({ className }) {
   return (
