@@ -22,7 +22,7 @@ import extractStyles from './extractStyles';
 const externalRequirementsVisitor = {
   Identifier(path) {
     if (path.isReferenced() && getSelfBinding(path) && !isExcluded(path)) {
-      const source: ?string = resolveSource(path);
+      const source: ?string = resolveSource(this.types, path);
       if (source && !this.requirements.find(item => item === source)) {
         this.requirements.splice(this.addBeforeIndex, 0, source);
         const binding = getSelfBinding(path);
@@ -37,7 +37,7 @@ const externalRequirementsVisitor = {
 const cssTaggedTemplateRequirementsVisitor = {
   Identifier(path) {
     if (path.isReferenced() && !isExcluded(path)) {
-      const source: ?string = resolveSource(path);
+      const source: ?string = resolveSource(this.types, path);
       if (source && !this.requirements.find(item => item === source)) {
         this.requirements.push(source);
         this.addBeforeIndex = this.requirements.length - 1;
@@ -86,6 +86,7 @@ export default (babel: BabelCore) => {
           const requirements = [];
           path.traverse(cssTaggedTemplateRequirementsVisitor, {
             requirements,
+            types,
           });
 
           buildPrevalTemplate(babel, path, state, requirements.join('\n'));

@@ -20,6 +20,7 @@
   ],
   "dependencies": {
     "babel-core": "^6.26.0",
+    "babel-generator": "^6.26.0",
     "babel-plugin-preval": "^1.4.4",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0",
