@@ -9,7 +9,8 @@ const html = css`
   height: 100%;
   width: 100%;
 
-  body, #root {
+  body,
+  #root {
     margin: 0;
     padding: 0;
     height: 100%;

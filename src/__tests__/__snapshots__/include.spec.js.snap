@@ -25,13 +25,11 @@ color: orange;
 
 @media (max-width: 100px) {
 font-family: monospace;
-}
-
-    font-family: sans-serif;"
+} font-family: sans-serif;"
 `;
 
 exports[`include module should include styles from a single class name 4`] = `
 ".css_4d5cc7ae{font-weight:400;}
 .css_b2c743f8{color:orange;}@media (max-width:100px){.css_b2c743f8{font-family:monospace;}}
-.css_5c4a7019{font-weight:400;color:orange;font-family:sans-serif;}@media (max-width:100px){.css_5c4a7019{font-family:monospace;}}"
+.css_83159b59{font-weight:400;color:orange;font-family:sans-serif;}@media (max-width:100px){.css_83159b59{font-family:monospace;}}"
 `;
