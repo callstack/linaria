@@ -30,8 +30,9 @@ export default function Header() {
               target="_blank"
               rel="noopener noreferrer"
               href="https://github.com/callstack-io/linaria"
+              title="GitHub"
             >
-              GitHub
+              <img className={image} src="./images/github.svg" alt="GitHub" />
             </a>
           </li>
         </ul>
@@ -78,5 +79,16 @@ const navLink = css`
 
   &:hover {
     color: ${theme.primary};
+  }
+`;
+
+const image = css`
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  transition: 0.2s background;
+
+  &:hover {
+    background: ${theme.secondary};
   }
 `;

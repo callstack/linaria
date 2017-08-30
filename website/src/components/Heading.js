@@ -35,7 +35,7 @@ export default function Heading(props: Props) {
 }
 
 const shared = `
-  margin: 0.5em 0 1em;
+  margin: 1em 0;
   font-weight: 600;
   line-height: 1.1;
 `;
