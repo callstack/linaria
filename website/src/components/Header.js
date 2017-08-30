@@ -15,7 +15,12 @@ export default function Header() {
         </a>
         <ul className={nav}>
           <li>
-            <a className={navLink} href="/docs">
+            <a
+              className={navLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/callstack-io/linaria"
+            >
               Docs
             </a>
           </li>
@@ -67,10 +72,11 @@ const navLink = css`
   display: block;
   padding: ${navSpacing}px;
   text-decoration: none;
+  text-transform: uppercase;
   color: ${theme.text};
-  transition: color .2s;
+  transition: color 0.2s;
 
   &:hover {
-    color: ${theme.primary}
+    color: ${theme.primary};
   }
 `;

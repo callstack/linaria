@@ -33,7 +33,7 @@ export default class CodeBlock extends Component<Props, State> {
         <code
           className={language && `language-${language}`}
           // eslint-disable-next-line
-          dangerouslySetInnerHTML={{ __html }}
+          dangerouslySetInnerHTML={{__html}}
         />
       </pre>
     );

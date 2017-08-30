@@ -17,10 +17,8 @@ export default function Footer() {
 const footer = css`
   margin-top: 100px;
   padding: 30px 0;
-  border-top: 1px solid ${theme.primary};
+  border-top: 1px solid ${theme.secondary};
   font-size: 0.9em;
 `;
 
-const footerContainer = css`
-  display: flex;
-`;
+const footerContainer = css`display: flex;`;

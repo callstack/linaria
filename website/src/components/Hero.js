@@ -9,8 +9,12 @@ export default function Hero() {
   return (
     <div className={hero}>
       <Container>
-        <h1 className={heading}>Linaria is zero-runtime CSS in JS library.</h1>
-        <button className={button}>Get Started</button>
+        <h1 className={heading}>
+          Linaria is <br />zero-runtime<br /> CSS in JS library.
+        </h1>
+        <a href="#get-started" className={button}>
+          Get Started
+        </a>
       </Container>
     </div>
   );
@@ -19,9 +23,11 @@ export default function Hero() {
 const hero = css`
   background: #fffaf6;
   padding: 70px 0;
+  margin-bottom: 70px;
 
   ${media.medium} {
-    padding: 150px 0;
+    padding: 120px 0;
+    margin-bottom: 120px;
   }
 `;
 
@@ -31,34 +37,40 @@ const heading = css`
   font-size: 1.5em;
   line-height: 1.1;
   text-transform: uppercase;
-  text-shadow: 0 0 ${theme.secondary}, 1px 1px ${theme.secondary}, 2px 2px ${theme.secondary}, 3px 3px ${theme.secondary}, 4px 4px ${theme.secondary}, 5px 5px ${theme.secondary};
+  text-shadow: 0 0 ${theme.secondary}, 1px 1px ${theme.secondary},
+    2px 2px ${theme.secondary}, 3px 3px ${theme.secondary},
+    4px 4px ${theme.secondary}, 5px 5px ${theme.secondary};
 
   ${media.small} {
     font-size: 2.5em;
   }
 
   ${media.medium} {
-    font-size: 3.5em;
+    font-size: 4em;
   }
 `;
 
 const button = css`
   appearance: none;
   background: none;
-  padding: 15px 30px;
+  padding: 10px 20px;
   color: ${theme.primary};
   font-size: 1em;
   font-weight: 700;
   font-family: ${theme.fontFamily};
-  letter-spacing: 0.1em;
   text-transform: uppercase;
+  text-decoration: none;
   border: 2px solid ${theme.primary};
   border-radius: 3px;
   cursor: pointer;
-  transition: color .2s, background .2s;
+  transition: color 0.2s, background 0.2s;
 
   &:hover {
     color: #fff;
-    background: ${theme.primary}
+    background: ${theme.primary};
+  }
+
+  ${media.medium} {
+    padding: 15px 30px;
   }
 `;

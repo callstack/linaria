@@ -11,10 +11,11 @@ const html = css`
   color: ${theme.text};
   font-family: ${theme.fontFamily};
   font-weight: 300;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.4;
 
-  body, #root {
+  body,
+  #root {
     margin: 0;
     padding: 0;
     height: 100%;
