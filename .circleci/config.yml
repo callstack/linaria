@@ -1,0 +1,49 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:6.10.3
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-example-{{ checksum "example/package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-example-
+
+      - run: |
+          curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 0.28.4
+          export PATH="$HOME/.yarn/bin:$PATH"
+
+      # Uncomment once we have E2E tests
+      # - run: ./.circleci/install-chrome-deps.sh
+
+      - run: yarn install
+      - run: cd example && yarn install && cd ..
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+      - save_cache:
+          paths:
+            - example/node_modules
+          key: v1-dependencies-example-{{ checksum "example/package.json" }}
+
+      - run: yarn run lint
+      - run: yarn run flow
+      - run: yarn test -- --coverage
+      # Uncomment once we have E2E tests
+      # - run: yarn run e2e
+
+      - store_artifacts:
+          path: coverage
