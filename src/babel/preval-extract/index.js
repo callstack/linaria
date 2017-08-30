@@ -1,6 +1,7 @@
 /* @flow */
 
 import type {
+  BabelCore,
   BabelTypes,
   NodePath,
   State,
@@ -49,43 +50,47 @@ const cssTaggedTemplateRequirementsVisitor = {
   },
 };
 
-export default ({ types }: { types: BabelTypes }) => ({
-  visitor: {
-    Program: {
-      enter(path: NodePath<*>, state: State) {
-        state.skipFile =
-          // $FlowFixMe
-          path.container.comments.length &&
-          path.container.comments[0].value.includes('linaria-preval');
-        state.foundLinariaTaggedLiterals = false;
-        state.filename = state.file.opts.filename;
-      },
-      exit(path: NodePath<*>, state: State) {
-        if (state.skipFile) {
-          return;
-        }
+export default (babel: BabelCore) => {
+  const { types }: { types: BabelTypes } = babel;
 
-        if (state.foundLinariaTaggedLiterals) {
-          extractStyles(types, path, state.filename, state.opts);
+  return {
+    visitor: {
+      Program: {
+        enter(path: NodePath<*>, state: State) {
+          state.skipFile =
+            // $FlowFixMe
+            path.container.comments.length &&
+            path.container.comments[0].value.includes('linaria-preval');
+          state.foundLinariaTaggedLiterals = false;
+          state.filename = state.file.opts.filename;
+        },
+        exit(path: NodePath<*>, state: State) {
+          if (state.skipFile) {
+            return;
+          }
+
+          if (state.foundLinariaTaggedLiterals) {
+            extractStyles(types, path, state.filename, state.opts);
+          }
+        },
+      },
+      TaggedTemplateExpression(
+        path: NodePath<BabelTaggedTemplateExpression<any>>,
+        state: State
+      ) {
+        if (!state.skipFile && isLinariaTaggedTemplate(types, path)) {
+          ensureTagIsAssignedToAVariable(path);
+
+          state.foundLinariaTaggedLiterals = true;
+
+          const requirements = [];
+          path.traverse(cssTaggedTemplateRequirementsVisitor, {
+            requirements,
+          });
+
+          buildPrevalTemplate(babel, path, state, requirements.join('\n'));
         }
       },
     },
-    TaggedTemplateExpression(
-      path: NodePath<BabelTaggedTemplateExpression<any>>,
-      state: State
-    ) {
-      if (!state.skipFile && isLinariaTaggedTemplate(types, path)) {
-        ensureTagIsAssignedToAVariable(path);
-
-        state.foundLinariaTaggedLiterals = true;
-
-        const requirements = [];
-        path.traverse(cssTaggedTemplateRequirementsVisitor, {
-          requirements,
-        });
-
-        buildPrevalTemplate(types, path, state, requirements.join('\n'));
-      }
-    },
-  },
-});
+  };
+};

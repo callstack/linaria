@@ -23,6 +23,10 @@ export type Binding<K> = {
   path: NodePath<K>,
 };
 
+export type BabelCore = {
+  type: BabelTypes,
+};
+
 export type BabelObjectExpression = {
   properties: any[],
   type: string,
