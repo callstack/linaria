@@ -54,9 +54,7 @@ export default function Hero() {
   );
 }
 
-const features = css`
-  margin: 50px 0;
-`;
+const features = css`margin: 50px 0;`;
 
 const container = css`
   ${media.medium} {
@@ -89,5 +87,5 @@ const figure = css`
   width: 100px;
   height: 100px;
   overflow: hidden;
-  border: 1px solid ${theme.secondary}
+  border: 1px solid ${theme.secondary};
 `;

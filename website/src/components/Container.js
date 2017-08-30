@@ -9,11 +9,7 @@ type Props = {
 };
 
 export default function Container({ className, children }: Props) {
-  return (
-    <div className={names(container, className)}>
-      {children}
-    </div>
-  );
+  return <div className={names(container, className)}>{children}</div>;
 }
 
 const container = css`

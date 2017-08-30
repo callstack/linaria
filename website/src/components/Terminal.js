@@ -11,11 +11,11 @@ type Props = {
 export default function Terminal(props: Props) {
   return (
     <div className={block}>
-      {props.lines.map((line, index) =>
+      {props.lines.map((line, index) => (
         <span className={codeLine} key={index.toString()}>
           {line}
         </span>
-      )}
+      ))}
     </div>
   );
 }
@@ -32,6 +32,6 @@ const codeLine = css`
   display: block;
 
   &::before {
-    content: "$ ";
+    content: '$ ';
   }
 `;
