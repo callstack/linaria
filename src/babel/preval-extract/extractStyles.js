@@ -26,19 +26,33 @@ function parseFilename(filename, currentFilename, outDir) {
   return path.join(dirname, filename.replace('[name]', basename));
 }
 
+let stylesCache = {};
+
+function hasCachedStyles(filename, styles) {
+  return stylesCache[filename] && stylesCache[filename] === styles;
+}
+
+function createCssFromCache() {
+  return Object.keys(stylesCache).reduce(
+    (acc, file) => `${acc}\n${stylesCache[file]}`,
+    preamble
+  );
+}
+
 export default function extractStyles(
   types: BabelTypes,
   program: NodePath<*>,
   currentFilename: string,
   options: { single?: boolean, filename?: string, outDir?: string },
-  { appendFileSync, writeFileSync }: * = fs
+  { writeFileSync }: * = fs
 ) {
   const data = sheet.dump();
   if (!data.length) {
     return;
   }
 
-  const { single, filename } = {
+  const { single, filename, cache } = {
+    cache: true,
     single: false,
     ...options,
     filename: options.filename
@@ -46,8 +60,16 @@ export default function extractStyles(
       : parseCurrentFilename(currentFilename, options.outDir || ''),
   };
 
+  if (cache && hasCachedStyles(filename, data)) {
+    return;
+  }
+
+  if (cache) {
+    stylesCache[filename] = data;
+  }
+
   if (single) {
-    appendFileSync(filename, `${preamble}\n${data}`);
+    writeFileSync(filename, createCssFromCache());
   } else {
     writeFileSync(filename, `${preamble}\n${data}`);
     program.node.body.unshift(
@@ -58,4 +80,8 @@ export default function extractStyles(
       )
     );
   }
+}
+
+export function clearCache() {
+  stylesCache = {};
 }
