@@ -21,7 +21,24 @@ describe('extractStyles module from preval-extract babel plugin', () => {
     expect(fs.writeFileSync).not.toHaveBeenCalled();
   });
 
+  it('should skip extraction if extract option is false', () => {
+    sheet.dump.mockImplementationOnce(() => '...');
+    const writeFileSync = jest.fn();
+
+    extractStyles(
+      types,
+      null,
+      'filename.js',
+      { extract: false },
+      { writeFileSync }
+    );
+
+    expect(writeFileSync).not.toHaveBeenCalled();
+  });
+
   describe('with cache disabled', () => {
+    beforeEach(clearCache);
+
     it('should append new styles to a file', () => {
       sheet.dump.mockImplementationOnce(() => '.classname{color: #ffffff}');
       const writeFileSync = jest.fn();

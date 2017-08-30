@@ -43,7 +43,13 @@ export default function extractStyles(
   types: BabelTypes,
   program: NodePath<*>,
   currentFilename: string,
-  options: { single?: boolean, filename?: string, outDir?: string },
+  options: {
+    single?: boolean,
+    filename?: string,
+    outDir?: string,
+    cache?: boolean,
+    extract?: boolean,
+  },
   { writeFileSync }: * = fs
 ) {
   const data = sheet.dump();
@@ -51,8 +57,9 @@ export default function extractStyles(
     return;
   }
 
-  const { single, filename, cache } = {
+  const { single, filename, cache, extract } = {
     cache: true,
+    extract: true,
     single: false,
     ...options,
     filename: options.filename
@@ -68,9 +75,9 @@ export default function extractStyles(
     stylesCache[filename] = data;
   }
 
-  if (single) {
+  if (extract && single) {
     writeFileSync(filename, createCssFromCache());
-  } else {
+  } else if (extract) {
     writeFileSync(filename, `${preamble}\n${data}`);
     program.node.body.unshift(
       types.expressionStatement(
