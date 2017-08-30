@@ -2,8 +2,7 @@ export { default as names } from './names';
 
 const createError = id =>
   new Error(
-    `No implementation provided for the Linaria's function ${id} - ` +
-      'this function is not intended to be used in runtime.'
+    `Looks like you tried to use ${id} from 'linaria' in runtime, but it is not supported.`
   );
 
 export function css() {
