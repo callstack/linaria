@@ -25,7 +25,6 @@
     "babel-register": "^6.26.0",
     "dedent": "^0.7.0",
     "postcss": "^6.0.10",
-    "short-hash": "^1.0.0",
     "stylis": "^3.2.13"
   },
   "devDependencies": {
