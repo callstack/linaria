@@ -1,5 +1,7 @@
 /* @flow */
-import * as React from 'react';
+
+import React from 'react';
+import dedent from 'dedent';
 import { css } from 'linaria';
 import theme from './styles/theme';
 import { media } from './styles/utils';
@@ -35,13 +37,13 @@ export default function Index() {
             like:
           </p>
           <CodeBlock>
-            {`{
-  "presets": [
-    "env",
-    "react"
-    "linaria/babel"
-  ]
-}`}
+            {dedent(`{
+              "presets": [
+                "env",
+                "react"
+                "linaria/babel"
+              ]
+            }`)}
           </CodeBlock>
           <p>And you are all set!</p>
           <Heading type="h3">Usage</Heading>
@@ -54,79 +56,78 @@ export default function Index() {
         <div className={result}>
           <div className={resultItem}>
             <CodeBlock language="jsx" className={stretch}>
-              {`// Header.js (source JS)
+              {dedent(`// Header.js (source JS)
 
-import React from 'react';
-import { css, names } from 'linaria';
-import colors from './colors';
+                import React from 'react';
+                import { css, names } from 'linaria';
+                import colors from './colors';
 
-const container = css\`
-  height: 3rem;
-\`;
+                const container = css\`
+                  height: 3rem;
+                \`;
 
-const header = css\`
-  color: $\{colors.white};
+                const header = css\`
+                  color: $\{colors.white};
 
-  [data-theme=dark] & {
-    color: $\{colors.black}
-  }
+                  [data-theme=dark] & {
+                    color: $\{colors.black}
+                  }
 
-  @media (max-width: 320px) {
-    font-size: 2rem;
-  }
-\`;
+                  @media (max-width: 320px) {
+                    font-size: 2rem;
+                  }
+                \`;
 
-export default function Header({ className }) {
-  return (
-    <div className={names(container, className)}>
-      <h1 className={header} />
-    </div>
-  );
-}`}
+                export default function Header({ className }) {
+                  return (
+                    <div className={names(container, className)}>
+                      <h1 className={header} />
+                    </div>
+                  );
+                }`)}
             </CodeBlock>
           </div>
           <div className={resultItem}>
             <CodeBlock language="css" className={stretch}>
-              {`/* Header.css (output CSS) */
+              {dedent(`/* Header.css (output CSS) */
 
-.container__jdh5rtz {
-  height: 3rem;
-}
+                .container__jdh5rtz {
+                  height: 3rem;
+                }
 
-.header__xy4ertz {
-  color: #fff;
-}
+                .header__xy4ertz {
+                  color: #fff;
+                }
 
-@media (max-width: 320px) {
-  .header__xy4ertz {
-    font-size: 2rem;
-  }
-}
+                @media (max-width: 320px) {
+                  .header__xy4ertz {
+                    font-size: 2rem;
+                  }
+                }
 
-[data-theme=dark] .header__xy4ertz {
-  color: #000;
-}`}
+                [data-theme=dark] .header__xy4ertz {
+                  color: #000;
+                }`)}
             </CodeBlock>
           </div>
           <div className={resultItem}>
             <CodeBlock language="jsx" className={stretch}>
-              {`// Header.js (output JS)
+              {dedent(`// Header.js (output JS)
 
-import React from 'react';
-import names from 'linaria/build/names';
+                import React from 'react';
+                import names from 'linaria/build/names';
 
-const container = 'container_jdh5rtz';
+                const container = 'container_jdh5rtz';
 
-const header = 'header_xy4ertz';
+                const header = 'header_xy4ertz';
 
-export default function Header({ className }) {
-  return (
-    <div className={names(container, className)}>
-      <h1 className={header} />
-    </div>
-  );
-}
-`}
+                export default function Header({ className }) {
+                  return (
+                    <div className={names(container, className)}>
+                      <h1 className={header} />
+                    </div>
+                  );
+                }`)}
             </CodeBlock>
           </div>
         </div>

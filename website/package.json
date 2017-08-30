@@ -11,6 +11,7 @@
     "postinstall": "cd .. && yarn link && cd website && yarn link linaria"
   },
   "dependencies": {
+    "dedent": "^0.7.0",
     "linaria": "0.0.0",
     "normalize.css": "^7.0.0",
     "prismjs": "^1.6.0",
