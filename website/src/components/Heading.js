@@ -1,5 +1,6 @@
 /* @flow */
-import * as React from 'react';
+
+import React from 'react';
 import { css, names } from 'linaria';
 import { media } from '../styles/utils';
 

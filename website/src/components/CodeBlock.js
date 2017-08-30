@@ -1,4 +1,5 @@
 /* @flow */
+
 import React, { Component } from 'react';
 import { css, names } from 'linaria';
 import theme from '../styles/theme';
