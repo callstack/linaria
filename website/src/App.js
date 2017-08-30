@@ -149,7 +149,7 @@ const result = css`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  padding: 20px 10px;
+  padding: 20px 0px;
 `;
 
 const resultItem = css`
@@ -157,10 +157,10 @@ const resultItem = css`
   flex-direction: column;
   flex: 1 1 auto;
   max-width: 100%;
-  padding: 0 10px;
+  padding: 0 1px;
 
   ${media.large} {
-    width: calc(33.33% - 6 * 10px);
+    width: 33%;
   }
 `;
 
