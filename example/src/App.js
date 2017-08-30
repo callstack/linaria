@@ -11,7 +11,11 @@ const container = css`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-image: linear-gradient(135deg, ${colors.accent} 0%, ${colors.primary} 100%);
+  background-image: linear-gradient(
+    135deg,
+    ${colors.accent} 0%,
+    ${colors.primary} 100%
+  );
   color: white;
   font-family: sans-serif;
 `;
@@ -30,7 +34,7 @@ const button = css`
   border: 2px solid white;
   background-color: transparent;
   margin: 1rem;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   transition: 200ms ease-in;
 
   &:hover {

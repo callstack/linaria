@@ -5,9 +5,7 @@ import css from '../css';
 describe('css module', () => {
   it('should return a class name given some css', () => {
     const color = 'blue';
-    const title = css`
-      color: ${color};
-    `;
+    const title = css`color: ${color};`;
 
     expect(title).toBe('css_d890fac7');
   });

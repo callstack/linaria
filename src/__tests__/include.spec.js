@@ -6,9 +6,7 @@ import include from '../include';
 
 describe('include module', () => {
   it('should include styles from a single class name', () => {
-    const text = css`
-      font-weight: 400;
-    `;
+    const text = css`font-weight: 400;`;
 
     const title = css`
       color: orange;
@@ -18,11 +16,7 @@ describe('include module', () => {
       }
     `;
 
-    const header = css`
-      ${include(text, title)}
-
-      font-family: sans-serif;
-    `;
+    const header = css`${include(text, title)} font-family: sans-serif;`;
 
     expect(include(title)).toMatchSnapshot();
     expect(include(text, title)).toMatchSnapshot();
