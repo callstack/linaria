@@ -43,8 +43,6 @@ export default function Index() {
   "env": {
     "production": {
       "presets": [
-        "env",
-        "react",
         "linaria/babel"
       ]
     }
