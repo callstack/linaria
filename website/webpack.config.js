@@ -28,6 +28,10 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
     new webpack.DefinePlugin({
       'process.env': { NODE_ENV: JSON.stringify(env.NODE_ENV) },
     }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      minChunks: ({ resource }) => /node_modules/.test(resource),
+    }),
   ].concat(
     env.NODE_ENV === 'production'
       ? [
@@ -37,10 +41,6 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
             sourceMap: true,
           }),
           new ExtractTextPlugin('styles.css'),
-          new webpack.optimize.CommonsChunkPlugin({
-            name: 'vendor',
-            minChunks: ({ resource }) => /node_modules/.test(resource),
-          }),
           new webpack.optimize.CommonsChunkPlugin('manifest'),
         ]
       : [
