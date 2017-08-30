@@ -4,7 +4,7 @@ import React from 'react';
 import { css, names } from 'linaria';
 
 type Props = {
-  children: React.Element<*> | Array<React.Element<*>>,
+  children: React$Element<*> | Array<React$Element<*>>,
   className?: string,
 };
 
