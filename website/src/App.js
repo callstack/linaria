@@ -28,7 +28,7 @@ export default function Index() {
             </span>
           </Heading>
           <Heading type="h3">Installation and setup</Heading>
-          <p>Install it like regular npm package:</p>
+          <p>Install it like a regular npm package:</p>
           <Terminal lines={['yarn add linaria']} />
           <p>
             Adjust the preset entry in your <code>.babelrc</code> file to look
@@ -39,14 +39,8 @@ export default function Index() {
   "presets": [
     "env",
     "react"
-  ],
-  "env": {
-    "production": {
-      "presets": [
-        "linaria/babel"
-      ]
-    }
-  }
+    "linaria/babel"
+  ]
 }`}
           </CodeBlock>
           <p>And you are all set!</p>
