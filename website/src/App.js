@@ -3,7 +3,6 @@
 import React from 'react';
 import dedent from 'dedent';
 import { css } from 'linaria';
-import theme from './styles/theme';
 import { media } from './styles/utils';
 import Container from './components/Container';
 import Header from './components/Header';
@@ -136,12 +135,6 @@ export default function Index() {
     </div>
   );
 }
-
-const code = css`
-  padding: 20px;
-  background: ${theme.backdrop};
-  color: ${theme.primary};
-`;
 
 const getStarted = css`color: #123;`;
 
