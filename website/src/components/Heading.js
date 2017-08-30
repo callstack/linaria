@@ -42,7 +42,8 @@ const shared = `
 `;
 
 const heading1 = css`
-  ${shared} font-size: 2em;
+  ${shared};
+  font-size: 2em;
 
   ${media.medium} {
     font-size: 3em;
@@ -54,7 +55,8 @@ const heading1 = css`
 `;
 
 const heading2 = css`
-  ${shared} font-size: 1.5em;
+  ${shared};
+  font-size: 1.5em;
 
   ${media.medium} {
     font-size: 2em;
@@ -66,7 +68,8 @@ const heading2 = css`
 `;
 
 const heading3 = css`
-  ${shared} font-size: 1.25em;
+  ${shared};
+  font-size: 1.25em;
 
   ${media.medium} {
     font-size: 1.5em;
@@ -78,7 +81,8 @@ const heading3 = css`
 `;
 
 const heading4 = css`
-  ${shared} font-size: 1em;
+  ${shared};
+  font-size: 1em;
 
   ${media.medium} {
     font-size: 1.1em;
