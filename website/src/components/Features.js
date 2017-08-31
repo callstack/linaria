@@ -66,7 +66,13 @@ export default function Hero() {
   );
 }
 
-const features = css`margin: 50px 0;`;
+const features = css`
+  margin: 70px 0;
+
+  ${media.medium} {
+    margin: 120px 0;
+  }
+`;
 
 const container = css`
   ${media.medium} {

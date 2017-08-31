@@ -24,11 +24,9 @@ export default function Hero() {
 const hero = css`
   background: #fffaf6;
   padding: 70px 0;
-  margin-bottom: 70px;
 
   ${media.medium} {
     padding: 120px 0;
-    margin-bottom: 120px;
   }
 `;
 
