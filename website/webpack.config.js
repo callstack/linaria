@@ -20,8 +20,8 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
           ...entry,
         ],
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    publicPath: '/dist/',
+    path: path.resolve(__dirname, 'build'),
+    publicPath: '/build/',
     filename: '[name].js',
   },
   plugins: [
