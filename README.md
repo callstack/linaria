@@ -9,6 +9,7 @@ Fast zero-runtime CSS in JS library.
 1. CSS is extracted at build time, no runtime is included.
 1. JavaScript expressions are supported and evaluated at build time.
 1. Critical CSS can be extracted for inlining during SSR.
+1. Integrates with existing tools like Webpack to provide e.g. Hot Reload
 
 ## Installation
 
@@ -32,7 +33,7 @@ Adjust the preset entry in your `.babelrc` file to look like:
 
 ## How it works
 
-Linaria reads your CSS declared as JavaScript variables through a `css` tagged literal function. Thanks to a Babel plugin, it is able give each variable a unique class name and extract all CSS rules to a corresponding file.
+Linaria lets you write CSS code in a tagged template literal in your JavaScript files. The Babel plugin extracts the CSS rules to real CSS files, and generates unique class names to use.
 
 Example is worth a thousand words:
 
@@ -148,7 +149,7 @@ export function App() {
 ## Documentation
 
 * [API and usage](/docs/README.md)
-* [Example app](/example)
+* [Example](/example)
 
 ## Inspiration
 

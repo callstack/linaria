@@ -4,9 +4,9 @@
 
 Linaria exposes a core `css` method alongside with small, but just enough amount of helpers. Inside `linaria` module you can find following methods:
 
-#### css(template: string[], ...expressions: string[]) => string
+#### css
 
-Takes template string literal and returns a unique class name to be used e.g. by `linaria/babel` plugin.
+String tag for tagged template literals consisting CSS code. The tagged template literal is evaluated to a unique class name. Needed by the Babel plugin to extract the CSS.
 
 ```js
 import { css } from 'linaria';
@@ -21,7 +21,7 @@ const flower = css`
 
 #### names(...classNames: string[]) => string
 
-This is basically `classnames`:
+Takes a list of class names and returns a concatenated string with the class names. Falsy values are ignored.
 
 ```js
 import { css, names } from 'linaria';
@@ -34,8 +34,12 @@ const yarn = css`
   color: violet;
 `;
 
-function App() {
-  return <Playground className={names(cat, yarn)} />;
+const fun = css`
+  display: flex;
+`;
+
+function App({ isPlaying }) {
+  return <Playground className={names(cat, yarn, isPlaying && fun)} />;
 }
 ```
 
@@ -56,6 +60,8 @@ export function Block({ className }) => {
 ```
 
 #### include(...classNames: string[]) => string
+
+Takes a class name previously created with the `css` tag and returns the CSS text for the class name.
 
 ```js
 import { css, include } from 'linaria';
@@ -78,6 +84,8 @@ const header = css`
   font-family: sans-serif;
 `;
 ```
+
+Here, the final CSS text for `header` will include the CSS from `text` and `title`.
 
 #### collect(html: string, css: string) => string
 
