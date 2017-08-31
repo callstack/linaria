@@ -14,7 +14,7 @@ aliases:
 
 version: 2
 jobs:
-  lint-and-test:
+  build:
     docker:
       - image: circleci/node:6.10.3
     steps:
