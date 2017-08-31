@@ -1,5 +1,6 @@
-node_modules/
-build/
-vendor/
-flow-typed/
 benchmark/
+build/
+coverage/
+flow-typed/
+node_modules/
+vendor/
