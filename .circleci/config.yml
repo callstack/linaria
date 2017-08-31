@@ -45,7 +45,7 @@ jobs:
     steps:
       - checkout
       - restore-cache: *restore-cache
-      - run: cd example && yarn install && cd ..
+      - run: cd example && yarn install
       - save-cache: *save-cache
       - run: yarn build
 
@@ -55,7 +55,7 @@ jobs:
     steps:
       - checkout
       - restore-cache: *restore-cache
-      - run: cd website && yarn install && cd ..
+      - run: cd website && yarn install
       - save-cache: *save-cache
       - run: yarn build
 
