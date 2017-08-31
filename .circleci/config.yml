@@ -14,59 +14,18 @@ aliases:
 
 version: 2
 jobs:
-  lint:
+  lint-and-test:
     docker:
       - image: circleci/node:6.10.3
     steps:
       - checkout
       - restore-cache: *restore-cache
       - run: yarn install
-      - run: cd example && yarn install && cd ..
-      - run: cd website && yarn install && cd ..
+      - run: cd example && yarn install && yarn build && cd ..
+      - run: cd website && yarn install && yarn build && cd ..
       - save-cache: *save-cache
       - run: yarn run lint
       - run: yarn run flow
-
-  test:
-    docker:
-      - image: circleci/node:6.10.3
-    steps:
-      - checkout
-      - restore-cache: *restore-cache
-      - run: yarn install
-      - save-cache: *save-cache
       - run: yarn test -- --coverage
-      - store_artifacts:
-          path: coverage
-
-  test-example:
-    docker:
-      - image: circleci/node:6.10.3
-    steps:
-      - checkout
-      - restore-cache: *restore-cache
-      - run: cd example && yarn install
-      - save-cache: *save-cache
-      - run: yarn build
-
-  test-website:
-    docker:
-      - image: circleci/node:6.10.3
-    steps:
-      - checkout
-      - restore-cache: *restore-cache
-      - run: cd website && yarn install
-      - save-cache: *save-cache
-      - run: yarn build
 
   # test-e2e:
-
-workflows:
-  version: 2
-  build-and-deploy:
-    jobs:
-      - lint
-      - test
-      - test-example
-      - test-website
-
