@@ -131,6 +131,18 @@ export default function Index() {
           </div>
         </div>
       </div>
+      <Container>
+        <Heading type="h3">Docs and examples</Heading>
+        <p>
+          We are actively working on broadening our{' '}
+          <a href="https://github.com/callstack-io/linaria">documentation</a>.
+          Also be sure to check the{' '}
+          <a href="https://github.com/callstack-io/linaria/tree/master/example">
+            example app
+          </a>{' '}
+          set up with React, Webpack and Linaria
+        </p>
+      </Container>
       <Footer />
     </div>
   );
