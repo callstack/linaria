@@ -14,7 +14,11 @@ export default function Hero() {
         <div className={container}>
           <div className={item}>
             <div className={figure}>
-              <img alt="" />
+              <img
+                className={figureImage}
+                alt=""
+                src="//placehold.it/150x150"
+              />
             </div>
             <Heading type="h4" className={title}>
               Familiar syntax
@@ -26,7 +30,11 @@ export default function Hero() {
           </div>
           <div className={item}>
             <div className={figure}>
-              <img alt="" />
+              <img
+                className={figureImage}
+                alt=""
+                src="//placehold.it/150x150"
+              />
             </div>
             <Heading type="h4" className={title}>
               Zero runtime
@@ -38,7 +46,11 @@ export default function Hero() {
           </div>
           <div className={item}>
             <div className={figure}>
-              <img alt="" />
+              <img
+                className={figureImage}
+                alt=""
+                src="//placehold.it/150x150"
+              />
             </div>
             <Heading type="h4" className={title}>
               SSR with critical CSS
@@ -88,4 +100,9 @@ const figure = css`
   height: 100px;
   overflow: hidden;
   border: 1px solid ${theme.secondary};
+`;
+
+const figureImage = css`
+  width: 100%;
+  object-fit: cover;
 `;
