@@ -5,12 +5,30 @@ aliases:
       # Fallback in case checksum fails
       - dependencies-{{ .Branch }}-
 
+  - &restore-example-cache
+    keys:
+      - dependencies-{{ .Branch }}-{{ checksum "example/package.json" }}
+      - dependencies-{{ .Branch }}-
+
+  - &restore-website-cache
+    keys:
+      - dependencies-{{ .Branch }}-{{ checksum "website/package.json" }}
+      - dependencies-{{ .Branch }}-
+
   - &save-cache
     paths:
       - node_modules
-      - example/node_modules
-      - website/node_modules
     key: dependencies-{{ .Branch }}-{{ checksum "package.json" }}
+
+  - &save-example-cache
+    paths:
+      - example/node_modules
+    key: dependencies-{{ .Branch }}-{{ checksum "example/package.json" }}
+
+  - &save-website-cache
+    paths:
+      - website/node_modules
+    key: dependencies-{{ .Branch }}-{{ checksum "website/package.json" }}
 
 version: 2
 jobs:
@@ -20,10 +38,15 @@ jobs:
     steps:
       - checkout
       - restore-cache: *restore-cache
-      - run: yarn install
-      - run: cd example && yarn install && yarn build && cd ..
-      - run: cd website && yarn install && yarn build && cd ..
+      - restore-cache: *restore-example-cache
+      - restore-cache: *restore-website-cache
+      - run: |
+          yarn install
+          cd example && yarn install && yarn build && cd ..
+          cd website && yarn install && yarn build && cd ..
       - save-cache: *save-cache
+      - save-cache: *save-example-cache
+      - save-cache: *save-website-cache
       - run: yarn run lint
       - run: yarn run flow
       - run: yarn test -- --coverage
