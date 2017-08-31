@@ -125,6 +125,8 @@ describe('extractStyles module from preval-extract babel plugin', () => {
       );
 
       sheet.dump.mockImplementationOnce(() => '.classname{color: #ffffff}');
+      // On each transpilation the body does not contain require call added by extractStyles
+      program.node.body = [];
 
       extractStyles(
         types,
