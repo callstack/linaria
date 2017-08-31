@@ -20,7 +20,7 @@ export default function Header() {
               className={navLink}
               target="_blank"
               rel="noopener noreferrer"
-              href="https://github.com/callstack-io/linaria"
+              href="https://github.com/callstack-io/linaria/docs"
             >
               Docs
             </a>
