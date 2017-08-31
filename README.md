@@ -9,7 +9,7 @@ Fast zero-runtime CSS in JS library.
 1. CSS is extracted at build time, no runtime is included.
 1. JavaScript expressions are supported and evaluated at build time.
 1. Critical CSS can be extracted for inlining during SSR.
-1. Integrates with existing tools like Webpack to provide e.g. Hot Reload
+1. Integrates with existing tools like Webpack to provide e.g. Hot Reload.
 
 ## Installation
 
