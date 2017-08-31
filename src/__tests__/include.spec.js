@@ -16,7 +16,10 @@ describe('include module', () => {
       }
     `;
 
-    const header = css`${include(text, title)} font-family: sans-serif;`;
+    const header = css`
+      ${include(text, title)};
+      font-family: sans-serif;
+    `;
 
     expect(include(title)).toMatchSnapshot();
     expect(include(text, title)).toMatchSnapshot();

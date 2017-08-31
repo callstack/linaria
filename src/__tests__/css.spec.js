@@ -7,7 +7,7 @@ describe('css module', () => {
     const color = 'blue';
     const title = css`color: ${color};`;
 
-    expect(title).toBe('css_d890fac7');
+    expect(title).toBe('css__1r77qux');
   });
 
   it('should return a class name with variable name', () => {
@@ -15,6 +15,6 @@ describe('css module', () => {
       color: blue;
     `;
 
-    expect(title).toBe('header_d890fac7');
+    expect(title).toBe('header__1r77qux');
   });
 });

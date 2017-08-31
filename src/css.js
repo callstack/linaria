@@ -10,7 +10,7 @@ const named = (name?: string = 'css', filename: ?string = null) => (
 ) => {
   const styles = dedent(template, ...expressions).trim();
   const slug = slugify(filename || styles);
-  const classname = `${name}_${slug}`;
+  const classname = `${name}__${slug}`;
 
   sheet.insert(`.${classname}`, styles);
 

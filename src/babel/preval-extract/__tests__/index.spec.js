@@ -104,7 +104,7 @@ describe('preval-extract babel plugin', () => {
     \`;
     `);
 
-    const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = filterResults(results, match);
     expect(css).toMatch('font-size: 3em');
@@ -130,10 +130,10 @@ describe('preval-extract babel plugin', () => {
     );
     process.env.BABEL_ENV = 'production';
 
-    const classnameWithSlugFromContent = /header = "(header_[a-z0-9]+)"/g.exec(
+    const classnameWithSlugFromContent = /header = "(header__[a-z0-9]+)"/g.exec(
       codeWithSlugFromContent
     );
-    const classnameWithSlugFromFilename = /header = "(header_[a-z0-9]+)"/g.exec(
+    const classnameWithSlugFromFilename = /header = "(header__[a-z0-9]+)"/g.exec(
       codeWithSlugFromFilename
     );
 
@@ -151,7 +151,7 @@ describe('preval-extract babel plugin', () => {
     \`;
     `);
 
-    const match = /header = "(my-header_[a-z0-9]+)"/g.exec(code);
+    const match = /header = "(my-header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = filterResults(results, match);
     expect(css).toMatch('font-size: 3em');
@@ -169,8 +169,8 @@ describe('preval-extract babel plugin', () => {
     \`;
     `);
 
-    const headerMatch = /header = "(header_[a-z0-9]+)"/g.exec(code);
-    const bodyMatch = /body = "(body_[a-z0-9]+)"/g.exec(code);
+    const headerMatch = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const bodyMatch = /body = "(body__[a-z0-9]+)"/g.exec(code);
     expect(headerMatch).not.toBeNull();
     expect(bodyMatch).not.toBeNull();
     const headerStyles = filterResults(results, headerMatch);
@@ -194,7 +194,7 @@ describe('preval-extract babel plugin', () => {
     }
     `);
 
-    const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = filterResults(results, match);
     expect(css).toMatch('font-size: 3em');
@@ -216,7 +216,7 @@ describe('preval-extract babel plugin', () => {
       { presets: [] }
     );
 
-    const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = filterResults(results, match);
     expect(css).toMatch('font-size: 3em');
@@ -262,7 +262,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 3em');
@@ -286,7 +286,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 3em');
@@ -308,7 +308,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 3em');
@@ -330,7 +330,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 3em');
@@ -352,7 +352,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 3em');
@@ -372,7 +372,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 3em');
@@ -390,7 +390,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
@@ -406,7 +406,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
@@ -424,7 +424,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
@@ -444,8 +444,8 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const headerMatch = /header = "(header_[a-z0-9]+)"/g.exec(code);
-      const bodyMatch = /body = "(body_[a-z0-9]+)"/g.exec(code);
+      const headerMatch = /header = "(header__[a-z0-9]+)"/g.exec(code);
+      const bodyMatch = /body = "(body__[a-z0-9]+)"/g.exec(code);
       expect(headerMatch).not.toBeNull();
       expect(bodyMatch).not.toBeNull();
       const headerStyles = filterResults(results, headerMatch);
@@ -465,7 +465,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 28px');
@@ -487,7 +487,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
@@ -507,7 +507,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
@@ -525,7 +525,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
@@ -542,7 +542,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 14px');
@@ -560,7 +560,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 15px');
@@ -583,7 +583,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 28px');
@@ -602,7 +602,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 28px');
@@ -625,7 +625,7 @@ describe('preval-extract babel plugin', () => {
       \`;
       `);
 
-      const match = /header = "(header_[a-z0-9]+)"/g.exec(code);
+      const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
       expect(match).not.toBeNull();
       const css = filterResults(results, match);
       expect(css).toMatch('font-size: 33px');

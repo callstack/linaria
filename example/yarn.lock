@@ -433,7 +433,7 @@ babel-plugin-check-es2015-constants@^6.22.0:
   dependencies:
     babel-runtime "^6.22.0"
 
-babel-plugin-preval@^1.4.3, babel-plugin-preval@^1.4.4:
+babel-plugin-preval@^1.4.4:
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/babel-plugin-preval/-/babel-plugin-preval-1.4.4.tgz#2d9f7c0577f098b8c41d3554e9760f9b880d0b43"
   dependencies:
@@ -2530,13 +2530,13 @@ lcid@^1.0.0:
   version "0.0.1"
   dependencies:
     babel-core "^6.26.0"
-    babel-plugin-preval "^1.4.3"
+    babel-plugin-preval "^1.4.4"
     babel-polyfill "^6.26.0"
     babel-register "^6.26.0"
     dedent "^0.7.0"
-    postcss "^6.0.9"
+    postcss "^6.0.10"
     short-hash "^1.0.0"
-    stylis "^3.2.8"
+    stylis "^3.2.13"
 
 load-json-file@^1.0.0:
   version "1.1.0"
@@ -3342,12 +3342,20 @@ postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0
     source-map "^0.5.6"
     supports-color "^3.2.3"
 
-postcss@^6.0.1, postcss@^6.0.9:
+postcss@^6.0.1:
   version "6.0.9"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-6.0.9.tgz#54819766784a51c65b1ec4d54c2f93765438c35a"
   dependencies:
     chalk "^2.1.0"
     source-map "^0.5.6"
+    supports-color "^4.2.1"
+
+postcss@^6.0.10:
+  version "6.0.10"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-6.0.10.tgz#c311b89734483d87a91a56dc9e53f15f4e6e84e4"
+  dependencies:
+    chalk "^2.1.0"
+    source-map "^0.5.7"
     supports-color "^4.2.1"
 
 prepend-http@^1.0.0, prepend-http@^1.0.1:
@@ -3870,6 +3878,10 @@ source-map@^0.5.0, source-map@^0.5.3, source-map@^0.5.6, source-map@~0.5.1, sour
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.6.tgz#75ce38f52bf0733c5a7f0c118d81334a2bb5f412"
 
+source-map@^0.5.7:
+  version "0.5.7"
+  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
+
 spdx-correct@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/spdx-correct/-/spdx-correct-1.0.2.tgz#4b3073d933ff51f3912f03ac5519498a4150db40"
@@ -4018,9 +4030,9 @@ style-loader@^0.18.2:
     loader-utils "^1.0.2"
     schema-utils "^0.3.0"
 
-stylis@^3.2.8:
-  version "3.2.11"
-  resolved "https://registry.yarnpkg.com/stylis/-/stylis-3.2.11.tgz#8e9b99ed5e3b9b1b959c455f004c6effb7cf7331"
+stylis@^3.2.13:
+  version "3.2.14"
+  resolved "https://registry.yarnpkg.com/stylis/-/stylis-3.2.14.tgz#30700e0507b7a804c03d7e2c28d8ee865697fb50"
 
 supports-color@^2.0.0:
   version "2.0.0"
