@@ -51,7 +51,7 @@ color: #ffffff;"
 exports[`preval-extract babel plugin should preval css with classname from another prevaled css 1`] = `
 "padding: 2rem;
 
-.title_d890fac7 {
+.title__1r77qux {
 margin-bottom: 1rem;
 }"
 `;

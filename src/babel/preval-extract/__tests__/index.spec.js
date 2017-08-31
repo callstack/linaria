@@ -239,10 +239,10 @@ describe('preval-extract babel plugin', () => {
     \`;
     `);
 
-    const titleMatch = /title = "(title_[a-z0-9]+)"/g.exec(code);
+    const titleMatch = /title = "(title__[a-z0-9]+)"/g.exec(code);
     expect(titleMatch).not.toBeNull();
 
-    const containerMatch = /container = "(container_[a-z0-9]+)"/g.exec(code);
+    const containerMatch = /container = "(container__[a-z0-9]+)"/g.exec(code);
     expect(containerMatch).not.toBeNull();
 
     const css = filterResults(results, containerMatch);
