@@ -13,7 +13,8 @@
     "babel-plugin-preval": "^1.4.4",
     "linaria": "file:../",
     "react": "^15.5.4",
-    "react-dom": "^15.5.4"
+    "react-dom": "^15.5.4",
+    "styled-components": "^2.1.2"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",
