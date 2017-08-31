@@ -67,4 +67,15 @@ export default function(
   path.node.quasi.expressions = [];
 
   path.parentPath.traverse(getPrevalPluginVisitor(babel), state);
+
+  const variableDeclarationPath = path.findParent(
+    babel.types.isVariableDeclaration
+  );
+
+  variableDeclarationPath.node.leadingComments = [
+    {
+      type: 'CommentBlock',
+      value: 'linaria-output',
+    },
+  ];
 }

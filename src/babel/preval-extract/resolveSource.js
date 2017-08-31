@@ -2,7 +2,7 @@
 
 import generate from 'babel-generator';
 
-import type { NodePath, BabelTypes } from '../types';
+import type { NodePath, BabelTypes, BabelVariableDeclarator } from '../types';
 
 import { getSelfBinding } from './utils';
 
@@ -13,6 +13,21 @@ function getSourceForVariableDeclarationFromAst(
 ) {
   const program = types.program([types.variableDeclaration(kind, [node])]);
   return generate(program).code;
+}
+
+function isLinariaOutput(
+  t: BabelTypes,
+  path: NodePath<BabelVariableDeclarator<any>>
+) {
+  const parent = path.parentPath;
+
+  return (
+    parent.isVariableDeclaration() &&
+    parent.node.leadingComments &&
+    parent.node.leadingComments.findIndex(
+      comment => comment.value === 'linaria-output'
+    ) > -1
+  );
 }
 
 export default function resolveSource(
@@ -27,21 +42,17 @@ export default function resolveSource(
     case 'const':
     case 'let':
     case 'var': {
-      const sourceFromAst = getSourceForVariableDeclarationFromAst(
-        types,
-        binding.kind,
-        binding.path.node
-      );
+      if (isLinariaOutput(types, binding.path)) {
+        return getSourceForVariableDeclarationFromAst(
+          types,
+          binding.kind,
+          binding.path.node
+        );
+      }
 
-      const originalSource =
-        binding.path.getSource().length === 0
-          ? ''
-          : `${binding.kind} ${binding.path.getSource()}`;
-
-      return /[a-zA-Z0-9_]+_[a-zA-Z0-9]+/.test(sourceFromAst) &&
-      /css(`|\.named\([^)]+\)`)/.test(originalSource)
-        ? sourceFromAst
-        : originalSource;
+      return binding.path.getSource().length === 0
+        ? null
+        : `${binding.kind} ${binding.path.getSource()}`;
     }
     default:
       return binding.path.getSource();
