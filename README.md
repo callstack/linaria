@@ -7,7 +7,7 @@ Fast zero-runtime CSS in JS library.
 
 1. Familiar CSS syntax with Sass like nesting.
 1. CSS is extracted at build time, no runtime is included.
-1. JavaScript expressions are supported and evaluated at build .time
+1. JavaScript expressions are supported and evaluated at build time.
 1. Critical CSS can be extracted for inlining during SSR.
 
 ## Installation
