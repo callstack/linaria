@@ -33,6 +33,30 @@ function getPrevalPluginVisitor(babel) {
   return _prevalPluginInstance.visitor;
 }
 
+function getRelevantModulesCacheKeys(env: ?string) {
+  if (env && env === 'production') {
+    return [];
+  }
+
+  return Object.keys(require.cache).filter(
+    moduleId => !/node_modules/.test(moduleId)
+  );
+}
+
+function clearModulesCache(moduleIds: string[], env: ?string) {
+  if (env && env === 'production') {
+    return;
+  }
+
+  const moduleIdsToRemove = getRelevantModulesCacheKeys().filter(
+    moduleId => moduleIds.indexOf(moduleId) === -1
+  );
+
+  moduleIdsToRemove.forEach(moduleId => {
+    delete require.cache[moduleId];
+  });
+}
+
 export default function(
   babel: BabelCore,
   path: NodePath<
@@ -66,7 +90,9 @@ export default function(
   path.node.quasi.quasis = [path.node.quasi.quasis[0]];
   path.node.quasi.expressions = [];
 
+  const moduleIds = getRelevantModulesCacheKeys(env);
   path.parentPath.traverse(getPrevalPluginVisitor(babel), state);
+  clearModulesCache(moduleIds, env);
 
   const variableDeclarationPath = path.findParent(
     babel.types.isVariableDeclaration
