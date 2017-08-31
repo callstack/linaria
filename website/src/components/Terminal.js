@@ -33,5 +33,6 @@ const codeLine = css`
 
   &::before {
     content: '$ ';
+    color: ${theme.text};
   }
 `;
