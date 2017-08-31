@@ -1,7 +1,9 @@
 /* @flow */
 
+import prevalPlugin from 'babel-plugin-preval';
+
 import type {
-  BabelTypes,
+  BabelCore,
   State,
   NodePath,
   BabelTaggedTemplateExpression,
@@ -21,8 +23,18 @@ import type {
  * `;
  */
 
+let _prevalPluginInstance = null;
+
+function getPrevalPluginVisitor(babel) {
+  if (!_prevalPluginInstance) {
+    _prevalPluginInstance = prevalPlugin(babel);
+  }
+
+  return _prevalPluginInstance.visitor;
+}
+
 export default function(
-  t: BabelTypes,
+  babel: BabelCore,
   path: NodePath<
     BabelTaggedTemplateExpression<BabelIdentifier | BabelCallExpression>
   >,
@@ -53,4 +65,17 @@ export default function(
   path.node.quasi.quasis[0].value.raw = replacement;
   path.node.quasi.quasis = [path.node.quasi.quasis[0]];
   path.node.quasi.expressions = [];
+
+  path.parentPath.traverse(getPrevalPluginVisitor(babel), state);
+
+  const variableDeclarationPath = path.findParent(
+    babel.types.isVariableDeclaration
+  );
+
+  variableDeclarationPath.node.leadingComments = [
+    {
+      type: 'CommentBlock',
+      value: 'linaria-output',
+    },
+  ];
 }

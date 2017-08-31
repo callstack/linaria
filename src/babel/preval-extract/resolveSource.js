@@ -1,10 +1,39 @@
 /* @flow */
 
-import type { NodePath } from '../types';
+import generate from 'babel-generator';
+
+import type { NodePath, BabelTypes, BabelVariableDeclarator } from '../types';
 
 import { getSelfBinding } from './utils';
 
-export default function resolveSource(path: NodePath<*>): ?string {
+function getSourceForVariableDeclarationFromAst(
+  types: BabelTypes,
+  kind: string,
+  node: Object
+) {
+  const program = types.program([types.variableDeclaration(kind, [node])]);
+  return generate(program).code;
+}
+
+function isLinariaOutput(
+  t: BabelTypes,
+  path: NodePath<BabelVariableDeclarator<any>>
+) {
+  const parent = path.parentPath;
+
+  return (
+    parent.isVariableDeclaration() &&
+    parent.node.leadingComments &&
+    parent.node.leadingComments.findIndex(
+      comment => comment.value === 'linaria-output'
+    ) > -1
+  );
+}
+
+export default function resolveSource(
+  types: BabelTypes,
+  path: NodePath<*>
+): ?string {
   const binding = getSelfBinding(path);
 
   switch (binding.kind) {
@@ -12,10 +41,19 @@ export default function resolveSource(path: NodePath<*>): ?string {
       return binding.path.parentPath.getSource();
     case 'const':
     case 'let':
-    case 'var':
+    case 'var': {
+      if (isLinariaOutput(types, binding.path)) {
+        return getSourceForVariableDeclarationFromAst(
+          types,
+          binding.kind,
+          binding.path.node
+        );
+      }
+
       return binding.path.getSource().length === 0
         ? null
         : `${binding.kind} ${binding.path.getSource()}`;
+    }
     default:
       return binding.path.getSource();
   }

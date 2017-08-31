@@ -224,6 +224,32 @@ describe('preval-extract babel plugin', () => {
     expect(css).toMatchSnapshot();
   });
 
+  it('should preval css with classname from another prevaled css', () => {
+    const { code, results } = transpile(dedent`
+    const title = css\`
+    color: blue;
+    \`;
+
+    const container = css\`
+    padding: 2rem;
+
+    .${'${title}'} {
+      margin-bottom: 1rem;
+    }
+    \`;
+    `);
+
+    const titleMatch = /title = "(title__[a-z0-9]+)"/g.exec(code);
+    expect(titleMatch).not.toBeNull();
+
+    const containerMatch = /container = "(container__[a-z0-9]+)"/g.exec(code);
+    expect(containerMatch).not.toBeNull();
+
+    const css = filterResults(results, containerMatch);
+    expect(css).toMatch(titleMatch[1]);
+    expect(css).toMatchSnapshot();
+  });
+
   describe('with plain objects', () => {
     it('should preval styles with shallow object', () => {
       const { code, results } = transpile(dedent`

@@ -12,6 +12,7 @@ export type NodePath<K> = {
   isVariableDeclarator: () => boolean,
   isImportDefaultSpecifier: () => boolean,
   isImportSpecifier: () => boolean,
+  isVariableDeclaration: () => boolean,
   getSource: () => string,
   buildCodeFrameError: (message: string) => Error,
   traverse: (visitor: { [key: string]: Function }, thisArgs?: any) => void,
@@ -21,6 +22,10 @@ export type NodePath<K> = {
 export type Binding<K> = {
   kind: string,
   path: NodePath<K>,
+};
+
+export type BabelCore = {
+  types: BabelTypes,
 };
 
 export type BabelObjectExpression = {
@@ -93,6 +98,8 @@ export type BabelTypes = {
   stringLiteral: BabelNodeFactory<BabelStringLiteral>,
   memberExpression: BabelNodeFactory<BabelMemberExpression>,
   expressionStatement: BabelNodeFactory<any>,
+  variableDeclaration: BabelNodeFactory<BabelVariableDeclaration>,
+  program: BabelNodeFactory<any>,
   isTaggedTemplateExpression: BabelIsTypeFunction<
     BabelTaggedTemplateExpression<any>
   >,

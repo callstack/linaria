@@ -48,6 +48,14 @@ exports[`preval-extract babel plugin should preval const and let without transpi
 color: #ffffff;"
 `;
 
+exports[`preval-extract babel plugin should preval css with classname from another prevaled css 1`] = `
+"padding: 2rem;
+
+.title__1r77qux {
+margin-bottom: 1rem;
+}"
+`;
+
 exports[`preval-extract babel plugin with commonjs imports should preval default export 1`] = `"font-size: 14px;"`;
 
 exports[`preval-extract babel plugin with commonjs imports should preval imported constants  1`] = `"font-size: 14px;"`;
