@@ -98,7 +98,7 @@ const { critical, other } = collect(html, css);
 
 ### Animations
 
-We could declare CSS animation like so:
+We can declare CSS animation like so:
 
 ```js
 const box = css`
@@ -165,4 +165,4 @@ app.get('/styles/:slug', (req, res) =>
 app.listen(3242);
 ```
 
-We probably should write these CSS chunks to disk and serve them with correct headers for caching.
+We should probably write these CSS chunks to disk and serve them with correct headers for caching.
