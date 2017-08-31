@@ -142,7 +142,7 @@ const result = css`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  padding: 20px 0px;
+  padding: 20px 10px;
 `;
 
 const resultItem = css`
@@ -150,7 +150,7 @@ const resultItem = css`
   flex-direction: column;
   flex: 1 1 auto;
   max-width: 100%;
-  padding: 0 1px;
+  padding: 0 2px;
 
   ${media.large} {
     width: 33%;
