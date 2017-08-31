@@ -1,0 +1,8 @@
+{
+  "presets": [
+    ["env", {"targets": {"browsers": ["last 2 versions"]}}],
+    "react",
+    "linaria/babel"
+  ],
+  "plugins": ["transform-class-properties", "transform-object-rest-spread"]
+}

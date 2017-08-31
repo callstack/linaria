@@ -1,0 +1,36 @@
+{
+  "name": "linaria-website",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Linaria website",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "NODE_ENV=production webpack -p --env.NODE_ENV production",
+    "prebuild": "yarn run clean",
+    "clean": "del dist",
+    "postinstall": "cd .. && yarn link && cd website && yarn link linaria"
+  },
+  "dependencies": {
+    "dedent": "^0.7.0",
+    "linaria": "0.0.0",
+    "normalize.css": "^7.0.0",
+    "prismjs": "^1.6.0",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.5",
+    "del-cli": "^1.0.0",
+    "eslint-plugin-react": "^7.3.0",
+    "extract-text-webpack-plugin": "^3.0.0",
+    "style-loader": "^0.18.2",
+    "webpack": "^3.5.5",
+    "webpack-dev-server": "^2.7.1"
+  }
+}

@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "flow": "flow",
-    "lint": "eslint src example",
+    "lint": "eslint .",
     "test": "jest",
     "prepublish": "npm run build:clean && npm run build:transpile && npm run build:flow",
     "build:clean": "del build",
