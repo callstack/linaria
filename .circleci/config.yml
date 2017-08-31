@@ -1,16 +1,16 @@
 aliases:
   - &restore-cache
     keys:
-      - dependencies-{{ .Branch }}-{{ checksum "package.json" }}
+      - dependencies-feat/website-{{ checksum "package.json" }}
       # Fallback in case checksum fails
-      - dependencies-{{ .Branch }}-
+      - dependencies-feat/website-
 
   - &save-cache
     paths:
       - node_modules
       - example/node_modules
       - website/node_modules
-    key: dependencies-{{ .Branch }}-{{ checksum "package.json" }}
+    key: dependencies-feat/website-{{ checksum "package.json" }}
 
 version: 2
 jobs:
