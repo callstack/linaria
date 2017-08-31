@@ -18,7 +18,7 @@ Install it like a regular npm package:
 yarn add linaria
 ```
 
-Adjust the preset entry in your <code>.babelrc</code> file to look like:
+Adjust the preset entry in your `.babelrc` file to look like:
 
 ```json
 {
