@@ -39,7 +39,7 @@ export default function Index() {
             {dedent(`{
               "presets": [
                 "env",
-                "react"
+                "react",
                 "linaria/babel"
               ]
             }`)}
