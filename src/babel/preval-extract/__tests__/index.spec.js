@@ -97,6 +97,16 @@ describe('preval-extract babel plugin', () => {
     }).toThrow();
   });
 
+  it('should throw error if the id was not found', () => {
+    expect(() => {
+      transpile(dedent`
+      const title = css\`
+        width: ${'${document.width}'};
+      \`;
+      `);
+    }).toThrowErrorMatchingSnapshot();
+  });
+
   it('should create classname for `css` tagged template literal', () => {
     const { code, results } = transpile(dedent`
     const header = css\`
