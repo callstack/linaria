@@ -50,5 +50,7 @@ jobs:
       - run: yarn run lint
       - run: yarn run flow
       - run: yarn test -- --coverage
+      - store_artifacts:
+          path: coverage
 
   # test-e2e:
