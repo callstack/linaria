@@ -1,18 +1,20 @@
 # `libaria/babel` preset
 
-In order to have styles in `css` tagged template literals evaluated and extracted you need to add a `linaria/babel` preset to your Babel configuration.
+In order to have styles in `css` tagged template literals evaluated and extracted you need to add the `linaria/babel` preset to your Babel configuration.
 
 `.babelrc`:
 
-```json
+```diff
 {
   "presets": [
-    "libaria/babel"
+    "es2015",
+    "react",
++   "linaria/babel"
   ]
 }
 ```
 
-Now, linaria will evaluate the `css` tags and extract styles to a CSS file for each JS file with the same name and inject `require` call with a absolute path to extracted CSS file.
+Now, linaria will evaluate the `css` tags and extract styles to a CSS file for each JS file with the same name and inject `require` call with a path to the extracted CSS file.
 
 For example, CSS file for `App.js` will be named `App.css` and will be written in the same directory as `App.js`.
 
@@ -21,14 +23,14 @@ You can configure the preset by passing and object with options:
 ```json
 {
   "presets": [
-    ["libaria/babel", { "filename": "[name]-chunk.css" }]
+    ["linaria/babel", { "filename": "[name]-chunk.css" }]
   ]
 }
 ```
 
 ## Options
 
-* `single: boolean` (default: `false`) - Defines whether to extract all styles into single file (if `true`), or into multiple ones for each JS file. If it's set to `false`, the JS file will have `require` call with absolute path to extracted CSS file injected into. Use it, in conjunction with `filename` option to specify filename for extracted styles.
+* `single: boolean` (default: `false`) - Defines whether to extract all styles into single file (if `true`), or into multiple ones for each JS file. If it's set to `false`, require calls for the CSS files will be injected into the JavaScript code, which then can be handled by a bundler like Webpack. Use it, in conjunction with `filename` option to specify filename for extracted styles.
 * `filename: string` (default: `'[name].css'`) - Template for a name of file with extracted styles. You can use `[name]` token to inject source JS file's name. You can use any extension you want.
 * `outDir: string` (default: N/A) - Path to directory where the CSS files should be saved. It can be absolute or relative to current working directory. If not specified, it will be calculated dynamically from directory name of each JS file.
 * `cache: boolean` (default: `true`) - Defines whether to disable the cache. By default it is enabled - if the styles between extractions are the same, the files won't be overwritten again.
@@ -42,7 +44,7 @@ To do that,  you need to set `extract` to `false` in Babel configuration for `te
 ```json
 {
   "presets": [
-    "libaria/babel"
+    "linaria/babel"
   ],
   "env": {
     "test": {
