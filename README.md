@@ -39,7 +39,7 @@ Example is worth a thousand words:
 
 ```js
 import React from 'react';
-import { css, include, names } from 'linaria';
+import { css, include, styles } from 'linaria';
 import { modularScale, hiDPI } from 'polished';
 import fonts from './fonts';
 import colors from './colors';
@@ -69,18 +69,18 @@ const header = css`
 
 export default function Header({ className }) {
   return (
-    <div className={names(container, className)}>
-      <h1 className={header} />
+    <div {...styles(container, className)}>
+      <h1 {...styles(header)} />
     </div>
   );
 }
 
 export function Block() {
-  return <div className={container} />;
+  return <div {...styles(container)} />;
 }
 
 export function App() {
-  return <Header className={title} />;
+  return <Header {...styles(title)} />;
 }
 ```
 
@@ -96,7 +96,7 @@ After being transpiled, the code will output following CSS:
   padding: 3em;
 }
 
-.header_xy4ertz {
+.header__xy4ertz {
   text-transform: uppercase;
   font-family: Helvetica, sans-serif; /* constants are automatically inlined */
   font-size: 2.66em;
