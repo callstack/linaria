@@ -1,7 +1,11 @@
+[![Build Status][build-badge]][build]
+[![Code Coverage][coverage-badge]][coverage]
+[![Version][version-badge]][package]
+[![MIT License][license-badge]][license]
+
 # Linaria
 
-Fast zero-runtime CSS in JS library.
-
+Zero-runtime CSS in JS library.
 
 ## Features
 
@@ -9,7 +13,7 @@ Fast zero-runtime CSS in JS library.
 * CSS is extracted at build time, no runtime is included.
 * JavaScript expressions are supported and evaluated at build time.
 * Critical CSS can be extracted for inlining during SSR.
-* Integrates with existing tools like Webpack to provide e.g. Hot Reload.
+* Integrates with existing tools like Webpack to provide features such as Hot Reload.
 
 ## Installation
 
@@ -26,7 +30,11 @@ Adjust the preset entry in your `.babelrc` file to look like:
   "presets": [
     "env",
     "react",
-    "linaria/babel"
+    ["linaria/babel", {
+      "single": true,
+      "filename": "styles.css",
+      "outDir": "dist"
+    }]
   ]
 }
 ```
@@ -121,7 +129,7 @@ And the following JavaScipt:
 
 ```js
 import React from 'react';
-import names from 'linaria/build/names';
+import { styles } from 'linaria/build/index.runtime';
 
 const title = 'title__jt5ry4';
 
@@ -131,18 +139,18 @@ const header = 'header__xy4ertz';
 
 export default function Header({ className }) {
   return (
-    <div className={names(container, className)}>
-      <h1 className={header} />
+    <div {...styles(container, className)}>
+      <h1 {...styles(header)} />
     </div>
   );
 }
 
 export function Block() {
-  return <div className={container} />;
+  return <div {...styles(container)} />;
 }
 
 export function App() {
-  return <Header className={title} />;
+  return <Header {...styles(title)} />;
 }
 ```
 
@@ -154,7 +162,7 @@ export function App() {
 
 ## Inspiration
 
-1. [glamor](https://github.com/threepointone/glamor)
+1. [glam](https://github.com/threepointone/glam)
 1. [styled-components](https://github.com/styled-components/styled-components)
 1. [css-literal-loader](https://github.com/4Catalyzer/css-literal-loader)
 
@@ -168,3 +176,12 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/kentcdodds/all-contributors) specification. Contributions of any kind welcome!
+
+[build-badge]: https://img.shields.io/circleci/project/github/callstack-io/linaria/master.svg?style=flat-square
+[build]: https://circleci.com/gh/callstack-io/linaria
+[coverage-badge]: https://img.shields.io/codecov/c/github/callstack-io/linaria.svg?style=flat-square
+[coverage]: https://codecov.io/github/callstack-io/linaria
+[version-badge]: https://img.shields.io/npm/v/linaria.svg?style=flat-square
+[package]: https://www.npmjs.com/package/linaria
+[license-badge]: https://img.shields.io/github/license/callstack-io/linaria.svg?style=flat-square
+[license]: https://opensource.org/licenses/MIT
