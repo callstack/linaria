@@ -26,6 +26,7 @@ const externalRequirementsVisitor = {
       if (source && !this.requirements.find(item => item === source)) {
         this.requirements.splice(this.addBeforeIndex, 0, source);
         const binding = getSelfBinding(path);
+        /* istanbul ignore else */
         if (shouldTraverseExternalIds(binding.path)) {
           binding.path.traverse(externalRequirementsVisitor, this);
         }
