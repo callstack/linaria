@@ -86,7 +86,7 @@ export default function extractStyles(
   };
 
   if (cache && hasCachedStyles(filename, data)) {
-    if (!single) {
+    if (extract && !single) {
       addRequireForCss(types, program, filename);
     }
 
