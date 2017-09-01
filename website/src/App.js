@@ -39,7 +39,7 @@ export default function Index() {
             {dedent(`{
               "presets": [
                 "env",
-                "react"
+                "react",
                 "linaria/babel"
               ]
             }`)}
@@ -135,8 +135,9 @@ export default function Index() {
         <Heading type="h3">Docs and examples</Heading>
         <p>
           We are actively working on broadening our{' '}
-          <a href="https://github.com/callstack-io/linaria">documentation</a>.
-          Also be sure to check the{' '}
+          <a href="https://github.com/callstack-io/linaria/docs">
+            documentation
+          </a>. Also be sure to check the{' '}
           <a href="https://github.com/callstack-io/linaria/tree/master/example">
             example app
           </a>{' '}
