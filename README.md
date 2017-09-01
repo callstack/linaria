@@ -149,7 +149,7 @@ export function App() {
 ## Documentation
 
 * [API and usage](/docs/README.md)
-* [Babel preset](/docs/BABEL_PRESET.md)]
+* [Configuring Babel](/docs/BABEL_PRESET.md)]
 * [Example](/example)
 
 ## Inspiration

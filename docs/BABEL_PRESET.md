@@ -34,6 +34,28 @@ You can configure the preset by passing and object with options:
 * `cache: boolean` (default: `true`) - Defines whether to disable the cache. By default it is enabled - if the styles between extractions are the same, the files won't be overwritten again.
 * `extract: boolean` (default: `true`) - Defines whether to disable the extraction of styles to CSS files. If set to `false` it will evaluate `css` tags and create a class names for each one, but the CSS files won't be created. Useful in SSR, if you don't want to create CSS files, but you want to have class names.
 
+## Testing components
+
+When testing a component you should disable the extraction, otherwise your test runner will create CSS files.
+To do that,  you need to set `extract` to `false` in Babel configuration for `test` environment:
+
+```json
+{
+  "presets": [
+    "libaria/babel"
+  ],
+  "env": {
+    "test": {
+      "presets": [
+        ["linaria/babel", { "extract": false }]
+      ]
+    }
+  }
+}
+```
+
+Remember to set `process.env.BABEL_ENV` or `process.env.NODE_ENV` to `test`. If you are using [jest](https://facebook.github.io/jest/), it will be set automatically, otherwise run test with `NODE_ENV=test` prefix - `NODE_ENV=test npm run test`.
+
 ## Examples
 
 ### Extract to a single file
