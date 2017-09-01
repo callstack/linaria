@@ -39,6 +39,7 @@ function getRelevantModulesCacheKeys(env: ?string) {
   }
 
   return Object.keys(require.cache).filter(
+    /* istanbul ignore next */
     moduleId => !/node_modules/.test(moduleId)
   );
 }
@@ -49,10 +50,12 @@ function clearModulesCache(moduleIds: string[], env: ?string) {
   }
 
   const moduleIdsToRemove = getRelevantModulesCacheKeys().filter(
+    /* istanbul ignore next */
     moduleId => moduleIds.indexOf(moduleId) === -1
   );
 
   moduleIdsToRemove.forEach(moduleId => {
+    /* istanbul ignore next */
     delete require.cache[moduleId];
   });
 }

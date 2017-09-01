@@ -36,6 +36,14 @@ export default function resolveSource(
 ): ?string {
   const binding = getSelfBinding(path);
 
+  if (!binding) {
+    throw path.buildCodeFrameError(
+      'Linaria css evaluation error:\n' +
+        `  Could not find a reference to '${path.node.name}'.\n` +
+        '  This might happen if you used some undeclared variable/function or a browser specific API.\n'
+    );
+  }
+
   switch (binding.kind) {
     case 'module':
       return binding.path.parentPath.getSource();

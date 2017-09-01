@@ -56,6 +56,13 @@ margin-bottom: 1rem;
 }"
 `;
 
+exports[`preval-extract babel plugin should throw error if the id was not found 1`] = `
+"unknown: Linaria css evaluation error:
+  Could not find a reference to 'document'.
+  This might happen if you used some undeclared variable/function or a browser specific API.
+"
+`;
+
 exports[`preval-extract babel plugin with commonjs imports should preval default export 1`] = `"font-size: 14px;"`;
 
 exports[`preval-extract babel plugin with commonjs imports should preval imported constants  1`] = `"font-size: 14px;"`;

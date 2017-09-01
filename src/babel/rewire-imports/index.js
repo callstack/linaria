@@ -10,6 +10,7 @@ function isLinariaImport(value) {
   try {
     return require.resolve(value) === require.resolve('linaria');
   } catch (e) {
+    /* istanbul ignore next */
     return false;
   }
 }
