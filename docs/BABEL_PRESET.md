@@ -1,4 +1,4 @@
-# `libaria/babel` preset
+# `linaria/babel` preset
 
 In order to have styles in `css` tagged template literals evaluated and extracted you need to add the `linaria/babel` preset to your Babel configuration.
 
