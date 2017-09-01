@@ -5,11 +5,11 @@ Fast zero-runtime CSS in JS library.
 
 ## Features
 
-1. Familiar CSS syntax with Sass like nesting.
-1. CSS is extracted at build time, no runtime is included.
-1. JavaScript expressions are supported and evaluated at build time.
-1. Critical CSS can be extracted for inlining during SSR.
-1. Integrates with existing tools like Webpack to provide e.g. Hot Reload.
+* Familiar CSS syntax with Sass like nesting.
+* CSS is extracted at build time, no runtime is included.
+* JavaScript expressions are supported and evaluated at build time.
+* Critical CSS can be extracted for inlining during SSR.
+* Integrates with existing tools like Webpack to provide e.g. Hot Reload.
 
 ## Installation
 
