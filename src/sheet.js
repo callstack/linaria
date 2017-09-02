@@ -49,6 +49,12 @@ function sheet() {
     throw new Error('Unable to insert stylesheet');
   }
 
+  if (process.env.NODE_ENV !== 'test') {
+    console.warn(
+      'Babel preset for Linaria is not configured. See https://github.com/callstack-io/linaria/blob/master/docs/BABEL_PRESET.md for instructions.'
+    );
+  }
+
   return {
     insert(selector: string, css: string) {
       if (selector in cache) {
