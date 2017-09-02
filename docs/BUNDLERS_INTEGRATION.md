@@ -1,6 +1,8 @@
-# webpack
+# Bundlers Integration
 
-## Development
+## webpack
+
+### Development
 
 In order for webpack to pick up extracted CSS files, you need to setup [style-loader](https://github.com/webpack-contrib/style-loader) and [css-loader](https://github.com/webpack-contrib/css-loader).
 
@@ -33,11 +35,11 @@ For this case you can use `linaria/babel` preset without any options:
 }
 ```
 
-## Production
+### Production
 
 For production, you don't want to have `<style>` elements created dynamically, you can either use `single` option and extract all CSS to a single file or use [ExtractTextWebpackPlugin](https://github.com/webpack-contrib/extract-text-webpack-plugin).
 
-### ExtractTextWebpackPlugin
+#### ExtractTextWebpackPlugin
 
 In order to have your styles extracted with **ExtractTextWebpackPlugin**, you need to place the following snippet in your webpack production config:
 
@@ -67,7 +69,7 @@ module.exports = {
 
 This will extract the CSS from all files into a single `styles.css`. Then you need to include this file in your HTML file.
 
-### `single` option
+#### `single` option
 
 For production environment, you need to use `single: true` options in conjunction with `filename` and `outDir` options:
 
