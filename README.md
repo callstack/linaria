@@ -66,10 +66,6 @@ const header = css`
   font-family: ${fonts.heading};
   font-size: ${modularScale(2)};
 
-  [data-theme=dark] & { color: ${colors.white} }
-
-  [data-theme=light] & { color: ${colors.black} }
-
   ${hiDPI(1.5)} {
     font-size: ${modularScale(2.5)}
   }
@@ -110,14 +106,6 @@ After being transpiled, the code will output following CSS:
   font-size: 2.66em;
 }
 
-[data-theme=dark] .header__xy4ertz {
-  color: #fff;
-}
-
-[data-theme=light] .header__xy4ertz {
-  color: #222;
-}
-
 @media only screen and (min-resolution: 144dpi), only screen and (min-resolution: 1.5dppx) {
   .header__xy4ertz {
     font-size: 3.3325em;
@@ -145,19 +133,48 @@ export default function Header({ className }) {
   );
 }
 
-export function Block() {
-  return <div {...styles(container)} />;
-}
-
 export function App() {
   return <Header {...styles(title)} />;
 }
 ```
 
+## Trade-offs
+
+* Dynamic styles are not supported with `css` tag. See [Dynamic Styles](/docs/DYNAMIC_STYLES.md) for alternative approaches.
+* Modules used in the CSS rules cannot have side-effects.
+  For example:
+
+  ```js
+  import { css } from 'linaria';
+  import colors from './colors';
+
+  const title = css`
+    color: ${colors.text};
+  `;
+  ```
+  Here, there should be no side-effects in the `colors.js` file, or any file it imports. We recommend to move helpers and shared configuration to files without any side-effects.
+
+## Editor Plugins
+
+### VSCode
+
+* Syntax Highlighting - [Styled Components Plugin](https://marketplace.visualstudio.com/items?itemName=jpoissonnier.vscode-styled-components)
+
+### Atom
+
+* Syntax Highlighting - [Babel Grammar](https://atom.io/packages/language-babel)
+
+## Recommended Libraries
+
+* [polished.js](polished.js.org) - A lightweight toolset for writing styles in JavaScript.
+
 ## Documentation
 
-* [API and usage](/docs/README.md)
+* [API and usage](/docs/API.md)
 * [Configuring Babel](/docs/BABEL_PRESET.md)
+* [Dynamic Styles](/docs/DYNAMIC_STYLES.md)
+* [Theming](/docs/THEMING.md)
+* [Server Rendering](/docs/SERVER_RENDERING.md)
 * [Example](/example)
 
 ## Inspiration
