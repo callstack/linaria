@@ -158,6 +158,7 @@ export function App() {
 
 * [API and usage](/docs/README.md)
 * [Configuring Babel](/docs/BABEL_PRESET.md)
+* [Bundles integration](/docs/BUNDLERS_INTEGRATION.md)
 * [Example](/example)
 
 ## Inspiration
