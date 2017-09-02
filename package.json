@@ -16,7 +16,7 @@
     "flow": "flow",
     "lint": "eslint .",
     "test": "jest",
-    "prepublish": "yarn run build:clean && yarn run build:transpile && yarn run build:flow",
+    "prepare": "yarn run build:clean && yarn run build:transpile && yarn run build:flow",
     "build:clean": "del build",
     "build:transpile": "babel src --out-dir build --ignore '**/__tests__/**,**/__mocks__/**,**/__fixtures__/**'",
     "build:transpile:watch": "babel src --out-dir build --watch --ignore '**/__tests__/**,**/__mocks__/**,**/__fixtures__/**'",
@@ -24,7 +24,9 @@
     "benchmark": "yarn run prepublish && node ./benchmark/run.js"
   },
   "files": [
-    "build"
+    "build",
+    "babel.js",
+    "server.js"
   ],
   "dependencies": {
     "babel-core": "^6.26.0",
