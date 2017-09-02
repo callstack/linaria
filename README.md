@@ -175,6 +175,7 @@ export function App() {
 * [Dynamic Styles](/docs/DYNAMIC_STYLES.md)
 * [Theming](/docs/THEMING.md)
 * [Server Rendering](/docs/SERVER_RENDERING.md)
+* [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md)
 * [Example](/example)
 
 ## Inspiration
