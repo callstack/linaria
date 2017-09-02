@@ -21,7 +21,8 @@
     "build:transpile": "babel src --out-dir build --ignore '**/__tests__/**,**/__mocks__/**,**/__fixtures__/**'",
     "build:transpile:watch": "babel src --out-dir build --watch --ignore '**/__tests__/**,**/__mocks__/**,**/__fixtures__/**'",
     "build:flow": "flow-copy-source src build -i '**/__tests__/**'",
-    "benchmark": "yarn run prepublish && node ./benchmark/run.js"
+    "benchmark": "yarn run prepare && node ./benchmark/run.js",
+    "postinstall": "yarn link && yarn link linaria"
   },
   "files": [
     "build",
