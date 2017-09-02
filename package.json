@@ -21,12 +21,8 @@
     "build:transpile": "babel src --out-dir build --ignore '**/__tests__/**,**/__mocks__/**,**/__fixtures__/**'",
     "build:transpile:watch": "babel src --out-dir build --watch --ignore '**/__tests__/**,**/__mocks__/**,**/__fixtures__/**'",
     "build:flow": "flow-copy-source src build -i '**/__tests__/**'",
-<<<<<<< 806e5cd826a6c2ed0174769ea2a875075a1f7df2
-    "benchmark": "yarn run prepublish && node ./benchmark/run.js"
-=======
-    "benchmark": "npm run prepublish && node ./benchmark/run.js",
+    "benchmark": "yarn run prepublish && node ./benchmark/run.js",
     "postinstall": "yarn link && yarn link linaria"
->>>>>>> Link linaria to itself so it's able to resolve
   },
   "files": [
     "build",
