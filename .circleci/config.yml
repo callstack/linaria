@@ -1,34 +1,34 @@
 aliases:
   - &restore-cache
     keys:
-      - dependencies-{{ .Branch }}-{{ checksum "package.json" }}
+      - dependencies-{{ checksum "package.json" }}
       # Fallback in case checksum fails
-      - dependencies-{{ .Branch }}-
+      - dependencies-
 
   - &restore-example-cache
     keys:
-      - dependencies-{{ .Branch }}-{{ checksum "example/package.json" }}
-      - dependencies-{{ .Branch }}-
+      - dependencies-example-{{ checksum "example/package.json" }}
+      - dependencies-example-
 
   - &restore-website-cache
     keys:
-      - dependencies-{{ .Branch }}-{{ checksum "website/package.json" }}
-      - dependencies-{{ .Branch }}-
+      - dependencies-website-{{ checksum "website/package.json" }}
+      - dependencies-website-
 
   - &save-cache
     paths:
       - node_modules
-    key: dependencies-{{ .Branch }}-{{ checksum "package.json" }}
+    key: dependencies-{{ checksum "package.json" }}
 
   - &save-example-cache
     paths:
       - example/node_modules
-    key: dependencies-{{ .Branch }}-{{ checksum "example/package.json" }}
+    key: dependencies-example-{{ checksum "example/package.json" }}
 
   - &save-website-cache
     paths:
       - website/node_modules
-    key: dependencies-{{ .Branch }}-{{ checksum "website/package.json" }}
+    key: dependencies-website-{{ checksum "website/package.json" }}
 
 version: 2
 jobs:
