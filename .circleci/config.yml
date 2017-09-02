@@ -50,6 +50,7 @@ jobs:
       - run: yarn run lint
       - run: yarn run flow
       - run: yarn test -- --coverage
+      - run: cat ./coverage/lcov.info | ./node_modules/.bin/codecov
       - store_artifacts:
           path: coverage
 

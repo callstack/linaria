@@ -4,16 +4,24 @@
   "description": "Fast zero-runtime CSS in JS library",
   "main": "build/index.js",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/callstack-io/linaria.git"
+  },
+  "bugs": {
+    "url": "https://github.com/callstack-io/linaria/issues"
+  },
+  "homepage": "https://github.com/callstack-io/linaria#readme",
   "scripts": {
     "flow": "flow",
     "lint": "eslint .",
     "test": "jest",
-    "prepublish": "npm run build:clean && npm run build:transpile && npm run build:flow",
+    "prepublish": "yarn run build:clean && yarn run build:transpile && yarn run build:flow",
     "build:clean": "del build",
     "build:transpile": "babel src --out-dir build --ignore '**/__tests__/**,**/__mocks__/**,**/__fixtures__/**'",
     "build:transpile:watch": "babel src --out-dir build --watch --ignore '**/__tests__/**,**/__mocks__/**,**/__fixtures__/**'",
     "build:flow": "flow-copy-source src build -i '**/__tests__/**'",
-    "benchmark": "npm run prepublish && node ./benchmark/run.js"
+    "benchmark": "yarn run prepublish && node ./benchmark/run.js"
   },
   "files": [
     "build"
@@ -36,6 +44,7 @@
     "babel-preset-stage-3": "^6.24.1",
     "benchmark": "^2.1.4",
     "cli-table": "^0.3.1",
+    "codecov": "^2.3.0",
     "cssom": "^0.3.2",
     "del-cli": "^1.1.0",
     "eslint": "^4.5.0",

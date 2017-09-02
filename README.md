@@ -201,5 +201,5 @@ This project follows the [all-contributors](https://github.com/kentcdodds/all-co
 [coverage]: https://codecov.io/github/callstack-io/linaria
 [version-badge]: https://img.shields.io/npm/v/linaria.svg?style=flat-square
 [package]: https://www.npmjs.com/package/linaria
-[license-badge]: https://img.shields.io/github/license/callstack-io/linaria.svg?style=flat-square
+[license-badge]: https://img.shields.io/npm/l/linaria.svg?style=flat-square
 [license]: https://opensource.org/licenses/MIT
