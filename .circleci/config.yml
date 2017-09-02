@@ -52,5 +52,7 @@ jobs:
       - run: yarn test -- --coverage
       - store_artifacts:
           path: coverage
+    post:
+      - cat ./coverage/lcov.info | ./node_modules/.bin/codecov
 
   # test-e2e:
