@@ -23,21 +23,23 @@ Install it like a regular npm package:
 yarn add linaria
 ```
 
-Adjust the preset entry in your `.babelrc` file to look like:
+Add the `linaria/babel` preset to your Babel configuration:
 
-```json
+```diff
 {
   "presets": [
     "env",
     "react",
-    ["linaria/babel", {
-      "single": true,
-      "filename": "styles.css",
-      "outDir": "dist"
-    }]
++   ["linaria/babel", {
++     "single": true,
++     "filename": "styles.css",
++     "outDir": "dist"
++   }]
   ]
 }
 ```
+
+See [Configuring Babel](/docs/BABEL_PRESET.md) for more options and [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md) for integrating with Webpack.
 
 ## How it works
 
@@ -154,6 +156,16 @@ export function App() {
   ```
   Here, there should be no side-effects in the `colors.js` file, or any file it imports. We recommend to move helpers and shared configuration to files without any side-effects.
 
+## Documentation
+
+* [API and usage](/docs/API.md)
+* [Configuring Babel](/docs/BABEL_PRESET.md)
+* [Dynamic Styles](/docs/DYNAMIC_STYLES.md)
+* [Theming](/docs/THEMING.md)
+* [Server Rendering](/docs/SERVER_RENDERING.md)
+* [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md)
+* [Example](/example)
+
 ## Editor Plugins
 
 ### VSCode
@@ -168,21 +180,21 @@ export function App() {
 
 * [polished.js](polished.js.org) - A lightweight toolset for writing styles in JavaScript.
 
-## Documentation
-
-* [API and usage](/docs/API.md)
-* [Configuring Babel](/docs/BABEL_PRESET.md)
-* [Dynamic Styles](/docs/DYNAMIC_STYLES.md)
-* [Theming](/docs/THEMING.md)
-* [Server Rendering](/docs/SERVER_RENDERING.md)
-* [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md)
-* [Example](/example)
-
 ## Inspiration
 
-1. [glam](https://github.com/threepointone/glam)
-1. [styled-components](https://github.com/styled-components/styled-components)
-1. [css-literal-loader](https://github.com/4Catalyzer/css-literal-loader)
+* [glam](https://github.com/threepointone/glam)
+* [styled-components](https://github.com/styled-components/styled-components)
+* [css-literal-loader](https://github.com/4Catalyzer/css-literal-loader)
+
+## Acknowledgements
+
+This project wouldn't have been possible without the following libraries or the people behind them.
+
+* [babel](https://babeljs.io/)
+* [babel-plugin-preval](https://github.com/kentcdodds/babel-plugin-preval)
+* [stylis.js](https://github.com/thysultan/stylis.js)
+
+Special thanks to [@kentcdodds](https://github.com/kentcdodds) for his babel plugin and [@threepointone](https://github.com/threepointone) for his suggestions and encouragement.
 
 ## Contributors
 
@@ -195,6 +207,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
 
 This project follows the [all-contributors](https://github.com/kentcdodds/all-contributors) specification. Contributions of any kind welcome!
 
+<!-- badges -->
 [build-badge]: https://img.shields.io/circleci/project/github/callstack-io/linaria/master.svg?style=flat-square
 [build]: https://circleci.com/gh/callstack-io/linaria
 [coverage-badge]: https://img.shields.io/codecov/c/github/callstack-io/linaria.svg?style=flat-square
