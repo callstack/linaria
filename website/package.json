@@ -7,7 +7,7 @@
     "start": "webpack-dev-server",
     "build": "NODE_ENV=production webpack -p --env.NODE_ENV production",
     "prebuild": "yarn run clean",
-    "clean": "del dist",
+    "clean": "del static/build",
     "postinstall": "cd .. && yarn link && cd website && yarn link linaria"
   },
   "dependencies": {

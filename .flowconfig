@@ -11,6 +11,7 @@ emoji=true
 unsafe.enable_getters_and_setters=true
 
 module.name_mapper='^linaria$' -> '<PROJECT_ROOT>/src/index.js'
+module.name_mapper='^prism$' -> '<PROJECT_ROOT>/website/static/vendor/prism.js'
 
 [version]
 ^0.53.1

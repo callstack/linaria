@@ -14,51 +14,30 @@ export default function Hero() {
         <div className={container}>
           <div className={item}>
             <div className={figure}>
-              <img
-                className={figureImage}
-                alt=""
-                src="//placehold.it/150x150"
-              />
+              <img className={figureImage} alt="" src="/images/image-1.png" />
             </div>
             <Heading type="h4" className={title}>
               Familiar syntax
             </Heading>
-            <p>
-              Linaria uses CSS syntax and API similar to{' '}
-              <code>styled-compontents</code>
-            </p>
+            <p>Linaria uses classic CSS syntax with nesting support.</p>
           </div>
           <div className={item}>
             <div className={figure}>
-              <img
-                className={figureImage}
-                alt=""
-                src="//placehold.it/150x150"
-              />
+              <img className={figureImage} alt="" src="/images/image-3.png" />
             </div>
             <Heading type="h4" className={title}>
               Zero runtime
             </Heading>
-            <p>
-              CSS is extracted from JS code, so with Dead Code Elimination and
-              Tree Shaking you can strip Linaria code completely.
-            </p>
+            <p>All CSS is extracted when transpiling the code with Babel.</p>
           </div>
           <div className={item}>
             <div className={figure}>
-              <img
-                className={figureImage}
-                alt=""
-                src="//placehold.it/150x150"
-              />
+              <img className={figureImage} alt="" src="/images/image-2.png" />
             </div>
             <Heading type="h4" className={title}>
               SSR with critical CSS
             </Heading>
-            <p>
-              Generating ciritcal CSS for server rendered apps has never been
-              easier.
-            </p>
+            <p>Critical CSS can be determined for SSR to improve load time.</p>
           </div>
         </div>
       </Container>
@@ -84,9 +63,6 @@ const container = css`
 `;
 
 const item = css`
-  dispaly: flex;
-  flexDirection: column;
-
   ${media.medium} {
     text-align: center;
     padding: 0 30px;
@@ -101,11 +77,12 @@ const title = css`
 `;
 
 const figure = css`
+  display: flex;
+  align-items: flex-end;
   margin: 0 auto;
-  width: 100px;
-  height: 100px;
-  overflow: hidden;
-  border: 1px solid ${theme.secondary};
+  width: 100%;
+  max-width: 260px;
+  height: 200px;
 `;
 
 const figureImage = css`

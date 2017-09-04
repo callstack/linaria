@@ -6,7 +6,6 @@ const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const PORT = 3000;
-
 const entry = ['./src/index.js'];
 
 module.exports = (env = { NODE_ENV: 'development' }) => ({
@@ -20,8 +19,8 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
           ...entry,
         ],
   output: {
-    path: path.resolve(__dirname, 'build'),
-    publicPath: '/build/',
+    path: path.resolve(__dirname, 'static', 'build'),
+    publicPath: '/build',
     filename: '[name].js',
   },
   plugins: [
@@ -30,8 +29,10 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
-      minChunks: ({ resource }) => /node_modules/.test(resource),
+      minChunks: ({ resource }) =>
+        /\/node_modules\//.test(resource) || /\/vendor\//.test(resource),
     }),
+    new webpack.optimize.CommonsChunkPlugin('manifest'),
   ].concat(
     env.NODE_ENV === 'production'
       ? [
@@ -41,7 +42,6 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
             sourceMap: true,
           }),
           new ExtractTextPlugin('styles.css'),
-          new webpack.optimize.CommonsChunkPlugin('manifest'),
         ]
       : [
           new webpack.HotModuleReplacementPlugin(),
@@ -70,6 +70,11 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
             use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
           }
     ),
+  },
+  resolve: {
+    alias: {
+      prism: path.resolve(__dirname, 'static', 'vendor', 'prism.js'),
+    },
   },
   devServer: {
     contentBase: 'static',

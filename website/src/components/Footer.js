@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { css } from 'linaria';
-import theme from '../styles/theme';
 import Container from './Container';
 
 export default function Footer() {
@@ -18,7 +17,6 @@ export default function Footer() {
 const footer = css`
   margin-top: 100px;
   padding: 30px 0;
-  border-top: 1px solid ${theme.secondary};
   font-size: 0.9em;
 `;
 

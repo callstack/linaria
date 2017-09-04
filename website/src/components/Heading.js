@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { css, names } from 'linaria';
+import { css, include, names } from 'linaria';
 import { media } from '../styles/utils';
 
 type AvailableHeadings = 'h1' | 'h2' | 'h3' | 'h4';
@@ -35,14 +35,15 @@ export default function Heading(props: Props) {
   return React.createElement(props.type, passedProps);
 }
 
-const shared = `
+const shared = css`
   margin: 1em 0;
   font-weight: 600;
   line-height: 1.1;
 `;
 
 const heading1 = css`
-  ${shared};
+  ${include(shared)};
+
   font-size: 2em;
 
   ${media.medium} {
@@ -55,7 +56,8 @@ const heading1 = css`
 `;
 
 const heading2 = css`
-  ${shared};
+  ${include(shared)};
+
   font-size: 1.5em;
 
   ${media.medium} {
@@ -68,7 +70,8 @@ const heading2 = css`
 `;
 
 const heading3 = css`
-  ${shared};
+  ${include(shared)};
+
   font-size: 1.25em;
 
   ${media.medium} {
@@ -81,7 +84,8 @@ const heading3 = css`
 `;
 
 const heading4 = css`
-  ${shared};
+  ${include(shared)};
+
   font-size: 1em;
 
   ${media.medium} {
