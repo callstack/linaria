@@ -1,4 +1,5 @@
 /* @flow */
+import 'prism'; // eslint-disable-line
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { css } from 'linaria';
