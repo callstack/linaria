@@ -14,48 +14,30 @@ export default function Hero() {
         <div className={container}>
           <div className={item}>
             <div className={figure}>
-              <img
-                className={figureImage}
-                alt=""
-                src="/images/image-1.png"
-              />
+              <img className={figureImage} alt="" src="/images/image-1.png" />
             </div>
             <Heading type="h4" className={title}>
               Familiar syntax
             </Heading>
-            <p>
-              Linaria uses classic CSS syntax with nesting support.
-            </p>
+            <p>Linaria uses classic CSS syntax with nesting support.</p>
           </div>
           <div className={item}>
             <div className={figure}>
-              <img
-                className={figureImage}
-                alt=""
-                src="/images/image-3.png"
-              />
+              <img className={figureImage} alt="" src="/images/image-3.png" />
             </div>
             <Heading type="h4" className={title}>
               Zero runtime
             </Heading>
-            <p>
-              All CSS is extracted when transpiling the code with Babel.
-            </p>
+            <p>All CSS is extracted when transpiling the code with Babel.</p>
           </div>
           <div className={item}>
             <div className={figure}>
-              <img
-                className={figureImage}
-                alt=""
-                src="/images/image-2.png"
-              />
+              <img className={figureImage} alt="" src="/images/image-2.png" />
             </div>
             <Heading type="h4" className={title}>
               SSR with critical CSS
             </Heading>
-            <p>
-              Critical CSS can be determined for SSR to improve load time.
-            </p>
+            <p>Critical CSS can be determined for SSR to improve load time.</p>
           </div>
         </div>
       </Container>
@@ -80,7 +62,7 @@ const container = css`
   }
 `;
 
-const item = css`;
+const item = css`
   ${media.medium} {
     text-align: center;
     padding: 0 30px;
@@ -95,8 +77,11 @@ const title = css`
 `;
 
 const figure = css`
+  display: flex;
+  align-items: flex-end;
   margin: 0 auto;
-  width: 260px;
+  width: 100%;
+  max-width: 260px;
   height: 200px;
 `;
 

@@ -53,7 +53,9 @@ export default function Index() {
           <p>And you are all set!</p>
           <Heading type="h3">Usage</Heading>
           <p>
-            Linaria lets you write CSS code in a tagged template literal in your JavaScript files. The Babel plugin extracts the CSS rules to real CSS files, and generates unique class names to use.
+            Linaria lets you write CSS code in a tagged template literal in your
+            JavaScript files. The Babel plugin extracts the CSS rules to real
+            CSS files, and generates unique class names to use.
           </p>
         </Container>
         <div className={result}>
