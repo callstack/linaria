@@ -2,9 +2,9 @@
 
 Linaria is one of Callstack.io open source projects that is currently under very active development. Hopefully this document makes the process for contributing clear and answers some questions that you may have.
 
-## [Code of Conduct](TBD)
+## [Code of Conduct](/CODE_OF_CONDUCT.md)
 
-We want this community to be friendly and respectufl to each other. Please read [the full text](TBD) so that you can understand what actions will and will not be tolerated.
+We want this community to be friendly and respectful to each other. Please read [the full text](/CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
 
 ## Our Development Process
 
@@ -25,12 +25,12 @@ You can learn how from this *free* series [How to Contribute to an Open Source P
 
    ```sh
    # in the background
-   yarn watch
+   yarn run build:transpile:watch
    ```
 
 1. If you've changed APIs, update the documentation.
 
-1. Ensure the test suite passes via `yarn test-and-lint`. 
+1. Ensure the test suite passes via `yarn run lint && yarn run flow && yarn run test`. 
 
 ### Additional Workflow for any changes made to website
 
@@ -68,7 +68,7 @@ The best way to get your bug fixed is to provide a reduced test case. Please pro
 
 ## How to Get in Touch
 
-* Callstack Open Source Slack - [#linaria](https://callstackoss.slack.com/messages/C6YSD7Q7R).
+* Callstack Open Source Slack - [#linaria](https://slack.callstack.io/).
 
 ## Code Conventions
 
