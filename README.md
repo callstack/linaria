@@ -178,7 +178,7 @@ export function App() {
 
 ## Recommended Libraries
 
-* [polished.js](polished.js.org) - A lightweight toolset for writing styles in JavaScript.
+* [polished.js](https://polished.js.org/) - A lightweight toolset for writing styles in JavaScript.
 
 ## Inspiration
 
