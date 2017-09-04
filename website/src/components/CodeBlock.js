@@ -29,7 +29,8 @@ const prism = (code, language) =>
     : window.Prism.highlight(code, window.Prism.languages[language]);
 
 const code = css`
-  padding: 20px;
+  font-size: 14px;
+  padding: 16px;
   background: ${theme.backdrop};
   color: ${theme.primary};
   overflow: auto;
