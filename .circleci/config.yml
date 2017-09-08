@@ -5,11 +5,6 @@ aliases:
       # Fallback in case checksum fails
       - dependencies-
 
-  - &restore-example-cache
-    keys:
-      - dependencies-example-{{ checksum "example/package.json" }}
-      - dependencies-example-
-
   - &restore-website-cache
     keys:
       - dependencies-website-{{ checksum "website/package.json" }}
@@ -19,11 +14,6 @@ aliases:
     paths:
       - node_modules
     key: dependencies-{{ checksum "package.json" }}
-
-  - &save-example-cache
-    paths:
-      - example/node_modules
-    key: dependencies-example-{{ checksum "example/package.json" }}
 
   - &save-website-cache
     paths:
@@ -38,14 +28,11 @@ jobs:
     steps:
       - checkout
       - restore-cache: *restore-cache
-      - restore-cache: *restore-example-cache
       - restore-cache: *restore-website-cache
       - run: |
           yarn install
-          cd example && yarn install && yarn build && cd ..
           cd website && yarn install && yarn build && cd ..
       - save-cache: *save-cache
-      - save-cache: *save-example-cache
       - save-cache: *save-website-cache
       - run: yarn run lint
       - run: yarn run flow
