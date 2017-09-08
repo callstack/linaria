@@ -173,7 +173,7 @@ export function App() {
 * [Theming](/docs/THEMING.md)
 * [Server Rendering](/docs/SERVER_RENDERING.md)
 * [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md)
-* [Example](/example)
+* [Example](/website)
 
 ## Editor Plugins
 

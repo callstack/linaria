@@ -1,8 +1,0 @@
-{
-  "presets": [
-    "es2015",
-    "react",
-    "stage-3",
-    "linaria/babel"
-  ]
-}
