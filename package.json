@@ -50,7 +50,7 @@
     "codecov": "^2.3.0",
     "cssom": "^0.3.2",
     "del-cli": "^1.1.0",
-    "eslint": "^4.5.0",
+    "eslint": "^4.6.1",
     "eslint-config-callstack-io": "^0.4.1",
     "flow-bin": "^0.53.1",
     "flow-copy-source": "^1.2.1",

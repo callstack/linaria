@@ -35,8 +35,9 @@ export default function Index() {
             Adjust the preset entry in your <code>.babelrc</code> file to look
             like:
           </p>
-          <CodeBlock>
-            {dedent(`
+          <CodeBlock
+            language="javascript"
+            text={dedent(`
               {
                 "presets": [
                   "env",
@@ -49,7 +50,7 @@ export default function Index() {
                 ]
               }
             `)}
-          </CodeBlock>
+          />
           <p>And you are all set!</p>
           <Heading type="h3">Usage</Heading>
           <p>
@@ -60,8 +61,10 @@ export default function Index() {
         </Container>
         <div className={result}>
           <div className={resultItem}>
-            <CodeBlock language="jsx" className={stretch}>
-              {dedent(`// Header.js (source JS)
+            <CodeBlock
+              language="jsx"
+              className={stretch}
+              text={dedent(`// Header.js (source JS)
 
                 import React from 'react';
                 import { css, names } from 'linaria';
@@ -90,11 +93,13 @@ export default function Index() {
                     </div>
                   );
                 }`)}
-            </CodeBlock>
+            />
           </div>
           <div className={resultItem}>
-            <CodeBlock language="css" className={stretch}>
-              {dedent(`/* Header.css (output CSS) */
+            <CodeBlock
+              language="css"
+              className={stretch}
+              text={dedent(`/* Header.css (output CSS) */
 
                 .container__jdh5rtz {
                   height: 3rem;
@@ -113,11 +118,13 @@ export default function Index() {
                 [data-theme=dark] .header__xy4ertz {
                   color: #000;
                 }`)}
-            </CodeBlock>
+            />
           </div>
           <div className={resultItem}>
-            <CodeBlock language="jsx" className={stretch}>
-              {dedent(`// Header.js (output JS)
+            <CodeBlock
+              language="jsx"
+              className={stretch}
+              text={dedent(`// Header.js (output JS)
 
                 import React from 'react';
                 import names from 'linaria/build/names';
@@ -133,7 +140,7 @@ export default function Index() {
                     </div>
                   );
                 }`)}
-            </CodeBlock>
+            />
           </div>
         </div>
       </div>
