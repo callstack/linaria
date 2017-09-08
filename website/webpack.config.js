@@ -73,7 +73,8 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
   },
   resolve: {
     alias: {
-      prism: path.resolve(__dirname, 'static', 'vendor', 'prism.js'),
+      react: 'preact-compat',
+      'react-dom': 'preact-compat',
     },
   },
   devServer: {

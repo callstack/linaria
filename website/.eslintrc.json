@@ -1,5 +1,5 @@
 {
   "settings": {
-    "import/core-modules": ["linaria"]
+    "import/core-modules": ["linaria", "react", "react-dom"]
   }
 }

@@ -14,17 +14,16 @@
     "dedent": "^0.7.0",
     "linaria": "0.0.0",
     "normalize.css": "^7.0.0",
-    "prismjs": "^1.6.0",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "preact": "^8.2.5",
+    "preact-compat": "^3.17.0",
+    "prismjs": "^1.6.0"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
     "css-loader": "^0.28.5",
     "del-cli": "^1.0.0",
     "eslint-plugin-react": "^7.3.0",

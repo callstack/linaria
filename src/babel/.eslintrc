@@ -1,7 +1,0 @@
-{
-  extends: '../../.eslintrc',
-
-  rules: {
-    'no-param-reassign': 0
-  }
-}

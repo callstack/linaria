@@ -1,10 +1,11 @@
 /* @flow */
-import 'prism'; // eslint-disable-line
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { css } from 'linaria';
 import theme from './styles/theme';
 import App from './App';
+import '../static/vendor/prism';
 
 const html = css`
   height: 100%;

@@ -1,6 +1,4 @@
 {
-  "extends": '../.eslintrc',
-
   "plugins": [
     "import",
     "react"
@@ -31,6 +29,6 @@
     "react/jsx-no-undef": "error",
     "react/jsx-pascal-case": "error",
     "react/jsx-uses-react": "error",
-    "react/jsx-uses-vars": "error",
-  },
+    "react/jsx-uses-vars": "error"
+  }
 }

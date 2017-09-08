@@ -8,16 +8,16 @@ import '../utils/prismTemplateString';
 type Props = {
   className?: string,
   language?: string,
-  children: string,
+  text: string,
 };
 
-export default function CodeBlock({ className, language, children }: Props) {
+export default function CodeBlock({ className, language, text }: Props) {
   return (
     <pre className={names(code, className)}>
       <code
         className={language && `language-${language}`}
         // eslint-disable-next-line
-        dangerouslySetInnerHTML={{__html: prism(children, language)}}
+        dangerouslySetInnerHTML={{__html: prism(text, language)}}
       />
     </pre>
   );
