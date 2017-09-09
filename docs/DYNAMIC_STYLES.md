@@ -4,7 +4,7 @@ Sometimes we have some styles based on component's props or state, or dynamic in
 
 ## Inline styles
 
-Inline styles are the most sraightforward way to use dynamic styles. Pass a `style` object with the dynamic styles, and you're done.
+Inline styles are the most straightforward way to use dynamic styles. Pass a `style` object with the dynamic styles, and you're done.
 
 ```js
 import React from 'react';
