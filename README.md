@@ -39,11 +39,11 @@ Add the `linaria/babel` preset to your Babel configuration:
   "presets": [
     "env",
     "react",
-+   ["linaria/babel", {
-+     "single": true,
-+     "filename": "styles.css",
-+     "outDir": "dist"
-+   }]
+    ["linaria/babel", {
+      "single": true,
+      "filename": "styles.css",
+      "outDir": "dist"
+    }]
   ]
 }
 ```
