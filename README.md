@@ -34,16 +34,16 @@ yarn add linaria
 
 Add the `linaria/babel` preset to your Babel configuration:
 
-```diff
+```json
 {
   "presets": [
     "env",
     "react",
-+   ["linaria/babel", {
-+     "single": true,
-+     "filename": "styles.css",
-+     "outDir": "dist"
-+   }]
+    ["linaria/babel", {
+      "single": true,
+      "filename": "styles.css",
+      "outDir": "dist"
+    }]
   ]
 }
 ```
