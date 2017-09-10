@@ -38,6 +38,15 @@
         "doc",
         "ideas"
       ]
+    },
+    {
+      "login": "AgtLucas",
+      "name": "Lucas",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1909761?v=4",
+      "profile": "https://lcs.sh",
+      "contributions": [
+        "doc"
+      ]
     }
   ]
 }
