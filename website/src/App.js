@@ -151,10 +151,10 @@ export default function Index() {
           <a href="https://github.com/callstack-io/linaria/tree/master/docs">
             documentation
           </a>. Also be sure to check the{' '}
-          <a href="https://github.com/callstack-io/linaria/tree/master/example">
+          <a href="https://github.com/callstack-io/linaria/tree/master/website">
             example app
           </a>{' '}
-          set up with React, Webpack and Linaria
+          set up with Preact, Webpack and Linaria
         </p>
       </Container>
       <Footer />
