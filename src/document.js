@@ -1,5 +1,5 @@
 /**
- * It's annoying we have to write this, but document.styleSheets returns an empty array in JSDOM
+ * It's annoying we have to write this, but document.styleSheets returns an empty array in JSDOM, so we cannot use it
  *
  * @flow
  */
