@@ -6,7 +6,7 @@
         "browsers": ["last 2 versions"]
       }
     }],
-    "stage-3"
+    "stage-2"
   ],
   "plugins": [
     "transform-flow-strip-types"

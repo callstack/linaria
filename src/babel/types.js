@@ -1,7 +1,11 @@
 /* @flow */
 
 export type NodePath<K> = {
-  node: K,
+  node: K & {
+    loc: {
+      start: { line: number, column: number },
+    },
+  },
   parent: Object,
   parentPath: NodePath<*>,
   scope: {
@@ -126,4 +130,9 @@ export type State = {
   foundLinariaTaggedLiterals: boolean,
   file: Object,
   opts: Object,
+};
+
+export type RequirementSource = {
+  code: string,
+  loc: { line: number, column: number },
 };
