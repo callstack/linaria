@@ -55,7 +55,7 @@
     "flow-bin": "^0.53.1",
     "flow-copy-source": "^1.2.1",
     "glob": "^7.1.2",
-    "jest": "^20.0.4",
+    "jest": "^21.1.0",
     "prettier": "^1.6.1"
   },
   "jest": {
