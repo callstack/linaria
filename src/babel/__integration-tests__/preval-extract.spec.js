@@ -51,19 +51,18 @@ describe('preval-extract babel plugin', () => {
     const { code } = transpile(dedent`
     /* linaria-preval */
     const header = css\`
-      font-size: {2 + 1}em;
+      font-size: ${'${2 + 1}'}em;
     \`;
     `);
-    expect(code).toMatch('font-size: {2 + 1}em;');
-    expect(code).toMatchSnapshot();
+    expect(code).not.toMatch('font-size: 3em;');
 
     const { code: codeAlt } = transpile(dedent`
     const header = css\`
-      font-size: {2 + 1}em;
+      font-size: ${'${2 + 1}'}em;
     \`;
     /* linaria-preval */
     `);
-    expect(codeAlt).toMatch('font-size: {2 + 1}em;');
+    expect(codeAlt).not.toMatch('font-size: 3em;');
   });
 
   it('should throw error if "css" tagged template literal is not assigned to a variable', () => {
