@@ -1,4 +1,5 @@
 import { SourceMapConsumer } from 'source-map';
+import stripAnsi from 'strip-ansi';
 import {
   getFramesFromStack,
   enhanceFrames,
@@ -113,6 +114,6 @@ describe('babel/lib/errorUtils', () => {
     const newError = buildCodeFrameError(error, frames);
 
     expect(newError.message).toEqual('Test message');
-    expect(newError.stack).toMatchSnapshot();
+    expect(stripAnsi(newError.stack)).toMatchSnapshot();
   });
 });

@@ -2,9 +2,9 @@
 
 exports[`babel/lib/errorUtils buildCodeFrameError should build code frame error 1`] = `
 "Error: Test message
-[0m [90m 1 | [39m[90m// comment[39m
-[31m[1m>[22m[39m[90m 2 | [39m[36mthrow[39m [36mnew[39m [33mError[39m([32m\\"test\\"[39m)[33m;[39m
- [90m   | [39m       [31m[1m^[22m[39m[0m
+  1 | // comment
+> 2 | throw new Error(\\"test\\");
+    |        ^
 at file1.js:2:8
 at file2.js:12:4"
 `;

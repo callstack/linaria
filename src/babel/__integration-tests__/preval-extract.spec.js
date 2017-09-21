@@ -43,7 +43,7 @@ describe('preval-extract babel plugin', () => {
       font-size: 3em;
     \`;
     `);
-    expect(code.includes('font-size: 3em;')).toBeTruthy();
+    expect(code).toMatch('font-size: 3em;');
     expect(code).toMatchSnapshot();
   });
 
@@ -54,7 +54,7 @@ describe('preval-extract babel plugin', () => {
       font-size: {2 + 1}em;
     \`;
     `);
-    expect(code.includes('font-size: {2 + 1}em;')).toBeTruthy();
+    expect(code).toMatch('font-size: {2 + 1}em;');
     expect(code).toMatchSnapshot();
 
     const { code: codeAlt } = transpile(dedent`
@@ -63,7 +63,7 @@ describe('preval-extract babel plugin', () => {
     \`;
     /* linaria-preval */
     `);
-    expect(codeAlt.includes('font-size: {2 + 1}em;')).toBeTruthy();
+    expect(codeAlt).toMatch('font-size: {2 + 1}em;');
   });
 
   it('should throw error if "css" tagged template literal is not assigned to a variable', () => {
@@ -242,7 +242,11 @@ describe('preval-extract babel plugin', () => {
       \`;
       `,
       undefined,
-      { presets: [], filename: 'test.js' }
+      {
+        presets: ['stage-2'],
+        filename: 'test.js',
+        babelrc: false,
+      }
     );
 
     const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
@@ -250,7 +254,7 @@ describe('preval-extract babel plugin', () => {
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 3em');
     expect(css).toMatch('color: #ffffff');
-    expect(css).toMatchSnapshot();
+    expect(code).toMatchSnapshot();
   });
 
   it('should preval css with classname from another prevaled css', () => {
@@ -722,12 +726,12 @@ describe('preval-extract babel plugin', () => {
         { filename: filename2 }
       );
 
-      expect(
-        transpiled1.includes(`require('${filename1.replace('js', 'css')}')`)
-      ).toBeTruthy();
-      expect(
-        transpiled2.includes(`require('${filename2.replace('js', 'css')}')`)
-      ).toBeTruthy();
+      expect(transpiled1).toMatch(
+        `require('${filename1.replace('js', 'css')}')`
+      );
+      expect(transpiled2).toMatch(
+        `require('${filename2.replace('js', 'css')}')`
+      );
 
       expect(data1).toMatchSnapshot();
       expect(data2).toMatchSnapshot();

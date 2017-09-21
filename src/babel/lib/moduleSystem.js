@@ -4,7 +4,7 @@
  * ==============================================
  * To avoid leakage from evaled code to module cache in current context,
  * for example with `babel-register` we provide our custom module system.
- * It designed to mimic the native node one, with the exception being
+ * It's designed to mimic the native node one, with the exception being
  * that we can transpile every module by default and store source maps
  * for it. As a result we can provide correct error stacktrace and
  * enhanced errors.
@@ -193,7 +193,7 @@ function getRequireMock(parent: ?Module) {
     const filename = resolveMock(moduleId);
 
     // Native Node modules
-    if (filename === moduleId && !moduleId.startsWith('/')) {
+    if (filename === moduleId && !path.isAbsolute(moduleId)) {
       // $FlowFixMe
       return require(moduleId); // eslint-disable-line global-require
     }

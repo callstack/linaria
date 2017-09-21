@@ -80,8 +80,12 @@ var header = '\\nfont-size: 3em;\\n';
 `;
 
 exports[`preval-extract babel plugin should preval const and let without transpilation to var 1`] = `
-"font-size: 3em;
-color: #ffffff;"
+import css from '<<REPLACED>>/build/css.js';
+
+const size = 3;
+let color = "#ffffff";
+
+/*linaria-output*/const header = "header__3r30ar";
 `;
 
 exports[`preval-extract babel plugin should preval css with classname from another prevaled css 1`] = `
