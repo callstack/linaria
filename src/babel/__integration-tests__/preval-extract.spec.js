@@ -97,7 +97,7 @@ describe('preval-extract babel plugin', () => {
   });
 
   it('should build valid code frame for errors while evaling styles', () => {
-    try {
+    expect(() => {
       transpile(dedent`
       const test = () => {
         throw new Error("Some weird error");
@@ -109,21 +109,15 @@ describe('preval-extract babel plugin', () => {
 
       const header = css\`color: ${'${m()}'};\`;
       `);
-    } catch (error) {
-      expect(stripAnsi(error.toString())).toMatch(/> 4 \| throw new Error/);
-      expect(error.toString()).toMatchSnapshot();
-    }
+    }).toThrowErrorMatchingSnapshot();
 
-    try {
+    expect(() => {
       transpile(dedent`
       const utils = require("./src/babel/__integration-tests__/__fixtures__/commonjs/utils.js");
 
       const header = css\`color: ${'${utils.throw()}'};\`;
       `);
-    } catch (error) {
-      expect(stripAnsi(error.toString())).toMatch(/> 10 \| {5}throw new Error/);
-      expect(error).toMatchSnapshot();
-    }
+    }).toThrowErrorMatchingSnapshot();
   });
 
   it('should create classname for "css" tagged template literal', () => {

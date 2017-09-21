@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`preval-extract babel plugin should build valid code frame for errors while evaling styles 1`] = `
-Error: Command failed: node <<REPLACED>>/src/babel/__integration-tests__/__utils__/transpile.js '"const test = () => {\\n  throw new Error(\\"Some weird error\\");\\n};\\n\\nfunction m() {\\n  test();\\n}\\n\\nconst header = css\`color: \${m()};\`;"' '{"pluginOptions":{"cache":false,"extract":false},"babelOptions":{"filename":"test.js"}}'
+Command failed: node <<REPLACED>>/src/babel/__integration-tests__/__utils__/transpile.js '"const test = () => {\\n  throw new Error(\\"Some weird error\\");\\n};\\n\\nfunction m() {\\n  test();\\n}\\n\\nconst header = css\`color: \${m()};\`;"' '{"pluginOptions":{"cache":false,"extract":false},"babelOptions":{"filename":"test.js"}}'
 <<REPLACED>>/node_modules/babel-core/lib/transformation/file/index.js:590
       throw err;
       ^
@@ -20,7 +20,7 @@ at <<REPLACED>>/test.js:4:6
 `;
 
 exports[`preval-extract babel plugin should build valid code frame for errors while evaling styles 2`] = `
-Error: Command failed: node <<REPLACED>>/src/babel/__integration-tests__/__utils__/transpile.js '"const utils = require(\\"./src/babel/__integration-tests__/__fixtures__/commonjs/utils.js\\");\\n\\nconst header = css\`color: \${utils.throw()};\`;"' '{"pluginOptions":{"cache":false,"extract":false},"babelOptions":{"filename":"test.js"}}'
+Command failed: node <<REPLACED>>/src/babel/__integration-tests__/__utils__/transpile.js '"const utils = require(\\"./src/babel/__integration-tests__/__fixtures__/commonjs/utils.js\\");\\n\\nconst header = css\`color: \${utils.throw()};\`;"' '{"pluginOptions":{"cache":false,"extract":false},"babelOptions":{"filename":"test.js"}}'
 <<REPLACED>>/node_modules/babel-core/lib/transformation/file/index.js:590
       throw err;
       ^
