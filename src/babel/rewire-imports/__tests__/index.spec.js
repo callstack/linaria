@@ -7,10 +7,7 @@ import path from 'path';
 function transpile(source, pluginOptions = {}, options = {}) {
   return babel.transform(source, {
     presets: ['es2015', 'stage-3'],
-    plugins: [
-      [path.resolve('src/babel/rewire-imports'), pluginOptions],
-      require.resolve('babel-plugin-preval'),
-    ],
+    plugins: [[path.resolve('src/babel/rewire-imports'), pluginOptions]],
     babelrc: false,
     ...options,
   });

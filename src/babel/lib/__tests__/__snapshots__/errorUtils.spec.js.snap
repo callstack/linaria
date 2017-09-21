@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`babel/lib/errorUtils buildCodeFrameError should build code frame error 1`] = `
+"Error: Test message
+  1 | // comment
+> 2 | throw new Error(\\"test\\");
+    |        ^
+at file1.js:2:8
+at file2.js:12:4"
+`;

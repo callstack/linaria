@@ -23,6 +23,7 @@ aliases:
 version: 2
 jobs:
   build:
+    working_directory: '~/linaria'
     docker:
       - image: circleci/node:6.10.3
     steps:
@@ -37,6 +38,7 @@ jobs:
       - run: yarn run lint
       - run: yarn run flow
       - run: yarn test -- --coverage
+      - run: yarn run test:integration:ci
       - run: cat ./coverage/lcov.info | ./node_modules/.bin/codecov
       - store_artifacts:
           path: coverage

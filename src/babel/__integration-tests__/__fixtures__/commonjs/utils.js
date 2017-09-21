@@ -6,4 +6,7 @@ module.exports = {
   add5(value) {
     return value + 5;
   },
+  throw() {
+    throw new Error('test');
+  },
 };

@@ -15,12 +15,14 @@
   "scripts": {
     "flow": "flow",
     "lint": "eslint .",
-    "test": "jest",
+    "test": "jest __tests__",
+    "test:integration": "yarn run build:clean && yarn run build:transpile && yarn run test:integration:ci",
+    "test:integration:ci": "jest __integration-tests__",
     "prepare": "yarn run build:clean && yarn run build:transpile && yarn run build:flow",
     "build:clean": "del build",
-    "build:transpile": "babel src --out-dir build --ignore '**/__tests__/**,**/__mocks__/**,**/__fixtures__/**'",
-    "build:transpile:watch": "babel src --out-dir build --watch --ignore '**/__tests__/**,**/__mocks__/**,**/__fixtures__/**'",
-    "build:flow": "flow-copy-source src build -i '**/__tests__/**'",
+    "build:transpile": "babel src --out-dir build --ignore '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
+    "build:transpile:watch": "babel src --out-dir build --watch --ignore '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
+    "build:flow": "flow-copy-source src build -i '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
     "benchmark": "yarn run prepare && node ./benchmark/run.js",
     "postinstall": "yarn link && yarn link linaria"
   },
@@ -30,13 +32,13 @@
     "server.js"
   ],
   "dependencies": {
+    "babel-code-frame": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-generator": "^6.26.0",
-    "babel-plugin-preval": "^1.4.4",
-    "babel-polyfill": "^6.26.0",
-    "babel-register": "^6.26.0",
     "dedent": "^0.7.0",
+    "error-stack-parser": "^2.0.1",
     "postcss": "^6.0.10",
+    "source-map": "^0.5.7",
     "stylis": "^3.2.13"
   },
   "devDependencies": {
@@ -44,22 +46,24 @@
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-preset-env": "1.6.0",
     "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-3": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
     "benchmark": "^2.1.4",
     "cli-table": "^0.3.1",
     "codecov": "^2.3.0",
     "cssom": "^0.3.2",
     "del-cli": "^1.1.0",
+    "escape-string-regexp": "^1.0.5",
     "eslint": "^4.6.1",
     "eslint-config-callstack-io": "^0.4.1",
     "flow-bin": "^0.53.1",
     "flow-copy-source": "^1.2.1",
     "glob": "^7.1.2",
     "jest": "^21.1.0",
-    "prettier": "^1.6.1"
+    "prettier": "^1.6.1",
+    "strip-ansi": "^4.0.0"
   },
   "jest": {
-    "testRegex": "/__tests__/.*\\.(test|spec)\\.js$",
+    "testRegex": "/__(integration-)?tests__/.*\\.(test|spec)\\.js$",
     "testEnvironment": "node"
   }
 }

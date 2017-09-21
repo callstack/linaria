@@ -6,6 +6,8 @@ import type {
   NodePath,
   State,
   BabelTaggedTemplateExpression,
+  BabelIdentifier,
+  RequirementSource,
 } from '../types';
 
 import {
@@ -15,18 +17,20 @@ import {
   isExcluded,
 } from './validators';
 import { getSelfBinding } from './utils';
-import buildPrevalTemplate from './buildPrevalTemplate';
+import prevalStyles from './prevalStyles';
 import resolveSource from './resolveSource';
 import extractStyles from './extractStyles';
 
-const externalRequirementsVisitor = {
-  Identifier(path) {
+export const externalRequirementsVisitor = {
+  Identifier(path: NodePath<BabelIdentifier>) {
     if (path.isReferenced() && getSelfBinding(path) && !isExcluded(path)) {
-      const source: ?string = resolveSource(this.types, path);
-      if (source && !this.requirements.find(item => item === source)) {
+      const source: ?RequirementSource = resolveSource(this.types, path);
+      if (
+        source &&
+        !this.requirements.find(item => item.code === source.code)
+      ) {
         this.requirements.splice(this.addBeforeIndex, 0, source);
         const binding = getSelfBinding(path);
-        /* istanbul ignore else */
         if (shouldTraverseExternalIds(binding.path)) {
           binding.path.traverse(externalRequirementsVisitor, this);
         }
@@ -35,11 +39,14 @@ const externalRequirementsVisitor = {
   },
 };
 
-const cssTaggedTemplateRequirementsVisitor = {
-  Identifier(path) {
+export const cssTaggedTemplateRequirementsVisitor = {
+  Identifier(path: NodePath<BabelIdentifier>) {
     if (path.isReferenced() && !isExcluded(path)) {
-      const source: ?string = resolveSource(this.types, path);
-      if (source && !this.requirements.find(item => item === source)) {
+      const source: ?RequirementSource = resolveSource(this.types, path);
+      if (
+        source &&
+        !this.requirements.find(item => item.code === source.code)
+      ) {
         this.requirements.push(source);
         this.addBeforeIndex = this.requirements.length - 1;
         const binding = getSelfBinding(path);
@@ -60,8 +67,11 @@ export default (babel: BabelCore) => {
         enter(path: NodePath<*>, state: State) {
           state.skipFile =
             // $FlowFixMe
-            path.container.comments.length &&
-            path.container.comments[0].value.includes('linaria-preval');
+            path.container.tokens.findIndex(
+              token =>
+                token.type === 'CommentBlock' &&
+                token.value.includes('linaria-preval')
+            ) > -1;
           state.foundLinariaTaggedLiterals = false;
           state.filename = state.file.opts.filename;
         },
@@ -84,13 +94,13 @@ export default (babel: BabelCore) => {
 
           state.foundLinariaTaggedLiterals = true;
 
-          const requirements = [];
+          const requirements: RequirementSource[] = [];
           path.traverse(cssTaggedTemplateRequirementsVisitor, {
             requirements,
             types,
           });
 
-          buildPrevalTemplate(babel, path, state, requirements.join('\n'));
+          prevalStyles(babel, path, state, requirements);
         }
       },
     },
