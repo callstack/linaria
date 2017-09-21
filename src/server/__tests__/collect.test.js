@@ -1,12 +1,16 @@
 /* @flow */
 
 import dedent from 'dedent';
+import prettier from 'prettier';
 import collect from '../collect';
+
+const prettyPrint = (src: string) =>
+  prettier.format(src, { parser: 'postcss' });
 
 const testCollect = (html, css) => {
   const { critical, other } = collect(html, css);
-  test('critical', () => expect(critical).toMatchSnapshot());
-  test('other', () => expect(other).toMatchSnapshot());
+  test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
+  test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
 };
 
 const html = dedent`
@@ -202,6 +206,6 @@ describe('works with global css', () => {
   `;
 
   const { critical, other } = collect(html, css, globalCSS);
-  test('critical', () => expect(critical).toMatchSnapshot());
-  test('other', () => expect(other).toMatchSnapshot());
+  test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
+  test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
 });

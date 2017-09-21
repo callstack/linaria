@@ -18,9 +18,7 @@ const collect = (
   const stylesheet = postcss.parse(css);
   const htmlClassesRegExp = extractClassesFromHtml(html);
 
-  // Traverse @rules, insert to critical and other and remove
-  // the rule from stylesheet
-  stylesheet.walkAtRules(rule => {
+  const handleAtRule = rule => {
     let addedToCritical = false;
 
     rule.each(childRule => {
@@ -39,10 +37,15 @@ const collect = (
     } else {
       other.append(rule);
     }
-  });
+  };
 
   stylesheet.walkRules(rule => {
     if (rule.parent.name === 'keyframes') {
+      return;
+    }
+
+    if (rule.parent.type === 'atrule') {
+      handleAtRule(rule.parent);
       return;
     }
 
@@ -71,7 +74,7 @@ const collect = (
 
 const extractClassesFromHtml = (html: string): RegExp => {
   const htmlClasses = [];
-  const regex = /\s+class="(.*)"/gm;
+  const regex = /\s+class="([^"]*)"/gm;
   let match = regex.exec(html);
 
   while (match !== null) {
