@@ -58,19 +58,11 @@ describe('preval-extract/extractStyles module', () => {
     expect(writeFileSync).not.toHaveBeenCalled();
   });
 
-<<<<<<< 24365331f3d83dc202e97254a587734dbbbf1e70
   it('should create directory structure if needed', () => {
-=======
-  it('should append classnames when writing to single file', () => {
-    const writeFileSync = jest.fn();
-    const opts = { single: true, filename: 'A.css' };
-
->>>>>>> fix: Append classnames when extracting to single file
     getCachedModule.mockImplementationOnce(
       getCachedModuleImpl('.classname{color: #ffffff}')
     );
 
-<<<<<<< 24365331f3d83dc202e97254a587734dbbbf1e70
     let calls = 0;
     fs.writeFileSync.mockImplementation(() => {
       if (calls === 0) {
@@ -119,29 +111,6 @@ describe('preval-extract/extractStyles module', () => {
         cache: false,
       });
     }).toThrowError();
-=======
-    extractStyles(types, null, 'file1.js', opts, { writeFileSync });
-
-    getCachedModule.mockImplementationOnce(
-      getCachedModuleImpl('.other{color: #000000}')
-    );
-
-    extractStyles(types, null, 'file2.js', opts, { writeFileSync });
-
-    expect(fs.writeFileSync).toHaveBeenCalledTimes(2);
-    expect(fs.writeFileSync.mock.calls[0][0]).toEqual(
-      path.join(process.cwd(), 'A.css')
-    );
-    expect(fs.writeFileSync.mock.calls[0][1]).toMatch(
-      '.classname{color: #ffffff}'
-    );
-    expect(fs.writeFileSync.mock.calls[1][0]).toEqual(
-      path.join(process.cwd(), 'A.css')
-    );
-    expect(fs.writeFileSync.mock.calls[1][1]).toMatch(
-      '.classname{color: #ffffff}\n.other{color: #000000}'
-    );
->>>>>>> fix: Append classnames when extracting to single file
   });
 
   describe('with cache disabled', () => {
