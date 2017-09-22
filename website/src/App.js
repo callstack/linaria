@@ -4,6 +4,7 @@ import React from 'react';
 import dedent from 'dedent';
 import { css } from 'linaria';
 import { media } from './styles/utils';
+import escapeHtml from './utils/escapeHtml';
 import Container from './components/Container';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -88,9 +89,9 @@ export default function Index() {
 
                 export default function Header({ className }) {
                   return (
-                    <div className={names(container, className)}>
+                    ${escapeHtml(`<div className={names(container, className)}>
                       <h1 className={header} />
-                    </div>
+                    </div>`)}
                   );
                 }`)}
             />
@@ -135,9 +136,9 @@ export default function Index() {
 
                 export default function Header({ className }) {
                   return (
-                    <div className={names(container, className)}>
+                    ${escapeHtml(`<div className={names(container, className)}>
                       <h1 className={header} />
-                    </div>
+                    </div>`)}
                   );
                 }`)}
             />
