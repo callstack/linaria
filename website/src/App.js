@@ -13,7 +13,6 @@ import Heading from './components/Heading';
 import Terminal from './components/Terminal';
 import Footer from './components/Footer';
 import CodeBlock from './components/CodeBlock';
-import './styles/global.css';
 
 export default function Index() {
   return (

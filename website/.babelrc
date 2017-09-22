@@ -1,15 +1,11 @@
 {
-  "presets": ["react"],
+  "presets": [
+    "react",
+    ["env", {"targets": {"browsers": ["last 2 versions"], "modules": false}}]
+  ],
   "env": {
     "development": {
-      "presets": [
-        [
-          "env",
-          {"targets": {"browsers": ["last 2 versions"], "modules": false}}
-        ],
-        "stage-3",
-        "linaria/babel"
-      ]
+      "presets": ["stage-3", "linaria/babel"]
     },
     "server": {
       "presets": [
@@ -20,10 +16,6 @@
     },
     "production": {
       "presets": [
-        [
-          "env",
-          {"targets": {"browsers": ["last 2 versions"], "modules": false}}
-        ],
         "stage-3",
         [
           "linaria/babel",

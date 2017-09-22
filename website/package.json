@@ -7,6 +7,7 @@
     "start": "webpack-dev-server",
     "build": "NODE_ENV=production webpack -p --env.NODE_ENV production",
     "build:server": "NODE_ENV=production BABEL_ENV=server babel src --out-dir static/server --ignore '{src/index.js,*.css}'",
+    "server": "node static/server/server.js",
     "build:all": "yarn build:server && yarn build",
     "prebuild": "yarn run clean",
     "clean": "del static/build",
