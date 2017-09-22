@@ -52,7 +52,7 @@ function runAssertions(expectedReplacement) {
 
 describe('preval-extract/prevalStyles', () => {
   beforeEach(() => {
-    process.env.BABEL_ENV = '';
+    process.env.NODE_ENV = '';
     getReplacement.mockClear();
     instantiateModule.mockClear();
     clearLocalModulesFromCache.mockClear();
@@ -63,8 +63,8 @@ describe('preval-extract/prevalStyles', () => {
   });
 
   it('should eval styles and replace css with class name from filename', () => {
-    process.env.BABEL_ENV = 'production';
+    process.env.NODE_ENV = 'production';
     runAssertions("css.named('header')`color: #ffffff`");
-    process.env.BABEL_ENV = '';
+    process.env.NODE_ENV = '';
   });
 });

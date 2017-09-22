@@ -39,7 +39,7 @@ export default function(
   requirements: RequirementSource[]
 ) {
   const title = path.parent.id.name;
-  const env = process.env.BABEL_ENV || process.env.NODE_ENV;
+  const env = process.env.NODE_ENV || process.env.BABEL_ENV;
 
   const replacement = getReplacement([
     ...requirements,
