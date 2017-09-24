@@ -148,10 +148,10 @@ export default function Index() {
         <Heading type="h3">Docs and examples</Heading>
         <p>
           We are actively working on broadening our{' '}
-          <a href="https://github.com/callstack-io/linaria/tree/master/docs">
+          <a href="https://github.com/callstack/linaria/tree/master/docs">
             documentation
           </a>. Also be sure to check the{' '}
-          <a href="https://github.com/callstack-io/linaria/tree/master/website">
+          <a href="https://github.com/callstack/linaria/tree/master/website">
             example app
           </a>{' '}
           set up with Preact, Webpack and Linaria

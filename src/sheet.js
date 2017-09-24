@@ -20,7 +20,7 @@ function sheet() {
 
   if (process.env.NODE_ENV !== 'test' && isBrowser) {
     console.warn(
-      'Babel preset for Linaria is not configured. See https://github.com/callstack-io/linaria/blob/master/docs/BABEL_PRESET.md for instructions.'
+      'Babel preset for Linaria is not configured. See https://github.com/callstack/linaria/blob/master/docs/BABEL_PRESET.md for instructions.'
     );
   }
 

@@ -6,12 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/callstack-io/linaria.git"
+    "url": "git+https://github.com/callstack/linaria.git"
   },
   "bugs": {
-    "url": "https://github.com/callstack-io/linaria/issues"
+    "url": "https://github.com/callstack/linaria/issues"
   },
-  "homepage": "https://github.com/callstack-io/linaria#readme",
+  "homepage": "https://github.com/callstack/linaria#readme",
   "scripts": {
     "flow": "flow",
     "lint": "eslint .",
