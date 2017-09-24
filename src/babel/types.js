@@ -10,6 +10,7 @@ export type NodePath<K> = {
   parentPath: NodePath<*>,
   scope: {
     getBinding: (id: string) => Binding<any>,
+    generateUidIdentifier: (id: string) => BabelIdentifier,
   },
   isProgram: () => boolean,
   isReferenced: () => boolean,
@@ -63,6 +64,22 @@ export type BabelIdentifier = {
   type: string,
 };
 
+export type BabelJSXExpressionContainer = {
+  type: string,
+  expression: any,
+};
+
+export type BabelJSXIdentifier = {
+  name: string,
+  type: string,
+};
+
+export type BabelJSXSpreadAttribute = {
+  attr: {
+    argument: any,
+  },
+};
+
 export type BabelMemberExpression = {
   object: BabelIdentifier,
   property: BabelIdentifier,
@@ -103,16 +120,20 @@ export type BabelTypes = {
   memberExpression: BabelNodeFactory<BabelMemberExpression>,
   expressionStatement: BabelNodeFactory<any>,
   variableDeclaration: BabelNodeFactory<BabelVariableDeclaration>,
+  variableDeclarator: BabelNodeFactory<BabelVariableDeclarator<any>>,
   program: BabelNodeFactory<any>,
   isTaggedTemplateExpression: BabelIsTypeFunction<
     BabelTaggedTemplateExpression<any>
   >,
   isCallExpression: BabelIsTypeFunction<BabelCallExpression>,
-  isMemberExpression: BabelIsTypeFunction<BabelMemberExpression>,
   isIdentifier: BabelIsTypeFunction<BabelIdentifier>,
-  isVariableDeclaration: BabelIsTypeFunction<BabelVariableDeclaration>,
+  isJSXExpressionContainer: BabelIsTypeFunction<BabelJSXExpressionContainer>,
+  isJSXIdentifier: BabelIsTypeFunction<BabelJSXIdentifier>,
+  isJSXSpreadAttribute: BabelIsTypeFunction<BabelJSXSpreadAttribute>,
+  isMemberExpression: BabelIsTypeFunction<BabelMemberExpression>,
   isObjectExpression: BabelIsTypeFunction<BabelObjectExpression>,
   isObjectPattern: BabelIsTypeFunction<BabelObjectPattern>,
+  isVariableDeclaration: BabelIsTypeFunction<BabelVariableDeclaration>,
 };
 
 export type ImportStatement = {
