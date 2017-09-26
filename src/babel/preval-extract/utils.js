@@ -15,7 +15,5 @@ export function relativeToCwd(filename: string): string {
 }
 
 export function makeAbsolute(filename: string): string {
-  return path.isAbsolute(filename)
-    ? filename
-    : path.join(process.cwd(), filename);
+  return path.isAbsolute(filename) ? filename : path.resolve(filename);
 }
