@@ -22,6 +22,11 @@ describe('babel/lib/errorUtils', () => {
     expect(frames[0].functionName).toBeDefined();
     expect(frames[0].lineNumber).toBeDefined();
     expect(frames[0].columnNumber).toBeDefined();
+
+    error.framesOffset = [{ lineNumber: 1, columnNumber: 0 }];
+    expect(getFramesFromStack(error, __filename)[0].offset).toEqual(
+      error.framesOffset[0]
+    );
   });
 
   it('enhanceFrames return modified frames based on source maps', () => {
@@ -39,6 +44,7 @@ describe('babel/lib/errorUtils', () => {
         functionName: 'testFn1',
         lineNumber: 10,
         columnNumber: 8,
+        offset: { lineNumber: 0, columnNumber: 0 },
       },
       {
         fileName: 'file2.js',
@@ -46,6 +52,7 @@ describe('babel/lib/errorUtils', () => {
         functionName: 'testFn2',
         lineNumber: 12,
         columnNumber: 4,
+        offset: { lineNumber: 0, columnNumber: 0 },
       },
     ];
 
@@ -76,6 +83,7 @@ describe('babel/lib/errorUtils', () => {
         lineNumber: 8,
         columnNumber: 8,
         originalSource: 'sourceContent 1',
+        offset: { lineNumber: 0, columnNumber: 0 },
       },
       {
         fileName: 'file2.js',
@@ -84,6 +92,7 @@ describe('babel/lib/errorUtils', () => {
         lineNumber: 12,
         columnNumber: 4,
         originalSource: 'sourceContent 2',
+        offset: { lineNumber: 0, columnNumber: 0 },
       },
     ]);
   });
@@ -101,6 +110,7 @@ describe('babel/lib/errorUtils', () => {
         lineNumber: 2,
         columnNumber: 8,
         originalSource: '// comment\nthrow new Error("test");',
+        offset: { lineNumber: 0, columnNumber: 0 },
       },
       {
         fileName: 'file2.js',
@@ -108,6 +118,7 @@ describe('babel/lib/errorUtils', () => {
         functionName: 'testFn2',
         lineNumber: 12,
         columnNumber: 4,
+        offset: { lineNumber: 0, columnNumber: 0 },
       },
     ];
 
