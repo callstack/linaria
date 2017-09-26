@@ -720,16 +720,20 @@ describe('preval-extract babel plugin', () => {
       );
 
       expect(transpiled1).toMatch(
-        `require('${filename1.replace('js', 'css')}')`
+        `require('${path.join(process.cwd(), '.linaria-cache/test1.css')}')`
       );
       expect(transpiled2).toMatch(
-        `require('${filename2.replace('js', 'css')}')`
+        `require('${path.join(process.cwd(), '.linaria-cache/test2.css')}')`
       );
 
       expect(data1).toMatchSnapshot();
       expect(data2).toMatchSnapshot();
-      expect(filenames1).toEqual([filename1.replace('js', 'css')]);
-      expect(filenames2).toEqual([filename2.replace('js', 'css')]);
+      expect(filenames1).toEqual([
+        path.join(process.cwd(), '.linaria-cache/test1.css'),
+      ]);
+      expect(filenames2).toEqual([
+        path.join(process.cwd(), '.linaria-cache/test2.css'),
+      ]);
     });
 
     it('extract styles to a given file', () => {
@@ -740,12 +744,12 @@ describe('preval-extract babel plugin', () => {
           font-size: 3em;
         \`;
         `,
-        { single: true, filename: '[name]-static.css', cache: false },
+        { single: true, filename: 'styles-static.css', cache: false },
         { filename }
       );
 
       expect(filenames).toEqual([
-        path.join(path.dirname(filename), 'test-static.css'),
+        path.join(path.dirname(filename), '.linaria-cache/styles-static.css'),
       ]);
       expect(data).toMatchSnapshot();
     });
@@ -760,7 +764,7 @@ describe('preval-extract babel plugin', () => {
         `,
         {
           single: true,
-          filename: '[name]-static.css',
+          filename: 'styles-static.css',
           outDir: 'output',
           cache: false,
         },
@@ -768,7 +772,7 @@ describe('preval-extract babel plugin', () => {
       );
 
       expect(filenames).toEqual([
-        path.join(path.dirname(filename), 'output', 'test-static.css'),
+        path.join(path.dirname(filename), 'output/styles-static.css'),
       ]);
       expect(data).toMatchSnapshot();
     });
