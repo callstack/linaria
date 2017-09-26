@@ -245,7 +245,7 @@ describe('preval-extract/extractStyles module', () => {
       );
     });
 
-    it('should overwrite if the tyles has changed', () => {
+    it('should overwrite if the styles has changed', () => {
       getCachedModule.mockImplementationOnce(
         getCachedModuleImpl('.classname{color: #ffffff}')
       );
