@@ -1,11 +1,13 @@
 import path from 'path';
 import fs from 'fs';
+import mkdirp from 'mkdirp';
 import { types } from 'babel-core';
 import extractStyles, { clearCache } from '../extractStyles';
 import { getCachedModule } from '../../lib/moduleSystem';
 
 jest.mock('../../lib/moduleSystem');
 jest.mock('fs');
+jest.mock('mkdirp');
 
 const getCachedModuleImpl = returnValue => () => ({
   exports: {
@@ -56,10 +58,65 @@ describe('preval-extract/extractStyles module', () => {
     expect(writeFileSync).not.toHaveBeenCalled();
   });
 
+  it('should create directory structure if needed', () => {
+    getCachedModule.mockImplementationOnce(
+      getCachedModuleImpl('.classname{color: #ffffff}')
+    );
+
+    let calls = 0;
+    fs.writeFileSync.mockImplementation(() => {
+      if (calls === 0) {
+        calls++;
+        const error = new Error('ENOENT');
+        error.code = 'ENOENT';
+        throw error;
+      }
+    });
+
+    const program = {
+      node: {
+        body: [],
+      },
+    };
+
+    extractStyles(types, program, 'filename.js', {
+      cache: false,
+    });
+
+    expect(mkdirp.sync).toHaveBeenCalledTimes(1);
+    expect(mkdirp.sync).toHaveBeenCalledWith(
+      path.join(process.cwd(), '.linaria-cache')
+    );
+  });
+
+  it('should throw error if cannot write to file', () => {
+    getCachedModule.mockImplementationOnce(
+      getCachedModuleImpl('.classname{color: #ffffff}')
+    );
+
+    fs.writeFileSync.mockImplementation(() => {
+      const error = new Error('ERR');
+      error.code = 'ERR';
+      throw error;
+    });
+
+    const program = {
+      node: {
+        body: [],
+      },
+    };
+
+    expect(() => {
+      extractStyles(types, program, 'filename.js', {
+        cache: false,
+      });
+    }).toThrowError();
+  });
+
   describe('with cache disabled', () => {
     beforeEach(clearCache);
 
-    it('should append new styles to a file', () => {
+    it('with single set to true, should write styles to a file', () => {
       getCachedModule.mockImplementationOnce(
         getCachedModuleImpl('.classname{color: #ffffff}')
       );
@@ -76,7 +133,7 @@ describe('preval-extract/extractStyles module', () => {
 
       expect(fs.writeFileSync).toHaveBeenCalledTimes(1);
       expect(fs.writeFileSync.mock.calls[0][0]).toEqual(
-        path.join(process.cwd(), 'filename.css')
+        path.join(process.cwd(), '.linaria-cache/styles.css')
       );
       expect(fs.writeFileSync.mock.calls[0][1]).toMatchSnapshot();
       expect(program.node.body.length).toBe(0);
@@ -109,9 +166,17 @@ describe('preval-extract/extractStyles module', () => {
 
       expect(fs.writeFileSync).toHaveBeenCalledTimes(2);
       expect(fs.writeFileSync.mock.calls[0][0]).toEqual(
-        path.join(process.cwd(), 'filename.css')
+        path.join(process.cwd(), '.linaria-cache/filename.css')
       );
-      expect(fs.writeFileSync.mock.calls[0][1]).toMatchSnapshot();
+      expect(fs.writeFileSync.mock.calls[0][1]).toMatch(
+        '.classname{color: #ffffff}'
+      );
+      expect(fs.writeFileSync.mock.calls[1][0]).toEqual(
+        path.join(process.cwd(), '.linaria-cache/filename.css')
+      );
+      expect(fs.writeFileSync.mock.calls[1][1]).toMatch(
+        '.classname{color: #000000}'
+      );
       expect(program.node.body.length).toBe(1);
     });
   });
@@ -119,7 +184,7 @@ describe('preval-extract/extractStyles module', () => {
   describe('with cache enabled', () => {
     beforeEach(clearCache);
 
-    it('should write only once if the file has not changed', () => {
+    it('should write only once if the styles has not changed', () => {
       getCachedModule.mockImplementationOnce(
         getCachedModuleImpl('.classname{color: #ffffff}')
       );
@@ -142,44 +207,45 @@ describe('preval-extract/extractStyles module', () => {
 
       expect(fs.writeFileSync).toHaveBeenCalledTimes(1);
       expect(fs.writeFileSync.mock.calls[0][0]).toEqual(
-        path.join(process.cwd(), 'A.css')
+        path.join(process.cwd(), '.linaria-cache/filename.css')
       );
-      expect(fs.writeFileSync.mock.calls[0][1]).toMatchSnapshot();
+      expect(fs.writeFileSync.mock.calls[0][1]).toMatch(
+        '.classname{color: #ffffff}'
+      );
       expect(program.node.body.length).toBe(1);
     });
 
     it('should append classnames when writing to single file', () => {
-      const writeFileSync = jest.fn();
       const opts = { single: true, filename: 'A.css' };
 
       getCachedModule.mockImplementationOnce(
         getCachedModuleImpl('.classname{color: #ffffff}')
       );
 
-      extractStyles(types, null, 'file1.js', opts, { writeFileSync });
+      extractStyles(types, null, 'file1.js', opts);
 
       getCachedModule.mockImplementationOnce(
         getCachedModuleImpl('.other{color: #000000}')
       );
 
-      extractStyles(types, null, 'file2.js', opts, { writeFileSync });
+      extractStyles(types, null, 'file2.js', opts);
 
       expect(fs.writeFileSync).toHaveBeenCalledTimes(2);
       expect(fs.writeFileSync.mock.calls[0][0]).toEqual(
-        path.join(process.cwd(), 'A.css')
+        path.join(process.cwd(), '.linaria-cache/A.css')
       );
       expect(fs.writeFileSync.mock.calls[0][1]).toMatch(
         '.classname{color: #ffffff}'
       );
       expect(fs.writeFileSync.mock.calls[1][0]).toEqual(
-        path.join(process.cwd(), 'A.css')
+        path.join(process.cwd(), '.linaria-cache/A.css')
       );
       expect(fs.writeFileSync.mock.calls[1][1]).toMatch(
         '.classname{color: #ffffff}\n.other{color: #000000}'
       );
     });
 
-    it('should overwrite if the file has changed', () => {
+    it('should overwrite if the styles has changed', () => {
       getCachedModule.mockImplementationOnce(
         getCachedModuleImpl('.classname{color: #ffffff}')
       );
@@ -190,10 +256,9 @@ describe('preval-extract/extractStyles module', () => {
         },
       };
 
-      extractStyles(types, program, 'filename.js', {
-        outDir: process.cwd(),
-        filename: '[name].css',
-      });
+      const opts = { outDir: 'out-dir' };
+
+      extractStyles(types, program, 'filename.js', opts);
 
       getCachedModule.mockImplementationOnce(
         getCachedModuleImpl('.classname{color: #000000}')
@@ -201,127 +266,105 @@ describe('preval-extract/extractStyles module', () => {
       // On each transpilation the body does not contain require call added by extractStyles
       program.node.body = [];
 
-      extractStyles(types, program, 'filename.js', {
-        outDir: process.cwd(),
-        filename: '[name].css',
-      });
+      extractStyles(types, program, 'filename.js', opts);
 
       expect(fs.writeFileSync).toHaveBeenCalledTimes(2);
       expect(fs.writeFileSync.mock.calls[0][0]).toEqual(
-        path.join(process.cwd(), 'filename.css')
-      );
-      expect(fs.writeFileSync.mock.calls[0][1]).toMatch('#ffffff');
-      expect(fs.writeFileSync.mock.calls[0][1]).toMatchSnapshot();
-      expect(fs.writeFileSync.mock.calls[1][0]).toEqual(
-        path.join(process.cwd(), 'filename.css')
-      );
-      expect(fs.writeFileSync.mock.calls[1][1]).toMatch('#000000');
-      expect(fs.writeFileSync.mock.calls[1][1]).toMatchSnapshot();
-      expect(program.node.body.length).toBe(1);
-    });
-
-    it('should append styles only once if the file has not changed', () => {
-      getCachedModule.mockImplementationOnce(
-        getCachedModuleImpl('.classname{color: #ffffff}')
-      );
-
-      extractStyles(types, null, 'filename.js', { single: true });
-
-      getCachedModule.mockImplementationOnce(
-        getCachedModuleImpl('.classname{color: #ffffff}')
-      );
-
-      extractStyles(types, null, 'filename.js', { single: true });
-
-      expect(fs.writeFileSync).toHaveBeenCalledTimes(1);
-      expect(fs.writeFileSync.mock.calls[0][0]).toEqual(
-        path.join(process.cwd(), 'filename.css')
+        path.join(process.cwd(), 'out-dir/filename.css')
       );
       expect(fs.writeFileSync.mock.calls[0][1]).toMatch(
         '.classname{color: #ffffff}'
       );
-      expect(fs.writeFileSync.mock.calls[0][1]).toMatchSnapshot();
+      expect(fs.writeFileSync.mock.calls[1][0]).toEqual(
+        path.join(process.cwd(), 'out-dir/filename.css')
+      );
+      expect(fs.writeFileSync.mock.calls[1][1]).toMatch(
+        '.classname{color: #000000}'
+      );
+      expect(program.node.body.length).toBe(1);
     });
 
-    it('should overwrite css if the file has changed', () => {
+    it('should append styles only once if the styles has not changed', () => {
       getCachedModule.mockImplementationOnce(
         getCachedModuleImpl('.classname{color: #ffffff}')
       );
-      const writeFileSync = jest.fn();
 
-      extractStyles(
-        types,
-        null,
-        'filename.js',
-        { single: true },
-        { writeFileSync }
+      const opts = { single: true };
+
+      extractStyles(types, null, 'filename.js', opts);
+
+      getCachedModule.mockImplementationOnce(
+        getCachedModuleImpl('.classname{color: #ffffff}')
       );
+
+      extractStyles(types, null, 'filename.js', opts);
+
+      expect(fs.writeFileSync).toHaveBeenCalledTimes(1);
+      expect(fs.writeFileSync.mock.calls[0][0]).toEqual(
+        path.join(process.cwd(), '.linaria-cache/styles.css')
+      );
+      expect(fs.writeFileSync.mock.calls[0][1]).toMatch(
+        '.classname{color: #ffffff}'
+      );
+    });
+
+    it('should overwrite css if the styles has changed', () => {
+      getCachedModule.mockImplementationOnce(
+        getCachedModuleImpl('.classname{color: #ffffff}')
+      );
+
+      const opts = { single: true };
+
+      extractStyles(types, null, 'filename.js', opts);
 
       getCachedModule.mockImplementationOnce(
         getCachedModuleImpl('.classname{color: #000000}')
       );
 
-      extractStyles(
-        types,
-        null,
-        'filename.js',
-        { single: true },
-        { writeFileSync }
-      );
+      extractStyles(types, null, 'filename.js', opts);
 
       expect(fs.writeFileSync).toHaveBeenCalledTimes(2);
       expect(fs.writeFileSync.mock.calls[0][0]).toEqual(
-        path.join(process.cwd(), 'filename.css')
+        path.join(process.cwd(), '.linaria-cache/styles.css')
       );
       expect(fs.writeFileSync.mock.calls[0][1]).toMatch(
         '.classname{color: #ffffff}'
       );
-      expect(fs.writeFileSync.mock.calls[0][1]).toMatchSnapshot();
       expect(fs.writeFileSync.mock.calls[1][0]).toEqual(
-        path.join(process.cwd(), 'filename.css')
+        path.join(process.cwd(), '.linaria-cache/styles.css')
       );
       expect(fs.writeFileSync.mock.calls[1][1]).toMatch(
         '.classname{color: #000000}'
       );
-      expect(fs.writeFileSync.mock.calls[1][1]).toMatchSnapshot();
+      expect(fs.writeFileSync.mock.calls[1][1]).not.toMatch(
+        '.classname{color: #ffffff}'
+      );
     });
 
     it('should overwrite css if the new file was added', () => {
       getCachedModule.mockImplementationOnce(
         getCachedModuleImpl('.classname{color: #ffffff}')
       );
-      const writeFileSync = jest.fn();
 
-      extractStyles(
-        types,
-        null,
-        'filename1.js',
-        { single: true },
-        { writeFileSync }
-      );
+      const opts = { single: true };
+
+      extractStyles(types, null, 'filename1.js', opts);
 
       getCachedModule.mockImplementationOnce(
         getCachedModuleImpl('.classname{color: #000000}')
       );
 
-      extractStyles(
-        types,
-        null,
-        'filename2.js',
-        { single: true },
-        { writeFileSync }
-      );
+      extractStyles(types, null, 'filename2.js', opts);
 
       expect(fs.writeFileSync).toHaveBeenCalledTimes(2);
       expect(fs.writeFileSync.mock.calls[0][0]).toEqual(
-        path.join(process.cwd(), 'filename1.css')
+        path.join(process.cwd(), '.linaria-cache/styles.css')
       );
       expect(fs.writeFileSync.mock.calls[0][1]).toMatch(
         '.classname{color: #ffffff}'
       );
-      expect(fs.writeFileSync.mock.calls[0][1]).toMatchSnapshot();
       expect(fs.writeFileSync.mock.calls[1][0]).toEqual(
-        path.join(process.cwd(), 'filename2.css')
+        path.join(process.cwd(), '.linaria-cache/styles.css')
       );
       expect(fs.writeFileSync.mock.calls[1][1]).toMatch(
         '.classname{color: #ffffff}'
@@ -329,7 +372,6 @@ describe('preval-extract/extractStyles module', () => {
       expect(fs.writeFileSync.mock.calls[1][1]).toMatch(
         '.classname{color: #000000}'
       );
-      expect(fs.writeFileSync.mock.calls[1][1]).toMatchSnapshot();
     });
   });
 });

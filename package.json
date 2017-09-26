@@ -37,6 +37,7 @@
     "babel-generator": "^6.26.0",
     "dedent": "^0.7.0",
     "error-stack-parser": "^2.0.1",
+    "mkdirp": "^0.5.1",
     "postcss": "^6.0.10",
     "source-map": "^0.5.7",
     "stylis": "^3.2.13"

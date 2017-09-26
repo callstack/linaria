@@ -13,11 +13,7 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
   entry:
     env.NODE_ENV === 'production'
       ? entry
-      : [
-          `webpack-dev-server/client?http://localhost:${PORT}`,
-          'webpack/hot/only-dev-server',
-          ...entry,
-        ],
+      : [`webpack-dev-server/client?http://localhost:${PORT}`, ...entry],
   output: {
     path: path.resolve(__dirname, 'static', 'build'),
     publicPath: '/build',
@@ -79,7 +75,7 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
   },
   devServer: {
     contentBase: 'static',
-    hot: true,
+    hotOnly: true,
     port: PORT,
   },
 });

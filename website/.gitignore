@@ -1,3 +1,2 @@
-dist
-src/**/*.css
-!src/styles/*.css
+dist/
+.linaria-cache/
