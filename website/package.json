@@ -15,6 +15,7 @@
     "start": "webpack-dev-server"
   },
   "dependencies": {
+    "compression": "^1.7.1",
     "dedent": "^0.7.0",
     "express": "^4.15.4",
     "linaria": "0.0.0",

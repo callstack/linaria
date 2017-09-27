@@ -1,8 +1,8 @@
 /* @flow */
 /* linaria-preval */
 import fs from 'fs';
-import path from 'path';
 import express from 'express';
+import compression from 'compression';
 import crypto from 'crypto';
 import dedent from 'dedent';
 import React from 'react';
@@ -47,18 +47,14 @@ app.get('/', (req, res) => {
   `);
 });
 
+app.use(compression());
+app.use('/build', express.static('static/build'));
+app.use('/vendor', express.static('static/vendor'));
+app.use('/images', express.static('static/images'));
 app.get('/styles/:slug', (req, res) => {
   res.type('text/css');
   res.end(cache[req.params.slug]);
 });
-app.get('/build/:slug', (req, res) => {
-  res.end(fs.readFileSync(path.resolve('static', 'build', req.params.slug)));
-});
-app.get('/vendor/:slug', (req, res) => {
-  res.type('text/css');
-  res.end(fs.readFileSync(path.resolve('static', 'vendor', req.params.slug)));
-});
-app.get('/images/:slug', (req, res) => {
-  res.end(fs.readFileSync(path.resolve('static', 'images', req.params.slug)));
-});
 app.listen(3242);
+
+console.log('Listening on http://localhost:3242');
