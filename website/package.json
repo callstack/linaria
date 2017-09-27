@@ -21,10 +21,11 @@
     "preact": "^8.2.5",
     "preact-compat": "^3.17.0",
     "prismjs": "^1.6.0",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
     "babel-preset-env": "^1.6.0",
