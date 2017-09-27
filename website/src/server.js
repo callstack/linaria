@@ -9,6 +9,7 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { collect } from 'linaria/server';
 import App from './App';
+import globalStyles from './styles/global';
 
 const cache = {};
 const css = fs.readFileSync('./static/styles.css', 'utf8');
@@ -31,6 +32,7 @@ app.get('/', (req, res) => {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Linaria – zero-runtime CSS in JS library</title>
+        <style type="text/css">${globalStyles}</style>
         <style type="text/css">${critical}</style>
         <script defer src="/build/manifest.js"></script>
         <script defer src="/build/vendor.js"></script>
