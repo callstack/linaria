@@ -15,7 +15,7 @@ const css = fs.readFileSync('./static/styles.css', 'utf8');
 const app = express();
 
 app.get('/', (req, res) => {
-  const html = ReactDOMServer.renderToString(<App />);
+  const html = ReactDOMServer.renderToStaticMarkup(<App />);
   const { critical, other } = collect(html, css);
   const slug = crypto
     .createHash('md5')
