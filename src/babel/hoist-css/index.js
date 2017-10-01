@@ -14,7 +14,11 @@ const transformTaggedTemplate = (
 ) => {
   if (
     t.isTaggedTemplateExpression(expression) &&
-    expression.tag.name === 'css'
+    ((t.isIdentifier(expression.tag) && expression.tag.name === 'css') ||
+      (t.isCallExpression(expression.tag) &&
+        t.isMemberExpression(expression.tag.callee) &&
+        expression.tag.callee.object.name === 'css' &&
+        expression.tag.callee.property.name === 'named'))
   ) {
     const className = path.scope.generateUidIdentifier(path.node.name.name);
     state.programPath.node.body.push(
