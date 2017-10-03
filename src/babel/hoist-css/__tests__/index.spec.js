@@ -27,6 +27,21 @@ describe('hoist-css babel plugin', () => {
     expect(code).toMatchSnapshot();
   });
 
+  it('should hoist named CSS from JSX from styles', () => {
+    const { code } = transpile(`
+      function MyComponent() {
+        return (
+          <article
+            id="post"
+            {...styles(css.named('test')\`color: \${colors.red};\`, css\`font-size: 12px;\`)}
+          />
+        );
+      }
+    `);
+
+    expect(code).toMatchSnapshot();
+  });
+
   it('should not affect other template literals in styles', () => {
     const { code } = transpile(`
       function MyComponent() {
