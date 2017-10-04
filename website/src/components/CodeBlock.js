@@ -23,10 +23,12 @@ export default function CodeBlock({ className, language, text }: Props) {
   );
 }
 
+const Prism = global.Prism;
+
 const prism = (code, language) =>
-  !language || !window.Prism.languages[language]
+  !Prism || !language || (Prism && !Prism.languages[language])
     ? code
-    : window.Prism.highlight(code, window.Prism.languages[language]);
+    : Prism.highlight(code, Prism.languages[language]);
 
 const code = css`
   font-size: 14px;

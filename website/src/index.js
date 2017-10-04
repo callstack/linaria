@@ -2,31 +2,16 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { css } from 'linaria';
-import theme from './styles/theme';
 import App from './App';
 import '../static/vendor/prism';
+import globalStyles from './styles/global';
 
-const html = css`
-  height: 100%;
-  width: 100%;
-  color: ${theme.text};
-  font-family: ${theme.fontFamily};
-  font-weight: 300;
-  font-size: 16px;
-  line-height: 1.4;
+const style = document.createElement('style');
 
-  body,
-  #root {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-  }
-`;
+style.appendChild(document.createTextNode(globalStyles));
 
 if (document.documentElement) {
-  document.documentElement.classList.add(html);
+  document.documentElement.appendChild(style);
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));

@@ -1,2 +1,4 @@
 dist/
 .linaria-cache/
+static/server/
+static/styles.css

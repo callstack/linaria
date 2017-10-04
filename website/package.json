@@ -4,21 +4,30 @@
   "private": true,
   "description": "Linaria website",
   "scripts": {
-    "start": "webpack-dev-server",
+    "build:all": "yarn build:server && yarn build",
+    "build:server": "NODE_ENV=production BABEL_ENV=server babel src --out-dir static/server --ignore '{src/index.js,*.css}'",
     "build": "NODE_ENV=production webpack -p --env.NODE_ENV production",
-    "prebuild": "yarn run clean",
     "clean": "del static/build",
-    "postinstall": "cd .. && yarn link && cd website && yarn link linaria"
+    "postinstall": "cd .. && yarn link && cd website && yarn link linaria",
+    "prebuild": "yarn run clean",
+    "server": "node static/server/server.js",
+    "start-server-render": "yarn build:all && yarn server",
+    "start": "webpack-dev-server"
   },
   "dependencies": {
+    "compression": "^1.7.1",
     "dedent": "^0.7.0",
+    "express": "^4.15.4",
     "linaria": "0.0.0",
     "normalize.css": "^7.0.0",
     "preact": "^8.2.5",
     "preact-compat": "^3.17.0",
-    "prismjs": "^1.6.0"
+    "prismjs": "^1.6.0",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
     "babel-preset-env": "^1.6.0",
