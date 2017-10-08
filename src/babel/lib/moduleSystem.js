@@ -118,11 +118,20 @@ export class Module {
         filename,
         path.dirname(filename)
       );
-    } catch (rawError) {
-      throw buildCodeFrameError(
-        rawError,
-        enhanceFrames(getFramesFromStack(rawError, filename), modulesCache)
-      );
+    } catch (error) {
+      if (error.isEnhanced) {
+        throw buildCodeFrameError(error, error.enhancedFrames);
+      } else {
+        throw buildCodeFrameError(
+          error,
+          enhanceFrames(
+            getFramesFromStack(error, frames =>
+              frames.findIndex(frame => frame.fileName === filename)
+            ),
+            modulesCache
+          )
+        );
+      }
     }
 
     return this.exports;

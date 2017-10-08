@@ -9,27 +9,20 @@ type Frame = {
   lineNumber: number,
   columnNumber: number,
   fileName: string,
-  offset: { lineNumber: number, columnNumber: number },
+  source: string,
 };
 
 type EnhancedFrame = Frame & { originalSource: string };
 
 export function getFramesFromStack(
   error: Error,
-  parentFilename: string
+  findLastFrame?: (frames: Frame[]) => number
 ): Frame[] {
   const allFrames = errorStackParser.parse(error);
-  const lastMeaningfulFrame = allFrames.findIndex(
-    frame => frame.fileName === parentFilename
-  );
-
-  return allFrames.slice(0, lastMeaningfulFrame + 1).map((frame, i) => ({
-    ...frame,
-    offset:
-      Array.isArray(error.framesOffset) && error.framesOffset[i]
-        ? error.framesOffset[i]
-        : { lineNumber: 0, columnNumber: 0 },
-  }));
+  const lastMeaningfulFrame = findLastFrame
+    ? findLastFrame(allFrames)
+    : allFrames.length - 1;
+  return allFrames.slice(0, lastMeaningfulFrame + 1);
 }
 
 export function enhanceFrames(
@@ -48,11 +41,11 @@ export function enhanceFrames(
       ...frame,
       lineNumber:
         originalPosition.line !== null
-          ? originalPosition.line + frame.offset.lineNumber
+          ? originalPosition.line
           : frame.lineNumber,
       columnNumber:
         originalPosition.column !== null
-          ? originalPosition.column + frame.offset.columnNumber
+          ? originalPosition.column
           : frame.columnNumber,
       originalSource: consumer.sourcesContent[0],
     };
