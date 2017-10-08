@@ -41,13 +41,10 @@ const named = (name?: string = 'css', filename: ?string = null) => (
         .join('')
         .split('\n');
 
-      // Get offets based on how many lines current tagged template expression has.
+      // Get offsets based on how many lines current tagged template expression has.
       const lineOffset = templateLines.length - 1;
-      let columnOffset = templateLines[templateLines.length - 1].length + 3;
-      if (lineOffset === 0) {
-        // single line styles
-        columnOffset = framesWithoutCurrentStack[0].columnNumber;
-      }
+      const columnOffset =
+        lineOffset > 0 ? templateLines[templateLines.length - 1].length + 3 : 0;
 
       // Enhance frames with source maps, since we need to add offsets after it's already
       // processed by enhancer.
