@@ -3,7 +3,11 @@
 import css from '../css';
 
 jest.mock('../babel/lib/errorUtils', () => ({
-  getFramesFromStack: (...args) => require.requireActual('../babel/lib/errorUtils').getFramesFromStack(...args),
+  getFramesFromStack: (...args) =>
+    require
+      // $FlowFixMe
+      .requireActual('../babel/lib/errorUtils')
+      .getFramesFromStack(...args),
   enhanceFrames: frames => frames,
 }));
 
