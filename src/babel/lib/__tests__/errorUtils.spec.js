@@ -45,7 +45,6 @@ describe('babel/lib/errorUtils', () => {
         functionName: 'testFn1',
         lineNumber: 10,
         columnNumber: 8,
-        offset: { lineNumber: 0, columnNumber: 0 },
       },
       {
         fileName: 'file2.js',
@@ -53,7 +52,6 @@ describe('babel/lib/errorUtils', () => {
         functionName: 'testFn2',
         lineNumber: 12,
         columnNumber: 4,
-        offset: { lineNumber: 0, columnNumber: 0 },
       },
     ];
 
@@ -84,7 +82,6 @@ describe('babel/lib/errorUtils', () => {
         lineNumber: 8,
         columnNumber: 8,
         originalSource: 'sourceContent 1',
-        offset: { lineNumber: 0, columnNumber: 0 },
       },
       {
         fileName: 'file2.js',
@@ -93,7 +90,6 @@ describe('babel/lib/errorUtils', () => {
         lineNumber: 12,
         columnNumber: 4,
         originalSource: 'sourceContent 2',
-        offset: { lineNumber: 0, columnNumber: 0 },
       },
     ]);
   });
@@ -111,7 +107,6 @@ describe('babel/lib/errorUtils', () => {
         lineNumber: 2,
         columnNumber: 8,
         originalSource: '// comment\nthrow new Error("test");',
-        offset: { lineNumber: 0, columnNumber: 0 },
       },
       {
         fileName: 'file2.js',
@@ -119,7 +114,6 @@ describe('babel/lib/errorUtils', () => {
         functionName: 'testFn2',
         lineNumber: 12,
         columnNumber: 4,
-        offset: { lineNumber: 0, columnNumber: 0 },
       },
     ];
 
