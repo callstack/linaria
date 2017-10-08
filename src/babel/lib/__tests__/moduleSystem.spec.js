@@ -121,5 +121,26 @@ describe('babel/lib/moduleSystem', () => {
       expect(error.message).toEqual('test');
       expect(error.stack).toMatch(`${__filename}:1:24`);
     }
+
+    try {
+      instantiateModule(
+        `function test() {
+          const error = new Error("test");
+          error.isEnhanced = true;
+          error.enhancedFrames = [{
+            originalSource: '// test',
+            lineNumber: 1,
+            columnNumber: 0,
+            fileName: '${__filename}'
+          }]
+          throw error;
+        }
+        module.exports = test();`,
+        __filename
+      );
+    } catch (error) {
+      expect(error.message).toEqual('test');
+      expect(error.stack).toMatch(`${__filename}:1:0`);
+    }
   });
 });
