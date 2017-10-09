@@ -75,3 +75,69 @@ Remember to set `process.env.BABEL_ENV` or `process.env.NODE_ENV` to `test`. If 
 ```
 
 Will extract all styles into `styles.css` file in `static` directory relatively to command working directory.
+
+## Integrating with other tools
+
+Linaria can be used together with many great tools, frameworks and boilerplates, but unfortunately it usually means some configuration changes.
+
+### Create React App (ejected)
+
+```json
+{
+  "babel": {
+    "presets": [
+      "react-app",
+      "env",
+      [
+        "linaria/babel",
+        {
+          "outDir": "./src/.linaria-cache"
+        }
+      ]
+    ]
+  }
+}
+```
+
+This will extract your CSS to `src/.linaria-cache` directory (add it to your `.gitignore`). We'll also need to install a plugin/preset for dealing with ES modules, like `babel-preset-env`.
+
+### Next.js
+
+```json
+{
+  "presets": [
+    "next/babel",
+    "env",
+    [
+      "linaria/babel",
+      {
+        "filename": "style.css",
+        "outDir": "./static",
+        "single": true
+      }
+    ]
+  ]
+}
+```
+
+Because `next` is doing server rendering, we'll need to adjust our config properly. We need to extract styles to a single file, which we can then be declared in e.g. custom `<Head>` component. We'll also need to install a plugin/preset for dealing with ES modules, like `babel-preset-env`.
+
+```js
+import Head from 'next/head';
+import {css} from 'linaria';
+
+const header = css`background: yellow;`;
+
+export default () => (
+  <div>
+    <Head>
+      <title>This page has a title 🤔</title>
+      <meta charSet="utf-8" />
+      <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      <link rel="stylesheet" href="/static/style.css" />
+    </Head>
+
+    <div className={header}>Welcome to next.js!</div>
+  </div>
+);
+```
