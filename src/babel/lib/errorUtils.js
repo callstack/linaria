@@ -9,19 +9,19 @@ type Frame = {
   lineNumber: number,
   columnNumber: number,
   fileName: string,
+  source: string,
 };
 
 type EnhancedFrame = Frame & { originalSource: string };
 
 export function getFramesFromStack(
   error: Error,
-  parentFilename: string
+  findLastFrame?: (frames: Frame[]) => number
 ): Frame[] {
   const allFrames = errorStackParser.parse(error);
-  const lastMeaningfulFrame = allFrames.findIndex(
-    frame => frame.fileName === parentFilename
-  );
-
+  const lastMeaningfulFrame = findLastFrame
+    ? findLastFrame(allFrames)
+    : allFrames.length - 1;
   return allFrames.slice(0, lastMeaningfulFrame + 1);
 }
 

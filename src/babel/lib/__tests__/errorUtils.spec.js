@@ -14,14 +14,20 @@ describe('babel/lib/errorUtils', () => {
   });
 
   it('getFramesFromStack should return parsed frames from stacktrace', () => {
+    function findLastFrame(frames) {
+      return frames.findIndex(frame => frame.fileName === __filename);
+    }
+
     const error = new Error('test');
-    const frames = getFramesFromStack(error, __filename);
+    const frames = getFramesFromStack(error, findLastFrame);
     expect(frames.length).toBe(1);
     expect(frames[0].fileName).toEqual(__filename);
     expect(frames[0].source).toBeDefined();
     expect(frames[0].functionName).toBeDefined();
     expect(frames[0].lineNumber).toBeDefined();
     expect(frames[0].columnNumber).toBeDefined();
+
+    expect(getFramesFromStack(error).length).toBeGreaterThan(frames.length);
   });
 
   it('enhanceFrames return modified frames based on source maps', () => {

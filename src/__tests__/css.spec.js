@@ -2,6 +2,15 @@
 
 import css from '../css';
 
+jest.mock('../babel/lib/errorUtils', () => ({
+  getFramesFromStack: (...args) =>
+    require
+      // $FlowFixMe
+      .requireActual('../babel/lib/errorUtils')
+      .getFramesFromStack(...args),
+  enhanceFrames: frames => frames,
+}));
+
 describe('css module', () => {
   it('should return a class name given some css', () => {
     const color = 'blue';
@@ -16,5 +25,17 @@ describe('css module', () => {
     `;
 
     expect(title).toBe('header__1r77qux');
+  });
+
+  it('should throw error if there is undefined or null expression', () => {
+    expect(() => {
+      css.named('test')`
+        color: ${undefined}
+      `;
+    }).toThrowError('Expression cannot be undefined or null');
+
+    expect(() => {
+      css.named('test')`color: ${null}`;
+    }).toThrowError('Expression cannot be undefined or null');
   });
 });
