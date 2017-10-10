@@ -122,4 +122,17 @@ describe('babel/lib/errorUtils', () => {
     expect(newError.message).toEqual('Test message');
     expect(stripAnsi(newError.stack)).toMatchSnapshot();
   });
+
+  it('buildCodeFrameError should fallback if no frames are passed', () => {
+    const error = {
+      message: 'Test message',
+    };
+
+    const frames = [];
+
+    const newError = buildCodeFrameError(error, frames);
+
+    expect(newError.message).toEqual('Test message');
+    expect(stripAnsi(newError.stack)).toBeUndefined();
+  });
 });

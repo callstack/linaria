@@ -56,7 +56,7 @@ export function buildCodeFrameError(
   error: Error,
   frames: EnhancedFrame[]
 ): Error {
-  const firstFrame = frames[0];
+  const firstFrame = frames && frames[0];
 
   if (!firstFrame) {
     return error;
