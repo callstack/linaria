@@ -99,7 +99,7 @@ Linaria can be used together with many great tools, frameworks and boilerplates,
 }
 ```
 
-This will extract your CSS to `src/.linaria-cache` directory (add it to your `.gitignore`). We'll also need to install a plugin/preset for dealing with ES modules, like `babel-preset-env`.
+This will extract your CSS to `src/.linaria-cache` directory (add it to your `.gitignore`). We need to override CRA's `babel-preset-env` `"modules": false` with `"modules": "commonjs"` (default), because Linaria needs transpiled the modules. You can still leverage Webpack's dynamic imports by using `"modules": false` in `babel-loader` config.
 
 ### Next.js
 
@@ -120,7 +120,7 @@ This will extract your CSS to `src/.linaria-cache` directory (add it to your `.g
 }
 ```
 
-Because `next` is doing server rendering, we'll need to adjust our config properly. We need to extract styles to a single file, which we can then be declared in e.g. custom `<Head>` component. We'll also need to install a plugin/preset for dealing with ES modules, like `babel-preset-env`.
+Because `next` is doing server rendering, we'll need to adjust our config properly. We need to extract styles to a single file, which we can then be declared in e.g. custom `<Head>` component. We need to override Next.js's `babel-preset-env` `"modules": false` with `"modules": "commonjs"` (default), because Linaria needs transpiled the modules. You can still leverage Webpack's dynamic imports by using `"modules": false` in `babel-loader` config.
 
 ```js
 import Head from 'next/head';
