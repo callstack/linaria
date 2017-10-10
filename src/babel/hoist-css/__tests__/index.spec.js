@@ -116,4 +116,38 @@ describe('hoist-css babel plugin', () => {
 
     expect(code).toMatchSnapshot();
   });
+
+  it('should hoist CSS from styles object', () => {
+    const { code } = transpile(`
+      const styles = {
+        text: css\`
+          font-size: 1.5em;
+          opacity: 0.5;
+        \`,
+        container: css.named('stuff')\`
+          font-size: 1.5em;
+          opacity: 0.5;
+        \`,
+      }
+    `);
+
+    expect(code).toMatchSnapshot();
+  });
+
+  it('should not affect other object properties', () => {
+    const { code } = transpile(`
+      const styles = {
+        text: sass\`
+          font-size: 1.5em;
+          opacity: 0.5;
+        \`,
+        container: \`
+          flex: 1;
+        \`,
+        width: 42
+      }
+    `);
+
+    expect(code).toMatchSnapshot();
+  });
 });

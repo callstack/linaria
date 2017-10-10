@@ -10,6 +10,7 @@ const transformTaggedTemplate = (
   t: BabelTypes,
   path: NodePath<*>,
   state: State,
+  name: string,
   expression: *
 ) => {
   if (
@@ -20,7 +21,7 @@ const transformTaggedTemplate = (
         expression.tag.callee.object.name === 'css' &&
         expression.tag.callee.property.name === 'named'))
   ) {
-    const className = path.scope.generateUidIdentifier(path.node.name.name);
+    const className = path.scope.generateUidIdentifier(name);
     state.programPath.node.body.push(
       t.variableDeclaration('var', [
         t.variableDeclarator(t.identifier(className.name), expression),
@@ -47,7 +48,7 @@ export default function({ types: t }: { types: BabelTypes }) {
             attr.argument.callee.name === 'styles'
           ) {
             attr.argument.arguments = attr.argument.arguments.map(arg =>
-              transformTaggedTemplate(t, path, state, arg)
+              transformTaggedTemplate(t, path, state, path.node.name.name, arg)
             );
           } else if (
             t.isJSXIdentifier(attr.name) &&
@@ -58,11 +59,21 @@ export default function({ types: t }: { types: BabelTypes }) {
               t,
               path,
               state,
+              path.node.name.name,
               attr.value.expression
             );
           }
         });
       },
+      ObjectProperty(path: NodePath<*>, state: State) {
+        path.node.value = transformTaggedTemplate(
+          t,
+          path,
+          state,
+          path.node.key.name,
+          path.node.value
+        );
+      }
     },
   };
 }
