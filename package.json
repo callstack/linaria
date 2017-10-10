@@ -27,9 +27,9 @@
     "postinstall": "yarn link && yarn link linaria"
   },
   "files": [
-    "build",
-    "babel.js",
-    "server.js"
+    "/build",
+    "/babel.js",
+    "/server.js"
   ],
   "dependencies": {
     "babel-code-frame": "^6.26.0",
