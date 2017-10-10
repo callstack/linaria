@@ -1,3 +1,11 @@
+<div style="text-align: center; padding: 50px">
+<img src="website/static/images/linaria-logo@2x.png" style="width: 396px; max-width: 100%; height: auto;" />
+
+Zero-runtime CSS in JS library.
+
+</div>
+<div style="text-align: center;">
+
 [![Build Status][build-badge]][build]
 [![Code Coverage][coverage-badge]][coverage]
 [![Version][version-badge]][package]
@@ -10,11 +18,7 @@
 [![Code of Conduct][coc-badge]][coc]
 
 [![tweet][tweet-badge]][tweet]
-
-
-# Linaria
-
-Zero-runtime CSS in JS library.
+</div>
 
 ## Features
 
