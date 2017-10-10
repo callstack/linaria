@@ -132,7 +132,6 @@ describe('babel/lib/errorUtils', () => {
 
     const newError = buildCodeFrameError(error, frames);
 
-    expect(newError.message).toEqual('Test message');
-    expect(stripAnsi(newError.stack)).toBeUndefined();
+    expect(newError).toEqual(error);
   });
 });
