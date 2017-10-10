@@ -56,10 +56,16 @@ export function buildCodeFrameError(
   error: Error,
   frames: EnhancedFrame[]
 ): Error {
+  const firstFrame = frames && frames[0];
+
+  if (!firstFrame) {
+    return error;
+  }
+
   const codeFrameString = codeFrame(
-    frames[0].originalSource,
-    frames[0].lineNumber,
-    frames[0].columnNumber,
+    firstFrame.originalSource,
+    firstFrame.lineNumber,
+    firstFrame.columnNumber,
     {
       highlightCode: true,
       linesAbove: 4,
