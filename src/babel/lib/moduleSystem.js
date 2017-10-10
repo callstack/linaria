@@ -122,15 +122,21 @@ export class Module {
       if (error.isEnhanced) {
         throw buildCodeFrameError(error, error.enhancedFrames);
       } else {
-        throw buildCodeFrameError(
-          error,
-          enhanceFrames(
-            getFramesFromStack(error, frames =>
-              frames.findIndex(frame => frame.fileName === filename)
-            ),
-            modulesCache
-          )
-        );
+        let errorToThrow;
+        try {
+          errorToThrow = buildCodeFrameError(
+            error,
+            enhanceFrames(
+              getFramesFromStack(error, frames =>
+                frames.findIndex(frame => frame.fileName === filename)
+              ),
+              modulesCache
+            )
+          );
+        } catch (_) {
+          errorToThrow = error;
+        }
+        throw errorToThrow;
       }
     }
 
