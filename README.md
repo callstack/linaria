@@ -1,10 +1,8 @@
-<div style="text-align: center; padding: 50px">
-<img src="website/static/images/linaria-logo@2x.png" style="width: 396px; max-width: 100%; height: auto;" />
+<p align="center">
+  <img alt="Haul" src="website/static/images/linaria-logo@2x.png" width="496">
+</p>
 
-Zero-runtime CSS in JS library.
-
-</div>
-<div style="text-align: center;">
+<p align="center">
 
 [![Build Status][build-badge]][build]
 [![Code Coverage][coverage-badge]][coverage]
@@ -18,7 +16,8 @@ Zero-runtime CSS in JS library.
 [![Code of Conduct][coc-badge]][coc]
 
 [![tweet][tweet-badge]][tweet]
-</div>
+
+</p>
 
 ## Features
 
