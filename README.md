@@ -1,8 +1,12 @@
 <p align="center">
-  <img alt="Haul" src="website/static/images/linaria-logo@2x.png" width="496">
+  <img alt="Linaria" src="website/static/images/linaria-logo@2x.png" width="496">
 </p>
 
 <p align="center">
+Zero-runtime CSS in JS library.
+</p>
+
+---
 
 [![Build Status][build-badge]][build]
 [![Code Coverage][coverage-badge]][coverage]
@@ -16,8 +20,6 @@
 [![Code of Conduct][coc-badge]][coc]
 
 [![tweet][tweet-badge]][tweet]
-
-</p>
 
 ## Features
 
