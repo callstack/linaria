@@ -1,0 +1,8 @@
+{
+  "processors": ["../../../stylelint-preprocessor.js"],
+  "syntax": "scss",
+  "rules": {
+    "block-no-empty": true,
+    "property-no-unknown": true
+  }
+}
