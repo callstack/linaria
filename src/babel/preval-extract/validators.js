@@ -38,15 +38,17 @@ export function isLinariaTaggedTemplate(
   return false;
 }
 
-export function ensureTagIsAssignedToAVariable(
+export function isTagAssignedToAVariable(
   path: NodePath<BabelTaggedTemplateExpression<any>>
 ) {
-  const parent = path.parentPath;
-  if (!parent.isVariableDeclarator()) {
-    throw path.buildCodeFrameError(
-      "Linaria's template literals must be assigned to a variable"
-    );
-  }
+  return path.parentPath.isVariableDeclarator();
+}
+
+export function isInlineStyles(path: NodePath<any>) {
+  return !!path.findParent(
+    parentPath =>
+      parentPath.isJSXOpeningElement() || parentPath.isObjectProperty()
+  );
 }
 
 export function shouldTraverseExternalIds(path: NodePath<any>) {

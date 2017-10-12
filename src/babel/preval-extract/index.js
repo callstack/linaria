@@ -13,8 +13,9 @@ import type {
 import {
   shouldTraverseExternalIds,
   isLinariaTaggedTemplate,
-  ensureTagIsAssignedToAVariable,
+  isTagAssignedToAVariable,
   isExcluded,
+  isInlineStyles,
 } from './validators';
 import { getSelfBinding } from './utils';
 import prevalStyles from './prevalStyles';
@@ -90,7 +91,34 @@ export default (babel: BabelCore) => {
         state: State
       ) {
         if (!state.skipFile && isLinariaTaggedTemplate(types, path)) {
-          ensureTagIsAssignedToAVariable(path);
+          let title: string;
+          let isInlined: boolean = false;
+          let inlineProperty: string;
+          if (!isTagAssignedToAVariable(path) && !isInlineStyles(path)) {
+            throw path.buildCodeFrameError(
+              "Linaria's template literals must be assigned to a variable"
+            );
+          } else if (isInlineStyles(path)) {
+            isInlined = true;
+            const namedParentPath = path.findParent(
+              parentPath =>
+                // $FlowFixMe
+                parentPath.isJSXOpeningElement() ||
+                // $FlowFixMe
+                parentPath.isObjectProperty()
+            );
+            inlineProperty = namedParentPath.isObjectProperty()
+              ? 'value'
+              : 'expression';
+            title = path.scope.generateUidIdentifier(
+              // $FlowFixMe
+              namedParentPath
+                ? (namedParentPath.node.key || namedParentPath.node.name).name
+                : null
+            ).name;
+          } else {
+            title = path.parent.id.name;
+          }
 
           state.foundLinariaTaggedLiterals = true;
 
@@ -100,7 +128,38 @@ export default (babel: BabelCore) => {
             types,
           });
 
-          prevalStyles(babel, path, state, requirements);
+          const classNameStringLiteral = prevalStyles(
+            babel,
+            title,
+            path,
+            state,
+            requirements
+          );
+          debugger;
+
+          if (isInlined) {
+            path.parentPath.node[inlineProperty] = classNameStringLiteral;
+
+            classNameStringLiteral.leadingComments = [
+              {
+                type: 'CommentBlock',
+                value: 'linaria-output',
+              },
+            ];
+          } else {
+            path.parentPath.node.init = classNameStringLiteral;
+
+            const variableDeclarationPath = path.findParent(
+              babel.types.isVariableDeclaration
+            );
+
+            variableDeclarationPath.node.leadingComments = [
+              {
+                type: 'CommentBlock',
+                value: 'linaria-output',
+              },
+            ];
+          }
         }
       },
     },

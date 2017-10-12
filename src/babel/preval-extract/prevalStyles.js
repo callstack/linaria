@@ -32,13 +32,13 @@ import {
 
 export default function(
   babel: BabelCore,
+  title: string,
   path: NodePath<
     BabelTaggedTemplateExpression<BabelIdentifier | BabelCallExpression>
   >,
   state: State,
   requirements: RequirementSource[]
 ) {
-  const title = path.parent.id.name;
   const env = process.env.NODE_ENV || process.env.BABEL_ENV;
 
   const replacement = getReplacement([
@@ -62,16 +62,5 @@ export default function(
     resolve(state.filename)
   );
 
-  path.parentPath.node.init = babel.types.stringLiteral(className);
-
-  const variableDeclarationPath = path.findParent(
-    babel.types.isVariableDeclaration
-  );
-
-  variableDeclarationPath.node.leadingComments = [
-    {
-      type: 'CommentBlock',
-      value: 'linaria-output',
-    },
-  ];
+  return babel.types.stringLiteral(className);
 }
