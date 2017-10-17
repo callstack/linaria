@@ -39,7 +39,7 @@ You can configure the preset by passing and object with options:
 ## Testing components
 
 When testing a component you should disable the extraction, otherwise your test runner will create CSS files.
-To do that,  you need to set `extract` to `false` in Babel configuration for `test` environment:
+To do that, you need to set `extract` to `false` in Babel configuration for `test` environment:
 
 ```json
 {

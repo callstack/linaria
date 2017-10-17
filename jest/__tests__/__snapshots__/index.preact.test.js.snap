@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`preactSerializer 1`] = `
+.a0 {
+  font-size: 14px;
+  padding: 16px;
+  background: #ccc;
+  color: #123;
+  overflow: auto;
+}
+.a1 {
+  max-width: 900px;
+}
+.a1:hover {
+  background: #fff;
+}
+.a3 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+<div class="a1">
+	<pre class="a0 a3">
+		<code class="a3">test preact</code>
+	</pre>
+</div>
+`;
