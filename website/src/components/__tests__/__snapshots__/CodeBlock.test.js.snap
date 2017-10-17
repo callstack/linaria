@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`CodeBlock 1`] = `
-"<pre class=\\"code__qxo8f1\\">
-	<code></code>
-</pre>"
-`;
