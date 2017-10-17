@@ -192,6 +192,7 @@ export function App() {
 
 ## Recommended Libraries
 
+* [linaria-jest](https://github.com/thymikee/linaria-jest) – Jest testing utilities for Linaria.
 * [polished.js](https://polished.js.org/) - A lightweight toolset for writing styles in JavaScript.
 
 ## Inspiration
