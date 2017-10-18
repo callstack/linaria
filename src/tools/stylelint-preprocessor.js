@@ -1,35 +1,82 @@
 import * as babel from 'babel-core';
-import { addInterceptor } from '../babel/preval-extract';
+import { SourceMapConsumer } from 'source-map';
 
-export default function linariaStylelintPreprocessor(options) {
+import { getCachedModule } from '../babel/lib/moduleSystem';
+
+function toString(templates, expressions) {
+  return templates.reduce(
+    (acc, template, i) =>
+      `${acc}${template}${i >= expressions.length ? '' : expressions[i]}`,
+    ''
+  );
+}
+
+export default function linariaStylelintPreprocessor(/* options */) {
+  process.env.LINARIA_OVERWRITE_BABEL_PRESET = JSON.stringify({
+    extract: false,
+  });
+  process.env.LINARIA_COLLECT_RAW_STYLES = true;
+
+  const cache = {};
+
   return {
     code(input, filename) {
-      const extractedStyles = [];
-      process.on('linaria-extract', ({ styles }) => {
-        extractedStyles.push(styles);
-      });
-
-      addInterceptor('pre-eval', ({ requirements }) => {
-        requirements.forEach(requirement => {
-          // eslint-disable-next-line no-param-reassign
-          requirement.code = requirement.code.replace(
-            /import {.*} from ["|'](linaria)["|']/,
-            (substring, ...args) =>
-              substring.replace(args[0], 'linaria/build/index.stylelint.js')
-          );
-        });
-      });
-
-      const { code, ast } = babel.transform(input, {
+      const { code, map } = babel.transform(input, {
         filename,
         sourceMaps: true,
       });
 
-      return extractedStyles.reduce(
-        (acc, style, i) => `${acc}\n.test${i} {${style}}`,
-        ''
-      );
+      const rawStyles = getCachedModule(
+        require.resolve('../css.js')
+      ).exports.getRawStyles();
+
+      const css = rawStyles[
+        filename
+      ].reduce((acc, { template, expressions, classname }) => {
+        const styles = toString(
+          template,
+          expressions.map(expression => String(expression).replace('\n', ' '))
+        );
+        return `${acc}\n.${classname} {${styles}}`;
+      }, '');
+
+      cache[filename] = { css, code, map };
+
+      return css;
     },
-    result(stylelintResult, filepath) {},
+    result(stylelintResult, filename) {
+      const { code, css, map } = cache[filename];
+      const { warnings } = stylelintResult;
+
+      warnings.forEach(warning => {
+        const relevantCss = css.split('\n').slice(0, warning.line);
+
+        let classname;
+        let offset = 0;
+        for (let i = relevantCss.length - 1; i >= 0; i--) {
+          const match = relevantCss[i].match(/\.([a-zA-Z0-9]+__[a-z0-9]+) {/);
+          if (match) {
+            classname = match[1];
+            offset = relevantCss.length - i - 1;
+            break;
+          }
+        }
+
+        const startLineLocation =
+          code.split('\n').findIndex(line => line.includes(classname)) + 1;
+        // prettier-ignore
+        const startColumnLocation = code.split('\n')[startLineLocation - 1]
+          .indexOf(classname);
+
+        const consumer = new SourceMapConsumer(map);
+        const originalPos = consumer.originalPositionFor({
+          line: startLineLocation,
+          column: startColumnLocation,
+        });
+
+        // eslint-disable-next-line no-param-reassign
+        warning.line = originalPos.line + offset;
+      });
+    },
   };
 }

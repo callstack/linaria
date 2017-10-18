@@ -21,8 +21,6 @@ import prevalStyles from './prevalStyles';
 import resolveSource from './resolveSource';
 import extractStyles from './extractStyles';
 
-let interceptors = {};
-
 export const externalRequirementsVisitor = {
   Identifier(path: NodePath<BabelIdentifier>) {
     if (path.isReferenced() && getSelfBinding(path) && !isExcluded(path)) {
@@ -102,25 +100,9 @@ export default (babel: BabelCore) => {
             types,
           });
 
-          runInterceptor('pre-eval', { requirements });
-
           prevalStyles(babel, path, state, requirements);
         }
       },
     },
   };
 };
-
-export function addInterceptor(name: string, fn: Function) {
-  interceptors[name] = fn;
-}
-
-function runInterceptor(name: string, ...args: any[]) {
-  if (interceptors[name]) {
-    interceptors[name](...args);
-  }
-}
-
-// function clearInterceptors() {
-//   interceptors = {};
-// }
