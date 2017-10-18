@@ -51,7 +51,7 @@ describe('css module', () => {
     expect(getRawStyles()).toEqual({
       'test.js': [
         {
-          template: ['\n  color: blue;\n'],
+          template: ['\n      color: blue;\n    '],
           expressions: [],
           classname: header,
         },
