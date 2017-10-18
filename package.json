@@ -65,8 +65,7 @@
     "glob": "^7.1.2",
     "jest": "^21.1.0",
     "prettier": "^1.6.1",
-    "strip-ansi": "^4.0.0",
-    "stylelint": "^8.2.0"
+    "strip-ansi": "^4.0.0"
   },
   "jest": {
     "testRegex": "/__(integration-)?tests__/.*\\.(test|spec)\\.js$",
