@@ -1,8 +1,7 @@
 {
   "processors": ["linaria/stylelint-preprocessor"],
   "syntax": "scss",
-  "rules": {
-    "block-no-empty": true,
-    "property-no-unknown": true
-  }
+  "extends": [
+    "linaria/stylelint-config"
+  ]
 }

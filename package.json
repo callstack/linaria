@@ -32,7 +32,8 @@
     "/server.js"
   ],
   "peerDependencies": {
-    "stylelint": "8.x"
+    "stylelint": "8.x",
+    "stylelint-config-recommended": "1.x"
   },
   "dependencies": {
     "babel-code-frame": "^6.26.0",
