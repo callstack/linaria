@@ -182,6 +182,10 @@ export function App() {
 
 ## Editor Plugins
 
+### CSS Autocompletion
+
+* VSCode, Atom, SublimeText – [typescript-styled-plugin](https://github.com/Microsoft/typescript-styled-plugin/issues/10)
+
 ### VSCode
 
 * Syntax Highlighting - [Styled Components Plugin](https://marketplace.visualstudio.com/items?itemName=jpoissonnier.vscode-styled-components)
