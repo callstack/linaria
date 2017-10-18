@@ -49,11 +49,13 @@ describe('css module', () => {
     process.env.LINARIA_COLLECT_RAW_STYLES = undefined;
 
     expect(getRawStyles()).toEqual({
-      'test.js': {
-        template: ['\n  color: blue;\n'],
-        expressions: [],
-        classname: header,
-      },
+      'test.js': [
+        {
+          template: ['\n  color: blue;\n'],
+          expressions: [],
+          classname: header,
+        },
+      ],
     });
   });
 });
