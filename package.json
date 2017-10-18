@@ -24,7 +24,8 @@
     "build:transpile:watch": "babel src --out-dir build --watch --ignore '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
     "build:flow": "flow-copy-source src build -i '{**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**}'",
     "benchmark": "yarn run prepare && node ./benchmark/run.js",
-    "postinstall": "yarn link && yarn link linaria"
+    "postinstall": "yarn link && yarn link linaria",
+    "add-contributor": "all-contributors add"
   },
   "files": [
     "/build",
@@ -44,6 +45,7 @@
     "stylis": "^3.2.13"
   },
   "devDependencies": {
+    "all-contributors-cli": "^4.5.0",
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-preset-env": "1.6.0",
