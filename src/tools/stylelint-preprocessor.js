@@ -1,9 +1,15 @@
+/* @flow */
+
 import * as babel from 'babel-core';
 import { SourceMapConsumer } from 'source-map';
 
 import { getCachedModule } from '../babel/lib/moduleSystem';
 
-function toString(templates, expressions) {
+type LintResults = {
+  warnings: { line: number, column: number }[],
+};
+
+function toString(templates: string[], expressions: string[]) {
   return templates.reduce(
     (acc, template, i) =>
       `${acc}${template}${i >= expressions.length ? '' : expressions[i]}`,
@@ -15,12 +21,13 @@ export default function linariaStylelintPreprocessor(/* options */) {
   process.env.LINARIA_OVERWRITE_BABEL_PRESET = JSON.stringify({
     extract: false,
   });
+  // $FlowFixMe
   process.env.LINARIA_COLLECT_RAW_STYLES = true;
 
   const cache = {};
 
   return {
-    code(input, filename) {
+    code(input: string, filename: string) {
       const { code, map } = babel.transform(input, {
         filename,
         sourceMaps: true,
@@ -29,6 +36,10 @@ export default function linariaStylelintPreprocessor(/* options */) {
       const rawStyles = getCachedModule(
         require.resolve('../css.js')
       ).exports.getRawStyles();
+
+      if (!Object.keys(rawStyles).length || !rawStyles[filename]) {
+        return '';
+      }
 
       const css = rawStyles[
         filename
@@ -44,9 +55,13 @@ export default function linariaStylelintPreprocessor(/* options */) {
 
       return css;
     },
-    result(stylelintResult, filename) {
+    result(lintResults: LintResults, filename: string) {
+      if (!cache[filename]) {
+        return;
+      }
+
       const { code, css, map } = cache[filename];
-      const { warnings } = stylelintResult;
+      const { warnings } = lintResults;
 
       warnings.forEach(warning => {
         const relevantCss = css.split('\n').slice(0, warning.line);

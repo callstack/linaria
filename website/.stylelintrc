@@ -1,5 +1,5 @@
 {
-  "processors": ["../../../stylelint-preprocessor.js"],
+  "processors": ["linaria/stylelint-preprocessor"],
   "syntax": "scss",
   "rules": {
     "block-no-empty": true,
