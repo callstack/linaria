@@ -36,6 +36,6 @@ Error: test
   12 | };
   13 | 
 at <<CWD>>/src/babel/__integration-tests__/__fixtures__/commonjs/utils.js:10:10
-at <<CWD>>/test.js:5:46
+at <<CWD>>/test.js:5:47
 
 `;

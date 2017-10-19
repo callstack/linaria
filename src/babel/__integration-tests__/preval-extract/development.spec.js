@@ -33,10 +33,10 @@ describe('preval-extract babel plugin', () => {
       { filename: path.join(process.cwd(), 'test.js') }
     );
 
-    const classnameWithSlugFromContent = /header = '(header__[a-z0-9]+)'/g.exec(
+    const classnameWithSlugFromContent = /header = \/\*.+\*\/'(_header__[a-z0-9]+)'/g.exec(
       codeWithSlugFromContent
     );
-    const classnameWithSlugFromFilename = /header = '(header__[a-z0-9]+)'/g.exec(
+    const classnameWithSlugFromFilename = /header = \/\*.+\*\/'(_header__[a-z0-9]+)'/g.exec(
       codeWithSlugFromFilename
     );
 

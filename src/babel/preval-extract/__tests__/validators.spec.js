@@ -1,7 +1,6 @@
 import { types } from 'babel-core';
 import {
   isLinariaTaggedTemplate,
-  ensureTagIsAssignedToAVariable,
   shouldTraverseExternalIds,
   isExcluded,
 } from '../validators';
@@ -108,25 +107,6 @@ describe('preval-extract/validators', () => {
           },
         });
       }).toThrowError();
-    });
-  });
-
-  describe('ensureTagIsAssignedToAVariable', () => {
-    it('should throw error if tag is not assigned to a variable', () => {
-      expect(() => {
-        ensureTagIsAssignedToAVariable({
-          parentPath: { isVariableDeclarator: () => false },
-          buildCodeFrameError: msg => new Error(msg),
-        });
-      }).toThrowError();
-    });
-
-    it('should not throw anything if tag is assigned to a variable', () => {
-      expect(() => {
-        ensureTagIsAssignedToAVariable({
-          parentPath: { isVariableDeclarator: () => true },
-        });
-      }).not.toThrowError();
     });
   });
 

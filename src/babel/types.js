@@ -5,7 +5,9 @@ export type NodePath<K> = {
     loc: {
       start: { line: number, column: number },
     },
+    leadingComments?: Array<BabelCommentBlock>,
   },
+  replaceWith: (path: any) => void,
   parent: Object,
   parentPath: NodePath<*>,
   scope: {
@@ -18,10 +20,13 @@ export type NodePath<K> = {
   isImportDefaultSpecifier: () => boolean,
   isImportSpecifier: () => boolean,
   isVariableDeclaration: () => boolean,
+  isObjectProperty: () => boolean,
+  isJSXOpeningElement: () => boolean,
   getSource: () => string,
   buildCodeFrameError: (message: string) => Error,
   traverse: (visitor: { [key: string]: Function }, thisArgs?: any) => void,
   findParent: ((path: NodePath<*>) => boolean) => NodePath<*>,
+  addComment: (type: 'leading' | 'trailing', comment: string) => void,
 };
 
 export type Binding<K> = {
@@ -31,6 +36,11 @@ export type Binding<K> = {
 
 export type BabelCore = {
   types: BabelTypes,
+};
+
+export type BabelCommentBlock = {
+  type: string,
+  value: string,
 };
 
 export type BabelObjectExpression = {

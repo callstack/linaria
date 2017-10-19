@@ -20,7 +20,7 @@ function transpile(source, options = { pluginOptions: {}, babelOptions: {} }) {
     `,
     Object.assign(
       {
-        presets: ['env', 'stage-2'],
+        presets: ['env', 'stage-2', 'react'],
         plugins: [[PREVAL_PLUGIN_PATH, options.pluginOptions]],
         sourceMaps: false,
       },

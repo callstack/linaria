@@ -25,8 +25,11 @@ export default ({ types }: { types: BabelTypes }) => ({
       enter(path: NodePath<any>, state: State) {
         state.shouldSkip =
           // $FlowFixMe
-          path.container.comments.length &&
-          path.container.comments[0].value.includes('linaria-preval');
+          path.container.tokens.some(
+            token =>
+              token.type === 'CommentBlock' &&
+              token.value.trim() === 'linaria-preval'
+          );
       },
     },
     ImportDeclaration(path: NodePath<any>, state: State) {

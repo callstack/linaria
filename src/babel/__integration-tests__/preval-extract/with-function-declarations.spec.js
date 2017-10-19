@@ -15,18 +15,18 @@ describe('preval-extract babel plugin with function delcarations/expressions', (
 
   it('should preval with function declaration', () => {
     const { code, getCSSForClassName } = transpile(dedent`
-      function getConstants() {
-        return {
-          fontSize: "14px",
-        };
-      }
+    function getConstants() {
+      return {
+        fontSize: "14px",
+      };
+    }
 
-      const header = css\`
-        font-size: ${'${getConstants().fontSize}'};
-      \`;
-      `);
+    const header = css\`
+      font-size: ${'${getConstants().fontSize}'};
+    \`;
+    `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 14px');
@@ -35,18 +35,18 @@ describe('preval-extract babel plugin with function delcarations/expressions', (
 
   it('should preval with function expression', () => {
     const { code, getCSSForClassName } = transpile(dedent`
-      const getConstants = function getConstants() {
-        return {
-          fontSize: "14px",
-        };
-      }
+    const getConstants = function getConstants() {
+      return {
+        fontSize: "14px",
+      };
+    }
 
-      const header = css\`
-        font-size: ${'${getConstants().fontSize}'};
-      \`;
-      `);
+    const header = css\`
+      font-size: ${'${getConstants().fontSize}'};
+    \`;
+    `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 14px');
@@ -55,16 +55,16 @@ describe('preval-extract babel plugin with function delcarations/expressions', (
 
   it('should preval with arrow function', () => {
     const { code, getCSSForClassName } = transpile(dedent`
-      const getConstants = () => ({
-        fontSize: "14px",
-      });
+    const getConstants = () => ({
+      fontSize: "14px",
+    });
 
-      const header = css\`
-        font-size: ${'${getConstants().fontSize}'};
-      \`;
-      `);
+    const header = css\`
+      font-size: ${'${getConstants().fontSize}'};
+    \`;
+    `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 14px');
@@ -73,15 +73,15 @@ describe('preval-extract babel plugin with function delcarations/expressions', (
 
   it('should preval function with flat/shallow external ids', () => {
     const { code, getCSSForClassName } = transpile(dedent`
-      const defaults = { fontSize: "14px" };
-      const getConstants = () => Object.assign({}, defaults);
+    const defaults = { fontSize: "14px" };
+    const getConstants = () => Object.assign({}, defaults);
 
-      const header = css\`
-        font-size: ${'${getConstants().fontSize}'};
-      \`;
-      `);
+    const header = css\`
+      font-size: ${'${getConstants().fontSize}'};
+    \`;
+    `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 14px');
@@ -90,16 +90,16 @@ describe('preval-extract babel plugin with function delcarations/expressions', (
 
   it('should preval function with nested/deep external ids', () => {
     const { code, getCSSForClassName } = transpile(dedent`
-      const base = { color: "#ffffff", fontSize: "15px" };
-      const defaults = { fontSize: "14px", ...base };
-      const getConstants = () => ({ ...defaults });
+    const base = { color: "#ffffff", fontSize: "15px" };
+    const defaults = { fontSize: "14px", ...base };
+    const getConstants = () => ({ ...defaults });
 
-      const header = css\`
-        font-size: ${'${getConstants().fontSize}'};
-      \`;
-      `);
+    const header = css\`
+      font-size: ${'${getConstants().fontSize}'};
+    \`;
+    `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 15px');
@@ -108,21 +108,21 @@ describe('preval-extract babel plugin with function delcarations/expressions', (
 
   it('should preval function with multiple nested/deep external ids', () => {
     const { code, getCSSForClassName } = transpile(dedent`
-      function multiply(value, by) {
-        return value * by;
-      }
+    function multiply(value, by) {
+      return value * by;
+    }
 
-      const bg = { background: "none" };
-      const base = { color: "#ffffff", fontSize: multiply(14, 2) + "px", ...bg };
-      const defaults = { fontSize: "14px", ...base, ...bg };
-      const getConstants = () => ({ ...defaults });
+    const bg = { background: "none" };
+    const base = { color: "#ffffff", fontSize: multiply(14, 2) + "px", ...bg };
+    const defaults = { fontSize: "14px", ...base, ...bg };
+    const getConstants = () => ({ ...defaults });
 
-      const header = css\`
-        font-size: ${'${getConstants().fontSize}'};
-      \`;
-      `);
+    const header = css\`
+      font-size: ${'${getConstants().fontSize}'};
+    \`;
+    `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 28px');

@@ -15,15 +15,15 @@ describe('preval-extract babel plugin with function calls', () => {
 
   it('should preval with function call inside an expression', () => {
     const { code, getCSSForClassName } = transpile(dedent`
-      const constants = require("./src/babel/__integration-tests__/__fixtures__/commonjs/constants.js");
-      const utils = require("./src/babel/__integration-tests__/__fixtures__/commonjs/utils.js");
+    const constants = require("./src/babel/__integration-tests__/__fixtures__/commonjs/constants.js");
+    const utils = require("./src/babel/__integration-tests__/__fixtures__/commonjs/utils.js");
 
-      const header = css\`
-        font-size: ${'${utils.multiply(constants.unitless.fontSize)}'}px;
-      \`;
-      `);
+    const header = css\`
+      font-size: ${'${utils.multiply(constants.unitless.fontSize)}'}px;
+    \`;
+    `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 28px');
@@ -32,21 +32,21 @@ describe('preval-extract babel plugin with function calls', () => {
 
   it('should preval multiple function calls inside an expression', () => {
     const { code, getCSSForClassName } = transpile(dedent`
-      const constants = require("./src/babel/__integration-tests__/__fixtures__/commonjs/constants.js");
-      const utils = require("./src/babel/__integration-tests__/__fixtures__/commonjs/utils.js");
+    const constants = require("./src/babel/__integration-tests__/__fixtures__/commonjs/constants.js");
+    const utils = require("./src/babel/__integration-tests__/__fixtures__/commonjs/utils.js");
 
-      function compose(...fns) {
-        return value => fns.reduce((prev, fn) => {
-          return fn(prev);
-        }, value);
-      }
+    function compose(...fns) {
+      return value => fns.reduce((prev, fn) => {
+        return fn(prev);
+      }, value);
+    }
 
-      const header = css\`
-        font-size: ${'${compose(utils.multiply, utils.add5)(constants.unitless.fontSize)}'}px;
-      \`;
-      `);
+    const header = css\`
+      font-size: ${'${compose(utils.multiply, utils.add5)(constants.unitless.fontSize)}'}px;
+    \`;
+    `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 33px');
