@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`preval-extract babel plugin with commonjs imports should preval imported constants  1`] = `"font-size: 14px;"`;
+
+exports[`preval-extract babel plugin with commonjs imports should preval imported constants with destructurization 1`] = `"font-size: 14px;"`;

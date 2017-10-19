@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`preval-extract babel plugin with function delcarations/expressions should preval function with flat/shallow external ids 1`] = `"font-size: 14px;"`;
+
+exports[`preval-extract babel plugin with function delcarations/expressions should preval function with multiple nested/deep external ids 1`] = `"font-size: 28px;"`;
+
+exports[`preval-extract babel plugin with function delcarations/expressions should preval function with nested/deep external ids 1`] = `"font-size: 15px;"`;
+
+exports[`preval-extract babel plugin with function delcarations/expressions should preval with arrow function 1`] = `"font-size: 14px;"`;
+
+exports[`preval-extract babel plugin with function delcarations/expressions should preval with function declaration 1`] = `"font-size: 14px;"`;
+
+exports[`preval-extract babel plugin with function delcarations/expressions should preval with function expression 1`] = `"font-size: 14px;"`;

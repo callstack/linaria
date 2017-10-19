@@ -1,3 +1,9 @@
 {
-  "extends": "callstack-io"
+  "extends": "callstack-io",
+  "overrides": {
+    "files": "{*.spec.js,setupJest.js}",
+    "env": {
+      "jest": true
+    }
+  }
 }
