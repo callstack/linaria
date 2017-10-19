@@ -56,6 +56,25 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "wojteg1337",
+      "name": "Wojtek Szafraniec",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/18573330?v=4",
+      "profile": "https://github.com/wojteg1337",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Tushkiz",
+      "name": "Tushar Sonawane",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1854763?v=4",
+      "profile": "https://twitter.com/tushkiz",
+      "contributions": [
+        "doc",
+        "example"
+      ]
     }
   ]
 }
