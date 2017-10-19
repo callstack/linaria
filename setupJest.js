@@ -1,10 +1,8 @@
 /* @flow */
+import stripAnsi from 'strip-ansi'; // eslint-disable-line import/no-extraneous-dependencies
+import escapeStringRegexp from 'escape-string-regexp'; // eslint-disable-line import/no-extraneous-dependencies
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-import stripAnsi from 'strip-ansi';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import escapeStringRegexp from 'escape-string-regexp';
-
+/* istanbul ignore next */
 const serialize = val =>
   stripAnsi(
     val
@@ -19,5 +17,4 @@ const serialize = val =>
 expect.addSnapshotSerializer({
   test: val => val && val.toString && val.toString().includes(process.cwd()),
   serialize,
-  print: serialize,
 });
