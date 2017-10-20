@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`preval-extract babel plugin code frames should build valid code frame for errors while evaling styles 1`] = `
-Command failed: node <<REPLACED>>/src/babel/__integration-tests__/__utils__/transpile.js '"const test = () => {\\n  throw new Error(\\"Some weird error\\");\\n};\\n\\nfunction m() {\\n  test();\\n}\\n\\nconst header = css\`color: \${m()};\`;"' '{"pluginOptions":{"cache":false,"extract":false},"babelOptions":{"filename":"test.js"}}'
-<<REPLACED>>/node_modules/babel-core/lib/transformation/file/index.js:590
+Command failed: node <<CWD>>/src/babel/__integration-tests__/__utils__/transpile.js '"const test = () => {\\n  throw new Error(\\"Some weird error\\");\\n};\\n\\nfunction m() {\\n  test();\\n}\\n\\nconst header = css\`color: \${m()};\`;"' '{"pluginOptions":{"cache":false,"extract":false},"babelOptions":{"filename":"test.js"}}'
+<<CWD>>/node_modules/babel-core/lib/transformation/file/index.js:590
       throw err;
       ^
 
 Error: Some weird error
-  1 | import css from '<<REPLACED>>/build/css.js';
+  1 | import css from '<<CWD>>/build/css.js';
   2 | 
   3 | var test = () => {
 > 4 | throw new Error("Some weird error");
@@ -15,13 +15,13 @@ Error: Some weird error
   5 | }
   6 | 
   7 | function m() {
-at <<REPLACED>>/test.js:4:6
+at <<CWD>>/test.js:4:6
 
 `;
 
 exports[`preval-extract babel plugin code frames should build valid code frame for errors while evaling styles 2`] = `
-Command failed: node <<REPLACED>>/src/babel/__integration-tests__/__utils__/transpile.js '"const utils = require(\\"./src/babel/__integration-tests__/__fixtures__/commonjs/utils.js\\");\\n\\nconst header = css\`color: \${utils.throw()};\`;"' '{"pluginOptions":{"cache":false,"extract":false},"babelOptions":{"filename":"test.js"}}'
-<<REPLACED>>/node_modules/babel-core/lib/transformation/file/index.js:590
+Command failed: node <<CWD>>/src/babel/__integration-tests__/__utils__/transpile.js '"const utils = require(\\"./src/babel/__integration-tests__/__fixtures__/commonjs/utils.js\\");\\n\\nconst header = css\`color: \${utils.throw()};\`;"' '{"pluginOptions":{"cache":false,"extract":false},"babelOptions":{"filename":"test.js"}}'
+<<CWD>>/node_modules/babel-core/lib/transformation/file/index.js:590
       throw err;
       ^
 
@@ -35,7 +35,7 @@ Error: test
   11 |   },
   12 | };
   13 | 
-at <<REPLACED>>/src/babel/__integration-tests__/__fixtures__/commonjs/utils.js:10:10
-at <<REPLACED>>/test.js:5:46
+at <<CWD>>/src/babel/__integration-tests__/__fixtures__/commonjs/utils.js:10:10
+at <<CWD>>/test.js:5:46
 
 `;

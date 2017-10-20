@@ -7,10 +7,7 @@ const serialize = val =>
   stripAnsi(
     val
       .toString()
-      .replace(
-        new RegExp(escapeStringRegexp(process.cwd()), 'gm'),
-        '<<REPLACED>>'
-      )
+      .replace(new RegExp(escapeStringRegexp(process.cwd()), 'gm'), '<<CWD>>')
   );
 
 // $FlowFixMe

@@ -13,7 +13,7 @@ exports[`preval-extract babel plugin should create classnames for multiple "css"
 exports[`preval-extract babel plugin should not process tagged template if tag is not "css" 1`] = `
 'use strict';
 
-var _css = require('<<REPLACED>>/build/css.js');
+var _css = require('<<CWD>>/build/css.js');
 
 var _css2 = _interopRequireDefault(_css);
 
@@ -23,7 +23,7 @@ var header = '\\nfont-size: 3em;\\n';
 `;
 
 exports[`preval-extract babel plugin should preval const and let without transpilation to var 1`] = `
-import css from '<<REPLACED>>/build/css.js';
+import css from '<<CWD>>/build/css.js';
 
 const size = 3;
 let color = "#ffffff";
