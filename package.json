@@ -68,6 +68,7 @@
   },
   "jest": {
     "testRegex": "/__(integration-)?tests__/.*\\.(test|spec)\\.js$",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupTestFrameworkScriptFile": "<rootDir>/setupJest.js"
   }
 }
