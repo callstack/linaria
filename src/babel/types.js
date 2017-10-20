@@ -64,6 +64,13 @@ export type BabelIdentifier = {
   type: string,
 };
 
+export type BabelConditionalExpression = {
+  type: string,
+  test: any,
+  consequent: any,
+  alternate: any,
+};
+
 export type BabelJSXExpressionContainer = {
   type: string,
   expression: any,
@@ -126,6 +133,7 @@ export type BabelTypes = {
     BabelTaggedTemplateExpression<any>
   >,
   isCallExpression: BabelIsTypeFunction<BabelCallExpression>,
+  isConditionalExpression: BabelIsTypeFunction<BabelConditionalExpression>,
   isIdentifier: BabelIsTypeFunction<BabelIdentifier>,
   isJSXExpressionContainer: BabelIsTypeFunction<BabelJSXExpressionContainer>,
   isJSXIdentifier: BabelIsTypeFunction<BabelJSXIdentifier>,
@@ -133,6 +141,7 @@ export type BabelTypes = {
   isMemberExpression: BabelIsTypeFunction<BabelMemberExpression>,
   isObjectExpression: BabelIsTypeFunction<BabelObjectExpression>,
   isObjectPattern: BabelIsTypeFunction<BabelObjectPattern>,
+  isStringLiteral: BabelIsTypeFunction<BabelStringLiteral>,
   isVariableDeclaration: BabelIsTypeFunction<BabelVariableDeclaration>,
 };
 
