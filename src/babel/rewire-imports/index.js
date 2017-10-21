@@ -1,10 +1,14 @@
 /* @flow */
 
-import type { BabelTypes, NodePath, BabelVariableDeclarator } from '../types';
+import type { BabelTypes, NodePath } from '../types';
 
 type State = {
   shouldSkip: boolean,
 };
+
+function getReplacement(value) {
+  return `${value}/build/index.runtime.js`.replace(/\/\//g, '/');
+}
 
 function isLinariaImport(value) {
   try {
@@ -27,24 +31,38 @@ export default ({ types }: { types: BabelTypes }) => ({
     },
     ImportDeclaration(path: NodePath<any>, state: State) {
       if (!state.shouldSkip && isLinariaImport(path.node.source.value)) {
-        path.node.source.value = `${path.node.source
-          .value}/build/index.runtime.js`.replace(/\/\//g, '/');
+        path.node.source.value = getReplacement(path.node.source.value);
       }
     },
-    VariableDeclarator(
-      path: NodePath<BabelVariableDeclarator<any>>,
-      state: State
-    ) {
+    CallExpression(path: NodePath<any>, state: State) {
       if (
         !state.shouldSkip &&
-        types.isCallExpression(path.node.init) &&
-        path.node.init.callee.name === 'require' &&
-        isLinariaImport(path.node.init.arguments[0].value)
+        path.node.callee.name === 'require' &&
+        path.node.arguments.length === 1
       ) {
-        // @TODO: it's very tricky to implement this for require
-        throw path.buildCodeFrameError(
-          "Linaria's rewire-imports plugin does not support require calls yet"
-        );
+        const argument = path.node.arguments[0];
+
+        if (types.isStringLiteral(argument)) {
+          if (isLinariaImport(argument.value)) {
+            argument.value = getReplacement(argument.value);
+          }
+        } else if (types.isConditionalExpression(argument)) {
+          if (
+            types.isStringLiteral(argument.consequent) &&
+            isLinariaImport(argument.consequent.value)
+          ) {
+            argument.consequent.value = getReplacement(
+              argument.consequent.value
+            );
+          }
+
+          if (
+            types.isStringLiteral(argument.alternate) &&
+            isLinariaImport(argument.alternate.value)
+          ) {
+            argument.alternate.value = getReplacement(argument.alternate.value);
+          }
+        }
       }
     },
   },
