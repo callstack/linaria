@@ -29,7 +29,9 @@ Zero-runtime CSS in JS library.
 * Critical CSS can be extracted for inlining during SSR.
 * Integrates with existing tools like Webpack to provide features such as Hot Reload.
 
-### [Try Linaria online](https://css-in-js-playground.com/?library=Linaria)
+**[Why use Linaria](/docs/BENEFITS.md)**
+
+**[Try Linaria online](https://css-in-js-playground.com/?library=Linaria)**
 
 ## Installation
 
