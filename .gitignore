@@ -49,3 +49,4 @@ android/keystores/debug.keystore
 # jest
 coverage/
 example/dist/
+__diff_output__

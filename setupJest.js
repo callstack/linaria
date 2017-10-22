@@ -1,6 +1,9 @@
 /* @flow */
-import stripAnsi from 'strip-ansi'; // eslint-disable-line import/no-extraneous-dependencies
-import escapeStringRegexp from 'escape-string-regexp'; // eslint-disable-line import/no-extraneous-dependencies
+/* eslint-disable import/no-extraneous-dependencies */
+
+import { toMatchImageSnapshot } from 'jest-image-snapshot';
+import stripAnsi from 'strip-ansi';
+import escapeStringRegexp from 'escape-string-regexp';
 
 /* istanbul ignore next */
 const serialize = val =>
@@ -15,3 +18,5 @@ expect.addSnapshotSerializer({
   test: val => val && val.toString && val.toString().includes(process.cwd()),
   serialize,
 });
+
+expect.extend({ toMatchImageSnapshot });

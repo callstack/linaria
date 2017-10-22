@@ -33,6 +33,7 @@ jobs:
       - run: |
           yarn install
           cd website && yarn install && yarn build && cd ..
+          bash .circleci/install-chrome-deps.sh
       - save-cache: *save-cache
       - save-cache: *save-website-cache
       - run: yarn run lint
@@ -42,5 +43,7 @@ jobs:
       - run: cat ./coverage/lcov.info | ./node_modules/.bin/codecov
       - store_artifacts:
           path: coverage
-
-  # test-e2e:
+          destination: coverage
+      - store_artifacts:
+          path: website/__integration-tests__/__image_snapshots__/__diff_output__
+          destination: website-diffs
