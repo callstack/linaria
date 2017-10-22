@@ -25,7 +25,7 @@ const block = css`
   padding: 20px;
   background: ${theme.backdrop};
   color: ${theme.primary};
-  font-family: monospace;
+  font-family: 'Fira Mono', monospace;
 `;
 
 const codeLine = css`
