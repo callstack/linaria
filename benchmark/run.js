@@ -17,10 +17,9 @@ fs.mkdirSync(outDir);
 
 function transpile(filename, opts = {}) {
   babel.transformFileSync(path.join(__dirname, filename), {
-    presets: ['es2015', 'stage-3'],
+    presets: ['env', 'stage-2'],
     plugins: [
       [require.resolve('../build/babel/index.js'), opts],
-      require.resolve('babel-plugin-preval'),
     ],
     babelrc: false,
   });

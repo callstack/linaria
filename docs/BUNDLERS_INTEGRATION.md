@@ -29,7 +29,7 @@ For this case you can use `linaria/babel` preset without any options:
 ```diff
 {
   "presets": [
-    "es2015",
+    "env",
 +   "linaria/babel"
   ]
 }
@@ -76,7 +76,7 @@ For production environment, you need to use `single: true` options in conjunctio
 ```diff
 {
   "presets": [
-    "es2015",
+    "env",
     "linaria/babel"
 - ]
 + ],

@@ -92,6 +92,9 @@ export class Module {
 
     // Transpile module implementation.
     const { code: moduleBody, map } = babel.transform(code, {
+      plugins: [
+        require.resolve('babel-plugin-transform-es2015-modules-commonjs'),
+      ],
       filename,
       sourceMaps: true,
       ignore: /node_modules/,

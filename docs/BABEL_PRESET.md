@@ -7,7 +7,7 @@ In order to have styles in `css` tagged template literals evaluated and extracte
 ```diff
 {
   "presets": [
-    "es2015",
+    "env",
     "react",
 +   "linaria/babel"
   ]
@@ -99,7 +99,7 @@ Linaria can be used together with many great tools, frameworks and boilerplates,
 }
 ```
 
-This will extract your CSS to `src/.linaria-cache` directory (add it to your `.gitignore`). We need to override CRA's `babel-preset-env` `"modules": false` with `"modules": "commonjs"` (default), because Linaria needs transpiled the modules. You can still leverage Webpack's dynamic imports by using `"modules": false` in `babel-loader` config.
+This will extract your CSS to `src/.linaria-cache` directory (add it to your `.gitignore`).
 
 ### Next.js
 
@@ -120,7 +120,7 @@ This will extract your CSS to `src/.linaria-cache` directory (add it to your `.g
 }
 ```
 
-Since `next` server renders our app, we need to tweak our configuration. We want to extract styles to a single file, which we can then be declared in e.g. custom `<Head>` component. We need to override Next.js's `babel-preset-env` `"modules": false` with `"modules": "commonjs"` (default), because Linaria needs transpiled the modules. You can still leverage Webpack's dynamic imports by using `"modules": false` in `babel-loader` config.
+Since `next` server renders our app, we need to tweak our configuration. We want to extract styles to a single file, which we can then be declared in e.g. custom `<Head>` component.
 
 ```js
 import Head from 'next/head';
