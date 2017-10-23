@@ -12,7 +12,7 @@ const getTheme = name => theme[name];
 const getLocalConstants = () => ({ ...base, ...getTheme('vibrant') });
 
 const button = css`
-  font-size: ${getLocalConstants.fontSize};
+  font-size: ${getLocalConstants().fontSize};
   color: ${getLocalConstants().fontColor};
   text-decoration: none;
   border-radius: ${multiply(3, 2)}px;
