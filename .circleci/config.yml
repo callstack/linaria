@@ -55,7 +55,11 @@ jobs:
         - attach_workspace:
             at: ~/linaria
         - run: |
+            bash .circleci/install-chrome-deps.sh
             yarn run test:integration:ci
+        - store_artifacts:
+            path: website/__integration-tests__/__image_snapshots__/__diff_output__
+            destination: website-snapshot-diffs
   build-website:
       <<: *defaults
       steps:

@@ -63,7 +63,9 @@
     "flow-copy-source": "^1.2.1",
     "glob": "^7.1.2",
     "jest": "^21.1.0",
+    "jest-image-snapshot": "^1.0.1",
     "prettier": "^1.6.1",
+    "puppeteer": "^0.12.0",
     "strip-ansi": "^4.0.0"
   },
   "jest": {

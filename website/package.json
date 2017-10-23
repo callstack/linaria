@@ -5,14 +5,14 @@
   "description": "Linaria website",
   "scripts": {
     "build:all": "yarn build:server && yarn build",
-    "build:server": "NODE_ENV=production BABEL_ENV=server babel src --out-dir static/server --ignore '{src/index.js,*.css}'",
-    "build": "NODE_ENV=production webpack -p --env.NODE_ENV production",
+    "build:server": "cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir static/server --ignore '{src/index.js,*.css}'",
+    "build": "cross-env NODE_ENV=production webpack -p --env.NODE_ENV production",
     "clean": "del static/build",
     "postinstall": "cd .. && yarn link && cd website && yarn link linaria",
     "prebuild": "yarn run clean",
     "server": "node static/server/server.js",
     "start-server-render": "yarn build:all && yarn server",
-    "start": "webpack-dev-server"
+    "start": "cross-env NODE_ENV=development webpack-dev-server"
   },
   "dependencies": {
     "compression": "^1.7.1",
@@ -33,6 +33,7 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
+    "cross-env": "^5.1.0",
     "css-loader": "^0.28.5",
     "del-cli": "^1.0.0",
     "eslint-plugin-react": "^7.3.0",
