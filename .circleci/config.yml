@@ -1,46 +1,82 @@
-aliases:
-  - &restore-cache
-    keys:
-      - dependencies-{{ checksum "package.json" }}
-      # Fallback in case checksum fails
-      - dependencies-
-
-  - &restore-website-cache
-    keys:
-      - dependencies-website-{{ checksum "website/package.json" }}
-      - dependencies-website-
-
-  - &save-cache
-    paths:
-      - node_modules
-    key: dependencies-{{ checksum "package.json" }}
-
-  - &save-website-cache
-    paths:
-      - website/node_modules
-    key: dependencies-website-{{ checksum "website/package.json" }}
-
 version: 2
+defaults: &defaults
+  docker:
+    - image: circleci/node:6.10.3
+  working_directory: ~/linaria
 jobs:
-  build:
-    working_directory: '~/linaria'
-    docker:
-      - image: circleci/node:6.10.3
+  install-dependencies:
+    <<: *defaults
     steps:
       - checkout
-      - restore-cache: *restore-cache
-      - restore-cache: *restore-website-cache
+      - attach_workspace:
+          at: ~/linaria
+      - restore_cache:
+          keys:
+            - dependencies-{{ checksum "package.json" }}
+            - dependencies-
+      - restore_cache:
+          keys:
+            - dependencies-website-{{ checksum "website/package.json" }}
+            - dependencies-website-
       - run: |
           yarn install
-          cd website && yarn install && yarn build && cd ..
-      - save-cache: *save-cache
-      - save-cache: *save-website-cache
-      - run: yarn run lint
-      - run: yarn run flow
-      - run: yarn test -- --coverage
-      - run: yarn run test:integration:ci
-      - run: cat ./coverage/lcov.info | ./node_modules/.bin/codecov
-      - store_artifacts:
-          path: coverage
-
-  # test-e2e:
+          cd website && yarn install && cd ..
+      - save_cache:
+          key: dependencies-{{ checksum "package.json" }}
+          paths: node_modules
+      - save_cache:
+          key: dependencies-website-{{ checksum "website/package.json" }}
+          paths: website/node_modules
+      - persist_to_workspace:
+          root: .
+          paths: .
+  lint-and-flow:
+      <<: *defaults
+      steps:
+        - attach_workspace:
+            at: ~/linaria
+        - run: |
+            yarn run lint
+            yarn run flow
+  unit-tests:
+      <<: *defaults
+      steps:
+        - attach_workspace:
+            at: ~/linaria
+        - run: |
+            yarn test -- --coverage
+            cat ./coverage/lcov.info | ./node_modules/.bin/codecov
+        - store_artifacts:
+            path: coverage
+            destination: coverage
+  integration-tests:
+      <<: *defaults
+      steps:
+        - attach_workspace:
+            at: ~/linaria
+        - run: |
+            yarn run test:integration:ci
+  build-website:
+      <<: *defaults
+      steps:
+        - attach_workspace:
+            at: ~/linaria
+        - run: |
+            cd website && yarn run build:all && cd ..
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - install-dependencies
+      - lint-and-flow:
+          requires:
+            - install-dependencies
+      - unit-tests:
+          requires:
+            - install-dependencies
+      - integration-tests:
+          requires:
+            - install-dependencies
+      - build-website:
+          requires:
+            - install-dependencies
