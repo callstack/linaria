@@ -21,7 +21,7 @@ describe('preval-extract babel plugin errors', () => {
         font-size: 3em;
       \`;
       `);
-    }).toThrow();
+    }).toThrowErrorMatchingSnapshot();
   });
 
   it('should throw error if "css.named" is not called with classname', () => {
@@ -31,7 +31,7 @@ describe('preval-extract babel plugin errors', () => {
         font-size: 3em;
       \`;
       `);
-    }).toThrow();
+    }).toThrowErrorMatchingSnapshot();
   });
 
   it('should throw error if the id was not found', () => {

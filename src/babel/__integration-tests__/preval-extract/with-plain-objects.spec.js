@@ -24,7 +24,7 @@ describe('preval-extract babel plugin with plain objects', () => {
     \`;
     `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 3em');
@@ -48,7 +48,7 @@ describe('preval-extract babel plugin with plain objects', () => {
     \`;
     `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 3em');
@@ -70,7 +70,7 @@ describe('preval-extract babel plugin with plain objects', () => {
     \`;
     `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 3em');
@@ -92,7 +92,7 @@ describe('preval-extract babel plugin with plain objects', () => {
     \`;
     `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 3em');
@@ -114,7 +114,7 @@ describe('preval-extract babel plugin with plain objects', () => {
     \`;
     `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 3em');
@@ -134,7 +134,7 @@ describe('preval-extract babel plugin with plain objects', () => {
     \`;
     `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 3em');

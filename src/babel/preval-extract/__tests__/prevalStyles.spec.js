@@ -26,7 +26,6 @@ function runAssertions(expectedReplacement) {
     },
     parentPath: {
       node: {
-        leadingComments: [],
         init: null,
       },
     },
@@ -36,14 +35,15 @@ function runAssertions(expectedReplacement) {
     findParent() {
       return this.parentPath;
     },
+    scope: {
+      generateUidIdentifier: name => ({
+        name,
+      }),
+    },
   };
 
-  prevalStyles(babel, path, { filename: 'test.js' }, []);
+  prevalStyles(babel, 'header', path, { filename: 'test.js' }, []);
 
-  expect(path.parentPath.node.leadingComments).toEqual([
-    { type: 'CommentBlock', value: 'linaria-output' },
-  ]);
-  expect(path.parentPath.node.init.value).toEqual('header__abc123');
   expect(getReplacement).toHaveBeenCalled();
   expect(getReplacement.mock.calls[0][0][0].code).toMatch(expectedReplacement);
   expect(clearLocalModulesFromCache).toHaveBeenCalled();

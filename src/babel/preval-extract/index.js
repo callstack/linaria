@@ -13,7 +13,6 @@ import type {
 import {
   shouldTraverseExternalIds,
   isLinariaTaggedTemplate,
-  ensureTagIsAssignedToAVariable,
   isExcluded,
 } from './validators';
 import { getSelfBinding } from './utils';
@@ -67,11 +66,11 @@ export default (babel: BabelCore) => {
         enter(path: NodePath<*>, state: State) {
           state.skipFile =
             // $FlowFixMe
-            path.container.tokens.findIndex(
+            path.container.tokens.some(
               token =>
                 token.type === 'CommentBlock' &&
-                token.value.includes('linaria-preval')
-            ) > -1;
+                token.value.trim() === 'linaria-preval'
+            );
           state.foundLinariaTaggedLiterals = false;
           state.filename = state.file.opts.filename;
         },
@@ -90,17 +89,50 @@ export default (babel: BabelCore) => {
         state: State
       ) {
         if (!state.skipFile && isLinariaTaggedTemplate(types, path)) {
-          ensureTagIsAssignedToAVariable(path);
+          let title;
+
+          if (path.parentPath.isVariableDeclarator()) {
+            title = path.parent.id.name;
+          } else {
+            const parent = path.findParent(
+              p => p.isObjectProperty() || p.isJSXOpeningElement()
+            );
+
+            if (parent) {
+              if (parent.isJSXOpeningElement()) {
+                title = parent.node.name.name;
+              } else {
+                title = parent.node.key.name;
+              }
+            } else {
+              throw path.buildCodeFrameError(
+                "Couldn't determine the class name for CSS template literal. Ensure that it's either:\n" +
+                  '- Assigned to a variable\n' +
+                  '- Is an object property\n' +
+                  '- Is a prop in a JSX element'
+              );
+            }
+          }
 
           state.foundLinariaTaggedLiterals = true;
 
           const requirements: RequirementSource[] = [];
+
           path.traverse(cssTaggedTemplateRequirementsVisitor, {
             requirements,
             types,
           });
 
-          prevalStyles(babel, path, state, requirements);
+          const className = prevalStyles(
+            babel,
+            title,
+            path,
+            state,
+            requirements
+          );
+
+          path.replaceWith(className);
+          path.addComment('leading', 'linaria-output');
         }
       },
     },

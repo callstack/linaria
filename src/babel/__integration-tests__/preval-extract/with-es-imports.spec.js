@@ -22,7 +22,7 @@ describe('preval-extract babel plugin with ES imports', () => {
       \`;
       `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 14px');
@@ -42,8 +42,8 @@ describe('preval-extract babel plugin with ES imports', () => {
       \`;
       `);
 
-    const headerMatch = /header = "(header__[a-z0-9]+)"/g.exec(code);
-    const bodyMatch = /body = "(body__[a-z0-9]+)"/g.exec(code);
+    const headerMatch = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
+    const bodyMatch = /body = \/\*.+\*\/"(_body__[a-z0-9]+)"/g.exec(code);
     expect(headerMatch).not.toBeNull();
     expect(bodyMatch).not.toBeNull();
     const headerStyles = getCSSForClassName(headerMatch[1]);
@@ -63,7 +63,7 @@ describe('preval-extract babel plugin with ES imports', () => {
       \`;
       `);
 
-    const match = /header = "(header__[a-z0-9]+)"/g.exec(code);
+    const match = /header = \/\*.+\*\/"(_header__[a-z0-9]+)"/g.exec(code);
     expect(match).not.toBeNull();
     const css = getCSSForClassName(match[1]);
     expect(css).toMatch('font-size: 28px');

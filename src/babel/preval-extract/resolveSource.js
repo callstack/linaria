@@ -21,14 +21,12 @@ function getSourceForVariableDeclarationFromAst(
 }
 
 function isLinariaOutput(path: NodePath<BabelVariableDeclarator<any>>) {
-  const parent = path.parentPath;
-
   return (
-    parent.isVariableDeclaration() &&
-    parent.node.leadingComments &&
-    parent.node.leadingComments.findIndex(
-      comment => comment.value === 'linaria-output'
-    ) > -1
+    path.isVariableDeclarator() &&
+    path.node.init.leadingComments &&
+    path.node.init.leadingComments.some(
+      comment => comment.value.trim() === 'linaria-output'
+    )
   );
 }
 
@@ -47,6 +45,7 @@ export default function resolveSource(
   }
 
   let code: ?string;
+
   switch (binding.kind) {
     case 'module':
       code = binding.path.parentPath.getSource();

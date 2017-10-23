@@ -61,7 +61,7 @@ describe('preval-extract/resolveSource', () => {
           kind,
           path: {
             getSource: () => 'source',
-            parentPath: { isVariableDeclaration: () => false },
+            isVariableDeclarator: () => false,
             node: {
               loc: { start: { line: 0, column: 0 } },
             },
@@ -79,12 +79,7 @@ describe('preval-extract/resolveSource', () => {
         kind: 'const',
         path: {
           getSource: () => 'source',
-          parentPath: {
-            isVariableDeclaration: () => true,
-            node: {
-              leadingComments: [{ value: 'linaria-output' }],
-            },
-          },
+          isVariableDeclarator: () => true,
           node: {
             type: 'VariableDeclarator',
             id: {
@@ -94,13 +89,14 @@ describe('preval-extract/resolveSource', () => {
             init: {
               type: 'StringLiteral',
               value: 'value',
+              leadingComments: [{ value: 'linaria-output' }],
             },
             loc: { start: { line: 0, column: 0 } },
           },
         },
       },
       {
-        code: 'const test = "value";',
+        code: 'const test = /*linaria-output*/"value";',
         loc: { line: 0, column: 0 },
       }
     );
@@ -110,9 +106,7 @@ describe('preval-extract/resolveSource', () => {
         kind: 'const',
         path: {
           getSource: () => '',
-          parentPath: {
-            isVariableDeclaration: () => false,
-          },
+          isVariableDeclarator: () => false,
           node: {
             loc: { start: { line: 0, column: 0 } },
           },

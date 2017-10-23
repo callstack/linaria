@@ -38,17 +38,6 @@ export function isLinariaTaggedTemplate(
   return false;
 }
 
-export function ensureTagIsAssignedToAVariable(
-  path: NodePath<BabelTaggedTemplateExpression<any>>
-) {
-  const parent = path.parentPath;
-  if (!parent.isVariableDeclarator()) {
-    throw path.buildCodeFrameError(
-      "Linaria's template literals must be assigned to a variable"
-    );
-  }
-}
-
 export function shouldTraverseExternalIds(path: NodePath<any>) {
   if (path.isImportDefaultSpecifier() || path.isImportSpecifier()) {
     return false;

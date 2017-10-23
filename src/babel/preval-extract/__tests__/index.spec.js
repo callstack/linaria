@@ -157,7 +157,6 @@ describe('preval-extract/index', () => {
 
       visitor.TaggedTemplateExpression(
         {
-          type: 'TaggedTemplateExpression',
           node: {
             type: 'TaggedTemplateExpression',
             tag: {
@@ -177,7 +176,6 @@ describe('preval-extract/index', () => {
       expect(() => {
         visitor.TaggedTemplateExpression(
           {
-            type: 'TaggedTemplateExpression',
             node: {
               type: 'TaggedTemplateExpression',
               tag: {
@@ -188,13 +186,15 @@ describe('preval-extract/index', () => {
             parentPath: {
               isVariableDeclarator: () => false,
             },
+            findParent: () => null,
+            buildCodeFrameError: text => new Error(text),
           },
           {
             skipFile: false,
             foundLinariaTaggedLiterals: false,
           }
         );
-      }).toThrowError();
+      }).toThrowErrorMatchingSnapshot();
     });
 
     it('should collect requirements and call prevalStyles', () => {
@@ -202,7 +202,6 @@ describe('preval-extract/index', () => {
 
       visitor.TaggedTemplateExpression(
         {
-          type: 'TaggedTemplateExpression',
           node: {
             type: 'TaggedTemplateExpression',
             tag: {
@@ -213,7 +212,15 @@ describe('preval-extract/index', () => {
           parentPath: {
             isVariableDeclarator: () => true,
           },
+          parent: {
+            id: {
+              name: 'test',
+            },
+          },
           traverse: () => {},
+          findParent: () => null,
+          replaceWith: () => {},
+          addComment: () => {},
         },
         {
           skipFile: false,
@@ -222,6 +229,83 @@ describe('preval-extract/index', () => {
       );
 
       expect(prevalStyles).toHaveBeenCalled();
+      expect(prevalStyles.mock.calls[0][1]).toBe('test');
+
+      const propertyParent = {
+        node: {
+          type: 'ObjectProperty',
+          key: {
+            type: 'Identifier',
+            name: 'foo',
+          },
+        },
+        isObjectProperty: () => true,
+        isJSXOpeningElement: () => false,
+      };
+
+      visitor.TaggedTemplateExpression(
+        {
+          node: {
+            type: 'TaggedTemplateExpression',
+            tag: {
+              type: 'Identifier',
+              name: 'css',
+            },
+          },
+          parentPath: {
+            isVariableDeclarator: () => false,
+          },
+          traverse: () => {},
+          findParent: check => (check(propertyParent) ? propertyParent : null),
+          replaceWith: () => {},
+          addComment: () => {},
+        },
+        {
+          skipFile: false,
+          foundLinariaTaggedLiterals: false,
+        }
+      );
+
+      expect(prevalStyles).toHaveBeenCalled();
+      expect(prevalStyles.mock.calls[1][1]).toBe('foo');
+
+      const jsxParent = {
+        node: {
+          type: 'JSXOpeningElement',
+          name: {
+            type: 'JSXIdentifier',
+            name: 'article',
+          },
+        },
+        isObjectProperty: () => false,
+        isJSXOpeningElement: () => true,
+      };
+
+      visitor.TaggedTemplateExpression(
+        {
+          node: {
+            type: 'TaggedTemplateExpression',
+            tag: {
+              type: 'Identifier',
+              name: 'css',
+            },
+          },
+          parentPath: {
+            isVariableDeclarator: () => false,
+          },
+          traverse: () => {},
+          findParent: check => (check(jsxParent) ? jsxParent : null),
+          replaceWith: () => {},
+          addComment: () => {},
+        },
+        {
+          skipFile: false,
+          foundLinariaTaggedLiterals: false,
+        }
+      );
+
+      expect(prevalStyles).toHaveBeenCalled();
+      expect(prevalStyles.mock.calls[2][1]).toBe('article');
     });
   });
 
