@@ -212,7 +212,6 @@ export function App() {
 This project wouldn't have been possible without the following libraries or the people behind them.
 
 * [babel](https://babeljs.io/)
-* [babel-plugin-preval](https://github.com/kentcdodds/babel-plugin-preval)
 * [stylis.js](https://github.com/thysultan/stylis.js)
 
 Special thanks to [@kentcdodds](https://github.com/kentcdodds) for his babel plugin and [@threepointone](https://github.com/threepointone) for his suggestions and encouragement.
