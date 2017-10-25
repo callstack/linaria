@@ -91,27 +91,30 @@ export default (babel: BabelCore) => {
         if (!state.skipFile && isLinariaTaggedTemplate(types, path)) {
           let title;
 
-          if (path.parentPath.isVariableDeclarator()) {
-            title = path.parent.id.name;
-          } else {
-            const parent = path.findParent(
-              p => p.isObjectProperty() || p.isJSXOpeningElement()
-            );
+          const parent = path.findParent(
+            p =>
+              types.isObjectProperty(p) ||
+              types.isJSXOpeningElement(p) ||
+              types.isVariableDeclarator(p)
+          );
 
-            if (parent) {
-              if (parent.isJSXOpeningElement()) {
-                title = parent.node.name.name;
-              } else {
-                title = parent.node.key.name;
-              }
-            } else {
-              throw path.buildCodeFrameError(
-                "Couldn't determine the class name for CSS template literal. Ensure that it's either:\n" +
-                  '- Assigned to a variable\n' +
-                  '- Is an object property\n' +
-                  '- Is a prop in a JSX element'
-              );
+          if (parent) {
+            if (types.isObjectProperty(parent)) {
+              title = parent.node.key.name;
+            } else if (types.isJSXOpeningElement(parent)) {
+              title = parent.node.name.name;
+            } else if (types.isVariableDeclarator(parent)) {
+              title = parent.node.id.name;
             }
+          }
+
+          if (!title) {
+            throw path.buildCodeFrameError(
+              "Couldn't determine the class name for CSS template literal. Ensure that it's either:\n" +
+                '- Assigned to a variable\n' +
+                '- Is an object property\n' +
+                '- Is a prop in a JSX element\n'
+            );
           }
 
           state.foundLinariaTaggedLiterals = true;

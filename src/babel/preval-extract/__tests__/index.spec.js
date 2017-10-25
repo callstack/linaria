@@ -183,9 +183,6 @@ describe('preval-extract/index', () => {
                 name: 'css',
               },
             },
-            parentPath: {
-              isVariableDeclarator: () => false,
-            },
             findParent: () => null,
             buildCodeFrameError: text => new Error(text),
           },
@@ -197,8 +194,18 @@ describe('preval-extract/index', () => {
       }).toThrowErrorMatchingSnapshot();
     });
 
-    it('should collect requirements and call prevalStyles', () => {
+    it('should prevalStyles with variable assignment', () => {
       const { visitor } = prevalExtractPlugin(babel);
+
+      const parent = {
+        type: 'VariableDeclarator',
+        node: {
+          type: 'VariableDeclarator',
+          id: {
+            name: 'test',
+          },
+        },
+      };
 
       visitor.TaggedTemplateExpression(
         {
@@ -209,16 +216,8 @@ describe('preval-extract/index', () => {
               name: 'css',
             },
           },
-          parentPath: {
-            isVariableDeclarator: () => true,
-          },
-          parent: {
-            id: {
-              name: 'test',
-            },
-          },
           traverse: () => {},
-          findParent: () => null,
+          findParent: check => (check(parent) ? parent : null),
           replaceWith: () => {},
           addComment: () => {},
         },
@@ -230,8 +229,13 @@ describe('preval-extract/index', () => {
 
       expect(prevalStyles).toHaveBeenCalled();
       expect(prevalStyles.mock.calls[0][1]).toBe('test');
+    });
 
-      const propertyParent = {
+    it('should prevalStyles with object property', () => {
+      const { visitor } = prevalExtractPlugin(babel);
+
+      const parent = {
+        type: 'ObjectProperty',
         node: {
           type: 'ObjectProperty',
           key: {
@@ -239,8 +243,6 @@ describe('preval-extract/index', () => {
             name: 'foo',
           },
         },
-        isObjectProperty: () => true,
-        isJSXOpeningElement: () => false,
       };
 
       visitor.TaggedTemplateExpression(
@@ -252,11 +254,8 @@ describe('preval-extract/index', () => {
               name: 'css',
             },
           },
-          parentPath: {
-            isVariableDeclarator: () => false,
-          },
           traverse: () => {},
-          findParent: check => (check(propertyParent) ? propertyParent : null),
+          findParent: check => (check(parent) ? parent : null),
           replaceWith: () => {},
           addComment: () => {},
         },
@@ -267,9 +266,14 @@ describe('preval-extract/index', () => {
       );
 
       expect(prevalStyles).toHaveBeenCalled();
-      expect(prevalStyles.mock.calls[1][1]).toBe('foo');
+      expect(prevalStyles.mock.calls[0][1]).toBe('foo');
+    });
 
-      const jsxParent = {
+    it('should prevalStyles with JSX opening element', () => {
+      const { visitor } = prevalExtractPlugin(babel);
+
+      const parent = {
+        type: 'JSXOpeningElement',
         node: {
           type: 'JSXOpeningElement',
           name: {
@@ -277,8 +281,6 @@ describe('preval-extract/index', () => {
             name: 'article',
           },
         },
-        isObjectProperty: () => false,
-        isJSXOpeningElement: () => true,
       };
 
       visitor.TaggedTemplateExpression(
@@ -290,11 +292,8 @@ describe('preval-extract/index', () => {
               name: 'css',
             },
           },
-          parentPath: {
-            isVariableDeclarator: () => false,
-          },
           traverse: () => {},
-          findParent: check => (check(jsxParent) ? jsxParent : null),
+          findParent: check => (check(parent) ? parent : null),
           replaceWith: () => {},
           addComment: () => {},
         },
@@ -305,7 +304,7 @@ describe('preval-extract/index', () => {
       );
 
       expect(prevalStyles).toHaveBeenCalled();
-      expect(prevalStyles.mock.calls[2][1]).toBe('article');
+      expect(prevalStyles.mock.calls[0][1]).toBe('article');
     });
   });
 

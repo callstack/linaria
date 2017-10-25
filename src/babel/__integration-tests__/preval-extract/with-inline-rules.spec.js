@@ -24,7 +24,22 @@ function assertAndCheckForDuplications(
   }
 }
 
-describe('with object and JSX properties', () => {
+describe('with inline rules', () => {
+  it('should preval inside function call assigned to variable', () => {
+    const { code, getCSSForClassName } = transpile(dedent`
+      const header = styled('div', css\`
+        font-size: 3em;
+      \`);
+      `);
+
+    const match = /header = styled\(div, \/\*.+\*\/'(_header__[a-z0-9]+)'/g.exec(
+      code
+    );
+    expect(match).not.toBeNull();
+    const css = getCSSForClassName(match[1]);
+    expect(css).toMatch('font-size: 3em');
+  });
+
   it('should preval with object properties', () => {
     const { code, getCSSForClassName } = transpile(dedent`
       const styles = {

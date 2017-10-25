@@ -53,6 +53,15 @@ export type BabelObjectPattern = {
   type: string,
 };
 
+export type BabelObjectProperty = {
+  type: string,
+  method: false,
+  shorthand: false,
+  computed: false,
+  key: BabelIdentifier | BabelStringLiteral,
+  value: any,
+};
+
 export type BabelTaggedTemplateElement = {
   value: {
     raw: string,
@@ -89,6 +98,13 @@ export type BabelJSXExpressionContainer = {
 export type BabelJSXIdentifier = {
   name: string,
   type: string,
+};
+
+export type BabelJSXOpeningElement = {
+  type: string,
+  properties: any[],
+  name: BabelJSXIdentifier,
+  selfClosing: boolean,
 };
 
 export type BabelJSXSpreadAttribute = {
@@ -147,12 +163,15 @@ export type BabelTypes = {
   isIdentifier: BabelIsTypeFunction<BabelIdentifier>,
   isJSXExpressionContainer: BabelIsTypeFunction<BabelJSXExpressionContainer>,
   isJSXIdentifier: BabelIsTypeFunction<BabelJSXIdentifier>,
+  isJSXOpeningElement: BabelIsTypeFunction<BabelJSXOpeningElement>,
   isJSXSpreadAttribute: BabelIsTypeFunction<BabelJSXSpreadAttribute>,
   isMemberExpression: BabelIsTypeFunction<BabelMemberExpression>,
   isObjectExpression: BabelIsTypeFunction<BabelObjectExpression>,
   isObjectPattern: BabelIsTypeFunction<BabelObjectPattern>,
+  isObjectProperty: BabelIsTypeFunction<BabelObjectProperty>,
   isStringLiteral: BabelIsTypeFunction<BabelStringLiteral>,
   isVariableDeclaration: BabelIsTypeFunction<BabelVariableDeclaration>,
+  isVariableDeclarator: BabelIsTypeFunction<BabelVariableDeclarator<any>>,
 };
 
 export type ImportStatement = {
