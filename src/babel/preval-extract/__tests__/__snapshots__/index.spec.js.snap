@@ -4,5 +4,6 @@ exports[`preval-extract/index TaggedTemplateExpression should not process templa
 "Couldn't determine the class name for CSS template literal. Ensure that it's either:
 - Assigned to a variable
 - Is an object property
-- Is a prop in a JSX element"
+- Is a prop in a JSX element
+"
 `;
