@@ -1,6 +1,4 @@
 {
-  "processors": ["linaria/stylelint-preprocessor"],
-  "syntax": "scss",
   "extends": [
     "linaria/stylelint-config"
   ]
