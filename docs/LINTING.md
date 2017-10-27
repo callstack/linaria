@@ -2,7 +2,7 @@
 
 ## stylelint
 
-For linting styles with [stylelint](https://stylelint.io/), we provide our custom preprocessor (`linaria/stylelint-preprocessor`) and a basic config tailored for linaria - `linaria/stylelint-config` based on [`stylelint-config-recommended`](https://github.com/stylelint/stylelint-config-recommended).
+For linting styles with [stylelint](https://stylelint.io/), we provide our custom config tailored for linaria - `linaria/stylelint-config` based on [`stylelint-config-recommended`](https://github.com/stylelint/stylelint-config-recommended).
 
 ### Installation
 
@@ -14,23 +14,19 @@ yarn add stylelint stylelint-config-recommended --dev
 
 ### Configuring stylelint
 
-First of all, you need to add `linaria/stylelint-preprocessor` to the `preprocessors` array in your stylelint configuration as well as set `syntax` to `scss`.
-
-Please refer to the [official stylelint documentation](https://stylelint.io/user-guide/configuration/) for more info about configuration.
-
-We strongly recommend to use our `linaria/stylelint-config` to provide sensible defaults for linting.
+All you need to do is to set your config to extend from `linaria/stylelint-config`.
 
 Here's the example `.stylelintrc` configuration file:
 
 ```json
 {
-  "processors": ["linaria/stylelint-preprocessor"],
-  "syntax": "scss",
   "extends": [
     "linaria/stylelint-config"
   ]
 }
 ```
+
+Please refer to the [official stylelint documentation](https://stylelint.io/user-guide/configuration/) for more info about configuration.
 
 ### Running the linter
 
