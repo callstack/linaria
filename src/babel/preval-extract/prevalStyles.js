@@ -52,6 +52,13 @@ export default function(
           env === 'production'
             ? `css.named('${name}')`
             : `css.named('${name}', '${state.filename}')`
+        )
+        .replace(
+          /css\.named\(([^,]+)\)/,
+          (input, customName) =>
+            env === 'production'
+              ? input
+              : `css.named(${customName}, '${state.filename}')`
         )}`,
       loc: path.node.loc.start,
     },

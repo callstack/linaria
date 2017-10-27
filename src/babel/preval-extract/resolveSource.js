@@ -34,6 +34,14 @@ export default function resolveSource(
   types: BabelTypes,
   path: NodePath<*>
 ): ?RequirementSource {
+  if (
+    ['module', 'global', '__dirname', '__filename', 'exports'].includes(
+      path.node.name
+    )
+  ) {
+    return null;
+  }
+
   const binding = getSelfBinding(path);
 
   if (!binding) {

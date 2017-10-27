@@ -148,4 +148,12 @@ describe('preval-extract/resolveSource', () => {
       null
     );
   });
+
+  it("should return null if it's a global identifier", () => {
+    expect(resolveSource({}, { node: { name: 'module' } })).toBeNull();
+    expect(resolveSource({}, { node: { name: '__filename' } })).toBeNull();
+    expect(resolveSource({}, { node: { name: '__dirname' } })).toBeNull();
+    expect(resolveSource({}, { node: { name: 'global' } })).toBeNull();
+    expect(resolveSource({}, { node: { name: 'exports' } })).toBeNull();
+  });
 });
