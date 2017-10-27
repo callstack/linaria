@@ -18,7 +18,7 @@ function toString(templates: string[], expressions: string[]) {
 }
 
 export default function linariaStylelintPreprocessor(/* options */) {
-  process.env.LINARIA_OVERWRITE_BABEL_PRESET = JSON.stringify({
+  process.env.LINARIA_BABEL_PRESET_OVERRIDES = JSON.stringify({
     extract: false,
   });
   // $FlowFixMe
