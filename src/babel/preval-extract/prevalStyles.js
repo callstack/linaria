@@ -32,15 +32,16 @@ import {
 
 export default function(
   babel: BabelCore,
+  title: string,
   path: NodePath<
     BabelTaggedTemplateExpression<BabelIdentifier | BabelCallExpression>
   >,
   state: State,
   requirements: RequirementSource[]
 ) {
-  const title = path.parent.id.name;
   const env = process.env.NODE_ENV || process.env.BABEL_ENV;
 
+  const { name } = path.scope.generateUidIdentifier(title);
   const replacement = getReplacement([
     ...requirements,
     {
@@ -49,8 +50,8 @@ export default function(
         .replace(
           /css(?!\.named)/g,
           env === 'production'
-            ? `css.named('${title}')`
-            : `css.named('${title}', '${state.filename}')`
+            ? `css.named('${name}')`
+            : `css.named('${name}', '${state.filename}')`
         )}`,
       loc: path.node.loc.start,
     },
@@ -62,16 +63,5 @@ export default function(
     resolve(state.filename)
   );
 
-  path.parentPath.node.init = babel.types.stringLiteral(className);
-
-  const variableDeclarationPath = path.findParent(
-    babel.types.isVariableDeclaration
-  );
-
-  variableDeclarationPath.node.leadingComments = [
-    {
-      type: 'CommentBlock',
-      value: 'linaria-output',
-    },
-  ];
+  return babel.types.stringLiteral(className);
 }

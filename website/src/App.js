@@ -23,10 +23,7 @@ export default function Index() {
       <div>
         <Container>
           <Heading type="h2" className={getStarted} id="get-started">
-            Get Started!{' '}
-            <span role="img" aria-labelledby="stars">
-              ✨
-            </span>
+            Get Started!
           </Heading>
           <Heading type="h3">Installation and setup</Heading>
           <p>Install it like a regular npm package:</p>

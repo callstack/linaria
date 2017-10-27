@@ -157,7 +157,6 @@ describe('preval-extract/index', () => {
 
       visitor.TaggedTemplateExpression(
         {
-          type: 'TaggedTemplateExpression',
           node: {
             type: 'TaggedTemplateExpression',
             tag: {
@@ -177,7 +176,6 @@ describe('preval-extract/index', () => {
       expect(() => {
         visitor.TaggedTemplateExpression(
           {
-            type: 'TaggedTemplateExpression',
             node: {
               type: 'TaggedTemplateExpression',
               tag: {
@@ -185,24 +183,32 @@ describe('preval-extract/index', () => {
                 name: 'css',
               },
             },
-            parentPath: {
-              isVariableDeclarator: () => false,
-            },
+            findParent: () => null,
+            buildCodeFrameError: text => new Error(text),
           },
           {
             skipFile: false,
             foundLinariaTaggedLiterals: false,
           }
         );
-      }).toThrowError();
+      }).toThrowErrorMatchingSnapshot();
     });
 
-    it('should collect requirements and call prevalStyles', () => {
+    it('should prevalStyles with variable assignment', () => {
       const { visitor } = prevalExtractPlugin(babel);
+
+      const parent = {
+        type: 'VariableDeclarator',
+        node: {
+          type: 'VariableDeclarator',
+          id: {
+            name: 'test',
+          },
+        },
+      };
 
       visitor.TaggedTemplateExpression(
         {
-          type: 'TaggedTemplateExpression',
           node: {
             type: 'TaggedTemplateExpression',
             tag: {
@@ -210,10 +216,10 @@ describe('preval-extract/index', () => {
               name: 'css',
             },
           },
-          parentPath: {
-            isVariableDeclarator: () => true,
-          },
           traverse: () => {},
+          findParent: check => (check(parent) ? parent : null),
+          replaceWith: () => {},
+          addComment: () => {},
         },
         {
           skipFile: false,
@@ -222,6 +228,83 @@ describe('preval-extract/index', () => {
       );
 
       expect(prevalStyles).toHaveBeenCalled();
+      expect(prevalStyles.mock.calls[0][1]).toBe('test');
+    });
+
+    it('should prevalStyles with object property', () => {
+      const { visitor } = prevalExtractPlugin(babel);
+
+      const parent = {
+        type: 'ObjectProperty',
+        node: {
+          type: 'ObjectProperty',
+          key: {
+            type: 'Identifier',
+            name: 'foo',
+          },
+        },
+      };
+
+      visitor.TaggedTemplateExpression(
+        {
+          node: {
+            type: 'TaggedTemplateExpression',
+            tag: {
+              type: 'Identifier',
+              name: 'css',
+            },
+          },
+          traverse: () => {},
+          findParent: check => (check(parent) ? parent : null),
+          replaceWith: () => {},
+          addComment: () => {},
+        },
+        {
+          skipFile: false,
+          foundLinariaTaggedLiterals: false,
+        }
+      );
+
+      expect(prevalStyles).toHaveBeenCalled();
+      expect(prevalStyles.mock.calls[0][1]).toBe('foo');
+    });
+
+    it('should prevalStyles with JSX opening element', () => {
+      const { visitor } = prevalExtractPlugin(babel);
+
+      const parent = {
+        type: 'JSXOpeningElement',
+        node: {
+          type: 'JSXOpeningElement',
+          name: {
+            type: 'JSXIdentifier',
+            name: 'article',
+          },
+        },
+      };
+
+      visitor.TaggedTemplateExpression(
+        {
+          node: {
+            type: 'TaggedTemplateExpression',
+            tag: {
+              type: 'Identifier',
+              name: 'css',
+            },
+          },
+          traverse: () => {},
+          findParent: check => (check(parent) ? parent : null),
+          replaceWith: () => {},
+          addComment: () => {},
+        },
+        {
+          skipFile: false,
+          foundLinariaTaggedLiterals: false,
+        }
+      );
+
+      expect(prevalStyles).toHaveBeenCalled();
+      expect(prevalStyles.mock.calls[0][1]).toBe('article');
     });
   });
 

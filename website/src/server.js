@@ -31,17 +31,24 @@ app.get('/', (req, res) => {
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <title>Linaria – zero-runtime CSS in JS library</title>
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:300,600">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono">
+
         <style type="text/css">${globalStyles}</style>
         <style type="text/css">${critical}</style>
+
         <script defer src="/build/manifest.js"></script>
         <script defer src="/build/vendor.js"></script>
         <script defer src="/build/main.js"></script>
       </head>
       <body>
         <div id="root">${html}</div>
+
         <link rel="stylesheet" href="/vendor/prism.css">
-        <link rel="stylesheet" href="/styles/${slug}" />
+        <link rel="stylesheet" href="/styles/${slug}">
       </body>
     </html>
   `);

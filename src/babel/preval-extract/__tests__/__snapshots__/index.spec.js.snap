@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`preval-extract/index TaggedTemplateExpression should not process template if checks do not pass 1`] = `
+"Couldn't determine the class name for CSS template literal. Ensure that it's either:
+- Assigned to a variable
+- Is an object property
+- Is a prop in a JSX element
+"
+`;

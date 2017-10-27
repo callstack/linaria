@@ -12,18 +12,18 @@ const resultsTable = new Table({
   colWidths: [60, 10, 10],
 });
 
-const outDir = path.join(__dirname, 'suites/_temp');
+const outDir = 'benchmark/_temp';
 fs.mkdirSync(outDir);
 
 function transpile(filename, opts = {}) {
-  babel.transformFileSync(path.join(__dirname, filename), {
-    presets: ['es2015', 'stage-3'],
-    plugins: [
-      [require.resolve('../build/babel/index.js'), opts],
-      require.resolve('babel-plugin-preval'),
-    ],
-    babelrc: false,
-  });
+  try {
+    babel.transformFileSync(path.join(__dirname, filename), {
+      presets: ['env', 'stage-2', [require.resolve('../babel.js'), opts]],
+      babelrc: false,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function appendResults({ target: { name, stats, hz } }) {
@@ -34,7 +34,7 @@ function setupSuites(suite) {
   glob.sync('suites/*.js', { cwd: __dirname }).forEach(filename => {
     const name = /suites\/([a-z-_]+)\.js/.exec(filename)[1];
     suite.add(`${name} (multiple)`, () => {
-      transpile(filename);
+      transpile(filename, { outDir });
     });
     suite.add(`${name} (single)`, () => {
       transpile(filename, {
@@ -47,10 +47,12 @@ function setupSuites(suite) {
 }
 
 function cleanUp() {
-  glob.sync('suites/**/*.css', { cwd: __dirname }).forEach(filename => {
+  glob.sync('_temp/**/*.css', { cwd: __dirname }).forEach(filename => {
     fs.unlinkSync(path.join(__dirname, filename));
   });
-  fs.rmdirSync(outDir);
+  fs.rmdirSync(path.resolve(outDir, 'benchmark/suites'));
+  fs.rmdirSync(path.resolve(outDir, 'benchmark'));
+  fs.rmdirSync(path.resolve(outDir));
 }
 
 const suite = new Benchmark.Suite();

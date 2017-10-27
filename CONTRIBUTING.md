@@ -1,6 +1,6 @@
 # Contributing to Linaria
 
-Linaria is one of Callstack.io open source projects that is currently under very active development. Hopefully this document makes the process for contributing clear and answers some questions that you may have.
+Linaria is one of [Callstack](https://callstack.com)'s open source projects that is currently under very active development. Hopefully this document makes the process for contributing clear and answers some questions that you may have.
 
 ## [Code of Conduct](/CODE_OF_CONDUCT.md)
 

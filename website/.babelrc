@@ -5,18 +5,18 @@
   ],
   "env": {
     "development": {
-      "presets": ["stage-3", "linaria/babel"]
+      "presets": ["stage-2", "linaria/babel"]
     },
     "server": {
       "presets": [
         ["env", {"targets": {"node": 8}}],
-        "stage-3",
+        "stage-2",
         ["linaria/babel", {"extract": false}]
       ]
     },
     "production": {
       "presets": [
-        "stage-3",
+        "stage-2",
         [
           "linaria/babel",
           {"single": true, "filename": "styles.css", "outDir": "static"}

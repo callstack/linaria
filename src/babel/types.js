@@ -5,7 +5,9 @@ export type NodePath<K> = {
     loc: {
       start: { line: number, column: number },
     },
+    leadingComments?: Array<BabelCommentBlock>,
   },
+  replaceWith: (path: any) => void,
   parent: Object,
   parentPath: NodePath<*>,
   scope: {
@@ -18,10 +20,13 @@ export type NodePath<K> = {
   isImportDefaultSpecifier: () => boolean,
   isImportSpecifier: () => boolean,
   isVariableDeclaration: () => boolean,
+  isObjectProperty: () => boolean,
+  isJSXOpeningElement: () => boolean,
   getSource: () => string,
   buildCodeFrameError: (message: string) => Error,
   traverse: (visitor: { [key: string]: Function }, thisArgs?: any) => void,
   findParent: ((path: NodePath<*>) => boolean) => NodePath<*>,
+  addComment: (type: 'leading' | 'trailing', comment: string) => void,
 };
 
 export type Binding<K> = {
@@ -33,6 +38,11 @@ export type BabelCore = {
   types: BabelTypes,
 };
 
+export type BabelCommentBlock = {
+  type: string,
+  value: string,
+};
+
 export type BabelObjectExpression = {
   properties: any[],
   type: string,
@@ -41,6 +51,15 @@ export type BabelObjectExpression = {
 export type BabelObjectPattern = {
   properties: Object[],
   type: string,
+};
+
+export type BabelObjectProperty = {
+  type: string,
+  method: false,
+  shorthand: false,
+  computed: false,
+  key: BabelIdentifier | BabelStringLiteral,
+  value: any,
 };
 
 export type BabelTaggedTemplateElement = {
@@ -64,6 +83,13 @@ export type BabelIdentifier = {
   type: string,
 };
 
+export type BabelConditionalExpression = {
+  type: string,
+  test: any,
+  consequent: any,
+  alternate: any,
+};
+
 export type BabelJSXExpressionContainer = {
   type: string,
   expression: any,
@@ -72,6 +98,13 @@ export type BabelJSXExpressionContainer = {
 export type BabelJSXIdentifier = {
   name: string,
   type: string,
+};
+
+export type BabelJSXOpeningElement = {
+  type: string,
+  properties: any[],
+  name: BabelJSXIdentifier,
+  selfClosing: boolean,
 };
 
 export type BabelJSXSpreadAttribute = {
@@ -126,14 +159,19 @@ export type BabelTypes = {
     BabelTaggedTemplateExpression<any>
   >,
   isCallExpression: BabelIsTypeFunction<BabelCallExpression>,
+  isConditionalExpression: BabelIsTypeFunction<BabelConditionalExpression>,
   isIdentifier: BabelIsTypeFunction<BabelIdentifier>,
   isJSXExpressionContainer: BabelIsTypeFunction<BabelJSXExpressionContainer>,
   isJSXIdentifier: BabelIsTypeFunction<BabelJSXIdentifier>,
+  isJSXOpeningElement: BabelIsTypeFunction<BabelJSXOpeningElement>,
   isJSXSpreadAttribute: BabelIsTypeFunction<BabelJSXSpreadAttribute>,
   isMemberExpression: BabelIsTypeFunction<BabelMemberExpression>,
   isObjectExpression: BabelIsTypeFunction<BabelObjectExpression>,
   isObjectPattern: BabelIsTypeFunction<BabelObjectPattern>,
+  isObjectProperty: BabelIsTypeFunction<BabelObjectProperty>,
+  isStringLiteral: BabelIsTypeFunction<BabelStringLiteral>,
   isVariableDeclaration: BabelIsTypeFunction<BabelVariableDeclaration>,
+  isVariableDeclarator: BabelIsTypeFunction<BabelVariableDeclarator<any>>,
 };
 
 export type ImportStatement = {

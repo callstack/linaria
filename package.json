@@ -1,6 +1,6 @@
 {
   "name": "linaria",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Fast zero-runtime CSS in JS library",
   "main": "build/index.js",
   "license": "MIT",
@@ -24,7 +24,8 @@
     "build:transpile:watch": "babel src --out-dir build --watch --ignore '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
     "build:flow": "flow-copy-source src build -i '{**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**}'",
     "benchmark": "yarn run prepare && node ./benchmark/run.js",
-    "postinstall": "yarn link && yarn link linaria"
+    "postinstall": "yarn link && yarn link linaria",
+    "add-contributor": "all-contributors add"
   },
   "files": [
     "/build",
@@ -39,6 +40,7 @@
     "babel-code-frame": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-generator": "^6.26.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "cssom": "^0.3.2",
     "dedent": "^0.7.0",
     "error-stack-parser": "^2.0.1",
@@ -48,10 +50,10 @@
     "stylis": "^3.2.13"
   },
   "devDependencies": {
+    "all-contributors-cli": "^4.5.0",
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
-    "babel-preset-env": "1.6.0",
-    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-env": "1.6.1",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "benchmark": "^2.1.4",
@@ -65,11 +67,14 @@
     "flow-copy-source": "^1.2.1",
     "glob": "^7.1.2",
     "jest": "^21.1.0",
+    "jest-image-snapshot": "^1.0.1",
     "prettier": "^1.6.1",
+    "puppeteer": "^0.12.0",
     "strip-ansi": "^4.0.0"
   },
   "jest": {
     "testRegex": "/__(integration-)?tests__/.*\\.(test|spec)\\.js$",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupTestFrameworkScriptFile": "<rootDir>/setupJest.js"
   }
 }
