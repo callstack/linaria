@@ -51,7 +51,7 @@ export default function linariaStylelintPreprocessor(/* options */) {
         return `${acc}\n.${classname} {${styles}}`;
       }, '');
 
-      cache[filename] = { css, code, map };
+      cache[filename] = { css, code, map, input };
 
       return css;
     },
@@ -60,16 +60,16 @@ export default function linariaStylelintPreprocessor(/* options */) {
         return;
       }
 
-      const { code, css, map } = cache[filename];
+      const { code, css, map, input } = cache[filename];
       const { warnings } = lintResults;
 
       warnings.forEach(warning => {
-        const relevantCss = css.split('\n').slice(0, warning.line);
+        const relevantCss = css.split('\n').slice(1, warning.line);
 
         let classname;
         let offset = 0;
         for (let i = relevantCss.length - 1; i >= 0; i--) {
-          const match = relevantCss[i].match(/\.([a-zA-Z0-9]+__[a-z0-9]+) {/);
+          const match = relevantCss[i].match(/\.(_?[a-zA-Z0-9]+__[a-z0-9]+) {/);
           if (match) {
             classname = match[1];
             offset = relevantCss.length - i - 1;
@@ -77,17 +77,23 @@ export default function linariaStylelintPreprocessor(/* options */) {
           }
         }
 
-        const startLineLocation =
-          code.split('\n').findIndex(line => line.includes(classname)) + 1;
+        const startLineLocation = code
+          .split('\n')
+          .findIndex(line => line.includes(classname));
         // prettier-ignore
-        const startColumnLocation = code.split('\n')[startLineLocation - 1]
+        const startColumnLocation = code.split('\n')[startLineLocation]
           .indexOf(classname);
 
         const consumer = new SourceMapConsumer(map);
         const originalPos = consumer.originalPositionFor({
-          line: startLineLocation,
+          line: startLineLocation + 1,
           column: startColumnLocation,
         });
+
+        offset += input
+          .split('\n')
+          .slice(originalPos.line - 1)
+          .findIndex(line => /css(\.named\(.+\))?`/.test(line));
 
         // eslint-disable-next-line no-param-reassign
         warning.line = originalPos.line + offset;
