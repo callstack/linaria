@@ -12,7 +12,7 @@
     "prebuild": "yarn run clean",
     "server": "node static/server/server.js",
     "start-server-render": "yarn build:all && yarn server",
-    "start": "cross-env NODE_ENV=development webpack-dev-server"
+    "start": "cross-env NODE_ENV=development webpack-dev-server",
     "lint-css": "stylelint src/**/*.js"
   },
   "dependencies": {
