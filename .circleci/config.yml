@@ -65,10 +65,8 @@ jobs:
       steps:
         - attach_workspace:
             at: ~/linaria
-        - run: cd website
-        - run: yarn run build:all
-        - run: yarn run lint-css
-        - run: cd ..
+        - run: cd website && yarn run build:all && cd ..
+        - run: cd website && yarn run lint-css && cd ..
 workflows:
   version: 2
   build-and-test:
