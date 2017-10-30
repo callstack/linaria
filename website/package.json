@@ -4,14 +4,14 @@
   "private": true,
   "description": "Linaria website",
   "scripts": {
-    "build:all": "yarn build:server && yarn build",
+    "build:all": "yarn run build:server && yarn run build",
     "build:server": "cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir static/server --ignore '{src/index.js,*.css}'",
     "build": "cross-env NODE_ENV=production webpack -p --env.NODE_ENV production",
     "clean": "del static/build",
     "postinstall": "cd .. && yarn link && cd website && yarn link linaria",
     "prebuild": "yarn run clean",
     "server": "node static/server/server.js",
-    "start-server-render": "yarn build:all && yarn server",
+    "start-server-render": "yarn run build:all && yarn run server",
     "start": "cross-env NODE_ENV=development webpack-dev-server"
   },
   "dependencies": {
