@@ -37,9 +37,7 @@ For this case you can use `linaria/babel` preset without any options:
 
 ### Production
 
-For production, you don't want to have `<style>` elements created dynamically, you can either use `single` option and extract all CSS to a single file or use [ExtractTextWebpackPlugin](https://github.com/webpack-contrib/extract-text-webpack-plugin).
-
-#### ExtractTextWebpackPlugin
+For production, you don't want to have `<style>` elements created dynamically, you should extract all CSS to a single file using [ExtractTextWebpackPlugin](https://github.com/webpack-contrib/extract-text-webpack-plugin).
 
 In order to have your styles extracted with **ExtractTextWebpackPlugin**, you need to place the following snippet in your webpack production config:
 
@@ -69,45 +67,4 @@ module.exports = {
 
 This will extract the CSS from all files into a single `styles.css`. Then you need to include this file in your HTML file.
 
-#### `single` option
-
-For production environment, you need to use `single: true` options in conjunction with `filename` and `outDir` options:
-
-```diff
-{
-  "presets": [
-    "env",
-    "linaria/babel"
-- ]
-+ ],
-+ "env": {
-+   "production": {
-+     "presets": [
-+       ["linaria/babel", {
-+         "single": true,
-+         "filename": "styles.css",
-+         "outDir": "dist"
-+       }]
-+     ]
-+   }
-+ }
-}
-```
-
-This will extract all styles into a single file `styles.css` inside `dist` directory.
-Then you need to include this file in your HTML with `<link>` element:
-
-```diff
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Linaria Example</title>
-+   <link rel="stylesheet" href="/dist/styles.css">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script src="/dist/bundle.js"></script>
-  </body>
-</html>
-```
+__NOTE__: When referencing files inside the CSS template literal, you can use `url(./path/to/asset.png)` instead of `url(${require('./path/to/asset.png')})` like you would do with other CSS-in-JS libraries. `url(...)` statements will be resolved and handled by webpack through __css_loader__ like normal `require` calls.
