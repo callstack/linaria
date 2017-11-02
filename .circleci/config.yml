@@ -12,6 +12,10 @@ jobs:
           at: ~/linaria
       - restore_cache:
           keys:
+            yarn-{{ checksum "package.json" }}
+            yarn-
+      - restore_cache:
+          keys:
             - dependencies-{{ checksum "package.json" }}
             - dependencies-
       - restore_cache:
@@ -21,6 +25,9 @@ jobs:
       - run: |
           yarn install
           cd website && yarn install && cd ..
+      - save_cache:
+          key: yarn-{{ checksum "package.json" }}
+          paths: ~/.cache/yarn
       - save_cache:
           key: dependencies-{{ checksum "package.json" }}
           paths: node_modules
