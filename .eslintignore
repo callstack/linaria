@@ -4,4 +4,4 @@ coverage/
 flow-typed/
 node_modules/
 vendor/
-website/
+website/static/server
