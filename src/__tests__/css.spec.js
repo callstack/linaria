@@ -1,6 +1,6 @@
 /* @flow */
 
-import css, { getRawStyles } from '../css';
+import css from '../css';
 
 jest.mock('../babel/lib/errorUtils', () => ({
   getFramesFromStack: (...args) =>
@@ -37,25 +37,5 @@ describe('css module', () => {
     expect(() => {
       css.named('test')`color: ${null}`;
     }).toThrowError('Expression cannot be undefined or null');
-  });
-
-  it('should collect raw styles', () => {
-    // $FlowFixMe
-    process.env.LINARIA_COLLECT_RAW_STYLES = true;
-
-    const header = css.named('header', 'test.js')`
-      color: blue;
-    `;
-    process.env.LINARIA_COLLECT_RAW_STYLES = undefined;
-
-    expect(getRawStyles()).toEqual({
-      'test.js': [
-        {
-          template: ['\n      color: blue;\n    '],
-          expressions: [],
-          classname: header,
-        },
-      ],
-    });
   });
 });
