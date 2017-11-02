@@ -7,29 +7,50 @@ jobs:
   install-dependencies:
     <<: *defaults
     steps:
-      - checkout
-      - attach_workspace:
-          at: ~/linaria
-      - restore_cache:
-          keys:
-            - dependencies-{{ checksum "package.json" }}
-            - dependencies-
-      - restore_cache:
-          keys:
-            - dependencies-website-{{ checksum "website/package.json" }}
-            - dependencies-website-
-      - run: |
-          yarn install --frozen-lockfile
-          yarn install --frozen-lockfile --cwd website
-      - save_cache:
-          key: dependencies-{{ checksum "package.json" }}
-          paths: node_modules
-      - save_cache:
-          key: dependencies-website-{{ checksum "website/package.json" }}
-          paths: website/node_modules
-      - persist_to_workspace:
-          root: .
-          paths: .
+        - checkout
+        - attach_workspace:
+            at: ~/linaria
+        - restore_cache:
+            name: Restore node_modules cache
+            keys:
+            - v1-node-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - v1-node-{{ .Branch }}-
+            - v1-node-
+        - run:
+            name: Install Dependencies
+            command: yarn install
+        - save_cache:
+            name: Save yarn cache
+            key: v1-yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            paths:
+            - .cache/yarn
+        - save_cache:
+            name: Save node_modules cache
+            key: v1-node-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            paths:
+            - node_modules/
+        - restore_cache:
+            name: Restore website node_modules cache
+            keys:
+            - v1-website-node-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - v1-website-node-{{ .Branch }}-
+            - v1-website-node-
+        - run:
+            name: Install Dependencies Website
+            command: yarn install --cwd website
+        - save_cache:
+            name: Save website/node_modules cache
+            key: v1-website-node-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            paths:
+            - website/node_modules/
+        - save_cache:
+            name: Save website yarn cache
+            key: v1-website-yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            paths:
+            - website/.cache/yarn
+        - persist_to_workspace:
+            root: .
+            paths: .
   lint-and-flow:
       <<: *defaults
       steps:
