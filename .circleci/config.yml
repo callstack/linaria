@@ -12,20 +12,20 @@ jobs:
           at: ~/linaria
       - restore_cache:
           keys:
-            - dependencies-{{ checksum "package.json" }}
+            - dependencies-{{ checksum "yarn.lock" }}
             - dependencies-
       - restore_cache:
           keys:
-            - dependencies-website-{{ checksum "website/package.json" }}
+            - dependencies-website-{{ checksum "website/yarn.lock" }}
             - dependencies-website-
       - run: |
           yarn install
           cd website && yarn install && cd ..
       - save_cache:
-          key: dependencies-{{ checksum "package.json" }}
+          key: dependencies-{{ checksum "yarn.lock" }}
           paths: node_modules
       - save_cache:
-          key: dependencies-website-{{ checksum "website/package.json" }}
+          key: dependencies-website-{{ checksum "website/yarn.lock" }}
           paths: website/node_modules
       - persist_to_workspace:
           root: .
