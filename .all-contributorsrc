@@ -75,6 +75,15 @@
         "doc",
         "example"
       ]
+    },
+    {
+      "login": "ferrannp",
+      "name": "Ferran Negre",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/774577?v=4",
+      "profile": "http://twitter.com/ferrannp",
+      "contributions": [
+        "doc"
+      ]
     }
   ]
 }
