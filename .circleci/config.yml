@@ -19,8 +19,8 @@ jobs:
             - dependencies-website-{{ checksum "website/package.json" }}
             - dependencies-website-
       - run: |
-          yarn install
-          cd website && yarn install && cd ..
+          yarn install --frozen-lockfile
+          yarn install --frozen-lockfile --cwd website
       - save_cache:
           key: dependencies-{{ checksum "package.json" }}
           paths: node_modules
