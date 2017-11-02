@@ -5,12 +5,6 @@ import slugify from './slugify';
 import sheet from './sheet';
 import { getFramesFromStack, enhanceFrames } from './babel/lib/errorUtils';
 
-const rawStyles = {};
-
-export function getRawStyles() {
-  return rawStyles;
-}
-
 const named = (name?: string = 'css', filename: ?string = null) => (
   template: string[],
   ...expressions: string[]
@@ -75,11 +69,7 @@ const named = (name?: string = 'css', filename: ?string = null) => (
   const slug = slugify(filename || styles);
   const classname = `${name}__${slug}`;
 
-  if (filename && process.env.LINARIA_COLLECT_RAW_STYLES) {
-    rawStyles[filename] = (rawStyles[filename] || [])
-      .concat({ template, expressions, classname });
-  }
-
+  sheet.insertRaw({ filename, template, expressions, classname });
   sheet.insert(`.${classname}`, styles);
 
   return classname;

@@ -34,8 +34,8 @@ export default function linariaStylelintPreprocessor(/* options */) {
       });
 
       const rawStyles = getCachedModule(
-        require.resolve('../css.js')
-      ).exports.getRawStyles();
+        require.resolve('../sheet.js')
+      ).exports.default.rawStyles();
 
       if (!Object.keys(rawStyles).length || !rawStyles[filename]) {
         return '';
