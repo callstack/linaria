@@ -60,13 +60,13 @@ jobs:
         - store_artifacts:
             path: website/__integration-tests__/__image_snapshots__/__diff_output__
             destination: website-snapshot-diffs
-  build-website:
+  build-and-lint-website:
       <<: *defaults
       steps:
         - attach_workspace:
             at: ~/linaria
-        - run: |
-            cd website && yarn run build:all && cd ..
+        - run: cd website && yarn run build:all && cd ..
+        - run: cd website && yarn run lint-css && cd ..
 workflows:
   version: 2
   build-and-test:
@@ -81,6 +81,6 @@ workflows:
       - integration-tests:
           requires:
             - install-dependencies
-      - build-website:
+      - build-and-lint-website:
           requires:
             - install-dependencies

@@ -51,4 +51,29 @@ describe('sheet module', () => {
 
     expect(sheet.dump()).toBe('.lol{color:pink;}');
   });
+
+  it('should collect raw styles', () => {
+    // $FlowFixMe
+    process.env.LINARIA_COLLECT_RAW_STYLES = true;
+
+    const header = 'header_123abc';
+    sheet.insertRaw({
+      filename: 'test.js',
+      template: ['color: blue;'],
+      expressions: [],
+      classname: header,
+    });
+
+    process.env.LINARIA_COLLECT_RAW_STYLES = undefined;
+
+    expect(sheet.rawStyles()).toEqual({
+      'test.js': [
+        {
+          template: ['color: blue;'],
+          expressions: [],
+          classname: header,
+        },
+      ],
+    });
+  });
 });

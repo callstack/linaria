@@ -67,7 +67,7 @@ SyntaxError: test.js: Linaria css evaluation error:
   5 | \`;
     at File.buildCodeFrameError (<<CWD>>/node_modules/babel-core/lib/transformation/file/index.js:427:15)
     at NodePath.buildCodeFrameError (<<CWD>>/node_modules/babel-traverse/lib/path/index.js:140:26)
-    at resolveSource (<<CWD>>/build/babel/preval-extract/resolveSource.js:31:16)
+    at resolveSource (<<CWD>>/build/babel/preval-extract/resolveSource.js:35:16)
     at Object.Identifier (<<CWD>>/build/babel/preval-extract/index.js:46:48)
     at NodePath._call (<<CWD>>/node_modules/babel-traverse/lib/path/context.js:76:18)
     at NodePath.call (<<CWD>>/node_modules/babel-traverse/lib/path/context.js:48:17)

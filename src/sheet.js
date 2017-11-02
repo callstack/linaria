@@ -2,8 +2,15 @@
 
 import stylis from 'stylis';
 
+type RawStyles = {
+  template: string[],
+  expressions: string[],
+  classname: string,
+};
+
 function sheet() {
   let cache: { [selector: string]: string } = {};
+  const rawCache: { [selector: string]: RawStyles[] } = {};
 
   const isBrowser =
     typeof window === 'object' && window != null && window.document != null;
@@ -25,6 +32,17 @@ function sheet() {
   }
 
   return {
+    insertRaw({
+      filename,
+      template,
+      expressions,
+      classname,
+    }: RawStyles & { filename: ?string }) {
+      if (filename && process.env.LINARIA_COLLECT_RAW_STYLES) {
+        rawCache[filename] = (rawCache[filename] || [])
+          .concat({ template, expressions, classname });
+      }
+    },
     insert(selector: string, css: string) {
       if (selector in cache) {
         return;
@@ -33,6 +51,9 @@ function sheet() {
       const text = stylis(selector, css);
       cache[selector] = css;
       node.appendData(`\n${text}`);
+    },
+    rawStyles() {
+      return rawCache;
     },
     styles() {
       return cache;

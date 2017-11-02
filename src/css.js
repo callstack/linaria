@@ -69,6 +69,7 @@ const named = (name?: string = 'css', filename: ?string = null) => (
   const slug = slugify(filename || styles);
   const classname = `${name}__${slug}`;
 
+  sheet.insertRaw({ filename, template, expressions, classname });
   sheet.insert(`.${classname}`, styles);
 
   return classname;

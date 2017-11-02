@@ -12,7 +12,8 @@
     "prebuild": "yarn run clean",
     "server": "node static/server/server.js",
     "start-server-render": "yarn build:all && yarn server",
-    "start": "cross-env NODE_ENV=development webpack-dev-server"
+    "start": "cross-env NODE_ENV=development webpack-dev-server",
+    "lint-css": "stylelint src/**/*.js"
   },
   "dependencies": {
     "compression": "^1.7.1",
@@ -24,7 +25,9 @@
     "preact-compat": "^3.17.0",
     "prismjs": "^1.6.0",
     "react": "^16.0.0",
-    "react-dom": "^16.0.0"
+    "react-dom": "^16.0.0",
+    "stylelint": "^8.2.0",
+    "stylelint-config-recommended": "1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

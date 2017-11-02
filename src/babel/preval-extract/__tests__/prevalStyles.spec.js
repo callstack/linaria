@@ -12,7 +12,7 @@ jest.mock('../../lib/moduleSystem', () => ({
   instantiateModule: jest.fn(() => ({ exports: 'header__abc123' })),
 }));
 
-function runAssertions(expectedReplacement) {
+function runAssertions(expectedReplacement, source = 'css`color: #ffffff`') {
   const path = {
     node: {
       loc: {
@@ -30,7 +30,7 @@ function runAssertions(expectedReplacement) {
       },
     },
     getSource() {
-      return 'css`color: #ffffff`';
+      return source;
     },
     findParent() {
       return this.parentPath;
@@ -50,16 +50,32 @@ function runAssertions(expectedReplacement) {
   expect(instantiateModule).toHaveBeenCalled();
 }
 
+function clearMocks() {
+  process.env.NODE_ENV = '';
+  getReplacement.mockClear();
+  instantiateModule.mockClear();
+  clearLocalModulesFromCache.mockClear();
+}
+
 describe('preval-extract/prevalStyles', () => {
-  beforeEach(() => {
-    process.env.NODE_ENV = '';
-    getReplacement.mockClear();
-    instantiateModule.mockClear();
-    clearLocalModulesFromCache.mockClear();
-  });
+  beforeEach(clearMocks);
 
   it('should eval styles and replace css with class name from content', () => {
     runAssertions("css.named('header', 'test.js')`color: #ffffff`");
+  });
+
+  it('should eval styles and append filename if used with css.named', () => {
+    runAssertions(
+      "css.named('header', 'test.js')`color: #ffffff`",
+      "css.named('header')`color: #ffffff`"
+    );
+
+    clearMocks();
+
+    runAssertions(
+      "css.named('header', 'filename.js')`color: #ffffff`",
+      "css.named('header', 'filename.js')`color: #ffffff`"
+    );
   });
 
   it('should eval styles and replace css with class name from filename', () => {

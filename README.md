@@ -57,7 +57,22 @@ Add the `linaria/babel` preset to your Babel configuration:
 }
 ```
 
-See [Configuring Babel](/docs/BABEL_PRESET.md) for more options and [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md) for integrating with Webpack.
+## Documentation
+
+* [API and usage](/docs/API.md)
+  * [Client APIs](/docs/API.md#client-apis)
+  * [Server APIs](/docs/API.md#server-apis)
+* [Configuring Babel](/docs/BABEL_PRESET.md)
+  * [Preset documentation](/docs/BABEL_PRESET.md#linariababel-preset)
+  * [Create React App](/docs/BABEL_PRESET.md#create-react-app-ejected)
+  * [Next.js](/docs/BABEL_PRESET.md#nextjs)
+* [Dynamic Styles](/docs/DYNAMIC_STYLES.md)
+* [Theming](/docs/THEMING.md)
+* [Server Rendering](/docs/SERVER_RENDERING.md)
+* [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md)
+  * [Webpack](/docs/BUNDLERS_INTEGRATION.md#webpack)
+* [Linting](/docs/LINTING.md)
+* [Example](/website)
 
 ## How it works
 
@@ -173,16 +188,6 @@ export function App() {
   `;
   ```
   Here, there should be no side-effects in the `colors.js` file, or any file it imports. We recommend to move helpers and shared configuration to files without any side-effects.
-
-## Documentation
-
-* [API and usage](/docs/API.md)
-* [Configuring Babel](/docs/BABEL_PRESET.md)
-* [Dynamic Styles](/docs/DYNAMIC_STYLES.md)
-* [Theming](/docs/THEMING.md)
-* [Server Rendering](/docs/SERVER_RENDERING.md)
-* [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md)
-* [Example](/website)
 
 ## Editor Plugins
 

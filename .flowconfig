@@ -1,6 +1,7 @@
 [ignore]
 <PROJECT_ROOT>/build/.*
 <PROJECT_ROOT>/website/node_modules/preact/.*
+<PROJECT_ROOT>/website/node_modules/stylelint/.*
 
 [include]
 flow-typed/
