@@ -18,13 +18,12 @@
     "test": "jest __tests__",
     "test:integration": "yarn run build:clean && yarn run build:transpile && yarn run test:integration:ci",
     "test:integration:ci": "jest __integration-tests__",
-    "prepare": "yarn run build:clean && yarn run build:transpile && yarn run build:flow",
+    "prepare": "yarn run build:clean && yarn run build:transpile && yarn run build:flow && yarn link",
     "build:clean": "del build",
     "build:transpile": "babel src --out-dir build --ignore '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
     "build:transpile:watch": "babel src --out-dir build --watch --ignore '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
     "build:flow": "flow-copy-source src build -i '{**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**}'",
     "benchmark": "yarn run prepare && node ./benchmark/run.js",
-    "postinstall": "yarn link && yarn link linaria",
     "add-contributor": "all-contributors add"
   },
   "files": [
