@@ -120,6 +120,9 @@ describe('with inline rules', () => {
         article: css\`
           font-size: 3em;
         \`,
+        'article1': css\`
+          font-size: 3em;
+        \`,
       };
 
         <div>

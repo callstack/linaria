@@ -231,42 +231,82 @@ describe('preval-extract/index', () => {
       expect(prevalStyles.mock.calls[0][1]).toBe('test');
     });
 
-    it('should prevalStyles with object property', () => {
-      const { visitor } = prevalExtractPlugin(babel);
+    describe('should prevalStyles with object property', () => {
+      it('with identifier', () => {
+        const { visitor } = prevalExtractPlugin(babel);
 
-      const parent = {
-        type: 'ObjectProperty',
-        node: {
+        const parent = {
           type: 'ObjectProperty',
-          key: {
-            type: 'Identifier',
-            name: 'foo',
-          },
-        },
-      };
-
-      visitor.TaggedTemplateExpression(
-        {
           node: {
-            type: 'TaggedTemplateExpression',
-            tag: {
+            type: 'ObjectProperty',
+            key: {
               type: 'Identifier',
-              name: 'css',
+              name: 'foo',
             },
           },
-          traverse: () => {},
-          findParent: check => (check(parent) ? parent : null),
-          replaceWith: () => {},
-          addComment: () => {},
-        },
-        {
-          skipFile: false,
-          foundLinariaTaggedLiterals: false,
-        }
-      );
+        };
 
-      expect(prevalStyles).toHaveBeenCalled();
-      expect(prevalStyles.mock.calls[0][1]).toBe('foo');
+        visitor.TaggedTemplateExpression(
+          {
+            node: {
+              type: 'TaggedTemplateExpression',
+              tag: {
+                type: 'Identifier',
+                name: 'css',
+              },
+            },
+            traverse: () => {},
+            findParent: check => (check(parent) ? parent : null),
+            replaceWith: () => {},
+            addComment: () => {},
+          },
+          {
+            skipFile: false,
+            foundLinariaTaggedLiterals: false,
+          }
+        );
+
+        expect(prevalStyles).toHaveBeenCalled();
+        expect(prevalStyles.mock.calls[0][1]).toBe('foo');
+      });
+
+      it('with string literal', () => {
+        const { visitor } = prevalExtractPlugin(babel);
+
+        const parent = {
+          type: 'ObjectProperty',
+          node: {
+            type: 'ObjectProperty',
+            key: {
+              type: 'StringLiteral',
+              value: 'foo',
+            },
+          },
+        };
+
+        visitor.TaggedTemplateExpression(
+          {
+            node: {
+              type: 'TaggedTemplateExpression',
+              tag: {
+                type: 'Identifier',
+                name: 'css',
+              },
+            },
+            traverse: () => {},
+            findParent: check => (check(parent) ? parent : null),
+            replaceWith: () => {},
+            addComment: () => {},
+          },
+          {
+            skipFile: false,
+            foundLinariaTaggedLiterals: false,
+          }
+        );
+
+        expect(prevalStyles).toHaveBeenCalled();
+        expect(prevalStyles.mock.calls[0][1]).toBe('foo');
+      });
     });
 
     it('should prevalStyles with JSX opening element', () => {
