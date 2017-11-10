@@ -100,7 +100,7 @@ export default (babel: BabelCore) => {
 
           if (parent) {
             if (types.isObjectProperty(parent)) {
-              title = parent.node.key.name;
+              title = parent.node.key.name || parent.node.key.value;
             } else if (types.isJSXOpeningElement(parent)) {
               title = parent.node.name.name;
             } else if (types.isVariableDeclarator(parent)) {
