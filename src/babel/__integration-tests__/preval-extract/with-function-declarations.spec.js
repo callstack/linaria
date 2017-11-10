@@ -5,14 +5,6 @@ import dedent from 'dedent';
 import { transpile } from '../__utils__/exec';
 
 describe('preval-extract babel plugin with function delcarations/expressions', () => {
-  beforeEach(() => {
-    process.env.NODE_ENV = 'production';
-  });
-
-  afterEach(() => {
-    process.env.NODE_ENV = '';
-  });
-
   it('should preval with function declaration', () => {
     const { code, getCSSForClassName } = transpile(dedent`
     function getConstants() {

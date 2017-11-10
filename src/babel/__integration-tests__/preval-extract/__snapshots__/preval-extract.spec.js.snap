@@ -28,13 +28,13 @@ import css from '<<CWD>>/build/css.js';
 const size = 3;
 let color = "#ffffff";
 
-const header = /*linaria-output*/"_header__3r30ar";
+const header = /*linaria-output*/"_header__zkmz8m";
 `;
 
 exports[`preval-extract babel plugin should preval css with classname from another prevaled css 1`] = `
 "padding: 2rem;
 
-._title__1r77qux {
+._title__zkmz8m {
 margin-bottom: 1rem;
 }"
 `;

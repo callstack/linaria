@@ -51,7 +51,6 @@ function runAssertions(expectedReplacement, source = 'css`color: #ffffff`') {
 }
 
 function clearMocks() {
-  process.env.NODE_ENV = '';
   getReplacement.mockClear();
   instantiateModule.mockClear();
   clearLocalModulesFromCache.mockClear();
@@ -76,11 +75,5 @@ describe('preval-extract/prevalStyles', () => {
       "css.named('header', 'filename.js')`color: #ffffff`",
       "css.named('header', 'filename.js')`color: #ffffff`"
     );
-  });
-
-  it('should eval styles and replace css with class name from filename', () => {
-    process.env.NODE_ENV = 'production';
-    runAssertions("css.named('header')`color: #ffffff`");
-    process.env.NODE_ENV = '';
   });
 });
