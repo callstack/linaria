@@ -231,7 +231,7 @@ describe('preval-extract/index', () => {
       expect(prevalStyles.mock.calls[0][1]).toBe('test');
     });
 
-    it('should prevalStyles with object property', () => {
+    it('should prevalStyles with object property with identifier', () => {
       const { visitor } = prevalExtractPlugin(babel);
 
       const parent = {
@@ -267,6 +267,82 @@ describe('preval-extract/index', () => {
 
       expect(prevalStyles).toHaveBeenCalled();
       expect(prevalStyles.mock.calls[0][1]).toBe('foo');
+    });
+
+    it('should prevalStyles with object property with string literal', () => {
+      const { visitor } = prevalExtractPlugin(babel);
+
+      const parent = {
+        type: 'ObjectProperty',
+        node: {
+          type: 'ObjectProperty',
+          key: {
+            type: 'StringLiteral',
+            value: 'foo',
+          },
+        },
+      };
+
+      visitor.TaggedTemplateExpression(
+        {
+          node: {
+            type: 'TaggedTemplateExpression',
+            tag: {
+              type: 'Identifier',
+              name: 'css',
+            },
+          },
+          traverse: () => {},
+          findParent: check => (check(parent) ? parent : null),
+          replaceWith: () => {},
+          addComment: () => {},
+        },
+        {
+          skipFile: false,
+          foundLinariaTaggedLiterals: false,
+        }
+      );
+
+      expect(prevalStyles).toHaveBeenCalled();
+      expect(prevalStyles.mock.calls[0][1]).toBe('foo');
+    });
+
+    it('should prevalStyles with object property with numeric literal', () => {
+      const { visitor } = prevalExtractPlugin(babel);
+
+      const parent = {
+        type: 'ObjectProperty',
+        node: {
+          type: 'ObjectProperty',
+          key: {
+            type: 'NumericLiteral',
+            value: 42,
+          },
+        },
+      };
+
+      visitor.TaggedTemplateExpression(
+        {
+          node: {
+            type: 'TaggedTemplateExpression',
+            tag: {
+              type: 'Identifier',
+              name: 'css',
+            },
+          },
+          traverse: () => {},
+          findParent: check => (check(parent) ? parent : null),
+          replaceWith: () => {},
+          addComment: () => {},
+        },
+        {
+          skipFile: false,
+          foundLinariaTaggedLiterals: false,
+        }
+      );
+
+      expect(prevalStyles).toHaveBeenCalled();
+      expect(prevalStyles.mock.calls[0][1]).toBe(42);
     });
 
     it('should prevalStyles with JSX opening element', () => {
