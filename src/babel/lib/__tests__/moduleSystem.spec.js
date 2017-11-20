@@ -143,4 +143,30 @@ describe('babel/lib/moduleSystem', () => {
       expect(error.stack).toMatch(`${__filename}:1:0`);
     }
   });
+
+  it('should instantiate a dummy wrapper module for unsupported file extensions', () => {
+    const moduleInstance = instantiateModule(
+      'module.exports = require("./image.svg");',
+      path.join(__dirname, 'test.js')
+    );
+    expect(moduleInstance.exports).toEqual('./image.svg');
+  });
+
+  it('should instantiate a module for JSON file', () => {
+    const content = { someColor: '#ffffff' };
+    const moduleInstance = instantiateModule(
+      JSON.stringify(content),
+      path.join(__dirname, 'test.json')
+    );
+    expect(moduleInstance.exports).toEqual(content);
+  });
+
+  it('should throw meaningful error for JSON files', () => {
+    expect(() => {
+      instantiateModule(
+        '{ "someColor": "#ffffff }',
+        path.join(__dirname, 'test.json')
+      );
+    }).toThrowErrorMatchingSnapshot();
+  });
 });

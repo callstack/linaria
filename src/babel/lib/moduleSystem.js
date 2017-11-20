@@ -90,6 +90,16 @@ export class Module {
   _compile(code: string, altFilename?: string): Exports {
     const filename = altFilename || this.filename;
 
+    if (/\.json$/.test(filename)) {
+      try {
+        this.exports = JSON.parse(code);
+      } catch (error) {
+        throw new Error(`${error.message} (${filename})`);
+      }
+
+      return this.exports;
+    }
+
     // Transpile module implementation.
     const { code: moduleBody, map } = babel.transform(code, {
       plugins: [
@@ -208,6 +218,18 @@ function getRequireMock(parent: ?Module) {
   }
 
   function requireMock(moduleId: string): Exports {
+    /**
+     * For non JS/JSON requires, we create a dummy wrapper module and just export
+     * the moduleId from it, thus letting the bundler handle the rest.
+     */
+    if (/\.(?!js)[a-zA-Z0-9]+$/.test(moduleId)) {
+      return instantiateModule(
+        `module.exports = '${moduleId}'`,
+        moduleId,
+        parent
+      ).exports;
+    }
+
     const filename = resolveMock(moduleId);
 
     // Native Node modules
