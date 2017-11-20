@@ -6,14 +6,6 @@ import dedent from 'dedent';
 import { extract } from '../__utils__/exec';
 
 describe('preval-extract babel plugin with extraction enabled', () => {
-  beforeEach(() => {
-    process.env.NODE_ENV = 'production';
-  });
-
-  afterEach(() => {
-    process.env.NODE_ENV = '';
-  });
-
   it('should extract all styles to a single file', () => {
     const filename = path.join(process.cwd(), 'test.js');
     const { data: data1, filenames: filenames1 } = extract(

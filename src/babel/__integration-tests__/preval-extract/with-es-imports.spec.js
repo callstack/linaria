@@ -5,14 +5,6 @@ import dedent from 'dedent';
 import { transpile } from '../__utils__/exec';
 
 describe('preval-extract babel plugin with ES imports', () => {
-  beforeEach(() => {
-    process.env.NODE_ENV = 'production';
-  });
-
-  afterEach(() => {
-    process.env.NODE_ENV = '';
-  });
-
   it('should preval default export', () => {
     const { code, getCSSForClassName } = transpile(dedent`
       import constants from "./src/babel/__integration-tests__/__fixtures__/esm/constants.js";

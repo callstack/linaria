@@ -6,14 +6,6 @@ import dedent from 'dedent';
 import { transpile } from '../__utils__/exec';
 
 describe('preval-extract babel plugin code frames', () => {
-  beforeEach(() => {
-    process.env.NODE_ENV = 'production';
-  });
-
-  afterEach(() => {
-    process.env.NODE_ENV = '';
-  });
-
   it('should build valid code frame for errors while evaling styles', () => {
     expect(() => {
       transpile(dedent`

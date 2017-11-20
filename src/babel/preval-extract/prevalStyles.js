@@ -39,26 +39,16 @@ export default function(
   state: State,
   requirements: RequirementSource[]
 ) {
-  const env = process.env.NODE_ENV || process.env.BABEL_ENV;
-
   const { name } = path.scope.generateUidIdentifier(title);
   const replacement = getReplacement([
     ...requirements,
     {
       code: `module.exports = ${path
         .getSource()
-        .replace(
-          /css(?!\.named)/g,
-          env === 'production'
-            ? `css.named('${name}')`
-            : `css.named('${name}', '${state.filename}')`
-        )
+        .replace(/css(?!\.named)/g, `css.named('${name}', '${state.filename}')`)
         .replace(
           /css\.named\(([^,]+)\)/,
-          (input, customName) =>
-            env === 'production'
-              ? input
-              : `css.named(${customName}, '${state.filename}')`
+          (input, customName) => `css.named(${customName}, '${state.filename}')`
         )}`,
       loc: path.node.loc.start,
     },

@@ -5,14 +5,6 @@ import dedent from 'dedent';
 import { transpile } from '../__utils__/exec';
 
 describe('preval-extract babel plugin with plain objects', () => {
-  beforeEach(() => {
-    process.env.NODE_ENV = 'production';
-  });
-
-  afterEach(() => {
-    process.env.NODE_ENV = '';
-  });
-
   it('should preval styles with shallow object', () => {
     const { code, getCSSForClassName } = transpile(dedent`
     const constants = {

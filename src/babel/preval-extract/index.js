@@ -15,7 +15,7 @@ import {
   isLinariaTaggedTemplate,
   isExcluded,
 } from './validators';
-import { getSelfBinding } from './utils';
+import { getSelfBinding, relativeToCwd } from './utils';
 import prevalStyles from './prevalStyles';
 import resolveSource from './resolveSource';
 import extractStyles from './extractStyles';
@@ -72,7 +72,7 @@ export default (babel: BabelCore) => {
                 token.value.trim() === 'linaria-preval'
             );
           state.foundLinariaTaggedLiterals = false;
-          state.filename = state.file.opts.filename;
+          state.filename = relativeToCwd(state.file.opts.filename);
         },
         exit(path: NodePath<*>, state: State) {
           if (state.skipFile) {
