@@ -35,9 +35,14 @@ export default function resolveSource(
   path: NodePath<*>
 ): ?RequirementSource {
   if (
-    ['module', 'global', '__dirname', '__filename', 'exports'].includes(
-      path.node.name
-    )
+    [
+      'module',
+      'global',
+      '__dirname',
+      '__filename',
+      'exports',
+      'require',
+    ].includes(path.node.name)
   ) {
     return null;
   }
