@@ -222,7 +222,7 @@ function getRequireMock(parent: ?Module) {
      * For non JS/JSON requires, we create a dummy wrapper module and just export
      * the moduleId from it, thus letting the bundler handle the rest.
      */
-    if (/\.(?!\/)(?!js$|json$).+$/.test(moduleId)) {
+    if (/\.(?!js)[a-zA-Z0-9]+$/.test(moduleId)) {
       return instantiateModule(
         `module.exports = '${moduleId}'`,
         moduleId,
