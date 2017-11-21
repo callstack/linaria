@@ -1,6 +1,6 @@
 {
   "name": "linaria",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Fast zero-runtime CSS in JS library",
   "main": "build/index.js",
   "license": "MIT",
