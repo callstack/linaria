@@ -45,6 +45,7 @@
     "error-stack-parser": "^2.0.1",
     "mkdirp": "^0.5.1",
     "postcss": "^6.0.10",
+    "prettier": "^1.7.4",
     "source-map": "^0.5.7",
     "stylis": "^3.2.13"
   },
@@ -61,13 +62,12 @@
     "del-cli": "^1.1.0",
     "escape-string-regexp": "^1.0.5",
     "eslint": "^4.6.1",
-    "eslint-config-callstack-io": "^0.4.1",
+    "eslint-config-callstack-io": "^1.0.1",
     "flow-bin": "^0.53.1",
     "flow-copy-source": "^1.2.1",
     "glob": "^7.1.2",
     "jest": "^21.1.0",
     "jest-image-snapshot": "^1.0.1",
-    "prettier": "^1.6.1",
     "puppeteer": "^0.12.0",
     "strip-ansi": "^4.0.0"
   },

@@ -6,7 +6,9 @@ import include from '../include';
 
 describe('include module', () => {
   it('should include styles from a single class name', () => {
-    const text = css`font-weight: 400;`;
+    const text = css`
+      font-weight: 400;
+    `;
 
     const title = css`
       color: orange;

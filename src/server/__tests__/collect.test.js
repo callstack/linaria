@@ -4,8 +4,7 @@ import dedent from 'dedent';
 import prettier from 'prettier';
 import collect from '../collect';
 
-const prettyPrint = (src: string) =>
-  prettier.format(src, { parser: 'postcss' });
+const prettyPrint = (src: string) => prettier.format(src, { parser: 'scss' });
 
 const testCollect = (html, css) => {
   const { critical, other } = collect(html, css);

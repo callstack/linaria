@@ -41,15 +41,16 @@ export default function linariaStylelintPreprocessor(/* options */) {
         return '';
       }
 
-      const css = rawStyles[
-        filename
-      ].reduce((acc, { template, expressions, classname }) => {
-        const styles = toString(
-          template,
-          expressions.map(expression => String(expression).replace('\n', ' '))
-        );
-        return `${acc}\n.${classname} {${styles}}`;
-      }, '');
+      const css = rawStyles[filename].reduce(
+        (acc, { template, expressions, classname }) => {
+          const styles = toString(
+            template,
+            expressions.map(expression => String(expression).replace('\n', ' '))
+          );
+          return `${acc}\n.${classname} {${styles}}`;
+        },
+        ''
+      );
 
       cache[filename] = { css, code, map, input };
 
