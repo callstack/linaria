@@ -20,4 +20,6 @@ const footer = css`
   font-size: 0.9em;
 `;
 
-const footerContainer = css`display: flex;`;
+const footerContainer = css`
+  display: flex;
+`;

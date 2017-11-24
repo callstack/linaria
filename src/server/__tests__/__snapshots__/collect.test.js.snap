@@ -9,47 +9,47 @@ exports[`classname in @rule critical 1`] = `
   .linaria {
   }
 }
-@charset () {
+@charset() {
   .linaria {
   }
 }
-@import () {
+@import() {
   .linaria {
   }
 }
-@namespace () {
+@namespace() {
   .linaria {
   }
 }
-@media () {
+@media() {
   .linaria {
   }
 }
-@supports () {
+@supports() {
   .linaria {
   }
 }
-@document () {
+@document() {
   .linaria {
   }
 }
-@page () {
+@page() {
   .linaria {
   }
 }
-@font-face () {
+@font-face() {
   .linaria {
   }
 }
-@viewport () {
+@viewport() {
   .linaria {
   }
 }
-@counter-style () {
+@counter-style() {
   .linaria {
   }
 }
-@font-feature-values () {
+@font-feature-values() {
   .linaria {
   }
 }
@@ -65,47 +65,47 @@ exports[`classname in @rule other 1`] = `
   .other {
   }
 }
-@charset () {
+@charset() {
   .other {
   }
 }
-@import () {
+@import() {
   .other {
   }
 }
-@namespace () {
+@namespace() {
   .other {
   }
 }
-@media () {
+@media() {
   .other {
   }
 }
-@supports () {
+@supports() {
   .other {
   }
 }
-@document () {
+@document() {
   .other {
   }
 }
-@page () {
+@page() {
   .other {
   }
 }
-@font-face () {
+@font-face() {
   .other {
   }
 }
-@viewport () {
+@viewport() {
   .other {
   }
 }
-@counter-style () {
+@counter-style() {
   .other {
   }
 }
-@font-feature-values () {
+@font-feature-values() {
   .other {
   }
 }

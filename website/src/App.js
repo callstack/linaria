@@ -159,7 +159,9 @@ export default function Index() {
   );
 }
 
-const getStarted = css`color: #123;`;
+const getStarted = css`
+  color: #123;
+`;
 
 const result = css`
   display: flex;
@@ -180,4 +182,6 @@ const resultItem = css`
   }
 `;
 
-const stretch = css`flex: 1;`;
+const stretch = css`
+  flex: 1;
+`;

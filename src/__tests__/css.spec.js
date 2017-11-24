@@ -14,7 +14,9 @@ jest.mock('../babel/lib/errorUtils', () => ({
 describe('css module', () => {
   it('should return a class name given some css', () => {
     const color = 'blue';
-    const title = css`color: ${color};`;
+    const title = css`
+      color: ${color};
+    `;
 
     expect(title).toBe('css__1r77qux');
   });

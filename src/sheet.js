@@ -39,8 +39,11 @@ function sheet() {
       classname,
     }: RawStyles & { filename: ?string }) {
       if (filename && process.env.LINARIA_COLLECT_RAW_STYLES) {
-        rawCache[filename] = (rawCache[filename] || [])
-          .concat({ template, expressions, classname });
+        rawCache[filename] = (rawCache[filename] || []).concat({
+          template,
+          expressions,
+          classname,
+        });
       }
     },
     insert(selector: string, css: string) {
