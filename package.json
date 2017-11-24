@@ -45,7 +45,6 @@
     "error-stack-parser": "^2.0.1",
     "mkdirp": "^0.5.1",
     "postcss": "^6.0.10",
-    "prettier": "^1.7.4",
     "source-map": "^0.5.7",
     "stylis": "^3.2.13"
   },
@@ -68,6 +67,7 @@
     "glob": "^7.1.2",
     "jest": "^21.1.0",
     "jest-image-snapshot": "^1.0.1",
+    "prettier": "^1.7.4",
     "puppeteer": "^0.12.0",
     "strip-ansi": "^4.0.0"
   },
