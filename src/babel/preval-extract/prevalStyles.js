@@ -12,12 +12,17 @@ import type {
   BabelCallExpression,
   RequirementSource,
 } from '../types';
+import slugify from '../../slugify';
 
 import getReplacement from './getReplacement';
 import {
   instantiateModule,
   clearLocalModulesFromCache,
 } from '../lib/moduleSystem';
+
+function getMinifiedClassName(className: string) {
+  return `ln${slugify(className).substr(0, 6)}`;
+}
 
 /**
  * const header = css`
@@ -62,5 +67,9 @@ export default function(
     resolve(state.filename)
   );
 
-  return babel.types.stringLiteral(className);
+  const { minifyClassnames } = this.state.opts;
+
+  return babel.types.stringLiteral(
+    minifyClassnames ? getMinifiedClassName(className) : className
+  );
 }
