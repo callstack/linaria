@@ -110,6 +110,10 @@ export default function extractStyles(
   const filename = single
     ? path.join(process.cwd(), outDir, basename)
     : getOutputFilename(relativeCurrentFilename, outDir);
+  const importPath = `./${path.relative(
+    path.dirname(absCurrentFilename),
+    filename
+  )}`;
 
   if (!extract) {
     return;
@@ -132,7 +136,7 @@ export default function extractStyles(
       stylesCache[absCurrentFilename] = data;
     } else {
       if (hasCachedStyles(filename, data)) {
-        addRequireForCss(types, program, filename);
+        addRequireForCss(types, program, importPath);
         return;
       }
       stylesCache[filename] = data;
@@ -146,7 +150,7 @@ export default function extractStyles(
     );
   } else {
     outputStylesToFile(filename, withPreamble(data));
-    addRequireForCss(types, program, filename);
+    addRequireForCss(types, program, importPath);
   }
 }
 

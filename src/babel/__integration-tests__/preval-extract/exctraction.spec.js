@@ -65,12 +65,8 @@ describe('preval-extract babel plugin with extraction enabled', () => {
       { filename: filename2 }
     );
 
-    expect(transpiled1).toMatch(
-      `require('${path.join(process.cwd(), '.linaria-cache/test1.css')}')`
-    );
-    expect(transpiled2).toMatch(
-      `require('${path.join(process.cwd(), '.linaria-cache/test2.css')}')`
-    );
+    expect(transpiled1).toMatch(`require('./.linaria-cache/test1.css')`);
+    expect(transpiled2).toMatch(`require('./.linaria-cache/test2.css')`);
 
     expect(data1).toMatchSnapshot();
     expect(data2).toMatchSnapshot();
