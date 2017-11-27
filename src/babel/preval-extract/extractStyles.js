@@ -18,13 +18,16 @@ const withPreamble = data =>
  * Get output filename with directory structure from source preserved inside
  * custom outDir.
  */
-function getOutputFilename(relativeFilename: string, outDir: string): string {
+function getOutputFilename(
+  relativeFilename: string,
+  absOutDir: string
+): string {
   const basename = /(.+)\..+$/.exec(path.basename(relativeFilename))[1];
   const relativeOutputFilename = path.join(
     path.dirname(relativeFilename),
     `${basename}.css`
   );
-  return path.join(process.cwd(), outDir, relativeOutputFilename);
+  return path.join(absOutDir, relativeOutputFilename);
 }
 
 let stylesCache = {};
@@ -95,21 +98,28 @@ export default function extractStyles(
   const relativeCurrentFilename = relativeToCwd(currentFilename);
   const absCurrentFilename = makeAbsolute(currentFilename);
 
-  const { single, cache, extract, outDir, filename: basename } = {
-    cache: true,
-    extract: true,
-    single: false,
-    outDir: '.linaria-cache',
-    filename: 'styles.css',
-    ...options,
-  };
+  const {
+    single = false,
+    cache = true,
+    extract = true,
+    outDir = '.linaria-cache',
+    filename: basename = 'styles.css',
+  } = options;
+
+  const absOutDir = path.isAbsolute(outDir)
+    ? outDir
+    : path.join(process.cwd(), outDir);
 
   // If single === true, we compute filename from outDir and filename options,
   // since there will be only one file, otherwise we need to reconstruct directory
   // structure inside outDir. In that case filename option is discard.
   const filename = single
-    ? path.join(process.cwd(), outDir, basename)
-    : getOutputFilename(relativeCurrentFilename, outDir);
+    ? path.join(absOutDir, basename)
+    : getOutputFilename(relativeCurrentFilename, absOutDir);
+  const importPath = `./${path.relative(
+    path.dirname(absCurrentFilename),
+    filename
+  )}`;
 
   if (!extract) {
     return;
@@ -132,7 +142,7 @@ export default function extractStyles(
       stylesCache[absCurrentFilename] = data;
     } else {
       if (hasCachedStyles(filename, data)) {
-        addRequireForCss(types, program, filename);
+        addRequireForCss(types, program, importPath);
         return;
       }
       stylesCache[filename] = data;
@@ -146,7 +156,7 @@ export default function extractStyles(
     );
   } else {
     outputStylesToFile(filename, withPreamble(data));
-    addRequireForCss(types, program, filename);
+    addRequireForCss(types, program, importPath);
   }
 }
 
