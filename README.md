@@ -206,6 +206,7 @@ export function App() {
 ## Recommended Libraries
 
 * [linaria-jest](https://github.com/thymikee/linaria-jest) – Jest testing utilities for Linaria.
+* [babel-plugin-object-styles-to-template](https://github.com/satya164/babel-plugin-object-styles-to-template) - Babel plugin to write styles in object syntax with linaria
 * [polished.js](https://polished.js.org/) - A lightweight toolset for writing styles in JavaScript.
 
 ## Inspiration
