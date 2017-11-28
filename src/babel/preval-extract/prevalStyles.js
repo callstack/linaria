@@ -1,6 +1,7 @@
 /* @flow */
 
 import { resolve } from 'path';
+import generate from 'babel-generator';
 
 import type {
   BabelCore,
@@ -40,11 +41,12 @@ export default function(
   requirements: RequirementSource[]
 ) {
   const { name } = path.scope.generateUidIdentifier(title);
+  const source = path.getSource() || generate(path.node).code;
+
   const replacement = getReplacement([
     ...requirements,
     {
-      code: `module.exports = ${path
-        .getSource()
+      code: `module.exports = ${source
         .replace(/css(?!\.named)/g, `css.named('${name}', '${state.filename}')`)
         .replace(
           /css\.named\(([^,]+)\)/,
