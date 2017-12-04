@@ -21,7 +21,7 @@ import {
 } from '../lib/moduleSystem';
 
 function getMinifiedClassName(className: string) {
-  return `ln${slugify(className).substr(0, 6)}`;
+  return `ln${slugify(className)}`;
 }
 
 /**
