@@ -67,7 +67,7 @@ export default function(
     resolve(state.filename)
   );
 
-  const { minifyClassnames } = this.state.opts;
+  const { minifyClassnames } = state.opts;
 
   return babel.types.stringLiteral(
     minifyClassnames ? getMinifiedClassName(className) : className
