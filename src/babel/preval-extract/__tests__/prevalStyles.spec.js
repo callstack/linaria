@@ -88,7 +88,7 @@ describe('preval-extract/prevalStyles', () => {
     );
   });
 
-  it('test', () => {
+  it('should return minified className', () => {
     const {
       value: className,
     } = runAssertions(
@@ -99,6 +99,7 @@ describe('preval-extract/prevalStyles', () => {
       }
     );
 
+    expect(/ln[\w]{6}/.test(className)).toBeTruthy();
     expect(className.startsWith('ln')).toBeTruthy();
   });
 });
