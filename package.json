@@ -20,16 +20,17 @@
     "test:integration:ci": "jest __integration-tests__",
     "prepare": "yarn run build:clean && yarn run build:transpile && yarn run build:flow && yarn link",
     "build:clean": "del build",
-    "build:transpile":
-      "babel src --out-dir build --ignore '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
-    "build:transpile:watch":
-      "babel src --out-dir build --watch --ignore '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
-    "build:flow":
-      "flow-copy-source src build -i '{**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**}'",
+    "build:transpile": "babel src --out-dir build --ignore '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
+    "build:transpile:watch": "babel src --out-dir build --watch --ignore '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
+    "build:flow": "flow-copy-source src build -i '{**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**}'",
     "benchmark": "yarn run prepare && node ./benchmark/run.js",
     "add-contributor": "all-contributors add"
   },
-  "files": ["/build", "/babel.js", "/server.js"],
+  "files": [
+    "/build",
+    "/babel.js",
+    "/server.js"
+  ],
   "peerDependencies": {
     "stylelint": "8.x",
     "stylelint-config-recommended": "1.x"
