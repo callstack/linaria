@@ -100,6 +100,5 @@ describe('preval-extract/prevalStyles', () => {
     );
 
     expect(/ln[\w]{6}/.test(className)).toBeTruthy();
-    expect(className.startsWith('ln')).toBeTruthy();
   });
 });

@@ -69,6 +69,7 @@
     "jest-image-snapshot": "^1.0.1",
     "prettier": "^1.7.4",
     "puppeteer": "^0.12.0",
+    "short-hash": "^1.0.0",
     "strip-ansi": "^4.0.0"
   },
   "jest": {

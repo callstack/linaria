@@ -1,7 +1,11 @@
 /* @flow */
 
 import { resolve } from 'path';
+<<<<<<< HEAD
 import generate from 'babel-generator';
+=======
+import shortHash from 'short-hash';
+>>>>>>> feat: added short-hash and used instead of slugify
 
 import type {
   BabelCore,
@@ -12,7 +16,6 @@ import type {
   BabelCallExpression,
   RequirementSource,
 } from '../types';
-import slugify from '../../slugify';
 
 import getReplacement from './getReplacement';
 import {
@@ -21,7 +24,7 @@ import {
 } from '../lib/moduleSystem';
 
 function getMinifiedClassName(className: string) {
-  return `ln${slugify(className)}`;
+  return `ln${shortHash(className)}`;
 }
 
 /**

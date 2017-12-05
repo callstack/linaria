@@ -35,6 +35,7 @@ You can configure the preset by passing and object with options:
 * `outDir: string` (default: `'.linaria-cache'`) - Path to directory where the CSS files should be saved. It must be relative to the current working directory. If `single` is set to `false` the __directory structure from the source will be preserved__.
 * `cache: boolean` (default: `true`) - Defines whether to disable the cache. By default it is enabled - if the styles between extractions are the same, the files won't be overwritten again.
 * `extract: boolean` (default: `true`) - Defines whether to disable the extraction of styles to CSS files. If set to `false` it will evaluate `css` tags and create a class names for each one, but the CSS files won't be created. Useful in SSR, if you don't want to create CSS files, but you want to have class names.
+* `minifyClassnames: boolean` (default: `false`) - Define whether to minify class names matching pattern `/ln[a-zA-Z0-9]{6}/`.
 
 ## Testing components
 
