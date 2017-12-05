@@ -89,9 +89,7 @@ describe('preval-extract/prevalStyles', () => {
   });
 
   it('should return minified className', () => {
-    const {
-      value: className,
-    } = runAssertions(
+    const { value: className } = runAssertions(
       "css.named('header', 'test.js')`color: #ffffff`",
       'css`color: #ffffff`',
       {
