@@ -99,6 +99,6 @@ describe('preval-extract/prevalStyles', () => {
       }
     );
 
-    expect(/ln[\w]{6}/.test(className)).toBeTruthy();
+    expect(/ln[a-zA-Z0-9]{6}/.test(className)).toBeTruthy();
   });
 });
