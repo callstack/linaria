@@ -12,7 +12,11 @@ jest.mock('../../lib/moduleSystem', () => ({
   instantiateModule: jest.fn(() => ({ exports: 'header__abc123' })),
 }));
 
-function runAssertions(expectedReplacement, source = 'css`color: #ffffff`') {
+function runAssertions(
+  expectedReplacement,
+  source = 'css`color: #ffffff`',
+  options = {}
+) {
   const path = {
     node: {
       loc: {
@@ -42,12 +46,19 @@ function runAssertions(expectedReplacement, source = 'css`color: #ffffff`') {
     },
   };
 
-  prevalStyles(babel, 'header', path, { filename: 'test.js' }, []);
-
+  const babelToken = prevalStyles(
+    babel,
+    'header',
+    path,
+    { filename: 'test.js', opts: options },
+    []
+  );
   expect(getReplacement).toHaveBeenCalled();
   expect(getReplacement.mock.calls[0][0][0].code).toMatch(expectedReplacement);
   expect(clearLocalModulesFromCache).toHaveBeenCalled();
   expect(instantiateModule).toHaveBeenCalled();
+
+  return babelToken;
 }
 
 function clearMocks() {
@@ -75,5 +86,17 @@ describe('preval-extract/prevalStyles', () => {
       "css.named('header', 'filename.js')`color: #ffffff`",
       "css.named('header', 'filename.js')`color: #ffffff`"
     );
+  });
+
+  it('should return minified className', () => {
+    const { value: className } = runAssertions(
+      "css.named('header', 'test.js')`color: #ffffff`",
+      'css`color: #ffffff`',
+      {
+        minifyClassnames: true,
+      }
+    );
+
+    expect(/ln[a-zA-Z0-9]{6}/.test(className)).toBeTruthy();
   });
 });

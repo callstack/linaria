@@ -46,6 +46,7 @@
     "mkdirp": "^0.5.1",
     "postcss": "^6.0.10",
     "source-map": "^0.5.7",
+    "short-hash": "^1.0.0",
     "stylis": "^3.2.13"
   },
   "devDependencies": {

@@ -2,6 +2,7 @@
 
 import { resolve } from 'path';
 import generate from 'babel-generator';
+import shortHash from 'short-hash';
 
 import type {
   BabelCore,
@@ -18,6 +19,10 @@ import {
   instantiateModule,
   clearLocalModulesFromCache,
 } from '../lib/moduleSystem';
+
+function getMinifiedClassName(className: string) {
+  return `ln${shortHash(className)}`;
+}
 
 /**
  * const header = css`
@@ -62,5 +67,9 @@ export default function(
     resolve(state.filename)
   );
 
-  return babel.types.stringLiteral(className);
+  const { minifyClassnames } = state.opts;
+
+  return babel.types.stringLiteral(
+    minifyClassnames ? getMinifiedClassName(className) : className
+  );
 }
