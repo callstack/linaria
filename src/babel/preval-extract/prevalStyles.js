@@ -1,11 +1,8 @@
 /* @flow */
 
 import { resolve } from 'path';
-<<<<<<< HEAD
 import generate from 'babel-generator';
-=======
 import shortHash from 'short-hash';
->>>>>>> feat: added short-hash and used instead of slugify
 
 import type {
   BabelCore,
