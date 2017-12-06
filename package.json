@@ -1,6 +1,6 @@
 {
   "name": "linaria",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Fast zero-runtime CSS in JS library",
   "main": "build/index.js",
   "license": "MIT",
@@ -47,8 +47,8 @@
     "error-stack-parser": "^2.0.1",
     "mkdirp": "^0.5.1",
     "postcss": "^6.0.10",
-    "source-map": "^0.5.7",
     "short-hash": "^1.0.0",
+    "source-map": "^0.5.7",
     "stylis": "^3.2.13"
   },
   "devDependencies": {
