@@ -29,7 +29,9 @@
   "files": [
     "/build",
     "/babel.js",
-    "/server.js"
+    "/server.js",
+    "/stylelint-config.js",
+    "/stylelint-preprocessor.js"
   ],
   "peerDependencies": {
     "stylelint": "8.x",
