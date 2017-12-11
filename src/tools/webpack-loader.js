@@ -1,0 +1,93 @@
+/* @flow */
+
+import * as babel from 'babel-core';
+
+function shouldRunLinaria(source: string) {
+  return (
+    (/import .+ from ['"]linaria['"]/g.test(source) ||
+      /require\(['"]linaria['"]\)/g.test(source)) &&
+    /css(\.named)?`/g.test(source)
+  );
+}
+
+function getParserOptions() {
+  // @TODO: find a way to either enable all or enable syntaxes based on babelrc.
+  return {
+    plugins: [
+      'jsx',
+      'flow',
+      'objectRestSpread',
+      'classProperties',
+      'asyncGenerators',
+      'functionBind',
+      'dynamicImport',
+    ],
+  };
+}
+
+function transpile(source: string, map: any, filename: string) {
+  return babel.transform(source, {
+    filename,
+    sourceMaps: true,
+    inputSourceMap: map,
+    presets: [require.resolve('../../babel.js')],
+    parserOpts: getParserOptions(),
+    babelrc: false,
+  });
+}
+
+function getLinariaParentModules(fs: any, module: any) {
+  const parentModules = [];
+
+  function findLinariaModules(reasons) {
+    reasons.forEach(reason => {
+      const source = fs.readFileSync(reason.module.resource).toString();
+      if (shouldRunLinaria(source)) {
+        parentModules.push({ source, filename: reason.module.resource });
+      }
+
+      findLinariaModules(reason.module.reasons);
+    });
+  }
+
+  findLinariaModules(module.reasons);
+
+  return parentModules;
+}
+
+const builtLinariaModules = [];
+
+export default function linariaLoader(
+  source: string,
+  inputMap: any,
+  meta: any
+) {
+  try {
+    // If the module has linaria styles, we build it and we're done here.
+    if (shouldRunLinaria(source)) {
+      const { code, map } = transpile(source, inputMap, this.resourcePath);
+      builtLinariaModules.push(this.resourcePath);
+      this.callback(null, code, map, meta);
+      return;
+    }
+
+    // Otherwise, we check for parent modules, which use this one
+    // and if they have linaria styles, we build them.
+    const parentModuleToTranspile = getLinariaParentModules(
+      this.fs.fileSystem,
+      this._module
+    );
+    parentModuleToTranspile.forEach(item => {
+      // We only care about modules which was previously built.
+      if (builtLinariaModules.indexOf(item.filename) > -1) {
+        transpile(item.source, null, item.filename);
+      }
+    });
+
+    this.callback(null, source, inputMap, meta);
+  } catch (error) {
+    this.callback(error);
+  }
+  // eslint-disable-next-line no-useless-return
+  return;
+}

@@ -50,7 +50,7 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: { loader: 'babel-loader' },
+        use: [{ loader: 'babel-loader' }, { loader: 'linaria/loader' }],
       },
     ].concat(
       env.NODE_ENV === 'production'
