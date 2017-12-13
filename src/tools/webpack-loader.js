@@ -10,30 +10,30 @@ function shouldRunLinaria(source: string) {
   );
 }
 
-function getParserOptions() {
-  // @TODO: find a way to either enable all or enable syntaxes based on babelrc.
-  return {
-    plugins: [
-      'jsx',
-      'flow',
-      'objectRestSpread',
-      'classProperties',
-      'asyncGenerators',
-      'functionBind',
-      'dynamicImport',
-    ],
-  };
-}
-
 function transpile(source: string, map: any, filename: string) {
-  return babel.transform(source, {
-    filename,
-    sourceMaps: true,
-    inputSourceMap: map,
-    presets: [require.resolve('../../babel.js')],
-    parserOpts: getParserOptions(),
-    babelrc: false,
-  });
+  const file = new babel.File(
+    {
+      filename,
+      sourceMaps: true,
+      inputSourceMap: map,
+    },
+    new babel.Pipeline()
+  );
+
+  // `transformFromAst` is synchronous in Babel 6, but async in Babel 7 hence
+  // the `transformFromAstSync`.
+  return (babel.transformFromAstSync || babel.transformFromAst)(
+    file.parse(source),
+    source,
+    {
+      filename,
+      sourceMaps: true,
+      inputSourceMap: map,
+      presets: [require.resolve('../../babel.js')],
+      parserOpts: file.parserOpts,
+      babelrc: false,
+    }
+  );
 }
 
 function getLinariaParentModules(fs: any, module: any) {
@@ -41,6 +41,10 @@ function getLinariaParentModules(fs: any, module: any) {
 
   function findLinariaModules(reasons) {
     reasons.forEach(reason => {
+      if (!reason.module.resource) {
+        return;
+      }
+
       const source = fs.readFileSync(reason.module.resource).toString();
       if (shouldRunLinaria(source)) {
         parentModules.push({ source, filename: reason.module.resource });
@@ -57,37 +61,70 @@ function getLinariaParentModules(fs: any, module: any) {
 
 const builtLinariaModules = [];
 
-export default function linariaLoader(
-  source: string,
-  inputMap: any,
-  meta: any
-) {
-  try {
-    // If the module has linaria styles, we build it and we're done here.
-    if (shouldRunLinaria(source)) {
-      const { code, map } = transpile(source, inputMap, this.resourcePath);
-      builtLinariaModules.push(this.resourcePath);
-      this.callback(null, code, map, meta);
-      return;
+function linariaLoader(source: string, inputMap: any, meta: any) {
+  // If the module has linaria styles, we build it and we're done here.
+  if (shouldRunLinaria(source)) {
+    const { code, map } = transpile(source, inputMap, this.resourcePath);
+    builtLinariaModules.push(this.resourcePath);
+    return {
+      source: code,
+      map,
+      meta,
+    };
+  }
+
+  // Otherwise, we check for parent modules, which use this one
+  // and if they have linaria styles, we build them.
+  const parentModuleToTranspile = getLinariaParentModules(
+    this.fs.fileSystem,
+    this._module
+  );
+
+  parentModuleToTranspile.forEach(item => {
+    // We only care about modules which was previously built.
+    if (builtLinariaModules.indexOf(item.filename) > -1) {
+      transpile(item.source, null, item.filename);
+    }
+  });
+
+  return {
+    source,
+    map: inputMap,
+    meta,
+  };
+}
+
+function makeLoaderAdapter(fn) {
+  function loaderAdapter(...args: any[]) {
+    let error;
+    let results;
+    try {
+      results = fn.call(this, ...args);
+    } catch (e) {
+      error = e;
     }
 
-    // Otherwise, we check for parent modules, which use this one
-    // and if they have linaria styles, we build them.
-    const parentModuleToTranspile = getLinariaParentModules(
-      this.fs.fileSystem,
-      this._module
-    );
-    parentModuleToTranspile.forEach(item => {
-      // We only care about modules which was previously built.
-      if (builtLinariaModules.indexOf(item.filename) > -1) {
-        transpile(item.source, null, item.filename);
-      }
-    });
-
-    this.callback(null, source, inputMap, meta);
-  } catch (error) {
-    this.callback(error);
+    if (results && results instanceof Promise) {
+      const callback = this.async();
+      results
+        .then(({ source, map, meta }) => {
+          callback(null, source, map, meta);
+        })
+        .catch(e => {
+          callback(e);
+        });
+    } else if (results && !error) {
+      this.callback(null, results.source, results.map, results.meta);
+    } else {
+      this.callback(error);
+    }
   }
-  // eslint-disable-next-line no-useless-return
-  return;
+
+  Object.defineProperty(loaderAdapter, 'name', {
+    value: fn.name || loaderAdapter.name,
+  });
+
+  return loaderAdapter;
 }
+
+export default makeLoaderAdapter(linariaLoader);
