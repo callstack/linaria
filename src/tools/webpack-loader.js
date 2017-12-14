@@ -45,7 +45,7 @@ function getLinariaParentModules(fs: any, module: any) {
         return;
       }
 
-      const source = fs.readFileSync(reason.module.resource).toString();
+      const source = fs.readFileSync(reason.module.resource, 'utf8');
       if (shouldRunLinaria(source)) {
         parentModules.push({ source, filename: reason.module.resource });
       }
@@ -61,70 +61,36 @@ function getLinariaParentModules(fs: any, module: any) {
 
 const builtLinariaModules = [];
 
-function linariaLoader(source: string, inputMap: any, meta: any) {
-  // If the module has linaria styles, we build it and we're done here.
-  if (shouldRunLinaria(source)) {
-    const { code, map } = transpile(source, inputMap, this.resourcePath);
-    builtLinariaModules.push(this.resourcePath);
-    return {
-      source: code,
-      map,
-      meta,
-    };
+export default function linariaLoader(
+  source: string,
+  inputMap: any,
+  meta: any
+) {
+  try {
+    // If the module has linaria styles, we build it and we're done here.
+    if (shouldRunLinaria(source)) {
+      const { code, map } = transpile(source, inputMap, this.resourcePath);
+      builtLinariaModules.push(this.resourcePath);
+      this.callback(null, code, map, meta);
+      return;
+    }
+
+    // Otherwise, we check for parent modules, which use this one
+    // and if they have linaria styles, we build them.
+    const parentModuleToTranspile = getLinariaParentModules(
+      this.fs.fileSystem,
+      this._module
+    );
+
+    parentModuleToTranspile.forEach(item => {
+      // We only care about modules which was previously built.
+      if (builtLinariaModules.indexOf(item.filename) > -1) {
+        transpile(item.source, null, item.filename);
+      }
+    });
+
+    this.callback(null, source, inputMap, meta);
+  } catch (error) {
+    this.callback(error);
   }
-
-  // Otherwise, we check for parent modules, which use this one
-  // and if they have linaria styles, we build them.
-  const parentModuleToTranspile = getLinariaParentModules(
-    this.fs.fileSystem,
-    this._module
-  );
-
-  parentModuleToTranspile.forEach(item => {
-    // We only care about modules which was previously built.
-    if (builtLinariaModules.indexOf(item.filename) > -1) {
-      transpile(item.source, null, item.filename);
-    }
-  });
-
-  return {
-    source,
-    map: inputMap,
-    meta,
-  };
 }
-
-function makeLoaderAdapter(fn) {
-  function loaderAdapter(...args: any[]) {
-    let error;
-    let results;
-    try {
-      results = fn.call(this, ...args);
-    } catch (e) {
-      error = e;
-    }
-
-    if (results && results instanceof Promise) {
-      const callback = this.async();
-      results
-        .then(({ source, map, meta }) => {
-          callback(null, source, map, meta);
-        })
-        .catch(e => {
-          callback(e);
-        });
-    } else if (results && !error) {
-      this.callback(null, results.source, results.map, results.meta);
-    } else {
-      this.callback(error);
-    }
-  }
-
-  Object.defineProperty(loaderAdapter, 'name', {
-    value: fn.name || loaderAdapter.name,
-  });
-
-  return loaderAdapter;
-}
-
-export default makeLoaderAdapter(linariaLoader);
