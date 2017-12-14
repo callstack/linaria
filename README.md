@@ -41,7 +41,8 @@ Install it like a regular npm package:
 yarn add linaria
 ```
 
-We recommend to use `linaria/loader` as long as you use __Webpack__:
+We recommend to use `linaria/loader` if you use __Webpack__:
+
 ```js
 module: {
   rules: [
@@ -52,7 +53,9 @@ module: {
   ],
 },
 ```
-or add the `linaria/babel` preset to your Babel configuration:
+
+If you don't use Webpack, you can add the `linaria/babel` preset to your Babel configuration:
+
 ```json
 {
   "presets": [
