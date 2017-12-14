@@ -37,10 +37,9 @@ function transpile(
       filename,
       sourceMaps: true,
       inputSourceMap: map,
-      presets: [require.resolve('../../babel.js')],
+      presets: [[require.resolve('../../babel.js'), loaderOptions]],
       parserOpts: file.parserOpts,
       babelrc: false,
-      ...loaderOptions,
     }
   );
 }
