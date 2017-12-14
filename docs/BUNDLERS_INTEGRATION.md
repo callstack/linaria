@@ -4,9 +4,9 @@
 
 ### Loader
 
-For the best user experience while working with Linaria we recommend to use our custom loader.
+For the best developer experience with Linaria, we recommend to use our Webpack loader.
 
-Just add it to a JS rule after `babel-loader` in webpack config:
+In your Webpack config, you'll need to add `linaria/loader` to run Linaria on `.js` files:
 
 ```js
 /* rest of your config */
@@ -21,11 +21,6 @@ module: {
   ],
 },
 ```
-
-It serves the following purposes:
-* no stale CSS
-* omits `babel-loader`'s cache, so you always get CSS generated
-* it triggers CSS generation, when external modules used in `css` tagged template changes
 
 If you use loader, you can remove `linaria/babel` from your Babel config and pass options directly to the loader:
 

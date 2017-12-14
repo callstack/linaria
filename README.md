@@ -41,8 +41,18 @@ Install it like a regular npm package:
 yarn add linaria
 ```
 
-Add the `linaria/babel` preset to your Babel configuration:
-
+We recommend to use `linaria/loader` as long as you use __Webpack__:
+```js
+module: {
+  rules: [
+    {
+      test: /\.js$/,
+      use: ['babel-loader', 'linaria-loader'],
+    },
+  ],
+},
+```
+or add the `linaria/babel` preset to your Babel configuration:
 ```json
 {
   "presets": [
