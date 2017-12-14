@@ -2,6 +2,54 @@
 
 ## webpack
 
+### Loader
+
+For the best user experience while working with Linaria we recommend to use our custom loader.
+
+Just add it to a JS rule after `babel-loader` in webpack config:
+
+```js
+/* rest of your config */
+module: {
+  /* rest of your module config */
+  rules: [
+    /* rest of your rules */
+    {
+      test: /\.js$/,
+      use: [{ loader: 'babel-loader' }, { loader: 'linaria/loader' }],
+    },
+  ],
+},
+```
+
+It serves the following purposes:
+* no stale CSS
+* omits `babel-loader`'s cache, so you always get CSS generated
+* it triggers CSS generation, when external modules used in `css` tagged template changes
+
+If you use loader, you can remove `linaria/babel` from your Babel config and pass options directly to the loader:
+
+```js
+module: {
+  rules: [
+    {
+      test: /\.js$/,
+      use: [
+        { loader: 'babel-loader' },
+        {
+          loader: 'linaria/loader',
+          options: {
+            single: true,
+            filename: 'styles.css',
+            outDir: 'static'
+          }
+        }
+      ],
+    },
+  ],
+},
+```
+
 ### Development
 
 In order for webpack to pick up extracted CSS files, you need to setup [style-loader](https://github.com/webpack-contrib/style-loader) and [css-loader](https://github.com/webpack-contrib/css-loader).

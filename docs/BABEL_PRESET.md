@@ -1,5 +1,9 @@
 # `linaria/babel` preset
 
+__If you use Webpack__, we highly recommend to add `linaria/loader` to your JS rule in Webpack config. It supports the same options as the preset. For more information go [here](./BUNDLERS_INTEGRATION.md#loader).
+
+---
+
 In order to have styles in `css` tagged template literals evaluated and extracted you need to add the `linaria/babel` preset to your Babel configuration.
 
 `.babelrc`:
