@@ -30,6 +30,7 @@
     "/build",
     "/babel.js",
     "/server.js",
+    "/loader.js",
     "/stylelint-config.js",
     "/stylelint-preprocessor.js"
   ],
