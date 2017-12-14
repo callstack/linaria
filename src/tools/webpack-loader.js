@@ -10,12 +10,18 @@ function shouldRunLinaria(source: string) {
   );
 }
 
-function transpile(source: string, map: any, filename: string) {
+function transpile(
+  source: string,
+  map: any,
+  filename: string,
+  babelLoaderOptions: Object
+) {
   const file = new babel.File(
     {
       filename,
       sourceMaps: true,
       inputSourceMap: map,
+      ...babelLoaderOptions,
     },
     new babel.Pipeline()
   );
@@ -59,6 +65,19 @@ function getLinariaParentModules(fs: any, module: any) {
   return parentModules;
 }
 
+function getBabelLoaderOptions(loaders: { path: string, options?: Object }[]) {
+  const babelLoader = loaders.find(loader =>
+    loader.path.includes('babel-loader')
+  );
+  if (!babelLoader) {
+    return {};
+  }
+
+  const { cacheDirectory, cacheIdentifier, forceEnv, ...babelCoreOptions } =
+    babelLoader.options || {};
+  return babelCoreOptions;
+}
+
 const builtLinariaModules = [];
 
 export default function linariaLoader(
@@ -69,7 +88,12 @@ export default function linariaLoader(
   try {
     // If the module has linaria styles, we build it and we're done here.
     if (shouldRunLinaria(source)) {
-      const { code, map } = transpile(source, inputMap, this.resourcePath);
+      const { code, map } = transpile(
+        source,
+        inputMap,
+        this.resourcePath,
+        getBabelLoaderOptions(this.loaders)
+      );
       builtLinariaModules.push(this.resourcePath);
       this.callback(null, code, map, meta);
       return;
@@ -85,7 +109,12 @@ export default function linariaLoader(
     parentModuleToTranspile.forEach(item => {
       // We only care about modules which was previously built.
       if (builtLinariaModules.indexOf(item.filename) > -1) {
-        transpile(item.source, null, item.filename);
+        transpile(
+          item.source,
+          null,
+          item.filename,
+          getBabelLoaderOptions(this.loaders)
+        );
       }
     });
 
