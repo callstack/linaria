@@ -1,6 +1,7 @@
 /* @flow */
 
 import * as babel from 'babel-core';
+import loaderUtils from 'loader-utils';
 
 function shouldRunLinaria(source: string) {
   return (
@@ -14,6 +15,7 @@ function transpile(
   source: string,
   map: any,
   filename: string,
+  loaderOptions: Object,
   babelLoaderOptions: Object
 ) {
   const file = new babel.File(
@@ -38,6 +40,7 @@ function transpile(
       presets: [require.resolve('../../babel.js')],
       parserOpts: file.parserOpts,
       babelrc: false,
+      ...loaderOptions,
     }
   );
 }
@@ -85,6 +88,7 @@ export default function linariaLoader(
   inputMap: any,
   meta: any
 ) {
+  const options = loaderUtils.getOptions(this) || {};
   try {
     // If the module has linaria styles, we build it and we're done here.
     if (shouldRunLinaria(source)) {
@@ -92,6 +96,7 @@ export default function linariaLoader(
         source,
         inputMap,
         this.resourcePath,
+        options,
         getBabelLoaderOptions(this.loaders)
       );
       builtLinariaModules.push(this.resourcePath);
@@ -113,6 +118,7 @@ export default function linariaLoader(
           item.source,
           null,
           item.filename,
+          options,
           getBabelLoaderOptions(this.loaders)
         );
       }
