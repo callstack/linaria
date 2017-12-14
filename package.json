@@ -30,6 +30,7 @@
     "/build",
     "/babel.js",
     "/server.js",
+    "/loader.js",
     "/stylelint-config.js",
     "/stylelint-preprocessor.js"
   ],
@@ -45,6 +46,7 @@
     "cssom": "^0.3.2",
     "dedent": "^0.7.0",
     "error-stack-parser": "^2.0.1",
+    "loader-utils": "^1.1.0",
     "mkdirp": "^0.5.1",
     "postcss": "^6.0.10",
     "short-hash": "^1.0.0",
