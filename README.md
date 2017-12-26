@@ -48,7 +48,7 @@ module: {
   rules: [
     {
       test: /\.js$/,
-      use: ['babel-loader', 'linaria-loader'],
+      use: ['babel-loader', 'linaria/loader'],
     },
   ],
 },
