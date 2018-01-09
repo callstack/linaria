@@ -37,11 +37,13 @@ export default function linariaStylelintPreprocessor(/* options */) {
         require.resolve('../sheet.js')
       ).exports.default.rawStyles();
 
-      if (!Object.keys(rawStyles).length || !rawStyles[filename]) {
+      const relativeFilename = filename.replace(`${process.cwd()}/`, '');
+
+      if (!Object.keys(rawStyles).length || !rawStyles[relativeFilename]) {
         return '';
       }
 
-      const css = rawStyles[filename].reduce(
+      const css = rawStyles[relativeFilename].reduce(
         (acc, { template, expressions, classname }) => {
           const styles = toString(
             template,
