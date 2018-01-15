@@ -94,6 +94,16 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "oBusk",
+      "name": "Oscar Busk",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/13413409?v=4",
+      "profile": "https://github.com/oBusk",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ]
 }

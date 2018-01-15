@@ -7,7 +7,7 @@ function shouldRunLinaria(source: string) {
   return (
     (/import .+ from ['"]linaria['"]/g.test(source) ||
       /require\(['"]linaria['"]\)/g.test(source)) &&
-    /css(\.named)?`/g.test(source)
+    /css(\.named)?\s*`/g.test(source)
   );
 }
 
