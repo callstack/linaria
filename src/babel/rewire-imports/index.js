@@ -12,7 +12,10 @@ function getReplacement(value) {
 
 function isLinariaImport(value) {
   try {
-    return require.resolve(value) === require.resolve('linaria');
+    return (
+      value === 'linaria' ||
+      require.resolve(value) === require.resolve('../../index.js')
+    );
   } catch (e) {
     /* istanbul ignore next */
     return false;
