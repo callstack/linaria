@@ -10,6 +10,7 @@ jest.mock('../getReplacement');
 jest.mock('../../lib/moduleSystem', () => ({
   clearLocalModulesFromCache: jest.fn(),
   instantiateModule: jest.fn(() => ({ exports: 'header__abc123' })),
+  provideModule: jest.fn(),
 }));
 
 function runAssertions(
