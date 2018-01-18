@@ -21,13 +21,21 @@ export default function Hero() {
             </a>
           </div>
           <div className={rightColumn}>
-            <img className={figureImage} alt="" src="/images/image-4.png" />
+            <img
+              className={figureImage}
+              alt="Linaria code sample"
+              src="/images/image-4.png"
+            />
           </div>
         </div>
       </Container>
       <div className={wrapper}>
         <div className={logoMarkContainer}>
-          <img className={logoMark} src="/images/linaria-logomark.svg" alt="" />
+          <img
+            className={logoMark}
+            src="/images/linaria-logomark.svg"
+            alt="Linaria logo"
+          />
         </div>
       </div>
     </div>
@@ -35,7 +43,7 @@ export default function Hero() {
 }
 
 const hero = css`
-  background: rgba(231, 56, 39, 1);
+  background: #d2356d;
   background: linear-gradient(to bottom right, #96368c, #d2356d);
   padding: 120px 0;
   position: relative;
@@ -116,7 +124,7 @@ const button = css`
   transition: color 0.2s, background 0.2s;
 
   &:hover {
-    color: rgba(210, 53, 109, 1);
+    color: #d2356d;
     background: ${theme.white};
   }
 
