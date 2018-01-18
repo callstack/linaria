@@ -36,12 +36,7 @@ export default function Hero() {
 
 const hero = css`
   background: rgba(231, 56, 39, 1);
-  background: linear-gradient(
-    135deg,
-    rgba(231, 56, 39, 1) 0%,
-    rgba(154, 59, 165, 1) 0%,
-    rgba(210, 53, 109, 1) 100%
-  );
+  background: linear-gradient(to bottom right, #96368c, #d2356d);
   padding: 120px 0;
   position: relative;
 
