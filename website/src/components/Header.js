@@ -13,7 +13,11 @@ export default function Header() {
     <div className={header}>
       <Container className={headerContainer}>
         <a className={logoLink} href="/">
-          <img className={logo} src="/images/linaria-logo.svg" alt="Alt" />
+          <img
+            className={logo}
+            src="/images/linaria-logo.svg"
+            alt="Linaria Logo"
+          />
         </a>
         <ul className={nav}>
           <li>
