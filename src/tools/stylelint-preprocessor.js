@@ -1,5 +1,6 @@
 /* @flow */
 
+import path from 'path';
 import * as babel from 'babel-core';
 import { SourceMapConsumer } from 'source-map';
 
@@ -37,7 +38,7 @@ export default function linariaStylelintPreprocessor(/* options */) {
         require.resolve('../sheet.js')
       ).exports.default.rawStyles();
 
-      const relativeFilename = filename.replace(`${process.cwd()}/`, '');
+      const relativeFilename = path.relative(process.cwd(), filename);
 
       if (!Object.keys(rawStyles).length || !rawStyles[relativeFilename]) {
         return '';
