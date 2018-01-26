@@ -33,13 +33,15 @@ describe('babel/lib/moduleSystem', () => {
 
     provideModule('test', exports);
     exports.someProp2 = 'test';
-    expect(getCachedModule('@linaria/test').exports).toBe(exports);
+    expect(getCachedModule('@linaria_provide/test').exports).toBe(exports);
 
     provideModule('test', exports, true);
-    expect(getCachedModule('@linaria/test').exports.default).toBe(exports);
+    expect(getCachedModule('@linaria_provide/test').exports.default).toBe(
+      exports
+    );
 
     const moduleInstance = instantiateModule(
-      'module.exports = require("@linaria/test").default;',
+      'module.exports = require("@linaria_provide/test").default;',
       path.join(__dirname, 'test.js')
     );
 

@@ -41,15 +41,15 @@ function resolveModuleId(moduleId: string, parent: ?Module): string {
 
 /**
  * Provide custom module with exports as reference.
- * Use `@linaria/` prefix to require/import provided module.
+ * Use `@linaria_provide/` prefix to require/import provided module.
  */
 export function provideModule(
   moduleId: string,
   exports: any,
   isDefault: boolean = false
 ) {
-  const moduleInstance = new Module(`@linaria/${moduleId}`, null);
-  modulesCache[`@linaria/${moduleId}`] = moduleInstance;
+  const moduleInstance = new Module(`@linaria_provide/${moduleId}`, null);
+  modulesCache[`@linaria_provide/${moduleId}`] = moduleInstance;
   moduleInstance.exports = isDefault
     ? { default: exports, __esModule: true }
     : exports;
@@ -247,8 +247,8 @@ function getRequireMock(parent: ?Module) {
       ).exports;
     }
 
-    // Provided modules should begin with `@linaria/`
-    if (/^@linaria\//.test(moduleId)) {
+    // Provided modules should begin with `@linaria_provide/`
+    if (/^@linaria_provide\//.test(moduleId)) {
       return modulesCache[moduleId].exports;
     }
 

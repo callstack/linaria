@@ -1,8 +1,8 @@
 import path from 'path';
 import stylisResolvePlugin from '../stylisResolvePlugin';
-import env from '@linaria/env'; // eslint-disable-line
+import env from '@linaria_provide/env'; // eslint-disable-line
 
-jest.mock('@linaria/env', () => ({ config: {} }), { virtual: true });
+jest.mock('@linaria_provide/env', () => ({ config: {} }), { virtual: true });
 jest.mock('glob', () => ({
   // eslint-disable-next-line global-require
   sync: jest.fn(() => require('path').resolve('static/Image.jpg')),

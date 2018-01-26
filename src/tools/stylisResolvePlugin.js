@@ -13,7 +13,7 @@ function resolvePath(original: string) {
     config: { single, outDir, filename: cssFilename },
     filename,
     // $FlowFixMe
-  } = require('@linaria/env'); // eslint-disable-line
+  } = require('@linaria_provide/env'); // eslint-disable-line
 
   const absAssetFilename = path.join(path.dirname(filename), original);
   const relativeFilename = path.isAbsolute(filename)
