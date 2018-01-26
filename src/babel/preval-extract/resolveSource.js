@@ -42,6 +42,7 @@ export default function resolveSource(
       '__filename',
       'exports',
       'require',
+      ...Object.keys(global),
     ].includes(path.node.name)
   ) {
     return null;

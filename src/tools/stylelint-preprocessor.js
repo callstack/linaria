@@ -29,6 +29,10 @@ export default function linariaStylelintPreprocessor(/* options */) {
 
   return {
     code(input: string, filename: string) {
+      if (!/\.jsx?$/.test(filename)) {
+        return input;
+      }
+
       const { code, map } = babel.transform(input, {
         filename,
         sourceMaps: true,
@@ -60,7 +64,7 @@ export default function linariaStylelintPreprocessor(/* options */) {
       return css;
     },
     result(lintResults: LintResults, filename: string) {
-      if (!cache[filename]) {
+      if (!cache[filename] || !/\.jsx?$/.test(filename)) {
         return;
       }
 
