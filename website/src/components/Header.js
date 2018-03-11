@@ -5,16 +5,26 @@ import { css } from 'linaria';
 import Container from './Container';
 import theme from '../styles/theme';
 
-const navSpacing = 20;
+const navVerticalSpacing = 20;
+const navHorizontalSpacing = 10;
 
 export default function Header() {
   return (
     <div className={header}>
       <Container className={headerContainer}>
-        <a className={logo} href="/">
-          Linaria
+        <a className={logoLink} href="/">
+          <img
+            className={logo}
+            src="/images/linaria-logo.svg"
+            alt="Linaria Logo"
+          />
         </a>
         <ul className={nav}>
+          <li>
+            <a className={navLink} href="#features">
+              Features
+            </a>
+          </li>
           <li>
             <a
               className={navLink}
@@ -47,20 +57,23 @@ const header = css`
   top: 0;
   left: 0;
   right: 0;
+  z-index: 1;
 `;
 
 const headerContainer = css`
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `;
 
 const logo = css`
-  display: block;
-  text-decoration: none;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: ${navSpacing}px 0;
-  color: ${theme.primary};
+  height: 25px;
+  display: inline-block;
+  vertical-align: middle;
+`;
+
+const logoLink = css`
+  display: inline-block;
 `;
 
 const nav = css`
@@ -68,18 +81,20 @@ const nav = css`
   padding: 0;
   margin: 0;
   list-style: none;
+  align-items: center;
 `;
 
 const navLink = css`
   display: block;
-  padding: ${navSpacing}px;
+  padding: ${navVerticalSpacing}px ${navHorizontalSpacing}px;
   text-decoration: none;
-  text-transform: uppercase;
-  color: ${theme.text};
+  color: ${theme.white};
   transition: color 0.2s;
+  font-size: 1.3em;
+  font-weight: 700;
 
   &:hover {
-    color: ${theme.primary};
+    color: ${theme.hoveredWhite};
   }
 `;
 
@@ -88,8 +103,4 @@ const image = css`
   height: 1.5em;
   border-radius: 50%;
   transition: 0.2s background;
-
-  &:hover {
-    background: ${theme.secondary};
-  }
 `;

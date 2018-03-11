@@ -13,7 +13,7 @@ export default function Container({ className, children }: Props) {
 }
 
 const container = css`
-  max-width: 940px;
+  max-width: 1140px;
   padding: 0 20px;
   margin: 0 auto;
 `;

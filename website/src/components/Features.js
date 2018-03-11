@@ -11,7 +11,7 @@ export default function Hero() {
   return (
     <div className={features}>
       <Container>
-        <div className={container}>
+        <div className={container} id="features">
           <div className={item}>
             <div className={figure}>
               <img className={figureImage} alt="" src="/images/image-1.png" />
@@ -63,8 +63,9 @@ const container = css`
 `;
 
 const item = css`
+  text-align: center;
+
   ${media.medium} {
-    text-align: center;
     padding: 0 30px;
     flex: 1;
   }

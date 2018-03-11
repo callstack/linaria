@@ -4,5 +4,7 @@ export default {
   secondary: '#FFEBCE',
   fontFamily: 'Montserrat, Helvetica, Arial',
   text: '#333',
+  white: '#eee',
+  hoveredWhite: '#fff',
   backdrop: '#fffaf6',
 };
