@@ -70,7 +70,7 @@ const container = css`
   max-width: 1337px;
 `;
 
-export function Block({ className }) => {
+export function Block({ className }) {
   return <div {...styles(container, className)} />;
 }
 ```
