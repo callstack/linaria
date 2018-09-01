@@ -41,7 +41,7 @@ Install it like a regular npm package:
 yarn add linaria
 ```
 
-We recommend to use `linaria/loader` if you use __Webpack__:
+We recommend using `linaria/loader` if you use __Webpack__:
 
 ```js
 module: {
