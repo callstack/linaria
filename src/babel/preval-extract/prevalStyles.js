@@ -62,10 +62,31 @@ export default function(
   ]);
 
   clearLocalModulesFromCache();
+
+  const overrides = process.env.LINARIA_BABEL_PRESET_OVERRIDES || '';
+
+  let parsed;
+
+  try {
+    parsed = JSON.parse(overrides || '{}');
+  } catch (e) {
+    parsed = null;
+  }
+
+  // Avoid writing css from the dependencies
+  // We should only write the CSS for the file the user ran through Babel
+  process.env.LINARIA_BABEL_PRESET_OVERRIDES = JSON.stringify({
+    ...parsed,
+    extract: false,
+  });
+
   const { exports: className } = instantiateModule(
     replacement,
     resolve(state.filename)
   );
+
+  // Restore the plugin options
+  process.env.LINARIA_BABEL_PRESET_OVERRIDES = overrides;
 
   const { minifyClassnames } = state.opts;
 
