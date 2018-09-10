@@ -6,9 +6,10 @@ const dedent = require('dedent');
 it('should extract CSS to a comment', async () => {
   const { code } = await babel.transformAsync(
     dedent`
-    var background = 'blue';
+    var background = 'yellow';
 
     const Container = styled('div')\`
+      font-family: ${'${serif}'};
       background-color: ${'${background}'};
       color: ${'${props => props.color}'};
       width: ${'${100 / 3}'};

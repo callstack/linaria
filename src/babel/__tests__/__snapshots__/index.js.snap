@@ -1,20 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`should extract CSS to a comment 1`] = `
-"var background = 'blue';
+"var background = 'yellow';
 const Container = component('div', {
   \\"displayName\\": \\"Container\\",
   \\"className\\": \\"Container_1ugh8t9\\",
   \\"interpolations\\": {
-    \\"c-0\\": background,
-    \\"c-1\\": props => props.color,
-    \\"c-2\\": 100 / 3
+    \\"c-0\\": serif,
+    \\"c-2\\": props => props.color
   }
 });
 
 /*CSS OUTPUT START
 
-.Container_1ugh8t9{background-color:var(--c-0);color:var(--c-1);width:var(--c-2);border:1px solid red;}.Container_1ugh8t9:hover{border-color:blue;}
+.Container_1ugh8t9{font-family:var(--c-0);background-color:yellow;color:var(--c-2);width:33.333333333333336;border:1px solid red;}.Container_1ugh8t9:hover{border-color:blue;}
 
 CSS OUTPUT END*/"
 `;

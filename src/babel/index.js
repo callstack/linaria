@@ -73,17 +73,24 @@ module.exports = function(babel /*: any */) {
           // Serialize the tagged template literal to a string
           let cssText = '';
 
+          const expressions = path.get('quasi').get('expressions');
+
           quasi.quasis.forEach((el, i) => {
             cssText += el.value.cooked;
 
-            // Include the intepolations as CSS custom properties
-            const ex = quasi.expressions[i];
+            const ex = expressions[i];
 
             if (ex) {
-              const id = `c-${i}`;
+              const result = ex.evaluate();
 
-              interpolations[id] = ex;
-              cssText += `var(--${id})`;
+              if (result.confident) {
+                cssText += result.value;
+              } else {
+                const id = `c-${i}`;
+
+                interpolations[id] = ex.node;
+                cssText += `var(--${id})`;
+              }
             }
           });
 
