@@ -98,14 +98,14 @@ module.exports = function(babel /*: any */) {
 
           options.push(
             t.objectProperty(
-              t.stringLiteral('displayName'),
+              t.identifier('displayName'),
               t.stringLiteral(displayName)
             )
           );
 
           options.push(
             t.objectProperty(
-              t.stringLiteral('className'),
+              t.identifier('className'),
               t.stringLiteral(className)
             )
           );
@@ -114,7 +114,7 @@ module.exports = function(babel /*: any */) {
           if (Object.keys(interpolations).length) {
             options.push(
               t.objectProperty(
-                t.stringLiteral('interpolations'),
+                t.identifier('interpolations'),
                 t.objectExpression(
                   Object.keys(interpolations).map(p =>
                     t.objectProperty(t.stringLiteral(p), interpolations[p])

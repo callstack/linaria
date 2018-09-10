@@ -12,7 +12,7 @@ it('should extract CSS to a comment', async () => {
       font-family: ${'${serif}'};
       background-color: ${'${background}'};
       color: ${'${props => props.color}'};
-      width: ${'${100 / 3}'};
+      width: ${'${100 / 3}'}%;
       border: 1px solid red;
 
       &:hover {
