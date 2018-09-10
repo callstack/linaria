@@ -8,7 +8,7 @@ it('should extract CSS to a comment', async () => {
     dedent`
     var background = 'blue';
 
-    const container = styled('div')\`
+    const Container = styled('div')\`
       background-color: ${'${background}'};
       color: ${'${props => props.color}'};
       width: ${'${100 / 3}'};
@@ -20,7 +20,7 @@ it('should extract CSS to a comment', async () => {
     \`;
     `,
     {
-      plugins: [require.resolve('../src/index')],
+      plugins: [require.resolve('../index')],
       filename: '/app/index.js',
     }
   );
