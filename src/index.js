@@ -10,15 +10,18 @@ module.exports = function(babel /*: any */) {
     visitor: {
       Program: {
         enter(path /*: any */, state /*: any */) {
+          // Collect all the style rules from the styles we encounter
           state.rules = {};
         },
         exit(path /*: any */, state /*: any */) {
+          // Add the collected styles as a comment to the end of file
           path.addComment(
             'trailing',
             'CSS OUTPUT START\n' +
               Object.keys(state.rules)
                 .map(
                   className =>
+                    // Run each rule through stylis to support nesting
                     `\n${stylis(`.${className}`, state.rules[className])}\n`
                 )
                 .join('\n') +
@@ -27,7 +30,7 @@ module.exports = function(babel /*: any */) {
         },
       },
       TaggedTemplateExpression(path /*: any */, state /*: any */) {
-        const properties = {};
+        const interpolations = {};
         const { quasi, tag } = path.node;
 
         if (t.isCallExpression(tag) && tag.callee.name === 'styled') {
@@ -63,34 +66,39 @@ module.exports = function(babel /*: any */) {
           let className = `${title}_${slugify(state.file.opts.filename)}`;
 
           while (className in state.rules) {
-            className += '1';
+            // Append 'x' to prevent collision in case of same variable names
+            className += 'x';
           }
 
+          // Serialize the tagged template literal to a string
           let cssText = '';
 
           quasi.quasis.forEach((el, i) => {
             cssText += el.value.cooked;
 
+            // Include the intepolations as CSS custom properties
             const ex = quasi.expressions[i];
 
             if (ex) {
-              const id = `--c-${i}`;
-              properties[i] = ex;
-              cssText += `var(${id})`;
+              interpolations[i] = ex;
+              cssText += `var(--c-${i})`;
             }
           });
 
-          path.replaceWith(
-            t.callExpression(t.identifier('component'), [
-              tag.arguments[0],
-              t.stringLiteral(className),
+          const args = [tag.arguments[0], t.stringLiteral(className)];
+
+          // If we found any interpolations, also pass them so they can be applied
+          if (Object.keys(interpolations).length) {
+            args.push(
               t.objectExpression(
-                Object.keys(properties).map(p =>
-                  t.objectProperty(t.stringLiteral(p), properties[p])
+                Object.keys(interpolations).map(p =>
+                  t.objectProperty(t.stringLiteral(p), interpolations[p])
                 )
-              ),
-            ])
-          );
+              )
+            );
+          }
+
+          path.replaceWith(t.callExpression(t.identifier('component'), args));
 
           state.rules[className] = cssText;
         }
