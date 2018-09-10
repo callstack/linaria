@@ -1,0 +1,34 @@
+{
+  "name": "babel-plugin-styling",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Experimental Babel plugin to extract CSS statically",
+  "main": "src/index.js",
+  "files": [
+    "src/"
+  ],
+  "repository": "git@github.com:satya164/babel-plugin-styling.git",
+  "author": "Satyajit Sahoo <satyajit.happy@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "babel-plugin",
+    "babel",
+    "module",
+    "require",
+    "import"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "flow": "flow",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "dedent": "^0.7.0",
+    "eslint": "^5.4.0",
+    "eslint-config-satya164": "^2.0.1",
+    "flow-bin": "^0.79.1",
+    "jest": "^23.5.0",
+    "prettier": "^1.14.2"
+  }
+}

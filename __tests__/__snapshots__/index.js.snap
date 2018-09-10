@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should extract CSS to a comment 1`] = `
+"var background = 'blue';
+const container = component('div', \\"container_1ugh8t9\\", {
+  \\"0\\": background,
+  \\"1\\": props => props.color,
+  \\"2\\": 100 / 3
+});
+
+/*CSS OUTPUT START
+
+.container_1ugh8t9 {
+  background-color: var(--c-0);
+  color: var(--c-1);
+  width: var(--c-2);
+  border: 1px solid red;
+}
+
+CSS OUTPUT END*/"
+`;

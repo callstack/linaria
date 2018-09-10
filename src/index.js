@@ -1,0 +1,98 @@
+/* @flow */
+
+const slugify = require('./slugify');
+
+module.exports = function(babel /*: any */) {
+  const { types: t } = babel;
+
+  return {
+    visitor: {
+      Program: {
+        enter(path /*: any */, state /*: any */) {
+          state.rules = {};
+        },
+        exit(path /*: any */, state /*: any */) {
+          path.addComment(
+            'trailing',
+            'CSS OUTPUT START\n' +
+              Object.keys(state.rules)
+                .map(
+                  className => `\n.${className} {${state.rules[className]}}\n`
+                )
+                .join('\n') +
+              '\nCSS OUTPUT END'
+          );
+        },
+      },
+      TaggedTemplateExpression(path /*: any */, state /*: any */) {
+        const properties = {};
+        const { quasi, tag } = path.node;
+
+        if (t.isCallExpression(tag) && tag.callee.name === 'styled') {
+          // Try to determine a readable class name
+          let title;
+
+          const parent = path.findParent(
+            p =>
+              t.isObjectProperty(p) ||
+              t.isJSXOpeningElement(p) ||
+              t.isVariableDeclarator(p)
+          );
+
+          if (parent) {
+            if (t.isObjectProperty(parent)) {
+              title = parent.node.key.name || parent.node.key.value;
+            } else if (t.isJSXOpeningElement(parent)) {
+              title = parent.node.name.name;
+            } else if (t.isVariableDeclarator(parent)) {
+              title = parent.node.id.name;
+            }
+          }
+
+          if (!title) {
+            throw path.buildCodeFrameError(
+              "Couldn't determine the class name for CSS template literal. Ensure that it's either:\n" +
+                '- Assigned to a variable\n' +
+                '- Is an object property\n' +
+                '- Is a prop in a JSX element\n'
+            );
+          }
+
+          let className = `${title}_${slugify(state.file.opts.filename)}`;
+
+          while (className in state.rules) {
+            className += '1';
+          }
+
+          let cssText = '';
+
+          quasi.quasis.forEach((el, i) => {
+            cssText += el.value.cooked;
+
+            const ex = quasi.expressions[i];
+
+            if (ex) {
+              const id = `--c-${i}`;
+              properties[i] = ex;
+              cssText += `var(${id})`;
+            }
+          });
+
+          path.replaceWith(
+            t.callExpression(t.identifier('component'), [
+              tag.arguments[0],
+              t.stringLiteral(className),
+              t.objectExpression(
+                Object.keys(properties).map(p =>
+                  t.objectProperty(t.stringLiteral(p), properties[p])
+                )
+              ),
+            ])
+          );
+
+          state.rules[className] = cssText;
+        }
+      },
+    },
+  };
+};
