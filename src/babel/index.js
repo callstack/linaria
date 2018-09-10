@@ -38,17 +38,12 @@ module.exports = function(babel /*: any */) {
           let displayName;
 
           const parent = path.findParent(
-            p =>
-              t.isObjectProperty(p) ||
-              t.isJSXOpeningElement(p) ||
-              t.isVariableDeclarator(p)
+            p => t.isObjectProperty(p) || t.isVariableDeclarator(p)
           );
 
           if (parent) {
             if (t.isObjectProperty(parent)) {
               displayName = parent.node.key.name || parent.node.key.value;
-            } else if (t.isJSXOpeningElement(parent)) {
-              displayName = parent.node.name.name;
             } else if (t.isVariableDeclarator(parent)) {
               displayName = parent.node.id.name;
             }
@@ -58,8 +53,7 @@ module.exports = function(babel /*: any */) {
             throw path.buildCodeFrameError(
               "Couldn't determine a name for the component. Ensure that it's either:\n" +
                 '- Assigned to a variable\n' +
-                '- Is an object property\n' +
-                '- Is a prop in a JSX element\n'
+                '- Is an object property\n'
             );
           }
 
