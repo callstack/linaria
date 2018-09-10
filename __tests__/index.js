@@ -13,6 +13,10 @@ it('should extract CSS to a comment', async () => {
       color: ${'${props => props.color}'};
       width: ${'${100 / 3}'};
       border: 1px solid red;
+
+      &:hover {
+        border-color: blue;
+      }
     \`;
     `,
     {

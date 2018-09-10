@@ -1,5 +1,6 @@
 /* @flow */
 
+const stylis = require('stylis');
 const slugify = require('./slugify');
 
 module.exports = function(babel /*: any */) {
@@ -17,7 +18,8 @@ module.exports = function(babel /*: any */) {
             'CSS OUTPUT START\n' +
               Object.keys(state.rules)
                 .map(
-                  className => `\n.${className} {${state.rules[className]}}\n`
+                  className =>
+                    `\n${stylis(`.${className}`, state.rules[className])}\n`
                 )
                 .join('\n') +
               '\nCSS OUTPUT END'

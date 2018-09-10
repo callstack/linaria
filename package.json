@@ -30,5 +30,8 @@
     "flow-bin": "^0.79.1",
     "jest": "^23.5.0",
     "prettier": "^1.14.2"
+  },
+  "dependencies": {
+    "stylis": "^3.5.3"
   }
 }
