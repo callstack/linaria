@@ -15,19 +15,21 @@ module.exports = function(babel /*: any */) {
           state.index = 0;
         },
         exit(path /*: any */, state /*: any */) {
-          // Add the collected styles as a comment to the end of file
-          path.addComment(
-            'trailing',
-            'CSS OUTPUT START\n\n' +
-              Object.keys(state.rules)
-                .map(
-                  className =>
-                    // Run each rule through stylis to support nesting
-                    `${stylis(`.${className}`, state.rules[className])}`
-                )
-                .join('\n\n') +
-              '\n\nCSS OUTPUT END'
-          );
+          if (Object.keys(state.rules).length) {
+            // Add the collected styles as a comment to the end of file
+            path.addComment(
+              'trailing',
+              'CSS OUTPUT START\n\n' +
+                Object.keys(state.rules)
+                  .map(
+                    className =>
+                      // Run each rule through stylis to support nesting
+                      `${stylis(`.${className}`, state.rules[className])}`
+                  )
+                  .join('\n\n') +
+                '\n\nCSS OUTPUT END'
+            );
+          }
         },
       },
       TaggedTemplateExpression(path /*: any */, state /*: any */) {
