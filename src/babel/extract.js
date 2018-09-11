@@ -139,7 +139,13 @@ module.exports = function(
                   try {
                     const value = evaluate(ex, t);
 
-                    if (typeof value !== 'function') {
+                    if (typeof value === 'function') {
+                      if (typeof value.className === 'string') {
+                        cssText += `.${value.className}`;
+
+                        return;
+                      }
+                    } else {
                       cssText += value;
 
                       return;

@@ -63,6 +63,26 @@ it('evaluates expressions with dependencies', async () => {
   expect(code).toMatchSnapshot();
 });
 
+it('evaluates component interpolations', async () => {
+  const code = await transpile(
+    dedent`
+    const styled = require('../styled');
+
+    const Title = styled('h1')\`
+      color: red;
+    \`;
+
+    const Paragraph = styled('p')\`
+      ${'${Title}'} {
+        color: blue
+      }
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
 it('ignores inline arrow function expressions', async () => {
   const code = await transpile(
     dedent`
