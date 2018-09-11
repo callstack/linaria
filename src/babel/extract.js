@@ -79,7 +79,7 @@ module.exports = function(babel /*: any */) {
           }
 
           // Custom properties need to start with a letter, so we prefix the slug
-          const slug = `${displayName.charAt(0).toLowerCase()}${slugify(
+          let slug = `${displayName.charAt(0).toLowerCase()}${slugify(
             state.file.opts.filename
           )}`;
 
@@ -88,6 +88,7 @@ module.exports = function(babel /*: any */) {
           while (className in state.rules) {
             // Append 'x' to prevent collision in case of same variable names
             className += 'x';
+            slug += 'x';
           }
 
           // Serialize the tagged template literal to a string

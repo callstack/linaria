@@ -1,30 +1,139 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`should extract CSS to a comment 1`] = `
-"const background = 'yellow';
+exports[`does not output CSS if none present 1`] = `
+"const number = 42;
+const title = String.raw\`This is something\`;"
+`;
+
+exports[`evaluates and inlines expressions in scope 1`] = `
+"const color = 'blue';
 const Title = styled.component('h1', {
   name: \\"Title\\",
-  class: \\"Title_t1ugh8t9\\",
-  vars: {
-    \\"t1ugh8t9-0-0\\": serif
-  }
+  class: \\"Title_t1ugh8t9\\"
 });
-const Container = styled.component('div', {
-  name: \\"Container\\",
-  class: \\"Container_c1ugh8t9\\",
+
+/*
+CSS OUTPUT START
+.Title_t1ugh8t9{color:blue;width:33.333333333333336%;}
+
+CSS OUTPUT END
+
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+*/"
+`;
+
+exports[`handles component in object property 1`] = `
+"const components = {
+  title: styled.component('h1', {
+    name: \\"title\\",
+    class: \\"title_t1ugh8t9\\"
+  })
+};
+
+/*
+CSS OUTPUT START
+.title_t1ugh8t9{font-size:14px;}
+
+CSS OUTPUT END
+
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":2,\\"column\\":2},\\"name\\":\\"title_t1ugh8t9\\"}]
+*/"
+`;
+
+exports[`handles nested blocks 1`] = `
+"const Button = styled.component('button', {
+  name: \\"Button\\",
+  class: \\"Button_b1ugh8t9\\",
   vars: {
-    \\"c1ugh8t9-1-0\\": regular,
-    \\"c1ugh8t9-1-2\\": props => props.color
+    \\"b1ugh8t9-0-0\\": regular
   }
 });
 
 /*
 CSS OUTPUT START
-.Title_t1ugh8t9{font-family:var(--t1ugh8t9-0-0);}
-.Container_c1ugh8t9{font-family:var(--c1ugh8t9-1-0);background-color:yellow;color:var(--c1ugh8t9-1-2);width:33.333333333333336%;border:1px solid red;}.Container_c1ugh8t9:hover{border-color:blue;}
+.Button_b1ugh8t9{font-family:var(--b1ugh8t9-0-0);}.Button_b1ugh8t9:hover{border-color:blue;}@media (max-width:200px){.Button_b1ugh8t9{width:100%;}}
 
 CSS OUTPUT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":6},\\"name\\":\\"Container_c1ugh8t9\\"}]
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Button_b1ugh8t9\\"}]
+*/"
+`;
+
+exports[`prevents class name collision 1`] = `
+"const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_t1ugh8t9\\",
+  vars: {
+    \\"t1ugh8t9-0-0\\": size,
+    \\"t1ugh8t9-0-1\\": props => props.color
+  }
+});
+
+function more() {
+  const Title = styled.component('h1', {
+    name: \\"Title\\",
+    class: \\"Title_t1ugh8t9x\\",
+    vars: {
+      \\"t1ugh8t9x-1-0\\": regular
+    }
+  });
+}
+
+/*
+CSS OUTPUT START
+.Title_t1ugh8t9{font-size:var(--t1ugh8t9-0-0)px;color:var(--t1ugh8t9-0-1);}
+.Title_t1ugh8t9x{font-family:var(--t1ugh8t9x-1-0);}
+
+CSS OUTPUT END
+
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":8},\\"name\\":\\"Title_t1ugh8t9x\\"}]
+*/"
+`;
+
+exports[`replaces unknown expressions with CSS custom properties 1`] = `
+"const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_t1ugh8t9\\",
+  vars: {
+    \\"t1ugh8t9-0-0\\": size,
+    \\"t1ugh8t9-0-1\\": props => props.color
+  }
+});
+
+/*
+CSS OUTPUT START
+.Title_t1ugh8t9{font-size:var(--t1ugh8t9-0-0)px;color:var(--t1ugh8t9-0-1);}
+
+CSS OUTPUT END
+
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+*/"
+`;
+
+exports[`throws when not attached to a variable 1`] = `
+"/app/index.js: Couldn't determine a name for the component. Ensure that it's either:
+- Assigned to a variable
+- Is an object property
+
+[0m[31m[1m>[22m[39m[90m 1 | [39mstyled([32m'h1'[39m)[32m\`[39m[0m
+[0m [90m   | [39m[31m[1m^[22m[39m[0m
+[0m [90m 2 | [39m[32m  font-size: \${size}px;[39m[0m
+[0m [90m 3 | [39m[32m  color: \${props => props.color}[39m[0m
+[0m [90m 4 | [39m[32m\`[39m[33m;[39m[0m"
+`;
+
+exports[`transpiles styled template literal 1`] = `
+"const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_t1ugh8t9\\"
+});
+
+/*
+CSS OUTPUT START
+.Title_t1ugh8t9{font-size:14px;}
+
+CSS OUTPUT END
+
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
 */"
 `;
