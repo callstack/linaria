@@ -1,6 +1,63 @@
 # linaria-styled
 
-Experimental Babel plugin to extract CSS statically from a components written with a styled-component like syntax. Uses CSS custom properties for interpolations.
+Zero-runtime CSS in JS library building React components (experimental).
+
+## Features
+
+- Familiar CSS syntax with Sass like nesting.
+- CSS is extracted at build time, no runtime is included.
+- Simple interpolations in the current scope are evaluated and inlined at build time.
+- Expressions containing imported modules and utility functions can be optionally evaluated at build time.
+- Dynamic runtime-based values are supported using CSS custom properties.
+- Function interpolations receive props as the argument for dynamic prop based styling.
+- Supports CSS sourcemaps, so you can easily find where the style was defined.
+
+## Usage
+
+Add the babel preset to your `.babelrc`:
+
+```json
+{
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react"
+    "linaria-styled/babel"
+  ]
+}
+```
+
+Make sure that `linaria-styled/babel` is the last item in your `presets` list.
+
+Add the webpack loader to your `webpack.config.js`:
+
+```js
+module: {
+  rules: [
+    {
+      test: /\.js$/,
+      use: ['linaria-styled/loader', 'babel-loader'],
+    },
+    {
+      test: /\.css$/,
+      use: [
+        MiniCssExtractPlugin.loader,
+        {
+          loader: 'css-loader',
+          options: {
+            sourceMap: true,
+          },
+        },
+      ],
+    },
+  ],
+},
+```
+
+Make sure that `linaria-styled/loader` is included before `babel-loader`.
+
+## How it works
+
+Linaria lets you write CSS code in a tagged template literal with a styled-component like syntax, using CSS custom properties for dynamic interpolations. The Babel plugin generates unique class names for the components and extracts the CSS to a comment in the JS file. Then the webpack loader extracts this comment out to real files.
 
 The plugin will transpile this:
 
@@ -71,20 +128,7 @@ CSS MAPPINGS:[{"generated":{"line":1,"column":0},"original":{"line":3,"column":6
 */
 ```
 
-Another tool such as a webpack loader can extract this comment to a separate CSS file and add source maps.
-
-## Features
-
-- Inlines simple interpolations in the current scope.
-- Optionally evaluates complex expressions containing imported modules and utility functions.
-- Dynamic runtime-based values are supported using CSS custom properties.
-- Function interpolations receive props as the argument for dynamic prop based styling.
-- Doesn't require any runtime, just a tiny helper to create the component.
-- Supports CSS sourcemaps, so you can easily find where the style was defined.
-
 ## Limitations
-
-Due to the way it works, there are some limitations:
 
 - No IE support due to the use of CSS custom properties.
 
@@ -106,4 +150,4 @@ Due to the way it works, there are some limitations:
   `;
   ```
 
-  Libraries like `styled-components` can get around the cascade because they can control the order of the CSS insertion during the runtime. We could probably generate additional metadata for the webpack loader to control the insertion order of the styles, but it's not possible right now.
+  Libraries like `styled-components` can get around the cascade because they can control the order of the CSS insertion during the runtime. It's not possible when statically extracting the CSS at build time.

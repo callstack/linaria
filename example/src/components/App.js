@@ -42,7 +42,7 @@ export default class App extends React.Component {
         <Button
           color={color}
           target="_blank"
-          href="https://github.com/satya164/linaria-styled"
+          href="https://github.com/callstack/linaria-styled"
         >
           Learn more
         </Button>

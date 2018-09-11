@@ -3,11 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "description": "Experimental Babel plugin to extract CSS statically",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "files": [
-    "src/"
+    "lib/",
+    "babel.js",
+    "loader.js"
   ],
-  "repository": "git@github.com:satya164/linaria-styled.git",
+  "repository": "git@github.com:callstack/linaria-styled.git",
   "author": "Satyajit Sahoo <satyajit.happy@gmail.com>",
   "license": "MIT",
   "keywords": [
@@ -18,7 +20,7 @@
     "import"
   ],
   "scripts": {
-    "build": "babel src --out-dir lib --ignore '**/__tests__/**' --source-maps && flow-copy-source -i '**/__tests__/**' src lib",
+    "prepare": "babel src --out-dir lib --ignore '**/__tests__/**' --source-maps && flow-copy-source -i '**/__tests__/**' src lib",
     "example": "webpack-serve --config example/webpack.config.js",
     "lint": "eslint .",
     "flow": "flow",

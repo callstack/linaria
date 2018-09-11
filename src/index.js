@@ -1,3 +1,3 @@
 /* @flow */
 
-export { default as styled } from './styled';
+module.exports = require('./styled');
