@@ -75,7 +75,7 @@ Another tool such as a webpack loader can extract this comment to a separate CSS
 
 ## Features
 
-- Statically evaluates interpolations in the current scope
+- Inlines interpolations in the current scope
 - Dynamic runtime-based values are supported using CSS custom properties
 - Function interpolations receive props as the argument for dynamic prop based styling
 - Doesn't require any runtime, just a tiny helper to create the component
@@ -93,7 +93,7 @@ Due to the way it works, there are several limitations:
   const width = 200;
 
   const Component = styled('div')`
-    @media (min-width: ${200}px) {
+    @media (min-width: ${width}px) {
       display: block;
     }
   `;
@@ -105,11 +105,13 @@ Due to the way it works, there are several limitations:
   import { width } from './config';
 
   const Component = styled('div')`
-    @media (min-width: ${200}px) {
+    @media (min-width: ${width}px) {
       display: block;
     }
   `;
   ```
+
+  It'll be nice to write linter which disallows use of dynamic interpolations outside of property values to catch it in the editor. We should also throw error a syntax error for this at build time.
 
 - The cascade is still there.
 
