@@ -75,43 +75,18 @@ Another tool such as a webpack loader can extract this comment to a separate CSS
 
 ## Features
 
-- Inlines interpolations in the current scope
-- Dynamic runtime-based values are supported using CSS custom properties
-- Function interpolations receive props as the argument for dynamic prop based styling
-- Doesn't require any runtime, just a tiny helper to create the component
-- Supports CSS sourcemaps, so you can easily find where the style was defined
+- Inlines simple interpolations in the current scope.
+- Optionally evaluates complex expressions containing imported modules and utility functions.
+- Dynamic runtime-based values are supported using CSS custom properties.
+- Function interpolations receive props as the argument for dynamic prop based styling.
+- Doesn't require any runtime, just a tiny helper to create the component.
+- Supports CSS sourcemaps, so you can easily find where the style was defined.
 
 ## Limitations
 
-Due to the way it works, there are several limitations:
+Due to the way it works, there are some limitations:
 
-- The interpolations which cannot be statically evaluated are replaced with CSS custom properties. This means that they can only used in place of property values.
-
-  This is valid, because `width` is defined in the current file and evaluated at build time:
-
-  ```js
-  const width = 200;
-
-  const Component = styled('div')`
-    @media (min-width: ${width}px) {
-      display: block;
-    }
-  `;
-  ```
-
-  But this is invalid, because `width` is imported from another file and cannot be statically evaluated:
-
-  ```js
-  import { width } from './config';
-
-  const Component = styled('div')`
-    @media (min-width: ${width}px) {
-      display: block;
-    }
-  `;
-  ```
-
-  It'll be nice to write linter which disallows use of dynamic interpolations outside of property values to catch it in the editor. We should also throw error a syntax error for this at build time.
+- No IE support due to the use of CSS custom properties.
 
 - The cascade is still there.
 

@@ -1,5 +1,5 @@
-module.exports = function() {
+module.exports = function(context, options) {
   return {
-    plugins: [require('./extract')],
+    plugins: [[require('./extract'), options]],
   };
 };

@@ -30,10 +30,10 @@
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.0.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-loader": "^8.0.2",
     "css-loader": "^1.0.0",
-    "dedent": "^0.7.0",
     "eslint": "^5.4.0",
     "eslint-config-satya164": "^2.0.1",
     "flow-bin": "^0.79.1",
@@ -49,6 +49,8 @@
     "webpack-serve": "^2.0.2"
   },
   "dependencies": {
+    "@babel/generator": "^7.0.0",
+    "dedent": "^0.7.0",
     "stylis": "^3.5.3"
   },
   "resolutions": {

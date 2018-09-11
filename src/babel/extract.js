@@ -2,19 +2,40 @@
 
 const stylis = require('stylis');
 const slugify = require('../slugify');
+const evaluate = require('./evaluate');
 
-module.exports = function(babel /*: any */) {
+/*::
+type State = {|
+  rules: {
+    [className: string]: {
+      cssText: string,
+      loc: { line: number, column: number },
+    },
+  },
+  index: number,
+  file: {
+    opts: {
+      filename: string,
+    },
+  },
+|};
+*/
+
+module.exports = function(
+  babel /*: any */,
+  options /*: { evaluate?: boolean } */ = {}
+) {
   const { types: t } = babel;
 
   return {
     visitor: {
       Program: {
-        enter(path /*: any */, state /*: any */) {
+        enter(path /*: any */, state /*: State */) {
           // Collect all the style rules from the styles we encounter
           state.rules = {};
           state.index = 0;
         },
-        exit(path /*: any */, state /*: any */) {
+        exit(path /*: any */, state /*: State */) {
           if (Object.keys(state.rules).length) {
             const mappings = [];
 
@@ -50,7 +71,7 @@ module.exports = function(babel /*: any */) {
           }
         },
       },
-      TaggedTemplateExpression(path /*: any */, state /*: any */) {
+      TaggedTemplateExpression(path /*: any */, state /*: State */) {
         const interpolations = {};
         const { quasi, tag } = path.node;
 
@@ -107,6 +128,27 @@ module.exports = function(babel /*: any */) {
               if (result.confident) {
                 cssText += result.value;
               } else {
+                // Try to preval the value
+                if (
+                  options.evaluate &&
+                  !(
+                    t.isFunctionExpression(ex) ||
+                    t.isArrowFunctionExpression(ex)
+                  )
+                ) {
+                  try {
+                    const value = evaluate(ex, t);
+
+                    if (typeof value !== 'function') {
+                      cssText += value;
+
+                      return;
+                    }
+                  } catch (e) {
+                    // Ignore
+                  }
+                }
+
                 const id = `${slug}-${state.index}-${i}`;
 
                 interpolations[id] = ex.node;
@@ -115,19 +157,19 @@ module.exports = function(babel /*: any */) {
             }
           });
 
-          const options = [];
+          const props = [];
 
-          options.push(
+          props.push(
             t.objectProperty(t.identifier('name'), t.stringLiteral(displayName))
           );
 
-          options.push(
+          props.push(
             t.objectProperty(t.identifier('class'), t.stringLiteral(className))
           );
 
           // If we found any interpolations, also pass them so they can be applied
           if (Object.keys(interpolations).length) {
-            options.push(
+            props.push(
               t.objectProperty(
                 t.identifier('vars'),
                 t.objectExpression(
@@ -145,7 +187,7 @@ module.exports = function(babel /*: any */) {
                 t.identifier('styled'),
                 t.identifier('component')
               ),
-              [tag.arguments[0], t.objectExpression(options)]
+              [tag.arguments[0], t.objectExpression(props)]
             )
           );
 
