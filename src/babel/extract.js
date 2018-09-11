@@ -139,10 +139,13 @@ module.exports = function(babel /*: any */) {
           }
 
           path.replaceWith(
-            t.callExpression(t.identifier('component'), [
-              tag.arguments[0],
-              t.objectExpression(options),
-            ])
+            t.callExpression(
+              t.memberExpression(
+                t.identifier('styled'),
+                t.identifier('component')
+              ),
+              [tag.arguments[0], t.objectExpression(options)]
+            )
           );
 
           state.rules[className] = { cssText, loc: path.parent.loc.start };

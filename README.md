@@ -29,7 +29,7 @@ To this:
 ```js
 const background = 'yellow';
 
-const Title = component('h1', {
+const Title = styled.component('h1', {
   name: 'Title',
   class: 'Title_t1ugh8t9',
   vars: {
@@ -37,7 +37,7 @@ const Title = component('h1', {
   },
 });
 
-const Container = component('div', {
+const Container = styled.component('div', {
   name: 'Container',
   class: 'Container_c1ugh8t9',
   vars: {
@@ -71,7 +71,7 @@ CSS MAPPINGS:[{"generated":{"line":1,"column":0},"original":{"line":3,"column":6
 */
 ```
 
-A separate tool such as a webpack loader can extract this comment to a separate CSS file.
+Another tool such as a webpack loader can extract this comment to a separate CSS file and add source maps.
 
 ## Features
 

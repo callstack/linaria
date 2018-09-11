@@ -1,6 +1,6 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import component from '../../src/component';
+import { styled } from '../../src';
 
 const background = 'yellow';
 
