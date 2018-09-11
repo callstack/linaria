@@ -29,17 +29,17 @@ const Container = component('div', {
   displayName: 'Container',
   className: 'Container_1ugh8t9',
   interpolations: {
-    'c-0': serif,
-    'c-2': props => props.color
+    '1ugh8t9-0-0': serif,
+    '1ugh8t9-0-2': props => props.color
   }
 });
 
 /*CSS OUTPUT START
 
 .Container_1ugh8t9 {
-  font-family: var(--c-0);
+  font-family: var(--1ugh8t9-0-0);
   background-color: yellow;
-  color: var(--c-2);
+  color: var(--1ugh8t9-0-2);
   width: 33.333333333333336%;
   border: 1px solid red;
 }

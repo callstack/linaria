@@ -12,19 +12,20 @@ module.exports = function(babel /*: any */) {
         enter(path /*: any */, state /*: any */) {
           // Collect all the style rules from the styles we encounter
           state.rules = {};
+          state.index = 0;
         },
         exit(path /*: any */, state /*: any */) {
           // Add the collected styles as a comment to the end of file
           path.addComment(
             'trailing',
-            'CSS OUTPUT START\n' +
+            'CSS OUTPUT START\n\n' +
               Object.keys(state.rules)
                 .map(
                   className =>
                     // Run each rule through stylis to support nesting
-                    `\n${stylis(`.${className}`, state.rules[className])}\n`
+                    `${stylis(`.${className}`, state.rules[className])}`
                 )
-                .join('\n') +
+                .join('\n\n') +
               '\nCSS OUTPUT END'
           );
         },
@@ -57,7 +58,12 @@ module.exports = function(babel /*: any */) {
             );
           }
 
-          let className = `${displayName}_${slugify(state.file.opts.filename)}`;
+          // Custom properties need to start with a letter, so we prefix the slug
+          const slug = `${displayName.charAt(0).toLowerCase()}${slugify(
+            state.file.opts.filename
+          )}`;
+
+          let className = `${displayName}_${slug}`;
 
           while (className in state.rules) {
             // Append 'x' to prevent collision in case of same variable names
@@ -80,7 +86,7 @@ module.exports = function(babel /*: any */) {
               if (result.confident) {
                 cssText += result.value;
               } else {
-                const id = `c-${i}`;
+                const id = `${slug}-${state.index}-${i}`;
 
                 interpolations[id] = ex.node;
                 cssText += `var(--${id})`;
@@ -126,6 +132,7 @@ module.exports = function(babel /*: any */) {
           );
 
           state.rules[className] = cssText;
+          state.index++;
         }
       },
     },
