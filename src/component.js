@@ -1,21 +1,18 @@
 import * as React from 'react';
 
-export default function component(
-  tag,
-  { displayName, className, interpolations }
-) {
+export default function component(tag, options) {
   const Result = function(props) {
     const next = Object.assign({}, props, {
       className: props.className
-        ? `${className} ${props.className}`
-        : className,
+        ? `${options.class} ${props.className}`
+        : options.class,
     });
 
-    if (interpolations) {
+    if (options.vars) {
       const style = {};
 
-      Object.keys(interpolations).forEach(name => {
-        const value = interpolations[name];
+      Object.keys(options.vars).forEach(name => {
+        const value = options.vars[name];
         style[`--${name}`] = typeof value === 'function' ? value(props) : value;
       });
 
@@ -25,7 +22,7 @@ export default function component(
     return React.createElement(tag, next);
   };
 
-  Result.displayName = displayName;
+  Result.displayName = options.name;
 
   return Result;
 }

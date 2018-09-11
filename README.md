@@ -7,8 +7,12 @@ The plugin will transpile this:
 ```js
 const background = 'yellow';
 
-const Container = styled('div')`
+const Title = styled('h1')`
   font-family: ${serif};
+`;
+
+const Container = styled('div')`
+  font-family: ${regular};
   background-color: ${background};
   color: ${props => props.color};
   width: ${100 / 3}%;
@@ -25,26 +29,38 @@ To this:
 ```js
 const background = 'yellow';
 
+const Title = component('h1', {
+  name: 'Title',
+  class: 'Title_t1ugh8t9',
+  vars: {
+    't1ugh8t9-0-0': serif,
+  },
+});
+
 const Container = component('div', {
-  displayName: 'Container',
-  className: 'Container_1ugh8t9',
-  interpolations: {
-    '1ugh8t9-0-0': serif,
-    '1ugh8t9-0-2': props => props.color
-  }
+  name: 'Container',
+  class: 'Container_c1ugh8t9',
+  vars: {
+    'c1ugh8t9-1-0': regular,
+    'c1ugh8t9-1-2': props => props.color,
+  },
 });
 
 /*CSS OUTPUT START
 
-.Container_1ugh8t9 {
-  font-family: var(--1ugh8t9-0-0);
+.Title_t1ugh8t9 {
+  font-family: var(--t1ugh8t9-0-0);
+}
+
+.Container_c1ugh8t9 {
+  font-family: var(--c1ugh8t9-1-0);
   background-color: yellow;
-  color: var(--1ugh8t9-0-2);
+  color: var(--c1ugh8t9-1-2);
   width: 33.333333333333336%;
   border: 1px solid red;
 }
 
-.Container_1ugh8t9:hover {
+.Container_c1ugh8t9:hover {
   border-color: blue;
 }
 

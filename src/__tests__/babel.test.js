@@ -13,6 +13,7 @@ it('should extract CSS to a comment', async () => {
     \`;
 
     const Container = styled('div')\`
+      font-family: ${'${regular}'};
       background-color: ${'${background}'};
       color: ${'${props => props.color}'};
       width: ${'${100 / 3}'}%;
@@ -24,7 +25,7 @@ it('should extract CSS to a comment', async () => {
     \`;
     `,
     {
-      plugins: [require.resolve('../index')],
+      plugins: [require.resolve('../babel')],
       filename: '/app/index.js',
     }
   );

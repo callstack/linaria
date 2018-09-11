@@ -26,7 +26,7 @@ module.exports = function(babel /*: any */) {
                     `${stylis(`.${className}`, state.rules[className])}`
                 )
                 .join('\n\n') +
-              '\nCSS OUTPUT END'
+              '\n\nCSS OUTPUT END'
           );
         },
       },
@@ -97,24 +97,18 @@ module.exports = function(babel /*: any */) {
           const options = [];
 
           options.push(
-            t.objectProperty(
-              t.identifier('displayName'),
-              t.stringLiteral(displayName)
-            )
+            t.objectProperty(t.identifier('name'), t.stringLiteral(displayName))
           );
 
           options.push(
-            t.objectProperty(
-              t.identifier('className'),
-              t.stringLiteral(className)
-            )
+            t.objectProperty(t.identifier('class'), t.stringLiteral(className))
           );
 
           // If we found any interpolations, also pass them so they can be applied
           if (Object.keys(interpolations).length) {
             options.push(
               t.objectProperty(
-                t.identifier('interpolations'),
+                t.identifier('vars'),
                 t.objectExpression(
                   Object.keys(interpolations).map(p =>
                     t.objectProperty(t.stringLiteral(p), interpolations[p])
