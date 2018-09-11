@@ -25,7 +25,7 @@ it('should extract CSS to a comment', async () => {
     \`;
     `,
     {
-      plugins: [require.resolve('../babel')],
+      presets: [require.resolve('../babel')],
       filename: '/app/index.js',
     }
   );

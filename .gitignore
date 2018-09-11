@@ -57,3 +57,7 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# generated files
+/lib/
+/example/dist/
