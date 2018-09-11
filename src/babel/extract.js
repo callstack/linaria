@@ -16,18 +16,36 @@ module.exports = function(babel /*: any */) {
         },
         exit(path /*: any */, state /*: any */) {
           if (Object.keys(state.rules).length) {
+            const mappings = [];
+
+            let cssText = '';
+
+            Object.keys(state.rules).forEach((className, index) => {
+              mappings.push({
+                generated: {
+                  line: index + 1,
+                  column: 0,
+                },
+                original: state.rules[className].loc,
+                name: className,
+              });
+
+              // Run each rule through stylis to support nesting
+              cssText += `${stylis(
+                `.${className}`,
+                state.rules[className].cssText
+              )}\n`;
+            });
+
             // Add the collected styles as a comment to the end of file
             path.addComment(
               'trailing',
-              'CSS OUTPUT START\n\n' +
-                Object.keys(state.rules)
-                  .map(
-                    className =>
-                      // Run each rule through stylis to support nesting
-                      `${stylis(`.${className}`, state.rules[className])}`
-                  )
-                  .join('\n\n') +
-                '\n\nCSS OUTPUT END'
+              '\nCSS OUTPUT START\n' +
+                cssText +
+                '\nCSS OUTPUT END\n' +
+                '\nCSS MAPPINGS:' +
+                JSON.stringify(mappings) +
+                '\n'
             );
           }
         },
@@ -127,7 +145,7 @@ module.exports = function(babel /*: any */) {
             ])
           );
 
-          state.rules[className] = cssText;
+          state.rules[className] = { cssText, loc: path.parent.loc.start };
           state.index++;
         }
       },

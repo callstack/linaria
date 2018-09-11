@@ -4,7 +4,9 @@ import component from '../../src/component';
 
 const background = 'yellow';
 
-const Title = styled('h1')``;
+const Title = styled('h1')`
+  font-size: 15px;
+`;
 
 const Container = styled('div')`
   background-color: ${background};
@@ -16,8 +18,6 @@ const Container = styled('div')`
     border-color: blue;
   }
 `;
-
-console.log(<Title>Hello sweetie</Title>);
 
 ReactDOM.render(
   <Container color="orange">

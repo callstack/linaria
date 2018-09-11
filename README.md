@@ -46,7 +46,8 @@ const Container = component('div', {
   },
 });
 
-/*CSS OUTPUT START
+/*
+CSS OUTPUT START
 
 .Title_t1ugh8t9 {
   font-family: var(--t1ugh8t9-0-0);
@@ -64,7 +65,10 @@ const Container = component('div', {
   border-color: blue;
 }
 
-CSS OUTPUT END*/
+CSS OUTPUT END
+
+CSS MAPPINGS:[{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":"Title_t1ugh8t9"},{"generated":{"line":5,"column":0},"original":{"line":7,"column":6},"name":"Container_c1ugh8t9"}]
+*/
 ```
 
 A separate tool such as a webpack loader can extract this comment to a separate CSS file.
@@ -75,6 +79,7 @@ A separate tool such as a webpack loader can extract this comment to a separate 
 - Dynamic runtime-based values are supported using CSS custom properties
 - Function interpolations receive props as the argument for dynamic prop based styling
 - Doesn't require any runtime, just a tiny helper to create the component
+- Supports CSS sourcemaps, so you can easily find where the style was defined
 
 ## Limitations
 

@@ -1,21 +1,34 @@
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
+const { SourceMapGenerator } = require('source-map');
 const slugify = require('./slugify');
 
 module.exports = function(content) {
   this.cacheable();
 
   let css = '';
+  let mappings = null;
   let found = false;
+  let comment = false;
 
   content.split('\n').forEach(line => {
-    if (line === '/*CSS OUTPUT START') {
+    if (line === '/*') {
+      comment = true;
+    } else if (line === '*/') {
+      comment = false;
+    } else if (line === 'CSS OUTPUT START' && comment) {
       found = true;
-    } else if (line === 'CSS OUTPUT END*/') {
+    } else if (line === 'CSS OUTPUT END' && comment) {
       found = false;
     } else if (found) {
-      css += line;
+      css += line + '\n';
+    } else if (line.startsWith('CSS MAPPINGS:')) {
+      try {
+        mappings = JSON.parse(line.substr(13));
+      } catch (e) {
+        // Ignore
+      }
     }
   });
 
@@ -26,6 +39,26 @@ module.exports = function(content) {
       os.tmpdir(),
       this.resourcePath.split('/').join('_') + '_' + filename
     );
+
+    if (mappings) {
+      const generator = new SourceMapGenerator({
+        file: filename,
+      });
+
+      mappings.forEach(map =>
+        generator.addMapping(Object.assign(map, { source: this.resourcePath }))
+      );
+
+      generator.setSourceContent(
+        this.resourcePath,
+        this.fs.readFileSync(this.resourcePath).toString()
+      );
+
+      css +=
+        '/*# sourceMappingURL=data:application/json;base64,' +
+        Buffer.from(generator.toString()).toString('base64') +
+        '*/';
+    }
 
     fs.writeFileSync(output, css);
 
