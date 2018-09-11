@@ -5,7 +5,11 @@ export default function component(
   { displayName, className, interpolations }
 ) {
   const Result = function(props) {
-    const next = { className };
+    const next = Object.assign({}, props, {
+      className: props.className
+        ? `${className} ${props.className}`
+        : className,
+    });
 
     if (interpolations) {
       const style = {};
@@ -14,6 +18,8 @@ export default function component(
         const value = interpolations[name];
         style[`--${name}`] = typeof value === 'function' ? value(props) : value;
       });
+
+      next.style = Object.assign(style, next.style);
     }
 
     return React.createElement(tag, next);
