@@ -1,6 +1,6 @@
 # linaria-styled
 
-Zero-runtime CSS in JS library building React components (experimental).
+Zero-runtime CSS in JS library for building React components (experimental).
 
 ## Features
 

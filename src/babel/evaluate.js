@@ -1,6 +1,6 @@
 /* @flow */
 
-const { resolve: resolvePath } = require('path');
+const { resolve: resolvePath, dirname } = require('path');
 const vm = require('vm');
 const dedent = require('dedent');
 const babel = require('@babel/core');
@@ -119,8 +119,9 @@ module.exports = function evaluate(
   );
 
   const context = {
-    /* $FlowFixMe */
-    require: id => require(id.startsWith('.') ? resolvePath(filename, id) : id),
+    require: id =>
+      /* $FlowFixMe */
+      require(id.startsWith('.') ? resolvePath(dirname(filename), id) : id),
     [VM_EVALUATION_RESULT]: {},
   };
 
