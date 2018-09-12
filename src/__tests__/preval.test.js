@@ -4,6 +4,8 @@ const path = require('path');
 const babel = require('@babel/core');
 const dedent = require('dedent');
 
+jest.mock('../slugify', () => () => 'abcdef');
+
 const transpile = async input => {
   const { code } = await babel.transformAsync(input, {
     babelrc: false,
@@ -11,6 +13,7 @@ const transpile = async input => {
     filename: path.join(__dirname, 'source.js'),
   });
 
+  // The slug will be machine specific, so replace it with a consistent one
   return code;
 };
 

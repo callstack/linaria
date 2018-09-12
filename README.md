@@ -1,6 +1,9 @@
 # linaria-styled
 
-Zero-runtime CSS in JS library for building React components (experimental).
+[![Build Status][build-badge]][build]
+[![Code Coverage][coverage-badge]][coverage]
+
+Zero-runtime CSS in JS library for building React components.
 
 ## Features
 
@@ -143,3 +146,10 @@ CSS MAPPINGS:[{"generated":{"line":1,"column":0},"original":{"line":3,"column":6
   ```
 
   Libraries like `styled-components` can get around the cascade because they can control the order of the CSS insertion during the runtime. It's not possible when statically extracting the CSS at build time.
+
+<!-- badges -->
+
+[build-badge]: https://img.shields.io/circleci/project/github/callstack/linaria-styled/master.svg?style=flat-square
+[build]: https://circleci.com/gh/callstack/linaria-styled
+[coverage-badge]: https://img.shields.io/codecov/c/github/callstack/linaria-styled.svg?style=flat-square
+[coverage]: https://codecov.io/github/callstack/linaria-styled

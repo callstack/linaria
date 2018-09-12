@@ -5,21 +5,21 @@ exports[`evaluates component interpolations 1`] = `
 
 const Title = styled.component('h1', {
   name: \\"Title\\",
-  class: \\"Title_t2sbey6\\"
+  class: \\"Title_tabcdef\\"
 });
 const Paragraph = styled.component('p', {
   name: \\"Paragraph\\",
-  class: \\"Paragraph_p2sbey6\\"
+  class: \\"Paragraph_pabcdef\\"
 });
 
 /*
 CSS OUTPUT START
-.Title_t2sbey6{color:red;}
-.Paragraph_p2sbey6 .Title_t2sbey6{color:blue;}
+.Title_tabcdef{color:red;}
+.Paragraph_pabcdef .Title_tabcdef{color:blue;}
 
 CSS OUTPUT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_t2sbey6\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":6},\\"name\\":\\"Paragraph_p2sbey6\\"}]
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":6},\\"name\\":\\"Paragraph_pabcdef\\"}]
 */"
 `;
 
@@ -27,16 +27,16 @@ exports[`evaluates expressions with dependencies 1`] = `
 "import slugify from '../slugify';
 const Title = styled.component('h1', {
   name: \\"Title\\",
-  class: \\"Title_t2sbey6\\"
+  class: \\"Title_tabcdef\\"
 });
 
 /*
 CSS OUTPUT START
-.Title_t2sbey6:before{content:\\"6og6jy\\";}
+.Title_tabcdef:before{content:\\"6og6jy\\";}
 
 CSS OUTPUT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_t2sbey6\\"}]
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
 */"
 `;
 
@@ -49,16 +49,16 @@ const bar = t => slugify(t) + 'bar';
 
 const Title = styled.component('h1', {
   name: \\"Title\\",
-  class: \\"Title_t2sbey6\\"
+  class: \\"Title_tabcdef\\"
 });
 
 /*
 CSS OUTPUT START
-.Title_t2sbey6:before{content:\\"6og6jyboo6og6jybar\\";}
+.Title_tabcdef:before{content:\\"6og6jyboo6og6jybar\\";}
 
 CSS OUTPUT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_t2sbey6\\"}]
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
 */"
 `;
 
@@ -70,16 +70,16 @@ const foo = () => answer;
 const days = foo() + ' days';
 const Title = styled.component('h1', {
   name: \\"Title\\",
-  class: \\"Title_t2sbey6\\"
+  class: \\"Title_tabcdef\\"
 });
 
 /*
 CSS OUTPUT START
-.Title_t2sbey6:before{content:\\"42 days\\";}
+.Title_tabcdef:before{content:\\"42 days\\";}
 
 CSS OUTPUT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":5,\\"column\\":6},\\"name\\":\\"Title_t2sbey6\\"}]
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":5,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
 */"
 `;
 
@@ -90,16 +90,16 @@ const foo = () => answer;
 
 const Title = styled.component('h1', {
   name: \\"Title\\",
-  class: \\"Title_t2sbey6\\"
+  class: \\"Title_tabcdef\\"
 });
 
 /*
 CSS OUTPUT START
-.Title_t2sbey6:before{content:\\"42 days\\";}
+.Title_tabcdef:before{content:\\"42 days\\";}
 
 CSS OUTPUT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":4,\\"column\\":6},\\"name\\":\\"Title_t2sbey6\\"}]
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":4,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
 */"
 `;
 
@@ -112,16 +112,16 @@ const bar = t => slugify(t) + 'bar';
 
 const Title = styled.component('h1', {
   name: \\"Title\\",
-  class: \\"Title_t2sbey6\\"
+  class: \\"Title_tabcdef\\"
 });
 
 /*
 CSS OUTPUT START
-.Title_t2sbey6:before{content:\\"6og6jyboo\\" content:\\"6og6jybar\\";}
+.Title_tabcdef:before{content:\\"6og6jyboo\\" content:\\"6og6jybar\\";}
 
 CSS OUTPUT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_t2sbey6\\"}]
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
 */"
 `;
 
@@ -130,47 +130,47 @@ exports[`ignores external expressions 1`] = `
 
 const Title = styled.component('h1', {
   name: \\"Title\\",
-  class: \\"Title_t2sbey6\\",
+  class: \\"Title_tabcdef\\",
   vars: {
-    \\"t2sbey6-0-0\\": generate
+    \\"tabcdef-0-0\\": generate
   }
 });
 
 /*
 CSS OUTPUT START
-.Title_t2sbey6:before{content:\\"var(--t2sbey6-0-0)\\";}
+.Title_tabcdef:before{content:\\"var(--tabcdef-0-0)\\";}
 
 CSS OUTPUT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_t2sbey6\\"}]
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
 */"
 `;
 
 exports[`ignores inline arrow function expressions 1`] = `
 "const Title = styled.component('h1', {
   name: \\"Title\\",
-  class: \\"Title_t2sbey6\\",
+  class: \\"Title_tabcdef\\",
   vars: {
-    \\"t2sbey6-0-0\\": props => props.content
+    \\"tabcdef-0-0\\": props => props.content
   }
 });
 
 /*
 CSS OUTPUT START
-.Title_t2sbey6:before{content:\\"var(--t2sbey6-0-0)\\";}
+.Title_tabcdef:before{content:\\"var(--tabcdef-0-0)\\";}
 
 CSS OUTPUT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t2sbey6\\"}]
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
 */"
 `;
 
 exports[`ignores inline vanilla function expressions 1`] = `
 "const Title = styled.component('h1', {
   name: \\"Title\\",
-  class: \\"Title_t2sbey6\\",
+  class: \\"Title_tabcdef\\",
   vars: {
-    \\"t2sbey6-0-0\\": function (props) {
+    \\"tabcdef-0-0\\": function (props) {
       return props.content;
     }
   }
@@ -178,10 +178,10 @@ exports[`ignores inline vanilla function expressions 1`] = `
 
 /*
 CSS OUTPUT START
-.Title_t2sbey6:before{content:\\"var(--t2sbey6-0-0)\\";}
+.Title_tabcdef:before{content:\\"var(--tabcdef-0-0)\\";}
 
 CSS OUTPUT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t2sbey6\\"}]
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
 */"
 `;
