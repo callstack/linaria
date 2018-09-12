@@ -155,23 +155,15 @@ module.exports = function(
                   }
                 }
 
-                let id;
+                const source = ex.getSource();
 
-                // If multiple expression refer to the same identifier, use a single id
-                if (t.isIdentifier(ex.node)) {
-                  id = Object.keys(interpolations).find(key => {
-                    const node = interpolations[key];
-
-                    if (t.isIdentifier(node) && ex.node.name === node.name) {
-                      return true;
-                    }
-
-                    return false;
-                  });
-                }
+                // If interpolations have the same expression, use a single id
+                let id = Object.keys(interpolations).find(
+                  key => source === interpolations[key].getSource()
+                );
 
                 id = id || `${slug}-${state.index}-${i}`;
-                interpolations[id] = ex.node;
+                interpolations[id] = ex;
                 cssText += `var(--${id})`;
               }
             }
@@ -194,7 +186,7 @@ module.exports = function(
                 t.identifier('vars'),
                 t.objectExpression(
                   Object.keys(interpolations).map(p =>
-                    t.objectProperty(t.stringLiteral(p), interpolations[p])
+                    t.objectProperty(t.stringLiteral(p), interpolations[p].node)
                   )
                 )
               )

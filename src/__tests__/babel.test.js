@@ -65,6 +65,19 @@ it('uses the same custom property for the same identifier', async () => {
   expect(code).toMatchSnapshot();
 });
 
+it('uses the same custom property for the same expression', async () => {
+  const code = await transpile(
+    dedent`
+    const Box = styled('div')\`
+      height: ${'${props => props.size}'}px;
+      width: ${'${props => props.size}'}px;
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
 it('handles nested blocks', async () => {
   const code = await transpile(
     dedent`

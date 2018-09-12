@@ -138,6 +138,25 @@ CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"
 */"
 `;
 
+exports[`uses the same custom property for the same expression 1`] = `
+"const Box = styled.component('div', {
+  name: \\"Box\\",
+  class: \\"Box_b1ugh8t9\\",
+  vars: {
+    \\"b1ugh8t9-0-0\\": props => props.size
+  }
+});
+
+/*
+CSS OUTPUT START
+.Box_b1ugh8t9{height:var(--b1ugh8t9-0-0)px;width:var(--b1ugh8t9-0-0)px;}
+
+CSS OUTPUT END
+
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Box_b1ugh8t9\\"}]
+*/"
+`;
+
 exports[`uses the same custom property for the same identifier 1`] = `
 "const Box = styled.component('div', {
   name: \\"Box\\",
