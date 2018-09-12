@@ -155,8 +155,22 @@ module.exports = function(
                   }
                 }
 
-                const id = `${slug}-${state.index}-${i}`;
+                let id;
 
+                // If multiple expression refer to the same identifier, use a single id
+                if (t.isIdentifier(ex.node)) {
+                  id = Object.keys(interpolations).find(key => {
+                    const node = interpolations[key];
+
+                    if (t.isIdentifier(node) && ex.node.name === node.name) {
+                      return true;
+                    }
+
+                    return false;
+                  });
+                }
+
+                id = id || `${slug}-${state.index}-${i}`;
                 interpolations[id] = ex.node;
                 cssText += `var(--${id})`;
               }
