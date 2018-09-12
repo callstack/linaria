@@ -36,15 +36,7 @@ module.exports = {
           },
           {
             loader: 'babel-loader',
-            options: {
-              babelrc: false,
-              presets: [
-                '@babel/preset-env',
-                '@babel/preset-flow',
-                '@babel/preset-react',
-                require.resolve('../src/babel'),
-              ],
-            },
+            options: require('./babel.config'),
           },
         ],
       },
