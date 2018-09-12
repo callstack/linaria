@@ -1,12 +1,12 @@
 /* @flow */
 
-const { resolve: resolvePath, dirname } = require('path');
+// $FlowFixMe
+const Module = require('module');
+const { dirname } = require('path');
 const vm = require('vm');
 const dedent = require('dedent');
 const babel = require('@babel/core');
 const generator = require('@babel/generator').default;
-
-const VM_EVALUATION_RESULT = '$$_vm_evaluation_result';
 
 const resolve = (path, requirements) => {
   const binding = path.scope.getBinding(path.node.name);
@@ -73,10 +73,7 @@ module.exports = function evaluate(
   const expression = t.expressionStatement(
     t.assignmentExpression(
       '=',
-      t.memberExpression(
-        t.identifier(VM_EVALUATION_RESULT),
-        t.identifier('value')
-      ),
+      t.memberExpression(t.identifier('module'), t.identifier('exports')),
       path.node
     )
   );
@@ -100,12 +97,16 @@ module.exports = function evaluate(
     req => !t.isImportDeclaration(req.path.parentPath)
   );
 
-  const preset = require.resolve('./index');
+  const config = {
+    // This is required to make babelrc work
+    filename,
+    presets: [require.resolve('./index')],
+    plugins: ['@babel/plugin-transform-modules-commonjs'],
+  };
+
   const { code } = babel.transformSync(
     dedent`
-    require('@babel/register')({
-      presets: ['${preset}']
-    });
+    require('@babel/register')(${JSON.stringify(config)});
 
     ${imports.map(c => c.code).join('\n')}
 
@@ -115,20 +116,20 @@ module.exports = function evaluate(
 
     ${rest.map(() => '}').join('\n')}
   `,
-    {
-      // This is required to make babelrc work
-      filename,
-    }
+    config
   );
 
+  const mod = new Module(filename);
+
+  mod.filename = filename;
+  mod.paths = Module._nodeModulePaths(dirname(filename));
+
   const context = {
-    require: id =>
-      /* $FlowFixMe */
-      require(id.startsWith('.') ? resolvePath(dirname(filename), id) : id),
-    [VM_EVALUATION_RESULT]: {},
+    module: mod,
+    require: id => mod.require(id),
   };
 
   vm.runInNewContext(code, context);
 
-  return context[VM_EVALUATION_RESULT].value;
+  return mod.exports;
 };
