@@ -61,12 +61,15 @@ module.exports = function evaluate(path /*: any */, t /*: any */) {
     )
   );
 
+  // Wrap each code in a block to avoid collisions in variable names
   const { code } = babel.transformSync(dedent`
     require('@babel/register')
 
-    ${requirements.join('\n')}
+    ${requirements.map(c => '{\n' + c).join('\n')}
 
     ${generator(expression).code}
+
+    ${requirements.map(() => '}').join('\n')}
   `);
 
   const context = { require, result: undefined };
