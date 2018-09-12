@@ -1,4 +1,4 @@
-import * as babel from 'babel-core';
+import * as babel from '@babel/core';
 import prevalStyles from '../prevalStyles';
 import getReplacement from '../getReplacement';
 import {

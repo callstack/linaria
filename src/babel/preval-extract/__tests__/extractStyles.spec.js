@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import mkdirp from 'mkdirp';
-import { types } from 'babel-core';
+import { types } from '@babel/core';
 import extractStyles, { clearCache } from '../extractStyles';
 import { getCachedModule } from '../../lib/moduleSystem';
 

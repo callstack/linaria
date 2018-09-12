@@ -1,4 +1,4 @@
-import { types } from 'babel-core';
+import { types } from '@babel/core';
 import resolveSource from '../resolveSource';
 
 function runAssertions(pathFromBinding, expectedSource) {

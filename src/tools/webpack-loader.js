@@ -1,6 +1,6 @@
 /* @flow */
 
-import * as babel from 'babel-core';
+import * as babel from '@babel/core';
 import loaderUtils from 'loader-utils';
 
 function shouldRunLinaria(source: string) {
