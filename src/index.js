@@ -1,3 +1,3 @@
 /* @flow */
 
-module.exports = require('./styled');
+exports.styled = require('./styled');
