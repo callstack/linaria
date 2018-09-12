@@ -98,9 +98,11 @@ module.exports = function evaluate(
   );
 
   const config = {
-    // This is required to make babelrc work
+    // This is required to properly resolve babelrc
     filename,
-    presets: [require.resolve('./index')],
+    cwd: dirname(filename),
+    presets: [require.resolve('../babel')],
+    // Include this plugin to avoid extra config when using { module: false } for webpack
     plugins: ['@babel/plugin-transform-modules-commonjs'],
   };
 
