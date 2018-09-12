@@ -1,9 +1,12 @@
 /* @flow */
 
+const { resolve: resolvePath } = require('path');
 const vm = require('vm');
 const dedent = require('dedent');
 const babel = require('@babel/core');
 const generator = require('@babel/generator').default;
+
+const VM_EVALUATION_RESULT = '$$_vm_evaluation_result';
 
 const resolve = (path, requirements) => {
   const binding = path.scope.getBinding(path.node.name);
@@ -50,7 +53,11 @@ const resolve = (path, requirements) => {
   }
 };
 
-module.exports = function evaluate(path /*: any */, t /*: any */) {
+module.exports = function evaluate(
+  path /*: any */,
+  t /*: any */,
+  filename /*: string */
+) {
   const requirements = [];
 
   if (t.isIdentifier(path)) {
@@ -66,7 +73,10 @@ module.exports = function evaluate(path /*: any */, t /*: any */) {
   const expression = t.expressionStatement(
     t.assignmentExpression(
       '=',
-      t.memberExpression(t.thisExpression(), t.identifier('result')),
+      t.memberExpression(
+        t.identifier(VM_EVALUATION_RESULT),
+        t.identifier('value')
+      ),
       path.node
     )
   );
@@ -80,20 +90,41 @@ module.exports = function evaluate(path /*: any */, t /*: any */) {
     return a.start.line - b.start.line;
   });
 
-  // Wrap each code in a block to avoid collisions in variable names
-  const { code } = babel.transformSync(dedent`
+  // Separate out the imports since they cannot be inside blocks
+  const imports = requirements.filter(req =>
+    t.isImportDeclaration(req.path.parentPath)
+  );
+
+  // We'll wrap each code in a block to avoid collisions in variable names
+  const rest = requirements.filter(
+    req => !t.isImportDeclaration(req.path.parentPath)
+  );
+
+  const { code } = babel.transformSync(
+    dedent`
     require('@babel/register')
 
-    ${requirements.map(c => '{\n' + c.code).join('\n')}
+    ${imports.map(c => c.code).join('\n')}
+
+    ${rest.map(c => '{\n' + c.code).join('\n')}
 
     ${generator(expression).code}
 
-    ${requirements.map(() => '}').join('\n')}
-  `);
+    ${rest.map(() => '}').join('\n')}
+  `,
+    {
+      // This is required to make babelrc work
+      filename,
+    }
+  );
 
-  const context = { require, result: undefined };
+  const context = {
+    /* $FlowFixMe */
+    require: id => require(id.startsWith('.') ? resolvePath(filename, id) : id),
+    [VM_EVALUATION_RESULT]: {},
+  };
 
   vm.runInNewContext(code, context);
 
-  return context.result;
+  return context[VM_EVALUATION_RESULT].value;
 };

@@ -137,7 +137,7 @@ module.exports = function(
                   )
                 ) {
                   try {
-                    const value = evaluate(ex, t);
+                    const value = evaluate(ex, t, state.file.opts.filename);
 
                     if (typeof value === 'function') {
                       if (typeof value.className === 'string') {

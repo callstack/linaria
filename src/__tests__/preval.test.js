@@ -1,12 +1,14 @@
 /* @flow */
 
+const path = require('path');
 const babel = require('@babel/core');
 const dedent = require('dedent');
 
 const transpile = async input => {
   const { code } = await babel.transformAsync(input, {
+    babelrc: false,
     presets: [[require.resolve('../babel'), { evaluate: true }]],
-    filename: '/app/index.js',
+    filename: path.join(__dirname, 'source.js'),
   });
 
   return code;
@@ -50,7 +52,7 @@ it('evaluates local expressions', async () => {
 it('evaluates expressions with dependencies', async () => {
   const code = await transpile(
     dedent`
-    const slugify = require('../slugify');
+    import slugify from '../../slugify';
 
     const Title = styled('h1')\`
       &:before {
@@ -66,7 +68,7 @@ it('evaluates expressions with dependencies', async () => {
 it('evaluates expressions with expressions depending on shared dependency', async () => {
   const code = await transpile(
     dedent`
-    const slugify = require('../slugify');
+    const slugify = require('../../slugify');
 
     const boo = t => slugify(t) + 'boo';
     const bar = t => slugify(t) + 'bar';
@@ -85,7 +87,7 @@ it('evaluates expressions with expressions depending on shared dependency', asyn
 it('evaluates multiple expressions with shared dependency', async () => {
   const code = await transpile(
     dedent`
-    const slugify = require('../slugify');
+    const slugify = require('../../slugify');
 
     const boo = t => slugify(t) + 'boo';
     const bar = t => slugify(t) + 'bar';
@@ -105,7 +107,7 @@ it('evaluates multiple expressions with shared dependency', async () => {
 it('evaluates component interpolations', async () => {
   const code = await transpile(
     dedent`
-    const styled = require('../styled');
+    const styled = require('../../styled');
 
     const Title = styled('h1')\`
       color: red;
