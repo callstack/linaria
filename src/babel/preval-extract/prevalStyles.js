@@ -1,7 +1,7 @@
 /* @flow */
 
 import { resolve } from 'path';
-import generate from 'babel-generator';
+import generate from '@babel/generator';
 import shortHash from 'short-hash';
 
 import type {

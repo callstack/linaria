@@ -1,7 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
 /* @flow */
 
-import * as babel from 'babel-core';
+import * as babel from '@babel/core';
 import path from 'path';
 
 function transpile(source, pluginOptions = {}, options = {}) {

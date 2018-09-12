@@ -1,7 +1,7 @@
 /* @flow */
 
 import { SourceMapConsumer } from 'source-map';
-import codeFrame from 'babel-code-frame';
+import codeFrame from '@babel/code-frame';
 import errorStackParser from 'error-stack-parser';
 
 type Frame = {

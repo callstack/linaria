@@ -16,7 +16,7 @@ import fs from 'fs';
 import vm from 'vm';
 // $FlowFixMe
 import NativeModule from 'module';
-import * as babel from 'babel-core';
+import * as babel from '@babel/core';
 
 import {
   buildCodeFrameError,
@@ -103,7 +103,7 @@ export class Module {
     // Transpile module implementation.
     const { code: moduleBody, map } = babel.transform(code, {
       plugins: [
-        require.resolve('babel-plugin-transform-es2015-modules-commonjs'),
+        require.resolve('@babel/plugin-transform-modules-commonjs'),
       ],
       filename,
       sourceMaps: true,

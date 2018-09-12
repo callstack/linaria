@@ -1,6 +1,6 @@
 /* @flow */
 
-import generate from 'babel-generator';
+import generate from '@babel/generator';
 
 import type {
   NodePath,
