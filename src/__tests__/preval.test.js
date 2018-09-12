@@ -63,6 +63,25 @@ it('evaluates expressions with dependencies', async () => {
   expect(code).toMatchSnapshot();
 });
 
+it('evaluates expressions with expressions depending on shared expression', async () => {
+  const code = await transpile(
+    dedent`
+    const slugify = require('../slugify');
+
+    const boo = t => slugify(t) + 'boo';
+    const too = t => slugify(t) + 'too';
+
+    const Title = styled('h1')\`
+      &:before {
+        content: "${"${boo('test') + too('test')}"}"
+      }
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
 it('evaluates component interpolations', async () => {
   const code = await transpile(
     dedent`

@@ -29,7 +29,9 @@ const resolve = (path, requirements) => {
     }
 
     if (code && !binding.path[found]) {
-      requirements.unshift(code);
+      const loc = binding.path.node.loc;
+
+      requirements.push({ code, start: loc.start, end: loc.end });
       binding.path[found] = true;
       binding.path.traverse({
         Identifier(path) {
@@ -61,11 +63,20 @@ module.exports = function evaluate(path /*: any */, t /*: any */) {
     )
   );
 
+  // Preserve source order
+  requirements.sort((a, b) => {
+    if (a.start.line === b.start.line) {
+      return a.start.column - b.start.column;
+    }
+
+    return a.start.line - b.start.line;
+  });
+
   // Wrap each code in a block to avoid collisions in variable names
   const { code } = babel.transformSync(dedent`
     require('@babel/register')
 
-    ${requirements.map(c => '{\n' + c).join('\n')}
+    ${requirements.map(c => '{\n' + c.code).join('\n')}
 
     ${generator(expression).code}
 
