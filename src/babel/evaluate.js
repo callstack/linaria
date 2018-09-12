@@ -100,9 +100,12 @@ module.exports = function evaluate(
     req => !t.isImportDeclaration(req.path.parentPath)
   );
 
+  const preset = require.resolve('./index');
   const { code } = babel.transformSync(
     dedent`
-    require('@babel/register')
+    require('@babel/register')({
+      presets: ['${preset}']
+    });
 
     ${imports.map(c => c.code).join('\n')}
 

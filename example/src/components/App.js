@@ -12,6 +12,10 @@ const Container = styled('div')`
   align-items: center;
   justify-content: center;
   background-color: ${colors.background};
+
+  ${Title} {
+    margin-bottom: 24px;
+  }
 `;
 
 const PRIMARY_COLORS = ['#de2d68', '#a32cde', '#4a2cde'];

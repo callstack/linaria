@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`evaluates component interpolations 1`] = `
-"const styled = require('../../styled');
+"const styled = require('../styled');
 
 const Title = styled.component('h1', {
   name: \\"Title\\",
@@ -24,7 +24,7 @@ CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"
 `;
 
 exports[`evaluates expressions with dependencies 1`] = `
-"import slugify from '../../slugify';
+"import slugify from '../slugify';
 const Title = styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_t2sbey6\\"
@@ -41,7 +41,7 @@ CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"
 `;
 
 exports[`evaluates expressions with expressions depending on shared dependency 1`] = `
-"const slugify = require('../../slugify');
+"const slugify = require('../slugify');
 
 const boo = t => slugify(t) + 'boo';
 
@@ -104,7 +104,7 @@ CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"
 `;
 
 exports[`evaluates multiple expressions with shared dependency 1`] = `
-"const slugify = require('../../slugify');
+"const slugify = require('../slugify');
 
 const boo = t => slugify(t) + 'boo';
 

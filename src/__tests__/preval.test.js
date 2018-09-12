@@ -52,7 +52,7 @@ it('evaluates local expressions', async () => {
 it('evaluates expressions with dependencies', async () => {
   const code = await transpile(
     dedent`
-    import slugify from '../../slugify';
+    import slugify from '../slugify';
 
     const Title = styled('h1')\`
       &:before {
@@ -68,7 +68,7 @@ it('evaluates expressions with dependencies', async () => {
 it('evaluates expressions with expressions depending on shared dependency', async () => {
   const code = await transpile(
     dedent`
-    const slugify = require('../../slugify');
+    const slugify = require('../slugify');
 
     const boo = t => slugify(t) + 'boo';
     const bar = t => slugify(t) + 'bar';
@@ -87,7 +87,7 @@ it('evaluates expressions with expressions depending on shared dependency', asyn
 it('evaluates multiple expressions with shared dependency', async () => {
   const code = await transpile(
     dedent`
-    const slugify = require('../../slugify');
+    const slugify = require('../slugify');
 
     const boo = t => slugify(t) + 'boo';
     const bar = t => slugify(t) + 'bar';
@@ -107,7 +107,7 @@ it('evaluates multiple expressions with shared dependency', async () => {
 it('evaluates component interpolations', async () => {
   const code = await transpile(
     dedent`
-    const styled = require('../../styled');
+    const styled = require('../styled');
 
     const Title = styled('h1')\`
       color: red;
