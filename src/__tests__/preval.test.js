@@ -63,17 +63,37 @@ it('evaluates expressions with dependencies', async () => {
   expect(code).toMatchSnapshot();
 });
 
-it('evaluates expressions with expressions depending on shared expression', async () => {
+it('evaluates expressions with expressions depending on shared dependency', async () => {
   const code = await transpile(
     dedent`
     const slugify = require('../slugify');
 
     const boo = t => slugify(t) + 'boo';
-    const too = t => slugify(t) + 'too';
+    const bar = t => slugify(t) + 'bar';
 
     const Title = styled('h1')\`
       &:before {
-        content: "${"${boo('test') + too('test')}"}"
+        content: "${"${boo('test') + bar('test')}"}"
+      }
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
+it('evaluates multiple expressions with shared dependency', async () => {
+  const code = await transpile(
+    dedent`
+    const slugify = require('../slugify');
+
+    const boo = t => slugify(t) + 'boo';
+    const bar = t => slugify(t) + 'bar';
+
+    const Title = styled('h1')\`
+      &:before {
+        content: "${"${boo('test')}"}"
+        content: "${"${bar('test')}"}"
       }
     \`;
     `

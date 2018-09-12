@@ -5,12 +5,15 @@ const dedent = require('dedent');
 const babel = require('@babel/core');
 const generator = require('@babel/generator').default;
 
-const found = Symbol('found');
-
 const resolve = (path, requirements) => {
   const binding = path.scope.getBinding(path.node.name);
 
-  if (path.isReferenced() && binding && binding.kind !== 'param') {
+  if (
+    path.isReferenced() &&
+    binding &&
+    binding.kind !== 'param' &&
+    !requirements.some(req => req.path === binding.path)
+  ) {
     let code;
 
     switch (binding.kind) {
@@ -28,11 +31,16 @@ const resolve = (path, requirements) => {
         break;
     }
 
-    if (code && !binding.path[found]) {
+    if (code) {
       const loc = binding.path.node.loc;
 
-      requirements.push({ code, start: loc.start, end: loc.end });
-      binding.path[found] = true;
+      requirements.push({
+        code,
+        path: binding.path,
+        start: loc.start,
+        end: loc.end,
+      });
+
       binding.path.traverse({
         Identifier(path) {
           resolve(path, requirements);

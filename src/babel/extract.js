@@ -151,6 +151,7 @@ module.exports = function(
                       return;
                     }
                   } catch (e) {
+                    console.log(e);
                     // Ignore
                   }
                 }

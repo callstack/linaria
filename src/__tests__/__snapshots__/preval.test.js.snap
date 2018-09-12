@@ -41,12 +41,12 @@ CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"
 */"
 `;
 
-exports[`evaluates expressions with expressions depending on shared expression 1`] = `
+exports[`evaluates expressions with expressions depending on shared dependency 1`] = `
 "const slugify = require('../slugify');
 
 const boo = t => slugify(t) + 'boo';
 
-const too = t => slugify(t) + 'too';
+const bar = t => slugify(t) + 'bar';
 
 const Title = styled.component('h1', {
   name: \\"Title\\",
@@ -55,7 +55,7 @@ const Title = styled.component('h1', {
 
 /*
 CSS OUTPUT START
-.Title_t1ugh8t9:before{content:\\"6og6jyboo6og6jytoo\\";}
+.Title_t1ugh8t9:before{content:\\"6og6jyboo6og6jybar\\";}
 
 CSS OUTPUT END
 
@@ -101,6 +101,28 @@ CSS OUTPUT START
 CSS OUTPUT END
 
 CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":4,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+*/"
+`;
+
+exports[`evaluates multiple expressions with shared dependency 1`] = `
+"const slugify = require('../slugify');
+
+const boo = t => slugify(t) + 'boo';
+
+const bar = t => slugify(t) + 'bar';
+
+const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_t1ugh8t9\\"
+});
+
+/*
+CSS OUTPUT START
+.Title_t1ugh8t9:before{content:\\"6og6jyboo\\" content:\\"6og6jybar\\";}
+
+CSS OUTPUT END
+
+CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
 */"
 `;
 
