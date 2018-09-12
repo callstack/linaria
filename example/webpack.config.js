@@ -28,7 +28,12 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         use: [
-          require.resolve('../src/webpack-loader'),
+          {
+            loader: require.resolve('../src/loader'),
+            options: {
+              sourceMap: true,
+            },
+          },
           {
             loader: 'babel-loader',
             options: {

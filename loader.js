@@ -1,1 +1,1 @@
-module.exports = require('lib/webpack-loader');
+module.exports = require('lib/loader');

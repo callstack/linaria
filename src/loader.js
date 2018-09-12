@@ -1,11 +1,14 @@
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
+const loaderUtils = require('loader-utils');
 const { SourceMapGenerator } = require('source-map');
 const slugify = require('./slugify');
 
 module.exports = function(content) {
   this.cacheable();
+
+  const options = loaderUtils.getOptions(this) || {};
 
   let css = '';
   let mappings = null;
@@ -40,7 +43,7 @@ module.exports = function(content) {
       this.resourcePath.split('/').join('_') + '_' + filename
     );
 
-    if (mappings) {
+    if (options.sourceMap && mappings) {
       const generator = new SourceMapGenerator({
         file: filename,
       });
