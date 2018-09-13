@@ -75,6 +75,41 @@ module.exports = function evaluate(
     });
   }
 
+  // Collect the list of dependencies that we import
+  const dependencies = requirements.reduce((deps, req) => {
+    if (t.isImportDeclaration(req.path.parentPath)) {
+      deps.push(req.path.parentPath.node.source.value);
+    } else {
+      req.path.traverse({
+        CallExpression(p) {
+          const { callee, arguments: args } = p.node;
+
+          let name;
+
+          if (callee.name === 'require' && args.length === 1) {
+            if (
+              args[0].type === 'Literal' ||
+              args[0].type === 'StringLiteral'
+            ) {
+              name = args[0].value;
+            } else if (
+              args[0].type === 'TemplateLiteral' &&
+              args[0].quasis.length === 1
+            ) {
+              name = args[0].quasis[0].value.cooked;
+            }
+          }
+
+          if (name) {
+            deps.push(name);
+          }
+        },
+      });
+    }
+
+    return deps;
+  }, []);
+
   const expression = t.expressionStatement(
     t.assignmentExpression(
       '=',
@@ -142,5 +177,8 @@ module.exports = function evaluate(
     require: id => mod.require(id),
   });
 
-  return mod.exports;
+  return {
+    value: mod.exports,
+    dependencies,
+  };
 };

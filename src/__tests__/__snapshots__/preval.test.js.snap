@@ -13,13 +13,14 @@ const Paragraph = styled.component('p', {
 });
 
 /*
-CSS OUTPUT START
+CSS OUTPUT TEXT START
 .Title_tabcdef{color:red;}
 .Paragraph_pabcdef .Title_tabcdef{color:blue;}
 
-CSS OUTPUT END
+CSS OUTPUT TEXT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":6},\\"name\\":\\"Paragraph_pabcdef\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":6},\\"name\\":\\"Paragraph_pabcdef\\"}]
+CSS OUTPUT DEPENDENCIES:[\\"../styled\\"]
 */"
 `;
 
@@ -31,12 +32,13 @@ const Title = styled.component('h1', {
 });
 
 /*
-CSS OUTPUT START
+CSS OUTPUT TEXT START
 .Title_tabcdef:before{content:\\"6og6jy\\";}
 
-CSS OUTPUT END
+CSS OUTPUT TEXT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
 */"
 `;
 
@@ -53,12 +55,13 @@ const Title = styled.component('h1', {
 });
 
 /*
-CSS OUTPUT START
+CSS OUTPUT TEXT START
 .Title_tabcdef:before{content:\\"6og6jyboo6og6jybar\\";}
 
-CSS OUTPUT END
+CSS OUTPUT TEXT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
 */"
 `;
 
@@ -74,12 +77,13 @@ const Title = styled.component('h1', {
 });
 
 /*
-CSS OUTPUT START
+CSS OUTPUT TEXT START
 .Title_tabcdef:before{content:\\"42 days\\";}
 
-CSS OUTPUT END
+CSS OUTPUT TEXT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":5,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":5,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
 
@@ -94,12 +98,13 @@ const Title = styled.component('h1', {
 });
 
 /*
-CSS OUTPUT START
+CSS OUTPUT TEXT START
 .Title_tabcdef:before{content:\\"42 days\\";}
 
-CSS OUTPUT END
+CSS OUTPUT TEXT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":4,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":4,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
 
@@ -116,12 +121,13 @@ const Title = styled.component('h1', {
 });
 
 /*
-CSS OUTPUT START
+CSS OUTPUT TEXT START
 .Title_tabcdef:before{content:\\"6og6jyboo\\" content:\\"6og6jybar\\";}
 
-CSS OUTPUT END
+CSS OUTPUT TEXT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
 */"
 `;
 
@@ -137,12 +143,13 @@ const Title = styled.component('h1', {
 });
 
 /*
-CSS OUTPUT START
+CSS OUTPUT TEXT START
 .Title_tabcdef:before{content:\\"var(--tabcdef-0-0)\\";}
 
-CSS OUTPUT END
+CSS OUTPUT TEXT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
 
@@ -156,12 +163,13 @@ exports[`ignores inline arrow function expressions 1`] = `
 });
 
 /*
-CSS OUTPUT START
+CSS OUTPUT TEXT START
 .Title_tabcdef:before{content:\\"var(--tabcdef-0-0)\\";}
 
-CSS OUTPUT END
+CSS OUTPUT TEXT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
 
@@ -177,11 +185,12 @@ exports[`ignores inline vanilla function expressions 1`] = `
 });
 
 /*
-CSS OUTPUT START
+CSS OUTPUT TEXT START
 .Title_tabcdef:before{content:\\"var(--tabcdef-0-0)\\";}
 
-CSS OUTPUT END
+CSS OUTPUT TEXT END
 
-CSS MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_tabcdef\\"}]
+CSS OUTPUT DEPENDENCIES:[]
 */"
 `;

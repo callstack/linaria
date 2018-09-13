@@ -13,6 +13,7 @@ type State = {|
     },
   },
   index: number,
+  dependencies: string[],
   file: {
     opts: {
       filename: string,
@@ -34,6 +35,7 @@ module.exports = function(
           // Collect all the style rules from the styles we encounter
           state.rules = {};
           state.index = 0;
+          state.dependencies = [];
         },
         exit(path /*: any */, state /*: State */) {
           if (Object.keys(state.rules).length) {
@@ -61,11 +63,18 @@ module.exports = function(
             // Add the collected styles as a comment to the end of file
             path.addComment(
               'trailing',
-              '\nCSS OUTPUT START\n' +
+              '\nCSS OUTPUT TEXT START\n' +
                 cssText +
-                '\nCSS OUTPUT END\n' +
-                '\nCSS MAPPINGS:' +
+                '\nCSS OUTPUT TEXT END\n' +
+                '\nCSS OUTPUT MAPPINGS:' +
                 JSON.stringify(mappings) +
+                '\nCSS OUTPUT DEPENDENCIES:' +
+                JSON.stringify(
+                  // Remove duplicate dependencies
+                  state.dependencies.filter(
+                    (d, i, self) => self.indexOf(d) == i
+                  )
+                ) +
                 '\n'
             );
           }
@@ -137,16 +146,22 @@ module.exports = function(
                   )
                 ) {
                   try {
-                    const value = evaluate(ex, t, state.file.opts.filename);
+                    const { value, dependencies } = evaluate(
+                      ex,
+                      t,
+                      state.file.opts.filename
+                    );
 
                     if (typeof value === 'function') {
                       if (typeof value.className === 'string') {
                         cssText += `.${value.className}`;
+                        state.dependencies.push(...dependencies);
 
                         return;
                       }
                     } else {
                       cssText += value;
+                      state.dependencies.push(...dependencies);
 
                       return;
                     }

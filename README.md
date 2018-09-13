@@ -99,7 +99,7 @@ const Container = styled.component('div', {
 });
 
 /*
-CSS OUTPUT START
+CSS OUTPUT TEXT START
 
 .Title_t1ugh8t9 {
   font-family: var(--t1ugh8t9-0-0);
@@ -117,9 +117,11 @@ CSS OUTPUT START
   border-color: blue;
 }
 
-CSS OUTPUT END
+CSS OUTPUT TEXT END
 
-CSS MAPPINGS:[{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":"Title_t1ugh8t9"},{"generated":{"line":5,"column":0},"original":{"line":7,"column":6},"name":"Container_c1ugh8t9"}]
+CSS OUTPUT MAPPINGS:[{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":"Title_t1ugh8t9"},{"generated":{"line":5,"column":0},"original":{"line":7,"column":6},"name":"Container_c1ugh8t9"}]
+
+CSS OUTPUT DEPENDENCIES:[]
 */
 ```
 

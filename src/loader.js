@@ -20,15 +20,15 @@ module.exports = function(content) {
       comment = true;
     } else if (line === '*/') {
       comment = false;
-    } else if (line === 'CSS OUTPUT START' && comment) {
+    } else if (line === 'CSS OUTPUT TEXT START' && comment) {
       found = true;
-    } else if (line === 'CSS OUTPUT END' && comment) {
+    } else if (line === 'CSS OUTPUT TEXT END' && comment) {
       found = false;
     } else if (found) {
       css += line + '\n';
-    } else if (line.startsWith('CSS MAPPINGS:')) {
+    } else if (line.startsWith('CSS OUTPUT MAPPINGS:')) {
       try {
-        mappings = JSON.parse(line.substr(13));
+        mappings = JSON.parse(line.substr(20));
       } catch (e) {
         // Ignore
       }
