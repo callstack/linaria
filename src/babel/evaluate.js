@@ -8,7 +8,7 @@ const dedent = require('dedent');
 const babel = require('@babel/core');
 const generator = require('@babel/generator').default;
 
-const resolve = (path, requirements) => {
+const resolve = (path, t, requirements) => {
   const binding = path.scope.getBinding(path.node.name);
 
   if (
@@ -21,7 +21,16 @@ const resolve = (path, requirements) => {
 
     switch (binding.kind) {
       case 'module':
-        code = generator(binding.path.parentPath.node).code;
+        if (t.isImportSpecifier(binding.path)) {
+          code = generator(
+            t.importDeclaration(
+              [binding.path.node],
+              binding.path.parentPath.node.source
+            )
+          ).code;
+        } else {
+          code = generator(binding.path.parentPath.node).code;
+        }
         break;
       case 'const':
       case 'let':
@@ -46,7 +55,7 @@ const resolve = (path, requirements) => {
 
       binding.path.traverse({
         Identifier(path) {
-          resolve(path, requirements);
+          resolve(path, t, requirements);
         },
       });
     }
@@ -61,11 +70,11 @@ module.exports = function evaluate(
   const requirements = [];
 
   if (t.isIdentifier(path)) {
-    resolve(path, requirements);
+    resolve(path, t, requirements);
   } else {
     path.traverse({
       Identifier(path) {
-        resolve(path, requirements);
+        resolve(path, t, requirements);
       },
     });
   }
@@ -87,14 +96,19 @@ module.exports = function evaluate(
     return a.start.line - b.start.line;
   });
 
-  // Separate out the imports since they cannot be inside blocks
-  const imports = requirements.filter(req =>
-    t.isImportDeclaration(req.path.parentPath)
-  );
-
   // We'll wrap each code in a block to avoid collisions in variable names
-  const rest = requirements.filter(
-    req => !t.isImportDeclaration(req.path.parentPath)
+  // We separate out the imports since they cannot be inside blocks
+  const { imports, others } = requirements.reduce(
+    (acc, curr) => {
+      if (t.isImportDeclaration(curr.path.parentPath)) {
+        acc.imports.push(curr);
+      } else {
+        acc.others.push(curr);
+      }
+
+      return acc;
+    },
+    { imports: [], others: [] }
   );
 
   const config = {
@@ -112,11 +126,11 @@ module.exports = function evaluate(
 
     ${imports.map(c => c.code).join('\n')}
 
-    ${rest.map(c => '{\n' + c.code).join('\n')}
+    ${others.map(c => '{\n' + c.code).join('\n')}
 
     ${generator(expression).code}
 
-    ${rest.map(() => '}').join('\n')}
+    ${others.map(() => '}').join('\n')}
   `,
     config
   );
@@ -126,12 +140,10 @@ module.exports = function evaluate(
   mod.filename = filename;
   mod.paths = Module._nodeModulePaths(dirname(filename));
 
-  const context = {
+  vm.runInNewContext(code, {
     module: mod,
     require: id => mod.require(id),
-  };
-
-  vm.runInNewContext(code, context);
+  });
 
   return mod.exports;
 };
