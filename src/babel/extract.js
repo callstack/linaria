@@ -2,6 +2,7 @@
 
 const stylis = require('stylis');
 const slugify = require('../slugify');
+const Module = require('./module');
 const evaluate = require('./evaluate');
 
 /*::
@@ -36,6 +37,9 @@ module.exports = function(
           state.rules = {};
           state.index = 0;
           state.dependencies = [];
+
+          // Invalidate cache for module evaluation
+          Module.invalidate();
         },
         exit(path /*: any */, state /*: State */) {
           if (Object.keys(state.rules).length) {

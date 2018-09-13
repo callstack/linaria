@@ -43,11 +43,13 @@ module.exports = function(content) {
 
   if (css) {
     const slug = slugify(this.resourcePath);
-    const filename = path.basename(this.resourcePath) + '_' + slug + '.css';
-    const output = path.join(
-      os.tmpdir(),
-      this.resourcePath.split('/').join('_') + '_' + filename
-    );
+    const filename =
+      path.basename(this.resourcePath).replace(/\.js$/, '') +
+      '_' +
+      slug +
+      '.css';
+
+    const output = path.join(os.tmpdir(), filename.split('/').join('_'));
 
     if (options.sourceMap && mappings) {
       const generator = new SourceMapGenerator({

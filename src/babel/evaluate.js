@@ -1,12 +1,8 @@
 /* @flow */
 
-// $FlowFixMe
-const Module = require('module');
-const { dirname } = require('path');
-const vm = require('vm');
 const dedent = require('dedent');
-const babel = require('@babel/core');
 const generator = require('@babel/generator').default;
+const Module = require('./module');
 
 const resolve = (path, t, requirements) => {
   const binding = path.scope.getBinding(path.node.name);
@@ -148,37 +144,18 @@ module.exports = function evaluate(
     t.blockStatement([expression])
   );
 
-  const config = {
-    // This is required to properly resolve babelrc
-    filename,
-    presets: [require.resolve('../babel')],
-    // Include this plugin to avoid extra config when using { module: false } for webpack
-    plugins: ['@babel/plugin-transform-modules-commonjs'],
-  };
+  const m = new Module(filename);
 
-  const { code } = babel.transformSync(
+  m.evaluate(
     dedent`
-    require('@babel/register')(${JSON.stringify(config)});
-
     ${imports.map(node => generator(node).code).join('\n')}
 
     ${generator(wrapped).code}
-  `,
-    config
+    `
   );
 
-  const mod = new Module(filename);
-
-  mod.filename = filename;
-  mod.paths = Module._nodeModulePaths(dirname(filename));
-
-  vm.runInNewContext(code, {
-    module: mod,
-    require: id => mod.require(id),
-  });
-
   return {
-    value: mod.exports,
+    value: m.exports,
     dependencies,
   };
 };

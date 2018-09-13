@@ -4,8 +4,6 @@ const path = require('path');
 const babel = require('@babel/core');
 const dedent = require('dedent');
 
-jest.mock('../slugify', () => () => 'abcdef');
-
 const transpile = async input => {
   const { code } = await babel.transformAsync(input, {
     babelrc: false,
@@ -14,7 +12,9 @@ const transpile = async input => {
   });
 
   // The slug will be machine specific, so replace it with a consistent one
-  return code;
+  return code
+    .replace(/((_)|(--))[a-z0-9]{7,8}/g, '$1abcdefg')
+    .replace(/(")[a-z0-9]{7,8}(-)/g, '$1abcdefg$2');
 };
 
 it('evaluates identifier in scope', async () => {
