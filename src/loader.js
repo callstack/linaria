@@ -1,17 +1,17 @@
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
+const Module = require('module');
 const loaderUtils = require('loader-utils');
 const { SourceMapGenerator } = require('source-map');
 const slugify = require('./slugify');
 
 module.exports = function(content) {
-  this.cacheable();
-
   const options = loaderUtils.getOptions(this) || {};
 
   let css = '';
   let mappings = null;
+  let dependencies = null;
   let found = false;
   let comment = false;
 
@@ -29,6 +29,12 @@ module.exports = function(content) {
     } else if (line.startsWith('CSS OUTPUT MAPPINGS:')) {
       try {
         mappings = JSON.parse(line.substr(20));
+      } catch (e) {
+        // Ignore
+      }
+    } else if (line.startsWith('CSS OUTPUT DEPENDENCIES:')) {
+      try {
+        dependencies = JSON.parse(line.substr(24));
       } catch (e) {
         // Ignore
       }
@@ -51,6 +57,20 @@ module.exports = function(content) {
       mappings.forEach(map =>
         generator.addMapping(Object.assign(map, { source: this.resourcePath }))
       );
+
+      dependencies.forEach(dep => {
+        try {
+          const file = Module._resolveFilename(dep, {
+            id: this.resourcePath,
+            filename: this.resourcePath,
+            paths: Module._nodeModulePaths(path.dirname(this.resourcePath)),
+          });
+
+          this.addDependency(file);
+        } catch (e) {
+          // Ignore
+        }
+      });
 
       generator.setSourceContent(
         this.resourcePath,
