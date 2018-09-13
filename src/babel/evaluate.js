@@ -17,48 +17,44 @@ const resolve = (path, t, requirements) => {
     binding.kind !== 'param' &&
     !requirements.some(req => req.path === binding.path)
   ) {
-    let code;
+    let result;
 
     switch (binding.kind) {
       case 'module':
         if (t.isImportSpecifier(binding.path)) {
-          code = generator(
-            t.importDeclaration(
-              [binding.path.node],
-              binding.path.parentPath.node.source
-            )
-          ).code;
+          result = t.importDeclaration(
+            [binding.path.node],
+            binding.path.parentPath.node.source
+          );
         } else {
-          code = generator(binding.path.parentPath.node).code;
+          result = binding.path.parentPath.node;
         }
         break;
       case 'const':
       case 'let':
       case 'var': {
-        code = `${binding.kind} ${generator(binding.path.node).code}`;
+        result = t.variableDeclaration(binding.kind, [binding.path.node]);
         break;
       }
       default:
-        code = generator(binding.path.node).code;
+        result = binding.path.node;
         break;
     }
 
-    if (code) {
-      const loc = binding.path.node.loc;
+    const loc = binding.path.node.loc;
 
-      requirements.push({
-        code,
-        path: binding.path,
-        start: loc.start,
-        end: loc.end,
-      });
+    requirements.push({
+      result,
+      path: binding.path,
+      start: loc.start,
+      end: loc.end,
+    });
 
-      binding.path.traverse({
-        Identifier(path) {
-          resolve(path, t, requirements);
-        },
-      });
-    }
+    binding.path.traverse({
+      Identifier(path) {
+        resolve(path, t, requirements);
+      },
+    });
   }
 };
 
@@ -101,9 +97,10 @@ module.exports = function evaluate(
   const { imports, others } = requirements.reduce(
     (acc, curr) => {
       if (t.isImportDeclaration(curr.path.parentPath)) {
-        acc.imports.push(curr);
+        acc.imports.push(curr.result);
       } else {
-        acc.others.push(curr);
+        // Add these in reverse because we'll need to wrap in block statements in reverse
+        acc.others.unshift(curr.result);
       }
 
       return acc;
@@ -111,10 +108,14 @@ module.exports = function evaluate(
     { imports: [], others: [] }
   );
 
+  const wrapped = others.reduce(
+    (acc, curr) => t.blockStatement([curr, acc]),
+    t.blockStatement([expression])
+  );
+
   const config = {
     // This is required to properly resolve babelrc
     filename,
-    cwd: dirname(filename),
     presets: [require.resolve('../babel')],
     // Include this plugin to avoid extra config when using { module: false } for webpack
     plugins: ['@babel/plugin-transform-modules-commonjs'],
@@ -124,13 +125,9 @@ module.exports = function evaluate(
     dedent`
     require('@babel/register')(${JSON.stringify(config)});
 
-    ${imports.map(c => c.code).join('\n')}
+    ${imports.map(node => generator(node).code).join('\n')}
 
-    ${others.map(c => '{\n' + c.code).join('\n')}
-
-    ${generator(expression).code}
-
-    ${others.map(() => '}').join('\n')}
+    ${generator(wrapped).code}
   `,
     config
   );
