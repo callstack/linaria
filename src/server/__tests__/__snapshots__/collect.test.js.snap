@@ -1,0 +1,314 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`classname in @rule critical 1`] = `
+"@supports (object-fit: cover) {
+  .linaria {
+  }
+}
+@media (min-width: 600px) {
+  .linaria {
+  }
+}
+@charset() {
+  .linaria {
+  }
+}
+@import() {
+  .linaria {
+  }
+}
+@namespace() {
+  .linaria {
+  }
+}
+@media() {
+  .linaria {
+  }
+}
+@supports() {
+  .linaria {
+  }
+}
+@document() {
+  .linaria {
+  }
+}
+@page() {
+  .linaria {
+  }
+}
+@font-face() {
+  .linaria {
+  }
+}
+@viewport() {
+  .linaria {
+  }
+}
+@counter-style() {
+  .linaria {
+  }
+}
+@font-feature-values() {
+  .linaria {
+  }
+}
+"
+`;
+
+exports[`classname in @rule other 1`] = `
+"@supports (object-fit: cover) {
+  .other {
+  }
+}
+@media (min-width: 600px) {
+  .other {
+  }
+}
+@charset() {
+  .other {
+  }
+}
+@import() {
+  .other {
+  }
+}
+@namespace() {
+  .other {
+  }
+}
+@media() {
+  .other {
+  }
+}
+@supports() {
+  .other {
+  }
+}
+@document() {
+  .other {
+  }
+}
+@page() {
+  .other {
+  }
+}
+@font-face() {
+  .other {
+  }
+}
+@viewport() {
+  .other {
+  }
+}
+@counter-style() {
+  .other {
+  }
+}
+@font-feature-values() {
+  .other {
+  }
+}
+"
+`;
+
+exports[`collects complex css critical 1`] = `
+".lotus {
+  vertical-align: top;
+}
+@media (max-width: 1200px) {
+  .lotus {
+    vertical-align: bottom;
+  }
+}
+@supports (object-fit: contain) {
+  .lotus {
+    object-fit: contain;
+  }
+
+  .linaria::before,
+  .linaria::after {
+    content: \\"\\";
+    object-fit: contain;
+  }
+}
+@supports (object-fit: contain) {
+  .lotus {
+    object-fit: contain;
+  }
+
+  .linaria::before,
+  .linaria::after {
+    content: \\"\\";
+    object-fit: contain;
+  }
+}
+@supports (object-fit: contain) {
+  .lotus {
+    object-fit: contain;
+  }
+
+  .linaria::before,
+  .linaria::after {
+    content: \\"\\";
+    object-fit: contain;
+  }
+}
+@supports (object-fit: contain) {
+  .lotus {
+    object-fit: contain;
+  }
+
+  .linaria::before,
+  .linaria::after {
+    content: \\"\\";
+    object-fit: contain;
+  }
+}
+.linaria {
+  float: left;
+  flex: 1;
+  animation: custom-animation 0.2s;
+}
+.linaria:hover {
+  float: right;
+}
+.linaria > span,
+.linaria + .linaria,
+.linaria ~ div {
+  display: none;
+}
+.linaria > span {
+  display: none;
+}
+.linaria::after {
+  display: block;
+}
+.lily {
+  color: #fff;
+}
+[data-theme=\\"dark\\"] .lily {
+  color: #000;
+}
+.linaria ~ div {
+}
+.linaria.linaria2 {
+}
+@keyframes custom-animation {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+"
+`;
+
+exports[`collects complex css other 1`] = `
+"@supports (object-fit: cover) {
+  .unrelated-nested {
+    float: left;
+    animation: custom-animation;
+  }
+
+  .unrelated-nested2 {
+    float: left;
+  }
+}
+
+.unrelated {
+  animation-name: custom-animation;
+}
+
+.unrelated2 {
+  animation: custom-animation 0.3s;
+}
+
+.unrelated3 {
+  flex: 0;
+}
+"
+`;
+
+exports[`simple class name critical 1`] = `
+".linaria {
+}
+"
+`;
+
+exports[`simple class name other 1`] = `
+".classname {
+}
+"
+`;
+
+exports[`works with CSS combinators critical 1`] = `
+".linaria + span {
+}
+.linaria ~ div {
+}
+.linaria > a {
+}
+.linaria b {
+}
+"
+`;
+
+exports[`works with CSS combinators other 1`] = `
+".other + span {
+}
+.other ~ div {
+}
+.other > a {
+}
+.other b {
+}
+"
+`;
+
+exports[`works with global css critical 1`] = `
+"body {
+  font-size: 13.37px;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  font-weight: bold;
+}
+.linaria:active {
+}
+.linaria::before {
+}
+"
+`;
+
+exports[`works with global css other 1`] = `
+".other:active {
+}
+.other::before {
+}
+"
+`;
+
+exports[`works with pseudo-class and pseudo-elements critical 1`] = `
+".linaria:active {
+}
+.linaria::before {
+}
+"
+`;
+
+exports[`works with pseudo-class and pseudo-elements other 1`] = `
+".other:active {
+}
+.other::before {
+}
+"
+`;

@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`preval-extract babel plugin should create classname for "css" tagged template literal 1`] = `"font-size: 3em;"`;
+
+exports[`preval-extract babel plugin should create classname for "css.named()" tagged template literal 1`] = `"font-size: 3em;"`;
+
+exports[`preval-extract babel plugin should create classname for non-top-level "css" tagged template literal 1`] = `"font-size: 3em;"`;
+
+exports[`preval-extract babel plugin should create classnames for multiple "css" tagged template literal 1`] = `"font-size: 3em;"`;
+
+exports[`preval-extract babel plugin should create classnames for multiple "css" tagged template literal 2`] = `"border-radius: 4px;"`;
+
+exports[`preval-extract babel plugin should not process tagged template if tag is not "css" 1`] = `
+'use strict';
+
+var _css = require('<<CWD>>/build/css.js');
+
+var _css2 = _interopRequireDefault(_css);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var header = '\\nfont-size: 3em;\\n';
+`;
+
+exports[`preval-extract babel plugin should preval const and let without transpilation to var 1`] = `
+import css from '<<CWD>>/build/css.js';
+
+const size = 3;
+let color = "#ffffff";
+
+const header = /*linaria-output*/"_header__zkmz8m";
+`;
+
+exports[`preval-extract babel plugin should preval css with classname from another prevaled css 1`] = `
+"padding: 2rem;
+
+._title__zkmz8m {
+margin-bottom: 1rem;
+}"
+`;

@@ -1,0 +1,87 @@
+version: 2
+defaults: &defaults
+  docker:
+    - image: circleci/node:6.10.3
+  working_directory: ~/linaria
+jobs:
+  install-dependencies:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/linaria
+      - restore_cache:
+          keys:
+            - dependencies-{{ checksum "package.json" }}
+            - dependencies-
+      - restore_cache:
+          keys:
+            - dependencies-website-{{ checksum "website/package.json" }}
+            - dependencies-website-
+      - run: |
+          yarn install --frozen-lockfile
+          yarn install --frozen-lockfile --cwd website
+      - save_cache:
+          key: dependencies-{{ checksum "package.json" }}
+          paths: node_modules
+      - save_cache:
+          key: dependencies-website-{{ checksum "website/package.json" }}
+          paths: website/node_modules
+      - persist_to_workspace:
+          root: .
+          paths: .
+  lint-and-flow:
+      <<: *defaults
+      steps:
+        - attach_workspace:
+            at: ~/linaria
+        - run: |
+            yarn run lint
+            yarn run flow
+  unit-tests:
+      <<: *defaults
+      steps:
+        - attach_workspace:
+            at: ~/linaria
+        - run: |
+            yarn test -- --coverage
+            cat ./coverage/lcov.info | ./node_modules/.bin/codecov
+            bash .circleci/comment-artifacts.sh
+        - store_artifacts:
+            path: coverage
+            destination: coverage
+  integration-tests:
+      <<: *defaults
+      steps:
+        - attach_workspace:
+            at: ~/linaria
+        - run: |
+            bash .circleci/install-chrome-deps.sh
+            yarn run test:integration:ci
+        - store_artifacts:
+            path: website/__integration-tests__/__image_snapshots__/__diff_output__
+            destination: website-snapshot-diffs
+  build-and-lint-website:
+      <<: *defaults
+      steps:
+        - attach_workspace:
+            at: ~/linaria
+        - run: cd website && yarn run build:all && cd ..
+        - run: cd website && yarn run lint-css && cd ..
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - install-dependencies
+      - lint-and-flow:
+          requires:
+            - install-dependencies
+      - unit-tests:
+          requires:
+            - install-dependencies
+      - integration-tests:
+          requires:
+            - install-dependencies
+      - build-and-lint-website:
+          requires:
+            - install-dependencies

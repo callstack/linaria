@@ -1,0 +1,18 @@
+[ignore]
+<PROJECT_ROOT>/build/.*
+<PROJECT_ROOT>/website/node_modules/preact/.*
+<PROJECT_ROOT>/website/node_modules/stylelint/.*
+
+[include]
+flow-typed/
+
+[libs]
+
+[options]
+emoji=true
+unsafe.enable_getters_and_setters=true
+
+module.name_mapper='^linaria$' -> '<PROJECT_ROOT>/src/index.js'
+
+[version]
+^0.53.1

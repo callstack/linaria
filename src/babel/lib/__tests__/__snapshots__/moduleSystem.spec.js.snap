@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`babel/lib/moduleSystem should throw meaningful error for JSON files 1`] = `Unexpected end of JSON input (<<CWD>>/src/babel/lib/__tests__/test.json)`;
