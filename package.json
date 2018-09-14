@@ -27,7 +27,7 @@
     "lint": "eslint .",
     "flow": "flow",
     "test": "jest",
-    "test:integration:ci": "jest __integration-tests__",
+    "test:integration": "jest __integration-tests__",
     "add-contributor": "all-contributors add",
     "prebuild": "del lib",
     "build": "babel src --out-dir lib --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps && flow-copy-source -i '{**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**}' src lib",
@@ -63,5 +63,9 @@
   },
   "resolutions": {
     "**/babel-core": "7.0.0-bridge.0"
+  },
+  "jest": {
+    "testRegex": "/__(integration-)?tests__/.*\\.(test|spec)\\.js$",
+    "testEnvironment": "node"
   }
 }

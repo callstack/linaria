@@ -47,8 +47,8 @@ it('should launch website with webpack', async () => {
 
   const screenshot = await page.screenshot();
 
+  browser.close();
+
   /* $FlowFixMe */
   expect(screenshot).toMatchImageSnapshot();
-
-  browser.close();
 });

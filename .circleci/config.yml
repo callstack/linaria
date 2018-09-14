@@ -1,7 +1,7 @@
 version: 2
 defaults: &defaults
   docker:
-    - image: circleci/node:6.10.3
+    - image: circleci/node:10
   working_directory: ~/linaria
 jobs:
   install-dependencies:
@@ -44,12 +44,18 @@ jobs:
         - attach_workspace:
             at: ~/linaria
         - run: |
-            yarn test -- --coverage
+            yarn test --coverage
             cat ./coverage/lcov.info | ./node_modules/.bin/codecov
             bash .circleci/comment-artifacts.sh
         - store_artifacts:
             path: coverage
             destination: coverage
+  build-website:
+      <<: *defaults
+      steps:
+        - attach_workspace:
+            at: ~/linaria
+        - run: cd website && yarn run build && cd ..
   integration-tests:
       <<: *defaults
       steps:
@@ -57,16 +63,11 @@ jobs:
             at: ~/linaria
         - run: |
             bash .circleci/install-chrome-deps.sh
+            cd website && yarn run build && cd ..
             yarn run test:integration
         - store_artifacts:
             path: website/__integration-tests__/__image_snapshots__/__diff_output__
             destination: website-snapshot-diffs
-  build-website:
-      <<: *defaults
-      steps:
-        - attach_workspace:
-            at: ~/linaria
-        - run: cd website && yarn run build && cd ..
 
 workflows:
   version: 2
