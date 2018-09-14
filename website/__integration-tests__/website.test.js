@@ -22,12 +22,12 @@ beforeAll(async () => {
       if (
         data.toString().includes(`Listening on http://localhost:${config.port}`)
       ) {
-        resolve(data);
+        resolve(data.toString());
       }
     });
 
     server.stderr.on('data', data => {
-      reject(data);
+      reject(data.toString());
     });
   });
 });
