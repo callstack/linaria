@@ -7,8 +7,9 @@ function styled() {
 }
 
 styled.component = (tag, options) => {
-  const Result = function Result(props) {
+  const Result = React.forwardRef((props, ref) => {
     const next = Object.assign({}, props, {
+      ref,
       className: props.className
         ? `${options.class} ${props.className}`
         : options.class,
@@ -26,7 +27,7 @@ styled.component = (tag, options) => {
     }
 
     return React.createElement(tag, next);
-  };
+  });
 
   Result.displayName = options.name;
   Result.className = options.class;
