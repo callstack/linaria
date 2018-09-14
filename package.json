@@ -1,84 +1,65 @@
 {
   "name": "linaria",
-  "version": "0.5.0",
+  "version": "1.0.0-alpha.0",
   "description": "Fast zero-runtime CSS in JS library",
-  "main": "build/index.js",
+  "main": "lib/index.js",
+  "files": [
+    "lib/",
+    "babel.js",
+    "loader.js"
+  ],
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/callstack/linaria.git"
-  },
+  "repository": "git@github.com:callstack/linaria.git",
   "bugs": {
     "url": "https://github.com/callstack/linaria/issues"
   },
   "homepage": "https://github.com/callstack/linaria#readme",
-  "scripts": {
-    "flow": "flow",
-    "lint": "eslint .",
-    "test": "jest __tests__",
-    "test:integration": "yarn run build:clean && yarn run build:transpile && yarn run test:integration:ci",
-    "test:integration:ci": "jest __integration-tests__",
-    "prepare": "yarn run build:clean && yarn run build:transpile && yarn run build:flow && yarn link",
-    "build:clean": "del build",
-    "build:transpile": "babel src --out-dir build --ignore '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
-    "build:transpile:watch": "babel src --out-dir build --watch --ignore '**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**'",
-    "build:flow": "flow-copy-source src build -i '{**/__tests__/**,**/__integration-tests__/**,**/__mocks__/**,**/__fixtures__/**}'",
-    "benchmark": "yarn run prepare && node ./benchmark/run.js",
-    "add-contributor": "all-contributors add"
-  },
-  "files": [
-    "/build",
-    "/babel.js",
-    "/server.js",
-    "/loader.js",
-    "/stylelint-config.js",
-    "/stylelint-preprocessor.js"
+  "keywords": [
+    "babel-plugin",
+    "babel",
+    "module",
+    "require",
+    "import"
   ],
-  "peerDependencies": {
-    "stylelint": "8.x",
-    "stylelint-config-recommended": "1.x"
-  },
-  "dependencies": {
-    "babel-code-frame": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-generator": "^6.26.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
-    "cssom": "^0.3.2",
-    "dedent": "^0.7.0",
-    "error-stack-parser": "^2.0.1",
-    "loader-utils": "^1.1.0",
-    "mkdirp": "^0.5.1",
-    "postcss": "^6.0.10",
-    "short-hash": "^1.0.0",
-    "source-map": "^0.5.7",
-    "stylis": "^3.2.13"
+  "scripts": {
+    "lint": "eslint .",
+    "flow": "flow",
+    "test": "jest",
+    "test:integration:ci": "jest __integration-tests__",
+    "add-contributor": "all-contributors add",
+    "prebuild": "del lib",
+    "build": "babel src --out-dir lib --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps && flow-copy-source -i '{**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**}' src lib",
+    "prepare": "yarn build"
   },
   "devDependencies": {
-    "all-contributors-cli": "^4.5.0",
-    "babel-cli": "^6.26.0",
-    "babel-plugin-transform-flow-strip-types": "^6.22.0",
-    "babel-preset-env": "1.6.1",
-    "babel-preset-react": "^6.24.1",
-    "babel-preset-stage-2": "^6.24.1",
-    "benchmark": "^2.1.4",
-    "cli-table": "^0.3.1",
-    "codecov": "^2.3.0",
+    "@babel/cli": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-flow": "^7.0.0",
+    "@callstack/eslint-config": "^2.0.0",
+    "all-contributors-cli": "^5.4.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "codecov": "^3.1.0",
     "del-cli": "^1.1.0",
-    "escape-string-regexp": "^1.0.5",
-    "eslint": "^4.6.1",
-    "eslint-config-callstack-io": "^1.0.1",
-    "flow-bin": "^0.53.1",
-    "flow-copy-source": "^1.2.1",
-    "glob": "^7.1.2",
-    "jest": "^21.1.0",
-    "jest-image-snapshot": "^1.0.1",
-    "prettier": "^1.7.4",
-    "puppeteer": "^0.12.0",
-    "strip-ansi": "^4.0.0"
+    "eslint": "^5.4.0",
+    "flow-bin": "^0.79.1",
+    "flow-copy-source": "^2.0.2",
+    "jest": "^23.5.0",
+    "jest-image-snapshot": "^2.5.0",
+    "prettier": "^1.14.2",
+    "puppeteer": "^1.8.0",
+    "react": "^16.5.1"
   },
-  "jest": {
-    "testRegex": "/__(integration-)?tests__/.*\\.(test|spec)\\.js$",
-    "testEnvironment": "node",
-    "setupTestFrameworkScriptFile": "<rootDir>/setupJest.js"
+  "dependencies": {
+    "@babel/core": "^7.0.1",
+    "@babel/generator": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "dedent": "^0.7.0",
+    "loader-utils": "^1.1.0",
+    "postcss": "^7.0.2",
+    "source-map": "^0.7.3",
+    "stylis": "^3.5.3"
+  },
+  "resolutions": {
+    "**/babel-core": "7.0.0-bridge.0"
   }
 }

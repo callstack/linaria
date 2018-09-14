@@ -4,14 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import '../static/vendor/prism';
-import globalStyles from './styles/global';
+import './styles/global.css';
 
-const style = document.createElement('style');
-
-style.appendChild(document.createTextNode(globalStyles));
-
-if (document.documentElement) {
-  document.documentElement.appendChild(style);
-}
-
+/* $FlowFixMe */
 ReactDOM.render(<App />, document.getElementById('root'));

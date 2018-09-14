@@ -2,9 +2,9 @@
 
 import React from 'react';
 import dedent from 'dedent';
+import escapeHtml from 'escape-html';
 import { css } from 'linaria';
 import { media } from './styles/utils';
-import escapeHtml from './utils/escapeHtml';
 import Container from './components/Container';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -147,7 +147,8 @@ export default function Index() {
           We are actively working on broadening our{' '}
           <a href="https://github.com/callstack/linaria/tree/master/docs">
             documentation
-          </a>. Also be sure to check the{' '}
+          </a>
+          . Also be sure to check the{' '}
           <a href="https://github.com/callstack/linaria/tree/master/website">
             example app
           </a>{' '}

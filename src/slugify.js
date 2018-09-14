@@ -1,10 +1,11 @@
+/* eslint-disable no-bitwise, default-case, no-param-reassign, prefer-destructuring */
+
 /**
  * murmurhash2 via https://gist.github.com/raycmorgan/588423
  * @flow
  */
 
-/* eslint-disable no-bitwise, no-param-reassign */
-function doHash(str: string, seed?: number = 0) {
+function doHash(str /* : string */, seed /* : number */ = 0) {
   const m = 0x5bd1e995;
   const r = 24;
   let h = seed ^ str.length;
@@ -25,7 +26,6 @@ function doHash(str: string, seed?: number = 0) {
     length -= 4;
   }
 
-  // eslint-disable-next-line default-case
   switch (length) {
     case 3:
       h ^= UInt16(str, currentIndex);
@@ -73,6 +73,8 @@ function Umul32(n, m) {
   return res;
 }
 
-export default function slugify(code: string): string {
+function slugify(code /* : string */) {
   return doHash(code).toString(36);
 }
+
+module.exports = slugify;

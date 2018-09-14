@@ -57,17 +57,17 @@ jobs:
             at: ~/linaria
         - run: |
             bash .circleci/install-chrome-deps.sh
-            yarn run test:integration:ci
+            yarn run test:integration
         - store_artifacts:
             path: website/__integration-tests__/__image_snapshots__/__diff_output__
             destination: website-snapshot-diffs
-  build-and-lint-website:
+  build-website:
       <<: *defaults
       steps:
         - attach_workspace:
             at: ~/linaria
-        - run: cd website && yarn run build:all && cd ..
-        - run: cd website && yarn run lint-css && cd ..
+        - run: cd website && yarn run build && cd ..
+
 workflows:
   version: 2
   build-and-test:
@@ -82,6 +82,7 @@ workflows:
       - integration-tests:
           requires:
             - install-dependencies
-      - build-and-lint-website:
+            - build-website
+      - build-website:
           requires:
             - install-dependencies

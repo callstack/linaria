@@ -17,7 +17,7 @@ exports[`classname in @rule critical 1`] = `
   .linaria {
   }
 }
-@namespace() {
+@namespace () {
   .linaria {
   }
 }
@@ -25,7 +25,7 @@ exports[`classname in @rule critical 1`] = `
   .linaria {
   }
 }
-@supports() {
+@supports () {
   .linaria {
   }
 }
@@ -73,7 +73,7 @@ exports[`classname in @rule other 1`] = `
   .other {
   }
 }
-@namespace() {
+@namespace () {
   .other {
   }
 }
@@ -81,7 +81,7 @@ exports[`classname in @rule other 1`] = `
   .other {
   }
 }
-@supports() {
+@supports () {
   .other {
   }
 }

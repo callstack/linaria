@@ -1,3 +1,3 @@
-/* eslint-disable global-require */
+/* eslint-disable import/no-unresolved */
 
-module.exports = require('./build/server/');
+module.exports = require('./lib/server');

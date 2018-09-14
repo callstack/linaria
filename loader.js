@@ -1,1 +1,3 @@
-module.exports = require('./build/tools/webpack-loader').default;
+/* eslint-disable import/no-unresolved */
+
+module.exports = require('lib/loader');

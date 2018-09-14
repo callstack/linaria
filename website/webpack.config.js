@@ -1,50 +1,27 @@
-/* eslint-env node */
-/* eslint-disable import/no-commonjs, import/no-extraneous-dependencies */
-
-const webpack = require('webpack');
+const webpack = require('webpack'); // eslint-disable-line import/no-extraneous-dependencies
 const path = require('path');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // eslint-disable-line import/no-extraneous-dependencies
 
-const PORT = 3000;
-const entry = ['./src/index.js'];
-
-module.exports = (env = { NODE_ENV: 'development' }) => ({
+module.exports = {
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   devtool: 'source-map',
-  entry:
-    env.NODE_ENV === 'production'
-      ? entry
-      : [`webpack-dev-server/client?http://localhost:${PORT}`, ...entry],
+  entry: {
+    app: './src/index',
+  },
   output: {
-    path: path.resolve(__dirname, 'static', 'build'),
-    publicPath: '/build',
-    filename: '[name].js',
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: '/dist/',
+    filename: '[name].bundle.js',
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': { NODE_ENV: JSON.stringify(env.NODE_ENV) },
+      'process.env': { NODE_ENV: JSON.stringify(process.env.NODE_ENV) },
     }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      minChunks: ({ resource }) =>
-        /\/node_modules\//.test(resource) || /\/vendor\//.test(resource),
+    new MiniCssExtractPlugin({
+      filename: 'styles.css',
     }),
-    new webpack.optimize.CommonsChunkPlugin('manifest'),
-  ].concat(
-    env.NODE_ENV === 'production'
-      ? [
-          new webpack.LoaderOptionsPlugin({ minimize: true, debug: false }),
-          new webpack.optimize.UglifyJsPlugin({
-            compress: { warnings: false },
-            sourceMap: true,
-          }),
-          new ExtractTextPlugin('styles.css'),
-        ]
-      : [
-          new webpack.HotModuleReplacementPlugin(),
-          new webpack.NamedModulesPlugin(),
-          new webpack.NoEmitOnErrorsPlugin(),
-        ]
-  ),
+    new webpack.NoEmitOnErrorsPlugin(),
+  ],
   module: {
     rules: [
       {
@@ -52,38 +29,29 @@ module.exports = (env = { NODE_ENV: 'development' }) => ({
         exclude: /node_modules/,
         use: [
           {
-            loader: 'babel-loader',
-            options: { cacheDirectory: true },
+            loader: require.resolve('../src/loader'),
+            options: {
+              sourceMap: true,
+            },
           },
           {
-            loader: 'linaria/loader',
+            loader: 'babel-loader',
+            options: require('./babel.config'),
           },
         ],
       },
-    ].concat(
-      env.NODE_ENV === 'production'
-        ? {
-            test: /\.css$/,
-            use: ExtractTextPlugin.extract({
-              fallback: 'style-loader',
-              use: 'css-loader',
-            }),
-          }
-        : {
-            test: /\.css$/,
-            use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
-          }
-    ),
+      {
+        test: /\.css$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+            },
+          },
+        ],
+      },
+    ],
   },
-  resolve: {
-    alias: {
-      react: 'preact-compat',
-      'react-dom': 'preact-compat',
-    },
-  },
-  devServer: {
-    contentBase: 'static',
-    hotOnly: true,
-    port: PORT,
-  },
-});
+};

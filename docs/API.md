@@ -6,7 +6,7 @@ Linaria exposes a core `css` method alongside with small, but just enough amount
 
 ### `css`
 
-String tag for tagged template literals consisting CSS code. The tagged template literal is evaluated to a unique class name. Needed by the Babel plugin to extract the CSS.
+String tag for tagged template literals consisting CSS code. The tagged template literal is evaluated to a unique class name by the Babel plugin:
 
 ```js
 import { css } from 'linaria';
@@ -16,7 +16,6 @@ const flower = css`
   color: violet,
 `;
 
-// flower === css__9o5awv -> without babel plugin applied
 // flower === flower__9o5awv –> with babel plugin
 ```
 
@@ -75,33 +74,44 @@ export function Block({ className }) {
 }
 ```
 
-### `include(...classNames: string[]) => string`
+### `styled`
 
-Takes a class name previously created with the `css` tag and returns the CSS text for the class name.
+Helper to build React components:
 
 ```js
-import { css, include } from 'linaria';
+import colors from './colors.json';
 
-const width = 100;
+const Container = styled('div')`
+  background-color: ${colors.background};
+  color: ${props => props.color};
+  width: ${100 / 3}%;
+  border: 1px solid red;
 
-const text = css`
-  font-weight: 400;
-`;
-
-const title = css`
-  @media (max-width: ${width}px) {
-    font-family: monospace;
+  &:hover {
+    border-color: blue;
   }
-`;
-
-const header = css`
-  ${include(text, title)};
-
-  font-family: sans-serif;
 `;
 ```
 
-Here, the final CSS text for `header` will include the CSS from `text` and `title`.
+All rules inside the template literal are scoped to the component, similar to the `css` tag.
+
+Dynamic interpolations are replaced with CSS custom properties. A dynamic function interpolation will receive the `props` of the component as it's arguments and the returned result will be used as the value for the variable. When using this, a tiny helper is imported so that we don't duplicate the code for creating the component in all files.
+
+If you have configured the babel plugin with `evaluate: true`, you can also interpolate a component to refer to it:
+
+```js
+const Title = styled('h1')`
+  font-size: 36px;
+`;
+
+const Article = styled('article')`
+  font-size: 16px;
+
+  ${Title} {
+    margin-bottom: 24px;
+  }
+`;
+```
 
 ## Server APIs (`linaria/server`)
 

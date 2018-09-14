@@ -1,0 +1,4 @@
+{
+  'extends': '@callstack/eslint-config',
+  'rules': { 'global-require': 'off' },
+}

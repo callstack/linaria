@@ -25,50 +25,48 @@ Zero-runtime CSS in JS library.
 
 * Familiar CSS syntax with Sass like nesting.
 * CSS is extracted at build time, no runtime is included.
-* JavaScript expressions are supported and evaluated at build time.
-* Critical CSS can be extracted for inlining during SSR.
-* Integrates with existing tools like Webpack to provide features such as Hot Reload.
+* Simple interpolations in the current scope are evaluated and inlined at build time.
+* Expressions containing imported modules and utility functions can be optionally evaluated at build time.
+* Dynamic runtime-based values are supported using CSS custom properties.
+* Function interpolations receive props as the argument for dynamic prop based styling.
+* Supports CSS sourcemaps, so you can easily find where the style was defined.
 
 **[Why use Linaria](/docs/BENEFITS.md)**
 
-**[Try Linaria online](https://css-in-js-playground.com/?library=Linaria)**
+## Usage
 
-## Installation
+Add the babel preset to your `.babelrc`:
 
-Install it like a regular npm package:
-
-```bash
-yarn add linaria
+```json
+{
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react"
+    "linaria/babel"
+  ]
+}
 ```
 
-We recommend using `linaria/loader` if you use __Webpack__:
+Make sure that `linaria/babel` is the last item in your `presets` list.
+
+Add the webpack loader to your `webpack.config.js`:
 
 ```js
 module: {
   rules: [
     {
       test: /\.js$/,
-      use: ['babel-loader', 'linaria/loader'],
+      use: ['linaria/loader', 'babel-loader'],
+    },
+    {
+      test: /\.css$/,
+      use: [MiniCssExtractPlugin.loader, 'css-loader'],
     },
   ],
 },
 ```
 
-If you don't use Webpack, you can add the `linaria/babel` preset to your Babel configuration:
-
-```json
-{
-  "presets": [
-    "env",
-    "react",
-    ["linaria/babel", {
-      "single": true,
-      "filename": "styles.css",
-      "outDir": "dist"
-    }]
-  ]
-}
-```
+Make sure that `linaria/loader` is included before `babel-loader`.
 
 ## Documentation
 
@@ -89,105 +87,101 @@ If you don't use Webpack, you can add the `linaria/babel` preset to your Babel c
 
 ## How it works
 
-Linaria lets you write CSS code in a tagged template literal in your JavaScript files. The Babel plugin extracts the CSS rules to real CSS files, and generates unique class names to use.
+Linaria lets you write CSS code in a tagged template literal with a styled-component like syntax, using CSS custom properties for dynamic interpolations. The Babel plugin generates unique class names for the components and extracts the CSS to a comment in the JS file. Then the webpack loader extracts this comment out to real files.
 
-Example is worth a thousand words:
-
-```js
-import React from 'react';
-import { css, include, styles } from 'linaria';
-import { modularScale, hiDPI } from 'polished';
-import fonts from './fonts';
-import colors from './colors';
-
-const title = css`
-  text-transform: uppercase;
-`;
-
-const container = css`
-  padding: 3em;
-`;
-
-const header = css`
-  ${include(title)};
-
-  font-family: ${fonts.heading};
-  font-size: ${modularScale(2)};
-
-  ${hiDPI(1.5)} {
-    font-size: ${modularScale(2.5)}
-  }
-`;
-
-export default function Header({ className }) {
-  return (
-    <div {...styles(container, className)}>
-      <h1 {...styles(header)} />
-    </div>
-  );
-}
-
-export function Block() {
-  return <div {...styles(container)} />;
-}
-
-export function App() {
-  return <Header {...styles(title)} />;
-}
-```
-
-After being transpiled, the code will output following CSS:
-
-
-```css
-.title__jt5ry4 {
-  text-transform: uppercase;
-}
-
-.container__jdh5rtz {
-  padding: 3em;
-}
-
-.header__xy4ertz {
-  text-transform: uppercase;
-  font-family: Helvetica, sans-serif; /* constants are automatically inlined */
-  font-size: 2.66em;
-}
-
-@media only screen and (min-resolution: 144dpi), only screen and (min-resolution: 1.5dppx) {
-  .header__xy4ertz {
-    font-size: 3.3325em;
-  }
-}
-```
-
-And the following JavaScipt:
+The plugin will transpile this:
 
 ```js
-import React from 'react';
-import { styles } from 'linaria/build/index.runtime';
+const background = 'yellow';
 
-const title = 'title__jt5ry4';
+const Title = styled('h1')`
+  font-family: ${serif};
+`;
 
-const container = 'container__jdh5rtz';
+const Container = styled('div')`
+  font-family: ${regular};
+  background-color: ${background};
+  color: ${props => props.color};
+  width: ${100 / 3}%;
+  border: 1px solid red;
 
-const header = 'header__xy4ertz';
+  &:hover {
+    border-color: blue;
+  }
+`;
+```
 
-export default function Header({ className }) {
-  return (
-    <div {...styles(container, className)}>
-      <h1 {...styles(header)} />
-    </div>
-  );
+To this:
+
+```js
+const background = 'yellow';
+
+const Title = styled.component('h1', {
+  name: 'Title',
+  class: 'Title_t1ugh8t9',
+  vars: {
+    't1ugh8t9-0-0': serif,
+  },
+});
+
+const Container = styled.component('div', {
+  name: 'Container',
+  class: 'Container_c1ugh8t9',
+  vars: {
+    'c1ugh8t9-1-0': regular,
+    'c1ugh8t9-1-2': props => props.color,
+  },
+});
+
+/*
+CSS OUTPUT TEXT START
+
+.Title_t1ugh8t9 {
+  font-family: var(--t1ugh8t9-0-0);
 }
 
-export function App() {
-  return <Header {...styles(title)} />;
+.Container_c1ugh8t9 {
+  font-family: var(--c1ugh8t9-1-0);
+  background-color: yellow;
+  color: var(--c1ugh8t9-1-2);
+  width: 33.333333333333336%;
+  border: 1px solid red;
 }
+
+.Container_c1ugh8t9:hover {
+  border-color: blue;
+}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":"Title_t1ugh8t9"},{"generated":{"line":5,"column":0},"original":{"line":7,"column":6},"name":"Container_c1ugh8t9"}]
+
+CSS OUTPUT DEPENDENCIES:[]
+*/
 ```
 
 ## Trade-offs
 
+* No IE11 support when using dynamic styles components since it uses CSS custom properties
+* The cascade is still there.
+
+  For example, the following code can produce a div with `color: red;` or `color: blue;` depending on generated the order of CSS rules:
+
+  ```js
+  // First.js
+  const First = styled('div')`
+    color: blue;
+  `;
+
+  // Second.js
+  import { First } from './First';
+
+  const Second = styled(First)`
+    color: red;
+  `;
+  ```
+
+  Libraries like `styled-components` can get around the cascade because they can control the order of the CSS insertion during the runtime. It's not possible when statically extracting the CSS at build time.
 * Dynamic styles are not supported with `css` tag. See [Dynamic Styles](/docs/DYNAMIC_STYLES.md) for alternative approaches.
 * Modules used in the CSS rules cannot have side-effects.
   For example:
@@ -200,6 +194,7 @@ export function App() {
     color: ${colors.text};
   `;
   ```
+
   Here, there should be no side-effects in the `colors.js` file, or any file it imports. We recommend to move helpers and shared configuration to files without any side-effects.
 
 ## Editor Plugins

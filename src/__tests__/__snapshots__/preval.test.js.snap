@@ -1,0 +1,196 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`evaluates component interpolations 1`] = `
+"const styled = require('../styled');
+
+const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_abcdefg\\"
+});
+const Paragraph = styled.component('p', {
+  name: \\"Paragraph\\",
+  class: \\"Paragraph_abcdefg\\"
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_abcdefg{color:red;}
+.Paragraph_abcdefg .Title_abcdefg{color:blue;}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":6},\\"name\\":\\"Paragraph_abcdefg\\"}]
+CSS OUTPUT DEPENDENCIES:[\\"../styled\\"]
+*/"
+`;
+
+exports[`evaluates expressions with dependencies 1`] = `
+"import slugify from '../slugify';
+const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_abcdefg\\"
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_abcdefg:before{content:\\"6og6jy\\";}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
+*/"
+`;
+
+exports[`evaluates expressions with expressions depending on shared dependency 1`] = `
+"const slugify = require('../slugify');
+
+const boo = t => slugify(t) + 'boo';
+
+const bar = t => slugify(t) + 'bar';
+
+const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_abcdefg\\"
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_abcdefg:before{content:\\"6og6jyboo6og6jybar\\";}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
+*/"
+`;
+
+exports[`evaluates identifier in scope 1`] = `
+"const answer = 42;
+
+const foo = () => answer;
+
+const days = foo() + ' days';
+const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_abcdefg\\"
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_abcdefg:before{content:\\"42 days\\";}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":5,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
+`;
+
+exports[`evaluates local expressions 1`] = `
+"const answer = 42;
+
+const foo = () => answer;
+
+const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_abcdefg\\"
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_abcdefg:before{content:\\"42 days\\";}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":4,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
+`;
+
+exports[`evaluates multiple expressions with shared dependency 1`] = `
+"const slugify = require('../slugify');
+
+const boo = t => slugify(t) + 'boo';
+
+const bar = t => slugify(t) + 'bar';
+
+const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_abcdefg\\"
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_abcdefg:before{content:\\"6og6jyboo\\" content:\\"6og6jybar\\";}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
+*/"
+`;
+
+exports[`ignores external expressions 1`] = `
+"const generate = props => props.content;
+
+const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_abcdefg\\",
+  vars: {
+    \\"abcdefg-0-0\\": generate
+  }
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_abcdefg:before{content:\\"var(--abcdefg-0-0)\\";}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
+`;
+
+exports[`ignores inline arrow function expressions 1`] = `
+"const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_abcdefg\\",
+  vars: {
+    \\"abcdefg-0-0\\": props => props.content
+  }
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_abcdefg:before{content:\\"var(--abcdefg-0-0)\\";}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
+`;
+
+exports[`ignores inline vanilla function expressions 1`] = `
+"const Title = styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_abcdefg\\",
+  vars: {
+    \\"abcdefg-0-0\\": function (props) {
+      return props.content;
+    }
+  }
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_abcdefg:before{content:\\"var(--abcdefg-0-0)\\";}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
+`;

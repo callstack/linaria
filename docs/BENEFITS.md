@@ -22,6 +22,10 @@ Like other JS variables, linters can warn you about when you have unused styles.
 
 Linaria will automatically vendor prefix your CSS, so you don't have to worry about supporting older browsers. You write modern CSS, and Linaria takes care of the rest.
 
+### 6. Declarative dynamic styling with React
+
+When using the `styled` helper, Linaria will generate dynamic CSS variables which automatically update when props change. When writing regular CSS, you'll have to manage it manually.
+
 ## Advantages over CSS preprocessors
 
 ### 1. No new syntax to learn

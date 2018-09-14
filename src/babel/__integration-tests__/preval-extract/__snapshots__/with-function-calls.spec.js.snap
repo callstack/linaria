@@ -1,5 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`preval-extract babel plugin with function calls should preval multiple function calls inside an expression 1`] = `"font-size: 33px;"`;
-
-exports[`preval-extract babel plugin with function calls should preval with function call inside an expression 1`] = `"font-size: 28px;"`;

@@ -3,7 +3,6 @@
 import React from 'react';
 import { css, names } from 'linaria';
 import theme from '../styles/theme';
-import '../utils/prismTemplateString';
 
 type Props = {
   className?: string,
@@ -23,7 +22,7 @@ export default function CodeBlock({ className, language, text }: Props) {
   );
 }
 
-const Prism = global.Prism;
+const { Prism } = global;
 
 const prism = (code, language) =>
   !Prism || !language || (Prism && !Prism.languages[language])

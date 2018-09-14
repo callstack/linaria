@@ -1,12 +1,17 @@
 /* @flow */
 
-import names from './names';
-import type { ClassName } from './names';
+const names = require('./names');
 
-export default function styles(
-  ...classNames: ClassName[]
-): { className: string } {
+/* ::
+import type { ClassName } from './names';
+*/
+
+function styles(
+  ...classNames /* : ClassName[] */
+) /* : { className: string } */ {
   return {
     className: names(...classNames),
   };
 }
+
+module.exports = styles;

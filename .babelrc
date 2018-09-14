@@ -1,15 +1,6 @@
 {
   "presets": [
-    ["env", {
-      "targets": {
-        "node": 4,
-        "browsers": ["last 2 versions"]
-      }
-    }],
-    "stage-2"
-  ],
-  "plugins": [
-    "transform-flow-strip-types"
-  ],
-  "sourceMaps": "inline"
+    "@babel/preset-env",
+    "@babel/preset-flow"
+  ]
 }

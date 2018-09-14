@@ -1,0 +1,22 @@
+html {
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  color: #333;
+  font-family: Montserrat, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}

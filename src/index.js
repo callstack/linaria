@@ -1,6 +1,6 @@
 /* @flow */
 
-export { default as css } from './css';
-export { default as include } from './include';
-export { default as names } from './names';
-export { default as styles } from './styles';
+exports.styled = require('./styled');
+exports.css = require('./css');
+exports.names = require('./names');
+exports.styles = require('./styles');

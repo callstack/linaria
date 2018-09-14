@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`preval-extract babel plugin with ES imports should preval default export 1`] = `"font-size: 14px;"`;
-
-exports[`preval-extract babel plugin with ES imports should preval imported module tree with constants 1`] = `"font-size: 28px;"`;
-
-exports[`preval-extract babel plugin with ES imports should preval named imports 1`] = `"font-size: 36px;"`;
-
-exports[`preval-extract babel plugin with ES imports should preval named imports 2`] = `"font-size: 24px;"`;
