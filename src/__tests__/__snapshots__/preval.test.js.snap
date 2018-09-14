@@ -5,11 +5,15 @@ exports[`evaluates component interpolations 1`] = `
   styled
 } = require('../react');
 
-const Title = styled.component('h1', {
+const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });
-const Paragraph = styled.component('p', {
+const Paragraph =
+/*#__PURE__*/
+styled.component('p', {
   name: \\"Paragraph\\",
   class: \\"Paragraph_abcdefg\\"
 });
@@ -28,7 +32,9 @@ CSS OUTPUT DEPENDENCIES:[\\"../react\\"]
 
 exports[`evaluates expressions with dependencies 1`] = `
 "import slugify from '../slugify';
-const Title = styled.component('h1', {
+const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });
@@ -51,7 +57,9 @@ const boo = t => slugify(t) + 'boo';
 
 const bar = t => slugify(t) + 'bar';
 
-const Title = styled.component('h1', {
+const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });
@@ -73,7 +81,9 @@ exports[`evaluates identifier in scope 1`] = `
 const foo = () => answer;
 
 const days = foo() + ' days';
-const Title = styled.component('h1', {
+const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });
@@ -94,7 +104,9 @@ exports[`evaluates local expressions 1`] = `
 
 const foo = () => answer;
 
-const Title = styled.component('h1', {
+const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });
@@ -117,7 +129,9 @@ const boo = t => slugify(t) + 'boo';
 
 const bar = t => slugify(t) + 'bar';
 
-const Title = styled.component('h1', {
+const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });
@@ -136,7 +150,9 @@ CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
 exports[`ignores external expressions 1`] = `
 "const generate = props => props.content;
 
-const Title = styled.component('h1', {
+const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_abcdefg\\",
   vars: {
@@ -156,7 +172,9 @@ CSS OUTPUT DEPENDENCIES:[]
 `;
 
 exports[`ignores inline arrow function expressions 1`] = `
-"const Title = styled.component('h1', {
+"const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_abcdefg\\",
   vars: {
@@ -176,7 +194,9 @@ CSS OUTPUT DEPENDENCIES:[]
 `;
 
 exports[`ignores inline vanilla function expressions 1`] = `
-"const Title = styled.component('h1', {
+"const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_abcdefg\\",
   vars: {

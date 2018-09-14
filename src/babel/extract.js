@@ -244,6 +244,8 @@ module.exports = function extract(
                 [tag.arguments[0], t.objectExpression(props)]
               )
             );
+
+            path.addComment('leading', '#__PURE__');
           } else {
             path.replaceWith(t.stringLiteral(className));
           }

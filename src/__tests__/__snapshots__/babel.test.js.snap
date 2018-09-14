@@ -7,7 +7,9 @@ const title = String.raw\`This is something\`;"
 
 exports[`evaluates and inlines expressions in scope 1`] = `
 "const color = 'blue';
-const Title = styled.component('h1', {
+const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_t1ugh8t9\\"
 });
@@ -25,7 +27,9 @@ CSS OUTPUT DEPENDENCIES:[]
 
 exports[`handles component in object property 1`] = `
 "const components = {
-  title: styled.component('h1', {
+  title:
+  /*#__PURE__*/
+  styled.component('h1', {
     name: \\"title\\",
     class: \\"title_t1ugh8t9\\"
   })
@@ -43,7 +47,9 @@ CSS OUTPUT DEPENDENCIES:[]
 `;
 
 exports[`handles nested blocks 1`] = `
-"const Button = styled.component('button', {
+"const Button =
+/*#__PURE__*/
+styled.component('button', {
   name: \\"Button\\",
   class: \\"Button_b1ugh8t9\\",
   vars: {
@@ -63,7 +69,9 @@ CSS OUTPUT DEPENDENCIES:[]
 `;
 
 exports[`prevents class name collision 1`] = `
-"const Title = styled.component('h1', {
+"const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_t1ugh8t9\\",
   vars: {
@@ -73,7 +81,9 @@ exports[`prevents class name collision 1`] = `
 });
 
 function more() {
-  const Title = styled.component('h1', {
+  const Title =
+  /*#__PURE__*/
+  styled.component('h1', {
     name: \\"Title\\",
     class: \\"Title_t1ugh8t9x\\",
     vars: {
@@ -95,7 +105,9 @@ CSS OUTPUT DEPENDENCIES:[]
 `;
 
 exports[`replaces unknown expressions with CSS custom properties 1`] = `
-"const Title = styled.component('h1', {
+"const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_t1ugh8t9\\",
   vars: {
@@ -129,7 +141,9 @@ exports[`throws when not attached to a variable 1`] = `
 `;
 
 exports[`transpiles styled template literal 1`] = `
-"const Title = styled.component('h1', {
+"const Title =
+/*#__PURE__*/
+styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_t1ugh8t9\\"
 });
@@ -146,7 +160,9 @@ CSS OUTPUT DEPENDENCIES:[]
 `;
 
 exports[`uses the same custom property for the same expression 1`] = `
-"const Box = styled.component('div', {
+"const Box =
+/*#__PURE__*/
+styled.component('div', {
   name: \\"Box\\",
   class: \\"Box_b1ugh8t9\\",
   vars: {
@@ -166,7 +182,9 @@ CSS OUTPUT DEPENDENCIES:[]
 `;
 
 exports[`uses the same custom property for the same identifier 1`] = `
-"const Box = styled.component('div', {
+"const Box =
+/*#__PURE__*/
+styled.component('div', {
   name: \\"Box\\",
   class: \\"Box_b1ugh8t9\\",
   vars: {
