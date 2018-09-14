@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`evaluates component interpolations 1`] = `
-"const styled = require('../styled');
+"const {
+  styled
+} = require('../react');
 
 const Title = styled.component('h1', {
   name: \\"Title\\",
@@ -20,7 +22,7 @@ CSS OUTPUT TEXT START
 CSS OUTPUT TEXT END
 
 CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":6},\\"name\\":\\"Paragraph_abcdefg\\"}]
-CSS OUTPUT DEPENDENCIES:[\\"../styled\\"]
+CSS OUTPUT DEPENDENCIES:[\\"../react\\"]
 */"
 `;
 

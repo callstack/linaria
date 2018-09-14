@@ -92,6 +92,9 @@ Linaria lets you write CSS code in a tagged template literal with a styled-compo
 The plugin will transpile this:
 
 ```js
+import { styled } from 'linaria/react';
+import { serif, regular } from './fonts';
+
 const background = 'yellow';
 
 const Title = styled('h1')`
@@ -114,6 +117,9 @@ const Container = styled('div')`
 To this:
 
 ```js
+import { styled } from 'linaria/react';
+import { serif, regular } from './fonts';
+
 const background = 'yellow';
 
 const Title = styled.component('h1', {
@@ -169,11 +175,14 @@ CSS OUTPUT DEPENDENCIES:[]
 
   ```js
   // First.js
+  import { styled } from 'linaria/react';
+
   const First = styled('div')`
     color: blue;
   `;
 
   // Second.js
+  import { styled } from 'linaria/react';
   import { First } from './First';
 
   const Second = styled(First)`

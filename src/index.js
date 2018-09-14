@@ -1,6 +1,5 @@
 /* @flow */
 
-exports.styled = require('./styled');
-exports.css = require('./css');
-exports.names = require('./names');
-exports.styles = require('./styles');
+exports.css = require('./core/css');
+exports.names = require('./core/names');
+exports.styles = require('./core/styles');

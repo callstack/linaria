@@ -111,7 +111,7 @@ it('evaluates multiple expressions with shared dependency', async () => {
 it('evaluates component interpolations', async () => {
   const code = await transpile(
     dedent`
-    const styled = require('../styled');
+    const { styled } = require('../react');
 
     const Title = styled('h1')\`
       color: red;

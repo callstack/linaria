@@ -161,15 +161,12 @@ module.exports = function extract(
                       state.file.opts.filename
                     );
 
-                    if (typeof value === 'function') {
-                      if (typeof value.className === 'string') {
-                        cssText += `.${value.className}`;
-                        state.dependencies.push(...dependencies);
+                    if (typeof value !== 'function') {
+                      cssText +=
+                        typeof value.className === 'string'
+                          ? `.${value.className}`
+                          : value;
 
-                        return;
-                      }
-                    } else {
-                      cssText += value;
                       state.dependencies.push(...dependencies);
 
                       return;

@@ -5,6 +5,8 @@
   "main": "lib/index.js",
   "files": [
     "lib/",
+    "react.js",
+    "server.js",
     "babel.js",
     "loader.js"
   ],
