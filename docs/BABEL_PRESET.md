@@ -9,26 +9,12 @@ The preset pre-processes and evaluates the CSS so that it can be extracted by th
   "presets": [
     "@babel/preset-env",
     "@babel/preset-react"
-+   "linaria/babel"
++   ["linaria/babel", { "evaluate": true }]
   ]
 }
 ```
 
 Make sure that `linaria/babel` is the last item in your `presets` list.
-
-Now, linaria will evaluate the `css` tags and extract styles to a CSS file for each JS file with the same name and inject `require` call with a path to the extracted CSS file.
-
-For example, CSS file for `src/components/App.js` will be named `src/components/App.css` and will be written inside `.linaria-cache` with directory - `.linaria-cache/src/components/App.css`.
-
-You can configure the preset by passing and object with options:
-
-```json
-{
-  "presets": [
-    ["linaria/babel", { "outDir": "css-output" }]
-  ]
-}
-```
 
 ## Options
 

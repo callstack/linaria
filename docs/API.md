@@ -79,6 +79,7 @@ export function Block({ className }) {
 Helper to build React components:
 
 ```js
+import { styled } from 'linaria/react';
 import colors from './colors.json';
 
 const Container = styled('div')`

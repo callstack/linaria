@@ -2,8 +2,6 @@
 
 ## webpack
 
-### Loader
-
 The webpack loader complements the babel plugin. For static extraction to work, you'll need to include both.
 
 In your Webpack config, you'll need to add `linaria/loader` to run it on `.js` files:
@@ -32,7 +30,7 @@ module: {
 },
 ```
 
-Make sure that `linaria/loader` is included before `babel-loader`.
+Make sure that `linaria/loader` is included before `babel-loader`. Setting the `sourceMap` option to `true` will include source maps for the generated CSS so that you can see where source of the class name in devtools. We recommend to enable this only in development mode because the sourcemap is inlined into the CSS files.
 
 In order to have your styles extracted, you'll also need to use **MiniCssExtractPlugin**. To do that, you can add the following snippet in your webpack config:
 

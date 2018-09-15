@@ -24,7 +24,7 @@ Linaria will automatically vendor prefix your CSS, so you don't have to worry ab
 
 ### 6. Declarative dynamic styling with React
 
-When using the `styled` helper, Linaria will generate dynamic CSS variables which automatically update when props change. When writing regular CSS, you'll have to manage it manually.
+When using the `styled(..)` helper, Linaria will generate dynamic CSS variables which automatically update when props change. When writing regular CSS, you'll have to manage it manually.
 
 ## Advantages over CSS preprocessors
 
@@ -59,7 +59,7 @@ Linaria is unique in the sense that it doesn't need a runtime to work. Styles ar
 
 ### 2. No framework coupling
 
-Many CSS in JS solutions only work with a single framework such as React. Linaria is independent of the framework you use and can be used with any framework that supports class names.
+Many CSS in JS solutions only work with a single framework such as React. While Linaria provides additional helpers for React components, the core is independent of the framework you use and can be used with any framework that supports class names.
 
 ### 3. Familiar CSS syntax
 

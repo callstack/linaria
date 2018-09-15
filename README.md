@@ -35,61 +35,92 @@ Zero-runtime CSS in JS library.
 
 ## Usage
 
-Add the babel preset to your `.babelrc`:
+Linaria requires you to use a babel plugin along with a webpack loader.
+
+First, add the babel preset to your `.babelrc`:
 
 ```json
 {
   "presets": [
     "@babel/preset-env",
     "@babel/preset-react"
-    "linaria/babel"
+    ["linaria/babel", { "evaluate": true }]
   ]
 }
 ```
 
 Make sure that `linaria/babel` is the last item in your `presets` list.
 
-Add the webpack loader to your `webpack.config.js`:
+Next, add the webpack loader to your `webpack.config.js`:
 
 ```js
 module: {
   rules: [
     {
       test: /\.js$/,
-      use: ['linaria/loader', 'babel-loader'],
+      use: [
+        {
+          loader: 'linaria/loader',
+          options: {
+            sourceMap: process.env.NODE_ENV !== 'production',
+          },
+        },
+        {
+          loader: 'babel-loader'
+        }
+      ],
     },
     {
       test: /\.css$/,
-      use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      use: [
+        MiniCssExtractPlugin.loader,
+        {
+          loader: 'css-loader',
+          options: {
+            sourceMap: process.env.NODE_ENV !== 'production',
+          },
+        },
+      ],
     },
+  ],
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: 'styles.css',
+    }),
   ],
 },
 ```
 
 Make sure that `linaria/loader` is included before `babel-loader`.
 
-## Documentation
+Now, the CSS you write with Linaria will be extracted at build time to the `styles.css` file.
 
-* [API and usage](/docs/API.md)
-  * [Client APIs](/docs/API.md#client-apis)
-  * [Server APIs](/docs/API.md#server-apis)
-* [Configuring Babel](/docs/BABEL_PRESET.md)
-  * [Preset documentation](/docs/BABEL_PRESET.md#linariababel-preset)
-  * [Create React App](/docs/BABEL_PRESET.md#create-react-app-ejected)
-  * [Next.js](/docs/BABEL_PRESET.md#nextjs)
-* [Dynamic Styles](/docs/DYNAMIC_STYLES.md)
-* [Theming](/docs/THEMING.md)
-* [Server Rendering](/docs/SERVER_RENDERING.md)
-* [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md)
-  * [Webpack](/docs/BUNDLERS_INTEGRATION.md#webpack)
-* [Linting](/docs/LINTING.md)
-* [Example](/website)
+## Syntax
 
-## How it works
+Linaria can be used with any framework, with additional helpers for `react`. The basic syntax looks like this:
 
-Linaria lets you write CSS code in a tagged template literal with a styled-component like syntax, using CSS custom properties for dynamic interpolations. The Babel plugin generates unique class names for the components and extracts the CSS to a comment in the JS file. Then the webpack loader extracts this comment out to real files.
+```js
+import { css } from 'linaria';
+import { modularScale, hiDPI } from 'polished';
+import fonts from './fonts';
+import colors from './colors';
 
-The plugin will transpile this:
+// Write your styles in `css` tag
+const header = css`
+  text-transform: uppercase;
+  font-family: ${fonts.heading};
+  font-size: ${modularScale(2)};
+
+  ${hiDPI(1.5)} {
+    font-size: ${modularScale(2.5)}
+  }
+`;
+
+// Then use it as a class name
+<h1 class={header}>Hello world</h1>
+```
+
+If you're using React, you can use the `styled(..)` helper, which makes it easy to write React components with dynamic styles with a styled-component like syntax:
 
 ```js
 import { styled } from 'linaria/react';
@@ -97,6 +128,7 @@ import { serif, regular } from './fonts';
 
 const background = 'yellow';
 
+// Write your styles in `styled(..)` tag
 const Title = styled('h1')`
   font-family: ${serif};
 `;
@@ -111,60 +143,34 @@ const Container = styled('div')`
   &:hover {
     border-color: blue;
   }
+
+  ${Title} {
+    margin-bottom: 24px;
+  }
 `;
+
+// Then use the resulting component
+<Container color="#333">
+  <Title>Hello world</Title>
+</Container>
 ```
 
-To this:
+Dynamic styles will be applied using CSS custom properties (aka CSS variables) and don't require any runtime.
 
-```js
-import { styled } from 'linaria/react';
-import { serif, regular } from './fonts';
+## Documentation
 
-const background = 'yellow';
-
-const Title = styled.component('h1', {
-  name: 'Title',
-  class: 'Title_t1ugh8t9',
-  vars: {
-    't1ugh8t9-0-0': serif,
-  },
-});
-
-const Container = styled.component('div', {
-  name: 'Container',
-  class: 'Container_c1ugh8t9',
-  vars: {
-    'c1ugh8t9-1-0': regular,
-    'c1ugh8t9-1-2': props => props.color,
-  },
-});
-
-/*
-CSS OUTPUT TEXT START
-
-.Title_t1ugh8t9 {
-  font-family: var(--t1ugh8t9-0-0);
-}
-
-.Container_c1ugh8t9 {
-  font-family: var(--c1ugh8t9-1-0);
-  background-color: yellow;
-  color: var(--c1ugh8t9-1-2);
-  width: 33.333333333333336%;
-  border: 1px solid red;
-}
-
-.Container_c1ugh8t9:hover {
-  border-color: blue;
-}
-
-CSS OUTPUT TEXT END
-
-CSS OUTPUT MAPPINGS:[{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":"Title_t1ugh8t9"},{"generated":{"line":5,"column":0},"original":{"line":7,"column":6},"name":"Container_c1ugh8t9"}]
-
-CSS OUTPUT DEPENDENCIES:[]
-*/
-```
+* [API and usage](/docs/API.md)
+  * [Client APIs](/docs/API.md#client-apis)
+  * [Server APIs](/docs/API.md#server-apis)
+* [Configuring Babel](/docs/BABEL_PRESET.md)
+* [Dynamic styles with `css` tag](/docs/DYNAMIC_STYLES.md)
+* [Theming](/docs/THEMING.md)
+* [Server rendering](/docs/SERVER_RENDERING.md)
+* [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md)
+  * [Webpack](/docs/BUNDLERS_INTEGRATION.md#webpack)
+* [Linting](/docs/LINTING.md)
+* [How it works](/docs/HOW_IT_WORKS.md)
+* [Example](/website)
 
 ## Trade-offs
 
@@ -208,13 +214,10 @@ CSS OUTPUT DEPENDENCIES:[]
 
 ## Editor Plugins
 
-### CSS Autocompletion
-
-* VSCode, Atom, SublimeText – [typescript-styled-plugin](https://github.com/Microsoft/typescript-styled-plugin/issues/10)
-
 ### VSCode
 
 * Syntax Highlighting - [Styled Components Plugin](https://marketplace.visualstudio.com/items?itemName=jpoissonnier.vscode-styled-components)
+* Autocompletion - [Styled Components Plugin](https://marketplace.visualstudio.com/items?itemName=jpoissonnier.vscode-styled-components)
 
 ### Atom
 

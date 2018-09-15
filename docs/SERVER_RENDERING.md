@@ -1,6 +1,6 @@
 # Server rendering
 
-If you're server rendering your app, we provide the `collect` method to extract the critical CSS so that you can ship the minimal amount of CSS used in the page to the browser.
+Since Linaria exracts the CSS statically at build time, you don't need to worry about server rendering your CSS. However, we provide the `collect` method to extract critical CSS for server rendered pages, so that you can ship the minimal amount of CSS used in the page to the browser.
 
 The `collect` method takes some HTML and CSS and gives you the critical CSS.
 
@@ -56,4 +56,4 @@ app.get('/styles/:slug', (req, res) => {
 app.listen(3242);
 ```
 
-By placing the non-critical CSS at the end of `body`, you can make sure that page rendering is not blocked till it has loaded. You can also load the non-critical CSS lazily with JavaScript once the page has loaded for a more efficient strategy.
+By placing the non-critical CSS at the end of `body`, you can make sure that page rendering is not blocked untill the CSS is loaded. You can also load the non-critical CSS lazily with JavaScript once the page has loaded for a more efficient strategy.
