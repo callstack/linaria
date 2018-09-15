@@ -3,8 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const Module = require('module');
 const loaderUtils = require('loader-utils');
-const slugify = require('./slugify');
-const transform = require('./transform');
+const slugify = require('../slugify');
+const transform = require('../transform');
 
 module.exports = function loader(content) {
   const options = loaderUtils.getOptions(this) || {};
