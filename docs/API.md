@@ -34,12 +34,12 @@ const box = css`
 `;
 ```
 
-### `names(...classNames: string[]) => string`
+### `cx(...classNames: Array<string | false | void | null | 0>) => string`
 
 Takes a list of class names and returns a concatenated string with the class names. Falsy values are ignored.
 
 ```js
-import { css, names } from 'linaria';
+import { css, cx } from 'linaria';
 
 const cat = css`
   font-weight: bold;
@@ -54,29 +54,15 @@ const fun = css`
 `;
 
 function App({ isPlaying }) {
-  return <Playground className={names(cat, yarn, isPlaying && fun)} />;
+  return <Playground className={cx(cat, yarn, isPlaying && fun)} />;
 }
 ```
 
-### `styles(...classNames: string[]) => { className: string }`
-
-Similar to `names`, but it also lets you write less code thanks to object destructuring.
-
-```js
-import { css, styles } from 'linaria';
-
-const container = css`
-  max-width: 1337px;
-`;
-
-export function Block({ className }) {
-  return <div {...styles(container, className)} />;
-}
-```
+Unlike the [`classnames`](https://www.npmjs.com/package/classnames) library, this doesn't handle objects. If you want need the features of the `classnames` library, you can use it instead.
 
 ### `styled`
 
-Helper to build React components:
+Helper to build React components. It allows you to write your components in a similar syntax as [`styled-components`](https://www.styled-components.com/):
 
 ```js
 import { styled } from 'linaria/react';

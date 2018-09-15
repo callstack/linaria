@@ -36,7 +36,7 @@ const box = css`
 export function Box({ size }) {
   return (
     <div
-      {...styles(box)}
+      className={box}
       style={{ '--box-size': size }}
     />
   );
@@ -64,10 +64,10 @@ const content = css`
 export function Box({ color }) {
   return (
     <div
-      {...styles(box)}
+      className={box}
       style={{ color }}
     >
-      <span {...styles(content)}>
+      <span className={content}>
         ¯\_(ツ)_/¯
       </span>
     </div>

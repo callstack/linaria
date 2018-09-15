@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { css, names } from 'linaria';
+import { css, cx } from 'linaria';
 import { media } from '../styles/utils';
 
 type AvailableHeadings = 'h1' | 'h2' | 'h3' | 'h4';
@@ -29,7 +29,7 @@ export default function Heading(props: Props) {
   }
 
   const passedProps = Object.assign({}, props, {
-    className: names(headingStyle, props.className),
+    className: cx(headingStyle, props.className),
   });
 
   return React.createElement(props.type, passedProps);

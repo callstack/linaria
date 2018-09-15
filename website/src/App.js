@@ -64,7 +64,7 @@ export default function Index() {
               text={dedent(`// Header.js (source JS)
 
                 import React from 'react';
-                import { css, names } from 'linaria';
+                import { css, cx } from 'linaria';
                 import colors from './colors';
 
                 const container = css\`
@@ -85,7 +85,7 @@ export default function Index() {
 
                 export default function Header({ className }) {
                   return (
-                    ${escapeHtml(`<div className={names(container, className)}>
+                    ${escapeHtml(`<div className={cx(container, className)}>
                       <h1 className={header} />
                     </div>`)}
                   );
@@ -124,7 +124,7 @@ export default function Index() {
               text={dedent(`// Header.js (output JS)
 
                 import React from 'react';
-                import names from 'linaria/build/names';
+                import cx from 'linaria/build/cx';
 
                 const container = 'container_jdh5rtz';
 
@@ -132,7 +132,7 @@ export default function Index() {
 
                 export default function Header({ className }) {
                   return (
-                    ${escapeHtml(`<div className={names(container, className)}>
+                    ${escapeHtml(`<div className={cx(container, className)}>
                       <h1 className={header} />
                     </div>`)}
                   );

@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { css, names } from 'linaria';
+import { css, cx } from 'linaria';
 import theme from '../styles/theme';
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
 
 export default function CodeBlock({ className, language, text }: Props) {
   return (
-    <pre className={names(code, className)}>
+    <pre className={cx(code, className)}>
       <code
         className={language && `language-${language}`}
         // eslint-disable-next-line
