@@ -3,45 +3,20 @@ const fs = require('fs');
 const path = require('path');
 const Module = require('module');
 const loaderUtils = require('loader-utils');
-const { SourceMapGenerator } = require('source-map');
 const slugify = require('./slugify');
+const transform = require('./transform');
 
 module.exports = function loader(content) {
   const options = loaderUtils.getOptions(this) || {};
+  const { css, dependencies, map } = transform(
+    this.resourcePath,
+    content,
+    options.sourceMap
+  );
 
-  let css = '';
-  let mappings = null;
-  let dependencies = null;
-  let found = false;
-  let comment = false;
+  let cssText = css;
 
-  content.split('\n').forEach(line => {
-    if (line === '/*') {
-      comment = true;
-    } else if (line === '*/') {
-      comment = false;
-    } else if (line === 'CSS OUTPUT TEXT START' && comment) {
-      found = true;
-    } else if (line === 'CSS OUTPUT TEXT END' && comment) {
-      found = false;
-    } else if (found) {
-      css += `${line}\n`;
-    } else if (line.startsWith('CSS OUTPUT MAPPINGS:')) {
-      try {
-        mappings = JSON.parse(line.substr(20));
-      } catch (e) {
-        // Ignore
-      }
-    } else if (line.startsWith('CSS OUTPUT DEPENDENCIES:')) {
-      try {
-        dependencies = JSON.parse(line.substr(24));
-      } catch (e) {
-        // Ignore
-      }
-    }
-  });
-
-  if (css) {
+  if (cssText) {
     const slug = slugify(this.resourcePath);
     const filename = `${path
       .basename(this.resourcePath)
@@ -49,15 +24,19 @@ module.exports = function loader(content) {
 
     const output = path.join(os.tmpdir(), filename.split('/').join('_'));
 
-    if (options.sourceMap && mappings) {
-      const generator = new SourceMapGenerator({
-        file: filename,
-      });
-
-      mappings.forEach(map =>
-        generator.addMapping(Object.assign(map, { source: this.resourcePath }))
+    if (map) {
+      map.setSourceContent(
+        this.resourcePath,
+        // We need to get the original source before it was processed
+        this.fs.readFileSync(this.resourcePath).toString()
       );
 
+      cssText += `/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
+        map.toString()
+      ).toString('base64')}*/`;
+    }
+
+    if (dependencies) {
       dependencies.forEach(dep => {
         try {
           const file = Module._resolveFilename(dep, {
@@ -71,18 +50,9 @@ module.exports = function loader(content) {
           // Ignore
         }
       });
-
-      generator.setSourceContent(
-        this.resourcePath,
-        this.fs.readFileSync(this.resourcePath).toString()
-      );
-
-      css += `/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
-        generator.toString()
-      ).toString('base64')}*/`;
     }
 
-    fs.writeFileSync(output, css);
+    fs.writeFileSync(output, cssText);
 
     return `${content}\n\nrequire("${output}")`;
   }

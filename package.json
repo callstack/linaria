@@ -49,6 +49,7 @@
     "flow-copy-source": "^2.0.2",
     "jest": "^23.5.0",
     "jest-image-snapshot": "^2.5.0",
+    "parcel-bundler": "^1.9.7",
     "prettier": "^1.14.2",
     "puppeteer": "^1.8.0",
     "react": "^16.5.1"
