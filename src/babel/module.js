@@ -107,7 +107,6 @@ class Module {
     // For JavaScript files, we need to transpile it and to get the exports of the module
     const { code, map } = babel.transformSync(text, {
       filename: this.filename,
-      presets: [require.resolve('../babel')],
       // Include this plugin to avoid extra config when using { module: false } for webpack
       plugins: ['@babel/plugin-transform-modules-commonjs'],
       sourceMaps: true,

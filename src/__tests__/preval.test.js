@@ -200,7 +200,7 @@ it('throws codeframe error when evaluation fails', async () => {
       dedent`
       const foo = props => { throw new Error('This will fail') };
 
-      const title = styled('h1')\`
+      const Title = styled('h1')\`
         font-size: ${'${foo()}'}px;
       \`;
       `
