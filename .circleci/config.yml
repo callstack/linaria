@@ -36,15 +36,15 @@ jobs:
         - attach_workspace:
             at: ~/linaria
         - run: |
-            yarn run lint
-            yarn run flow
+            yarn lint
+            yarn flow
   unit-tests:
       <<: *defaults
       steps:
         - attach_workspace:
             at: ~/linaria
         - run: |
-            yarn test --coverage
+            yarn test:unit --coverage
             cat ./coverage/lcov.info | ./node_modules/.bin/codecov
             bash .circleci/comment-artifacts.sh
         - store_artifacts:
@@ -55,7 +55,7 @@ jobs:
       steps:
         - attach_workspace:
             at: ~/linaria
-        - run: cd website && yarn run build && cd ..
+        - run: cd website && yarn build && cd ..
   integration-tests:
       <<: *defaults
       steps:
@@ -63,8 +63,8 @@ jobs:
             at: ~/linaria
         - run: |
             bash .circleci/install-chrome-deps.sh
-            cd website && yarn run build && cd ..
-            yarn run test:integration
+            cd website && yarn build && cd ..
+            yarn test:integration
         - store_artifacts:
             path: website/__integration-tests__/__image_snapshots__/__diff_output__
             destination: website-snapshot-diffs
