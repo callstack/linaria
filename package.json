@@ -70,7 +70,7 @@
     "**/babel-core": "7.0.0-bridge.0"
   },
   "jest": {
-    "testRegex": "/__(integration-)?tests__/.*\\.(test|spec)\\.js$",
+    "testRegex": "/__tests__/.*\\.test\\.js$",
     "testEnvironment": "node"
   }
 }
