@@ -7,6 +7,7 @@ const dedent = require('dedent');
 const transpile = async input => {
   const { code } = await babel.transformAsync(input, {
     presets: [require.resolve('../babel')],
+    plugins: ['@babel/plugin-syntax-jsx'],
     filename: '/app/index.js',
   });
 
@@ -33,6 +34,35 @@ it('evaluates and inlines expressions in scope', async () => {
     const Title = styled('h1')\`
       color: ${'${color}'};
       width: ${'${100 / 3}'}%;
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
+it('inlines object styles as CSS string', async () => {
+  const code = await transpile(
+    dedent`
+    const cover = {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      opacity: 1,
+      minHeight: 420,
+
+      '@media (min-width: 200px)': {
+        WebkitTransition: '400ms',
+        MozTransition: '400ms',
+        OTransition: '400ms',
+        msTransition: '400ms',
+      }
+    };
+
+    const Title = styled('h1')\`
+      ${'${cover}'}
     \`;
     `
   );
@@ -118,20 +148,6 @@ it('prevents class name collision', async () => {
   expect(code).toMatchSnapshot();
 });
 
-it('handles component in object property', async () => {
-  const code = await transpile(
-    dedent`
-    const components = {
-      title: styled('h1')\`
-        font-size: 14px;
-      \`
-    };
-    `
-  );
-
-  expect(code).toMatchSnapshot();
-});
-
 it('throws when not attached to a variable', async () => {
   expect.assertions(1);
 
@@ -159,4 +175,56 @@ it('does not output CSS if none present', async () => {
   );
 
   expect(code).toMatchSnapshot();
+});
+
+it('transpiles css template literal', async () => {
+  const code = await transpile(
+    dedent`
+    const title = css\`
+      font-size: 14px;
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
+it('handles css template literal in object property', async () => {
+  const code = await transpile(
+    dedent`
+    const components = {
+      title: css\`
+        font-size: 14px;
+      \`
+    };
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
+it('handles css template literal in JSX element', async () => {
+  const code = await transpile(
+    dedent`
+    <Title class={css\` font-size: 14px; \`} />
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
+it('throws when contains dynamic expression without evaluate: true in css tag', async () => {
+  expect.assertions(1);
+
+  try {
+    await transpile(
+      dedent`
+      const title = css\`
+        font-size: ${'${size}'}px;
+      \`;
+      `
+    );
+  } catch (e) {
+    expect(e.message).toMatchSnapshot();
+  }
 });

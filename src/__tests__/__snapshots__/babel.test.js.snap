@@ -25,14 +25,23 @@ CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
 
-exports[`handles component in object property 1`] = `
+exports[`handles css template literal in JSX element 1`] = `
+"<Title class={\\"Title_t1ugh8t9\\"} />;
+
+/*
+CSS OUTPUT TEXT START
+.Title_t1ugh8t9{font-size:14px;}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":13},\\"name\\":\\"Title_t1ugh8t9\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
+`;
+
+exports[`handles css template literal in object property 1`] = `
 "const components = {
-  title:
-  /*#__PURE__*/
-  styled.component('h1', {
-    name: \\"title\\",
-    class: \\"title_t1ugh8t9\\"
-  })
+  title: \\"title_t1ugh8t9\\"
 };
 
 /*
@@ -64,6 +73,40 @@ CSS OUTPUT TEXT START
 CSS OUTPUT TEXT END
 
 CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Button_b1ugh8t9\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
+`;
+
+exports[`inlines object styles as CSS string 1`] = `
+"const cover = {
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+  opacity: 1,
+  minHeight: 420,
+  '@media (min-width: 200px)': {
+    WebkitTransition: '400ms',
+    MozTransition: '400ms',
+    OTransition: '400ms',
+    msTransition: '400ms'
+  }
+};
+const Title =
+/*#__PURE__*/
+styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_t1ugh8t9\\"
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_t1ugh8t9{position:absolute;top:0;right:0;bottom:0;left:0;opacity:1;min-height:420px;}@media (min-width:200px){.Title_t1ugh8t9{-webkit-transition:400ms;-moz-transition:400ms;-o-transition:400ms;-ms-transition:400ms;}}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":18,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -127,6 +170,14 @@ CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
 
+exports[`throws when contains dynamic expression without evaluate: true in css tag 1`] = `
+"/app/index.js: The CSS cannot contain JavaScript expressions. To evaluate the expressions at build time, pass evaluate: true to the babel plugin.
+[0m [90m 1 | [39m[36mconst[39m title [33m=[39m css[32m\`[39m[0m
+[0m[31m[1m>[22m[39m[90m 2 | [39m[32m  font-size: \${size}px;[39m[0m
+[0m [90m   | [39m               [31m[1m^[22m[39m[0m
+[0m [90m 3 | [39m[32m\`[39m[33m;[39m[0m"
+`;
+
 exports[`throws when not attached to a variable 1`] = `
 "/app/index.js: Couldn't determine a name for the component. Ensure that it's either:
 - Assigned to a variable
@@ -138,6 +189,20 @@ exports[`throws when not attached to a variable 1`] = `
 [0m [90m 2 | [39m[32m  font-size: \${size}px;[39m[0m
 [0m [90m 3 | [39m[32m  color: \${props => props.color}[39m[0m
 [0m [90m 4 | [39m[32m\`[39m[33m;[39m[0m"
+`;
+
+exports[`transpiles css template literal 1`] = `
+"const title = \\"title_t1ugh8t9\\";
+
+/*
+CSS OUTPUT TEXT START
+.title_t1ugh8t9{font-size:14px;}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"title_t1ugh8t9\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
 `;
 
 exports[`transpiles styled template literal 1`] = `

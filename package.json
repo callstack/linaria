@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
+    "@babel/plugin-syntax-jsx": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-flow": "^7.0.0",
     "@callstack/eslint-config": "^2.0.0",
@@ -61,6 +62,7 @@
     "dedent": "^0.7.0",
     "loader-utils": "^1.1.0",
     "postcss": "^7.0.2",
+    "react-is": "^16.5.1",
     "source-map": "^0.7.3",
     "stylis": "^3.5.3"
   },

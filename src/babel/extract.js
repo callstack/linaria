@@ -2,9 +2,38 @@
 /* @flow */
 
 const stylis = require('stylis');
-const slugify = require('../slugify');
+const { isValidElementType } = require('react-is');
 const Module = require('./module');
 const evaluate = require('./evaluate');
+const unitless = require('./unitless');
+const slugify = require('../slugify');
+
+const hyphenate = s =>
+  s.replace(/([A-Z])/g, g => `-${g[0].toLowerCase()}`).replace(/^ms-/, '-ms-');
+
+const isPlainObject = o =>
+  typeof o === 'object' && o != null && o.constructor.name === 'Object';
+
+const toCSS = o =>
+  Object.entries(o)
+    .filter(
+      ([, value]) =>
+        // Ignore all falsy values except numbers
+        typeof value === 'number' || value
+    )
+    .map(([key, value]) => {
+      if (isPlainObject(value)) {
+        return `${hyphenate(key)} { ${toCSS(value)} }`;
+      }
+
+      return `${hyphenate(key)}: ${
+        /* $FlowFixMe */
+        typeof value === 'number' && value !== 0 && !unitless[key]
+          ? `${value}px`
+          : value
+      };`;
+    })
+    .join(' ');
 
 /* ::
 type State = {|
@@ -144,7 +173,13 @@ module.exports = function extract(
               const result = ex.evaluate();
 
               if (result.confident) {
-                cssText += result.value;
+                if (isPlainObject(result.value)) {
+                  // If it's a plain object, convert it to a CSS string
+                  cssText += toCSS(result.value);
+                } else if (result.value != null) {
+                  // Don't insert anything for null and undefined
+                  cssText += result.value;
+                }
               } else {
                 // Try to preval the value
                 if (
@@ -162,10 +197,24 @@ module.exports = function extract(
                     );
 
                     if (typeof value !== 'function') {
-                      cssText +=
-                        typeof value.className === 'string'
-                          ? `.${value.className}`
-                          : value;
+                      // Only insert text for non functions
+                      // We don't touch functions because they'll be interpolated at runtime
+
+                      if (value != null) {
+                        if (
+                          isValidElementType(value) &&
+                          typeof value.className === 'string'
+                        ) {
+                          // If it's an React component with a classname property, use it
+                          // Useful for interpolating components
+                          cssText += `.${value.className}`;
+                        } else if (isPlainObject(value)) {
+                          cssText += toCSS(value);
+                        } else {
+                          // For anything else, assume it'll be stringified
+                          cssText += value;
+                        }
+                      }
 
                       state.dependencies.push(...dependencies);
 

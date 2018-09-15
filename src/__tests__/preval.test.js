@@ -128,6 +128,26 @@ it('evaluates component interpolations', async () => {
   expect(code).toMatchSnapshot();
 });
 
+it('inlines object styles as CSS string', async () => {
+  const code = await transpile(
+    dedent`
+    const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
+      position: 'absolute',
+      top,
+      right,
+      bottom,
+      left,
+    });
+
+    const Title = styled('h1')\`
+      ${'${fill(0, 0)}'}
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
 it('ignores inline arrow function expressions', async () => {
   const code = await transpile(
     dedent`
@@ -170,4 +190,22 @@ it('ignores external expressions', async () => {
   );
 
   expect(code).toMatchSnapshot();
+});
+
+it('throws codeframe error when evaluation fails', async () => {
+  expect.assertions(1);
+
+  try {
+    await transpile(
+      dedent`
+      const foo = props => { throw new Error('This will fail') };
+
+      const title = styled('h1')\`
+        font-size: ${'${foo()}'}px;
+      \`;
+      `
+    );
+  } catch (e) {
+    expect(e.message.replace(__dirname, '<<DIRNAME>>')).toMatchSnapshot();
+  }
 });

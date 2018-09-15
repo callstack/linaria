@@ -216,3 +216,39 @@ CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
+
+exports[`inlines object styles as CSS string 1`] = `
+"const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
+  position: 'absolute',
+  top,
+  right,
+  bottom,
+  left
+});
+
+const Title =
+/*#__PURE__*/
+styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_abcdefg\\"
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_abcdefg{position:absolute;top:0;right:0;bottom:0;left:0;}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":9,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
+`;
+
+exports[`throws codeframe error when evaluation fails 1`] = `
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: This will fail. Make sure you are not using a browser or Node specific API.
+[0m [90m 2 | [39m[0m
+[0m [90m 3 | [39m[36mconst[39m title [33m=[39m styled([32m'h1'[39m)[32m\`[39m[0m
+[0m[31m[1m>[22m[39m[90m 4 | [39m[32m  font-size: \${foo()}px;[39m[0m
+[0m [90m   | [39m               [31m[1m^[22m[39m[0m
+[0m [90m 5 | [39m[32m\`[39m[33m;[39m[0m"
+`;
