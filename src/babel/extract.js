@@ -172,7 +172,7 @@ module.exports = function extract(
                       return;
                     }
                   } catch (e) {
-                    throw path.buildCodeFrameError(
+                    throw ex.buildCodeFrameError(
                       `An error occurred when evaluating the expression: ${
                         e.message
                       }. Make sure you are not using a browser or Node specific API.`

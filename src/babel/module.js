@@ -28,16 +28,33 @@ class Module {
   id: string;
   filename: string;
   paths: string;
+  require: (id: string) => any;
   exports: any;
 
   sourceMap: any;
   */
 
   constructor(filename /* : string */) {
-    this.id = filename;
-    this.filename = filename;
+    Object.defineProperties(this, {
+      id: {
+        value: filename,
+        writable: false,
+      },
+      filename: {
+        value: filename,
+        writable: false,
+      },
+      paths: {
+        value: Object.freeze(
+          NativeModule._nodeModulePaths(path.dirname(filename))
+        ),
+        writable: false,
+      },
+    });
+
     this.exports = {};
-    this.paths = NativeModule._nodeModulePaths(path.dirname(this.filename));
+    this.require = this.require.bind(this);
+    this.require.resolve = this.resolve.bind(this);
   }
 
   resolve(id /* : string */) {
@@ -50,8 +67,9 @@ class Module {
 
     if (filename === id && !path.isAbsolute(id)) {
       // Native Node modules
-      /* $FlowFixMe */
-      return require(id);
+      throw new Error(
+        `Unable to import "${id}". Importing Node builtins is not supported in the sandbox.`
+      );
     }
 
     let m = cache[filename];
@@ -102,21 +120,16 @@ class Module {
       filename: this.filename,
     });
 
-    const requireImpl = this.require.bind(this);
-
-    // Make require.resolve work
-    requireImpl.resolve = this.resolve.bind(this);
-
     script.runInContext(
       vm.createContext({
         module: this,
         exports: this.exports,
-        require: requireImpl,
-        process: {
-          env: {
+        require: this.require,
+        process: Object.freeze({
+          env: Object.freeze({
             NODE_ENV: process.env.NODE_ENV,
-          },
-        },
+          }),
+        }),
         __filename: this.filename,
         __dirname: path.dirname(this.filename),
       })

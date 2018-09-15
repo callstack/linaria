@@ -103,8 +103,10 @@ it('exports the path for non JS/JSON files', () => {
   );
 });
 
-it('returns original module for native node modules', () => {
+it('throws when requiring native node modules', () => {
   const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
 
-  expect(mod.require('fs') === require('fs')).toBe(true);
+  expect(() => mod.require('fs')).toThrow(
+    'Unable to import "fs". Importing Node builtins is not supported in the sandbox.'
+  );
 });
