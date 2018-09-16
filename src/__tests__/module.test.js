@@ -110,3 +110,65 @@ it('throws when requiring native node modules', () => {
     'Unable to import "fs". Importing Node builtins is not supported in the sandbox.'
   );
 });
+
+it("doesn't have access to the process object", () => {
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+
+  expect(() =>
+    mod.evaluate(dedent`
+    process.exit();
+  `)
+  ).toThrow('process.exit is not a function');
+});
+
+it('has access to NODE_ENV', () => {
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+
+  mod.evaluate(dedent`
+  module.exports = process.env.NODE_ENV;
+  `);
+
+  expect(mod.exports).toBe(process.env.NODE_ENV);
+});
+
+it('has require.resolve available', () => {
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+
+  mod.evaluate(dedent`
+  module.exports = require.resolve('./sample-script');
+  `);
+
+  expect(mod.exports).toBe(
+    path.resolve(path.dirname(mod.filename), 'sample-script.js')
+  );
+});
+
+it('has require.ensure available', () => {
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+
+  expect(() =>
+    mod.evaluate(dedent`
+  require.ensure(['./sample-script']);
+  `)
+  ).not.toThrowError();
+});
+
+it('has __filename available', () => {
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+
+  mod.evaluate(dedent`
+  module.exports = __filename;
+  `);
+
+  expect(mod.exports).toBe(mod.filename);
+});
+
+it('has __dirname available', () => {
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+
+  mod.evaluate(dedent`
+  module.exports = __dirname;
+  `);
+
+  expect(mod.exports).toBe(path.dirname(mod.filename));
+});

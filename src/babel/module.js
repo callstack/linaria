@@ -21,6 +21,8 @@ const babel = require('@babel/core');
 // Separate cache for evaled modules
 let cache = {};
 
+const NOOP = () => {};
+
 class Module {
   /* ::
   static invalidate: () => void;
@@ -55,6 +57,8 @@ class Module {
     this.exports = {};
     this.require = this.require.bind(this);
     this.require.resolve = this.resolve.bind(this);
+    this.require.ensure = NOOP;
+    this.require.cache = cache;
   }
 
   resolve(id /* : string */) {
