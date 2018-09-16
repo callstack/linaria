@@ -1,12 +1,13 @@
-const os = require('os');
-const fs = require('fs');
 const path = require('path');
 const Module = require('module');
 const loaderUtils = require('loader-utils');
-const slugify = require('./slugify');
-const transform = require('./transform');
+const transform = require('../transform');
 
-module.exports = function loader(content) {
+const cache = {};
+
+let id = 0;
+
+function loader(content) {
   const options = loaderUtils.getOptions(this) || {};
   const { css, dependencies, map } = transform(
     this.resourcePath,
@@ -17,13 +18,6 @@ module.exports = function loader(content) {
   let cssText = css;
 
   if (cssText) {
-    const slug = slugify(this.resourcePath);
-    const filename = `${path
-      .basename(this.resourcePath)
-      .replace(/\.js$/, '')}_${slug}.css`;
-
-    const output = path.join(os.tmpdir(), filename.split('/').join('_'));
-
     if (map) {
       map.setSourceContent(
         this.resourcePath,
@@ -52,10 +46,16 @@ module.exports = function loader(content) {
       });
     }
 
-    fs.writeFileSync(output, cssText);
+    id++;
 
-    return `${content}\n\nrequire("${output}")`;
+    cache[id] = { cssText };
+
+    return `${content}\n\nrequire("!!${require.resolve('./css')}?id=${id}!")`;
   }
 
   return content;
-};
+}
+
+loader.cache = cache;
+
+module.exports = loader;
