@@ -55,6 +55,42 @@ CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
 
+exports[`handles interpolation followed by unit 1`] = `
+"const Title =
+/*#__PURE__*/
+styled.component('h1', {
+  name: \\"Title\\",
+  class: \\"Title_t1ugh8t9\\",
+  vars: {
+    \\"t1ugh8t9-0-0\\": [size, \\"em\\"],
+    \\"t1ugh8t9-0-1\\": [shadow, \\"px\\"],
+    \\"t1ugh8t9-0-2\\": [size, \\"px\\"],
+    \\"t1ugh8t9-0-3\\": [props => props.width, \\"vw\\"],
+    \\"t1ugh8t9-0-4\\": [props => {
+      if (true) {
+        return props.height;
+      } else {
+        return 200;
+      }
+    }, \\"px\\"],
+    \\"t1ugh8t9-0-5\\": [unit, \\"fr\\"],
+    \\"t1ugh8t9-0-7\\": [function (props) {
+      return 200;
+    }, \\"px\\"]
+  }
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_t1ugh8t9{font-size:var(--t1ugh8t9-0-0);text-shadow:black 1px var(--t1ugh8t9-0-1),white -2px -2px;margin:var(--t1ugh8t9-0-2);width:calc(2 * var(--t1ugh8t9-0-3));height:var(--t1ugh8t9-0-4);grid-template-columns:var(--t1ugh8t9-0-5) 1fr 1fr var(--t1ugh8t9-0-5);border-radius:var(--t1ugh8t9-0-7);}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
+`;
+
 exports[`handles nested blocks 1`] = `
 "const Button =
 /*#__PURE__*/
@@ -62,7 +98,7 @@ styled.component('button', {
   name: \\"Button\\",
   class: \\"Button_b1ugh8t9\\",
   vars: {
-    \\"b1ugh8t9-0-0\\": regular
+    \\"b1ugh8t9-0-0\\": [regular]
   }
 });
 
@@ -118,8 +154,8 @@ styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_t1ugh8t9\\",
   vars: {
-    \\"t1ugh8t9-0-0\\": size,
-    \\"t1ugh8t9-0-1\\": props => props.color
+    \\"t1ugh8t9-0-0\\": [size, \\"px\\"],
+    \\"t1ugh8t9-0-1\\": [props => props.color]
   }
 });
 
@@ -130,14 +166,14 @@ function more() {
     name: \\"Title\\",
     class: \\"Title_t1ugh8t9x\\",
     vars: {
-      \\"t1ugh8t9x-1-0\\": regular
+      \\"t1ugh8t9x-1-0\\": [regular]
     }
   });
 }
 
 /*
 CSS OUTPUT TEXT START
-.Title_t1ugh8t9{font-size:var(--t1ugh8t9-0-0)px;color:var(--t1ugh8t9-0-1);}
+.Title_t1ugh8t9{font-size:var(--t1ugh8t9-0-0);color:var(--t1ugh8t9-0-1);}
 .Title_t1ugh8t9x{font-family:var(--t1ugh8t9x-1-0);}
 
 CSS OUTPUT TEXT END
@@ -154,14 +190,14 @@ styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_t1ugh8t9\\",
   vars: {
-    \\"t1ugh8t9-0-0\\": size,
-    \\"t1ugh8t9-0-1\\": props => props.color
+    \\"t1ugh8t9-0-0\\": [size, \\"px\\"],
+    \\"t1ugh8t9-0-1\\": [props => props.color]
   }
 });
 
 /*
 CSS OUTPUT TEXT START
-.Title_t1ugh8t9{font-size:var(--t1ugh8t9-0-0)px;color:var(--t1ugh8t9-0-1);}
+.Title_t1ugh8t9{font-size:var(--t1ugh8t9-0-0);color:var(--t1ugh8t9-0-1);}
 
 CSS OUTPUT TEXT END
 
@@ -231,13 +267,13 @@ styled.component('div', {
   name: \\"Box\\",
   class: \\"Box_b1ugh8t9\\",
   vars: {
-    \\"b1ugh8t9-0-0\\": props => props.size
+    \\"b1ugh8t9-0-0\\": [props => props.size, \\"px\\"]
   }
 });
 
 /*
 CSS OUTPUT TEXT START
-.Box_b1ugh8t9{height:var(--b1ugh8t9-0-0)px;width:var(--b1ugh8t9-0-0)px;}
+.Box_b1ugh8t9{height:var(--b1ugh8t9-0-0);width:var(--b1ugh8t9-0-0);}
 
 CSS OUTPUT TEXT END
 
@@ -253,13 +289,13 @@ styled.component('div', {
   name: \\"Box\\",
   class: \\"Box_b1ugh8t9\\",
   vars: {
-    \\"b1ugh8t9-0-0\\": size
+    \\"b1ugh8t9-0-0\\": [size, \\"px\\"]
   }
 });
 
 /*
 CSS OUTPUT TEXT START
-.Box_b1ugh8t9{height:var(--b1ugh8t9-0-0)px;width:var(--b1ugh8t9-0-0)px;}
+.Box_b1ugh8t9{height:var(--b1ugh8t9-0-0);width:var(--b1ugh8t9-0-0);}
 
 CSS OUTPUT TEXT END
 

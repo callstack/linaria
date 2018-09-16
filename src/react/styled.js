@@ -19,8 +19,10 @@ styled.component = (tag, options) => {
       const style = {};
 
       Object.keys(options.vars).forEach(name => {
-        const value = options.vars[name];
-        style[`--${name}`] = typeof value === 'function' ? value(props) : value;
+        const [value, unit = ''] = options.vars[name];
+        style[`--${name}`] = `${
+          typeof value === 'function' ? value(props) : value
+        }${unit}`;
       });
 
       next.style = Object.assign(style, next.style);

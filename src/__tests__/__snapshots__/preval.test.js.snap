@@ -156,7 +156,7 @@ styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_abcdefg\\",
   vars: {
-    \\"abcdefg-0-0\\": generate
+    \\"abcdefg-0-0\\": [generate]
   }
 });
 
@@ -178,7 +178,7 @@ styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_abcdefg\\",
   vars: {
-    \\"abcdefg-0-0\\": props => props.content
+    \\"abcdefg-0-0\\": [props => props.content]
   }
 });
 
@@ -200,9 +200,9 @@ styled.component('h1', {
   name: \\"Title\\",
   class: \\"Title_abcdefg\\",
   vars: {
-    \\"abcdefg-0-0\\": function (props) {
+    \\"abcdefg-0-0\\": [function (props) {
       return props.content;
-    }
+    }]
   }
 });
 

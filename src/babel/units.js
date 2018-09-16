@@ -1,5 +1,30 @@
 /* @flow */
 
+const units = [
+  '%',
+
+  // absolute units
+  'cm',
+  'mm',
+  'in',
+  'px',
+  'pt',
+  'pc',
+
+  // relative units
+  'em',
+  'ex',
+  'ch',
+  'rem',
+  'vw',
+  'vh',
+  'vmin',
+  'vmax',
+
+  // css grid
+  'fr',
+];
+
 const unitless = {
   animationIterationCount: true,
   borderImageOutset: true,
@@ -46,4 +71,5 @@ const unitless = {
   strokeWidth: true,
 };
 
-module.exports = unitless;
+exports.units = units;
+exports.unitless = unitless;

@@ -75,7 +75,25 @@ it('replaces unknown expressions with CSS custom properties', async () => {
     dedent`
     const Title = styled('h1')\`
       font-size: ${'${size}'}px;
-      color: ${'${props => props.color}'}
+      color: ${'${props => props.color}'};
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
+it('handles interpolation followed by unit', async () => {
+  const code = await transpile(
+    dedent`
+    const Title = styled('h1')\`
+      font-size: ${'${size}'}em;
+      text-shadow: black 1px ${'${shadow}'}px, white -2px -2px;
+      margin: ${'${size}'}px;
+      width: calc(2 * ${'${props => props.width}'}vw);
+      height: ${'${props => { if (true) { return props.height } else { return 200 } }}'}px;
+      grid-template-columns: ${'${unit}'}fr 1fr 1fr ${'${unit}'}fr;
+      border-radius: ${'${function(props) { return 200 }}'}px
     \`;
     `
   );

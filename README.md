@@ -134,7 +134,7 @@ const Title = styled('h1')`
 `;
 
 const Container = styled('div')`
-  font-family: ${regular};
+  font-family: ${regular}px;
   background-color: ${background};
   color: ${props => props.color};
   width: ${100 / 3}%;

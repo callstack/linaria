@@ -7,7 +7,7 @@ Linaria consists of 2 parts:
 
 ## Babel plugin
 
-The Babel plugin will look for `css` and `styled(..)` tags in your code and extract them out to a comment at the end of the file. It will also generate unique class names based on the hash of the filename.
+The Babel plugin will look for `css` and `styled(..)` tags in your code and extract the CSS out to a comment at the end of the file. It will also generate unique class names based on the hash of the filename.
 
 When using the `styled(..)` tag, dynamic interpolations will be replaced with CSS custom properties. References to constants in the scope will also be inlined. If the same expression is used multiple times, the plugin will create a single CSS custom property for those.
 
@@ -17,16 +17,16 @@ The plugin will transpile this:
 
 ```js
 import { styled } from 'linaria/react';
-import { serif, regular } from './fonts';
+import { families, sizes } from './fonts';
 
 const background = 'yellow';
 
 const Title = styled('h1')`
-  font-family: ${serif};
+  font-family: ${families.serif};
 `;
 
 const Container = styled('div')`
-  font-family: ${regular};
+  font-size: ${sizes.medium}px;
   background-color: ${background};
   color: ${props => props.color};
   width: ${100 / 3}%;
@@ -42,7 +42,7 @@ To this:
 
 ```js
 import { styled } from 'linaria/react';
-import { serif, regular } from './fonts';
+import { families, sizes } from './fonts';
 
 const background = 'yellow';
 
@@ -50,7 +50,7 @@ const Title = styled.component('h1', {
   name: 'Title',
   class: 'Title_t1ugh8t9',
   vars: {
-    't1ugh8t9-0-0': serif,
+    't1ugh8t9-0-0': [families.serif],
   },
 });
 
@@ -58,8 +58,8 @@ const Container = styled.component('div', {
   name: 'Container',
   class: 'Container_c1ugh8t9',
   vars: {
-    'c1ugh8t9-1-0': regular,
-    'c1ugh8t9-1-2': props => props.color,
+    'c1ugh8t9-1-0': [sizes.medium, 'px'],
+    'c1ugh8t9-1-2': [props => props.color],
   },
 });
 
@@ -71,7 +71,7 @@ CSS OUTPUT TEXT START
 }
 
 .Container_c1ugh8t9 {
-  font-family: var(--c1ugh8t9-1-0);
+  font-size: var(--c1ugh8t9-1-0);
   background-color: yellow;
   color: var(--c1ugh8t9-1-2);
   width: 33.333333333333336%;

@@ -5,8 +5,8 @@ const stylis = require('stylis');
 const { isValidElementType } = require('react-is');
 const Module = require('./module');
 const evaluate = require('./evaluate');
-const unitless = require('./unitless');
 const slugify = require('../slugify');
+const { units, unitless } = require('./units');
 
 const hyphenate = s =>
   s.replace(/([A-Z])/g, g => `-${g[0].toLowerCase()}`).replace(/^ms-/, '-ms-');
@@ -34,6 +34,8 @@ const toCSS = o =>
       };`;
     })
     .join(' ');
+
+const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
 
 /* ::
 type State = {|
@@ -115,7 +117,7 @@ module.exports = function extract(
         const styled = t.isCallExpression(tag) && tag.callee.name === 'styled';
 
         if (styled || (t.isIdentifier(tag) && tag.name === 'css')) {
-          const interpolations = {};
+          const interpolations = [];
 
           // Try to determine a readable class name
           let displayName;
@@ -165,7 +167,30 @@ module.exports = function extract(
           const expressions = path.get('quasi').get('expressions');
 
           quasi.quasis.forEach((el, i) => {
-            cssText += el.value.cooked;
+            let appended = false;
+
+            if (i !== 0) {
+              // Check if previous expression was a CSS variable that we replaced
+              // If it has a unit after it, we need to move the unit into the interpolation
+              // e.g. `var(--size)px` should actually be `var(--size)`
+              // So we check if the current text starts with a unit, and add the unit to the previous interpolation
+              const matches = el.value.cooked.match(unitRegex);
+
+              if (matches) {
+                const last = interpolations[interpolations.length - 1];
+                const [, unit, sep] = matches;
+
+                if (last && cssText.endsWith(`var(--${last.id})`)) {
+                  last.unit = unit;
+                  cssText += el.value.cooked.replace(unitRegex, sep);
+                  appended = true;
+                }
+              }
+            }
+
+            if (!appended) {
+              cssText += el.value.cooked;
+            }
 
             const ex = expressions[i];
 
@@ -230,15 +255,15 @@ module.exports = function extract(
                 }
 
                 if (styled) {
-                  const source = ex.getSource();
+                  const id = `${slug}-${state.index}-${i}`;
 
-                  // If interpolations have the same expression, use a single id
-                  let id = Object.keys(interpolations).find(
-                    key => source === interpolations[key].getSource()
-                  );
+                  interpolations.push({
+                    id,
+                    node: ex.node,
+                    source: ex.getSource(),
+                    unit: '',
+                  });
 
-                  id = id || `${slug}-${state.index}-${i}`;
-                  interpolations[id] = ex;
                   cssText += `var(--${id})`;
                 } else {
                   // CSS custom properties can't be used outside components
@@ -268,17 +293,42 @@ module.exports = function extract(
             );
 
             // If we found any interpolations, also pass them so they can be applied
-            if (Object.keys(interpolations).length) {
+            if (interpolations.length) {
+              // De-duplicate interpolations based on the source and unit
+              // If two interpolations have the same source code and same unit,
+              // we don't need to use 2 custom properties for them, we can use a single one
+              const result = {};
+
+              interpolations.forEach(it => {
+                const key = it.source + it.unit;
+
+                if (key in result) {
+                  cssText = cssText.replace(
+                    `var(--${it.id})`,
+                    `var(--${result[key].id})`
+                  );
+                } else {
+                  result[key] = it;
+                }
+              });
+
               props.push(
                 t.objectProperty(
                   t.identifier('vars'),
                   t.objectExpression(
-                    Object.keys(interpolations).map(p =>
-                      t.objectProperty(
-                        t.stringLiteral(p),
-                        interpolations[p].node
-                      )
-                    )
+                    Object.keys(result).map(key => {
+                      const { id, node, unit } = result[key];
+                      const items = [node];
+
+                      if (unit) {
+                        items.push(t.stringLiteral(unit));
+                      }
+
+                      return t.objectProperty(
+                        t.stringLiteral(id),
+                        t.arrayExpression(items)
+                      );
+                    })
                   )
                 )
               );
