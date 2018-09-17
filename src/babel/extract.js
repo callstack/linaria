@@ -114,7 +114,24 @@ module.exports = function extract(
       },
       TaggedTemplateExpression(path /* : any */, state /* : State */) {
         const { quasi, tag } = path.node;
-        const styled = t.isCallExpression(tag) && tag.callee.name === 'styled';
+
+        let styled;
+
+        if (
+          t.isCallExpression(tag) &&
+          t.isIdentifier(tag.callee) &&
+          tag.arguments.length === 1 &&
+          tag.callee.name === 'styled'
+        ) {
+          styled = { component: tag.arguments[0] };
+        } else if (
+          t.isMemberExpression(tag) &&
+          t.isIdentifier(tag.object) &&
+          t.isIdentifier(tag.property) &&
+          tag.object.name === 'styled'
+        ) {
+          styled = { component: t.stringLiteral(tag.property.name) };
+        }
 
         if (styled || (t.isIdentifier(tag) && tag.name === 'css')) {
           const interpolations = [];
@@ -336,7 +353,7 @@ module.exports = function extract(
 
             path.replaceWith(
               t.callExpression(
-                t.callExpression(t.identifier('styled'), tag.arguments),
+                t.callExpression(t.identifier('styled'), [styled.component]),
                 [t.objectExpression(props)]
               )
             );

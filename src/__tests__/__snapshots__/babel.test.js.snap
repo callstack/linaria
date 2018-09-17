@@ -9,7 +9,7 @@ exports[`evaluates and inlines expressions in scope 1`] = `
 "const color = 'blue';
 const Title =
 /*#__PURE__*/
-styled('h1')({
+styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1ugh8t9\\"
 });
@@ -58,7 +58,7 @@ CSS OUTPUT DEPENDENCIES:[]
 exports[`handles interpolation followed by unit 1`] = `
 "const Title =
 /*#__PURE__*/
-styled('h1')({
+styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1ugh8t9\\",
   vars: {
@@ -94,7 +94,7 @@ CSS OUTPUT DEPENDENCIES:[]
 exports[`handles nested blocks 1`] = `
 "const Button =
 /*#__PURE__*/
-styled('button')({
+styled(\\"button\\")({
   name: \\"Button\\",
   class: \\"Button_b1ugh8t9\\",
   vars: {
@@ -131,7 +131,7 @@ exports[`inlines object styles as CSS string 1`] = `
 };
 const Title =
 /*#__PURE__*/
-styled('h1')({
+styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1ugh8t9\\"
 });
@@ -150,7 +150,7 @@ CSS OUTPUT DEPENDENCIES:[]
 exports[`prevents class name collision 1`] = `
 "const Title =
 /*#__PURE__*/
-styled('h1')({
+styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1ugh8t9\\",
   vars: {
@@ -162,7 +162,7 @@ styled('h1')({
 function more() {
   const Title =
   /*#__PURE__*/
-  styled('h1')({
+  styled(\\"h1\\")({
     name: \\"Title\\",
     class: \\"Title_t1ugh8t9x\\",
     vars: {
@@ -186,7 +186,7 @@ CSS OUTPUT DEPENDENCIES:[]
 exports[`replaces unknown expressions with CSS custom properties 1`] = `
 "const Title =
 /*#__PURE__*/
-styled('h1')({
+styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1ugh8t9\\",
   vars: {
@@ -220,7 +220,7 @@ exports[`throws when not attached to a variable 1`] = `
 - Is an object property
 - Is a prop in a JSX element
 
-[0m[31m[1m>[22m[39m[90m 1 | [39mstyled([32m'h1'[39m)[32m\`[39m[0m
+[0m[31m[1m>[22m[39m[90m 1 | [39mstyled[33m.[39mh1[32m\`[39m[0m
 [0m [90m   | [39m[31m[1m^[22m[39m[0m
 [0m [90m 2 | [39m[32m  font-size: \${size}px;[39m[0m
 [0m [90m 3 | [39m[32m  color: \${props => props.color}[39m[0m
@@ -241,7 +241,26 @@ CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
 
-exports[`transpiles styled template literal 1`] = `
+exports[`transpiles styled template literal with function and component 1`] = `
+"const Title =
+/*#__PURE__*/
+styled(Heading)({
+  name: \\"Title\\",
+  class: \\"Title_t1ugh8t9\\"
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_t1ugh8t9{font-size:14px;}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
+`;
+
+exports[`transpiles styled template literal with function and tag 1`] = `
 "const Title =
 /*#__PURE__*/
 styled('h1')({
@@ -260,10 +279,29 @@ CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
 
+exports[`transpiles styled template literal with object 1`] = `
+"const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1ugh8t9\\"
+});
+
+/*
+CSS OUTPUT TEXT START
+.Title_t1ugh8t9{font-size:14px;}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
+`;
+
 exports[`uses the same custom property for the same expression 1`] = `
 "const Box =
 /*#__PURE__*/
-styled('div')({
+styled(\\"div\\")({
   name: \\"Box\\",
   class: \\"Box_b1ugh8t9\\",
   vars: {
@@ -285,7 +323,7 @@ CSS OUTPUT DEPENDENCIES:[]
 exports[`uses the same custom property for the same identifier 1`] = `
 "const Box =
 /*#__PURE__*/
-styled('div')({
+styled(\\"div\\")({
   name: \\"Box\\",
   class: \\"Box_b1ugh8t9\\",
   vars: {

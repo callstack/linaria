@@ -7,9 +7,9 @@ Linaria consists of 2 parts:
 
 ## Babel plugin
 
-The Babel plugin will look for `css` and `styled(..)` tags in your code and extract the CSS out to a comment at the end of the file. It will also generate unique class names based on the hash of the filename.
+The Babel plugin will look for `css` and `styled` tags in your code and extract the CSS out to a comment at the end of the file. It will also generate unique class names based on the hash of the filename.
 
-When using the `styled(..)` tag, dynamic interpolations will be replaced with CSS custom properties. References to constants in the scope will also be inlined. If the same expression is used multiple times, the plugin will create a single CSS custom property for those.
+When using the `styled` tag, dynamic interpolations will be replaced with CSS custom properties. References to constants in the scope will also be inlined. If the same expression is used multiple times, the plugin will create a single CSS custom property for those.
 
 If you've configured the plugin to evaluate expressions with `evaluate: true`, any dynamic expressions we encounter will be evaluated during the buildtime in a sandbox, and the result will be included in the CSS. Since these expressions are evaluated at build time in Node, you cannot use any browser specific APIs or any API which is only available in runtime. Access to Node native modules such as `fs` is also not allowed inside the sandbox to prevent malicious scripts. In addition, to achieve consistent build output, you should also avoid doing any side effects in these expressions and keep them pure.
 
@@ -21,11 +21,11 @@ import { families, sizes } from './fonts';
 
 const background = 'yellow';
 
-const Title = styled('h1')`
+const Title = styled.h1`
   font-family: ${families.serif};
 `;
 
-const Container = styled('div')`
+const Container = styled.div`
   font-size: ${sizes.medium}px;
   background-color: ${background};
   color: ${props => props.color};
@@ -46,7 +46,7 @@ import { families, sizes } from './fonts';
 
 const background = 'yellow';
 
-const Title = styled.component('h1', {
+const Title = styled('h1')({
   name: 'Title',
   class: 'Title_t1ugh8t9',
   vars: {
@@ -54,7 +54,7 @@ const Title = styled.component('h1', {
   },
 });
 
-const Container = styled.component('div', {
+const Container = styled('div')({
   name: 'Container',
   class: 'Container_c1ugh8t9',
   vars: {

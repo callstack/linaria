@@ -14,10 +14,34 @@ const transpile = async input => {
   return code;
 };
 
-it('transpiles styled template literal', async () => {
+it('transpiles styled template literal with object', async () => {
+  const code = await transpile(
+    dedent`
+    const Title = styled.h1\`
+      font-size: 14px;
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
+it('transpiles styled template literal with function and tag', async () => {
   const code = await transpile(
     dedent`
     const Title = styled('h1')\`
+      font-size: 14px;
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
+it('transpiles styled template literal with function and component', async () => {
+  const code = await transpile(
+    dedent`
+    const Title = styled(Heading)\`
       font-size: 14px;
     \`;
     `
@@ -31,7 +55,7 @@ it('evaluates and inlines expressions in scope', async () => {
     dedent`
     const color = 'blue';
 
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       color: ${'${color}'};
       width: ${'${100 / 3}'}%;
     \`;
@@ -61,7 +85,7 @@ it('inlines object styles as CSS string', async () => {
       }
     };
 
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       ${'${cover}'}
     \`;
     `
@@ -73,7 +97,7 @@ it('inlines object styles as CSS string', async () => {
 it('replaces unknown expressions with CSS custom properties', async () => {
   const code = await transpile(
     dedent`
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       font-size: ${'${size}'}px;
       color: ${'${props => props.color}'};
     \`;
@@ -86,7 +110,7 @@ it('replaces unknown expressions with CSS custom properties', async () => {
 it('handles interpolation followed by unit', async () => {
   const code = await transpile(
     dedent`
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       font-size: ${'${size}'}em;
       text-shadow: black 1px ${'${shadow}'}px, white -2px -2px;
       margin: ${'${size}'}px;
@@ -104,7 +128,7 @@ it('handles interpolation followed by unit', async () => {
 it('uses the same custom property for the same identifier', async () => {
   const code = await transpile(
     dedent`
-    const Box = styled('div')\`
+    const Box = styled.div\`
       height: ${'${size}'}px;
       width: ${'${size}'}px;
     \`;
@@ -117,7 +141,7 @@ it('uses the same custom property for the same identifier', async () => {
 it('uses the same custom property for the same expression', async () => {
   const code = await transpile(
     dedent`
-    const Box = styled('div')\`
+    const Box = styled.div\`
       height: ${'${props => props.size}'}px;
       width: ${'${props => props.size}'}px;
     \`;
@@ -130,7 +154,7 @@ it('uses the same custom property for the same expression', async () => {
 it('handles nested blocks', async () => {
   const code = await transpile(
     dedent`
-    const Button = styled('button')\`
+    const Button = styled.button\`
       font-family: ${'${regular}'};
 
       &:hover {
@@ -150,13 +174,13 @@ it('handles nested blocks', async () => {
 it('prevents class name collision', async () => {
   const code = await transpile(
     dedent`
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       font-size: ${'${size}'}px;
       color: ${'${props => props.color}'}
     \`;
 
     function more() {
-      const Title = styled('h1')\`
+      const Title = styled.h1\`
         font-family: ${'${regular}'};
       \`;
     }
@@ -172,7 +196,7 @@ it('throws when not attached to a variable', async () => {
   try {
     await transpile(
       dedent`
-      styled('h1')\`
+      styled.h1\`
         font-size: ${'${size}'}px;
         color: ${'${props => props.color}'}
       \`;

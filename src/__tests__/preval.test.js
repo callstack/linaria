@@ -25,7 +25,7 @@ it('evaluates identifier in scope', async () => {
     const foo = () => answer;
     const days = foo() + ' days';
 
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       &:before {
         content: "${'${days}'}"
       }
@@ -42,7 +42,7 @@ it('evaluates local expressions', async () => {
     const answer = 42;
     const foo = () => answer;
 
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       &:before {
         content: "${"${foo() + ' days'}"}"
       }
@@ -58,7 +58,7 @@ it('evaluates expressions with dependencies', async () => {
     dedent`
     import slugify from '../slugify';
 
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       &:before {
         content: "${"${slugify('test')}"}"
       }
@@ -77,7 +77,7 @@ it('evaluates expressions with expressions depending on shared dependency', asyn
     const boo = t => slugify(t) + 'boo';
     const bar = t => slugify(t) + 'bar';
 
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       &:before {
         content: "${"${boo('test') + bar('test')}"}"
       }
@@ -96,7 +96,7 @@ it('evaluates multiple expressions with shared dependency', async () => {
     const boo = t => slugify(t) + 'boo';
     const bar = t => slugify(t) + 'bar';
 
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       &:before {
         content: "${"${boo('test')}"}"
         content: "${"${bar('test')}"}"
@@ -113,11 +113,11 @@ it('evaluates component interpolations', async () => {
     dedent`
     const { styled } = require('../react');
 
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       color: red;
     \`;
 
-    const Paragraph = styled('p')\`
+    const Paragraph = styled.p\`
       ${'${Title}'} {
         color: blue
       }
@@ -139,7 +139,7 @@ it('inlines object styles as CSS string', async () => {
       left,
     });
 
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       ${'${fill(0, 0)}'}
     \`;
     `
@@ -151,7 +151,7 @@ it('inlines object styles as CSS string', async () => {
 it('ignores inline arrow function expressions', async () => {
   const code = await transpile(
     dedent`
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       &:before {
         content: "${'${props => props.content}'}"
       }
@@ -165,7 +165,7 @@ it('ignores inline arrow function expressions', async () => {
 it('ignores inline vanilla function expressions', async () => {
   const code = await transpile(
     dedent`
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       &:before {
         content: "${'${function(props) { return props.content }}'}"
       }
@@ -181,7 +181,7 @@ it('ignores external expressions', async () => {
     dedent`
     const generate = props => props.content;
 
-    const Title = styled('h1')\`
+    const Title = styled.h1\`
       &:before {
         content: "${'${generate}'}"
       }
@@ -200,7 +200,7 @@ it('throws codeframe error when evaluation fails', async () => {
       dedent`
       const foo = props => { throw new Error('This will fail') };
 
-      const Title = styled('h1')\`
+      const Title = styled.h1\`
         font-size: ${'${foo()}'}px;
       \`;
       `

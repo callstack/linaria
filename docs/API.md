@@ -68,7 +68,7 @@ Helper to build React components. It allows you to write your components in a si
 import { styled } from 'linaria/react';
 import colors from './colors.json';
 
-const Container = styled('div')`
+const Container = styled.div`
   background-color: ${colors.background};
   color: ${props => props.color};
   width: ${100 / 3}%;
@@ -87,7 +87,7 @@ Dynamic interpolations are replaced with CSS custom properties. A dynamic functi
 If you have configured the babel plugin with `evaluate: true`, you can also interpolate a component to refer to it:
 
 ```js
-const Title = styled('h1')`
+const Title = styled.h1`
   font-size: 36px;
 `;
 

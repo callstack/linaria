@@ -24,7 +24,7 @@ Linaria will automatically vendor prefix your CSS, so you don't have to worry ab
 
 ### 6. Declarative dynamic styling with React
 
-When using the `styled(..)` helper, Linaria will generate dynamic CSS variables which automatically update when props change. When writing regular CSS, you'll have to manage it manually.
+When using the `styled` helper, Linaria will generate dynamic CSS variables which automatically update when props change. When writing regular CSS, you'll have to manage it manually.
 
 ## Advantages over CSS preprocessors
 

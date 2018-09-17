@@ -120,21 +120,21 @@ const header = css`
 <h1 class={header}>Hello world</h1>
 ```
 
-If you're using React, you can use the `styled(..)` helper, which makes it easy to write React components with dynamic styles with a styled-component like syntax:
+If you're using React, you can use the `styled` helper, which makes it easy to write React components with dynamic styles with a styled-component like syntax:
 
 ```js
 import { styled } from 'linaria/react';
-import { serif, regular } from './fonts';
+import { families, sizes } from './fonts';
 
 const background = 'yellow';
 
-// Write your styles in `styled(..)` tag
-const Title = styled('h1')`
-  font-family: ${serif};
+// Write your styles in `styled` tag
+const Title = styled.h1`
+  font-family: ${families.serif};
 `;
 
-const Container = styled('div')`
-  font-family: ${regular}px;
+const Container = styled.div`
+  font-size: ${sizes.medium}px;
   background-color: ${background};
   color: ${props => props.color};
   width: ${100 / 3}%;
@@ -183,7 +183,7 @@ Dynamic styles will be applied using CSS custom properties (aka CSS variables) a
   // First.js
   import { styled } from 'linaria/react';
 
-  const First = styled('div')`
+  const First = styled.div`
     color: blue;
   `;
 
