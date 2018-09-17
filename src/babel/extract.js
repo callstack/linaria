@@ -70,7 +70,7 @@ module.exports = function extract(
           state.index = 0;
           state.dependencies = [];
 
-          // Invalidate cache for module evaluation
+          // Invalidate cache for module evaluation to get fresh modules
           Module.invalidate();
         },
         exit(path /* : any */, state /* : State */) {
@@ -110,6 +110,9 @@ module.exports = function extract(
                 )}\n`
             );
           }
+
+          // Invalidate cache for module evaluation when we're done
+          Module.invalidate();
         },
       },
       TaggedTemplateExpression(path /* : any */, state /* : State */) {
