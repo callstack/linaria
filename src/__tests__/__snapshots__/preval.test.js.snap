@@ -7,13 +7,13 @@ exports[`evaluates component interpolations 1`] = `
 
 const Title =
 /*#__PURE__*/
-styled.component('h1', {
+styled('h1')({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });
 const Paragraph =
 /*#__PURE__*/
-styled.component('p', {
+styled('p')({
   name: \\"Paragraph\\",
   class: \\"Paragraph_abcdefg\\"
 });
@@ -34,7 +34,7 @@ exports[`evaluates expressions with dependencies 1`] = `
 "import slugify from '../slugify';
 const Title =
 /*#__PURE__*/
-styled.component('h1', {
+styled('h1')({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });
@@ -59,7 +59,7 @@ const bar = t => slugify(t) + 'bar';
 
 const Title =
 /*#__PURE__*/
-styled.component('h1', {
+styled('h1')({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });
@@ -83,7 +83,7 @@ const foo = () => answer;
 const days = foo() + ' days';
 const Title =
 /*#__PURE__*/
-styled.component('h1', {
+styled('h1')({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });
@@ -106,7 +106,7 @@ const foo = () => answer;
 
 const Title =
 /*#__PURE__*/
-styled.component('h1', {
+styled('h1')({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });
@@ -131,7 +131,7 @@ const bar = t => slugify(t) + 'bar';
 
 const Title =
 /*#__PURE__*/
-styled.component('h1', {
+styled('h1')({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });
@@ -152,7 +152,7 @@ exports[`ignores external expressions 1`] = `
 
 const Title =
 /*#__PURE__*/
-styled.component('h1', {
+styled('h1')({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\",
   vars: {
@@ -174,7 +174,7 @@ CSS OUTPUT DEPENDENCIES:[]
 exports[`ignores inline arrow function expressions 1`] = `
 "const Title =
 /*#__PURE__*/
-styled.component('h1', {
+styled('h1')({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\",
   vars: {
@@ -196,7 +196,7 @@ CSS OUTPUT DEPENDENCIES:[]
 exports[`ignores inline vanilla function expressions 1`] = `
 "const Title =
 /*#__PURE__*/
-styled.component('h1', {
+styled('h1')({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\",
   vars: {
@@ -228,7 +228,7 @@ exports[`inlines object styles as CSS string 1`] = `
 
 const Title =
 /*#__PURE__*/
-styled.component('h1', {
+styled('h1')({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
 });

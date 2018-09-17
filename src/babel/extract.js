@@ -336,11 +336,8 @@ module.exports = function extract(
 
             path.replaceWith(
               t.callExpression(
-                t.memberExpression(
-                  t.identifier('styled'),
-                  t.identifier('component')
-                ),
-                [tag.arguments[0], t.objectExpression(props)]
+                t.callExpression(t.identifier('styled'), tag.arguments),
+                [t.objectExpression(props)]
               )
             );
 
