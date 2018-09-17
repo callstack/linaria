@@ -111,8 +111,13 @@ class Module {
     // For JavaScript files, we need to transpile it and to get the exports of the module
     const { code, map } = babel.transformSync(text, {
       filename: this.filename,
-      // Include this plugin to avoid extra config when using { module: false } for webpack
-      plugins: ['@babel/plugin-transform-modules-commonjs'],
+      plugins: [
+        // Include this plugin to avoid extra config when using { module: false } for webpack
+        '@babel/plugin-transform-modules-commonjs',
+        // We don't support dynamic imports when evaluating, but don't wanna syntax error
+        // This will replace dynamic imports with an object that does nothing
+        require.resolve('./dynamic-import-noop'),
+      ],
       sourceMaps: true,
       exclude: /node_modules/,
     });

@@ -59,6 +59,7 @@
   "dependencies": {
     "@babel/core": "^7.0.1",
     "@babel/generator": "^7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/register": "^7.0.0",
     "dedent": "^0.7.0",
     "loader-utils": "^1.1.0",

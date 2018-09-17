@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`replaces dynamic imports with a noop 1`] = `
+"({
+  then: () => undefined,
+  catch: () => undefined
+}).then(foo => foo.init());"
+`;
