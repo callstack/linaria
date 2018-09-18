@@ -1,5 +1,0 @@
-{
-  "extends": [
-    "linaria/stylelint-config"
-  ]
-}

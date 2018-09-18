@@ -2,14 +2,14 @@
 
 ## stylelint
 
-For linting styles with [stylelint](https://stylelint.io/), we provide our custom config tailored for linaria - `linaria/stylelint-config` based on [`stylelint-config-recommended`](https://github.com/stylelint/stylelint-config-recommended).
+For linting styles with [stylelint](https://stylelint.io/), we provide our custom config tailored for linaria - `linaria/stylelint-config`.
 
 ### Installation
 
-Both `stylelint` and `stylelint-config-recommended` are `peerDependencies` so you need to install them manually:
+You need to install `stylelint` and optionally your favorite config (such as `stylelint-config-recommended`) in your project:
 
 ```bash
-yarn add stylelint stylelint-config-recommended --dev
+yarn add --dev stylelint stylelint-config-recommended
 ```
 
 ### Configuring stylelint
@@ -21,6 +21,7 @@ Here's the example `.stylelintrc` configuration file:
 ```json
 {
   "extends": [
+    "stylelint-config-recommended",
     "linaria/stylelint-config"
   ]
 }
@@ -28,7 +29,7 @@ Here's the example `.stylelintrc` configuration file:
 
 Please refer to the [official stylelint documentation](https://stylelint.io/user-guide/configuration/) for more info about configuration.
 
-### Running the linter
+### Linting your files
 
 Add the following to your `package.json` scripts:
 
@@ -36,6 +37,6 @@ Add the following to your `package.json` scripts:
 "lint:css": "stylelint src/**/*.js"
 ```
 
-Now, you can run `yarn lint:css` to run the linter.
+Now, you can run `yarn lint:css` to lint the CSS in your JS files with stylelint.
 
 For more information refer to [stylelint documentation](https://stylelint.io/user-guide/cli/).

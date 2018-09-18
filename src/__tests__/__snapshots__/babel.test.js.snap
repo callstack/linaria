@@ -207,7 +207,7 @@ CSS OUTPUT DEPENDENCIES:[]
 `;
 
 exports[`throws when contains dynamic expression without evaluate: true in css tag 1`] = `
-"/app/index.js: The CSS cannot contain JavaScript expressions. To evaluate the expressions at build time, pass evaluate: true to the babel plugin.
+"/app/index.js: The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.
 [0m [90m 1 | [39m[36mconst[39m title [33m=[39m css[32m\`[39m[0m
 [0m[31m[1m>[22m[39m[90m 2 | [39m[32m  font-size: \${size}px;[39m[0m
 [0m [90m   | [39m               [31m[1m^[22m[39m[0m

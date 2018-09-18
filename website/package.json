@@ -12,7 +12,8 @@
     "build:client": "cross-env NODE_ENV=production webpack -p --env.NODE_ENV production",
     "build:server": "cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build",
     "build": "yarn build:client && yarn build:server",
-    "prebuild": "yarn clean"
+    "prebuild": "yarn clean",
+    "lint:css": "stylelint src/**/*.js"
   },
   "dependencies": {
     "dedent": "^0.7.0",
@@ -37,6 +38,8 @@
     "css-loader": "^1.0.0",
     "del-cli": "^1.1.0",
     "mini-css-extract-plugin": "^0.4.2",
+    "stylelint": "^9.5.0",
+    "stylelint-config-recommended": "^2.1.0",
     "webpack": "^4.19.0",
     "webpack-cli": "^3.1.0",
     "webpack-serve": "^2.0.2"
