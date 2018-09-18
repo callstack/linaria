@@ -284,7 +284,7 @@ module.exports = function extract(
                 } else {
                   // CSS custom properties can't be used outside components
                   throw ex.buildCodeFrameError(
-                    `The CSS cannot contain JavaScript expressions. To evaluate the expressions at build time, pass evaluate: true to the babel plugin.`
+                    `The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.`
                   );
                 }
               }

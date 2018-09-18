@@ -2,7 +2,7 @@ const React = require('react'); // eslint-disable-line import/no-extraneous-depe
 
 function styled(tag) {
   return options => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV !== 'production') {
       if (Array.isArray(options)) {
         // We received a strings array since it's used as a tag
         throw new Error(
@@ -42,4 +42,12 @@ function styled(tag) {
   };
 }
 
-module.exports = styled;
+if (process.env.NODE_ENV !== 'production') {
+  module.exports = new Proxy(styled, {
+    get(o, prop) {
+      return o(prop);
+    },
+  });
+} else {
+  module.exports = styled;
+}
