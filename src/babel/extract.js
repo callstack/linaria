@@ -10,11 +10,15 @@ const slugify = require('../slugify');
 const { units, unitless } = require('./units');
 
 const hyphenate = s =>
+  // Hyphenate CSS property names from camelCase version from JS string
+  // Special case for `-ms` because in JS it starts with `ms` unlike `Webkit`
   s.replace(/([A-Z])/g, g => `-${g[0].toLowerCase()}`).replace(/^ms-/, '-ms-');
 
 const isPlainObject = o =>
   typeof o === 'object' && o != null && o.constructor.name === 'Object';
 
+// Some tools such as polished.js output JS objects
+// To support them transparently, we convert JS objects to CSS strings
 const toCSS = o =>
   Object.entries(o)
     .filter(
@@ -36,6 +40,15 @@ const toCSS = o =>
     })
     .join(' ');
 
+// Stripping away the new lines ensures that we preserve line numbers
+// This is useful in case of tools such as the stylelint pre-processor
+// This should be safe because strings cannot contain newline: https://www.w3.org/TR/CSS2/syndata.html#strings
+const stripLines = text =>
+  String(text)
+    .replace(/[\r\n]+/, ' ')
+    .trim();
+
+// Match any valid CSS units followed by a separator such as ;, newline etc.
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
 
 /* ::
@@ -43,7 +56,7 @@ type State = {|
   rules: {
     [className: string]: {
       cssText: string,
-      loc: { line: number, column: number },
+      start: { line: number, column: number },
     },
   },
   index: number,
@@ -52,6 +65,7 @@ type State = {|
     opts: {
       filename: string,
     },
+    metadata: any,
   },
 |};
 */
@@ -86,7 +100,7 @@ module.exports = function extract(
                   line: index + 1,
                   column: 0,
                 },
-                original: state.rules[className].loc,
+                original: state.rules[className].start,
                 name: className,
               });
 
@@ -110,6 +124,16 @@ module.exports = function extract(
                   )
                 )}\n`
             );
+
+            // Also return the data as the fle metadata
+            // Bundlers or other tools can use this instead of reading the comment
+            state.file.metadata = {
+              linaria: {
+                rules: state.rules,
+                mappings,
+                cssText,
+              },
+            };
           }
 
           // Invalidate cache for module evaluation when we're done
@@ -216,10 +240,10 @@ module.exports = function extract(
               if (result.confident) {
                 if (isPlainObject(result.value)) {
                   // If it's a plain object, convert it to a CSS string
-                  cssText += toCSS(result.value);
+                  cssText += stripLines(toCSS(result.value));
                 } else if (result.value != null) {
                   // Don't insert anything for null and undefined
-                  cssText += result.value;
+                  cssText += stripLines(result.value);
                 }
               } else {
                 // Try to preval the value
@@ -250,10 +274,10 @@ module.exports = function extract(
                           // Useful for interpolating components
                           cssText += `.${value.className}`;
                         } else if (isPlainObject(value)) {
-                          cssText += toCSS(value);
+                          cssText += stripLines(toCSS(value));
                         } else {
                           // For anything else, assume it'll be stringified
-                          cssText += value;
+                          cssText += stripLines(value);
                         }
                       }
 
@@ -362,7 +386,11 @@ module.exports = function extract(
             path.replaceWith(t.stringLiteral(className));
           }
 
-          state.rules[className] = { cssText, loc: path.parent.loc.start };
+          state.rules[className] = {
+            cssText,
+            displayName,
+            start: path.parent.loc.start,
+          };
         }
       },
     },

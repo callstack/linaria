@@ -8,7 +8,8 @@
     "react.js",
     "server.js",
     "babel.js",
-    "loader.js"
+    "loader.js",
+    "stylelint-config.js"
   ],
   "license": "MIT",
   "repository": "git@github.com:callstack/linaria.git",
