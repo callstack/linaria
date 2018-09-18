@@ -156,13 +156,13 @@ styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\",
   vars: {
-    \\"abcdefg-0-0\\": [generate]
+    \\"abcdefg-0\\": [generate]
   }
 });
 
 /*
 CSS OUTPUT TEXT START
-.Title_abcdefg:before{content:\\"var(--abcdefg-0-0)\\";}
+.Title_abcdefg:before{content:\\"var(--abcdefg-0)\\";}
 
 CSS OUTPUT TEXT END
 
@@ -178,13 +178,13 @@ styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\",
   vars: {
-    \\"abcdefg-0-0\\": [props => props.content]
+    \\"abcdefg-0\\": [props => props.content]
   }
 });
 
 /*
 CSS OUTPUT TEXT START
-.Title_abcdefg:before{content:\\"var(--abcdefg-0-0)\\";}
+.Title_abcdefg:before{content:\\"var(--abcdefg-0)\\";}
 
 CSS OUTPUT TEXT END
 
@@ -200,7 +200,7 @@ styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\",
   vars: {
-    \\"abcdefg-0-0\\": [function (props) {
+    \\"abcdefg-0\\": [function (props) {
       return props.content;
     }]
   }
@@ -208,7 +208,7 @@ styled(\\"h1\\")({
 
 /*
 CSS OUTPUT TEXT START
-.Title_abcdefg:before{content:\\"var(--abcdefg-0-0)\\";}
+.Title_abcdefg:before{content:\\"var(--abcdefg-0)\\";}
 
 CSS OUTPUT TEXT END
 

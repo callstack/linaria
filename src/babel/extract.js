@@ -169,17 +169,12 @@ module.exports = function extract(
           }
 
           // Custom properties need to start with a letter, so we prefix the slug
-          let slug = `${displayName.charAt(0).toLowerCase()}${slugify(
-            state.file.opts.filename
+          // Also use append the index of the class to the filename for uniqueness in the file
+          const slug = `${displayName.charAt(0).toLowerCase()}${slugify(
+            `${state.file.opts.filename}:${state.index++}`
           )}`;
 
-          let className = `${displayName}_${slug}`;
-
-          while (className in state.rules) {
-            // Append 'x' to prevent collision in case of same variable names
-            className += 'x';
-            slug += 'x';
-          }
+          const className = `${displayName}_${slug}`;
 
           // Serialize the tagged template literal to a string
           let cssText = '';
@@ -275,7 +270,7 @@ module.exports = function extract(
                 }
 
                 if (styled) {
-                  const id = `${slug}-${state.index}-${i}`;
+                  const id = `${slug}-${i}`;
 
                   interpolations.push({
                     id,
@@ -367,7 +362,6 @@ module.exports = function extract(
           }
 
           state.rules[className] = { cssText, loc: path.parent.loc.start };
-          state.index++;
         }
       },
     },

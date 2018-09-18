@@ -11,46 +11,46 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_t1ugh8t9\\"
+  class: \\"Title_th73eyu\\"
 });
 
 /*
 CSS OUTPUT TEXT START
-.Title_t1ugh8t9{color:blue;width:33.333333333333336%;}
+.Title_th73eyu{color:blue;width:33.333333333333336%;}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_th73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
 
 exports[`handles css template literal in JSX element 1`] = `
-"<Title class={\\"Title_t1ugh8t9\\"} />;
+"<Title class={\\"Title_th73eyu\\"} />;
 
 /*
 CSS OUTPUT TEXT START
-.Title_t1ugh8t9{font-size:14px;}
+.Title_th73eyu{font-size:14px;}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":13},\\"name\\":\\"Title_t1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":13},\\"name\\":\\"Title_th73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
 
 exports[`handles css template literal in object property 1`] = `
 "const components = {
-  title: \\"title_t1ugh8t9\\"
+  title: \\"title_th73eyu\\"
 };
 
 /*
 CSS OUTPUT TEXT START
-.title_t1ugh8t9{font-size:14px;}
+.title_th73eyu{font-size:14px;}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":2,\\"column\\":2},\\"name\\":\\"title_t1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":2,\\"column\\":2},\\"name\\":\\"title_th73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -60,21 +60,21 @@ exports[`handles interpolation followed by unit 1`] = `
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_t1ugh8t9\\",
+  class: \\"Title_th73eyu\\",
   vars: {
-    \\"t1ugh8t9-0-0\\": [size, \\"em\\"],
-    \\"t1ugh8t9-0-1\\": [shadow, \\"px\\"],
-    \\"t1ugh8t9-0-2\\": [size, \\"px\\"],
-    \\"t1ugh8t9-0-3\\": [props => props.width, \\"vw\\"],
-    \\"t1ugh8t9-0-4\\": [props => {
+    \\"th73eyu-0\\": [size, \\"em\\"],
+    \\"th73eyu-1\\": [shadow, \\"px\\"],
+    \\"th73eyu-2\\": [size, \\"px\\"],
+    \\"th73eyu-3\\": [props => props.width, \\"vw\\"],
+    \\"th73eyu-4\\": [props => {
       if (true) {
         return props.height;
       } else {
         return 200;
       }
     }, \\"px\\"],
-    \\"t1ugh8t9-0-5\\": [unit, \\"fr\\"],
-    \\"t1ugh8t9-0-7\\": [function (props) {
+    \\"th73eyu-5\\": [unit, \\"fr\\"],
+    \\"th73eyu-7\\": [function (props) {
       return 200;
     }, \\"px\\"]
   }
@@ -82,11 +82,11 @@ styled(\\"h1\\")({
 
 /*
 CSS OUTPUT TEXT START
-.Title_t1ugh8t9{font-size:var(--t1ugh8t9-0-0);text-shadow:black 1px var(--t1ugh8t9-0-1),white -2px -2px;margin:var(--t1ugh8t9-0-2);width:calc(2 * var(--t1ugh8t9-0-3));height:var(--t1ugh8t9-0-4);grid-template-columns:var(--t1ugh8t9-0-5) 1fr 1fr var(--t1ugh8t9-0-5);border-radius:var(--t1ugh8t9-0-7);}
+.Title_th73eyu{font-size:var(--th73eyu-0);text-shadow:black 1px var(--th73eyu-1),white -2px -2px;margin:var(--th73eyu-2);width:calc(2 * var(--th73eyu-3));height:var(--th73eyu-4);grid-template-columns:var(--th73eyu-5) 1fr 1fr var(--th73eyu-5);border-radius:var(--th73eyu-7);}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_th73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -96,19 +96,19 @@ exports[`handles nested blocks 1`] = `
 /*#__PURE__*/
 styled(\\"button\\")({
   name: \\"Button\\",
-  class: \\"Button_b1ugh8t9\\",
+  class: \\"Button_bh73eyu\\",
   vars: {
-    \\"b1ugh8t9-0-0\\": [regular]
+    \\"bh73eyu-0\\": [regular]
   }
 });
 
 /*
 CSS OUTPUT TEXT START
-.Button_b1ugh8t9{font-family:var(--b1ugh8t9-0-0);}.Button_b1ugh8t9:hover{border-color:blue;}@media (max-width:200px){.Button_b1ugh8t9{width:100%;}}
+.Button_bh73eyu{font-family:var(--bh73eyu-0);}.Button_bh73eyu:hover{border-color:blue;}@media (max-width:200px){.Button_bh73eyu{width:100%;}}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Button_b1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Button_bh73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -133,16 +133,16 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_t1ugh8t9\\"
+  class: \\"Title_th73eyu\\"
 });
 
 /*
 CSS OUTPUT TEXT START
-.Title_t1ugh8t9{position:absolute;top:0;right:0;bottom:0;left:0;opacity:1;min-height:420px;}@media (min-width:200px){.Title_t1ugh8t9{-webkit-transition:400ms;-moz-transition:400ms;-o-transition:400ms;-ms-transition:400ms;}}
+.Title_th73eyu{position:absolute;top:0;right:0;bottom:0;left:0;opacity:1;min-height:420px;}@media (min-width:200px){.Title_th73eyu{-webkit-transition:400ms;-moz-transition:400ms;-o-transition:400ms;-ms-transition:400ms;}}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":18,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":18,\\"column\\":6},\\"name\\":\\"Title_th73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -152,10 +152,10 @@ exports[`prevents class name collision 1`] = `
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_t1ugh8t9\\",
+  class: \\"Title_th73eyu\\",
   vars: {
-    \\"t1ugh8t9-0-0\\": [size, \\"px\\"],
-    \\"t1ugh8t9-0-1\\": [props => props.color]
+    \\"th73eyu-0\\": [size, \\"px\\"],
+    \\"th73eyu-1\\": [props => props.color]
   }
 });
 
@@ -164,21 +164,21 @@ function more() {
   /*#__PURE__*/
   styled(\\"h1\\")({
     name: \\"Title\\",
-    class: \\"Title_t1ugh8t9x\\",
+    class: \\"Title_t462dh3\\",
     vars: {
-      \\"t1ugh8t9x-1-0\\": [regular]
+      \\"t462dh3-0\\": [regular]
     }
   });
 }
 
 /*
 CSS OUTPUT TEXT START
-.Title_t1ugh8t9{font-size:var(--t1ugh8t9-0-0);color:var(--t1ugh8t9-0-1);}
-.Title_t1ugh8t9x{font-family:var(--t1ugh8t9x-1-0);}
+.Title_th73eyu{font-size:var(--th73eyu-0);color:var(--th73eyu-1);}
+.Title_t462dh3{font-family:var(--t462dh3-0);}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":8},\\"name\\":\\"Title_t1ugh8t9x\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_th73eyu\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":8},\\"name\\":\\"Title_t462dh3\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -188,20 +188,20 @@ exports[`replaces unknown expressions with CSS custom properties 1`] = `
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_t1ugh8t9\\",
+  class: \\"Title_th73eyu\\",
   vars: {
-    \\"t1ugh8t9-0-0\\": [size, \\"px\\"],
-    \\"t1ugh8t9-0-1\\": [props => props.color]
+    \\"th73eyu-0\\": [size, \\"px\\"],
+    \\"th73eyu-1\\": [props => props.color]
   }
 });
 
 /*
 CSS OUTPUT TEXT START
-.Title_t1ugh8t9{font-size:var(--t1ugh8t9-0-0);color:var(--t1ugh8t9-0-1);}
+.Title_th73eyu{font-size:var(--th73eyu-0);color:var(--th73eyu-1);}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_th73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -228,15 +228,15 @@ exports[`throws when not attached to a variable 1`] = `
 `;
 
 exports[`transpiles css template literal 1`] = `
-"const title = \\"title_t1ugh8t9\\";
+"const title = \\"title_th73eyu\\";
 
 /*
 CSS OUTPUT TEXT START
-.title_t1ugh8t9{font-size:14px;}
+.title_th73eyu{font-size:14px;}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"title_t1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"title_th73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -246,16 +246,16 @@ exports[`transpiles styled template literal with function and component 1`] = `
 /*#__PURE__*/
 styled(Heading)({
   name: \\"Title\\",
-  class: \\"Title_t1ugh8t9\\"
+  class: \\"Title_th73eyu\\"
 });
 
 /*
 CSS OUTPUT TEXT START
-.Title_t1ugh8t9{font-size:14px;}
+.Title_th73eyu{font-size:14px;}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_th73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -265,16 +265,16 @@ exports[`transpiles styled template literal with function and tag 1`] = `
 /*#__PURE__*/
 styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t1ugh8t9\\"
+  class: \\"Title_th73eyu\\"
 });
 
 /*
 CSS OUTPUT TEXT START
-.Title_t1ugh8t9{font-size:14px;}
+.Title_th73eyu{font-size:14px;}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_th73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -284,16 +284,16 @@ exports[`transpiles styled template literal with object 1`] = `
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_t1ugh8t9\\"
+  class: \\"Title_th73eyu\\"
 });
 
 /*
 CSS OUTPUT TEXT START
-.Title_t1ugh8t9{font-size:14px;}
+.Title_th73eyu{font-size:14px;}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_t1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_th73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -303,19 +303,19 @@ exports[`uses the same custom property for the same expression 1`] = `
 /*#__PURE__*/
 styled(\\"div\\")({
   name: \\"Box\\",
-  class: \\"Box_b1ugh8t9\\",
+  class: \\"Box_bh73eyu\\",
   vars: {
-    \\"b1ugh8t9-0-0\\": [props => props.size, \\"px\\"]
+    \\"bh73eyu-0\\": [props => props.size, \\"px\\"]
   }
 });
 
 /*
 CSS OUTPUT TEXT START
-.Box_b1ugh8t9{height:var(--b1ugh8t9-0-0);width:var(--b1ugh8t9-0-0);}
+.Box_bh73eyu{height:var(--bh73eyu-0);width:var(--bh73eyu-0);}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Box_b1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Box_bh73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -325,19 +325,19 @@ exports[`uses the same custom property for the same identifier 1`] = `
 /*#__PURE__*/
 styled(\\"div\\")({
   name: \\"Box\\",
-  class: \\"Box_b1ugh8t9\\",
+  class: \\"Box_bh73eyu\\",
   vars: {
-    \\"b1ugh8t9-0-0\\": [size, \\"px\\"]
+    \\"bh73eyu-0\\": [size, \\"px\\"]
   }
 });
 
 /*
 CSS OUTPUT TEXT START
-.Box_b1ugh8t9{height:var(--b1ugh8t9-0-0);width:var(--b1ugh8t9-0-0);}
+.Box_bh73eyu{height:var(--bh73eyu-0);width:var(--bh73eyu-0);}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Box_b1ugh8t9\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Box_bh73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;

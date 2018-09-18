@@ -48,18 +48,18 @@ const background = 'yellow';
 
 const Title = styled('h1')({
   name: 'Title',
-  class: 'Title_t1ugh8t9',
+  class: 'Title_t1ugh8t',
   vars: {
-    't1ugh8t9-0-0': [families.serif],
+    't1ugh8t9-0': [families.serif],
   },
 });
 
 const Container = styled('div')({
   name: 'Container',
-  class: 'Container_c1ugh8t9',
+  class: 'Container_c1ugh8t',
   vars: {
-    'c1ugh8t9-1-0': [sizes.medium, 'px'],
-    'c1ugh8t9-1-2': [props => props.color],
+    'c1ugh8t9-0': [sizes.medium, 'px'],
+    'c1ugh8t9-2': [props => props.color],
   },
 });
 
@@ -67,13 +67,13 @@ const Container = styled('div')({
 CSS OUTPUT TEXT START
 
 .Title_t1ugh8t9 {
-  font-family: var(--t1ugh8t9-0-0);
+  font-family: var(--t1ugh8t-0);
 }
 
 .Container_c1ugh8t9 {
-  font-size: var(--c1ugh8t9-1-0);
+  font-size: var(--c1ugh8t-0);
   background-color: yellow;
-  color: var(--c1ugh8t9-1-2);
+  color: var(--c1ugh8t-2);
   width: 33.333333333333336%;
   border: 1px solid red;
 }
@@ -84,7 +84,7 @@ CSS OUTPUT TEXT START
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":"Title_t1ugh8t9"},{"generated":{"line":5,"column":0},"original":{"line":7,"column":6},"name":"Container_c1ugh8t9"}]
+CSS OUTPUT MAPPINGS:[{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":"Title_t1ugh8t9"},{"generated":{"line":5,"column":0},"original":{"line":7,"column":6},"name":"Container_c1ugh8t"}]
 
 CSS OUTPUT DEPENDENCIES:[]
 */
