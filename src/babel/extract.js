@@ -2,6 +2,7 @@
 /* @flow */
 
 const stylis = require('stylis');
+const generator = require('@babel/generator').default;
 const { isValidElementType } = require('react-is');
 const Module = require('./module');
 const evaluate = require('./evaluate');
@@ -275,7 +276,7 @@ module.exports = function extract(
                   interpolations.push({
                     id,
                     node: ex.node,
-                    source: ex.getSource(),
+                    source: ex.getSource() || generator(ex.node).code,
                     unit: '',
                   });
 
