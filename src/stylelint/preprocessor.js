@@ -9,6 +9,8 @@ type LintResult = {
 */
 
 function preprocessor() {
+  const cache = {};
+
   return {
     code(input /* : string */, filename /* : string */) {
       // Check if the file contains `css` or `styled` tag first
@@ -28,7 +30,7 @@ function preprocessor() {
       let cssText = '';
 
       // Construct a CSS-ish file from the unprocessed style rules
-      const { rules } = metadata.linaria;
+      const { rules, replacements } = metadata.linaria;
 
       Object.keys(rules).forEach(className => {
         const rule = rules[className];
@@ -56,9 +58,31 @@ function preprocessor() {
         cssText += `${rule.cssText} }`;
       });
 
+      cache[filename] = replacements;
+
       return cssText;
     },
-    result(result /* : LintResult */) {
+    result(result /* : LintResult */, filename /* : string */) {
+      const replacements = cache[filename];
+
+      replacements.forEach(({ original, length }) => {
+        // If the warnings contain stuff that's been replaced,
+        // Correct the line and column numbers to what's replaced
+        result.warnings.forEach(w => {
+          if (
+            w.line === original.start.line &&
+            w.column >= original.start.column - 2 && // -2 to account for '${'
+            w.column < original.start.column + length + 1 // +1 to account for '}'
+          ) {
+            // The linter will underline the whole word in the editor if column is in inside a word
+            // Set the column to the end, so it will underline the word inside the interpolation
+            // e.g. in `${colors.primary}`, `primary` will be underlined
+            // eslint-disable-next-line no-param-reassign
+            w.column = original.end.column;
+          }
+        });
+      });
+
       return result;
     },
   };

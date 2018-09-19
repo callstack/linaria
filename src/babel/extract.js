@@ -52,13 +52,25 @@ const stripLines = text =>
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
 
 /* ::
+type Location = {
+  line: number,
+  column: number
+}
+*/
+
+/* ::
 type State = {|
   rules: {
     [className: string]: {
       cssText: string,
-      start: { line: number, column: number },
+      displayName: string,
+      start: Location,
     },
   },
+  replacements: Array<{
+    original: { start: Location, end: Location },
+    length: number
+  }>,
   index: number,
   dependencies: string[],
   file: {
@@ -84,6 +96,7 @@ module.exports = function extract(
           state.rules = {};
           state.index = 0;
           state.dependencies = [];
+          state.replacements = [];
 
           // Invalidate cache for module evaluation to get fresh modules
           Module.invalidate();
@@ -130,6 +143,8 @@ module.exports = function extract(
             state.file.metadata = {
               linaria: {
                 rules: state.rules,
+                replacements: state.replacements,
+                dependencies: state.dependencies,
                 mappings,
                 cssText,
               },
@@ -235,7 +250,9 @@ module.exports = function extract(
             const ex = expressions[i];
 
             if (ex) {
+              const { loc } = ex.node;
               const result = ex.evaluate();
+              const beforeLength = cssText.length;
 
               if (result.confident) {
                 if (isPlainObject(result.value)) {
@@ -245,6 +262,11 @@ module.exports = function extract(
                   // Don't insert anything for null and undefined
                   cssText += stripLines(result.value);
                 }
+
+                state.replacements.push({
+                  original: loc,
+                  length: cssText.length - beforeLength,
+                });
               } else {
                 // Try to preval the value
                 if (
@@ -282,6 +304,10 @@ module.exports = function extract(
                       }
 
                       state.dependencies.push(...dependencies);
+                      state.replacements.push({
+                        original: loc,
+                        length: cssText.length - beforeLength,
+                      });
 
                       return;
                     }
