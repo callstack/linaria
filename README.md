@@ -31,6 +31,18 @@ Zero-runtime CSS in JS library.
 
 **[Why use Linaria](/docs/BENEFITS.md)**
 
+## Installation
+
+```sh
+npm install linaria@next
+```
+
+or
+
+```sh
+yarn add linaria@next
+```
+
 ## Usage
 
 Linaria requires you to use a babel plugin along with a webpack loader.
@@ -91,7 +103,9 @@ module: {
 
 Make sure that `linaria/loader` is included before `babel-loader`.
 
-Now, the CSS you write with Linaria will be extracted at build time to the `styles.css` file.
+Now, the CSS you write with Linaria will be extracted at build time to the `styles.css` file. Linaria automatically vendor prefixes and strips whitespace from the CSS.
+
+Linaria integrates with your CSS pipeline, so you can always perform additional operations on the CSS, for example, using [postcss](https://postcss.org/) plugins such as [clean-css](https://github.com/jakubpawlowicz/clean-css) to further minify your CSS.
 
 ## Syntax
 
