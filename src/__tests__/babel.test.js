@@ -6,7 +6,7 @@ const dedent = require('dedent');
 
 const transpile = async input => {
   const { code } = await babel.transformAsync(input, {
-    presets: [require.resolve('../babel')],
+    presets: [[require.resolve('../babel'), { evaluate: false }]],
     plugins: ['@babel/plugin-syntax-jsx'],
     filename: '/app/index.js',
   });

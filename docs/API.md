@@ -84,7 +84,7 @@ All rules inside the template literal are scoped to the component, similar to th
 
 Dynamic interpolations are replaced with CSS custom properties. A dynamic function interpolation will receive the `props` of the component as it's arguments and the returned result will be used as the value for the variable. When using this, a tiny helper is imported so that we don't duplicate the code for creating the component in all files.
 
-If you have configured the babel plugin with `evaluate: true`, you can also interpolate a component to refer to it:
+You can also interpolate a component to refer to it:
 
 ```js
 const Title = styled.h1`

@@ -224,7 +224,7 @@ module.exports = function extract(
               } else {
                 // Try to preval the value
                 if (
-                  options.evaluate &&
+                  options.evaluate !== false &&
                   !(
                     t.isFunctionExpression(ex) ||
                     t.isArrowFunctionExpression(ex)

@@ -23,13 +23,11 @@ Zero-runtime CSS in JS library.
 
 ## Features
 
-* Familiar CSS syntax with Sass like nesting.
-* CSS is extracted at build time, no runtime is included.
-* Simple interpolations in the current scope are evaluated and inlined at build time.
-* Expressions containing imported modules and utility functions can be optionally evaluated at build time.
-* Dynamic runtime-based values are supported using CSS custom properties.
-* Function interpolations receive props as the argument for dynamic prop based styling.
-* Supports CSS sourcemaps, so you can easily find where the style was defined.
+* Write CSS in JS, but with **zero runtime**, CSS is extracted to CSS files during build
+* Familiar **CSS syntax** with Sass like nesting
+* Use **dynamic prop based styles** with the React bindings, uses CSS variables behind the scenes
+* Easily find where the style was defined with **CSS sourcemaps**
+* **Lint your CSS** in JS with [stylelint](https://github.com/stylelint/stylelint)
 
 **[Why use Linaria](/docs/BENEFITS.md)**
 
@@ -43,8 +41,8 @@ First, add the babel preset to your `.babelrc`:
 {
   "presets": [
     "@babel/preset-env",
-    "@babel/preset-react"
-    ["linaria/babel", { "evaluate": true }]
+    "@babel/preset-react",
+    "linaria/babel"
   ]
 }
 ```
@@ -119,6 +117,8 @@ const header = css`
 // Then use it as a class name
 <h1 class={header}>Hello world</h1>
 ```
+
+You can use imported variables and functions for logic inside the CSS code. They will be evaluated at build time.
 
 If you're using React, you can use the `styled` helper, which makes it easy to write React components with dynamic styles with a styled-component like syntax:
 
