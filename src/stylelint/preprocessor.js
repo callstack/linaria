@@ -65,23 +65,25 @@ function preprocessor() {
     result(result /* : LintResult */, filename /* : string */) {
       const replacements = cache[filename];
 
-      replacements.forEach(({ original, length }) => {
-        // If the warnings contain stuff that's been replaced,
-        // Correct the line and column numbers to what's replaced
-        result.warnings.forEach(w => {
-          if (
-            w.line === original.start.line &&
-            w.column >= original.start.column - 2 && // -2 to account for '${'
-            w.column < original.start.column + length + 1 // +1 to account for '}'
-          ) {
-            // The linter will underline the whole word in the editor if column is in inside a word
-            // Set the column to the end, so it will underline the word inside the interpolation
-            // e.g. in `${colors.primary}`, `primary` will be underlined
-            // eslint-disable-next-line no-param-reassign
-            w.column = original.end.column;
-          }
+      if (replacements) {
+        replacements.forEach(({ original, length }) => {
+          // If the warnings contain stuff that's been replaced,
+          // Correct the line and column numbers to what's replaced
+          result.warnings.forEach(w => {
+            if (
+              w.line === original.start.line &&
+              w.column >= original.start.column - 2 && // -2 to account for '${'
+              w.column < original.start.column + length + 1 // +1 to account for '}'
+            ) {
+              // The linter will underline the whole word in the editor if column is in inside a word
+              // Set the column to the end, so it will underline the word inside the interpolation
+              // e.g. in `${colors.primary}`, `primary` will be underlined
+              // eslint-disable-next-line no-param-reassign
+              w.column = original.end.column;
+            }
+          });
         });
-      });
+      }
 
       return result;
     },
