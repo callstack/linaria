@@ -19,9 +19,16 @@ function preprocessor() {
         return '';
       }
 
-      const { metadata } = babel.transformSync(input, {
-        filename,
-      });
+      let metadata;
+
+      try {
+        // eslint-disable-next-line prefer-destructuring
+        metadata = babel.transformSync(input, {
+          filename,
+        }).metadata;
+      } catch (e) {
+        return '';
+      }
 
       if (!metadata.linaria) {
         return '';
