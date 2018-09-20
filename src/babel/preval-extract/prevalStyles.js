@@ -18,6 +18,7 @@ import getReplacement from './getReplacement';
 import {
   instantiateModule,
   clearLocalModulesFromCache,
+  provideModule,
 } from '../lib/moduleSystem';
 
 function getMinifiedClassName(className: string) {
@@ -62,6 +63,10 @@ export default function(
   ]);
 
   clearLocalModulesFromCache();
+  provideModule('env', {
+    config: state.opts,
+    filename: resolve(state.filename),
+  });
   const { exports: className } = instantiateModule(
     replacement,
     resolve(state.filename)

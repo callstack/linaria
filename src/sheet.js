@@ -1,6 +1,7 @@
 /* @flow */
 
 import stylis from 'stylis';
+import stylisResolvePlugin from './tools/stylisResolvePlugin';
 
 type RawStyles = {
   template: string[],
@@ -51,6 +52,7 @@ function sheet() {
         return;
       }
 
+      stylis.use(stylisResolvePlugin);
       const text = stylis(selector, css);
       cache[selector] = css;
       node.appendData(`\n${text}`);

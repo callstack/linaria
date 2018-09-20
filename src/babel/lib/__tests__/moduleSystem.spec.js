@@ -3,6 +3,7 @@ import NativeModule from 'module';
 import {
   clearModulesCache,
   instantiateModule,
+  provideModule,
   Module,
   ModuleMock,
   getCachedModule,
@@ -25,6 +26,26 @@ describe('babel/lib/moduleSystem', () => {
     expect(moduleInstance.sourceMap).toBeDefined();
     expect(moduleInstance.children).toEqual([]);
     expect(getCachedModule(filename)).toEqual(moduleInstance);
+  });
+
+  it('provideModule should create a module instance with reference to exported value', () => {
+    const exports = { someProp1: true, someProp2: '' };
+
+    provideModule('test', exports);
+    exports.someProp2 = 'test';
+    expect(getCachedModule('@linaria_provide/test').exports).toBe(exports);
+
+    provideModule('test', exports, true);
+    expect(getCachedModule('@linaria_provide/test').exports.default).toBe(
+      exports
+    );
+
+    const moduleInstance = instantiateModule(
+      'module.exports = require("@linaria_provide/test").default;',
+      path.join(__dirname, 'test.js')
+    );
+
+    expect(moduleInstance.exports).toEqual(exports);
   });
 
   it('clearLocalModulesFromCache should clear local modules from cache', () => {
