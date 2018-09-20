@@ -161,7 +161,7 @@ After being transpiled, the code will output following CSS:
 }
 ```
 
-And the following JavaScipt:
+And the following JavaScript:
 
 ```js
 import React from 'react';
