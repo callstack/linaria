@@ -45,7 +45,7 @@ const toCSS = o =>
 // This should be safe because strings cannot contain newline: https://www.w3.org/TR/CSS2/syndata.html#strings
 const stripLines = text =>
   String(text)
-    .replace(/[\r\n]+/, ' ')
+    .replace(/[\r\n]+/g, ' ')
     .trim();
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
