@@ -22,7 +22,7 @@ module.exports = function loader(content) {
       .basename(this.resourcePath)
       .replace(/\.js$/, '')}_${slug}.css`;
 
-    const output = path.join(os.tmpdir(), filename.split('/').join('_'));
+    const output = path.join(os.tmpdir(), filename.split(path.sep).join('_'));
 
     if (map) {
       map.setSourceContent(
