@@ -1,7 +1,7 @@
 version: 2
 defaults: &defaults
   docker:
-    - image: circleci/node:6.10.3
+    - image: circleci/node:10
   working_directory: ~/linaria
 jobs:
   install-dependencies:
