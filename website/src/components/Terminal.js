@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { css } from 'linaria';
+import { styled } from 'linaria/react';
 import theme from '../styles/theme';
 
 type Props = {
@@ -10,17 +10,15 @@ type Props = {
 
 export default function Terminal(props: Props) {
   return (
-    <div className={block}>
+    <Block>
       {props.lines.map((line, index) => (
-        <span className={codeLine} key={index.toString()}>
-          {line}
-        </span>
+        <CodeLine key={index.toString()}>{line}</CodeLine>
       ))}
-    </div>
+    </Block>
   );
 }
 
-const block = css`
+const Block = styled.div`
   display: block;
   padding: 20px;
   background: ${theme.backdrop};
@@ -28,7 +26,7 @@ const block = css`
   font-family: 'Fira Mono', monospace;
 `;
 
-const codeLine = css`
+const CodeLine = styled.span`
   display: block;
 
   &::before {

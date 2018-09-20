@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { css } from 'linaria';
+import { styled } from 'linaria/react';
 import { media } from '../styles/utils';
 import theme from '../styles/theme';
 import Container from './Container';
@@ -9,43 +9,37 @@ import Heading from './Heading';
 
 export default function Hero() {
   return (
-    <div className={features}>
+    <Features>
       <Container>
-        <div className={container} id="features">
-          <div className={item}>
-            <div className={figure}>
-              <img className={figureImage} alt="" src="/images/image-1.png" />
-            </div>
-            <Heading type="h4" className={title}>
-              Familiar syntax
-            </Heading>
+        <Content id="features">
+          <Item>
+            <Figure>
+              <FigureImage alt="" src="/images/image-1.png" />
+            </Figure>
+            <Title type="h4">Familiar syntax</Title>
             <p>Linaria uses classic CSS syntax with nesting support.</p>
-          </div>
-          <div className={item}>
-            <div className={figure}>
-              <img className={figureImage} alt="" src="/images/image-3.png" />
-            </div>
-            <Heading type="h4" className={title}>
-              Zero runtime
-            </Heading>
+          </Item>
+          <Item>
+            <Figure>
+              <FigureImage alt="" src="/images/image-3.png" />
+            </Figure>
+            <Title type="h4">Zero runtime</Title>
             <p>All CSS is extracted when transpiling the code with Babel.</p>
-          </div>
-          <div className={item}>
-            <div className={figure}>
-              <img className={figureImage} alt="" src="/images/image-2.png" />
-            </div>
-            <Heading type="h4" className={title}>
-              SSR with critical CSS
-            </Heading>
+          </Item>
+          <Item>
+            <Figure>
+              <FigureImage alt="" src="/images/image-2.png" />
+            </Figure>
+            <Title type="h4">SSR with critical CSS</Title>
             <p>Critical CSS can be determined for SSR to improve load time.</p>
-          </div>
-        </div>
+          </Item>
+        </Content>
       </Container>
-    </div>
+    </Features>
   );
 }
 
-const features = css`
+const Features = styled.div`
   margin: 70px 0;
 
   ${media.medium} {
@@ -53,7 +47,7 @@ const features = css`
   }
 `;
 
-const container = css`
+const Content = styled.div`
   ${media.medium} {
     display: flex;
     justify-content: space-around;
@@ -62,7 +56,7 @@ const container = css`
   }
 `;
 
-const item = css`
+const Item = styled.div`
   text-align: center;
 
   ${media.medium} {
@@ -71,13 +65,13 @@ const item = css`
   }
 `;
 
-const title = css`
+const Title = styled(Heading)`
   text-transform: uppercase;
   margin: 1em 0;
   color: ${theme.primary};
 `;
 
-const figure = css`
+const Figure = styled.figure`
   display: flex;
   align-items: flex-end;
   margin: 0 auto;
@@ -86,7 +80,7 @@ const figure = css`
   height: 200px;
 `;
 
-const figureImage = css`
+const FigureImage = styled.img`
   width: 100%;
   object-fit: cover;
 `;

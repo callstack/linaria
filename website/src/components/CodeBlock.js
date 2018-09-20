@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { css, cx } from 'linaria';
+import { styled } from 'linaria/react';
 import theme from '../styles/theme';
 
 type Props = {
@@ -12,13 +12,13 @@ type Props = {
 
 export default function CodeBlock({ className, language, text }: Props) {
   return (
-    <pre className={cx(code, className)}>
+    <CodeWrapper className={className}>
       <code
         className={language && `language-${language}`}
         // eslint-disable-next-line
         dangerouslySetInnerHTML={{__html: prism(text, language)}}
       />
-    </pre>
+    </CodeWrapper>
   );
 }
 
@@ -29,7 +29,7 @@ const prism = (code, language) =>
     ? code
     : Prism.highlight(code, Prism.languages[language]);
 
-const code = css`
+const CodeWrapper = styled.pre`
   font-size: 14px;
   padding: 16px;
   background: ${theme.backdrop};

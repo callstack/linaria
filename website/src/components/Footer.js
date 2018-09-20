@@ -1,25 +1,25 @@
 /* @flow */
 
 import React from 'react';
-import { css } from 'linaria';
+import { styled } from 'linaria/react';
 import Container from './Container';
 
 export default function Footer() {
   return (
-    <div className={footer}>
-      <Container className={footerContainer}>
+    <FooterContainer>
+      <Inner>
         <p>&copy; 2017 Callstack.io</p>
-      </Container>
-    </div>
+      </Inner>
+    </FooterContainer>
   );
 }
 
-const footer = css`
+const FooterContainer = styled.div`
   margin-top: 100px;
   padding: 30px 0;
   font-size: 0.9em;
 `;
 
-const footerContainer = css`
+const Inner = styled(Container)`
   display: flex;
 `;
