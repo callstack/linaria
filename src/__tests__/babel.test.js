@@ -50,6 +50,18 @@ it('transpiles styled template literal with function and component', async () =>
   expect(code).toMatchSnapshot();
 });
 
+it('outputs valid CSS classname', async () => {
+  const code = await transpile(
+    dedent`
+    const ᾩPage$Title = styled.h1\`
+      font-size: 14px;
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
 it('evaluates and inlines expressions in scope', async () => {
   const code = await transpile(
     dedent`

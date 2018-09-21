@@ -147,6 +147,25 @@ CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
 
+exports[`outputs valid CSS classname 1`] = `
+"const ᾩPage$Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"\\\\u1FA9Page$Title\\",
+  class: \\"_Page_Title__h73eyu\\"
+});
+
+/*
+CSS OUTPUT TEXT START
+._Page_Title__h73eyu{font-size:14px;}
+
+CSS OUTPUT TEXT END
+
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"._Page_Title__h73eyu\\"}]
+CSS OUTPUT DEPENDENCIES:[]
+*/"
+`;
+
 exports[`prevents class name collision 1`] = `
 "const Title =
 /*#__PURE__*/

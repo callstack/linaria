@@ -17,6 +17,8 @@ const hyphenate = s =>
 const isPlainObject = o =>
   typeof o === 'object' && o != null && o.constructor.name === 'Object';
 
+const toValidCSSIdentifier = s => s.replace(/[^_0-9a-z]/gi, '_');
+
 // Some tools such as polished.js output JS objects
 // To support them transparently, we convert JS objects to CSS strings
 const toCSS = o =>
@@ -207,11 +209,13 @@ module.exports = function extract(
 
           // Custom properties need to start with a letter, so we prefix the slug
           // Also use append the index of the class to the filename for uniqueness in the file
-          const slug = `${displayName.charAt(0).toLowerCase()}${slugify(
-            `${state.file.opts.filename}:${state.index++}`
-          )}`;
+          const slug = toValidCSSIdentifier(
+            `${displayName.charAt(0).toLowerCase()}${slugify(
+              `${state.file.opts.filename}:${state.index++}`
+            )}`
+          );
 
-          const className = `${displayName}_${slug}`;
+          const className = toValidCSSIdentifier(`${displayName}_${slug}`);
 
           // Serialize the tagged template literal to a string
           let cssText = '';
