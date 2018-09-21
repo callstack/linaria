@@ -84,9 +84,16 @@ type State = {|
 |};
 */
 
+/* ::
+type Options = {
+  displayName?: boolean,
+  evaluate?: boolean
+}
+*/
+
 module.exports = function extract(
   babel /* : any */,
-  options /* : { evaluate?: boolean } */ = {}
+  options /* : Options */ = {}
 ) {
   const { types: t } = babel;
 
@@ -215,7 +222,9 @@ module.exports = function extract(
             )}`
           );
 
-          const className = toValidCSSIdentifier(`${displayName}_${slug}`);
+          const className = options.displayName
+            ? `${toValidCSSIdentifier(displayName)}_${slug}`
+            : slug;
 
           // Serialize the tagged template literal to a string
           let cssText = '';

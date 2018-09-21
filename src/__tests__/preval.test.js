@@ -8,7 +8,9 @@ const dedent = require('dedent');
 const transpile = async input => {
   const { code } = await babel.transformAsync(input, {
     babelrc: false,
-    presets: [[require.resolve('../babel'), { evaluate: true }]],
+    presets: [
+      [require.resolve('../babel'), { displayName: true, evaluate: true }],
+    ],
     filename: path.join(__dirname, 'source.js'),
   });
 
