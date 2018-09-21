@@ -34,13 +34,13 @@ Zero-runtime CSS in JS library.
 ## Installation
 
 ```sh
-npm install linaria@next
+npm install linaria
 ```
 
 or
 
 ```sh
-yarn add linaria@next
+yarn add linaria
 ```
 
 ## Usage
