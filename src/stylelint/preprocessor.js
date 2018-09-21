@@ -39,8 +39,8 @@ function preprocessor() {
       // Construct a CSS-ish file from the unprocessed style rules
       const { rules, replacements } = metadata.linaria;
 
-      Object.keys(rules).forEach(className => {
-        const rule = rules[className];
+      Object.keys(rules).forEach(selector => {
+        const rule = rules[selector];
 
         // Append new lines until we get to the start line number
         let line = cssText.split('\n').length;

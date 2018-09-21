@@ -25,7 +25,7 @@ CSS OUTPUT TEXT START
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":6},\\"name\\":\\"Paragraph_abcdefg\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":6},\\"name\\":\\".Paragraph_abcdefg\\"}]
 CSS OUTPUT DEPENDENCIES:[\\"../react\\"]
 */"
 `;
@@ -45,7 +45,7 @@ CSS OUTPUT TEXT START
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
 CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
 */"
 `;
@@ -70,7 +70,7 @@ CSS OUTPUT TEXT START
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
 CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
 */"
 `;
@@ -94,7 +94,7 @@ CSS OUTPUT TEXT START
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":5,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":5,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -117,7 +117,7 @@ CSS OUTPUT TEXT START
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":4,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":4,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -142,7 +142,7 @@ CSS OUTPUT TEXT START
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
 CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
 */"
 `;
@@ -166,7 +166,7 @@ CSS OUTPUT TEXT START
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -188,7 +188,7 @@ CSS OUTPUT TEXT START
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -212,7 +212,7 @@ CSS OUTPUT TEXT START
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
@@ -239,7 +239,7 @@ CSS OUTPUT TEXT START
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":9,\\"column\\":6},\\"name\\":\\"Title_abcdefg\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":9,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;
