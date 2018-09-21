@@ -89,8 +89,8 @@ function preprocessor() {
                 w.column +=
                   original.end.column - original.start.column + 1 - length;
               } else if (
-                w.column >= original.start.column - 2 && // -2 to account for '${'
-                w.column < original.start.column + length + 1 // +1 to account for '}'
+                w.column >= original.start.column &&
+                w.column < original.start.column + length
               ) {
                 // The linter will underline the whole word in the editor if column is in inside a word
                 // Set the column to the end, so it will underline the word inside the interpolation
