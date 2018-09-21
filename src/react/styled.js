@@ -37,6 +37,7 @@ function styled(tag) {
 
     Result.displayName = options.name;
     Result.className = options.class;
+    Result.extends = tag;
 
     return Result;
   };

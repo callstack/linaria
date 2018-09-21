@@ -189,28 +189,6 @@ Dynamic styles will be applied using CSS custom properties (aka CSS variables) a
 ## Trade-offs
 
 * No IE11 support when using dynamic styles components since it uses CSS custom properties
-* The cascade is still there.
-
-  For example, the following code can produce a div with `color: red;` or `color: blue;` depending on generated the order of CSS rules:
-
-  ```js
-  // First.js
-  import { styled } from 'linaria/react';
-
-  const First = styled.div`
-    color: blue;
-  `;
-
-  // Second.js
-  import { styled } from 'linaria/react';
-  import { First } from './First';
-
-  const Second = styled(First)`
-    color: red;
-  `;
-  ```
-
-  Libraries like `styled-components` can get around the cascade because they can control the order of the CSS insertion during the runtime. It's not possible when statically extracting the CSS at build time.
 * Dynamic styles are not supported with `css` tag. See [Dynamic Styles](/docs/DYNAMIC_STYLES.md) for alternative approaches.
 * Modules used in the CSS rules cannot have side-effects.
   For example:

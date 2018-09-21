@@ -107,21 +107,18 @@ module.exports = function extract(
 
             let cssText = '';
 
-            Object.keys(state.rules).forEach((className, index) => {
+            Object.keys(state.rules).forEach((selector, index) => {
               mappings.push({
                 generated: {
                   line: index + 1,
                   column: 0,
                 },
-                original: state.rules[className].start,
-                name: className,
+                original: state.rules[selector].start,
+                name: selector,
               });
 
               // Run each rule through stylis to support nesting
-              cssText += `${stylis(
-                `.${className}`,
-                state.rules[className].cssText
-              )}\n`;
+              cssText += `${stylis(selector, state.rules[selector].cssText)}\n`;
             });
 
             // Add the collected styles as a comment to the end of file
@@ -166,14 +163,14 @@ module.exports = function extract(
           tag.arguments.length === 1 &&
           tag.callee.name === 'styled'
         ) {
-          styled = { component: tag.arguments[0] };
+          styled = { component: path.get('tag').get('arguments')[0] };
         } else if (
           t.isMemberExpression(tag) &&
           t.isIdentifier(tag.object) &&
           t.isIdentifier(tag.property) &&
           tag.object.name === 'styled'
         ) {
-          styled = { component: t.stringLiteral(tag.property.name) };
+          styled = { component: { node: t.stringLiteral(tag.property.name) } };
         }
 
         if (styled || (t.isIdentifier(tag) && tag.name === 'css')) {
@@ -341,7 +338,28 @@ module.exports = function extract(
             }
           });
 
+          let selector = `.${className}`;
+
           if (styled) {
+            // If `styled` wraps another component and not a primitive,
+            // get its class name to create a more specific selector
+            // it'll ensure that styles are overridden properly
+            if (
+              options.evaluate !== false &&
+              t.isIdentifier(styled.component.node)
+            ) {
+              let { value } = evaluate(
+                styled.component,
+                t,
+                state.file.opts.filename
+              );
+
+              while (isValidElementType(value) && value.className) {
+                selector += `.${value.className}`;
+                value = value.extends;
+              }
+            }
+
             const props = [];
 
             props.push(
@@ -402,7 +420,9 @@ module.exports = function extract(
 
             path.replaceWith(
               t.callExpression(
-                t.callExpression(t.identifier('styled'), [styled.component]),
+                t.callExpression(t.identifier('styled'), [
+                  styled.component.node,
+                ]),
                 [t.objectExpression(props)]
               )
             );
@@ -412,8 +432,9 @@ module.exports = function extract(
             path.replaceWith(t.stringLiteral(className));
           }
 
-          state.rules[className] = {
+          state.rules[selector] = {
             cssText,
+            className,
             displayName,
             start: path.parent.loc.start,
           };
