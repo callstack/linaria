@@ -77,16 +77,29 @@ function preprocessor() {
           // If the warnings contain stuff that's been replaced,
           // Correct the line and column numbers to what's replaced
           result.warnings.forEach(w => {
-            if (
-              w.line === original.start.line &&
-              w.column >= original.start.column - 2 && // -2 to account for '${'
-              w.column < original.start.column + length + 1 // +1 to account for '}'
-            ) {
-              // The linter will underline the whole word in the editor if column is in inside a word
-              // Set the column to the end, so it will underline the word inside the interpolation
-              // e.g. in `${colors.primary}`, `primary` will be underlined
-              // eslint-disable-next-line no-param-reassign
-              w.column = original.end.column;
+            /* eslint-disable no-param-reassign */
+
+            if (w.line === original.start.line) {
+              // If the error is on the same line where an interpolation started, we need to adjust the line and column numbers
+              // Because a replacement would have increased or decreased the column numbers
+              // If it's in the same line where interpolation ended, it would have been adjusted during replacement
+              if (w.column > original.start.column + length) {
+                // The error is from an item after the replacements
+                // So we need to adjust the column
+                w.column +=
+                  original.end.column - original.start.column + 1 - length;
+              } else if (
+                w.column >= original.start.column - 2 && // -2 to account for '${'
+                w.column < original.start.column + length + 1 // +1 to account for '}'
+              ) {
+                // The linter will underline the whole word in the editor if column is in inside a word
+                // Set the column to the end, so it will underline the word inside the interpolation
+                // e.g. in `${colors.primary}`, `primary` will be underlined
+                w.column =
+                  original.start.line === original.end.line
+                    ? original.end.column - 1
+                    : original.start.column;
+              }
             }
           });
         });

@@ -45,10 +45,21 @@ const toCSS = o =>
 // Stripping away the new lines ensures that we preserve line numbers
 // This is useful in case of tools such as the stylelint pre-processor
 // This should be safe because strings cannot contain newline: https://www.w3.org/TR/CSS2/syndata.html#strings
-const stripLines = text =>
-  String(text)
+const stripLines = (loc, text) => {
+  let result = String(text)
     .replace(/[\r\n]+/g, ' ')
     .trim();
+
+  // If the start and end line numbers aren't same, add new lines to span the text across multiple lines
+  if (loc.start.line !== loc.end.line) {
+    result += '\n'.repeat(loc.end.line - loc.start.line);
+
+    // Add extra spaces to offset the column
+    result += ' '.repeat(loc.end.column);
+  }
+
+  return result;
+};
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
@@ -231,7 +242,7 @@ module.exports = function extract(
 
           const expressions = path.get('quasi').get('expressions');
 
-          quasi.quasis.forEach((el, i) => {
+          quasi.quasis.forEach((el, i, self) => {
             let appended = false;
 
             if (i !== 0) {
@@ -260,17 +271,27 @@ module.exports = function extract(
             const ex = expressions[i];
 
             if (ex) {
-              const { loc } = ex.node;
+              const { end } = ex.node.loc;
               const result = ex.evaluate();
               const beforeLength = cssText.length;
+
+              // The location will be end of the current string to start of next string
+              const next = self[i + 1];
+              const loc = {
+                // +1 because the expressions location always shows 1 column before
+                start: { line: el.loc.end.line, column: el.loc.end.column + 1 },
+                end: next
+                  ? { line: next.loc.start.line, column: next.loc.start.column }
+                  : { line: end.line, column: end.column + 1 },
+              };
 
               if (result.confident) {
                 if (isPlainObject(result.value)) {
                   // If it's a plain object, convert it to a CSS string
-                  cssText += stripLines(toCSS(result.value));
+                  cssText += stripLines(loc, toCSS(result.value));
                 } else if (result.value != null) {
                   // Don't insert anything for null and undefined
-                  cssText += stripLines(result.value);
+                  cssText += stripLines(loc, result.value);
                 }
 
                 state.replacements.push({
@@ -306,10 +327,10 @@ module.exports = function extract(
                           // Useful for interpolating components
                           cssText += `.${value.className}`;
                         } else if (isPlainObject(value)) {
-                          cssText += stripLines(toCSS(value));
+                          cssText += stripLines(loc, toCSS(value));
                         } else {
                           // For anything else, assume it'll be stringified
-                          cssText += stripLines(value);
+                          cssText += stripLines(loc, value);
                         }
                       }
 
