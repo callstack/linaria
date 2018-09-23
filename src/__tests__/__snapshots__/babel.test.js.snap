@@ -123,6 +123,14 @@ exports[`inlines object styles as CSS string 1`] = `
   opacity: 1,
   minHeight: 420,
   '@media (min-width: 200px)': {
+    WebkitOpacity: .8,
+    MozOpacity: .8,
+    msOpacity: .8,
+    OOpacity: .8,
+    WebkitBorderRadius: 2,
+    MozBorderRadius: 2,
+    msBorderRadius: 2,
+    OBorderRadius: 2,
     WebkitTransition: '400ms',
     MozTransition: '400ms',
     OTransition: '400ms',
@@ -138,11 +146,11 @@ styled(\\"h1\\")({
 
 /*
 CSS OUTPUT TEXT START
-.th73eyu{position:absolute;top:0;right:0;bottom:0;left:0;opacity:1;min-height:420px;}@media (min-width:200px){.th73eyu{-webkit-transition:400ms;-moz-transition:400ms;-o-transition:400ms;-ms-transition:400ms;}}
+.th73eyu{position:absolute;top:0;right:0;bottom:0;left:0;opacity:1;min-height:420px;}@media (min-width:200px){.th73eyu{-webkit-opacity:0.8;-moz-opacity:0.8;-ms-opacity:0.8;-o-opacity:0.8;-webkit-border-radius:2px;-moz-border-radius:2px;-ms-border-radius:2px;-o-border-radius:2px;-webkit-transition:400ms;-moz-transition:400ms;-o-transition:400ms;-ms-transition:400ms;}}
 
 CSS OUTPUT TEXT END
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":18,\\"column\\":6},\\"name\\":\\".th73eyu\\"}]
+CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":26,\\"column\\":6},\\"name\\":\\".th73eyu\\"}]
 CSS OUTPUT DEPENDENCIES:[]
 */"
 `;

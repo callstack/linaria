@@ -90,6 +90,14 @@ it('inlines object styles as CSS string', async () => {
       minHeight: 420,
 
       '@media (min-width: 200px)': {
+        WebkitOpacity: .8,
+        MozOpacity: .8,
+        msOpacity: .8,
+        OOpacity: .8,
+        WebkitBorderRadius: 2,
+        MozBorderRadius: 2,
+        msBorderRadius: 2,
+        OBorderRadius: 2,
         WebkitTransition: '400ms',
         MozTransition: '400ms',
         OTransition: '400ms',
