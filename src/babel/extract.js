@@ -10,9 +10,11 @@ const slugify = require('../slugify');
 const { units, unitless } = require('./units');
 
 const hyphenate = s =>
-  // Hyphenate CSS property names from camelCase version from JS string
-  // Special case for `-ms` because in JS it starts with `ms` unlike `Webkit`
-  s.replace(/([A-Z])/g, g => `-${g[0].toLowerCase()}`).replace(/^ms-/, '-ms-');
+  s
+    // Hyphenate CSS property names from camelCase version from JS string
+    .replace(/([A-Z])/g, (match, p1) => `-${p1.toLowerCase()}`)
+    // Special case for `-ms` because in JS it starts with `ms` unlike `Webkit`
+    .replace(/^ms-/, '-ms-');
 
 const isPlainObject = o =>
   typeof o === 'object' && o != null && o.constructor.name === 'Object';
@@ -35,7 +37,15 @@ const toCSS = o =>
 
       return `${hyphenate(key)}: ${
         /* $FlowFixMe */
-        typeof value === 'number' && value !== 0 && !unitless[key]
+        typeof value === 'number' &&
+        value !== 0 &&
+        !unitless[
+          // Strip vendor prefixes when checking if the value is unitless
+          key.replace(
+            /^(Webkit|Moz|O|ms)([A-Z])(.+)$/,
+            (match, p1, p2, p3) => `${p2.toLowerCase()}${p3}`
+          )
+        ]
           ? `${value}px`
           : value
       };`;
