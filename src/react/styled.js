@@ -12,7 +12,8 @@ function styled(tag) {
     }
 
     const Result = React.forwardRef((props, ref) => {
-      const next = Object.assign({}, props, {
+      const { as: component, ...rest } = props;
+      const next = Object.assign(rest, {
         ref,
         className: props.className
           ? `${options.class} ${props.className}`
@@ -32,12 +33,16 @@ function styled(tag) {
         next.style = Object.assign(style, next.style);
       }
 
-      return React.createElement(tag, next);
+      return React.createElement(component, next);
     });
 
     Result.displayName = options.name;
     Result.className = options.class;
     Result.extends = tag;
+
+    Result.defaultProps = {
+      as: tag,
+    };
 
     return Result;
   };

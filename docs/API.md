@@ -13,7 +13,7 @@ import { css } from 'linaria';
 
 const flower = css`
   display: inline;
-  color: violet,
+  color: violet;
 `;
 
 // flower === flower__9o5awv –> with babel plugin
@@ -28,8 +28,8 @@ const box = css`
   animation: rotate 1s linear infinite;
 
   @keyframes rotate {
-    { from: 0deg }
-    { to: 360deg }
+    { from: 0deg; }
+    { to: 360deg; }
   }
 `;
 ```
@@ -64,6 +64,8 @@ Unlike the [`classnames`](https://www.npmjs.com/package/classnames) library, thi
 
 Helper to build React components. It allows you to write your components in a similar syntax as [`styled-components`](https://www.styled-components.com/):
 
+The syntax is similar to the `css` tag. Additionally, you can use function interpolations that receive the component's props:
+
 ```js
 import { styled } from 'linaria/react';
 import colors from './colors.json';
@@ -82,7 +84,7 @@ const Container = styled.div`
 
 All rules inside the template literal are scoped to the component, similar to the `css` tag.
 
-Dynamic interpolations are replaced with CSS custom properties. A dynamic function interpolation will receive the `props` of the component as it's arguments and the returned result will be used as the value for the variable. When using this, a tiny helper is imported so that we don't duplicate the code for creating the component in all files.
+Dynamic function interpolations are replaced with CSS custom properties. A dynamic function interpolation will receive the `props` of the component as it's arguments and the returned result will be used as the value for the variable. When using this, a tiny helper is imported so that we don't duplicate the code for creating the component in all files.
 
 You can also interpolate a component to refer to it:
 
@@ -91,12 +93,40 @@ const Title = styled.h1`
   font-size: 36px;
 `;
 
-const Article = styled('article')`
+const Article = styled.article`
   font-size: 16px;
 
+  /* this will evaluate to the selector that refers to `Title` */
   ${Title} {
     margin-bottom: 24px;
   }
+`;
+```
+
+If you want to swap out the tag that's rendered, you can use the `as` prop:
+
+```js
+// Here `Button` is defined as a `button` tag
+const Button = styled.button`
+  background-color: rebeccapurple;
+`;
+
+// You can switch it to use an `a` tag with the `as` prop
+<Button as="a" href="/get-started">
+  Click me
+</Button>;
+```
+
+You can also decorate another styled component with `styled`:
+
+```js
+const Button = styled.button`
+  background-color: rebeccapurple;
+`;
+
+// The background-color in FancyButton will take precedence
+const FancyButton = styled(Button)`
+  background-color: black;
 `;
 ```
 

@@ -16,7 +16,9 @@ export default function Hero() {
             <Description>
               Linaria lets you write CSS in your JS with no runtime overhead
             </Description>
-            <Button href="#get-started">Get Started</Button>
+            <Button as="a" href="#get-started">
+              Get Started
+            </Button>
           </LeftColumn>
           <RightColumn>
             <CodeSample alt="Linaria code sample" src="/images/image-4.png" />
