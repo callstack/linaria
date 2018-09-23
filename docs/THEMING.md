@@ -1,6 +1,6 @@
 # Theming
 
-There are several approaches you can use for theming. Depending on the browser supportand requirements, you can pick the approach that suits you the best.
+There are several approaches you can use for theming. Depending on the browser support and requirements, you can pick the approach that suits you the best.
 
 ## CSS custom properties
 
@@ -91,7 +91,7 @@ This approach works in all browsers, and is the best approach if you want to sup
 
 ## React Context
 
-Another approach is to use React Context to pass down colors, and then use function interpolations with the `styled` tag to use the colors in your component. You could use something like [`@callstack/react-theme-provider`](https://github.com/callstack/react-theme-provider) or write your own HOC.
+Another approach is to use React Context to pass down colors, and then use function interpolations with the `styled` tag to use the colors in your component. You could use something like [`@callstack/react-theme-provider`](https://github.com/callstack/react-theme-provider) or write your own HOC. Then use it like:
 
 ```js
 const Button = withTheme(styled.button`
