@@ -260,15 +260,17 @@ module.exports = function extract(
               // If it has a unit after it, we need to move the unit into the interpolation
               // e.g. `var(--size)px` should actually be `var(--size)`
               // So we check if the current text starts with a unit, and add the unit to the previous interpolation
+              // Another approach would be `calc(var(--size) * 1px), but some browsers don't support all units
+              // https://bugzilla.mozilla.org/show_bug.cgi?id=956573
               const matches = el.value.cooked.match(unitRegex);
 
               if (matches) {
                 const last = interpolations[interpolations.length - 1];
-                const [, unit, sep] = matches;
+                const [, unit] = matches;
 
                 if (last && cssText.endsWith(`var(--${last.id})`)) {
                   last.unit = unit;
-                  cssText += el.value.cooked.replace(unitRegex, sep);
+                  cssText += el.value.cooked.replace(unitRegex, '$2');
                   appended = true;
                 }
               }
