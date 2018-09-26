@@ -1,6 +1,8 @@
 # `linaria/babel` preset
 
-The preset pre-processes and evaluates the CSS so that it can be extracted by the bundler. In order to have styles in `css` tagged template literals evaluated, you need to add the `linaria/babel` preset to your Babel configuration.
+The preset pre-processes and evaluates the CSS. The webpack loader uses this preset under the hood. You don't need to use add this plugin if you're using the webpack loader.
+
+If you need to use this preset for some reason, add `linaria/babel` to your Babel configuration at the end of your presets list:
 
 `.babelrc`:
 
@@ -13,8 +15,6 @@ The preset pre-processes and evaluates the CSS so that it can be extracted by th
   ]
 }
 ```
-
-Make sure that `linaria/babel` is the last item in your `presets` list.
 
 ## Options
 

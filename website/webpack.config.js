@@ -29,16 +29,13 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           {
-            loader: require.resolve('../src/loader'),
-            options: {
-              sourceMap: true,
-            },
+            loader: 'babel-loader',
+            options: require('./babel.config'),
           },
           {
-            loader: 'babel-loader',
+            loader: require.resolve('../src/loader'),
             options: {
-              ...require('./babel.config'),
-              cacheDirectory: false,
+              sourceMap: process.env.NODE_ENV !== 'production',
             },
           },
         ],
@@ -50,7 +47,7 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              sourceMap: true,
+              sourceMap: process.env.NODE_ENV !== 'production',
             },
           },
         ],
