@@ -2,5 +2,7 @@ __fixtures__/
 coverage/
 flow-typed/
 lib/
+dist/
+build/
 node_modules/
 vendor/

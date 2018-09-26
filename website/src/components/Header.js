@@ -3,69 +3,65 @@
 import React from 'react';
 import { styled } from 'linaria/react';
 import Container from './Container';
-import theme from '../styles/theme';
-
-const navVerticalSpacing = 20;
-const navHorizontalSpacing = 10;
+import constants from '../styles/constants';
+import { media } from '../styles/utils';
 
 export default function Header() {
   return (
     <NavBar>
-      <NavBarContainer>
-        <LogoLink href="/">
-          <LogoImage src="/images/linaria-logo.svg" alt="Linaria Logo" />
-        </LogoLink>
-        <Links>
-          <li>
-            <LinkItem href="#features">Features</LinkItem>
-          </li>
-          <li>
-            <LinkItem
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://github.com/callstack/linaria/tree/master/docs"
-            >
-              Docs
-            </LinkItem>
-          </li>
-          <li>
-            <LinkItem
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://github.com/callstack/linaria"
-              title="GitHub"
-            >
-              <GitHubLogo src="./images/github.svg" alt="GitHub" />
-            </LinkItem>
-          </li>
-        </Links>
-      </NavBarContainer>
+      <LogoImage src="/images/linaria-logo.svg" alt="Linaria Logo" />
+      <Links>
+        <li>
+          <LinkItem href="https://github.com/callstack/linaria#features">
+            Features
+          </LinkItem>
+        </li>
+        <li>
+          <LinkItem
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/callstack/linaria/tree/master/docs"
+          >
+            Docs
+          </LinkItem>
+        </li>
+        <li>
+          <LinkItem
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/callstack/linaria"
+            title="GitHub"
+          >
+            GitHub
+          </LinkItem>
+        </li>
+      </Links>
     </NavBar>
   );
 }
 
-const NavBar = styled.nav`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1;
-`;
-
-const NavBarContainer = styled(Container)`
+const NavBar = styled(Container)`
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
-`;
 
-const LogoLink = styled.a`
-  display: inline-block;
+  ${media.medium} {
+    flex-direction: row;
+  }
 `;
 
 const LogoImage = styled.img`
-  height: 32px;
-  display: inline-block;
-  vertical-align: middle;
+  height: 64px;
+  margin: 16px auto;
+  display: block;
+
+  ${media.medium} {
+    height: 48px;
+    margin: 0;
+    display: inline-block;
+    vertical-align: middle;
+  }
 `;
 
 const Links = styled.ul`
@@ -78,21 +74,25 @@ const Links = styled.ul`
 
 const LinkItem = styled.a`
   display: block;
-  padding: ${navVerticalSpacing}px ${navHorizontalSpacing}px;
-  text-decoration: none;
-  color: ${theme.white};
-  transition: color 0.2s;
-  font-size: 1.3em;
+  font-size: 1.2em;
   font-weight: 700;
+  padding: 24px 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s;
+  transition: 200ms;
 
   &:hover {
-    color: ${theme.hoveredWhite};
+    color: inherit;
   }
-`;
 
-const GitHubLogo = styled.img`
-  width: 1.5em;
-  height: 1.5em;
-  border-radius: 50%;
-  transition: 0.2s background;
+  @supports (-webkit-background-clip: text) {
+    background-image: ${constants.gradient};
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-background-clip: text;
+
+    &:hover {
+      color: transparent;
+    }
+  }
 `;

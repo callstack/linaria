@@ -3,7 +3,6 @@
 import React from 'react';
 import { styled } from 'linaria/react';
 import { media } from '../styles/utils';
-import theme from '../styles/theme';
 import Container from './Container';
 
 export default function Hero() {
@@ -14,39 +13,43 @@ export default function Hero() {
           <LeftColumn>
             <Heading>Zero-Runtime CSS in JS</Heading>
             <Description>
-              Linaria lets you write CSS in your JS with no runtime overhead
+              Write CSS in JS and get real CSS files during build. Use dynamic
+              prop based styles with the React bindings and have them transpiled
+              to CSS variables automatically. Great productivity with source
+              maps and linting support.
             </Description>
-            <Button as="a" href="#get-started">
+            <Button
+              as="a"
+              href="https://github.com/callstack/linaria#installation"
+            >
               Get Started
             </Button>
           </LeftColumn>
           <RightColumn>
-            <CodeSample alt="Linaria code sample" src="/images/image-4.png" />
+            <CodeSample
+              alt="Linaria code sample"
+              src="/images/code-sample.png"
+            />
           </RightColumn>
         </Row>
       </Container>
-      <Wrapper>
-        <LogoMarkContainer>
-          <LogoMark src="/images/linaria-logomark.svg" alt="Linaria logo" />
-        </LogoMarkContainer>
-      </Wrapper>
     </HeroContainer>
   );
 }
 
 const HeroContainer = styled.main`
-  background: #d2356d;
-  background: linear-gradient(to bottom right, #96368c, #d2356d);
-  padding: 120px 0;
   position: relative;
 
-  ${media.medium} {
-    padding: 150px 0;
+  ${media.large} {
+    padding: 64px 0;
+    background-image: url('/images/linaria-logomark.svg');
+    background-repeat: no-repeat;
+    background-position: bottom right;
   }
 `;
 
 const Row = styled.div`
-  ${media.medium} {
+  ${media.large} {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -56,9 +59,8 @@ const Row = styled.div`
 const LeftColumn = styled.div`
   text-align: center;
   flex: 3;
-  z-index: 1;
 
-  ${media.medium} {
+  ${media.large} {
     text-align: left;
   }
 `;
@@ -67,96 +69,54 @@ const RightColumn = styled.div`
   text-align: center;
   flex: 2;
   z-index: 1;
-
-  ${media.medium} {
-    text-align: left;
-  }
 `;
 
 const Heading = styled.h1`
-  color: ${theme.white};
   font-weight: 700;
-
-  ${media.small} {
-    font-size: 2.5em;
-  }
-
-  ${media.medium} {
-    font-size: 3.5em;
-  }
+  font-size: 56px;
 `;
 
 const Description = styled.p`
-  color: ${theme.white};
-  font-weight: 700;
   margin-bottom: 60px;
-
-  ${media.small} {
-    font-size: 1em;
-  }
-
-  ${media.medium} {
-    font-size: 1.2em;
-  }
 `;
 
 const Button = styled.button`
+  display: inline-block;
   appearance: none;
   background: none;
-  padding: 10px 20px;
-  color: ${theme.white};
-  font-size: 1em;
+  border: 0;
+  padding: 16px 24px;
+  color: inherit;
+  font-size: inherit;
   font-weight: 700;
-  font-family: ${theme.fontFamily};
+  font-family: inherit;
   text-transform: uppercase;
   text-decoration: none;
-  border: 2px solid ${theme.white};
+  box-shadow: inset 0 0 0 2px currentColor, 1px 1px 1px rgba(0, 0, 0, 0.08);
   border-radius: 30px;
   cursor: pointer;
-  transition: color 0.2s, background 0.2s;
+  transition: color 200ms, background 200ms;
 
   &:hover {
     color: #d2356d;
-    background: ${theme.white};
-  }
-
-  ${media.medium} {
-    padding: 15px 30px;
+    box-shadow: inset 0 0 0 2px transparent, 1px 1px 1px rgba(0, 0, 0, 0.08);
+    background: linear-gradient(
+      to right,
+      hsl(180, 100%, 70%),
+      hsl(64, 57%, 82%),
+      hsl(0, 100%, 84%)
+    );
   }
 `;
 
 const CodeSample = styled.img`
   width: 100%;
   height: auto;
-  margin-top: 30px;
+  margin: 64px 24px;
+  max-width: calc(100% - 48px);
+  box-shadow: 3px 3px 32px rgba(0, 0, 0, 0.32);
 
-  ${media.medium} {
-    margin-top: 0;
+  ${media.large} {
+    margin: 24px;
   }
-`;
-
-const LogoMark = styled.img`
-  position: absolute;
-  left: 0;
-  bottom: -50px;
-`;
-
-const LogoMarkContainer = styled.div`
-  position: absolute;
-
-  ${media.medium} {
-    left: 62%;
-    bottom: 0;
-    height: 650px;
-    width: 650px;
-  }
-`;
-
-const Wrapper = styled.div`
-  position: absolute;
-  overflow: hidden;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 100%;
 `;

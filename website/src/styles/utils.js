@@ -1,10 +1,8 @@
 /* @flow */
 
 export const breakpoints = {
-  small: 480,
-  medium: 768,
-  large: 1200,
-  xlarge: 1600,
+  medium: 640,
+  large: 1024,
 };
 
 export const media = Object.keys(breakpoints).reduce((acc, item) => {
