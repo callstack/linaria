@@ -7,7 +7,7 @@ Linaria consists of 2 parts:
 
 ## Babel plugin
 
-The Babel plugin will look for `css` and `styled` tags in your code and extract the CSS out to a comment at the end of the file. It will also generate unique class names based on the hash of the filename.
+The Babel plugin will look for `css` and `styled` tags in your code, extract the CSS out and return it in the file's metadata. It will also generate unique class names based on the hash of the filename.
 
 When using the `styled` tag, dynamic interpolations will be replaced with CSS custom properties. References to constants in the scope will also be inlined. If the same expression is used multiple times, the plugin will create a single CSS custom property for those.
 
@@ -62,10 +62,11 @@ const Container = styled('div')({
     'c1ugh8t9-2': [props => props.color],
   },
 });
+```
 
-/*
-CSS OUTPUT TEXT START
+The extracted CSS will look something like this:
 
+```css
 .Title_t1ugh8t9 {
   font-family: var(--t1ugh8t-0);
 }
@@ -81,13 +82,6 @@ CSS OUTPUT TEXT START
 .Container_c1ugh8t9:hover {
   border-color: blue;
 }
-
-CSS OUTPUT TEXT END
-
-CSS OUTPUT MAPPINGS:[{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":"Title_t1ugh8t9"},{"generated":{"line":5,"column":0},"original":{"line":7,"column":6},"name":"Container_c1ugh8t"}]
-
-CSS OUTPUT DEPENDENCIES:[]
-*/
 ```
 
 If we encounter a valid unit directly after the interpolation, it'll be passed to the helper so that the correct unit is used when setting the property. This allows you to write this:
@@ -166,4 +160,4 @@ But keep in mind that if you're doing SSR for your app, this won't work with SSR
 
 ## Webpack loader
 
-The webpack loader reads the comment output from the Babel plugin and writes it to a CSS file, which can be picked up by `css-loader` to generate the final CSS. It's also responsible for generating the sourcemap from the metadata from the Babel plugin.
+The webpack loader uses the Babel plugin internally and writes the CSS text to a CSS file, which can be picked up by `css-loader` to generate the final CSS. It's also responsible for generating the sourcemap from the metadata from the Babel plugin.

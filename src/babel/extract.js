@@ -151,22 +151,7 @@ module.exports = function extract(
               cssText += `${stylis(selector, state.rules[selector].cssText)}\n`;
             });
 
-            // Add the collected styles as a comment to the end of file
-            path.addComment(
-              'trailing',
-              `\nCSS OUTPUT TEXT START\n${cssText}\nCSS OUTPUT TEXT END\n` +
-                `\nCSS OUTPUT MAPPINGS:${JSON.stringify(
-                  mappings
-                )}\nCSS OUTPUT DEPENDENCIES:${JSON.stringify(
-                  // Remove duplicate dependencies
-                  state.dependencies.filter(
-                    (d, i, self) => self.indexOf(d) === i
-                  )
-                )}\n`
-            );
-
-            // Also return the data as the fle metadata
-            // Bundlers or other tools can use this instead of reading the comment
+            // Store the result as the file metadata
             state.file.metadata = {
               linaria: {
                 rules: state.rules,

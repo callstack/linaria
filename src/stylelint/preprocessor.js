@@ -1,6 +1,6 @@
 /* @flow */
 
-const babel = require('@babel/core');
+const transform = require('../transform');
 
 /* ::
 type LintResult = {
@@ -13,31 +13,16 @@ function preprocessor() {
 
   return {
     code(input /* : string */, filename /* : string */) {
-      // Check if the file contains `css` or `styled` tag first
-      // Otherwise we should skip linting
-      if (!/\b(styled(\([^)]+\)|\.[a-z0-9]+)|css)`/.test(input)) {
+      const { rules, replacements } = transform(filename, input, {
+        evaluate: true,
+      });
+
+      if (!rules) {
         return '';
       }
-
-      let metadata;
-
-      try {
-        // eslint-disable-next-line prefer-destructuring
-        metadata = babel.transformSync(input, {
-          filename,
-        }).metadata;
-      } catch (e) {
-        return '';
-      }
-
-      if (!metadata.linaria) {
-        return '';
-      }
-
-      let cssText = '';
 
       // Construct a CSS-ish file from the unprocessed style rules
-      const { rules, replacements } = metadata.linaria;
+      let cssText = '';
 
       Object.keys(rules).forEach(selector => {
         const rule = rules[selector];

@@ -44,23 +44,7 @@ yarn add linaria
 
 ## Setup
 
-Linaria requires you to use a babel plugin along with a webpack loader.
-
-First, add the babel preset to your `.babelrc`:
-
-```json
-{
-  "presets": [
-    "@babel/preset-env",
-    "@babel/preset-react",
-    "linaria/babel"
-  ]
-}
-```
-
-Make sure that `linaria/babel` is the last item in your `presets` list.
-
-Next, add the webpack loader to your `webpack.config.js`:
+Linaria requires webpack to build your CSS. To set up the build, add the webpack loader to your `webpack.config.js` after `babel-loader` (if you use it):
 
 ```js
 module: {
@@ -68,18 +52,13 @@ module: {
     {
       test: /\.js$/,
       use: [
+        { loader: 'babel-loader' },
         {
           loader: 'linaria/loader',
           options: {
             sourceMap: process.env.NODE_ENV !== 'production',
           },
         },
-        {
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: false,
-          }
-        }
       ],
     },
     {
@@ -103,7 +82,7 @@ module: {
 },
 ```
 
-Make sure that `linaria/loader` is included before `babel-loader`.
+You also need `css-loader` and `mini-css-extract-plugin` in your pipeline. The usage is shown above.
 
 Now, the CSS you write with Linaria will be extracted at build time to the `styles.css` file. Linaria automatically vendor prefixes and strips whitespace from the CSS.
 

@@ -117,6 +117,7 @@ class Module {
         // We don't support dynamic imports when evaluating, but don't wanna syntax error
         // This will replace dynamic imports with an object that does nothing
         require.resolve('./dynamic-import-noop'),
+        [require.resolve('./extract'), { evaluate: true }],
       ],
       sourceMaps: true,
       exclude: /node_modules/,
