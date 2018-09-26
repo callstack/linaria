@@ -23,6 +23,9 @@ module: {
         },
         {
           loader: 'babel-loader'
+          options: {
+            cacheDirectory: false,
+          },
         }
       ],
     },
@@ -32,7 +35,13 @@ module: {
 
 Make sure that `linaria/loader` is included before `babel-loader`. Setting the `sourceMap` option to `true` will include source maps for the generated CSS so that you can see where source of the class name in devtools. We recommend to enable this only in development mode because the sourcemap is inlined into the CSS files.
 
-In order to have your styles extracted, you'll also need to use **MiniCssExtractPlugin**. To do that, you can add the following snippet in your webpack config:
+In order to have your styles extracted, you'll also need to use **css-loader** and **MiniCssExtractPlugin**. First, install them:
+
+```sh
+yarn add --dev css-loader mini-css-extract-plugin
+```
+
+To do that, you can add the following snippet in your webpack config:
 
 ```js
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
