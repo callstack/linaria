@@ -27,6 +27,8 @@ const transpile = async input => {
 it('evaluates identifier in scope', async () => {
   const { code, metadata } = await transpile(
     dedent`
+    import { styled } from 'linaria/react';
+
     const answer = 42;
     const foo = () => answer;
     const days = foo() + ' days';
@@ -46,6 +48,8 @@ it('evaluates identifier in scope', async () => {
 it('evaluates local expressions', async () => {
   const { code, metadata } = await transpile(
     dedent`
+    import { styled } from 'linaria/react';
+
     const answer = 42;
     const foo = () => answer;
 
@@ -64,6 +68,7 @@ it('evaluates local expressions', async () => {
 it('evaluates expressions with dependencies', async () => {
   const { code, metadata } = await transpile(
     dedent`
+    import { styled } from 'linaria/react';
     import slugify from '../slugify';
 
     const Title = styled.h1\`
@@ -81,6 +86,7 @@ it('evaluates expressions with dependencies', async () => {
 it('evaluates expressions with expressions depending on shared dependency', async () => {
   const { code, metadata } = await transpile(
     dedent`
+    import { styled } from 'linaria/react';
     const slugify = require('../slugify');
 
     const boo = t => slugify(t) + 'boo';
@@ -101,6 +107,7 @@ it('evaluates expressions with expressions depending on shared dependency', asyn
 it('evaluates multiple expressions with shared dependency', async () => {
   const { code, metadata } = await transpile(
     dedent`
+    import { styled } from 'linaria/react';
     const slugify = require('../slugify');
 
     const boo = t => slugify(t) + 'boo';
@@ -143,6 +150,8 @@ it('evaluates component interpolations', async () => {
 it('inlines object styles as CSS string', async () => {
   const { code, metadata } = await transpile(
     dedent`
+    import { styled } from 'linaria/react';
+
     const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
       position: 'absolute',
       top,
@@ -164,6 +173,8 @@ it('inlines object styles as CSS string', async () => {
 it('ignores inline arrow function expressions', async () => {
   const { code, metadata } = await transpile(
     dedent`
+    import { styled } from 'linaria/react';
+
     const Title = styled.h1\`
       &:before {
         content: "${'${props => props.content}'}"
@@ -179,6 +190,8 @@ it('ignores inline arrow function expressions', async () => {
 it('ignores inline vanilla function expressions', async () => {
   const { code, metadata } = await transpile(
     dedent`
+    import { styled } from 'linaria/react';
+
     const Title = styled.h1\`
       &:before {
         content: "${'${function(props) { return props.content }}'}"
@@ -194,6 +207,8 @@ it('ignores inline vanilla function expressions', async () => {
 it('ignores external expressions', async () => {
   const { code, metadata } = await transpile(
     dedent`
+    import { styled } from 'linaria/react';
+
     const generate = props => props.content;
 
     const Title = styled.h1\`
@@ -214,6 +229,8 @@ it('throws codeframe error when evaluation fails', async () => {
   try {
     await transpile(
       dedent`
+      import { styled } from 'linaria/react';
+
       const foo = props => { throw new Error('This will fail') };
 
       const Title = styled.h1\`

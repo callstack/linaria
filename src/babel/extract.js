@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 /* @flow */
 
-const { relative } = require('path');
+const { relative, dirname } = require('path');
 const generator = require('@babel/generator').default;
 const { isValidElementType } = require('react-is');
 const Module = require('./module');
@@ -69,6 +69,69 @@ const stripLines = (loc, text) => {
   }
 
   return result;
+};
+
+// Verify if the binding is imported from the specified source
+const imports = (t, scope, filename, identifier, source) => {
+  const binding = scope.getAllBindings()[identifier];
+
+  if (!binding) {
+    return false;
+  }
+
+  const p = binding.path;
+
+  const resolveFromFile = id => {
+    /* $FlowFixMe */
+    const M = require('module');
+
+    try {
+      return M._resolveFilename(id, {
+        id: filename,
+        filename,
+        paths: M._nodeModulePaths(dirname(filename)),
+      });
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const isImportingModule = value =>
+    // If the value is an exact match, assume it imports the module
+    value === source ||
+    // Otherwise try to resolve both and check if they are the same file
+    resolveFromFile(value) ===
+      // eslint-disable-next-line no-nested-ternary
+      (source === 'linaria'
+        ? require.resolve('../index')
+        : source === 'linaria/react'
+          ? require.resolve('../react/')
+          : resolveFromFile(source));
+
+  if (t.isImportSpecifier(p) && t.isImportDeclaration(p.parentPath)) {
+    return isImportingModule(p.parentPath.node.source.value);
+  }
+
+  if (t.isVariableDeclarator(p)) {
+    if (
+      t.isCallExpression(p.node.init) &&
+      t.isIdentifier(p.node.init.callee) &&
+      p.node.init.callee.name === 'require' &&
+      p.node.init.arguments.length === 1
+    ) {
+      const node = p.node.init.arguments[0];
+
+      if (t.isStringLiteral(node)) {
+        return isImportingModule(node.value);
+      }
+
+      if (t.isTemplateLiteral(node) && node.quasis.length === 1) {
+        return isImportingModule(node.quasis[0].value.cooked);
+      }
+    }
+  }
+
+  return false;
 };
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
@@ -154,24 +217,41 @@ module.exports = function extract(
         const { quasi, tag } = path.node;
 
         let styled;
+        let css;
 
         if (
-          t.isCallExpression(tag) &&
-          t.isIdentifier(tag.callee) &&
-          tag.arguments.length === 1 &&
-          tag.callee.name === 'styled'
+          imports(
+            t,
+            path.scope,
+            state.file.opts.filename,
+            'styled',
+            'linaria/react'
+          )
         ) {
-          styled = { component: path.get('tag').get('arguments')[0] };
+          if (
+            t.isCallExpression(tag) &&
+            t.isIdentifier(tag.callee) &&
+            tag.arguments.length === 1 &&
+            tag.callee.name === 'styled'
+          ) {
+            styled = { component: path.get('tag').get('arguments')[0] };
+          } else if (
+            t.isMemberExpression(tag) &&
+            t.isIdentifier(tag.object) &&
+            t.isIdentifier(tag.property) &&
+            tag.object.name === 'styled'
+          ) {
+            styled = {
+              component: { node: t.stringLiteral(tag.property.name) },
+            };
+          }
         } else if (
-          t.isMemberExpression(tag) &&
-          t.isIdentifier(tag.object) &&
-          t.isIdentifier(tag.property) &&
-          tag.object.name === 'styled'
+          imports(t, path.scope, state.file.opts.filename, 'css', 'linaria')
         ) {
-          styled = { component: { node: t.stringLiteral(tag.property.name) } };
+          css = t.isIdentifier(tag) && tag.name === 'css';
         }
 
-        if (styled || (t.isIdentifier(tag) && tag.name === 'css')) {
+        if (styled || css) {
           const interpolations = [];
 
           // Try to determine a readable class name
