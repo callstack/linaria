@@ -13,7 +13,7 @@ import dedent from 'dedent';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { collect } from 'linaria/server'; // eslint-disable-line import/no-unresolved
-import App from './App';
+import App from './components/App';
 import config from '../serve.config';
 
 const cache = {};

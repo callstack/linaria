@@ -2,8 +2,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
-import '../static/vendor/prism';
+import App from './components/App';
 import './styles/global.css';
 
 /* $FlowFixMe */

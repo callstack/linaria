@@ -1,3 +1,7 @@
+### OS Junk ###
+.DS_Store
+*~
+
 ### Node ###
 # Logs
 logs
