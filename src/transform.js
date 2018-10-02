@@ -44,7 +44,7 @@ module.exports = function transform(
 ) /* : Result */ {
   // Check if the file contains `css` or `styled` tag first
   // Otherwise we should skip transforming
-  if (!/\b(styled(\([^)]+\)|\.[a-z0-9]+)|css)`/.test(content)) {
+  if (!/\b(styled(\([^)]+\)|\.[a-z0-9]+)|css)[\s\n]*`/.test(content)) {
     return { code: content };
   }
 
