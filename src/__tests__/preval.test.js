@@ -4,9 +4,20 @@
 const path = require('path');
 const babel = require('@babel/core');
 const dedent = require('dedent');
+const serializer = require('../__utils__/linaria-snapshot-serializer');
+
+const replaceSlug = value =>
+  value
+    .replace(/((_)|(--))[a-z0-9]{7,8}/g, '$1abcdefg')
+    .replace(/(")[a-z0-9]{7,8}(-)/g, '$1abcdefg$2');
+
+expect.addSnapshotSerializer({
+  ...serializer,
+  print: value => replaceSlug(serializer.print(value)),
+});
 
 const transpile = async input => {
-  const { code } = await babel.transformAsync(input, {
+  const { code, metadata } = await babel.transformAsync(input, {
     babelrc: false,
     presets: [
       [require.resolve('../babel'), { displayName: true, evaluate: true }],
@@ -15,13 +26,14 @@ const transpile = async input => {
   });
 
   // The slug will be machine specific, so replace it with a consistent one
-  return code
-    .replace(/((_)|(--))[a-z0-9]{7,8}/g, '$1abcdefg')
-    .replace(/(")[a-z0-9]{7,8}(-)/g, '$1abcdefg$2');
+  return {
+    metadata,
+    code: replaceSlug(code),
+  };
 };
 
 it('evaluates identifier in scope', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const answer = 42;
     const foo = () => answer;
@@ -36,10 +48,11 @@ it('evaluates identifier in scope', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('evaluates local expressions', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const answer = 42;
     const foo = () => answer;
@@ -53,10 +66,11 @@ it('evaluates local expressions', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('evaluates expressions with dependencies', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     import slugify from '../slugify';
 
@@ -69,10 +83,11 @@ it('evaluates expressions with dependencies', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('evaluates expressions with expressions depending on shared dependency', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const slugify = require('../slugify');
 
@@ -88,10 +103,11 @@ it('evaluates expressions with expressions depending on shared dependency', asyn
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('evaluates multiple expressions with shared dependency', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const slugify = require('../slugify');
 
@@ -108,10 +124,11 @@ it('evaluates multiple expressions with shared dependency', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('evaluates component interpolations', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const { styled } = require('../react');
 
@@ -128,10 +145,11 @@ it('evaluates component interpolations', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('inlines object styles as CSS string', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
       position: 'absolute',
@@ -148,10 +166,11 @@ it('inlines object styles as CSS string', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('ignores inline arrow function expressions', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const Title = styled.h1\`
       &:before {
@@ -162,10 +181,11 @@ it('ignores inline arrow function expressions', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('ignores inline vanilla function expressions', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const Title = styled.h1\`
       &:before {
@@ -176,10 +196,11 @@ it('ignores inline vanilla function expressions', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('ignores external expressions', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const generate = props => props.content;
 
@@ -192,6 +213,7 @@ it('ignores external expressions', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('throws codeframe error when evaluation fails', async () => {

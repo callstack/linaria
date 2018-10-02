@@ -16,18 +16,18 @@ const Paragraph =
 styled(\\"p\\")({
   name: \\"Paragraph\\",
   class: \\"Paragraph_abcdefg\\"
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.Title_abcdefg{color:red;}
+exports[`evaluates component interpolations 2`] = `
+
+CSS Text: .Title_abcdefg{color:red;}
 .Paragraph_abcdefg .Title_abcdefg{color:blue;}
 
-CSS OUTPUT TEXT END
+Dependencies: ../react
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":6},\\"name\\":\\".Paragraph_abcdefg\\"}]
-CSS OUTPUT DEPENDENCIES:[\\"../react\\"]
-*/"
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".Title_abcdefg"},{"generated":{"line":2,"column":0},"original":{"line":7,"column":6},"name":".Paragraph_abcdefg"}]
+
 `;
 
 exports[`evaluates expressions with dependencies 1`] = `
@@ -37,17 +37,17 @@ const Title =
 styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.Title_abcdefg:before{content:\\"6og6jy\\";}
+exports[`evaluates expressions with dependencies 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .Title_abcdefg:before{content:"6og6jy";}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
-CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
-*/"
+Dependencies: ../slugify
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".Title_abcdefg"}]
+
 `;
 
 exports[`evaluates expressions with expressions depending on shared dependency 1`] = `
@@ -62,17 +62,17 @@ const Title =
 styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.Title_abcdefg:before{content:\\"6og6jyboo6og6jybar\\";}
+exports[`evaluates expressions with expressions depending on shared dependency 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .Title_abcdefg:before{content:"6og6jyboo6og6jybar";}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
-CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
-*/"
+Dependencies: ../slugify
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":6,"column":6},"name":".Title_abcdefg"}]
+
 `;
 
 exports[`evaluates identifier in scope 1`] = `
@@ -86,17 +86,17 @@ const Title =
 styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.Title_abcdefg:before{content:\\"42 days\\";}
+exports[`evaluates identifier in scope 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .Title_abcdefg:before{content:"42 days";}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":5,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":5,"column":6},"name":".Title_abcdefg"}]
+
 `;
 
 exports[`evaluates local expressions 1`] = `
@@ -109,17 +109,17 @@ const Title =
 styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.Title_abcdefg:before{content:\\"42 days\\";}
+exports[`evaluates local expressions 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .Title_abcdefg:before{content:"42 days";}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":4,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":4,"column":6},"name":".Title_abcdefg"}]
+
 `;
 
 exports[`evaluates multiple expressions with shared dependency 1`] = `
@@ -134,17 +134,17 @@ const Title =
 styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.Title_abcdefg:before{content:\\"6og6jyboo\\" content:\\"6og6jybar\\";}
+exports[`evaluates multiple expressions with shared dependency 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .Title_abcdefg:before{content:"6og6jyboo" content:"6og6jybar";}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":6,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
-CSS OUTPUT DEPENDENCIES:[\\"../slugify\\"]
-*/"
+Dependencies: ../slugify, ../slugify
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":6,"column":6},"name":".Title_abcdefg"}]
+
 `;
 
 exports[`ignores external expressions 1`] = `
@@ -158,17 +158,17 @@ styled(\\"h1\\")({
   vars: {
     \\"abcdefg-0\\": [generate]
   }
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.Title_abcdefg:before{content:\\"var(--abcdefg-0)\\";}
+exports[`ignores external expressions 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .Title_abcdefg:before{content:"var(--abcdefg-0)";}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".Title_abcdefg"}]
+
 `;
 
 exports[`ignores inline arrow function expressions 1`] = `
@@ -180,17 +180,17 @@ styled(\\"h1\\")({
   vars: {
     \\"abcdefg-0\\": [props => props.content]
   }
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.Title_abcdefg:before{content:\\"var(--abcdefg-0)\\";}
+exports[`ignores inline arrow function expressions 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .Title_abcdefg:before{content:"var(--abcdefg-0)";}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".Title_abcdefg"}]
+
 `;
 
 exports[`ignores inline vanilla function expressions 1`] = `
@@ -204,17 +204,17 @@ styled(\\"h1\\")({
       return props.content;
     }]
   }
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.Title_abcdefg:before{content:\\"var(--abcdefg-0)\\";}
+exports[`ignores inline vanilla function expressions 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .Title_abcdefg:before{content:"var(--abcdefg-0)";}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".Title_abcdefg"}]
+
 `;
 
 exports[`inlines object styles as CSS string 1`] = `
@@ -231,17 +231,17 @@ const Title =
 styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_abcdefg\\"
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.Title_abcdefg{position:absolute;top:0;right:0;bottom:0;left:0;}
+exports[`inlines object styles as CSS string 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .Title_abcdefg{position:absolute;top:0;right:0;bottom:0;left:0;}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":9,\\"column\\":6},\\"name\\":\\".Title_abcdefg\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":9,"column":6},"name":".Title_abcdefg"}]
+
 `;
 
 exports[`throws codeframe error when evaluation fails 1`] = `

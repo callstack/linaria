@@ -5,6 +5,8 @@ exports[`does not output CSS if none present 1`] = `
 const title = String.raw\`This is something\`;"
 `;
 
+exports[`does not output CSS if none present 2`] = `Object {}`;
+
 exports[`evaluates and inlines expressions in scope 1`] = `
 "const color = 'blue';
 const Title =
@@ -12,47 +14,45 @@ const Title =
 styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"th73eyu\\"
-});
-
-/*
-CSS OUTPUT TEXT START
-.th73eyu{color:blue;width:33.333333333333336%;}
-
-CSS OUTPUT TEXT END
-
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":3,\\"column\\":6},\\"name\\":\\".th73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+});"
 `;
 
-exports[`handles css template literal in JSX element 1`] = `
-"<Title class={\\"th73eyu\\"} />;
+exports[`evaluates and inlines expressions in scope 2`] = `
 
-/*
-CSS OUTPUT TEXT START
-.th73eyu{font-size:14px;}
+CSS Text: .th73eyu{color:blue;width:33.333333333333336%;}
 
-CSS OUTPUT TEXT END
+Dependencies: NA
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":13},\\"name\\":\\".th73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".th73eyu"}]
+
+`;
+
+exports[`handles css template literal in JSX element 1`] = `"<Title class={\\"th73eyu\\"} />;"`;
+
+exports[`handles css template literal in JSX element 2`] = `
+
+CSS Text: .th73eyu{font-size:14px;}
+
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":13},"name":".th73eyu"}]
+
 `;
 
 exports[`handles css template literal in object property 1`] = `
 "const components = {
   title: \\"th73eyu\\"
-};
+};"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.th73eyu{font-size:14px;}
+exports[`handles css template literal in object property 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .th73eyu{font-size:14px;}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":2,\\"column\\":2},\\"name\\":\\".th73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":2,"column":2},"name":".th73eyu"}]
+
 `;
 
 exports[`handles interpolation followed by unit 1`] = `
@@ -78,17 +78,17 @@ styled(\\"h1\\")({
       return 200;
     }, \\"px\\"]
   }
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.th73eyu{font-size:var(--th73eyu-0);text-shadow:black 1px var(--th73eyu-1),white -2px -2px;margin:var(--th73eyu-2);width:calc(2 * var(--th73eyu-3));height:var(--th73eyu-4);grid-template-columns:var(--th73eyu-5) 1fr 1fr var(--th73eyu-5);border-radius:var(--th73eyu-7);}
+exports[`handles interpolation followed by unit 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .th73eyu{font-size:var(--th73eyu-0);text-shadow:black 1px var(--th73eyu-1),white -2px -2px;margin:var(--th73eyu-2);width:calc(2 * var(--th73eyu-3));height:var(--th73eyu-4);grid-template-columns:var(--th73eyu-5) 1fr 1fr var(--th73eyu-5);border-radius:var(--th73eyu-7);}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".th73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"}]
+
 `;
 
 exports[`handles nested blocks 1`] = `
@@ -100,17 +100,17 @@ styled(\\"button\\")({
   vars: {
     \\"bh73eyu-0\\": [regular]
   }
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.bh73eyu{font-family:var(--bh73eyu-0);}.bh73eyu:hover{border-color:blue;}@media (max-width:200px){.bh73eyu{width:100%;}}
+exports[`handles nested blocks 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .bh73eyu{font-family:var(--bh73eyu-0);}.bh73eyu:hover{border-color:blue;}@media (max-width:200px){.bh73eyu{width:100%;}}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".bh73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".bh73eyu"}]
+
 `;
 
 exports[`inlines object styles as CSS string 1`] = `
@@ -142,17 +142,17 @@ const Title =
 styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"th73eyu\\"
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.th73eyu{position:absolute;top:0;right:0;bottom:0;left:0;opacity:1;min-height:420px;}@media (min-width:200px){.th73eyu{-webkit-opacity:0.8;-moz-opacity:0.8;-ms-opacity:0.8;-o-opacity:0.8;-webkit-border-radius:2px;-moz-border-radius:2px;-ms-border-radius:2px;-o-border-radius:2px;-webkit-transition:400ms;-moz-transition:400ms;-o-transition:400ms;-ms-transition:400ms;}}
+exports[`inlines object styles as CSS string 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .th73eyu{position:absolute;top:0;right:0;bottom:0;left:0;opacity:1;min-height:420px;}@media (min-width:200px){.th73eyu{-webkit-opacity:0.8;-moz-opacity:0.8;-ms-opacity:0.8;-o-opacity:0.8;-webkit-border-radius:2px;-moz-border-radius:2px;-ms-border-radius:2px;-o-border-radius:2px;-webkit-transition:400ms;-moz-transition:400ms;-o-transition:400ms;-ms-transition:400ms;}}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":26,\\"column\\":6},\\"name\\":\\".th73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":26,"column":6},"name":".th73eyu"}]
+
 `;
 
 exports[`outputs valid CSS classname 1`] = `
@@ -161,17 +161,17 @@ exports[`outputs valid CSS classname 1`] = `
 styled(\\"h1\\")({
   name: \\"\\\\u1FA9Page$Title\\",
   class: \\"_h73eyu\\"
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-._h73eyu{font-size:14px;}
+exports[`outputs valid CSS classname 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: ._h73eyu{font-size:14px;}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\"._h73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":"._h73eyu"}]
+
 `;
 
 exports[`prevents class name collision 1`] = `
@@ -196,18 +196,18 @@ function more() {
       \\"t462dh3-0\\": [regular]
     }
   });
-}
+}"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.th73eyu{font-size:var(--th73eyu-0);color:var(--th73eyu-1);}
+exports[`prevents class name collision 2`] = `
+
+CSS Text: .th73eyu{font-size:var(--th73eyu-0);color:var(--th73eyu-1);}
 .t462dh3{font-family:var(--t462dh3-0);}
 
-CSS OUTPUT TEXT END
+Dependencies: NA
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".th73eyu\\"},{\\"generated\\":{\\"line\\":2,\\"column\\":0},\\"original\\":{\\"line\\":7,\\"column\\":8},\\"name\\":\\".t462dh3\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"},{"generated":{"line":2,"column":0},"original":{"line":7,"column":8},"name":".t462dh3"}]
+
 `;
 
 exports[`replaces unknown expressions with CSS custom properties 1`] = `
@@ -220,17 +220,17 @@ styled(\\"h1\\")({
     \\"th73eyu-0\\": [size, \\"px\\"],
     \\"th73eyu-1\\": [props => props.color]
   }
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.th73eyu{font-size:var(--th73eyu-0);color:var(--th73eyu-1);}
+exports[`replaces unknown expressions with CSS custom properties 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .th73eyu{font-size:var(--th73eyu-0);color:var(--th73eyu-1);}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".th73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"}]
+
 `;
 
 exports[`throws when contains dynamic expression without evaluate: true in css tag 1`] = `
@@ -254,18 +254,16 @@ exports[`throws when not attached to a variable 1`] = `
 [0m [90m 4 | [39m[32m\`[39m[33m;[39m[0m"
 `;
 
-exports[`transpiles css template literal 1`] = `
-"const title = \\"th73eyu\\";
+exports[`transpiles css template literal 1`] = `"const title = \\"th73eyu\\";"`;
 
-/*
-CSS OUTPUT TEXT START
-.th73eyu{font-size:14px;}
+exports[`transpiles css template literal 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .th73eyu{font-size:14px;}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".th73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"}]
+
 `;
 
 exports[`transpiles styled template literal with function and component 1`] = `
@@ -274,17 +272,17 @@ exports[`transpiles styled template literal with function and component 1`] = `
 styled(Heading)({
   name: \\"Title\\",
   class: \\"th73eyu\\"
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.th73eyu{font-size:14px;}
+exports[`transpiles styled template literal with function and component 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .th73eyu{font-size:14px;}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".th73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"}]
+
 `;
 
 exports[`transpiles styled template literal with function and tag 1`] = `
@@ -293,17 +291,17 @@ exports[`transpiles styled template literal with function and tag 1`] = `
 styled('h1')({
   name: \\"Title\\",
   class: \\"th73eyu\\"
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.th73eyu{font-size:14px;}
+exports[`transpiles styled template literal with function and tag 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .th73eyu{font-size:14px;}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".th73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"}]
+
 `;
 
 exports[`transpiles styled template literal with object 1`] = `
@@ -312,17 +310,17 @@ exports[`transpiles styled template literal with object 1`] = `
 styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"th73eyu\\"
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.th73eyu{font-size:14px;}
+exports[`transpiles styled template literal with object 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .th73eyu{font-size:14px;}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".th73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"}]
+
 `;
 
 exports[`uses the same custom property for the same expression 1`] = `
@@ -334,17 +332,17 @@ styled(\\"div\\")({
   vars: {
     \\"bh73eyu-0\\": [props => props.size, \\"px\\"]
   }
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.bh73eyu{height:var(--bh73eyu-0);width:var(--bh73eyu-0);}
+exports[`uses the same custom property for the same expression 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .bh73eyu{height:var(--bh73eyu-0);width:var(--bh73eyu-0);}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".bh73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".bh73eyu"}]
+
 `;
 
 exports[`uses the same custom property for the same identifier 1`] = `
@@ -356,15 +354,15 @@ styled(\\"div\\")({
   vars: {
     \\"bh73eyu-0\\": [size, \\"px\\"]
   }
-});
+});"
+`;
 
-/*
-CSS OUTPUT TEXT START
-.bh73eyu{height:var(--bh73eyu-0);width:var(--bh73eyu-0);}
+exports[`uses the same custom property for the same identifier 2`] = `
 
-CSS OUTPUT TEXT END
+CSS Text: .bh73eyu{height:var(--bh73eyu-0);width:var(--bh73eyu-0);}
 
-CSS OUTPUT MAPPINGS:[{\\"generated\\":{\\"line\\":1,\\"column\\":0},\\"original\\":{\\"line\\":1,\\"column\\":6},\\"name\\":\\".bh73eyu\\"}]
-CSS OUTPUT DEPENDENCIES:[]
-*/"
+Dependencies: NA
+
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".bh73eyu"}]
+
 `;

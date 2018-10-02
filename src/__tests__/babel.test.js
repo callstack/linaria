@@ -3,19 +3,19 @@
 
 const babel = require('@babel/core');
 const dedent = require('dedent');
+const serializer = require('../__utils__/linaria-snapshot-serializer');
 
-const transpile = async input => {
-  const { code } = await babel.transformAsync(input, {
+expect.addSnapshotSerializer(serializer);
+
+const transpile = input =>
+  babel.transformAsync(input, {
     presets: [[require.resolve('../babel'), { evaluate: false }]],
     plugins: ['@babel/plugin-syntax-jsx'],
     filename: '/app/index.js',
   });
 
-  return code;
-};
-
 it('transpiles styled template literal with object', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const Title = styled.h1\`
       font-size: 14px;
@@ -24,10 +24,11 @@ it('transpiles styled template literal with object', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('transpiles styled template literal with function and tag', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const Title = styled('h1')\`
       font-size: 14px;
@@ -36,10 +37,11 @@ it('transpiles styled template literal with function and tag', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('transpiles styled template literal with function and component', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const Title = styled(Heading)\`
       font-size: 14px;
@@ -48,10 +50,11 @@ it('transpiles styled template literal with function and component', async () =>
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('outputs valid CSS classname', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const ᾩPage$Title = styled.h1\`
       font-size: 14px;
@@ -60,10 +63,11 @@ it('outputs valid CSS classname', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('evaluates and inlines expressions in scope', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const color = 'blue';
 
@@ -75,10 +79,11 @@ it('evaluates and inlines expressions in scope', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('inlines object styles as CSS string', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const cover = {
       position: 'absolute',
@@ -112,10 +117,11 @@ it('inlines object styles as CSS string', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('replaces unknown expressions with CSS custom properties', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const Title = styled.h1\`
       font-size: ${'${size}'}px;
@@ -125,10 +131,11 @@ it('replaces unknown expressions with CSS custom properties', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('handles interpolation followed by unit', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const Title = styled.h1\`
       font-size: ${'${size}'}em;
@@ -143,10 +150,11 @@ it('handles interpolation followed by unit', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('uses the same custom property for the same identifier', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const Box = styled.div\`
       height: ${'${size}'}px;
@@ -156,10 +164,11 @@ it('uses the same custom property for the same identifier', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('uses the same custom property for the same expression', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const Box = styled.div\`
       height: ${'${props => props.size}'}px;
@@ -169,10 +178,11 @@ it('uses the same custom property for the same expression', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('handles nested blocks', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const Button = styled.button\`
       font-family: ${'${regular}'};
@@ -189,10 +199,11 @@ it('handles nested blocks', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('prevents class name collision', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const Title = styled.h1\`
       font-size: ${'${size}'}px;
@@ -208,6 +219,7 @@ it('prevents class name collision', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('throws when not attached to a variable', async () => {
@@ -228,7 +240,7 @@ it('throws when not attached to a variable', async () => {
 });
 
 it('does not output CSS if none present', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
       const number = 42;
 
@@ -237,10 +249,11 @@ it('does not output CSS if none present', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('transpiles css template literal', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const title = css\`
       font-size: 14px;
@@ -249,10 +262,11 @@ it('transpiles css template literal', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('handles css template literal in object property', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     const components = {
       title: css\`
@@ -263,16 +277,18 @@ it('handles css template literal in object property', async () => {
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('handles css template literal in JSX element', async () => {
-  const code = await transpile(
+  const { code, metadata } = await transpile(
     dedent`
     <Title class={css\` font-size: 14px; \`} />
     `
   );
 
   expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('throws when contains dynamic expression without evaluate: true in css tag', async () => {
