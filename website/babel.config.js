@@ -12,7 +12,10 @@ module.exports = {
   ],
   env: {
     server: {
-      presets: [['@babel/preset-env', { targets: { node: 8 } }]],
+      presets: [
+        ['@babel/preset-env', { targets: { node: 8 } }],
+        require.resolve('../src/babel'),
+      ],
     },
   },
 };

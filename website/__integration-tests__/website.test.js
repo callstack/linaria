@@ -33,21 +33,21 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  server.kill();
+  server.kill('SIGINT');
 });
 
 it('should launch website with webpack', async () => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
-  await page.setViewport({ width: 800, height: 3260 });
+  await page.setViewport({ width: 1200, height: 800 });
   await page.goto(`http://localhost:${config.port}`, {
     waitUntil: 'networkidle2',
   });
 
   const screenshot = await page.screenshot();
 
-  browser.close();
+  await browser.close();
 
   /* $FlowFixMe */
   expect(screenshot).toMatchImageSnapshot();

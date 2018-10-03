@@ -50,12 +50,6 @@ jobs:
         - store_artifacts:
             path: coverage
             destination: coverage
-  build-website:
-      <<: *defaults
-      steps:
-        - attach_workspace:
-            at: ~/linaria
-        - run: yarn --cwd website build
   lint-website:
       <<: *defaults
       steps:
@@ -69,6 +63,7 @@ jobs:
             at: ~/linaria
         - run: |
             bash .circleci/install-chrome-deps.sh
+            yarn --cwd website build
             yarn test:integration
         - store_artifacts:
             path: website/__integration-tests__/__image_snapshots__/__diff_output__
@@ -86,10 +81,6 @@ workflows:
           requires:
             - install-dependencies
       - integration-tests:
-          requires:
-            - install-dependencies
-            - build-website
-      - build-website:
           requires:
             - install-dependencies
       - lint-website:
