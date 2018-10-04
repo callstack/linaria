@@ -1,6 +1,6 @@
 {
   "name": "linaria",
-  "version": "1.0.0-alpha.7",
+  "version": "1.0.0-alpha.8",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "main": "lib/index.js",
   "files": [
