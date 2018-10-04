@@ -114,6 +114,7 @@ class Module {
       plugins: [
         // Include this plugin to avoid extra config when using { module: false } for webpack
         '@babel/plugin-transform-modules-commonjs',
+        '@babel/plugin-proposal-export-namespace-from',
         // We don't support dynamic imports when evaluating, but don't wanna syntax error
         // This will replace dynamic imports with an object that does nothing
         require.resolve('./dynamic-import-noop'),
