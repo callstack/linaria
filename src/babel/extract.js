@@ -87,7 +87,7 @@ type State = {|
     [className: string]: {
       cssText: string,
       displayName: string,
-      start: Location,
+      start: ?Location,
     },
   },
   replacements: Array<{
@@ -467,7 +467,8 @@ module.exports = function extract(
             cssText,
             className,
             displayName,
-            start: path.parent.loc.start,
+            start:
+              path.parent && path.parent.loc ? path.parent.loc.start : null,
           };
         }
       },

@@ -30,7 +30,7 @@ function preprocessor() {
         // Append new lines until we get to the start line number
         let line = cssText.split('\n').length;
 
-        while (line < rule.start.line) {
+        while (rule.start && line < rule.start.line) {
           cssText += '\n';
           line++;
         }
@@ -42,7 +42,7 @@ function preprocessor() {
 
         let column = last ? last.length : 0;
 
-        while (column < rule.start.column) {
+        while (rule.start && column < rule.start.column) {
           cssText += ' ';
           column++;
         }

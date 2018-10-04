@@ -20,7 +20,7 @@ type Result = {
     [className: string]: {
       cssText: string,
       displayName: string,
-      start: Location,
+      start: ?Location,
     },
   },
   replacements?: Array<{
