@@ -88,8 +88,9 @@ module.exports = function transform(
   const { metadata, code } = babel.transformSync(content, {
     filename,
     presets: [[require.resolve('./babel'), options]],
-    babelrc: false,
     exclude: /node_modules/,
+    babelrc: false,
+    configFile: false,
     parserOpts,
   });
 
