@@ -9,24 +9,24 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_abcdefg\\"
+  class: \\"Title_t1xha7dm\\"
 });
 const Paragraph =
 /*#__PURE__*/
 styled(\\"p\\")({
   name: \\"Paragraph\\",
-  class: \\"Paragraph_abcdefg\\"
+  class: \\"Paragraph_p1rsdnkv\\"
 });"
 `;
 
 exports[`evaluates component interpolations 2`] = `
 
-CSS Text: .Title_abcdefg{color:red;}
-.Paragraph_abcdefg .Title_abcdefg{color:blue;}
+CSS Text: .Title_t1xha7dm{color:red;}
+.Paragraph_p1rsdnkv .Title_t1xha7dm{color:blue;}
 
 Dependencies: ../react
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".Title_abcdefg"},{"generated":{"line":2,"column":0},"original":{"line":7,"column":6},"name":".Paragraph_abcdefg"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".Title_t1xha7dm"},{"generated":{"line":2,"column":0},"original":{"line":7,"column":6},"name":".Paragraph_p1rsdnkv"}]
 
 `;
 
@@ -36,17 +36,17 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_abcdefg\\"
+  class: \\"Title_t1xha7dm\\"
 });"
 `;
 
 exports[`evaluates expressions with dependencies 2`] = `
 
-CSS Text: .Title_abcdefg:before{content:"6og6jy";}
+CSS Text: .Title_t1xha7dm:before{content:"6og6jy";}
 
 Dependencies: ../slugify
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".Title_abcdefg"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".Title_t1xha7dm"}]
 
 `;
 
@@ -61,17 +61,17 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_abcdefg\\"
+  class: \\"Title_t1xha7dm\\"
 });"
 `;
 
 exports[`evaluates expressions with expressions depending on shared dependency 2`] = `
 
-CSS Text: .Title_abcdefg:before{content:"6og6jyboo6og6jybar";}
+CSS Text: .Title_t1xha7dm:before{content:"6og6jyboo6og6jybar";}
 
 Dependencies: ../slugify
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":6,"column":6},"name":".Title_abcdefg"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":6,"column":6},"name":".Title_t1xha7dm"}]
 
 `;
 
@@ -85,17 +85,17 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_abcdefg\\"
+  class: \\"Title_t1xha7dm\\"
 });"
 `;
 
 exports[`evaluates identifier in scope 2`] = `
 
-CSS Text: .Title_abcdefg:before{content:"42 days";}
+CSS Text: .Title_t1xha7dm:before{content:"42 days";}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":5,"column":6},"name":".Title_abcdefg"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":5,"column":6},"name":".Title_t1xha7dm"}]
 
 `;
 
@@ -108,17 +108,17 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_abcdefg\\"
+  class: \\"Title_t1xha7dm\\"
 });"
 `;
 
 exports[`evaluates local expressions 2`] = `
 
-CSS Text: .Title_abcdefg:before{content:"42 days";}
+CSS Text: .Title_t1xha7dm:before{content:"42 days";}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":4,"column":6},"name":".Title_abcdefg"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":4,"column":6},"name":".Title_t1xha7dm"}]
 
 `;
 
@@ -133,17 +133,17 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_abcdefg\\"
+  class: \\"Title_t1xha7dm\\"
 });"
 `;
 
 exports[`evaluates multiple expressions with shared dependency 2`] = `
 
-CSS Text: .Title_abcdefg:before{content:"6og6jyboo" content:"6og6jybar";}
+CSS Text: .Title_t1xha7dm:before{content:"6og6jyboo" content:"6og6jybar";}
 
 Dependencies: ../slugify, ../slugify
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":6,"column":6},"name":".Title_abcdefg"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":6,"column":6},"name":".Title_t1xha7dm"}]
 
 `;
 
@@ -154,20 +154,20 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_abcdefg\\",
+  class: \\"Title_t1xha7dm\\",
   vars: {
-    \\"abcdefg-0\\": [generate]
+    \\"t1xha7dm-0\\": [generate]
   }
 });"
 `;
 
 exports[`ignores external expressions 2`] = `
 
-CSS Text: .Title_abcdefg:before{content:"var(--abcdefg-0)";}
+CSS Text: .Title_t1xha7dm:before{content:"var(--t1xha7dm-0)";}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".Title_abcdefg"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".Title_t1xha7dm"}]
 
 `;
 
@@ -176,20 +176,20 @@ exports[`ignores inline arrow function expressions 1`] = `
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_abcdefg\\",
+  class: \\"Title_t1xha7dm\\",
   vars: {
-    \\"abcdefg-0\\": [props => props.content]
+    \\"t1xha7dm-0\\": [props => props.content]
   }
 });"
 `;
 
 exports[`ignores inline arrow function expressions 2`] = `
 
-CSS Text: .Title_abcdefg:before{content:"var(--abcdefg-0)";}
+CSS Text: .Title_t1xha7dm:before{content:"var(--t1xha7dm-0)";}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".Title_abcdefg"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".Title_t1xha7dm"}]
 
 `;
 
@@ -198,9 +198,9 @@ exports[`ignores inline vanilla function expressions 1`] = `
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_abcdefg\\",
+  class: \\"Title_t1xha7dm\\",
   vars: {
-    \\"abcdefg-0\\": [function (props) {
+    \\"t1xha7dm-0\\": [function (props) {
       return props.content;
     }]
   }
@@ -209,11 +209,11 @@ styled(\\"h1\\")({
 
 exports[`ignores inline vanilla function expressions 2`] = `
 
-CSS Text: .Title_abcdefg:before{content:"var(--abcdefg-0)";}
+CSS Text: .Title_t1xha7dm:before{content:"var(--t1xha7dm-0)";}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".Title_abcdefg"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".Title_t1xha7dm"}]
 
 `;
 
@@ -230,17 +230,17 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_abcdefg\\"
+  class: \\"Title_t1xha7dm\\"
 });"
 `;
 
 exports[`inlines object styles as CSS string 2`] = `
 
-CSS Text: .Title_abcdefg{position:absolute;top:0;right:0;bottom:0;left:0;}
+CSS Text: .Title_t1xha7dm{position:absolute;top:0;right:0;bottom:0;left:0;}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":9,"column":6},"name":".Title_abcdefg"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":9,"column":6},"name":".Title_t1xha7dm"}]
 
 `;
 

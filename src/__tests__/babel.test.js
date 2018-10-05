@@ -1,6 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
 /* @flow */
 
+const path = require('path');
 const babel = require('@babel/core');
 const dedent = require('dedent');
 const serializer = require('../__utils__/linaria-snapshot-serializer');
@@ -9,9 +10,10 @@ expect.addSnapshotSerializer(serializer);
 
 const transpile = input =>
   babel.transformAsync(input, {
+    babelrc: false,
     presets: [[require.resolve('../babel'), { evaluate: false }]],
     plugins: ['@babel/plugin-syntax-jsx'],
-    filename: '/app/index.js',
+    filename: path.join(__dirname, 'app/index.js'),
   });
 
 it('transpiles styled template literal with object', async () => {
@@ -235,7 +237,7 @@ it('throws when not attached to a variable', async () => {
       `
     );
   } catch (e) {
-    expect(e.message).toMatchSnapshot();
+    expect(e.message.replace(__dirname, '<<DIRNAME>>')).toMatchSnapshot();
   }
 });
 
@@ -303,6 +305,6 @@ it('throws when contains dynamic expression without evaluate: true in css tag', 
       `
     );
   } catch (e) {
-    expect(e.message).toMatchSnapshot();
+    expect(e.message.replace(__dirname, '<<DIRNAME>>')).toMatchSnapshot();
   }
 });

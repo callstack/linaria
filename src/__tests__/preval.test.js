@@ -6,15 +6,7 @@ const babel = require('@babel/core');
 const dedent = require('dedent');
 const serializer = require('../__utils__/linaria-snapshot-serializer');
 
-const replaceSlug = value =>
-  value
-    .replace(/((_)|(--))[a-z0-9]{7,8}/g, '$1abcdefg')
-    .replace(/(")[a-z0-9]{7,8}(-)/g, '$1abcdefg$2');
-
-expect.addSnapshotSerializer({
-  ...serializer,
-  print: value => replaceSlug(serializer.print(value)),
-});
+expect.addSnapshotSerializer(serializer);
 
 const transpile = async input => {
   const { code, metadata } = await babel.transformAsync(input, {
@@ -28,7 +20,7 @@ const transpile = async input => {
   // The slug will be machine specific, so replace it with a consistent one
   return {
     metadata,
-    code: replaceSlug(code),
+    code,
   };
 };
 
