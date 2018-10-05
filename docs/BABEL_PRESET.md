@@ -1,8 +1,8 @@
 # `linaria/babel` preset
 
-The preset pre-processes and evaluates the CSS. The webpack loader uses this preset under the hood. You don't need to use add this plugin if you're using the webpack loader.
+The preset pre-processes and evaluates the CSS. The webpack loader uses this preset under the hood. You also might want to use this preset if you import the components outside webpack, such as on your server or in unit tests.
 
-If you need to use this preset for some reason, add `linaria/babel` to your Babel configuration at the end of your presets list:
+To use this preset, add `linaria/babel` to your Babel configuration at the end of the presets list:
 
 `.babelrc`:
 

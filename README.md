@@ -88,6 +88,18 @@ Now, the CSS you write with Linaria will be extracted at build time to the `styl
 
 Linaria integrates with your CSS pipeline, so you can always perform additional operations on the CSS, for example, using [postcss](https://postcss.org/) plugins such as [clean-css](https://github.com/jakubpawlowicz/clean-css) to further minify your CSS.
 
+Optionally, add the `linaria/babel` preset to your Babel configuration at the end of the presets list to avoid errors when importing the components in your server code or tests:
+
+```json
+{
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react",
+    "linaria/babel"
+  ]
+}
+```
+
 ## Syntax
 
 Linaria can be used with any framework, with additional helpers for React. The basic syntax looks like this:
