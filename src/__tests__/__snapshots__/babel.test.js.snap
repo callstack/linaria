@@ -13,45 +13,45 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th73eyu\\"
+  class: \\"th6xni0\\"
 });"
 `;
 
 exports[`evaluates and inlines expressions in scope 2`] = `
 
-CSS Text: .th73eyu{color:blue;width:33.333333333333336%;}
+CSS Text: .th6xni0{color:blue;width:33.333333333333336%;}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".th73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".th6xni0"}]
 
 `;
 
-exports[`handles css template literal in JSX element 1`] = `"<Title class={\\"th73eyu\\"} />;"`;
+exports[`handles css template literal in JSX element 1`] = `"<Title class={\\"th6xni0\\"} />;"`;
 
 exports[`handles css template literal in JSX element 2`] = `
 
-CSS Text: .th73eyu{font-size:14px;}
+CSS Text: .th6xni0{font-size:14px;}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":13},"name":".th73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":13},"name":".th6xni0"}]
 
 `;
 
 exports[`handles css template literal in object property 1`] = `
 "const components = {
-  title: \\"th73eyu\\"
+  title: \\"th6xni0\\"
 };"
 `;
 
 exports[`handles css template literal in object property 2`] = `
 
-CSS Text: .th73eyu{font-size:14px;}
+CSS Text: .th6xni0{font-size:14px;}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":2,"column":2},"name":".th73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":2,"column":2},"name":".th6xni0"}]
 
 `;
 
@@ -60,21 +60,21 @@ exports[`handles interpolation followed by unit 1`] = `
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th73eyu\\",
+  class: \\"th6xni0\\",
   vars: {
-    \\"th73eyu-0\\": [size, \\"em\\"],
-    \\"th73eyu-1\\": [shadow, \\"px\\"],
-    \\"th73eyu-2\\": [size, \\"px\\"],
-    \\"th73eyu-3\\": [props => props.width, \\"vw\\"],
-    \\"th73eyu-4\\": [props => {
+    \\"th6xni0-0\\": [size, \\"em\\"],
+    \\"th6xni0-1\\": [shadow, \\"px\\"],
+    \\"th6xni0-2\\": [size, \\"px\\"],
+    \\"th6xni0-3\\": [props => props.width, \\"vw\\"],
+    \\"th6xni0-4\\": [props => {
       if (true) {
         return props.height;
       } else {
         return 200;
       }
     }, \\"px\\"],
-    \\"th73eyu-5\\": [unit, \\"fr\\"],
-    \\"th73eyu-7\\": [function (props) {
+    \\"th6xni0-5\\": [unit, \\"fr\\"],
+    \\"th6xni0-7\\": [function (props) {
       return 200;
     }, \\"px\\"]
   }
@@ -83,11 +83,11 @@ styled(\\"h1\\")({
 
 exports[`handles interpolation followed by unit 2`] = `
 
-CSS Text: .th73eyu{font-size:var(--th73eyu-0);text-shadow:black 1px var(--th73eyu-1),white -2px -2px;margin:var(--th73eyu-2);width:calc(2 * var(--th73eyu-3));height:var(--th73eyu-4);grid-template-columns:var(--th73eyu-5) 1fr 1fr var(--th73eyu-5);border-radius:var(--th73eyu-7);}
+CSS Text: .th6xni0{font-size:var(--th6xni0-0);text-shadow:black 1px var(--th6xni0-1),white -2px -2px;margin:var(--th6xni0-2);width:calc(2 * var(--th6xni0-3));height:var(--th6xni0-4);grid-template-columns:var(--th6xni0-5) 1fr 1fr var(--th6xni0-5);border-radius:var(--th6xni0-7);}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -96,20 +96,20 @@ exports[`handles nested blocks 1`] = `
 /*#__PURE__*/
 styled(\\"button\\")({
   name: \\"Button\\",
-  class: \\"bh73eyu\\",
+  class: \\"bh6xni0\\",
   vars: {
-    \\"bh73eyu-0\\": [regular]
+    \\"bh6xni0-0\\": [regular]
   }
 });"
 `;
 
 exports[`handles nested blocks 2`] = `
 
-CSS Text: .bh73eyu{font-family:var(--bh73eyu-0);}.bh73eyu:hover{border-color:blue;}@media (max-width:200px){.bh73eyu{width:100%;}}
+CSS Text: .bh6xni0{font-family:var(--bh6xni0-0);}.bh6xni0:hover{border-color:blue;}@media (max-width:200px){.bh6xni0{width:100%;}}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".bh73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".bh6xni0"}]
 
 `;
 
@@ -141,17 +141,17 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th73eyu\\"
+  class: \\"th6xni0\\"
 });"
 `;
 
 exports[`inlines object styles as CSS string 2`] = `
 
-CSS Text: .th73eyu{position:absolute;top:0;right:0;bottom:0;left:0;opacity:1;min-height:420px;}@media (min-width:200px){.th73eyu{-webkit-opacity:0.8;-moz-opacity:0.8;-ms-opacity:0.8;-o-opacity:0.8;-webkit-border-radius:2px;-moz-border-radius:2px;-ms-border-radius:2px;-o-border-radius:2px;-webkit-transition:400ms;-moz-transition:400ms;-o-transition:400ms;-ms-transition:400ms;}}
+CSS Text: .th6xni0{position:absolute;top:0;right:0;bottom:0;left:0;opacity:1;min-height:420px;}@media (min-width:200px){.th6xni0{-webkit-opacity:0.8;-moz-opacity:0.8;-ms-opacity:0.8;-o-opacity:0.8;-webkit-border-radius:2px;-moz-border-radius:2px;-ms-border-radius:2px;-o-border-radius:2px;-webkit-transition:400ms;-moz-transition:400ms;-o-transition:400ms;-ms-transition:400ms;}}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":26,"column":6},"name":".th73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":26,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -160,17 +160,17 @@ exports[`outputs valid CSS classname 1`] = `
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"\\\\u1FA9Page$Title\\",
-  class: \\"_h73eyu\\"
+  class: \\"_h6xni0\\"
 });"
 `;
 
 exports[`outputs valid CSS classname 2`] = `
 
-CSS Text: ._h73eyu{font-size:14px;}
+CSS Text: ._h6xni0{font-size:14px;}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":"._h73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":"._h6xni0"}]
 
 `;
 
@@ -179,10 +179,10 @@ exports[`prevents class name collision 1`] = `
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th73eyu\\",
+  class: \\"th6xni0\\",
   vars: {
-    \\"th73eyu-0\\": [size, \\"px\\"],
-    \\"th73eyu-1\\": [props => props.color]
+    \\"th6xni0-0\\": [size, \\"px\\"],
+    \\"th6xni0-1\\": [props => props.color]
   }
 });
 
@@ -191,9 +191,9 @@ function more() {
   /*#__PURE__*/
   styled(\\"h1\\")({
     name: \\"Title\\",
-    class: \\"t462dh3\\",
+    class: \\"t1u0rrat\\",
     vars: {
-      \\"t462dh3-0\\": [regular]
+      \\"t1u0rrat-0\\": [regular]
     }
   });
 }"
@@ -201,12 +201,12 @@ function more() {
 
 exports[`prevents class name collision 2`] = `
 
-CSS Text: .th73eyu{font-size:var(--th73eyu-0);color:var(--th73eyu-1);}
-.t462dh3{font-family:var(--t462dh3-0);}
+CSS Text: .th6xni0{font-size:var(--th6xni0-0);color:var(--th6xni0-1);}
+.t1u0rrat{font-family:var(--t1u0rrat-0);}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"},{"generated":{"line":2,"column":0},"original":{"line":7,"column":8},"name":".t462dh3"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"},{"generated":{"line":2,"column":0},"original":{"line":7,"column":8},"name":".t1u0rrat"}]
 
 `;
 
@@ -215,26 +215,26 @@ exports[`replaces unknown expressions with CSS custom properties 1`] = `
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th73eyu\\",
+  class: \\"th6xni0\\",
   vars: {
-    \\"th73eyu-0\\": [size, \\"px\\"],
-    \\"th73eyu-1\\": [props => props.color]
+    \\"th6xni0-0\\": [size, \\"px\\"],
+    \\"th6xni0-1\\": [props => props.color]
   }
 });"
 `;
 
 exports[`replaces unknown expressions with CSS custom properties 2`] = `
 
-CSS Text: .th73eyu{font-size:var(--th73eyu-0);color:var(--th73eyu-1);}
+CSS Text: .th6xni0{font-size:var(--th6xni0-0);color:var(--th6xni0-1);}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"}]
 
 `;
 
 exports[`throws when contains dynamic expression without evaluate: true in css tag 1`] = `
-"/app/index.js: The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.
+"<<DIRNAME>>/app/index.js: The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.
 [0m [90m 1 | [39m[36mconst[39m title [33m=[39m css[32m\`[39m[0m
 [0m[31m[1m>[22m[39m[90m 2 | [39m[32m  font-size: \${size}px;[39m[0m
 [0m [90m   | [39m               [31m[1m^[22m[39m[0m
@@ -242,7 +242,7 @@ exports[`throws when contains dynamic expression without evaluate: true in css t
 `;
 
 exports[`throws when not attached to a variable 1`] = `
-"/app/index.js: Couldn't determine a name for the component. Ensure that it's either:
+"<<DIRNAME>>/app/index.js: Couldn't determine a name for the component. Ensure that it's either:
 - Assigned to a variable
 - Is an object property
 - Is a prop in a JSX element
@@ -254,15 +254,15 @@ exports[`throws when not attached to a variable 1`] = `
 [0m [90m 4 | [39m[32m\`[39m[33m;[39m[0m"
 `;
 
-exports[`transpiles css template literal 1`] = `"const title = \\"th73eyu\\";"`;
+exports[`transpiles css template literal 1`] = `"const title = \\"th6xni0\\";"`;
 
 exports[`transpiles css template literal 2`] = `
 
-CSS Text: .th73eyu{font-size:14px;}
+CSS Text: .th6xni0{font-size:14px;}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -271,17 +271,17 @@ exports[`transpiles styled template literal with function and component 1`] = `
 /*#__PURE__*/
 styled(Heading)({
   name: \\"Title\\",
-  class: \\"th73eyu\\"
+  class: \\"th6xni0\\"
 });"
 `;
 
 exports[`transpiles styled template literal with function and component 2`] = `
 
-CSS Text: .th73eyu{font-size:14px;}
+CSS Text: .th6xni0{font-size:14px;}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -290,17 +290,17 @@ exports[`transpiles styled template literal with function and tag 1`] = `
 /*#__PURE__*/
 styled('h1')({
   name: \\"Title\\",
-  class: \\"th73eyu\\"
+  class: \\"th6xni0\\"
 });"
 `;
 
 exports[`transpiles styled template literal with function and tag 2`] = `
 
-CSS Text: .th73eyu{font-size:14px;}
+CSS Text: .th6xni0{font-size:14px;}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -309,17 +309,17 @@ exports[`transpiles styled template literal with object 1`] = `
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th73eyu\\"
+  class: \\"th6xni0\\"
 });"
 `;
 
 exports[`transpiles styled template literal with object 2`] = `
 
-CSS Text: .th73eyu{font-size:14px;}
+CSS Text: .th6xni0{font-size:14px;}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -328,20 +328,20 @@ exports[`uses the same custom property for the same expression 1`] = `
 /*#__PURE__*/
 styled(\\"div\\")({
   name: \\"Box\\",
-  class: \\"bh73eyu\\",
+  class: \\"bh6xni0\\",
   vars: {
-    \\"bh73eyu-0\\": [props => props.size, \\"px\\"]
+    \\"bh6xni0-0\\": [props => props.size, \\"px\\"]
   }
 });"
 `;
 
 exports[`uses the same custom property for the same expression 2`] = `
 
-CSS Text: .bh73eyu{height:var(--bh73eyu-0);width:var(--bh73eyu-0);}
+CSS Text: .bh6xni0{height:var(--bh6xni0-0);width:var(--bh6xni0-0);}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".bh73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".bh6xni0"}]
 
 `;
 
@@ -350,19 +350,19 @@ exports[`uses the same custom property for the same identifier 1`] = `
 /*#__PURE__*/
 styled(\\"div\\")({
   name: \\"Box\\",
-  class: \\"bh73eyu\\",
+  class: \\"bh6xni0\\",
   vars: {
-    \\"bh73eyu-0\\": [size, \\"px\\"]
+    \\"bh6xni0-0\\": [size, \\"px\\"]
   }
 });"
 `;
 
 exports[`uses the same custom property for the same identifier 2`] = `
 
-CSS Text: .bh73eyu{height:var(--bh73eyu-0);width:var(--bh73eyu-0);}
+CSS Text: .bh6xni0{height:var(--bh6xni0-0);width:var(--bh6xni0-0);}
 
 Dependencies: NA
 
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".bh73eyu"}]
+Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".bh6xni0"}]
 
 `;

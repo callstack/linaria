@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 /* @flow */
 
+const { relative } = require('path');
 const stylis = require('stylis');
 const generator = require('@babel/generator').default;
 const { isValidElementType } = require('react-is');
@@ -98,6 +99,8 @@ type State = {|
   dependencies: string[],
   file: {
     opts: {
+      cwd: string,
+      root: string,
       filename: string,
     },
     metadata: any,
@@ -224,7 +227,10 @@ module.exports = function extract(
           // Also use append the index of the class to the filename for uniqueness in the file
           const slug = toValidCSSIdentifier(
             `${displayName.charAt(0).toLowerCase()}${slugify(
-              `${state.file.opts.filename}:${state.index++}`
+              `${relative(
+                state.file.opts.root,
+                state.file.opts.filename
+              )}:${state.index++}`
             )}`
           );
 
