@@ -6,10 +6,13 @@ const loaderUtils = require('loader-utils');
 const transform = require('./transform');
 const slugify = require('./slugify');
 
-module.exports = function loader(content /* :string */) {
+module.exports = function loader(
+  content /* :string */,
+  inputSourceMap /* :?Object */
+) {
   const { sourceMap, ...rest } = loaderUtils.getOptions(this) || {};
 
-  const result = transform(this.resourcePath, content, rest);
+  const result = transform(this.resourcePath, content, rest, inputSourceMap);
 
   if (result.cssText) {
     let { cssText } = result;
@@ -21,7 +24,7 @@ module.exports = function loader(content /* :string */) {
 
     if (sourceMap) {
       cssText += `/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
-        result.sourceMap
+        result.cssSourceMapText
       ).toString('base64')}*/`;
     }
 
@@ -45,8 +48,13 @@ module.exports = function loader(content /* :string */) {
 
     fs.writeFileSync(output, cssText);
 
-    return `${result.code}\n\nrequire("${output}")`;
+    this.callback(
+      null,
+      `${result.code}\n\nrequire("${output}")`,
+      result.sourceMap
+    );
+    return;
   }
 
-  return result.code;
+  this.callback(null, result.code, result.sourceMap);
 };

@@ -19,11 +19,14 @@ styled(\\"h1\\")({
 
 exports[`evaluates and inlines expressions in scope 2`] = `
 
-CSS Text: .th6xni0{color:blue;width:33.333333333333336%;}
+CSS:
+
+.th6xni0 {
+  color: blue;
+  width: 33.333333333333336%;
+}
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":3,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -31,11 +34,11 @@ exports[`handles css template literal in JSX element 1`] = `"<Title class={\\"th
 
 exports[`handles css template literal in JSX element 2`] = `
 
-CSS Text: .th6xni0{font-size:14px;}
+CSS:
+
+.th6xni0 { font-size: 14px; }
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":13},"name":".th6xni0"}]
 
 `;
 
@@ -47,11 +50,13 @@ exports[`handles css template literal in object property 1`] = `
 
 exports[`handles css template literal in object property 2`] = `
 
-CSS Text: .th6xni0{font-size:14px;}
+CSS:
+
+.th6xni0 {
+    font-size: 14px;
+  }
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":2,"column":2},"name":".th6xni0"}]
 
 `;
 
@@ -83,11 +88,19 @@ styled(\\"h1\\")({
 
 exports[`handles interpolation followed by unit 2`] = `
 
-CSS Text: .th6xni0{font-size:var(--th6xni0-0);text-shadow:black 1px var(--th6xni0-1),white -2px -2px;margin:var(--th6xni0-2);width:calc(2 * var(--th6xni0-3));height:var(--th6xni0-4);grid-template-columns:var(--th6xni0-5) 1fr 1fr var(--th6xni0-5);border-radius:var(--th6xni0-7);}
+CSS:
+
+.th6xni0 {
+  font-size: var(--th6xni0-0);
+  text-shadow: black 1px var(--th6xni0-1), white -2px -2px;
+  margin: var(--th6xni0-2);
+  width: calc(2 * var(--th6xni0-3));
+  height: var(--th6xni0-4);
+  grid-template-columns: var(--th6xni0-5) 1fr 1fr var(--th6xni0-5);
+  border-radius: var(--th6xni0-7)
+}
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -105,11 +118,21 @@ styled(\\"button\\")({
 
 exports[`handles nested blocks 2`] = `
 
-CSS Text: .bh6xni0{font-family:var(--bh6xni0-0);}.bh6xni0:hover{border-color:blue;}@media (max-width:200px){.bh6xni0{width:100%;}}
+CSS:
+
+.bh6xni0 {
+  font-family: var(--bh6xni0-0);
+
+  &:hover {
+    border-color: blue;
+  }
+
+  @media (max-width: 200px) {
+    width: 100%;
+  }
+}
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".bh6xni0"}]
 
 `;
 
@@ -147,11 +170,13 @@ styled(\\"h1\\")({
 
 exports[`inlines object styles as CSS string 2`] = `
 
-CSS Text: .th6xni0{position:absolute;top:0;right:0;bottom:0;left:0;opacity:1;min-height:420px;}@media (min-width:200px){.th6xni0{-webkit-opacity:0.8;-moz-opacity:0.8;-ms-opacity:0.8;-o-opacity:0.8;-webkit-border-radius:2px;-moz-border-radius:2px;-ms-border-radius:2px;-o-border-radius:2px;-webkit-transition:400ms;-moz-transition:400ms;-o-transition:400ms;-ms-transition:400ms;}}
+CSS:
+
+.th6xni0 {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0; opacity: 1; min-height: 420px; @media (min-width: 200px) { -webkit-opacity: 0.8; -moz-opacity: 0.8; -ms-opacity: 0.8; -o-opacity: 0.8; -webkit-border-radius: 2px; -moz-border-radius: 2px; -ms-border-radius: 2px; -o-border-radius: 2px; -webkit-transition: 400ms; -moz-transition: 400ms; -o-transition: 400ms; -ms-transition: 400ms; }
+}
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":26,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -166,11 +191,13 @@ styled(\\"h1\\")({
 
 exports[`outputs valid CSS classname 2`] = `
 
-CSS Text: ._h6xni0{font-size:14px;}
+CSS:
+
+._h6xni0 {
+  font-size: 14px;
+}
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":"._h6xni0"}]
 
 `;
 
@@ -201,12 +228,17 @@ function more() {
 
 exports[`prevents class name collision 2`] = `
 
-CSS Text: .th6xni0{font-size:var(--th6xni0-0);color:var(--th6xni0-1);}
-.t1u0rrat{font-family:var(--t1u0rrat-0);}
+CSS:
+
+.th6xni0 {
+  font-size: var(--th6xni0-0);
+  color: var(--th6xni0-1)
+}
+.t1u0rrat {
+    font-family: var(--t1u0rrat-0);
+  }
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"},{"generated":{"line":2,"column":0},"original":{"line":7,"column":8},"name":".t1u0rrat"}]
 
 `;
 
@@ -225,11 +257,14 @@ styled(\\"h1\\")({
 
 exports[`replaces unknown expressions with CSS custom properties 2`] = `
 
-CSS Text: .th6xni0{font-size:var(--th6xni0-0);color:var(--th6xni0-1);}
+CSS:
+
+.th6xni0 {
+  font-size: var(--th6xni0-0);
+  color: var(--th6xni0-1);
+}
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -258,11 +293,13 @@ exports[`transpiles css template literal 1`] = `"const title = \\"th6xni0\\";"`;
 
 exports[`transpiles css template literal 2`] = `
 
-CSS Text: .th6xni0{font-size:14px;}
+CSS:
+
+.th6xni0 {
+  font-size: 14px;
+}
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -277,11 +314,13 @@ styled(Heading)({
 
 exports[`transpiles styled template literal with function and component 2`] = `
 
-CSS Text: .th6xni0{font-size:14px;}
+CSS:
+
+.th6xni0 {
+  font-size: 14px;
+}
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -296,11 +335,13 @@ styled('h1')({
 
 exports[`transpiles styled template literal with function and tag 2`] = `
 
-CSS Text: .th6xni0{font-size:14px;}
+CSS:
+
+.th6xni0 {
+  font-size: 14px;
+}
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -315,11 +356,13 @@ styled(\\"h1\\")({
 
 exports[`transpiles styled template literal with object 2`] = `
 
-CSS Text: .th6xni0{font-size:14px;}
+CSS:
+
+.th6xni0 {
+  font-size: 14px;
+}
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".th6xni0"}]
 
 `;
 
@@ -337,11 +380,14 @@ styled(\\"div\\")({
 
 exports[`uses the same custom property for the same expression 2`] = `
 
-CSS Text: .bh6xni0{height:var(--bh6xni0-0);width:var(--bh6xni0-0);}
+CSS:
+
+.bh6xni0 {
+  height: var(--bh6xni0-0);
+  width: var(--bh6xni0-0);
+}
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".bh6xni0"}]
 
 `;
 
@@ -359,10 +405,13 @@ styled(\\"div\\")({
 
 exports[`uses the same custom property for the same identifier 2`] = `
 
-CSS Text: .bh6xni0{height:var(--bh6xni0-0);width:var(--bh6xni0-0);}
+CSS:
+
+.bh6xni0 {
+  height: var(--bh6xni0-0);
+  width: var(--bh6xni0-0);
+}
 
 Dependencies: NA
-
-Mappings: [{"generated":{"line":1,"column":0},"original":{"line":1,"column":6},"name":".bh6xni0"}]
 
 `;
