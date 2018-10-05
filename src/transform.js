@@ -1,6 +1,7 @@
 /* @flow */
 
 const babel = require('@babel/core');
+const stylis = require('stylis');
 const { SourceMapGenerator } = require('source-map');
 
 /* ::
@@ -13,8 +14,9 @@ type Location = {
 /* ::
 type Result = {
   code: string,
+  sourceMap: ?Object,
   cssText?: string,
-  sourceMap?: ?string,
+  cssSourceMapText?: ?string,
   dependencies?: string[],
   rules?: {
     [className: string]: {
@@ -40,12 +42,13 @@ type PluginOptions = {
 module.exports = function transform(
   filename /* :string */,
   content /* :string */,
-  options /* :PluginOptions */
+  options /* :PluginOptions */,
+  inputSourceMap /* :?Object */
 ) /* : Result */ {
   // Check if the file contains `css` or `styled` tag first
   // Otherwise we should skip transforming
   if (!/\b(styled(\([^)]+\)|\.[a-z0-9]+)|css)[\s\n]*`/.test(content)) {
-    return { code: content };
+    return { code: content, sourceMap: inputSourceMap };
   }
 
   const parserOpts = {
@@ -85,17 +88,36 @@ module.exports = function transform(
     parserOpts.plugins.push('flow');
   }
 
-  const { metadata, code } = babel.transformSync(content, {
+  const { metadata, code, map } = babel.transformSync(content, {
     filename,
     presets: [[require.resolve('./babel'), options]],
     exclude: /node_modules/,
     babelrc: false,
     configFile: false,
+    sourceMaps: true,
+    sourceFileName: filename,
+    inputSourceMap,
     parserOpts,
   });
 
-  const { cssText, rules, replacements, dependencies, mappings } =
-    metadata.linaria || {};
+  const { rules, replacements, dependencies } = metadata.linaria || {};
+  const mappings = [];
+
+  let cssText = '';
+
+  Object.keys(rules).forEach((selector, index) => {
+    mappings.push({
+      generated: {
+        line: index + 1,
+        column: 0,
+      },
+      original: rules[selector].start,
+      name: selector,
+    });
+
+    // Run each rule through stylis to support nesting
+    cssText += `${stylis(selector, rules[selector].cssText)}\n`;
+  });
 
   return {
     code,
@@ -103,8 +125,9 @@ module.exports = function transform(
     rules,
     replacements,
     dependencies,
+    sourceMap: map,
 
-    get sourceMap() {
+    get cssSourceMapText() {
       if (mappings && mappings.length) {
         const generator = new SourceMapGenerator({
           file: filename.replace(/\.js$/, '.css'),

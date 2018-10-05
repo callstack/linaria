@@ -2,7 +2,6 @@
 /* @flow */
 
 const { relative } = require('path');
-const stylis = require('stylis');
 const generator = require('@babel/generator').default;
 const { isValidElementType } = require('react-is');
 const Module = require('./module');
@@ -85,9 +84,10 @@ type Location = {
 /* ::
 type State = {|
   rules: {
-    [className: string]: {
-      cssText: string,
+    [selector: string]: {
+      className: string,
       displayName: string,
+      cssText: string,
       start: ?Location,
     },
   },
@@ -136,32 +136,12 @@ module.exports = function extract(
         },
         exit(path /* : any */, state /* : State */) {
           if (Object.keys(state.rules).length) {
-            const mappings = [];
-
-            let cssText = '';
-
-            Object.keys(state.rules).forEach((selector, index) => {
-              mappings.push({
-                generated: {
-                  line: index + 1,
-                  column: 0,
-                },
-                original: state.rules[selector].start,
-                name: selector,
-              });
-
-              // Run each rule through stylis to support nesting
-              cssText += `${stylis(selector, state.rules[selector].cssText)}\n`;
-            });
-
             // Store the result as the file metadata
             state.file.metadata = {
               linaria: {
                 rules: state.rules,
                 replacements: state.replacements,
                 dependencies: state.dependencies,
-                mappings,
-                cssText,
               },
             };
           }
