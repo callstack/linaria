@@ -35,7 +35,8 @@
     "add-contributor": "all-contributors add",
     "prebuild": "del lib",
     "build": "babel src --out-dir lib --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps && flow-copy-source -i '{**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**}' src lib",
-    "prepare": "yarn build"
+    "prepare": "yarn build",
+    "release": "release-it"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
@@ -46,6 +47,7 @@
     "all-contributors-cli": "^5.4.0",
     "babel-core": "^7.0.0-bridge.0",
     "codecov": "^3.1.0",
+    "conventional-changelog-cli": "^2.0.5",
     "del-cli": "^1.1.0",
     "eslint": "^5.4.0",
     "flow-bin": "^0.79.1",
@@ -55,7 +57,8 @@
     "parcel-bundler": "^1.9.7",
     "prettier": "^1.14.2",
     "puppeteer": "^1.8.0",
-    "react": "^16.5.1"
+    "react": "^16.5.1",
+    "release-it": "^7.6.1"
   },
   "dependencies": {
     "@babel/core": "^7.0.1",
