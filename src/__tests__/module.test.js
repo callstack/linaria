@@ -172,3 +172,10 @@ it('has __dirname available', () => {
 
   expect(mod.exports).toBe(path.dirname(mod.filename));
 });
+
+it('can alterate the babel configuration', () => {
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+  const initialBabelConfig = mod.$$babelConfig;
+  mod.$$babelConfig = {};
+  expect(mod.$$babelConfig).not.toEqual(initialBabelConfig);
+});
