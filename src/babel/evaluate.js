@@ -57,7 +57,8 @@ const resolve = (path, t, requirements) => {
 module.exports = function evaluate(
   path /* : any */,
   t /* : any */,
-  filename /* : string */
+  filename /* : string */,
+  module /* : ?Module */ = null
 ) {
   const requirements = [];
 
@@ -144,7 +145,7 @@ module.exports = function evaluate(
     t.blockStatement([expression])
   );
 
-  const m = new Module(filename);
+  const m = module || new Module(filename);
 
   m.evaluate(
     dedent`

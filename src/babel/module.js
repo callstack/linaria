@@ -34,6 +34,7 @@ class Module {
   exports: any;
 
   sourceMap: any;
+  $$babelConfig: Object;
   */
 
   constructor(filename /* : string */) {
@@ -53,6 +54,21 @@ class Module {
         writable: false,
       },
     });
+
+    this.$$babelConfig = {
+      filename: this.filename,
+      plugins: [
+        // Include this plugin to avoid extra config when using { module: false } for webpack
+        '@babel/plugin-transform-modules-commonjs',
+        '@babel/plugin-proposal-export-namespace-from',
+        // We don't support dynamic imports when evaluating, but don't wanna syntax error
+        // This will replace dynamic imports with an object that does nothing
+        require.resolve('./dynamic-import-noop'),
+        [require.resolve('./extract'), { evaluate: true }],
+      ],
+      sourceMaps: true,
+      exclude: /node_modules/,
+    };
 
     this.exports = {};
     this.require = this.require.bind(this);
@@ -109,20 +125,7 @@ class Module {
 
   evaluate(text /* : string */) {
     // For JavaScript files, we need to transpile it and to get the exports of the module
-    const { code, map } = babel.transformSync(text, {
-      filename: this.filename,
-      plugins: [
-        // Include this plugin to avoid extra config when using { module: false } for webpack
-        '@babel/plugin-transform-modules-commonjs',
-        '@babel/plugin-proposal-export-namespace-from',
-        // We don't support dynamic imports when evaluating, but don't wanna syntax error
-        // This will replace dynamic imports with an object that does nothing
-        require.resolve('./dynamic-import-noop'),
-        [require.resolve('./extract'), { evaluate: true }],
-      ],
-      sourceMaps: true,
-      exclude: /node_modules/,
-    });
+    const { code, map } = babel.transformSync(text, this.$$babelConfig);
 
     this.sourceMap = map;
 
