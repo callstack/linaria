@@ -1,0 +1,15 @@
+{
+  "alias": "linaria",
+  "public": true,
+  "files": [
+    "src/",
+    "website/src",
+    "website/assets",
+    "website/babel.config.js",
+    "website/webpack.config.js",
+    "website/serve.config.js",
+    "website/package.json",
+    "website/yarn.lock",
+    ".babelrc"
+  ]
+}
