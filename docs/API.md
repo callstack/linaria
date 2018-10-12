@@ -134,7 +134,7 @@ const FancyButton = styled(Button)`
 
 ### `collect(html: string, css: string) => string`
 
-Takes HTML and CSS strings and returns the critical CSS used in the page by analyzing the class names. It can be used to detrmine critical CSS for server side rendering.
+Takes HTML and CSS strings and returns the critical CSS used in the page by analyzing the class names. It can be used to determine critical CSS for server side rendering.
 
 ```js
 import { collect } from 'linaria/server';
@@ -146,3 +146,7 @@ const { critical, other } = collect(html, css);
 // critical – returns critical CSS for given html
 // other – returns the rest of styles
 ```
+
+This will only detect critical CSS based on class names, so if you have any other type of selectors, they'll get added to the critical CSS.
+
+Also note that extracting critical CSS this way will change the order of class names. It's not a problem if you're primarily using Linaria for styling. However if you're using a third party framework which imports its own CSS, then it's not recommended to use this helper on the extracted CSS.

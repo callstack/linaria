@@ -183,6 +183,12 @@ describe('works with pseudo-class and pseudo-elements', () => {
 
 describe('works with global css', () => {
   const css = dedent`
+    body { font-size: 13.37px; }
+
+    html { -webkit-font-smoothing: antialiased; }
+
+    h1 { font-weight: bold; }
+
     .linaria:active {}
     .linaria::before {}
 
@@ -190,21 +196,8 @@ describe('works with global css', () => {
     .other::before {}
   `;
 
-  const globalCSS = dedent`
-    body {
-      font-size: 13.37px;
-    }
+  const { critical, other } = collect(html, css);
 
-    html {
-      -webkit-font-smoothing: antialiased;
-    }
-
-    h1 {
-      font-weight: bold;
-    }
-  `;
-
-  const { critical, other } = collect(html, css, globalCSS);
   test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
   test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
 });

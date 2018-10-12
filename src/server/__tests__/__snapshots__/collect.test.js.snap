@@ -274,11 +274,9 @@ exports[`works with global css critical 1`] = `
 "body {
   font-size: 13.37px;
 }
-
 html {
   -webkit-font-smoothing: antialiased;
 }
-
 h1 {
   font-weight: bold;
 }

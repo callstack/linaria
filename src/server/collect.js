@@ -11,8 +11,7 @@ type CollectResult = {
 
 const collect = (
   html /* : string */,
-  css /* : string */,
-  globalCSS /* : ?string */
+  css /* : string */
 ) /* : CollectResult */ => {
   const animations = new Set();
   const other = postcss.root();
@@ -20,11 +19,20 @@ const collect = (
   const stylesheet = postcss.parse(css);
   const htmlClassesRegExp = extractClassesFromHtml(html);
 
+  const isCritical = rule => {
+    // Only check class names selectors
+    if (rule.selector.startsWith('.')) {
+      return Boolean(rule.selector.match(htmlClassesRegExp));
+    }
+
+    return true;
+  };
+
   const handleAtRule = rule => {
     let addedToCritical = false;
 
     rule.each(childRule => {
-      if (childRule.selector.match(htmlClassesRegExp)) {
+      if (isCritical(childRule)) {
         critical.append(rule.clone());
         addedToCritical = true;
       }
@@ -51,7 +59,7 @@ const collect = (
       return;
     }
 
-    if (rule.selector.match(htmlClassesRegExp)) {
+    if (isCritical(rule)) {
       critical.append(rule);
     } else {
       other.append(rule);
@@ -69,7 +77,7 @@ const collect = (
   });
 
   return {
-    critical: (globalCSS || '') + critical.toString(),
+    critical: critical.toString(),
     other: other.toString(),
   };
 };
