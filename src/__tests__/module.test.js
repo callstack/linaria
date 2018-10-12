@@ -106,9 +106,7 @@ it('clears modules from the cache', () => {
 it('exports the path for non JS/JSON files', () => {
   const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
 
-  expect(mod.require('./sample-asset.png')).toBe(
-    path.resolve(__dirname, '../__fixtures__/sample-asset.png')
-  );
+  expect(mod.require('./sample-asset.png')).toBe('./sample-asset.png');
 });
 
 it('throws when requiring native node modules', () => {

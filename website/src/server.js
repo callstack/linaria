@@ -48,13 +48,11 @@ router.get('/', async ctx => {
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono">
 
         <style type="text/css">${critical}</style>
-
-        <script src="/dist/app.bundle.js"></script>
       </head>
       <body>
         <div id="root">${html}</div>
 
-        <link rel="stylesheet" href="/vendor/prism.css">
+        <script src="/dist/app.bundle.js"></script>
         <link rel="stylesheet" href="/styles/${slug}">
       </body>
     </html>
@@ -63,14 +61,6 @@ router.get('/', async ctx => {
 
 router.get('/dist/:path+', async ctx => {
   await send(ctx, path.join('dist', ctx.params.path));
-});
-
-router.get('/vendor/:path+', async ctx => {
-  await send(ctx, path.join('static', 'vendor', ctx.params.path));
-});
-
-router.get('/images/:path+', async ctx => {
-  await send(ctx, path.join('static', 'images', ctx.params.path));
 });
 
 router.get('/styles/:slug', async ctx => {

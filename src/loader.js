@@ -1,26 +1,37 @@
-const os = require('os');
 const fs = require('fs');
 const path = require('path');
+const mkdirp = require('mkdirp');
 const Module = require('module');
 const loaderUtils = require('loader-utils');
 const transform = require('./transform');
-const slugify = require('./slugify');
 
-module.exports = function loader(
-  content /* :string */,
-  inputSourceMap /* :?Object */
-) {
+module.exports = function loader(content, inputSourceMap) {
   const { sourceMap, ...rest } = loaderUtils.getOptions(this) || {};
 
-  const result = transform(this.resourcePath, content, rest, inputSourceMap);
+  const outputDirectory = path.join(
+    process.cwd(),
+    'node_modules',
+    '.linaria-cache'
+  );
+
+  const outputFilename = path.join(
+    outputDirectory,
+    path.relative(
+      process.cwd(),
+      this.resourcePath.replace(/\.[^.]+$/, '.linaria.css')
+    )
+  );
+
+  const result = transform(
+    this.resourcePath,
+    content,
+    rest,
+    inputSourceMap,
+    outputFilename
+  );
 
   if (result.cssText) {
     let { cssText } = result;
-
-    const slug = slugify(this.resourcePath);
-    const filename = `${path
-      .basename(this.resourcePath)
-      .replace(/\.js$/, '')}_${slug}.css`;
 
     if (sourceMap) {
       cssText += `/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
@@ -44,13 +55,25 @@ module.exports = function loader(
       });
     }
 
-    const output = path.join(os.tmpdir(), filename.split(path.sep).join('_'));
+    // Read the file first to compare the content
+    // Write the new content only if it's changed
+    // This will prevent unnecessary WDS reloads
+    let currentCssText;
 
-    fs.writeFileSync(output, cssText);
+    try {
+      currentCssText = fs.readFileSync(outputFilename, 'utf-8');
+    } catch (e) {
+      // Ignore error
+    }
+
+    if (currentCssText !== cssText) {
+      mkdirp.sync(path.dirname(outputFilename));
+      fs.writeFileSync(outputFilename, cssText);
+    }
 
     this.callback(
       null,
-      `${result.code}\n\nrequire("${output}")`,
+      `${result.code}\n\nrequire("${outputFilename}")`,
       result.sourceMap
     );
     return;

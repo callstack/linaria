@@ -43,12 +43,21 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
+          'css-hot-loader',
           MiniCssExtractPlugin.loader,
           {
             loader: 'css-loader',
             options: {
               sourceMap: process.env.NODE_ENV !== 'production',
             },
+          },
+        ],
+      },
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        use: [
+          {
+            loader: 'file-loader',
           },
         ],
       },
