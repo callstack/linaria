@@ -58,7 +58,8 @@ const resolve = (path, t, requirements) => {
 module.exports = function evaluate(
   path /* : any */,
   t /* : any */,
-  filename /* : string */
+  filename /* : string */,
+  transform /* : ?(text: string) => { code: string } */ = null
 ) {
   const requirements = [];
 
@@ -147,21 +148,24 @@ module.exports = function evaluate(
 
   const m = new Module(filename);
 
-  m.transform = function transform(text) {
-    return babel.transformSync(text, {
-      filename: this.filename,
-      plugins: [
-        // Include this plugin to avoid extra config when using { module: false } for webpack
-        '@babel/plugin-transform-modules-commonjs',
-        '@babel/plugin-proposal-export-namespace-from',
-        // We don't support dynamic imports when evaluating, but don't wanna syntax error
-        // This will replace dynamic imports with an object that does nothing
-        require.resolve('./dynamic-import-noop'),
-        [require.resolve('./extract'), { evaluate: true }],
-      ],
-      exclude: /node_modules/,
-    });
-  };
+  m.transform =
+    typeof transform === 'function'
+      ? transform
+      : function defaultTransform(text) {
+          return babel.transformSync(text, {
+            filename: this.filename,
+            plugins: [
+              // Include this plugin to avoid extra config when using { module: false } for webpack
+              '@babel/plugin-transform-modules-commonjs',
+              '@babel/plugin-proposal-export-namespace-from',
+              // We don't support dynamic imports when evaluating, but don't wanna syntax error
+              // This will replace dynamic imports with an object that does nothing
+              require.resolve('./dynamic-import-noop'),
+              [require.resolve('./extract'), { evaluate: true }],
+            ],
+            exclude: /node_modules/,
+          });
+        };
 
   m.evaluate(
     dedent`
