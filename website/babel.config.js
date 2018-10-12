@@ -16,6 +16,15 @@ module.exports = {
         ['@babel/preset-env', { targets: { node: 8 } }],
         require.resolve('../src/babel'),
       ],
+      plugins: [
+        [
+          'file-loader',
+          {
+            publicPath: '/dist',
+            outputPath: '/dist',
+          },
+        ],
+      ],
     },
   },
 };

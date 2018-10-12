@@ -1,5 +1,6 @@
 /* @flow */
 
+const path = require('path');
 const babel = require('@babel/core');
 const stylis = require('stylis');
 const { SourceMapGenerator } = require('source-map');
@@ -16,7 +17,7 @@ type Result = {
   code: string,
   sourceMap: ?Object,
   cssText?: string,
-  cssSourceMapText?: ?string,
+  cssSourceMapText?: string,
   dependencies?: string[],
   rules?: {
     [className: string]: {
@@ -39,11 +40,14 @@ type PluginOptions = {
 }
 */
 
+const STYLIS_DECLARATION = 1;
+
 module.exports = function transform(
   filename /* :string */,
   content /* :string */,
   options /* :PluginOptions */,
-  inputSourceMap /* :?Object */
+  inputSourceMap /* :?Object */,
+  outputFilename /* : ?string */
 ) /* : Result */ {
   // Check if the file contains `css` or `styled` tag first
   // Otherwise we should skip transforming
@@ -104,6 +108,28 @@ module.exports = function transform(
   const mappings = [];
 
   let cssText = '';
+
+  stylis.use(null)((context, decl) => {
+    if (context === STYLIS_DECLARATION && outputFilename) {
+      // When writing to a file, we need to adjust the relative paths inside url(..) expressions
+      // It'll allow css-loader to resolve an imported asset properly
+      return decl.replace(
+        /\b(url\()(\.[^)]+)(\))/,
+        (match, p1, p2, p3) =>
+          p1 +
+          // Replace asset path with new path relative to the output CSS
+          path.relative(
+            /* $FlowFixMe */
+            path.dirname(outputFilename),
+            // Get the absolute path to the asset from the path relative to the JS file
+            path.resolve(path.dirname(filename), p2)
+          ) +
+          p3
+      );
+    }
+
+    return decl;
+  });
 
   Object.keys(rules).forEach((selector, index) => {
     mappings.push({

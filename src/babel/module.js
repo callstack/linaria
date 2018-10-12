@@ -98,9 +98,10 @@ class Module {
           m.evaluate(code);
         }
       } else {
-        // For non JS/JSON requires, just export the filename
+        // For non JS/JSON requires, just export the id
         // This is to support importing assets in webpack
-        m.exports = filename;
+        // The module will be resolved by css-loader
+        m.exports = id;
       }
     }
 

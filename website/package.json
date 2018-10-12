@@ -16,6 +16,7 @@
     "lint:css": "stylelint src/**/*.js"
   },
   "dependencies": {
+    "babel-plugin-file-loader": "^1.1.0",
     "dedent": "^0.7.0",
     "escape-html": "^1.0.3",
     "ignore-styles": "^5.0.1",
@@ -35,8 +36,10 @@
     "babel-loader": "^8.0.2",
     "babel-plugin-module-resolver": "^3.1.1",
     "cross-env": "^5.2.0",
+    "css-hot-loader": "^1.4.2",
     "css-loader": "^1.0.0",
     "del-cli": "^1.1.0",
+    "file-loader": "^2.0.0",
     "mini-css-extract-plugin": "^0.4.2",
     "stylelint": "^9.5.0",
     "stylelint-config-recommended": "^2.1.0",

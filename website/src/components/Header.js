@@ -9,7 +9,10 @@ import { media } from '../styles/utils';
 export default function Header() {
   return (
     <NavBar>
-      <LogoImage src="/images/linaria-logo.svg" alt="Linaria Logo" />
+      <LogoImage
+        src={require('../../assets/linaria-logo.svg')}
+        alt="Linaria Logo"
+      />
       <Links>
         <li>
           <LinkItem href="https://github.com/callstack/linaria#features">

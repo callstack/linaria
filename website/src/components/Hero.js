@@ -28,7 +28,7 @@ export default function Hero() {
           <RightColumn>
             <CodeSample
               alt="Linaria code sample"
-              src="/images/code-sample.png"
+              src={require('../../assets/code-sample.png')}
             />
           </RightColumn>
         </Row>
@@ -42,7 +42,7 @@ const HeroContainer = styled.main`
 
   ${media.large} {
     padding: 64px 0;
-    background-image: url('/images/linaria-logomark.svg');
+    background-image: url(${require('../../assets/linaria-logomark.svg')});
     background-repeat: no-repeat;
     background-position: bottom right;
   }
