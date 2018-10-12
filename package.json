@@ -36,7 +36,9 @@
     "prebuild": "del lib",
     "build": "babel src --out-dir lib --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps && flow-copy-source -i '{**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**}' src lib",
     "prepare": "yarn build",
-    "release": "release-it"
+    "release": "release-it",
+    "now-build": "yarn --cwd website install && yarn --cwd website build",
+    "now-start": "yarn --cwd website server"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
