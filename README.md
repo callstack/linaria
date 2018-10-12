@@ -27,6 +27,7 @@ Zero-runtime CSS in JS library.
 - Use **dynamic prop based styles** with the React bindings, uses CSS variables behind the scenes
 - Easily find where the style was defined with **CSS sourcemaps**
 - **Lint your CSS** in JS with [stylelint](https://github.com/stylelint/stylelint)
+- Use **JavaScript for logic**, no CSS preprocessor needed
 
 **[Why use Linaria](/docs/BENEFITS.md)**
 

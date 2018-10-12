@@ -6,25 +6,79 @@
 
 Unlike regular CSS, Linaria will generate scoped class names so that there's no collision between multiple styles in a large application. It's automatic, unlike conventions such as BEM.
 
-### 2. Refactor with confidence
+For example, consider the following:
+
+```js
+const title = css`
+  font-size: 18px;
+`;
+```
+
+The resulting CSS will look something like:
+
+```css
+.k4yi6fg {
+  font-size: 18px;
+}
+```
+
+Here the generated class name is unique and based on the hash of the file path.
+
+### 2. Styles are in same file as the component
+
+With regular CSS, you'll need to create a separate file to write the CSS. This can be annoying when working with components because you'll need to do constant switching between the JS and CSS files while you're tweaking the styles. With Linaria, you can have the styles in the same file as rest of the JS.
+
+You can also keep the styles in a separate JS file if you want, of course.
+
+### 3. Refactor with confidence
 
 You don't have to worry about breaking an unrelated component when changing and removing styles. Since Linaria's styles are like regular JavaScript variables, it's easy to track their usage and refactor.
 
-### 3. Maximum expressiveness
+### 4. No pre-processor needed
 
-Linaria supports JavaScript expressions, which enables you to generate style rules inside a declaration programmatically with JavaScript. You can also share constants and helper functions between your CSS and JavaScript, compose styles together and much more.
+Linaria supports JavaScript expressions, which enables you to generate style rules inside a declaration programmatically with JavaScript. You can share constants and helper functions between your CSS and JavaScript freely.
 
-### 4. Easy to get rid of unused styles
+For example, here we are using a `lighten` helper from a third-party library:
 
-Like other JS variables, linters can warn you about when you have unused styles.
+```js
+import { lighten } from 'polished';
 
-### 5. Automatic vendor prefixing
+const PRIMARY_COLOR = '#de2d68';
+
+const button = css`
+  background-color: ${PRIMARY_COLOR};
+
+  &:hover {
+    background-color: ${lighten(0.2, PRIMARY_COLOR)};
+  }
+`;
+```
+
+### 5. Easy to get rid of unused styles
+
+Like other JS variables, linters like [ESLint](https://eslint.org/) can warn you about when you have unused styles.
+
+### 6. Automatic vendor prefixing
 
 Linaria will automatically vendor prefix your CSS, so you don't have to worry about supporting older browsers. You write modern CSS, and Linaria takes care of the rest.
 
-### 6. Declarative dynamic styling with React
+You can still use tools like [PostCSS](https://postcss.org/) to further optimize the CSS.
+
+### 7. Declarative dynamic styling with React
 
 When using the `styled` helper, Linaria will generate dynamic CSS variables which automatically update when props change. When writing regular CSS, you'll have to manage it manually.
+
+For example, here the `height` and `width` will automatically update based on the `size` prop of `Box`:
+
+```js
+const Box = styled.div`
+  background-color: orange;
+  height: ${props => props.size}px;
+  width: ${props => props.size}px;
+`;
+
+<Box size={48}>
+```
 
 ## Advantages over CSS preprocessors
 
