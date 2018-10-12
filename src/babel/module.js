@@ -16,7 +16,6 @@ const NativeModule = require('module');
 const vm = require('vm');
 const fs = require('fs');
 const path = require('path');
-const babel = require('@babel/core');
 
 // Separate cache for evaled modules
 let cache = {};
@@ -33,7 +32,7 @@ class Module {
   require: (id: string) => any;
   exports: any;
 
-  sourceMap: any;
+  transform: ?(text: string) => { code: string }
   */
 
   constructor(filename /* : string */) {
@@ -81,6 +80,7 @@ class Module {
     if (!m) {
       // Create the module if cached module is not available
       m = new Module(filename);
+      m.transform = this.transform;
 
       // Store it in cache at this point with, otherwise
       // we would end up in infinite loop with cyclic dependencies
@@ -109,22 +109,7 @@ class Module {
 
   evaluate(text /* : string */) {
     // For JavaScript files, we need to transpile it and to get the exports of the module
-    const { code, map } = babel.transformSync(text, {
-      filename: this.filename,
-      plugins: [
-        // Include this plugin to avoid extra config when using { module: false } for webpack
-        '@babel/plugin-transform-modules-commonjs',
-        '@babel/plugin-proposal-export-namespace-from',
-        // We don't support dynamic imports when evaluating, but don't wanna syntax error
-        // This will replace dynamic imports with an object that does nothing
-        require.resolve('./dynamic-import-noop'),
-        [require.resolve('./extract'), { evaluate: true }],
-      ],
-      sourceMaps: true,
-      exclude: /node_modules/,
-    });
-
-    this.sourceMap = map;
+    const code = this.transform ? this.transform(text).code : text;
 
     const script = new vm.Script(code, {
       filename: this.filename,

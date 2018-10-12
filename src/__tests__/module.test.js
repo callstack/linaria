@@ -2,9 +2,16 @@
 
 import path from 'path';
 import dedent from 'dedent';
+import * as babel from '@babel/core';
 import Module from '../babel/module';
 
 beforeEach(() => Module.invalidate());
+
+function transform(text) {
+  return babel.transformSync(text, {
+    filename: this.filename,
+  });
+}
 
 it('creates module for JS files', () => {
   const filename = '/foo/bar/test.js';
@@ -15,7 +22,6 @@ it('creates module for JS files', () => {
   expect(mod.exports()).toBe(42);
   expect(mod.id).toBe(filename);
   expect(mod.filename).toBe(filename);
-  expect(mod.sourceMap).toBeDefined();
 });
 
 it('requires JS files', () => {
@@ -45,6 +51,7 @@ it('requires JSON files', () => {
 it('imports JS files', () => {
   const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
 
+  mod.transform = transform;
   mod.evaluate(dedent`
     import answer from './sample-script';
 
@@ -57,6 +64,7 @@ it('imports JS files', () => {
 it('imports JSON files', () => {
   const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
 
+  mod.transform = transform;
   mod.evaluate(dedent`
     import data from './sample-data.json';
 
