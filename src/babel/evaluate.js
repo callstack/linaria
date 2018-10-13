@@ -1,6 +1,5 @@
 /* @flow */
 
-const dedent = require('dedent');
 const generator = require('@babel/generator').default;
 const babel = require('@babel/core');
 const Module = require('./module');
@@ -165,13 +164,15 @@ module.exports = function evaluate(
   const m = new Module(filename);
 
   m.transform = transformModule;
-
   m.evaluate(
-    dedent`
-    ${imports.map(node => generator(node).code).join('\n')}
-
-    ${generator(wrapped).code}
-    `
+    [
+      // Use String.raw to preserve escapes such as '\n' in the code
+      // Flow doesn't understand template tags: https://github.com/facebook/flow/issues/2616
+      /* $FlowFixMe */
+      imports.map(node => String.raw`${generator(node).code}`).join('\n'),
+      /* $FlowFixMe */
+      String.raw`${generator(wrapped).code}`,
+    ].join('\n')
   );
 
   return {
