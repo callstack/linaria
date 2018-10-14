@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
@@ -18,9 +19,10 @@ module.exports = function loader(
     let { cssText } = result;
 
     const slug = slugify(this.resourcePath);
+    const hash = calculateMd5(cssText);
     const filename = `${path
       .basename(this.resourcePath)
-      .replace(/\.js$/, '')}_${slug}.css`;
+      .replace(/\.js$/, '')}_${slug}.${hash}.css`;
 
     if (sourceMap) {
       cssText += `/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
@@ -58,3 +60,10 @@ module.exports = function loader(
 
   this.callback(null, result.code, result.sourceMap);
 };
+
+function calculateMd5(input) {
+  return crypto
+    .createHash('md5')
+    .update(input)
+    .digest('hex');
+}
