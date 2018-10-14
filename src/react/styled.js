@@ -1,7 +1,17 @@
+/* @flow */
+
 const React = require('react'); // eslint-disable-line import/no-extraneous-dependencies
 
-function styled(tag) {
-  return options => {
+/* ::
+type Options = {
+  name: string,
+  class: string,
+  vars?: { [string]: [string | number | ((props: *) => string | number), string | void] }
+}
+*/
+
+function styled(tag /* : React.ComponentType<*> | string */) {
+  return (options /* : Options */) => {
     if (process.env.NODE_ENV !== 'production') {
       if (Array.isArray(options)) {
         // We received a strings array since it's used as a tag
@@ -11,8 +21,9 @@ function styled(tag) {
       }
     }
 
+    /* $FlowFixMe: Flow doesn't know about forwardRef */
     const Result = React.forwardRef((props, ref) => {
-      const { as: component, ...rest } = props;
+      const { as: component = tag, ...rest } = props;
       const next = Object.assign(rest, {
         ref,
         className: props.className
@@ -20,11 +31,13 @@ function styled(tag) {
           : options.class,
       });
 
-      if (options.vars) {
+      const { vars } = options;
+
+      if (vars) {
         const style = {};
 
-        Object.keys(options.vars).forEach(name => {
-          const [value, unit = ''] = options.vars[name];
+        Object.keys(vars).forEach(name => {
+          const [value, unit = ''] = vars[name];
           style[`--${name}`] = `${
             typeof value === 'function' ? value(props) : value
           }${unit}`;
@@ -40,10 +53,6 @@ function styled(tag) {
     Result.className = options.class;
     Result.extends = tag;
 
-    Result.defaultProps = {
-      as: tag,
-    };
-
     return Result;
   };
 }
@@ -57,3 +66,14 @@ if (process.env.NODE_ENV !== 'production') {
 } else {
   module.exports = styled;
 }
+
+/* ::
+type StyledComponent<T> = React.ComponentType<T & { as?: React$ElementType }>;
+
+type StyledTag<T> = (string[], Array<string | number | {} | (T => string | number)>) => StyledComponent<T>;
+
+declare module.exports: {|
+  <T>(T): StyledTag<React.ElementConfig<T>>,
+  [string]: StyledTag<{ children?: React.Node, [key: string]: any }>,
+|};
+*/
