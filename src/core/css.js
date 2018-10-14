@@ -1,3 +1,5 @@
+/* @flow */
+
 function css() {
   throw new Error(
     'Using the "css" tag in runtime is not supported. Make sure you have set up the Babel plugin correctly.'
@@ -5,3 +7,7 @@ function css() {
 }
 
 module.exports = css;
+
+/* ::
+declare module.exports: (string[], Array<string | number | {}>) => string;
+*/
