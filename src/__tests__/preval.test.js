@@ -8,12 +8,16 @@ const serializer = require('../__utils__/linaria-snapshot-serializer');
 
 expect.addSnapshotSerializer(serializer);
 
+const babelrc = {
+  babelrc: false,
+  presets: [
+    [require.resolve('../babel'), { displayName: true, evaluate: true }],
+  ],
+};
+
 const transpile = async input => {
   const { code, metadata } = await babel.transformAsync(input, {
-    babelrc: false,
-    presets: [
-      [require.resolve('../babel'), { displayName: true, evaluate: true }],
-    ],
+    ...babelrc,
     filename: path.join(__dirname, 'source.js'),
   });
 
@@ -224,4 +228,14 @@ it('throws codeframe error when evaluation fails', async () => {
   } catch (e) {
     expect(e.message.replace(__dirname, '<<DIRNAME>>')).toMatchSnapshot();
   }
+});
+
+it('handles escapes properly', async () => {
+  const { code, metadata } = await babel.transformFileAsync(
+    path.resolve(__dirname, '../__fixtures__/escape-character.js'),
+    babelrc
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
