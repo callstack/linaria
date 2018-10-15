@@ -8,7 +8,8 @@ const title = String.raw\`This is something\`;"
 exports[`does not output CSS if none present 2`] = `Object {}`;
 
 exports[`evaluates and inlines expressions in scope 1`] = `
-"const color = 'blue';
+"import { styled } from 'linaria/react';
+const color = 'blue';
 const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
@@ -30,7 +31,10 @@ Dependencies: NA
 
 `;
 
-exports[`handles css template literal in JSX element 1`] = `"<Title class={\\"th6xni0\\"} />;"`;
+exports[`handles css template literal in JSX element 1`] = `
+"import { css } from 'linaria';
+<Title class={\\"th6xni0\\"} />;"
+`;
 
 exports[`handles css template literal in JSX element 2`] = `
 
@@ -43,7 +47,8 @@ Dependencies: NA
 `;
 
 exports[`handles css template literal in object property 1`] = `
-"const components = {
+"import { css } from 'linaria';
+const components = {
   title: \\"th6xni0\\"
 };"
 `;
@@ -61,7 +66,8 @@ Dependencies: NA
 `;
 
 exports[`handles interpolation followed by unit 1`] = `
-"const Title =
+"import { styled } from 'linaria/react';
+const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -105,7 +111,8 @@ Dependencies: NA
 `;
 
 exports[`handles nested blocks 1`] = `
-"const Button =
+"import { styled } from 'linaria/react';
+const Button =
 /*#__PURE__*/
 styled(\\"button\\")({
   name: \\"Button\\",
@@ -137,7 +144,8 @@ Dependencies: NA
 `;
 
 exports[`inlines object styles as CSS string 1`] = `
-"const cover = {
+"import { styled } from 'linaria/react';
+const cover = {
   position: 'absolute',
   top: 0,
   right: 0,
@@ -181,7 +189,8 @@ Dependencies: NA
 `;
 
 exports[`outputs valid CSS classname 1`] = `
-"const ᾩPage$Title =
+"import { styled } from 'linaria/react';
+const ᾩPage$Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"\\\\u1FA9Page$Title\\",
@@ -202,7 +211,8 @@ Dependencies: NA
 `;
 
 exports[`prevents class name collision 1`] = `
-"const Title =
+"import { styled } from 'linaria/react';
+const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -243,7 +253,8 @@ Dependencies: NA
 `;
 
 exports[`replaces unknown expressions with CSS custom properties 1`] = `
-"const Title =
+"import { styled } from 'linaria/react';
+const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -270,10 +281,11 @@ Dependencies: NA
 
 exports[`throws when contains dynamic expression without evaluate: true in css tag 1`] = `
 "<<DIRNAME>>/app/index.js: The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.
-[0m [90m 1 | [39m[36mconst[39m title [33m=[39m css[32m\`[39m[0m
-[0m[31m[1m>[22m[39m[90m 2 | [39m[32m  font-size: \${size}px;[39m[0m
+[0m [90m 2 | [39m[0m
+[0m [90m 3 | [39m[36mconst[39m title [33m=[39m css[32m\`[39m[0m
+[0m[31m[1m>[22m[39m[90m 4 | [39m[32m  font-size: \${size}px;[39m[0m
 [0m [90m   | [39m               [31m[1m^[22m[39m[0m
-[0m [90m 3 | [39m[32m\`[39m[33m;[39m[0m"
+[0m [90m 5 | [39m[32m\`[39m[33m;[39m[0m"
 `;
 
 exports[`throws when not attached to a variable 1`] = `
@@ -282,14 +294,19 @@ exports[`throws when not attached to a variable 1`] = `
 - Is an object property
 - Is a prop in a JSX element
 
-[0m[31m[1m>[22m[39m[90m 1 | [39mstyled[33m.[39mh1[32m\`[39m[0m
+[0m [90m 1 | [39m[36mimport[39m { styled } from [32m'linaria/react'[39m[33m;[39m[0m
+[0m [90m 2 | [39m[0m
+[0m[31m[1m>[22m[39m[90m 3 | [39mstyled[33m.[39mh1[32m\`[39m[0m
 [0m [90m   | [39m[31m[1m^[22m[39m[0m
-[0m [90m 2 | [39m[32m  font-size: \${size}px;[39m[0m
-[0m [90m 3 | [39m[32m  color: \${props => props.color}[39m[0m
-[0m [90m 4 | [39m[32m\`[39m[33m;[39m[0m"
+[0m [90m 4 | [39m[32m  font-size: \${size}px;[39m[0m
+[0m [90m 5 | [39m[32m  color: \${props => props.color}[39m[0m
+[0m [90m 6 | [39m[32m\`[39m[33m;[39m[0m"
 `;
 
-exports[`transpiles css template literal 1`] = `"const title = \\"th6xni0\\";"`;
+exports[`transpiles css template literal 1`] = `
+"import { css } from 'linaria';
+const title = \\"th6xni0\\";"
+`;
 
 exports[`transpiles css template literal 2`] = `
 
@@ -304,7 +321,8 @@ Dependencies: NA
 `;
 
 exports[`transpiles styled template literal with function and component 1`] = `
-"const Title =
+"import { styled } from 'linaria/react';
+const Title =
 /*#__PURE__*/
 styled(Heading)({
   name: \\"Title\\",
@@ -325,7 +343,8 @@ Dependencies: NA
 `;
 
 exports[`transpiles styled template literal with function and tag 1`] = `
-"const Title =
+"import { styled } from 'linaria/react';
+const Title =
 /*#__PURE__*/
 styled('h1')({
   name: \\"Title\\",
@@ -346,7 +365,8 @@ Dependencies: NA
 `;
 
 exports[`transpiles styled template literal with object 1`] = `
-"const Title =
+"import { styled } from 'linaria/react';
+const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -367,7 +387,8 @@ Dependencies: NA
 `;
 
 exports[`uses the same custom property for the same expression 1`] = `
-"const Box =
+"import { styled } from 'linaria/react';
+const Box =
 /*#__PURE__*/
 styled(\\"div\\")({
   name: \\"Box\\",
@@ -392,7 +413,8 @@ Dependencies: NA
 `;
 
 exports[`uses the same custom property for the same identifier 1`] = `
-"const Box =
+"import { styled } from 'linaria/react';
+const Box =
 /*#__PURE__*/
 styled(\\"div\\")({
   name: \\"Box\\",

@@ -37,7 +37,8 @@ Dependencies: ../react
 `;
 
 exports[`evaluates expressions with dependencies 1`] = `
-"import slugify from '../slugify';
+"import { styled } from 'linaria/react';
+import slugify from '../slugify';
 const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
@@ -61,7 +62,9 @@ Dependencies: ../slugify
 `;
 
 exports[`evaluates expressions with expressions depending on shared dependency 1`] = `
-"const slugify = require('../slugify');
+"import { styled } from 'linaria/react';
+
+const slugify = require('../slugify');
 
 const boo = t => slugify(t) + 'boo';
 
@@ -90,7 +93,8 @@ Dependencies: ../slugify
 `;
 
 exports[`evaluates identifier in scope 1`] = `
-"const answer = 42;
+"import { styled } from 'linaria/react';
+const answer = 42;
 
 const foo = () => answer;
 
@@ -118,7 +122,8 @@ Dependencies: NA
 `;
 
 exports[`evaluates local expressions 1`] = `
-"const answer = 42;
+"import { styled } from 'linaria/react';
+const answer = 42;
 
 const foo = () => answer;
 
@@ -145,7 +150,9 @@ Dependencies: NA
 `;
 
 exports[`evaluates multiple expressions with shared dependency 1`] = `
-"const slugify = require('../slugify');
+"import { styled } from 'linaria/react';
+
+const slugify = require('../slugify');
 
 const boo = t => slugify(t) + 'boo';
 
@@ -201,7 +208,9 @@ Dependencies: NA
 `;
 
 exports[`ignores external expressions 1`] = `
-"const generate = props => props.content;
+"import { styled } from 'linaria/react';
+
+const generate = props => props.content;
 
 const Title =
 /*#__PURE__*/
@@ -229,7 +238,8 @@ Dependencies: NA
 `;
 
 exports[`ignores inline arrow function expressions 1`] = `
-"const Title =
+"import { styled } from 'linaria/react';
+const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -255,7 +265,8 @@ Dependencies: NA
 `;
 
 exports[`ignores inline vanilla function expressions 1`] = `
-"const Title =
+"import { styled } from 'linaria/react';
+const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -283,7 +294,9 @@ Dependencies: NA
 `;
 
 exports[`inlines object styles as CSS string 1`] = `
-"const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
+"import { styled } from 'linaria/react';
+
+const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
   position: 'absolute',
   top,
   right,
@@ -313,9 +326,9 @@ Dependencies: NA
 
 exports[`throws codeframe error when evaluation fails 1`] = `
 "<<DIRNAME>>/source.js: An error occurred when evaluating the expression: This will fail. Make sure you are not using a browser or Node specific API.
-[0m [90m 2 | [39m[0m
-[0m [90m 3 | [39m[36mconst[39m [33mTitle[39m [33m=[39m styled[33m.[39mh1[32m\`[39m[0m
-[0m[31m[1m>[22m[39m[90m 4 | [39m[32m  font-size: \${foo()}px;[39m[0m
+[0m [90m 4 | [39m[0m
+[0m [90m 5 | [39m[36mconst[39m [33mTitle[39m [33m=[39m styled[33m.[39mh1[32m\`[39m[0m
+[0m[31m[1m>[22m[39m[90m 6 | [39m[32m  font-size: \${foo()}px;[39m[0m
 [0m [90m   | [39m               [31m[1m^[22m[39m[0m
-[0m [90m 5 | [39m[32m\`[39m[33m;[39m[0m"
+[0m [90m 7 | [39m[32m\`[39m[33m;[39m[0m"
 `;
