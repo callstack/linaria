@@ -45,76 +45,7 @@ yarn add linaria
 
 ## Setup
 
-Linaria is compatible with webpack and Rollup.
-
-### Webpack
-
-To set up the build, add the webpack loader to your `webpack.config.js` after `babel-loader` (if you use it):
-
-```js
-module: {
-  rules: [
-    {
-      test: /\.js$/,
-      use: [
-        { loader: 'babel-loader' },
-        {
-          loader: 'linaria/loader',
-          options: {
-            sourceMap: process.env.NODE_ENV !== 'production',
-          },
-        },
-      ],
-    },
-    {
-      test: /\.css$/,
-      use: [
-        MiniCssExtractPlugin.loader,
-        {
-          loader: 'css-loader',
-          options: {
-            sourceMap: process.env.NODE_ENV !== 'production',
-          },
-        },
-      ],
-    },
-  ],
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: 'styles.css',
-    }),
-  ],
-},
-```
-
-You also need `css-loader` and `mini-css-extract-plugin` in your pipeline. The usage is shown above.
-
-### Rollup
-
-To use linaria with Rollup you need to add it to your `rollup.config.js`, together with a plugin which handles CSS files, such as `rollup-plugin-css-only`.
-
-```js
-import linaria from 'linaria/rollup';
-import css from 'rollup-plugin-css-only';
-
-export default {
-  /* rest of your config */
-  plugins: [
-    /* rest of your plugins */
-    linaria({
-      sourceMap: process.env.NODE_ENV !== 'production'
-    }),
-    css({
-      output: 'styles.css'
-    })
-  ]
-};
-```
-
-
-Now, the CSS you write with Linaria will be extracted at build time to the `styles.css` file. Linaria automatically vendor prefixes and strips whitespace from the CSS.
-
-Linaria integrates with your CSS pipeline, so you can always perform additional operations on the CSS, for example, using [postcss](https://postcss.org/) plugins such as [clean-css](https://github.com/jakubpawlowicz/clean-css) to further minify your CSS.
+Linaria currently supports webpack and Rollup to extract the CSS at build time. See [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md) to configure your bundler.
 
 Optionally, add the `linaria/babel` preset to your Babel configuration at the end of the presets list to avoid errors when importing the components in your server code or tests:
 
