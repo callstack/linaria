@@ -3,7 +3,7 @@
 Linaria consists of 2 parts:
 
 1. Babel plugin
-2. Webpack loader or Rollup plugin
+2. Bundler integration
 
 ## Babel plugin
 
@@ -146,7 +146,7 @@ const Container = styled.h1`
 
 We support this usage because it allows you to use a library such as [polished.js](https://polished.js.org) which outputs object based styles along with Linaria.
 
-If you've configured the plugin to evaluate expressions with `evaluate: true` (default), any dynamic expressions we encounter will be evaluated during the buildtime in a sandbox, and the result will be included in the CSS. Since these expressions are evaluated at build time in Node, you cannot use any browser specific APIs or any API which is only available in runtime. Access to Node native modules such as `fs` is also not allowed inside the sandbox to prevent malicious scripts. In addition, to achieve consistent build output, you should also avoid doing any side effects in these expressions and keep them pure.
+If you've configured the plugin to evaluate expressions with `evaluate: true` (default), any dynamic expressions we encounter will be evaluated during the build-time in a sandbox, and the result will be included in the CSS. Since these expressions are evaluated at build time in Node, you cannot use any browser specific APIs or any API which is only available in runtime. Access to Node native modules such as `fs` is also not allowed inside the sandbox to prevent malicious scripts. In addition, to achieve consistent build output, you should also avoid doing any side effects in these expressions and keep them pure.
 
 You might want to skip evaluating a certain interpolation if you're using a browser API, a global variable which is only available at runtime, or a module which breaks when evaluating in the sandbox for some reason. To skip evaluating an interpolation, you can always wrap it in a function, like so:
 
@@ -158,10 +158,6 @@ const Box = styled.h1`
 
 But keep in mind that if you're doing SSR for your app, this won't work with SSR. In this particular case, better option will be to use the `calc` function along with the `vh` unit for the viewport height (e.g. `calc(100vh * 2)`).
 
-## Webpack loader
+## Bundler integration
 
-The webpack loader uses the Babel plugin internally and writes the CSS text to a CSS file, which can be picked up by `css-loader` to generate the final CSS. It's also responsible for generating the sourcemap from the metadata from the Babel plugin.
-
-## Rollup plugin
-
-The Rollup plugin also uses the Babel plugin, and adds the CSS text to Rollup, to be picked up by a CSS plugin, which can generate the final CSS. It also generates a sourcemap.
+Plugins for bundlers such as webpack and Rollup use the Babel plugin internally and write the CSS text along with the sourcemap to a CSS file. The CSS file is then picked up and processed by the bundler (e.g. - `css-loader` in case of webpack) to generate the final CSS.

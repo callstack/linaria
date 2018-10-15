@@ -2,9 +2,7 @@
 
 ## webpack
 
-The webpack loader complements the babel plugin. For static extraction to work, you'll need to include both.
-
-In your Webpack config, you'll need to add `linaria/loader` to run it on `.js` files:
+To use Linaria wih webpack, in your webpack config, add `linaria/loader`:
 
 ```js
 /* rest of your config */
@@ -71,11 +69,21 @@ module.exports = {
 };
 ```
 
-This will extract the CSS from all files into a single `styles.css`. Then you need to include this file in your HTML file.
+This will extract the CSS from all files into a single `styles.css`. Then you need to link to this file in your HTML file or use something like [`HTMLWebpackPlugin`](https://github.com/jantimon/html-webpack-plugin).
+
+If you want to hot reload your styles when they change, you will also need to configure [`style-loader`](https://github.com/webpack-contrib/style-loader) or [`css-hot-loader`](https://github.com/shepherdwind/css-hot-loader).
+
+Linaria integrates with your CSS pipeline, so you can always perform additional operations on the CSS, for example, using [postcss](https://postcss.org/) plugins such as [clean-css](https://github.com/jakubpawlowicz/clean-css) to further minify your CSS.
 
 ## Rollup
 
-To use linaria with Rollup you need to add it to your `rollup.config.js`, together with a plugin which handles CSS files, such as `rollup-plugin-css-only`.
+To use Linaria with Rollup, you need to use it together with a plugin which handles CSS files, such as `rollup-plugin-css-only`:
+
+```sh
+yarn add --dev rollup-plugin-css-only
+```
+
+Then add them to your `rollup.config.js`:
 
 ```js
 import linaria from 'linaria/rollup';

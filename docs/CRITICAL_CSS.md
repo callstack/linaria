@@ -2,7 +2,7 @@
 
 Since Linaria extracts the CSS statically at build time, you don't need to setup a server rendering. Usually, critical CSS extraction will be automatic if you are code splitting your code and using something like [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin) for webpack to generate your CSS files.
 
-If you're not code splitting, or the initial CSS chunk is not representative of initally rendered content, you might want to extract critical CSS using the `collect` helper we provide to ship the minimal amount of CSS used in the page to the browser. To be able to use the `collect` helper, you need to provide the initial HTML, which usually means that you need to have SSR setup for your web app.
+If you're not code splitting, or the initial CSS chunk is not representative of initially rendered content, you might want to extract critical CSS using the `collect` helper we provide to ship the minimal amount of CSS used in the page to the browser. To be able to use the `collect` helper, you need to provide the initial HTML, which usually means that you need to have SSR setup for your web app.
 
 The `collect` method takes some HTML and CSS and gives you the critical CSS:
 
