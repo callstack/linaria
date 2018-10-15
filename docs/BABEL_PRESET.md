@@ -1,6 +1,6 @@
 # `linaria/babel` preset
 
-The preset pre-processes and evaluates the CSS. The webpack loader uses this preset under the hood. You also might want to use this preset if you import the components outside webpack, such as on your server or in unit tests.
+The preset pre-processes and evaluates the CSS. The webpack loader and Rollup plugin use this preset under the hood. You also might want to use this preset if you import the components outside webpack or Rollup, such as on your server or in unit tests.
 
 To use this preset, add `linaria/babel` to your Babel configuration at the end of the presets list:
 

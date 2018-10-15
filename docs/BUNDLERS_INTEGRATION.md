@@ -72,3 +72,25 @@ module.exports = {
 ```
 
 This will extract the CSS from all files into a single `styles.css`. Then you need to include this file in your HTML file.
+
+## Rollup
+
+To use linaria with Rollup you need to add it to your `rollup.config.js`, together with a plugin which handles CSS files, such as `rollup-plugin-css-only`.
+
+```js
+import linaria from 'linaria/rollup';
+import css from 'rollup-plugin-css-only';
+
+export default {
+  /* rest of your config */
+  plugins: [
+    /* rest of your plugins */
+    linaria({
+      sourceMap: process.env.NODE_ENV !== 'production'
+    }),
+    css({
+      output: 'styles.css'
+    })
+  ]
+};
+```

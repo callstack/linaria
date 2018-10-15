@@ -75,6 +75,7 @@
     "mkdirp": "^0.5.1",
     "postcss": "^7.0.2",
     "react-is": "^16.5.1",
+    "rollup-pluginutils": "^2.3.3",
     "source-map": "^0.7.3",
     "stylis": "^3.5.3"
   },

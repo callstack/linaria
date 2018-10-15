@@ -3,7 +3,7 @@
 Linaria consists of 2 parts:
 
 1. Babel plugin
-2. Webpack loader
+2. Webpack loader or Rollup plugin
 
 ## Babel plugin
 
@@ -161,3 +161,7 @@ But keep in mind that if you're doing SSR for your app, this won't work with SSR
 ## Webpack loader
 
 The webpack loader uses the Babel plugin internally and writes the CSS text to a CSS file, which can be picked up by `css-loader` to generate the final CSS. It's also responsible for generating the sourcemap from the metadata from the Babel plugin.
+
+## Rollup plugin
+
+The Rollup plugin also uses the Babel plugin, and adds the CSS text to Rollup, to be picked up by a CSS plugin, which can generate the final CSS. It also generates a sourcemap.
