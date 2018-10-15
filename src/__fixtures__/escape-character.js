@@ -1,3 +1,5 @@
+import { styled } from 'linaria/react';
+
 const selectors = ['a', 'b'];
 
 const Block = styled.div`

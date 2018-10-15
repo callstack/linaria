@@ -182,7 +182,8 @@ Dependencies: ../slugify, ../slugify
 `;
 
 exports[`handles escapes properly 1`] = `
-"const selectors = ['a', 'b'];
+"import { styled } from 'linaria/react';
+const selectors = ['a', 'b'];
 const Block =
 /*#__PURE__*/
 styled(\\"div\\")({
