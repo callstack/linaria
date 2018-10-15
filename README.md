@@ -45,7 +45,11 @@ yarn add linaria
 
 ## Setup
 
-Linaria requires webpack to build your CSS. To set up the build, add the webpack loader to your `webpack.config.js` after `babel-loader` (if you use it):
+Linaria is compatible with webpack and Rollup.
+
+### Webpack
+
+To set up the build, add the webpack loader to your `webpack.config.js` after `babel-loader` (if you use it):
 
 ```js
 module: {
@@ -84,6 +88,29 @@ module: {
 ```
 
 You also need `css-loader` and `mini-css-extract-plugin` in your pipeline. The usage is shown above.
+
+### Rollup
+
+To use linaria with Rollup you need to add it to your `rollup.config.js`, together with a plugin which handles CSS files, such as `rollup-plugin-css-only`.
+
+```js
+import linaria from 'linaria/rollup';
+import css from 'rollup-plugin-css-only';
+
+export default {
+  /* rest of your config */
+  plugins: [
+    /* rest of your plugins */
+    linaria({
+      sourceMap: process.env.NODE_ENV !== 'production'
+    }),
+    css({
+      output: 'styles.css'
+    })
+  ]
+};
+```
+
 
 Now, the CSS you write with Linaria will be extracted at build time to the `styles.css` file. Linaria automatically vendor prefixes and strips whitespace from the CSS.
 
@@ -171,6 +198,7 @@ Dynamic styles will be applied using CSS custom properties (aka CSS variables) a
 - [Critical CSS extraction](/docs/CRITICAL_CSS.md)
 - [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md)
   - [Webpack](/docs/BUNDLERS_INTEGRATION.md#webpack)
+  - [Rollup](/docs/BUNDLERS_INTEGRATION.md#rollup)
 - [Linting](/docs/LINTING.md)
 - [How it works](/docs/HOW_IT_WORKS.md)
 - [Example](/website)
