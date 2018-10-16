@@ -104,7 +104,14 @@ module.exports = function transform(
     parserOpts,
   });
 
-  const { rules, replacements, dependencies } = metadata.linaria || {};
+  if (!metadata.linaria) {
+    return {
+      code: content,
+      sourceMap: inputSourceMap,
+    };
+  }
+
+  const { rules, replacements, dependencies } = metadata.linaria;
   const mappings = [];
 
   let cssText = '';
