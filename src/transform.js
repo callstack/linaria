@@ -42,6 +42,8 @@ type PluginOptions = {
 
 const STYLIS_DECLARATION = 1;
 
+const astCache /* : Map<string, { content: string, ast: Object }> */ = new Map();
+
 module.exports = function transform(
   filename /* :string */,
   content /* :string */,
@@ -62,9 +64,21 @@ module.exports = function transform(
     };
   }
 
-  // Parse the code first so babel uses user's babel config for parsing
-  // We don't want to use user's config when transforming the code
-  const ast = babel.parseSync(content, { filename });
+  let ast;
+
+  const cached = astCache.get(filename);
+
+  if (cached && cached.content === content) {
+    // eslint-disable-next-line prefer-destructuring
+    ast = cached.ast;
+  } else {
+    // Parse the code first so babel uses user's babel config for parsing
+    // We don't want to use user's config when transforming the code
+    ast = babel.parseSync(content, { filename });
+
+    astCache.set(filename, { content, ast });
+  }
+
   const { metadata, code, map } = babel.transformFromAstSync(ast, content, {
     filename,
     presets: [[require.resolve('./babel'), options]],
