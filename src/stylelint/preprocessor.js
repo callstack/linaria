@@ -13,9 +13,20 @@ function preprocessor() {
 
   return {
     code(input /* : string */, filename /* : string */) {
-      const { rules, replacements } = transform(filename, input, {
-        evaluate: true,
-      });
+      /* eslint-disable prefer-destructuring */
+
+      let result;
+
+      try {
+        result = transform(filename, input, {
+          evaluate: true,
+        });
+      } catch (e) {
+        // Ignore parse errors
+        return '';
+      }
+
+      const { rules, replacements } = result;
 
       if (!rules) {
         return '';
