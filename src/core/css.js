@@ -9,5 +9,5 @@ function css() {
 module.exports = css;
 
 /* ::
-declare module.exports: (string[], Array<string | number | {}>) => string;
+declare module.exports: (strings: string[], ...exprs: Array<string | number | {}>) => string;
 */

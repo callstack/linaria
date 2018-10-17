@@ -70,7 +70,7 @@ if (process.env.NODE_ENV !== 'production') {
 /* ::
 type StyledComponent<T> = React.ComponentType<T & { as?: React$ElementType }>;
 
-type StyledTag<T> = (string[], Array<string | number | {} | (T => string | number)>) => StyledComponent<T>;
+type StyledTag<T> = (strings: string[], ...exprs: Array<string | number | {} | (T => string | number)>) => StyledComponent<T>;
 
 declare module.exports: {|
   <T>(T): StyledTag<React.ElementConfig<T>>,
