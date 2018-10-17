@@ -82,8 +82,9 @@ type StyledComponent<T> = React.ComponentType<T & { as?: React$ElementType }>;
 
 type StyledTag<T> = (strings: string[], ...exprs: Array<string | number | {} | (T => string | number)>) => StyledComponent<T>;
 
-declare module.exports: {|
+type StyledJSXIntrinsics = $ObjMap<$JSXIntrinsics, <T>({ props: T }) => StyledTag<T>>;
+
+declare module.exports: StyledJSXIntrinsics & {|
   <T>(T): StyledTag<React.ElementConfig<T>>,
-  [string]: StyledTag<{ children?: React.Node, [key: string]: any }>,
 |};
 */
