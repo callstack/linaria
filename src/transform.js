@@ -63,6 +63,14 @@ module.exports = function transform(
   }
 
   const parserOpts = {
+    // Enable these options so we don't error if user is using these
+    // https://babeljs.io/docs/en/babel-parser#options
+    allowImportExportEverywhere: true,
+    allowAwaitOutsideFunction: true,
+    allowReturnOutsideFunction: true,
+    allowSuperOutsideMethod: true,
+
+    // Specify all the plugins manually since there's no way to infer them
     // https://babeljs.io/docs/en/next/babel-parser.html#plugins
     plugins: [
       // ECMAScript proposals
@@ -102,7 +110,6 @@ module.exports = function transform(
   const { metadata, code, map } = babel.transformSync(content, {
     filename,
     presets: [[require.resolve('./babel'), options]],
-    exclude: /node_modules/,
     babelrc: false,
     configFile: false,
     sourceMaps: true,
