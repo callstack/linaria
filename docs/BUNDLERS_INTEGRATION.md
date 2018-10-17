@@ -1,6 +1,12 @@
 # Bundlers Integration
 
-## webpack
+## Pre-requisites
+
+If you use Babel in your project, make sure to have a [config file for Babel](https://babeljs.io/docs/en/config-files) in your project root with the plugins and presets you use. Otherwise Linaria won't be able to parse the code.
+
+## Bundlers
+
+### webpack
 
 To use Linaria wih webpack, in your webpack config, add `linaria/loader`:
 
@@ -75,7 +81,7 @@ If you want to hot reload your styles when they change, you will also need to co
 
 Linaria integrates with your CSS pipeline, so you can always perform additional operations on the CSS, for example, using [postcss](https://postcss.org/) plugins such as [clean-css](https://github.com/jakubpawlowicz/clean-css) to further minify your CSS.
 
-## Rollup
+### Rollup
 
 To use Linaria with Rollup, you need to use it together with a plugin which handles CSS files, such as `rollup-plugin-css-only`:
 

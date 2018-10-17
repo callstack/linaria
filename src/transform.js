@@ -62,52 +62,10 @@ module.exports = function transform(
     };
   }
 
-  const parserOpts = {
-    // Enable these options so we don't error if user is using these
-    // https://babeljs.io/docs/en/babel-parser#options
-    allowImportExportEverywhere: true,
-    allowAwaitOutsideFunction: true,
-    allowReturnOutsideFunction: true,
-    allowSuperOutsideMethod: true,
-
-    // Specify all the plugins manually since there's no way to infer them
-    // https://babeljs.io/docs/en/next/babel-parser.html#plugins
-    plugins: [
-      // ECMAScript proposals
-      'asyncGenerators',
-      'bigInt',
-      'classProperties',
-      'classPrivateProperties',
-      'classPrivateMethods',
-      ['decorators', { decoratorsBeforeExport: true }],
-      'doExpressions',
-      'dynamicImport',
-      'exportDefaultFrom',
-      'exportNamespaceFrom',
-      'functionBind',
-      'functionSent',
-      'importMeta',
-      'logicalAssignment',
-      'nullishCoalescingOperator',
-      'numericSeparator',
-      'objectRestSpread',
-      'optionalCatchBinding',
-      'optionalChaining',
-      ['pipelineOperator', { proposal: 'minimal' }],
-      'throwExpressions',
-
-      // Language extensions
-      'jsx',
-    ],
-  };
-
-  if (/\.tsx?/.test(filename)) {
-    parserOpts.plugins.push('typescript');
-  } else {
-    parserOpts.plugins.push('flow');
-  }
-
-  const { metadata, code, map } = babel.transformSync(content, {
+  // Parse the code first so babel uses user's babel config for parsing
+  // We don't want to use user's config when transforming the code
+  const ast = babel.parseSync(content, { filename });
+  const { metadata, code, map } = babel.transformFromAstSync(ast, content, {
     filename,
     presets: [[require.resolve('./babel'), options]],
     babelrc: false,
@@ -115,7 +73,6 @@ module.exports = function transform(
     sourceMaps: true,
     sourceFileName: filename,
     inputSourceMap,
-    parserOpts,
   });
 
   if (!metadata.linaria) {
