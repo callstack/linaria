@@ -1,6 +1,7 @@
 /* @flow */
 
 const React = require('react'); // eslint-disable-line import/no-extraneous-dependencies
+const { cx } = require('../index');
 
 /* ::
 type Options = {
@@ -23,13 +24,10 @@ function styled(tag /* : React.ComponentType<*> | string */) {
 
     /* $FlowFixMe: Flow doesn't know about forwardRef */
     const Result = React.forwardRef((props, ref) => {
-      const { as: component = tag, ...rest } = props;
-      const next = Object.assign(rest, {
-        ref,
-        className: props.className
-          ? `${options.class} ${props.className}`
-          : options.class,
-      });
+      const { as: component = tag, class: className, ...rest } = props;
+
+      rest.ref = ref;
+      rest.className = cx(rest.className || className, options.class);
 
       const { vars } = options;
 
@@ -43,10 +41,10 @@ function styled(tag /* : React.ComponentType<*> | string */) {
           }${unit}`;
         });
 
-        next.style = Object.assign(style, next.style);
+        rest.style = Object.assign(style, rest.style);
       }
 
-      return React.createElement(component, next);
+      return React.createElement(component, rest);
     });
 
     Result.displayName = options.name;
