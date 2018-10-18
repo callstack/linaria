@@ -28,7 +28,7 @@ CSS:
 }
 .Paragraph_p1rsdnkv {
   .Title_t1xha7dm {
-    color: blue
+    color: blue;
   }
 }
 
@@ -202,6 +202,41 @@ CSS:
 
 
    ;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`handles wrapping another styled component 1`] = `
+"const {
+  styled
+} = require('../react');
+
+const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1xha7dm\\"
+});
+const CustomTitle =
+/*#__PURE__*/
+styled(Title)({
+  name: \\"CustomTitle\\",
+  class: \\"CustomTitle_c1rsdnkv\\"
+});"
+`;
+
+exports[`handles wrapping another styled component 2`] = `
+
+CSS:
+
+.Title_t1xha7dm {
+  color: red;
+}
+.CustomTitle_c1rsdnkv.Title_t1xha7dm {
+  font-size: 24px;
+  color: blue;
 }
 
 Dependencies: NA

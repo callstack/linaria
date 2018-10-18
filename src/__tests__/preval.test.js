@@ -141,8 +141,28 @@ it('evaluates component interpolations', async () => {
 
     const Paragraph = styled.p\`
       ${'${Title}'} {
-        color: blue
+        color: blue;
       }
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('handles wrapping another styled component', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    const { styled } = require('../react');
+
+    const Title = styled.h1\`
+      color: red;
+    \`;
+
+    const CustomTitle = styled(Title)\`
+      font-size: 24px;
+      color: blue;
     \`;
     `
   );
