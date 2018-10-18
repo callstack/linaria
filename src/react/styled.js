@@ -44,6 +44,18 @@ function styled(tag /* : React.ComponentType<*> | string */) {
         rest.style = Object.assign(style, rest.style);
       }
 
+      /* $FlowFixMe */
+      if (typeof tag.className === 'string' && tag !== component) {
+        // If the underlying tag is a styled component, forward the `as` prop
+        // Otherwise the styles from the underlying component will be ignored
+        return React.createElement(
+          tag,
+          Object.assign(rest, {
+            as: component,
+          })
+        );
+      }
+
       return React.createElement(component, rest);
     });
 
