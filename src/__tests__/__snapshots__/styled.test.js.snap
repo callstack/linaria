@@ -16,9 +16,31 @@ exports[`applies CSS variables in style prop 1`] = `
 </div>
 `;
 
+exports[`forwards as prop when wrapping another styled component 1`] = `
+<a
+  className="hijklmn abcdefg"
+>
+  This is a test
+</a>
+`;
+
 exports[`handles wrapping another styled component 1`] = `
 <div
   className="hijklmn abcdefg"
+>
+  This is a test
+</div>
+`;
+
+exports[`merges CSS variables with custom style prop 1`] = `
+<div
+  className="abcdefg"
+  style={
+    Object {
+      "--foo": "tomato",
+      "bar": "baz",
+    }
+  }
 >
   This is a test
 </div>
@@ -38,6 +60,14 @@ exports[`renders tag with display name and class name 1`] = `
 >
   This is a test
 </h1>
+`;
+
+exports[`replaces custom component with as prop 1`] = `
+<a
+  className="abcdefg"
+>
+  This is a test
+</a>
 `;
 
 exports[`replaces simple component with as prop 1`] = `

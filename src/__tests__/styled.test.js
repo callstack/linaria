@@ -52,6 +52,22 @@ it('applies CSS variables in style prop', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
+it('merges CSS variables with custom style prop', () => {
+  const Test = styled('div')({
+    name: 'TestComponent',
+    class: 'abcdefg',
+    vars: {
+      foo: ['tomato'],
+    },
+  });
+
+  const tree = renderer.create(
+    <Test style={{ bar: 'baz' }}>This is a test</Test>
+  );
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
 it('supports extra className prop', () => {
   const Test = styled('div')({
     name: 'TestComponent',
@@ -85,6 +101,19 @@ it('replaces simple component with as prop', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
+it('replaces custom component with as prop', () => {
+  const Custom = props => <div {...props} style={{ fontSize: 12 }} />;
+
+  const Test = styled(Custom)({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  const tree = renderer.create(<Test as="a">This is a test</Test>);
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
 it('handles wrapping another styled component', () => {
   const First = styled('div')({
     name: 'FirstComponent',
@@ -97,6 +126,22 @@ it('handles wrapping another styled component', () => {
   });
 
   const tree = renderer.create(<Second>This is a test</Second>);
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
+it('forwards as prop when wrapping another styled component', () => {
+  const First = styled('div')({
+    name: 'FirstComponent',
+    class: 'abcdefg',
+  });
+
+  const Second = styled(First)({
+    name: 'SecondComponent',
+    class: 'hijklmn',
+  });
+
+  const tree = renderer.create(<Second as="a">This is a test</Second>);
 
   expect(tree.toJSON()).toMatchSnapshot();
 });
