@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`applies CSS variables in style prop 1`] = `
+<div
+  className="abcdefg"
+  size={24}
+  style={
+    Object {
+      "--bar": "20px",
+      "--baz": "24px",
+      "--foo": "tomato",
+    }
+  }
+>
+  This is a test
+</div>
+`;
+
+exports[`handles wrapping another styled component 1`] = `
+<div
+  className="hijklmn abcdefg"
+>
+  This is a test
+</div>
+`;
+
+exports[`renders component with display name and class name 1`] = `
+<div
+  className="abcdefg"
+>
+  This is a test
+</div>
+`;
+
+exports[`renders tag with display name and class name 1`] = `
+<h1
+  className="abcdefg"
+>
+  This is a test
+</h1>
+`;
+
+exports[`replaces simple component with as prop 1`] = `
+<a
+  className="abcdefg"
+>
+  This is a test
+</a>
+`;
+
+exports[`supports extra class prop 1`] = `
+<div
+  className="primary abcdefg"
+>
+  This is a test
+</div>
+`;
+
+exports[`supports extra className prop 1`] = `
+<div
+  className="primary abcdefg"
+>
+  This is a test
+</div>
+`;

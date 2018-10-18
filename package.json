@@ -48,6 +48,7 @@
     "@babel/plugin-syntax-jsx": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-flow": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
     "@callstack/eslint-config": "^2.0.0",
     "all-contributors-cli": "^5.4.0",
     "babel-core": "^7.0.0-bridge.0",
@@ -63,6 +64,7 @@
     "prettier": "^1.14.2",
     "puppeteer": "^1.8.0",
     "react": "^16.5.1",
+    "react-test-renderer": "^16.5.2",
     "release-it": "^7.6.1"
   },
   "dependencies": {

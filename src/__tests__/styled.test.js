@@ -1,0 +1,118 @@
+/* @flow */
+
+const React = require('react');
+const renderer = require('react-test-renderer');
+const styled: any = require('../react/styled');
+
+it('renders tag with display name and class name', () => {
+  const Test = styled('h1')({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  expect(Test.displayName).toBe('TestComponent');
+  expect(Test.className).toBe('abcdefg');
+  expect(Test.extends).toBe('h1');
+
+  const tree = renderer.create(<Test>This is a test</Test>);
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
+it('renders component with display name and class name', () => {
+  const Custom = props => <div {...props} />;
+
+  const Test = styled(Custom)({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  expect(Test.displayName).toBe('TestComponent');
+  expect(Test.className).toBe('abcdefg');
+  expect(Test.extends).toBe(Custom);
+
+  const tree = renderer.create(<Test>This is a test</Test>);
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
+it('applies CSS variables in style prop', () => {
+  const Test = styled('div')({
+    name: 'TestComponent',
+    class: 'abcdefg',
+    vars: {
+      foo: ['tomato'],
+      bar: [20, 'px'],
+      baz: [props => props.size, 'px'],
+    },
+  });
+
+  const tree = renderer.create(<Test size={24}>This is a test</Test>);
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
+it('supports extra className prop', () => {
+  const Test = styled('div')({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  const tree = renderer.create(<Test className="primary">This is a test</Test>);
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
+it('supports extra class prop', () => {
+  const Test = styled('div')({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  const tree = renderer.create(<Test class="primary">This is a test</Test>);
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
+it('replaces simple component with as prop', () => {
+  const Test = styled('button')({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  const tree = renderer.create(<Test as="a">This is a test</Test>);
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
+it('handles wrapping another styled component', () => {
+  const First = styled('div')({
+    name: 'FirstComponent',
+    class: 'abcdefg',
+  });
+
+  const Second = styled(First)({
+    name: 'SecondComponent',
+    class: 'hijklmn',
+  });
+
+  const tree = renderer.create(<Second>This is a test</Second>);
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
+it('throws when using as tag for template literal', () => {
+  expect(
+    () =>
+      styled('div')`
+        color: blue;
+      `
+  ).toThrowError('Using the "styled" tag in runtime is not supported');
+
+  expect(
+    () =>
+      styled.div`
+        color: blue;
+      `
+  ).toThrowError('Using the "styled" tag in runtime is not supported');
+});
