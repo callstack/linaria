@@ -64,7 +64,11 @@ module.exports = function transform(
 
   // Parse the code first so babel uses user's babel config for parsing
   // We don't want to use user's config when transforming the code
-  const ast = babel.parseSync(content, { filename });
+  const ast = babel.parseSync(content, {
+    filename,
+    caller: { name: 'linaria' },
+  });
+
   const { metadata, code, map } = babel.transformFromAstSync(ast, content, {
     filename,
     presets: [[require.resolve('./babel'), options]],
