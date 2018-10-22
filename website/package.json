@@ -16,7 +16,7 @@
     "lint:css": "stylelint src/**/*.js"
   },
   "dependencies": {
-    "babel-plugin-file-loader": "^1.1.0",
+    "babel-plugin-file-loader": "^1.1.1",
     "dedent": "^0.7.0",
     "escape-html": "^1.0.3",
     "ignore-styles": "^5.0.1",
@@ -24,27 +24,27 @@
     "koa-compress": "^3.0.0",
     "koa-router": "^7.4.0",
     "koa-send": "^5.0.0",
-    "react": "^16.5.1",
-    "react-dom": "^16.5.1"
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.1",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
-    "babel-loader": "^8.0.2",
+    "babel-loader": "^8.0.4",
     "babel-plugin-module-resolver": "^3.1.1",
     "cross-env": "^5.2.0",
     "css-hot-loader": "^1.4.2",
     "css-loader": "^1.0.0",
     "del-cli": "^1.1.0",
     "file-loader": "^2.0.0",
-    "mini-css-extract-plugin": "^0.4.2",
-    "stylelint": "^9.5.0",
+    "mini-css-extract-plugin": "^0.4.4",
+    "stylelint": "^9.6.0",
     "stylelint-config-recommended": "^2.1.0",
-    "webpack": "^4.19.0",
-    "webpack-cli": "^3.1.0",
+    "webpack": "^4.22.0",
+    "webpack-cli": "^3.1.2",
     "webpack-serve": "^2.0.2"
   }
 }

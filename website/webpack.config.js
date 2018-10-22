@@ -30,7 +30,6 @@ module.exports = {
         use: [
           {
             loader: 'babel-loader',
-            options: require('./babel.config'),
           },
           {
             loader: require.resolve('../src/loader'),

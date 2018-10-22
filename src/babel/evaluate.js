@@ -6,6 +6,7 @@ const Module = require('./module');
 
 function defaultTransformModule(text) {
   return babel.transformSync(text, {
+    caller: { name: 'linaria', evaluate: true },
     filename: this.filename,
     plugins: [
       // Include this plugin to avoid extra config when using { module: false } for webpack
@@ -16,7 +17,6 @@ function defaultTransformModule(text) {
       require.resolve('./dynamic-import-noop'),
       [require.resolve('./extract'), { evaluate: true }],
     ],
-    exclude: /node_modules/,
   });
 }
 
