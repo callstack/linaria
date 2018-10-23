@@ -15,12 +15,15 @@ const absoluteFill = {
 
 const Button = styled.button`
   color: ${white};
-  background-color: ${props => props.background};
   border-width: ${border}px;
 
   &.abs {
     ${absoluteFill};
   }
+`;
+
+const ColoredButton = styled.button<{ background: string; children: string }>`
+  background-color: ${props => props.background};
 `;
 
 const CustomButton = styled(Button)`
@@ -41,6 +44,12 @@ const CustomTitle = styled(Title)`
 
 // $Expect Element
 <Button as="a">Hello world</Button>;
+
+// $Expect Element
+<ColoredButton background="blue">Hello world</ColoredButton>;
+
+// $ExpectError
+<ColoredButton background={42}>Hello world</ColoredButton>;
 
 // $ExpectError
 <Button onClick={42}>Hello world</Button>;
