@@ -1,4 +1,4 @@
-// TypeScript Version: 2.8
+// TypeScript Version: 2.9
 
 declare module 'linaria' {
   function css(
@@ -18,15 +18,15 @@ declare module 'linaria/react' {
     T & { as?: React.ReactType }
   >;
 
-  type StyledTag<T> = (
+  type StyledTag<T> = <Props = T>(
     strings: TemplateStringsArray,
-    ...exprs: Array<string | number | object | ((props: T) => string | number)>
-  ) => StyledComponent<T>;
+    ...exprs: Array<
+      string | number | object | ((props: Props) => string | number)
+    >
+  ) => StyledComponent<Props>;
 
   type StyledJSXIntrinsics = {
-    [P in keyof JSX.IntrinsicElements]: StyledTag<
-      JSX.IntrinsicElements[P] & { [key: string]: any }
-    >
+    [P in keyof JSX.IntrinsicElements]: StyledTag<JSX.IntrinsicElements[P]>
   };
 
   const styled: StyledJSXIntrinsics & {
