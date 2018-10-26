@@ -78,9 +78,13 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 /* ::
+type CSSProperties = {
+  [key: string]: string | number | CSSProperties;
+};
+
 type StyledComponent<T> = React.ComponentType<T & { as?: React$ElementType }>;
 
-type StyledTag<T> = (strings: string[], ...exprs: Array<string | number | {} | (T => string | number)>) => StyledComponent<T>;
+type StyledTag<T> = (strings: string[], ...exprs: Array<string | number | CSSProperties | (T => string | number)>) => StyledComponent<T>;
 
 type StyledJSXIntrinsics = $ObjMap<$JSXIntrinsics, <T>({ props: T }) => StyledTag<T>>;
 

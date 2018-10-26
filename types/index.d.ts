@@ -1,9 +1,13 @@
 // TypeScript Version: 2.9
 
 declare module 'linaria' {
+  type CSSProperties = {
+    [key: string]: string | number | CSSProperties;
+  };
+
   function css(
     strings: TemplateStringsArray,
-    ...exprs: Array<string | number | object>
+    ...exprs: Array<string | number | CSSProperties>
   ): string;
 
   function cx(
@@ -14,6 +18,10 @@ declare module 'linaria' {
 declare module 'linaria/react' {
   import * as React from 'react';
 
+  type CSSProperties = {
+    [key: string]: string | number | CSSProperties;
+  };
+
   type StyledComponent<T> = React.StatelessComponent<
     T & { as?: React.ReactType }
   >;
@@ -21,18 +29,18 @@ declare module 'linaria/react' {
   type StyledTag<T> = <Props = T>(
     strings: TemplateStringsArray,
     ...exprs: Array<
-      string | number | object | ((props: Props) => string | number)
+      string | number | CSSProperties | ((props: Props) => string | number)
     >
   ) => StyledComponent<Props>;
 
   type StyledJSXIntrinsics = {
-    [P in keyof JSX.IntrinsicElements]: StyledTag<JSX.IntrinsicElements[P]>
+    readonly [P in keyof JSX.IntrinsicElements]: StyledTag<JSX.IntrinsicElements[P]>
   };
 
   const styled: StyledJSXIntrinsics & {
     <T>(component: React.ReactType<T>): StyledTag<T>;
 
-    [key: string]: StyledTag<{
+    readonly [key: string]: StyledTag<{
       children?: React.ReactNode;
       [key: string]: any;
     }>;
