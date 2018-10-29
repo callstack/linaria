@@ -6,16 +6,13 @@ const loaderUtils = require('loader-utils');
 const transform = require('./transform');
 
 module.exports = function loader(content, inputSourceMap) {
-  const { sourceMap, ...rest } = loaderUtils.getOptions(this) || {};
-
-  const outputDirectory = path.join(
-    process.cwd(),
-    'node_modules',
-    '.linaria-cache'
-  );
+  const { sourceMap, cacheDirectory = '.linaria-cache', ...rest } =
+    loaderUtils.getOptions(this) || {};
 
   const outputFilename = path.join(
-    outputDirectory,
+    path.isAbsolute(cacheDirectory)
+      ? cacheDirectory
+      : path.join(process.cwd(), cacheDirectory),
     path.relative(
       process.cwd(),
       this.resourcePath.replace(/\.[^.]+$/, '.linaria.css')
