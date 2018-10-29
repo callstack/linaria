@@ -32,9 +32,7 @@ module: {
 },
 ```
 
-Make sure that `linaria/loader` is included after `babel-loader`. Setting the `sourceMap` option to `true` will include source maps for the generated CSS so that you can see where source of the class name in devtools. We recommend to enable this only in development mode because the sourcemap is inlined into the CSS files.
-
-The loader accepts same options as the [babel preset](/docs/BABEL_PRESET.md).
+Make sure that `linaria/loader` is included after `babel-loader`.
 
 In order to have your styles extracted, you'll also need to use **css-loader** and **MiniCssExtractPlugin**. First, install them:
 
@@ -81,6 +79,27 @@ If you want to hot reload your styles when they change, you will also need to co
 
 Linaria integrates with your CSS pipeline, so you can always perform additional operations on the CSS, for example, using [postcss](https://postcss.org/) plugins such as [clean-css](https://github.com/jakubpawlowicz/clean-css) to further minify your CSS.
 
+#### Options
+
+The loader accepts the following options:
+
+- `sourceMap: boolean` (default: `false`) - Setting this option to `true` will include source maps for the generated CSS so that you can see where source of the class name in devtools. We recommend to enable this only in development mode because the sourcemap is inlined into the CSS files.
+- `cacheDirectory: string` (default: `'.linaria-cache'`) - Path to the directory where the loader will output the intermediate CSS files. You can pass a relative or absolute directory path. Make sure the directory is inside the working directory for things to work properly. **You should add this directory to `.gitignore` so you don't accidentally commit them.**
+
+In addition to the above options, the loader also accepts all the options accepted by the [babel preset](/docs/BABEL_PRESET.md).
+
+You can pass options to the loader like so:
+
+```js
+{
+  loader: 'linaria/loader',
+  options: {
+    sourceMap: false,
+    cacheDirectory: '.linaria-cache',
+  },
+}
+```
+
 ### Rollup
 
 To use Linaria with Rollup, you need to use it together with a plugin which handles CSS files, such as `rollup-plugin-css-only`:
@@ -100,11 +119,11 @@ export default {
   plugins: [
     /* rest of your plugins */
     linaria({
-      sourceMap: process.env.NODE_ENV !== 'production'
+      sourceMap: process.env.NODE_ENV !== 'production',
     }),
     css({
-      output: 'styles.css'
-    })
-  ]
+      output: 'styles.css',
+    }),
+  ],
 };
 ```
