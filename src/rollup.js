@@ -54,7 +54,7 @@ module.exports = function linaria({
       result.code += `\nimport ${JSON.stringify(filename)};\n`;
 
       /* eslint-disable-next-line consistent-return */
-      return result.code;
+      return { code: result.code, map: result.sourceMap };
     },
   };
 };
