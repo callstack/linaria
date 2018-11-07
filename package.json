@@ -8,6 +8,7 @@
     "lib/",
     "types/",
     "react.js",
+    "rollup.js",
     "server.js",
     "babel.js",
     "loader.js",
