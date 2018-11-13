@@ -166,9 +166,7 @@ Dynamic styles will be applied using CSS custom properties (aka CSS variables) a
 ## Recommended Libraries
 
 - [linaria-jest](https://github.com/thymikee/linaria-jest) – Jest testing utilities for Linaria.
-- [gatsby-plugin-linaria](https://github.com/silvenon/gatsby-plugin-linaria) – Gatsby plugin that sets up Babel and webpack configuration for Linaria
-- [babel-plugin-object-styles-to-template](https://github.com/satya164/babel-plugin-object-styles-to-template) - Babel plugin to write styles in object syntax with linaria
-- [babel-plugin-css-prop](https://github.com/satya164/babel-plugin-css-prop/) - Babel plugin to use a `css` prop ala [`emotion`](https://emotion.sh) in linaria
+- [gatsby-plugin-linaria](https://github.com/silvenon/gatsby-plugin-linaria) – Gatsby plugin that sets up Babel and webpack configuration for Linaria.
 - [polished.js](https://polished.js.org/) - A lightweight toolset for writing styles in JavaScript.
 
 ## Inspiration
