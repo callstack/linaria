@@ -156,12 +156,13 @@ Dynamic styles will be applied using CSS custom properties (aka CSS variables) a
 
 ### VSCode
 
-- Syntax Highlighting and autocompletion - [styled-components plugin](https://marketplace.visualstudio.com/items?itemName=jpoissonnier.vscode-styled-components)
-- Linting - [stylelint plugin](https://marketplace.visualstudio.com/items?itemName=shinnn.stylelint)
+- Syntax Highlighting - [language-babel](https://marketplace.visualstudio.com/items?itemName=mgmcdermott.vscode-language-babel)
+- Autocompletion - [vscode-styled-components](https://marketplace.visualstudio.com/items?itemName=jpoissonnier.vscode-styled-components)
+- Linting - [stylelint](https://marketplace.visualstudio.com/items?itemName=shinnn.stylelint)
 
 ### Atom
 
-- Syntax Highlighting and autocompletion - [babel grammar](https://atom.io/packages/language-babel)
+- Syntax Highlighting and Autocompletion - [language-babel](https://atom.io/packages/language-babel)
 
 ## Recommended Libraries
 
