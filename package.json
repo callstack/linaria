@@ -11,7 +11,10 @@
     "server.js",
     "babel.js",
     "loader.js",
-    "stylelint-config.js"
+    "stylelint-config.js",
+    "index.d.ts",
+    "react.d.ts",
+    "server.d.ts"
   ],
   "license": "MIT",
   "repository": "git@github.com:callstack/linaria.git",
