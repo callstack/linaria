@@ -6,7 +6,6 @@
   "types": "types/index.d.ts",
   "files": [
     "lib/",
-    "types/",
     "react.js",
     "rollup.js",
     "server.js",
@@ -32,7 +31,7 @@
   "scripts": {
     "lint": "eslint .",
     "flow": "flow",
-    "typescript": "dtslint types",
+    "typescript": "dtslint",
     "test": "jest",
     "test:unit": "jest __tests__",
     "test:integration": "jest __integration-tests__",

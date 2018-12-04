@@ -2,6 +2,8 @@
   "compilerOptions": {
     "module": "commonjs",
     "lib": ["es6", "dom"],
+    "baseUrl": "..",
+    "rootDir": "__ts-tests__",
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
