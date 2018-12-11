@@ -49,13 +49,9 @@ module.exports = function transform(
   inputSourceMap /* :?Object */,
   outputFilename /* : ?string */
 ) /* : Result */ {
-  // Check if the file contains `css` or `styled` tag first
+  // Check if the file contains `css` or `styled` words first
   // Otherwise we should skip transforming
-  if (
-    !/\b(styled[\s\n]*(\([\s\S]+\)|\.[\s\n]*[a-z0-9]+)|css)[\s\n]*`/.test(
-      content
-    )
-  ) {
+  if (!/\b(styled|css)/.test(content)) {
     return {
       code: content,
       sourceMap: inputSourceMap,
