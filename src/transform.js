@@ -49,7 +49,7 @@ module.exports = function transform(
   inputSourceMap /* :?Object */,
   outputFilename /* : ?string */
 ) /* : Result */ {
-  // Check if the file imports linaria
+  // Check if the file contains `css` or `styled` words first
   // Otherwise we should skip transforming
   if (!/\b(styled|css)/.test(content)) {
     return {
