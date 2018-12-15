@@ -32,6 +32,7 @@ class Module {
   require: (id: string) => any;
   exports: any;
 
+  extensions: string[];
   transform: ?(text: string) => { code: string }
   */
 
@@ -58,10 +59,35 @@ class Module {
     this.require.resolve = this.resolve.bind(this);
     this.require.ensure = NOOP;
     this.require.cache = cache;
+
+    // We support following extensions by default
+    this.extensions = ['.json', '.js', '.ts', '.tsx'];
   }
 
   resolve(id /* : string */) {
-    return NativeModule._resolveFilename(id, this);
+    const extensions = NativeModule._extensions;
+    const added = [];
+
+    try {
+      // Check for supported extensions
+      this.extensions.forEach(ext => {
+        if (ext in extensions) {
+          return;
+        }
+
+        // When an extension is not supported, add it
+        // And keep track of it to clean it up after resolving
+        // Use noop for the tranform function since we handle it
+        extensions[ext] = NOOP;
+        added.push(ext);
+      });
+
+      // Resolve the module using node's resolve algorithm
+      return NativeModule._resolveFilename(id, this);
+    } finally {
+      // Cleanup the extensions we added to restore previous behaviour
+      added.forEach(ext => delete extensions[ext]);
+    }
   }
 
   require(id /* : string */) {
@@ -86,15 +112,16 @@ class Module {
       // we would end up in infinite loop with cyclic dependencies
       cache[filename] = m;
 
-      if (/\.(js|json)$/.test(filename)) {
-        // For JS/JSON files, we need to read the file first
+      if (this.extensions.includes(path.extname(filename))) {
+        // To evaluate the file, we need to read it first
         const code = fs.readFileSync(filename, 'utf-8');
 
         if (/\.json$/.test(filename)) {
           // For JSON files, parse it to a JS object similar to Node
           m.exports = JSON.parse(code);
         } else {
-          // For JS files, evaluate the module
+          // For JS/TS files, evaluate the module
+          // The module will be transpiled using provided transform
           m.evaluate(code);
         }
       } else {

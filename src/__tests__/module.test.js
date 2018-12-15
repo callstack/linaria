@@ -61,6 +61,19 @@ it('imports JS files', () => {
   expect(mod.exports.result).toBe('The answer is 42');
 });
 
+it('imports TypeScript files', () => {
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.ts'));
+
+  mod.transform = transform;
+  mod.evaluate(dedent`
+    import answer from './sample-typescript';
+
+    export const result = 'The answer is ' + answer;
+  `);
+
+  expect(mod.exports.result).toBe('The answer is 27');
+});
+
 it('imports JSON files', () => {
   const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
 
