@@ -65,7 +65,7 @@ jobs:
         - run: |
             bash .circleci/install-chrome-deps.sh
             yarn --cwd website build
-            yarn test:integration --forceExit
+            yarn test:integration
         - store_artifacts:
             path: website/__integration-tests__/__image_snapshots__/__diff_output__
             destination: website-snapshot-diffs

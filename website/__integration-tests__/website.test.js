@@ -15,6 +15,7 @@ let server;
 beforeAll(async () => {
   server = child_process.spawn('yarn', ['server'], {
     cwd: path.join(__dirname, '..'),
+    detached: true,
   });
 
   await new Promise((resolve, reject) => {
@@ -32,8 +33,8 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => {
-  server.kill('SIGINT');
+afterAll(() => {
+  process.kill(-server.pid);
 });
 
 it('should launch website with webpack', async () => {
