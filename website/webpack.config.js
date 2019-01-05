@@ -32,7 +32,7 @@ module.exports = {
             loader: 'babel-loader',
           },
           {
-            loader: require.resolve('../src/loader'),
+            loader: require.resolve('../lib/loader'),
             options: {
               sourceMap: process.env.NODE_ENV !== 'production',
             },

@@ -4,6 +4,7 @@
   "private": true,
   "description": "Linaria website",
   "scripts": {
+    "prestart": "yarn --cwd .. prepare",
     "start": "webpack-serve",
     "server": "node build/server",
     "clean:client": "del dist",

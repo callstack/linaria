@@ -1,40 +1,36 @@
 /* @flow */
 
+import type { Options as PluginOptions } from './babel/extract';
+
 const { createFilter } = require('rollup-pluginutils');
 const transform = require('./transform');
 const slugify = require('./slugify');
 
-/* ::
-import type { Options as PluginOptions } from './babel/extract';
-*/
-
-/* ::
 type RollupPluginOptions = PluginOptions & {
   include?: string | string[],
   exclude?: string | string[],
   sourceMap?: boolean,
-}
-*/
+};
 
 module.exports = function linaria({
   include,
   exclude,
   sourceMap,
   ...rest
-} /* :RollupPluginOptions */ = {}) {
+}: RollupPluginOptions = {}) {
   const filter = createFilter(include, exclude);
   const cssLookup = {};
 
   return {
     name: 'linaria',
-    load(id /* :string */) {
+    load(id: string) {
       return cssLookup[id];
     },
     /* eslint-disable-next-line consistent-return */
-    resolveId(importee /* :string */) {
+    resolveId(importee: string) {
       if (importee in cssLookup) return importee;
     },
-    transform(code /* :string */, id /* :string */) {
+    transform(code: string, id: string) {
       if (!filter(id)) return;
 
       const result = transform(id, code, rest);

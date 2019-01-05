@@ -1,22 +1,17 @@
 /* @flow */
 
+import type { Options as PluginOptions } from './babel/extract';
+
 const path = require('path');
 const babel = require('@babel/core');
 const stylis = require('stylis');
 const { SourceMapGenerator } = require('source-map');
 
-/* ::
-import type { Options as PluginOptions } from './babel/extract';
-*/
-
-/* ::
 type Location = {
   line: number,
-  column: number
-}
-*/
+  column: number,
+};
 
-/* ::
 type Result = {
   code: string,
   sourceMap: ?Object,
@@ -32,20 +27,19 @@ type Result = {
   },
   replacements?: Array<{
     original: { start: Location, end: Location },
-    length: number
+    length: number,
   }>,
-}
-*/
+};
 
 const STYLIS_DECLARATION = 1;
 
 module.exports = function transform(
-  filename /* :string */,
-  content /* :string */,
-  options /* :PluginOptions */,
-  inputSourceMap /* :?Object */,
-  outputFilename /* : ?string */
-) /* : Result */ {
+  filename: string,
+  content: string,
+  options: PluginOptions,
+  inputSourceMap?: Object,
+  outputFilename?: string
+): Result {
   // Check if the file contains `css` or `styled` words first
   // Otherwise we should skip transforming
   if (!/\b(styled|css)/.test(content)) {

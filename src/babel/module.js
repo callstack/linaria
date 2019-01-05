@@ -23,20 +23,23 @@ let cache = {};
 const NOOP = () => {};
 
 class Module {
-  /* ::
   static invalidate: () => void;
 
   id: string;
+
   filename: string;
+
   paths: string;
+
   require: (id: string) => any;
+
   exports: any;
 
   extensions: string[];
-  transform: ?(text: string) => { code: string }
-  */
 
-  constructor(filename /* : string */) {
+  transform: ?(text: string) => { code: string };
+
+  constructor(filename: string) {
     Object.defineProperties(this, {
       id: {
         value: filename,
@@ -64,7 +67,7 @@ class Module {
     this.extensions = ['.json', '.js', '.ts', '.tsx'];
   }
 
-  resolve(id /* : string */) {
+  resolve(id: string) {
     const extensions = NativeModule._extensions;
     const added = [];
 
@@ -90,7 +93,7 @@ class Module {
     }
   }
 
-  require(id /* : string */) {
+  require(id: string) {
     // Resolve module id (and filename) relatively to parent module
     const filename = this.resolve(id);
 
@@ -135,7 +138,7 @@ class Module {
     return m.exports;
   }
 
-  evaluate(text /* : string */) {
+  evaluate(text: string) {
     // For JavaScript files, we need to transpile it and to get the exports of the module
     const code = this.transform ? this.transform(text).code : text;
 

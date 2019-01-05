@@ -3,16 +3,19 @@
 const React = require('react'); // eslint-disable-line import/no-extraneous-dependencies
 const { cx } = require('../index');
 
-/* ::
 type Options = {
   name: string,
   class: string,
-  vars?: { [string]: [string | number | ((props: *) => string | number), string | void] }
-}
-*/
+  vars?: {
+    [string]: [
+      string | number | ((props: *) => string | number),
+      string | void,
+    ],
+  },
+};
 
-function styled(tag /* : React.ComponentType<*> | string */) {
-  return (options /* : Options */) => {
+function styled(tag: React.ComponentType<*> | string) {
+  return (options: Options) => {
     if (process.env.NODE_ENV !== 'production') {
       if (Array.isArray(options)) {
         // We received a strings array since it's used as a tag
@@ -77,18 +80,22 @@ if (process.env.NODE_ENV !== 'production') {
   module.exports = styled;
 }
 
-/* ::
 type CSSProperties = {
-  [key: string]: string | number | CSSProperties;
+  [key: string]: string | number | CSSProperties,
 };
 
 type StyledComponent<T> = React.ComponentType<T & { as?: React$ElementType }>;
 
-type StyledTag<T> = (strings: string[], ...exprs: Array<string | number | CSSProperties | (T => string | number)>) => StyledComponent<T>;
+type StyledTag<T> = (
+  strings: string[],
+  ...exprs: Array<string | number | CSSProperties | (T => string | number)>
+) => StyledComponent<T>;
 
-type StyledJSXIntrinsics = $ObjMap<$JSXIntrinsics, <T>({ props: T }) => StyledTag<T>>;
+type StyledJSXIntrinsics = $ObjMap<
+  $JSXIntrinsics,
+  <T>({ props: T }) => StyledTag<T>
+>;
 
 declare module.exports: StyledJSXIntrinsics & {|
   <T>(T): StyledTag<React.ElementConfig<T>>,
 |};
-*/

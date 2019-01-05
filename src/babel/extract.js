@@ -137,14 +137,11 @@ const imports = (t, scope, filename, identifier, source) => {
 // Match any valid CSS units followed by a separator such as ;, newline etc.
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
 
-/* ::
 type Location = {
   line: number,
-  column: number
-}
-*/
+  column: number,
+};
 
-/* ::
 type State = {|
   rules: {
     [selector: string]: {
@@ -156,7 +153,7 @@ type State = {|
   },
   replacements: Array<{
     original: { start: Location, end: Location },
-    length: number
+    length: number,
   }>,
   index: number,
   dependencies: string[],
@@ -169,20 +166,14 @@ type State = {|
     metadata: any,
   },
 |};
-*/
 
-/* ::
 export type Options = {
   displayName?: boolean,
   evaluate?: boolean,
-  ignore?: RegExp
-}
-*/
+  ignore?: RegExp,
+};
 
-module.exports = function extract(
-  babel /* : any */,
-  options /* : Options */ = {}
-) {
+module.exports = function extract(babel: any, options: Options = {}) {
   // Set some defaults for options
   options = {
     displayName: false,
@@ -196,7 +187,7 @@ module.exports = function extract(
   return {
     visitor: {
       Program: {
-        enter(path /* : any */, state /* : State */) {
+        enter(path: any, state: State) {
           // Collect all the style rules from the styles we encounter
           state.rules = {};
           state.index = 0;
@@ -206,7 +197,7 @@ module.exports = function extract(
           // Invalidate cache for module evaluation to get fresh modules
           Module.invalidate();
         },
-        exit(path /* : any */, state /* : State */) {
+        exit(path: any, state: State) {
           if (Object.keys(state.rules).length) {
             // Store the result as the file metadata
             state.file.metadata = {
@@ -222,7 +213,7 @@ module.exports = function extract(
           Module.invalidate();
         },
       },
-      TaggedTemplateExpression(path /* : any */, state /* : State */) {
+      TaggedTemplateExpression(path: any, state: State) {
         const { quasi, tag } = path.node;
 
         let styled;
