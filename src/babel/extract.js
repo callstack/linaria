@@ -172,9 +172,10 @@ type State = {|
 */
 
 /* ::
-type Options = {
+export type Options = {
   displayName?: boolean,
-  evaluate?: boolean
+  evaluate?: boolean,
+  ignore?: RegExp
 }
 */
 
@@ -182,6 +183,14 @@ module.exports = function extract(
   babel /* : any */,
   options /* : Options */ = {}
 ) {
+  // Set some defaults for options
+  options = {
+    displayName: false,
+    evaluate: true,
+    ignore: /node_modules/,
+    ...options,
+  };
+
   const { types: t } = babel;
 
   return {
@@ -364,7 +373,7 @@ module.exports = function extract(
               } else {
                 // Try to preval the value
                 if (
-                  options.evaluate !== false &&
+                  options.evaluate &&
                   !(
                     t.isFunctionExpression(ex) ||
                     t.isArrowFunctionExpression(ex)
@@ -374,7 +383,9 @@ module.exports = function extract(
                     const { value, dependencies } = evaluate(
                       ex,
                       t,
-                      state.file.opts.filename
+                      state.file.opts.filename,
+                      undefined,
+                      options
                     );
 
                     if (typeof value !== 'function') {
@@ -441,10 +452,7 @@ module.exports = function extract(
             // If `styled` wraps another component and not a primitive,
             // get its class name to create a more specific selector
             // it'll ensure that styles are overridden properly
-            if (
-              options.evaluate !== false &&
-              t.isIdentifier(styled.component.node)
-            ) {
+            if (options.evaluate && t.isIdentifier(styled.component.node)) {
               let { value } = evaluate(
                 styled.component,
                 t,
