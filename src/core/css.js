@@ -8,10 +8,11 @@ function css() {
 
 module.exports = css;
 
-/* ::
 type CSSProperties = {
-  [key: string]: string | number | CSSProperties;
+  [key: string]: string | number | CSSProperties,
 };
 
-declare module.exports: (strings: string[], ...exprs: Array<string | number | CSSProperties>) => string;
-*/
+declare module.exports: (
+  strings: string[],
+  ...exprs: Array<string | number | CSSProperties>
+) => string;

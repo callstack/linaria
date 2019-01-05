@@ -55,11 +55,11 @@ const resolve = (path, t, requirements) => {
 };
 
 module.exports = function evaluate(
-  path /* : any */,
-  t /* : any */,
-  filename /* : string */,
-  transformer /* : void | (text: string) => { code: string } */,
-  options /* : void | { ignore?: RegExp } */
+  path: any,
+  t: any,
+  filename: string,
+  transformer?: (text: string) => { code: string },
+  options?: { ignore?: RegExp }
 ) {
   const requirements = [];
 

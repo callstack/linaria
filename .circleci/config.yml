@@ -56,7 +56,9 @@ jobs:
       steps:
         - attach_workspace:
             at: ~/linaria
-        - run: yarn --cwd website lint:css
+        - run: |
+            yarn prepare
+            yarn --cwd website lint:css
   integration-tests:
       <<: *defaults
       steps:
@@ -64,6 +66,7 @@ jobs:
             at: ~/linaria
         - run: |
             bash .circleci/install-chrome-deps.sh
+            yarn prepare
             yarn --cwd website build
             yarn test:integration
         - store_artifacts:

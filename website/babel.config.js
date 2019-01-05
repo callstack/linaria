@@ -5,7 +5,7 @@ module.exports = {
       'module-resolver',
       {
         alias: {
-          linaria: '../src',
+          linaria: '../lib',
         },
       },
     ],
@@ -14,7 +14,7 @@ module.exports = {
     server: {
       presets: [
         ['@babel/preset-env', { targets: { node: 8 } }],
-        require.resolve('../src/babel'),
+        require.resolve('../lib/babel'),
       ],
       plugins: [
         [

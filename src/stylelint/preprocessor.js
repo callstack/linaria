@@ -2,17 +2,15 @@
 
 const transform = require('../transform');
 
-/* ::
 type LintResult = {
   warnings: { line: number, column: number }[],
 };
-*/
 
 function preprocessor() {
   const cache = {};
 
   return {
-    code(input /* : string */, filename /* : string */) {
+    code(input: string, filename: string) {
       /* eslint-disable prefer-destructuring */
 
       let result;
@@ -65,7 +63,7 @@ function preprocessor() {
 
       return cssText;
     },
-    result(result /* : LintResult */, filename /* : string */) {
+    result(result: LintResult, filename: string) {
       const replacements = cache[filename];
 
       if (replacements) {

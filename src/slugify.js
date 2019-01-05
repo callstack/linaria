@@ -5,7 +5,7 @@
  * @flow
  */
 
-function doHash(str /* : string */, seed /* : number */ = 0) {
+function doHash(str: string, seed: number = 0) {
   const m = 0x5bd1e995;
   const r = 24;
   let h = seed ^ str.length;
@@ -73,7 +73,7 @@ function Umul32(n, m) {
   return res;
 }
 
-function slugify(code /* : string */) {
+function slugify(code: string) {
   return doHash(code).toString(36);
 }
 

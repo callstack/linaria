@@ -2,17 +2,12 @@
 
 const postcss = require('postcss');
 
-/* ::
 type CollectResult = {
   critical: string,
   other: string,
 };
-*/
 
-const collect = (
-  html /* : string */,
-  css /* : string */
-) /* : CollectResult */ => {
+const collect = (html: string, css: string): CollectResult => {
   const animations = new Set();
   const other = postcss.root();
   const critical = postcss.root();
@@ -82,7 +77,7 @@ const collect = (
   };
 };
 
-const extractClassesFromHtml = (html /* : string */) /* : RegExp */ => {
+const extractClassesFromHtml = (html: string): RegExp => {
   const htmlClasses = [];
   const regex = /\s+class="([^"]*)"/gm;
   let match = regex.exec(html);
