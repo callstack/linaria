@@ -6,6 +6,10 @@ const stylis = require('stylis');
 const { SourceMapGenerator } = require('source-map');
 
 /* ::
+import type { Options as PluginOptions } from './babel/extract';
+*/
+
+/* ::
 type Location = {
   line: number,
   column: number
@@ -30,13 +34,6 @@ type Result = {
     original: { start: Location, end: Location },
     length: number
   }>,
-}
-*/
-
-/* ::
-type PluginOptions = {
-  evaluate?: boolean,
-  displayName?: boolean,
 }
 */
 

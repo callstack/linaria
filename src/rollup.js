@@ -5,12 +5,14 @@ const transform = require('./transform');
 const slugify = require('./slugify');
 
 /* ::
-type RollupPluginOptions = {
+import type { Options as PluginOptions } from './babel/extract';
+*/
+
+/* ::
+type RollupPluginOptions = PluginOptions & {
   include?: string | string[],
   exclude?: string | string[],
   sourceMap?: boolean,
-  evaluate?: boolean,
-  displayName?: boolean,
 }
 */
 

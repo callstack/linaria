@@ -4,22 +4,6 @@ const generator = require('@babel/generator').default;
 const babel = require('@babel/core');
 const Module = require('./module');
 
-function defaultTransformModule(text) {
-  return babel.transformSync(text, {
-    caller: { name: 'linaria', evaluate: true },
-    filename: this.filename,
-    plugins: [
-      // Include this plugin to avoid extra config when using { module: false } for webpack
-      '@babel/plugin-transform-modules-commonjs',
-      '@babel/plugin-proposal-export-namespace-from',
-      // We don't support dynamic imports when evaluating, but don't wanna syntax error
-      // This will replace dynamic imports with an object that does nothing
-      require.resolve('./dynamic-import-noop'),
-      [require.resolve('./extract'), { evaluate: true }],
-    ],
-  });
-}
-
 const resolve = (path, t, requirements) => {
   const binding = path.scope.getBinding(path.node.name);
 
@@ -74,7 +58,8 @@ module.exports = function evaluate(
   path /* : any */,
   t /* : any */,
   filename /* : string */,
-  transformModule /* : (text: string) => { code: string } */ = defaultTransformModule
+  transformer /* : void | (text: string) => { code: string } */,
+  options /* : void | { ignore?: RegExp } */
 ) {
   const requirements = [];
 
@@ -163,7 +148,29 @@ module.exports = function evaluate(
 
   const m = new Module(filename);
 
-  m.transform = transformModule;
+  m.transform =
+    typeof transformer !== 'undefined'
+      ? transformer
+      : function transform(text) {
+          if (options && options.ignore && options.ignore.test(this.filename)) {
+            return { code: text };
+          }
+
+          return babel.transformSync(text, {
+            caller: { name: 'linaria', evaluate: true },
+            filename: this.filename,
+            plugins: [
+              // Include this plugin to avoid extra config when using { module: false } for webpack
+              '@babel/plugin-transform-modules-commonjs',
+              '@babel/plugin-proposal-export-namespace-from',
+              // We don't support dynamic imports when evaluating, but don't wanna syntax error
+              // This will replace dynamic imports with an object that does nothing
+              require.resolve('./dynamic-import-noop'),
+              [require.resolve('./extract'), { evaluate: true }],
+            ],
+          });
+        };
+
   m.evaluate(
     [
       // Use String.raw to preserve escapes such as '\n' in the code
