@@ -16,9 +16,7 @@ function preprocessor() {
       let result;
 
       try {
-        result = transform(filename, input, {
-          evaluate: true,
-        });
+        result = transform(filename, input);
       } catch (e) {
         // Ignore parse errors
         return '';

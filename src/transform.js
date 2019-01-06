@@ -36,7 +36,7 @@ const STYLIS_DECLARATION = 1;
 module.exports = function transform(
   filename: string,
   content: string,
-  options: PluginOptions,
+  options: $Shape<PluginOptions>,
   inputSourceMap?: Object,
   outputFilename?: string
 ): Result {

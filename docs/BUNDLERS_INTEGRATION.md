@@ -86,7 +86,7 @@ The loader accepts the following options:
 - `sourceMap: boolean` (default: `false`) - Setting this option to `true` will include source maps for the generated CSS so that you can see where source of the class name in devtools. We recommend to enable this only in development mode because the sourcemap is inlined into the CSS files.
 - `cacheDirectory: string` (default: `'.linaria-cache'`) - Path to the directory where the loader will output the intermediate CSS files. You can pass a relative or absolute directory path. Make sure the directory is inside the working directory for things to work properly. **You should add this directory to `.gitignore` so you don't accidentally commit them.**
 
-In addition to the above options, the loader also accepts all the options accepted by the [babel preset](/docs/BABEL_PRESET.md).
+In addition to the above options, the loader also accepts all the options supported in the [configuration file](/docs/CONFIGURATION.md).
 
 You can pass options to the loader like so:
 
