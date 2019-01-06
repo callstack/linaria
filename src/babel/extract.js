@@ -447,7 +447,9 @@ module.exports = function extract(babel: any, options: Options = {}) {
               let { value } = evaluate(
                 styled.component,
                 t,
-                state.file.opts.filename
+                state.file.opts.filename,
+                undefined,
+                options
               );
 
               while (isValidElementType(value) && value.className) {
