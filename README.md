@@ -59,6 +59,8 @@ Optionally, add the `linaria/babel` preset to your Babel configuration at the en
 }
 ```
 
+See [Configuration](/docs/CONFIGURATION.md) to customize how Linaria processes your files.
+
 ## Syntax
 
 Linaria can be used with any framework, with additional helpers for React. The basic syntax looks like this:
@@ -123,7 +125,7 @@ Dynamic styles will be applied using CSS custom properties (aka CSS variables) a
 - [API and usage](/docs/API.md)
   - [Client APIs](/docs/API.md#client-apis)
   - [Server APIs](/docs/API.md#server-apis)
-- [Configuring Babel](/docs/BABEL_PRESET.md)
+- [Configuration](/docs/CONFIGURATION.md)
 - [Dynamic styles with `css` tag](/docs/DYNAMIC_STYLES.md)
 - [Theming](/docs/THEMING.md)
 - [Critical CSS extraction](/docs/CRITICAL_CSS.md)

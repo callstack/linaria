@@ -82,6 +82,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/plugin-transform-modules-commonjs": "^7.1.0",
     "@babel/register": "^7.0.0",
+    "cosmiconfig": "^5.0.7",
     "loader-utils": "^1.1.0",
     "mkdirp": "^0.5.1",
     "postcss": "^7.0.5",
