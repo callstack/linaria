@@ -101,14 +101,14 @@ function processFiles(files: string[], options: Options) {
 
         const requireStatement = `\nrequire('${normalize(
           path.relative(path.dirname(inputFilename), outputFilename)
-        )}');\n`;
+        )}');`;
 
         const inputContent = fs.readFileSync(inputFilename, 'utf-8');
 
         if (!inputContent.trim().endsWith(requireStatement)) {
           fs.writeFileSync(
             inputFilename,
-            `${inputContent}\n${requireStatement}`
+            `${inputContent}\n${requireStatement}\n`
           );
         }
       }
