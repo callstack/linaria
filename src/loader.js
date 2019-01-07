@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
+const normalize = require('normalize-path');
 /* $FlowFixMe */
 const Module = require('module');
 const loaderUtils = require('loader-utils');
@@ -72,7 +73,7 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
 
     this.callback(
       null,
-      `${result.code}\n\nrequire("${outputFilename}")`,
+      `${result.code}\n\nrequire("${normalize(outputFilename)}")`,
       result.sourceMap
     );
     return;
