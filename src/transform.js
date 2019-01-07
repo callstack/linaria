@@ -40,7 +40,13 @@ type Options = {
 
 const STYLIS_DECLARATION = 1;
 
-module.exports = function transform(code: string, options: Options): Result {
+module.exports = function transform(
+  filename: string,
+  content: string,
+  options: PluginOptions,
+  inputSourceMap?: Object,
+  outputFilename?: string
+): Result {
   // Check if the file contains `css` or `styled` words first
   // Otherwise we should skip transforming
   if (!/\b(styled|css)/.test(code)) {
@@ -148,3 +154,5 @@ module.exports = function transform(code: string, options: Options): Result {
     },
   };
 };
+
+module.exports = function transform(code: string, options: Options): Result {
