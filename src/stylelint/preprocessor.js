@@ -11,12 +11,12 @@ function preprocessor() {
 
   return {
     code(input: string, filename: string) {
-      /* eslint-disable prefer-destructuring */
-
       let result;
 
       try {
-        result = transform(filename, input);
+        result = transform(input, {
+          filename,
+        });
       } catch (e) {
         // Ignore parse errors
         return '';

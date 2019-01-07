@@ -1,0 +1,132 @@
+#!/usr/bin/env node
+
+/* @flow */
+
+const path = require('path');
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+const glob = require('glob');
+const yargs = require('yargs');
+const transform = require('./transform');
+
+const { argv } = yargs
+  .usage('Usage: $0 [options] <files ...>')
+  .option('out-dir', {
+    alias: 'o',
+    type: 'string',
+    description: 'Output directory for the extracted CSS files',
+    demandOption: true,
+    requiresArg: true,
+  })
+  .option('source-maps', {
+    alias: 's',
+    type: 'boolean',
+    description: 'Generate source maps for the CSS files',
+    default: false,
+  })
+  .option('source-root', {
+    alias: 'r',
+    type: 'string',
+    description: 'Directory containing the source JS files',
+    requiresArg: true,
+  })
+  .option('insert-css-requires', {
+    alias: 'i',
+    type: 'string',
+    description:
+      'Directory containing JS files to insert require statements for the CSS files',
+    requiresArg: true,
+  })
+  .implies('insert-css-requires', 'source-root')
+  .alias('help', 'h')
+  .alias('version', 'v')
+  .strict();
+
+processFiles(argv._, {
+  outDir: argv['out-dir'],
+  sourceMaps: argv['source-maps'],
+  sourceRoot: argv['source-root'],
+  insertCssRequires: argv['insert-css-requires'],
+});
+
+type Options = {
+  outDir: string,
+  sourceMaps?: boolean,
+  sourceRoot?: string,
+  insertCssRequires?: string,
+};
+
+function processFiles(files: string[], options: Options) {
+  let count = 0;
+
+  const resolvedFiles = files.reduce(
+    (acc, pattern) => [...acc, ...glob.sync(pattern, { absolute: true })],
+    []
+  );
+
+  resolvedFiles.forEach(filename => {
+    const outputFilename = resolveOutputFilename(filename, options.outDir);
+
+    const { cssText, sourceMap, cssSourceMapText } = transform(
+      fs.readFileSync(filename).toString(),
+      {
+        filename,
+        outputFilename,
+        pluginOptions: {},
+      }
+    );
+
+    if (cssText) {
+      mkdirp.sync(path.dirname(outputFilename));
+
+      const cssContent =
+        options.sourceMaps && sourceMap
+          ? `${cssText}\n/*# sourceMappingURL=${outputFilename}.map */`
+          : cssText;
+
+      fs.writeFileSync(outputFilename, cssContent);
+
+      if (
+        options.sourceMaps &&
+        sourceMap &&
+        typeof cssSourceMapText !== 'undefined'
+      ) {
+        fs.writeFileSync(`${outputFilename}.map`, cssSourceMapText);
+      }
+
+      if (options.insertCssRequires && options.sourceRoot) {
+        const inputFilename = path.resolve(
+          options.insertCssRequires,
+          path.relative(options.sourceRoot, filename)
+        );
+
+        const requireStatement = `\nrequire('${path.relative(
+          path.dirname(inputFilename),
+          outputFilename
+        )}');`;
+
+        const inputContent = fs.readFileSync(inputFilename, 'utf-8');
+
+        if (!inputContent.trim().endsWith(requireStatement)) {
+          fs.writeFileSync(
+            inputFilename,
+            `${inputContent}\n${requireStatement}`
+          );
+        }
+      }
+
+      count++;
+    }
+  });
+
+  console.log(`Successfully extracted ${count} CSS files.`);
+}
+
+function resolveOutputFilename(filename: string, outDir: string) {
+  const folderStructure = path.relative(process.cwd(), path.dirname(filename));
+  const outputBasename = path
+    .basename(filename)
+    .replace(path.extname(filename), '.css');
+
+  return path.join(outDir, folderStructure, outputBasename);
+}
