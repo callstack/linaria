@@ -11,13 +11,14 @@ function preprocessor() {
 
   return {
     code(input: string, filename: string) {
-      /* eslint-disable prefer-destructuring */
-
       let result;
 
       try {
-        result = transform(filename, input, {
-          evaluate: true,
+        result = transform(input, {
+          filename,
+          pluginOptions: {
+            evaluate: true,
+          },
         });
       } catch (e) {
         // Ignore parse errors

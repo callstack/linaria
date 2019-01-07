@@ -1,5 +1,7 @@
 /* @flow */
 
+import type { Options as PluginOptions } from './extract';
+
 const generator = require('@babel/generator').default;
 const babel = require('@babel/core');
 const Module = require('./module');
@@ -59,7 +61,7 @@ module.exports = function evaluate(
   t: any,
   filename: string,
   transformer?: (text: string) => { code: string },
-  options?: { ignore?: RegExp }
+  options?: PluginOptions
 ) {
   const requirements = [];
 
@@ -159,6 +161,7 @@ module.exports = function evaluate(
           return babel.transformSync(text, {
             caller: { name: 'linaria', evaluate: true },
             filename: this.filename,
+            presets: [[require.resolve('./index'), options]],
             plugins: [
               // Include this plugin to avoid extra config when using { module: false } for webpack
               '@babel/plugin-transform-modules-commonjs',
@@ -166,7 +169,6 @@ module.exports = function evaluate(
               // We don't support dynamic imports when evaluating, but don't wanna syntax error
               // This will replace dynamic imports with an object that does nothing
               require.resolve('./dynamic-import-noop'),
-              [require.resolve('./extract'), { evaluate: true }],
             ],
           });
         };

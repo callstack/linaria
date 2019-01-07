@@ -29,6 +29,8 @@ Here's the example `.stylelintrc` configuration file:
 
 Please refer to the [official stylelint documentation](https://stylelint.io/user-guide/configuration/) for more info about configuration.
 
+The preprocessor will use the [options from the configuration file](/docs/CONFIGURATION.md) for processing your files.
+
 ### Linting your files
 
 Add the following to your `package.json` scripts:

@@ -6,10 +6,11 @@ const { createFilter } = require('rollup-pluginutils');
 const transform = require('./transform');
 const slugify = require('./slugify');
 
-type RollupPluginOptions = PluginOptions & {
+type RollupPluginOptions = {
   include?: string | string[],
   exclude?: string | string[],
   sourceMap?: boolean,
+  ...$Shape<PluginOptions>,
 };
 
 module.exports = function linaria({
@@ -33,7 +34,10 @@ module.exports = function linaria({
     transform(code: string, id: string) {
       if (!filter(id)) return;
 
-      const result = transform(id, code, rest);
+      const result = transform(code, {
+        filename: id,
+        pluginOptions: rest,
+      });
 
       if (!result.cssText) return;
 

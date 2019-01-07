@@ -168,20 +168,12 @@ type State = {|
 |};
 
 export type Options = {
-  displayName?: boolean,
-  evaluate?: boolean,
-  ignore?: RegExp,
+  displayName: boolean,
+  evaluate: boolean,
+  ignore: RegExp,
 };
 
-module.exports = function extract(babel: any, options: Options = {}) {
-  // Set some defaults for options
-  options = {
-    displayName: false,
-    evaluate: true,
-    ignore: /node_modules/,
-    ...options,
-  };
-
+module.exports = function extract(babel: any, options: Options) {
   const { types: t } = babel;
 
   return {
@@ -447,7 +439,9 @@ module.exports = function extract(babel: any, options: Options = {}) {
               let { value } = evaluate(
                 styled.component,
                 t,
-                state.file.opts.filename
+                state.file.opts.filename,
+                undefined,
+                options
               );
 
               while (isValidElementType(value) && value.className) {
