@@ -1,8 +1,7 @@
-#!/usr/bin/env node
-
 /* @flow */
 
 const path = require('path');
+const normalize = require('normalize-path');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const glob = require('glob');
@@ -100,10 +99,9 @@ function processFiles(files: string[], options: Options) {
           path.relative(options.sourceRoot, filename)
         );
 
-        const requireStatement = `\nrequire('${path.relative(
-          path.dirname(inputFilename),
-          outputFilename
-        )}');`;
+        const requireStatement = `\nrequire('${normalize(
+          path.relative(path.dirname(inputFilename), outputFilename)
+        )}');\n`;
 
         const inputContent = fs.readFileSync(inputFilename, 'utf-8');
 
