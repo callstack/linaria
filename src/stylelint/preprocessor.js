@@ -16,9 +16,6 @@ function preprocessor() {
       try {
         result = transform(input, {
           filename,
-          pluginOptions: {
-            evaluate: true,
-          },
         });
       } catch (e) {
         // Ignore parse errors
