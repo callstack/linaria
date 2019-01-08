@@ -267,12 +267,26 @@ module.exports = function extract(babel: any, options: Options) {
           }
 
           if (!displayName) {
-            throw path.buildCodeFrameError(
-              "Couldn't determine a name for the component. Ensure that it's either:\n" +
-                '- Assigned to a variable\n' +
-                '- Is an object property\n' +
-                '- Is a prop in a JSX element\n'
-            );
+            // try to generate displayName from filename
+            try {
+              if (state.file.opts.filename) {
+                // removes the dot and splits to array with platform-specific path segment separator
+                const fileName = state.file.opts.filename
+                  .slice(0, state.file.opts.filename.lastIndexOf('.'))
+                  .split(require('path').sep);
+                // filter index, because its to much generic, and use last part of array
+                displayName = fileName.filter(f => f !== 'index').slice(-1);
+                // check if displayName is valid otherwise throw exception;
+                displayName.charAt(0);
+              }
+            } catch (e) {
+              throw path.buildCodeFrameError(
+                "Couldn't determine a name for the component. Ensure that it's either:\n" +
+                  '- Assigned to a variable\n' +
+                  '- Is an object property\n' +
+                  '- Is a prop in a JSX element\n'
+              );
+            }
           }
 
           // Custom properties need to start with a letter, so we prefix the slug
