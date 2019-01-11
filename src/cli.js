@@ -99,9 +99,13 @@ function processFiles(files: string[], options: Options) {
           path.relative(options.sourceRoot, filename)
         );
 
-        const requireStatement = `\nrequire('${normalize(
+        const relativePath = normalize(
           path.relative(path.dirname(inputFilename), outputFilename)
-        )}');`;
+        );
+
+        const requireStatement = `\nrequire('${
+          relativePath.startsWith('.') ? relativePath : `./${relativePath}`
+        }');`;
 
         const inputContent = fs.readFileSync(inputFilename, 'utf-8');
 
