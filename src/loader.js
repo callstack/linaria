@@ -10,8 +10,12 @@ const loaderUtils = require('loader-utils');
 const transform = require('./transform');
 
 module.exports = function loader(content: string, inputSourceMap: ?Object) {
-  const { sourceMap, cacheDirectory = '.linaria-cache', ...rest } =
-    loaderUtils.getOptions(this) || {};
+  const {
+    sourceMap,
+    cacheDirectory = '.linaria-cache',
+    preprocessor,
+    ...rest
+  } = loaderUtils.getOptions(this) || {};
 
   const outputFilename = path.join(
     path.isAbsolute(cacheDirectory)
@@ -28,6 +32,7 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
     inputSourceMap: inputSourceMap != null ? inputSourceMap : undefined,
     outputFilename,
     pluginOptions: rest,
+    preprocessor,
   });
 
   if (result.cssText) {

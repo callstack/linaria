@@ -33,10 +33,17 @@ type Result = {
 
 type Options = {
   filename: string,
+  preprocessor?: Preprocessor,
   outputFilename?: string,
   inputSourceMap?: Object,
   pluginOptions?: $Shape<PluginOptions>,
 };
+
+export type Preprocessor =
+  | 'none'
+  | 'stylis'
+  | ((selector: string, cssText: string) => string)
+  | void;
 
 const STYLIS_DECLARATION = 1;
 
@@ -83,27 +90,43 @@ module.exports = function transform(code: string, options: Options): Result {
 
   let cssText = '';
 
-  stylis.use(null)((context, decl) => {
-    if (context === STYLIS_DECLARATION && options.outputFilename) {
-      // When writing to a file, we need to adjust the relative paths inside url(..) expressions
-      // It'll allow css-loader to resolve an imported asset properly
-      return decl.replace(
-        /\b(url\()(\.[^)]+)(\))/,
-        (match, p1, p2, p3) =>
-          p1 +
-          // Replace asset path with new path relative to the output CSS
-          path.relative(
-            /* $FlowFixMe */
-            path.dirname(options.outputFilename),
-            // Get the absolute path to the asset from the path relative to the JS file
-            path.resolve(path.dirname(options.filename), p2)
-          ) +
-          p3
-      );
-    }
+  let preprocessor;
 
-    return decl;
-  });
+  if (typeof options.preprocessor === 'function') {
+    // eslint-disable-next-line prefer-destructuring
+    preprocessor = options.preprocessor;
+  } else {
+    switch (options.preprocessor) {
+      case 'none':
+        preprocessor = (selector, text) => `${selector} {${text}}\n`;
+        break;
+      case 'stylis':
+      default:
+        stylis.use(null)((context, decl) => {
+          if (context === STYLIS_DECLARATION && options.outputFilename) {
+            // When writing to a file, we need to adjust the relative paths inside url(..) expressions
+            // It'll allow css-loader to resolve an imported asset properly
+            return decl.replace(
+              /\b(url\()(\.[^)]+)(\))/,
+              (match, p1, p2, p3) =>
+                p1 +
+                // Replace asset path with new path relative to the output CSS
+                path.relative(
+                  /* $FlowFixMe */
+                  path.dirname(options.outputFilename),
+                  // Get the absolute path to the asset from the path relative to the JS file
+                  path.resolve(path.dirname(options.filename), p2)
+                ) +
+                p3
+            );
+          }
+
+          return decl;
+        });
+
+        preprocessor = stylis;
+    }
+  }
 
   Object.keys(rules).forEach((selector, index) => {
     mappings.push({
@@ -116,7 +139,7 @@ module.exports = function transform(code: string, options: Options): Result {
     });
 
     // Run each rule through stylis to support nesting
-    cssText += `${stylis(selector, rules[selector].cssText)}\n`;
+    cssText += `${preprocessor(selector, rules[selector].cssText)}\n`;
   });
 
   return {
