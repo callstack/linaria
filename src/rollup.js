@@ -1,6 +1,7 @@
 /* @flow */
 
 import type { Options as PluginOptions } from './babel/extract';
+import type { Preprocessor } from './transform';
 
 const { createFilter } = require('rollup-pluginutils');
 const transform = require('./transform');
@@ -10,6 +11,7 @@ type RollupPluginOptions = {
   include?: string | string[],
   exclude?: string | string[],
   sourceMap?: boolean,
+  preprocessor?: Preprocessor,
   ...$Shape<PluginOptions>,
 };
 
@@ -17,6 +19,7 @@ module.exports = function linaria({
   include,
   exclude,
   sourceMap,
+  preprocessor,
   ...rest
 }: RollupPluginOptions = {}) {
   const filter = createFilter(include, exclude);
@@ -36,6 +39,7 @@ module.exports = function linaria({
 
       const result = transform(code, {
         filename: id,
+        preprocessor: ((preprocessor: any): Preprocessor),
         pluginOptions: rest,
       });
 
