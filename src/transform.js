@@ -107,7 +107,7 @@ module.exports = function transform(code: string, options: Options): Result {
             // When writing to a file, we need to adjust the relative paths inside url(..) expressions
             // It'll allow css-loader to resolve an imported asset properly
             return decl.replace(
-              /\b(url\()(\.[^)]+)(\))/,
+              /\b(url\()(\.[^)]+)(\))/g,
               (match, p1, p2, p3) =>
                 p1 +
                 // Replace asset path with new path relative to the output CSS
