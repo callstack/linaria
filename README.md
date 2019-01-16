@@ -169,7 +169,6 @@ Dynamic styles will be applied using CSS custom properties (aka CSS variables) a
 
 ## Recommended Libraries
 
-- [linaria-jest](https://github.com/thymikee/linaria-jest) – Jest testing utilities for Linaria.
 - [gatsby-plugin-linaria](https://github.com/silvenon/gatsby-plugin-linaria) – Gatsby plugin that sets up Babel and webpack configuration for Linaria.
 - [polished.js](https://polished.js.org/) - A lightweight toolset for writing styles in JavaScript.
 
