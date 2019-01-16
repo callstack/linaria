@@ -31,7 +31,8 @@ function styled(tag: React.ComponentType<*> | string) {
 
       let filteredProps;
 
-      if (typeof tag === 'string') {
+      // Check if it's an HTML tag and not a custom element
+      if (typeof tag === 'string' && !tag.includes('-')) {
         filteredProps = {};
 
         // eslint-disable-next-line guard-for-in

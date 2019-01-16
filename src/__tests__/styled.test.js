@@ -146,6 +146,47 @@ it('forwards as prop when wrapping another styled component', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
+it('filters unknown html attributes for HTML tag', () => {
+  const Test = styled('div')({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  const tree = renderer.create(
+    <Test unknownAttribute="voila">This is a test</Test>
+  );
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
+it('does not filter attributes for custom elements', () => {
+  const Test = styled('my-element')({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  const tree = renderer.create(
+    <Test unknownAttribute="voila">This is a test</Test>
+  );
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
+it('does not filter attributes for components', () => {
+  const Custom = props => <div>{props.unknownAttribute}</div>;
+
+  const Test = styled(Custom)({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  const tree = renderer.create(
+    <Test unknownAttribute="voila">This is a test</Test>
+  );
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
 it('throws when using as tag for template literal', () => {
   expect(
     () =>
