@@ -212,6 +212,10 @@ module.exports = function extract(babel: any, options: Options) {
         let css;
 
         if (
+          t.isCallExpression(tag) &&
+          t.isIdentifier(tag.callee) &&
+          tag.arguments.length === 1 &&
+          tag.callee.name === 'styled' &&
           imports(
             t,
             path.scope,
@@ -220,23 +224,23 @@ module.exports = function extract(babel: any, options: Options) {
             'linaria/react'
           )
         ) {
-          if (
-            t.isCallExpression(tag) &&
-            t.isIdentifier(tag.callee) &&
-            tag.arguments.length === 1 &&
-            tag.callee.name === 'styled'
-          ) {
-            styled = { component: path.get('tag').get('arguments')[0] };
-          } else if (
-            t.isMemberExpression(tag) &&
-            t.isIdentifier(tag.object) &&
-            t.isIdentifier(tag.property) &&
-            tag.object.name === 'styled'
-          ) {
-            styled = {
-              component: { node: t.stringLiteral(tag.property.name) },
-            };
-          }
+          styled = { component: path.get('tag').get('arguments')[0] };
+        } else if (
+          t.isMemberExpression(tag) &&
+          t.isIdentifier(tag.object) &&
+          t.isIdentifier(tag.property) &&
+          tag.object.name === 'styled' &&
+          imports(
+            t,
+            path.scope,
+            state.file.opts.filename,
+            'styled',
+            'linaria/react'
+          )
+        ) {
+          styled = {
+            component: { node: t.stringLiteral(tag.property.name) },
+          };
         } else if (
           imports(t, path.scope, state.file.opts.filename, 'css', 'linaria')
         ) {

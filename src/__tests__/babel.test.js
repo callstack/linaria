@@ -342,3 +342,23 @@ it('throws when contains dynamic expression without evaluate: true in css tag', 
     expect(e.message.replace(__dirname, '<<DIRNAME>>')).toMatchSnapshot();
   }
 });
+
+it('supports both css and styled tags', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { css } from 'linaria';
+      import { styled } from 'linaria/react';
+
+      const Title = styled.h1\`
+        font-size: 14px;
+      \`;
+
+      const title = css\`
+        color: blue;
+      \`;
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});

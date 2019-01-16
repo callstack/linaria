@@ -279,6 +279,33 @@ Dependencies: NA
 
 `;
 
+exports[`supports both css and styled tags 1`] = `
+"import { css } from 'linaria';
+import { styled } from 'linaria/react';
+const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"th6xni0\\"
+});
+const title = \\"t1u0rrat\\";"
+`;
+
+exports[`supports both css and styled tags 2`] = `
+
+CSS:
+
+.th6xni0 {
+  font-size: 14px;
+}
+.t1u0rrat {
+  color: blue;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`throws when contains dynamic expression without evaluate: true in css tag 1`] = `
 "<<DIRNAME>>/app/index.js: The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.
 [0m [90m 2 | [39m[0m
