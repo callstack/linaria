@@ -34,6 +34,8 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
     // Another option is to read the webpack.config.js, but it won't work for programmatic usage
     // This API is used by many loaders/plugins, so hope we're safe for a while
     this._compilation.options.resolve
+      ? { alias: this._compilation.options.resolve.alias }
+      : undefined
   );
 
   let result;
