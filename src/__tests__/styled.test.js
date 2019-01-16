@@ -11,8 +11,8 @@ it('renders tag with display name and class name', () => {
   });
 
   expect(Test.displayName).toBe('TestComponent');
-  expect(Test.className).toBe('abcdefg');
-  expect(Test.extends).toBe('h1');
+  expect(Test.__linaria.className).toBe('abcdefg');
+  expect(Test.__linaria.extends).toBe('h1');
 
   const tree = renderer.create(<Test>This is a test</Test>);
 
@@ -28,8 +28,8 @@ it('renders component with display name and class name', () => {
   });
 
   expect(Test.displayName).toBe('TestComponent');
-  expect(Test.className).toBe('abcdefg');
-  expect(Test.extends).toBe(Custom);
+  expect(Test.__linaria.className).toBe('abcdefg');
+  expect(Test.__linaria.extends).toBe(Custom);
 
   const tree = renderer.create(<Test>This is a test</Test>);
 

@@ -380,13 +380,10 @@ module.exports = function extract(babel: any, options: Options) {
                       // We don't touch functions because they'll be interpolated at runtime
 
                       if (value != null) {
-                        if (
-                          isValidElementType(value) &&
-                          typeof value.className === 'string'
-                        ) {
-                          // If it's an React component with a classname property, use it
+                        if (isValidElementType(value) && value.__linaria) {
+                          // If it's an React component wrapped in styled, get the class name
                           // Useful for interpolating components
-                          cssText += `.${value.className}`;
+                          cssText += `.${value.__linaria.className}`;
                         } else if (isPlainObject(value)) {
                           cssText += stripLines(loc, toCSS(value));
                         } else {
@@ -448,9 +445,9 @@ module.exports = function extract(babel: any, options: Options) {
                 options
               );
 
-              while (isValidElementType(value) && value.className) {
-                selector += `.${value.className}`;
-                value = value.extends;
+              while (isValidElementType(value) && value.__linaria) {
+                selector += `.${value.__linaria.className}`;
+                value = value.__linaria.extends;
               }
             }
 
