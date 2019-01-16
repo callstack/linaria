@@ -1,6 +1,7 @@
 /* @flow */
 
 const React = require('react'); // eslint-disable-line import/no-extraneous-dependencies
+const { default: validAttr } = require('@emotion/is-prop-valid');
 const { cx } = require('../index');
 
 type Options = {
@@ -25,12 +26,30 @@ function styled(tag: React.ComponentType<*> | string) {
       }
     }
 
-    /* $FlowFixMe: Flow doesn't know about forwardRef */
-    const Result = React.forwardRef((props, ref) => {
+    const render = (props, ref) => {
       const { as: component = tag, class: className, ...rest } = props;
 
-      rest.ref = ref;
-      rest.className = cx(rest.className || className, options.class);
+      let filteredProps;
+
+      if (typeof tag === 'string') {
+        filteredProps = {};
+
+        // eslint-disable-next-line guard-for-in
+        for (const key in rest) {
+          if (key === 'as' || validAttr(key)) {
+            // Don't pass through invalid attributes to HTML elements
+            filteredProps[key] = rest[key];
+          }
+        }
+      } else {
+        filteredProps = rest;
+      }
+
+      filteredProps.ref = ref;
+      filteredProps.className = cx(
+        filteredProps.className || className,
+        options.class
+      );
 
       const { vars } = options;
 
@@ -44,27 +63,35 @@ function styled(tag: React.ComponentType<*> | string) {
           }${unit}`;
         });
 
-        rest.style = Object.assign(style, rest.style);
+        filteredProps.style = Object.assign(style, filteredProps.style);
       }
 
       /* $FlowFixMe */
-      if (typeof tag.className === 'string' && tag !== component) {
+      if (tag.__linaria && tag !== component) {
         // If the underlying tag is a styled component, forward the `as` prop
         // Otherwise the styles from the underlying component will be ignored
-        return React.createElement(
-          tag,
-          Object.assign(rest, {
-            as: component,
-          })
-        );
+        filteredProps.as = component;
+
+        return React.createElement(tag, filteredProps);
       }
 
-      return React.createElement(component, rest);
-    });
+      return React.createElement(component, filteredProps);
+    };
+
+    const Result = React.forwardRef
+      ? React.forwardRef(render)
+      : // React.forwardRef won't available on older React versions and in Preact
+        // Fallback to a innerRef prop in that case
+        ({ innerRef, ...rest }) => render(rest, innerRef);
 
     Result.displayName = options.name;
-    Result.className = options.class;
-    Result.extends = tag;
+
+    // These properties will be read by the babel plugin for interpolation
+    /* $FlowFixMe */
+    Result.__linaria = {
+      className: options.class,
+      extends: tag,
+    };
 
     return Result;
   };
@@ -93,7 +120,7 @@ type StyledTag<T> = (
 
 type StyledJSXIntrinsics = $ObjMap<
   $JSXIntrinsics,
-  <T>({ props: T }) => StyledTag<T>
+  () => StyledTag<{ children?: React$Node, [key: string]: any }>
 >;
 
 declare module.exports: StyledJSXIntrinsics & {|
