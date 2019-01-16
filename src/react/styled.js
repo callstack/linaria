@@ -26,7 +26,7 @@ function styled(tag: React.ComponentType<*> | string) {
       }
     }
 
-    const Result = React.forwardRef((props, ref) => {
+    const render = (props, ref) => {
       const { as: component = tag, class: className, ...rest } = props;
 
       let filteredProps;
@@ -70,20 +70,23 @@ function styled(tag: React.ComponentType<*> | string) {
       if (tag.__linaria && tag !== component) {
         // If the underlying tag is a styled component, forward the `as` prop
         // Otherwise the styles from the underlying component will be ignored
-        return React.createElement(
-          tag,
-          Object.assign(filteredProps, {
-            as: component,
-          })
-        );
+        filteredProps.as = component;
+
+        return React.createElement(tag, filteredProps);
       }
 
       return React.createElement(component, filteredProps);
-    });
+    };
+
+    const Result = React.forwardRef
+      ? React.forwardRef(render)
+      : // React.forwardRef won't available on older React versions and in Preact
+        // Fallback to a innerRef prop in that case
+        ({ innerRef, ...rest }) => render(rest, innerRef);
 
     Result.displayName = options.name;
 
-    // This properties will be read by the babel plugin for interpolation
+    // These properties will be read by the babel plugin for interpolation
     /* $FlowFixMe */
     Result.__linaria = {
       className: options.class,
