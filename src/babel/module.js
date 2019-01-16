@@ -25,11 +25,16 @@ const NOOP = () => {};
 class Module {
   static invalidate: () => void;
 
+  static _resolveFilename: (
+    id: string,
+    options: { id: string, filename: string, paths: string[] }
+  ) => string;
+
   id: string;
 
   filename: string;
 
-  paths: string;
+  paths: string[];
 
   require: (id: string) => any;
 
@@ -85,8 +90,7 @@ class Module {
         added.push(ext);
       });
 
-      // Resolve the module using node's resolve algorithm
-      return NativeModule._resolveFilename(id, this);
+      return Module._resolveFilename(id, this);
     } finally {
       // Cleanup the extensions we added to restore previous behaviour
       added.forEach(ext => delete extensions[ext]);
@@ -166,5 +170,11 @@ class Module {
 Module.invalidate = () => {
   cache = {};
 };
+
+// Alias to resolve the module using node's resolve algorithm
+// This static property can be overriden by the webpack loader
+// This allows us to use webpack's module resolution algorithm
+Module._resolveFilename = (id, options) =>
+  NativeModule._resolveFilename(id, options);
 
 module.exports = Module;

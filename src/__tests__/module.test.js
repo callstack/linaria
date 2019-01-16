@@ -191,3 +191,23 @@ it('has __dirname available', () => {
 
   expect(mod.exports).toBe(path.dirname(mod.filename));
 });
+
+it('changes resolve behaviour on overriding _resolveFilename', () => {
+  const originalResolveFilename = Module._resolveFilename;
+
+  Module._resolveFilename = id => (id === 'foo' ? 'bar' : id);
+
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+
+  mod.evaluate(dedent`
+  module.exports = [
+    require.resolve('foo'),
+    require.resolve('test'),
+  ];
+  `);
+
+  // Restore old behavior
+  Module._resolveFilename = originalResolveFilename;
+
+  expect(mod.exports).toEqual(['bar', 'test']);
+});
