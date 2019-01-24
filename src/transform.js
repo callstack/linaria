@@ -37,6 +37,7 @@ type Options = {
   outputFilename?: string,
   inputSourceMap?: Object,
   pluginOptions?: $Shape<PluginOptions>,
+  babelOptions?: Object,
 };
 
 export type Preprocessor =
@@ -62,6 +63,7 @@ module.exports = function transform(code: string, options: Options): Result {
   const ast = babel.parseSync(code, {
     filename: options.filename,
     caller: { name: 'linaria' },
+    ...options.babelOptions,
   });
 
   const { metadata, code: transformedCode, map } = babel.transformFromAstSync(

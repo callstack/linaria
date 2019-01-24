@@ -14,6 +14,7 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
     sourceMap,
     cacheDirectory = '.linaria-cache',
     preprocessor,
+    babelOptions,
     ...rest
   } = loaderUtils.getOptions(this) || {};
 
@@ -59,6 +60,7 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
       inputSourceMap: inputSourceMap != null ? inputSourceMap : undefined,
       outputFilename,
       pluginOptions: rest,
+      babelOptions,
       preprocessor,
     });
   } finally {
