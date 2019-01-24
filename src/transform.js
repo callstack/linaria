@@ -60,6 +60,7 @@ module.exports = function transform(code: string, options: Options): Result {
   // Parse the code first so babel uses user's babel config for parsing
   // We don't want to use user's config when transforming the code
   const ast = babel.parseSync(code, {
+    ...(options.pluginOptions ? options.pluginOptions.babelOptions : null),
     filename: options.filename,
     caller: { name: 'linaria' },
   });

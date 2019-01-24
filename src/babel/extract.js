@@ -192,6 +192,7 @@ export type Options = {
   displayName: boolean,
   evaluate: boolean,
   ignore: RegExp,
+  babelOptions: Object,
 };
 
 module.exports = function extract(babel: any, options: Options) {

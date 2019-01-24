@@ -158,10 +158,21 @@ module.exports = function evaluate(
             return { code: text };
           }
 
+          const babelOptions =
+            options && options.babelOptions ? options.babelOptions : {};
+
           return babel.transformSync(text, {
+            // These shouldn't be able to override the options we pass
+            // Linaria's plugins rely on these (such as filename to generate consistent hash)
+            ...babelOptions,
             caller: { name: 'linaria', evaluate: true },
             filename: this.filename,
-            presets: [[require.resolve('./index'), options]],
+            presets: [
+              // Preset order is last to first, so add the extra presets to start
+              // This makes sure that our preset is always run first
+              ...(babelOptions.presets || []),
+              [require.resolve('./index'), options],
+            ],
             plugins: [
               // Include this plugin to avoid extra config when using { module: false } for webpack
               require.resolve('@babel/plugin-transform-modules-commonjs'),
@@ -169,6 +180,9 @@ module.exports = function evaluate(
               // We don't support dynamic imports when evaluating, but don't wanna syntax error
               // This will replace dynamic imports with an object that does nothing
               require.resolve('./dynamic-import-noop'),
+              // Plugin order is first to last, so add the extra presets to end
+              // This makes sure that the plugins we specify always run first
+              ...(babelOptions.plugins || []),
             ],
           });
         };
