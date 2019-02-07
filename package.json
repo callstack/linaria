@@ -75,7 +75,8 @@
     "puppeteer": "^1.9.0",
     "react": "^16.5.2",
     "react-test-renderer": "^16.5.2",
-    "release-it": "^7.6.2"
+    "release-it": "^7.6.2",
+    "strip-ansi": "^5.0.0"
   },
   "dependencies": {
     "@babel/core": "^7.1.2",

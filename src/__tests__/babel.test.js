@@ -4,6 +4,7 @@
 const path = require('path');
 const babel = require('@babel/core');
 const dedent = require('dedent');
+const stripAnsi = require('strip-ansi');
 const serializer = require('../__utils__/linaria-snapshot-serializer');
 
 expect.addSnapshotSerializer(serializer);
@@ -263,7 +264,9 @@ it('throws when not attached to a variable', async () => {
       `
     );
   } catch (e) {
-    expect(e.message.replace(__dirname, '<<DIRNAME>>')).toMatchSnapshot();
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
   }
 });
 
@@ -339,7 +342,9 @@ it('throws when contains dynamic expression without evaluate: true in css tag', 
       `
     );
   } catch (e) {
-    expect(e.message.replace(__dirname, '<<DIRNAME>>')).toMatchSnapshot();
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
   }
 });
 

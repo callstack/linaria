@@ -15,13 +15,32 @@ type Options = {
   },
 };
 
+const warnIfInvalid = (value: any, componentName) => {
+  if (process.env.NODE_ENV !== 'production') {
+    if (
+      typeof value === 'string' ||
+      (typeof value === 'number' && Number.isFinite(value))
+    ) {
+      return;
+    }
+
+    const stringified =
+      typeof value === 'object' ? JSON.stringify(value) : String(value);
+
+    // eslint-disable-next-line no-console
+    console.warn(
+      `An inteprolation evaluated to '${stringified}' in the component '${componentName}', which is probably a mistake. You should explicitly cast or transform the value to a string.`
+    );
+  }
+};
+
 function styled(tag: React.ComponentType<*> | string) {
   return (options: Options) => {
     if (process.env.NODE_ENV !== 'production') {
       if (Array.isArray(options)) {
         // We received a strings array since it's used as a tag
         throw new Error(
-          'Using the "styled" tag in runtime is not supported. Make sure you have set up the Babel plugin correctly.'
+          'Using the "styled" tag in runtime is not supported. Make sure you have set up the Babel plugin correctly. See https://github.com/callstack/linaria#setup'
         );
       }
     }
@@ -58,10 +77,12 @@ function styled(tag: React.ComponentType<*> | string) {
         const style = {};
 
         Object.keys(vars).forEach(name => {
-          const [value, unit = ''] = vars[name];
-          style[`--${name}`] = `${
-            typeof value === 'function' ? value(props) : value
-          }${unit}`;
+          const [result, unit = ''] = vars[name];
+          const value = typeof result === 'function' ? result(props) : result;
+
+          warnIfInvalid(value, options.name);
+
+          style[`--${name}`] = `${value}${unit}`;
         });
 
         filteredProps.style = Object.assign(style, filteredProps.style);

@@ -4,6 +4,7 @@
 const path = require('path');
 const babel = require('@babel/core');
 const dedent = require('dedent');
+const stripAnsi = require('strip-ansi');
 const serializer = require('../__utils__/linaria-snapshot-serializer');
 
 expect.addSnapshotSerializer(serializer);
@@ -151,6 +152,94 @@ it('evaluates component interpolations', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('throws when interpolation evaluates to undefined', async () => {
+  expect.assertions(1);
+
+  try {
+    await transpile(
+      dedent`
+      const { styled } = require('../react');
+
+      let fontSize;
+
+      const Title = styled.h1\`
+        font-size: ${'${fontSize}'};
+      \`;
+      `
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
+});
+
+it('throws when interpolation evaluates to null', async () => {
+  expect.assertions(1);
+
+  try {
+    await transpile(
+      dedent`
+      const { styled } = require('../react');
+
+      const color = null;
+
+      const Title = styled.h1\`
+        color: ${'${color}'};
+      \`;
+      `
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
+});
+
+it('throws when interpolation evaluates to NaN', async () => {
+  expect.assertions(1);
+
+  try {
+    await transpile(
+      dedent`
+      const { styled } = require('../react');
+
+      const height = NaN;
+
+      const Title = styled.h1\`
+        height: ${'${height}'}px;
+      \`;
+      `
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
+});
+
+it('throws when interpolation evaluates to an array', async () => {
+  expect.assertions(1);
+
+  try {
+    await transpile(
+      dedent`
+      const { styled } = require('../react');
+
+      const borderRadius = ['2px', '0', '2px'];
+
+      const Title = styled.h1\`
+        border-radius: ${'${borderRadius}'}px;
+      \`;
+      `
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
+});
+
 it('handles wrapping another styled component', async () => {
   const { code, metadata } = await transpile(
     dedent`
@@ -263,7 +352,9 @@ it('throws codeframe error when evaluation fails', async () => {
       `
     );
   } catch (e) {
-    expect(e.message.replace(__dirname, '<<DIRNAME>>')).toMatchSnapshot();
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
   }
 });
 
