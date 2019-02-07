@@ -134,6 +134,27 @@ const imports = (t, scope, filename, identifier, source) => {
   return false;
 };
 
+// Throw if we can't handle the interpolated value
+const throwIfInvalid = (value: any, ex: any) => {
+  if (
+    typeof value === 'function' ||
+    typeof value === 'string' ||
+    (typeof value === 'number' && Number.isFinite(value)) ||
+    isPlainObject(value)
+  ) {
+    return;
+  }
+
+  const stringified =
+    typeof value === 'object' ? JSON.stringify(value) : String(value);
+
+  throw ex.buildCodeFrameError(
+    `The expression evaluated to '${stringified}', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(${
+      generator(ex.node).code
+    })'.`
+  );
+};
+
 // Match any valid CSS units followed by a separator such as ;, newline etc.
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
 
@@ -345,11 +366,12 @@ module.exports = function extract(babel: any, options: Options) {
               };
 
               if (result.confident) {
+                throwIfInvalid(result.value, ex);
+
                 if (isPlainObject(result.value)) {
                   // If it's a plain object, convert it to a CSS string
                   cssText += stripLines(loc, toCSS(result.value));
-                } else if (result.value != null) {
-                  // Don't insert anything for null and undefined
+                } else {
                   cssText += stripLines(loc, result.value);
                 }
 
@@ -366,46 +388,50 @@ module.exports = function extract(babel: any, options: Options) {
                     t.isArrowFunctionExpression(ex)
                   )
                 ) {
+                  let evaluation;
+
                   try {
-                    const { value, dependencies } = evaluate(
+                    evaluation = evaluate(
                       ex,
                       t,
                       state.file.opts.filename,
                       undefined,
                       options
                     );
-
-                    if (typeof value !== 'function') {
-                      // Only insert text for non functions
-                      // We don't touch functions because they'll be interpolated at runtime
-
-                      if (value != null) {
-                        if (isValidElementType(value) && value.__linaria) {
-                          // If it's an React component wrapped in styled, get the class name
-                          // Useful for interpolating components
-                          cssText += `.${value.__linaria.className}`;
-                        } else if (isPlainObject(value)) {
-                          cssText += stripLines(loc, toCSS(value));
-                        } else {
-                          // For anything else, assume it'll be stringified
-                          cssText += stripLines(loc, value);
-                        }
-                      }
-
-                      state.dependencies.push(...dependencies);
-                      state.replacements.push({
-                        original: loc,
-                        length: cssText.length - beforeLength,
-                      });
-
-                      return;
-                    }
                   } catch (e) {
                     throw ex.buildCodeFrameError(
                       `An error occurred when evaluating the expression: ${
                         e.message
                       }. Make sure you are not using a browser or Node specific API.`
                     );
+                  }
+
+                  const { value, dependencies } = evaluation;
+
+                  throwIfInvalid(value, ex);
+
+                  if (typeof value !== 'function') {
+                    // Only insert text for non functions
+                    // We don't touch functions because they'll be interpolated at runtime
+
+                    if (isValidElementType(value) && value.__linaria) {
+                      // If it's an React component wrapped in styled, get the class name
+                      // Useful for interpolating components
+                      cssText += `.${value.__linaria.className}`;
+                    } else if (isPlainObject(value)) {
+                      cssText += stripLines(loc, toCSS(value));
+                    } else {
+                      // For anything else, assume it'll be stringified
+                      cssText += stripLines(loc, value);
+                    }
+
+                    state.dependencies.push(...dependencies);
+                    state.replacements.push({
+                      original: loc,
+                      length: cssText.length - beforeLength,
+                    });
+
+                    return;
                   }
                 }
 

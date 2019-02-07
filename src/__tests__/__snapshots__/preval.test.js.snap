@@ -362,9 +362,45 @@ Dependencies: NA
 
 exports[`throws codeframe error when evaluation fails 1`] = `
 "<<DIRNAME>>/source.js: An error occurred when evaluating the expression: This will fail. Make sure you are not using a browser or Node specific API.
-[0m [90m 4 | [39m[0m
-[0m [90m 5 | [39m[36mconst[39m [33mTitle[39m [33m=[39m styled[33m.[39mh1[32m\`[39m[0m
-[0m[31m[1m>[22m[39m[90m 6 | [39m[32m  font-size: \${foo()}px;[39m[0m
-[0m [90m   | [39m               [31m[1m^[22m[39m[0m
-[0m [90m 7 | [39m[32m\`[39m[33m;[39m[0m"
+  4 | 
+  5 | const Title = styled.h1\`
+> 6 |   font-size: \${foo()}px;
+    |                ^
+  7 | \`;"
+`;
+
+exports[`throws when interpolation evaluates to NaN 1`] = `
+"<<DIRNAME>>/source.js: The expression evaluated to 'NaN', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(height)'.
+  4 | 
+  5 | const Title = styled.h1\`
+> 6 |   height: \${height}px;
+    |             ^
+  7 | \`;"
+`;
+
+exports[`throws when interpolation evaluates to an array 1`] = `
+"<<DIRNAME>>/source.js: The expression evaluated to '[\\"2px\\",\\"0\\",\\"2px\\"]', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(borderRadius)'.
+  4 | 
+  5 | const Title = styled.h1\`
+> 6 |   border-radius: \${borderRadius}px;
+    |                    ^
+  7 | \`;"
+`;
+
+exports[`throws when interpolation evaluates to null 1`] = `
+"<<DIRNAME>>/source.js: The expression evaluated to 'null', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(color)'.
+  4 | 
+  5 | const Title = styled.h1\`
+> 6 |   color: \${color};
+    |            ^
+  7 | \`;"
+`;
+
+exports[`throws when interpolation evaluates to undefined 1`] = `
+"<<DIRNAME>>/source.js: The expression evaluated to 'undefined', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(fontSize)'.
+  4 | 
+  5 | const Title = styled.h1\`
+> 6 |   font-size: \${fontSize};
+    |                ^
+  7 | \`;"
 `;
