@@ -377,12 +377,41 @@ You can use the `styled(..)` tag to style any component as long as they accept a
 function CoolComponent(props) {
   return (
     <div className={props.className}>
-      ...
+      {...}
     </div>
-  )
+  );
 }
 
 const StyledCoolComponent = styled(CoolComponent)`
   background-color: tomato;
 `;
 ```
+
+## Adding global styles
+
+Normally, the styles are scoped to specific components. But sometimes you may need to write some global styles, for example, to normalize browser inconsistencies, define a font-family etc.
+
+You can do the following to generate unscoped global styles:
+
+```js
+export const globals = css`
+  :global {
+    html {
+      box-sizing: border-box;
+    }
+
+    *,
+    *:before,
+    *:after {
+      box-sizing: inherit;
+    }
+
+    @font-face {
+      font-family: 'MaterialIcons';
+      src: url(../assets/fonts/MaterialIcons.ttf) format('truetype');
+    }
+  }
+`;
+```
+
+It's not possible to use dynamic prop based styles inside global styles.
