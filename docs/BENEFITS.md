@@ -107,18 +107,36 @@ Class names perform much faster than inline styles.
 
 ## Advantages over other CSS-in-JS solutions
 
-### 1. Zero-runtime
+### 1. CSS is downloaded and parsed separately from JS
 
-Linaria is unique in the sense that it doesn't need a runtime to work. Styles are parsed, evaluated and generated at build time. It can help you improve the load time by loading CSS and JavaScript in parallel, and improve runtime performance because no extra work such as parsing, needs to be done at runtime.
+Since the styles are extracted to separate CSS files, the CSS and JavaScript can be downloaded and parsed by the browser in parallel and can improve the load time.
 
-### 2. No framework coupling
+### 2. No extra parsing needed for CSS
 
-Many CSS in JS solutions only work with a single framework such as React. While Linaria provides additional helpers for React components, the core is independent of the framework you use and can be used with any framework that supports class names.
+Many CSS-in-JS libraries parse the CSS string using a custom parser on the client. This increases the bundle size (albeit slightly) due to the inclusion of the parser. In addition, the CSS cannot be parsed until the JavaScript code is parsed and executed, which can be noticable, especially on low-end devices and bigger JS bundles.
 
-### 3. Familiar CSS syntax
+Linaria is unique in the sense that it doesn't need a runtime to work. Styles are parsed, evaluated and generated at build time and no extra parsing is needed on the client.
 
-Unlike some CSS in JS solutions, Linaria lets you write normal CSS syntax, which means you can copy paste styles from the browser's dev tools (or StackOverflow), and avoid unnecessary noise in the styles.
+### 3. No style duplication on SSR
 
-### 4. Use without JavaScript
+For component based CSS in JS libraries, rendering same component with different props can lead to duplicating the same set of styles multiple times. It doesn't matter on client side, but may increase the size of the rendered CSS when doing SSR. It may not matter in most cases, but in cases where you are rendering a large list of elements with tiny differences in styles, it can quickly add up.
+
+In addition, when you do SSR, the rendered CSS is downloaded in addition to the CSS you wrote in JS files, further increasing the size.
+
+Linaria produces only one rule set per declaration, and the differences are taken care of using CSS variables, so there's no duplication, which is great for reducing bundle size.
+
+### 4. Catch errors early due to build-time evaluation
+
+When you interpolate invalid values in Linaria (for example NaN in styles), you'll get a build time error. So you don't accidentally ship bugs into production and realize it later.
+
+Linaria's stylelint processor is also more robust and can lint styles much better, like you're writing vanilla CSS files.
+
+### 5. Familiar CSS syntax
+
+Unlike some CSS in JS libraries, Linaria lets you write normal CSS syntax, which means you can copy paste styles from the browser's dev tools (or StackOverflow), and avoid unnecessary noise in the styles.
+
+You can also use a pre-processor such as Sass if you prefer.
+
+### 6. Works without JavaScript
 
 If your website needs to work without JavaScript, or you generate the HTML in advance at build time, Linaria is a great fit for styling such websites.
