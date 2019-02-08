@@ -28,6 +28,7 @@ Zero-runtime CSS in JS library.
 - Easily find where the style was defined with **CSS sourcemaps**
 - **Lint your CSS** in JS with [stylelint](https://github.com/stylelint/stylelint)
 - Use **JavaScript for logic**, no CSS preprocessor needed
+- Optionally use any **CSS preprocessor** such as Sass or PostCSS
 
 **[Why use Linaria](/docs/BENEFITS.md)**
 
@@ -120,8 +121,11 @@ const Container = styled.div`
 
 Dynamic styles will be applied using CSS custom properties (aka CSS variables) and don't require any runtime.
 
+See [Basics](/docs/BASICS.md) for a detailed information about the syntax.
+
 ## Documentation
 
+- [Basics](/docs/BASICS.md)
 - [API and usage](/docs/API.md)
   - [Client APIs](/docs/API.md#client-apis)
   - [Server APIs](/docs/API.md#server-apis)
