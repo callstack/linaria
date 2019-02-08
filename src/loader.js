@@ -36,7 +36,7 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
     this._compilation.options.resolve
       ? {
           alias: this._compilation.options.resolve.alias,
-          extensions: ['.js', '.json', '.node', '.ts', '.tsx'],
+          extensions: ['.js', '.ts', '.tsx', '.json'],
         }
       : undefined
   );
