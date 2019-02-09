@@ -1,6 +1,6 @@
 {
-  "projectName": "linara",
-  "projectOwner": "satya164",
+  "projectName": "linaria",
+  "projectOwner": "callstack",
   "files": [
     "README.md"
   ],
@@ -25,6 +25,7 @@
       "profile": "https://medium.com/@satya164",
       "contributions": [
         "code",
+        "doc",
         "ideas"
       ]
     },
@@ -114,6 +115,100 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "Esemesek",
+      "name": "Kacper Wiszczuk",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/9092510?v=4",
+      "profile": "https://twitter.com/esemesek",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "que-etc",
+      "name": "Denis Rul",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/2401842?v=4",
+      "profile": "https://github.com/que-etc",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "johanholmerin",
+      "name": "Johan Holmerin",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/7433263?v=4",
+      "profile": "https://github.com/johanholmerin",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "pgilad",
+      "name": "Gilad Peleg",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/4533329?v=4",
+      "profile": "https://www.giladpeleg.com/",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "giuseppeg",
+      "name": "Giuseppe",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/711311?v=4",
+      "profile": "http://giuseppe.pizza",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "silvenon",
+      "name": "Matija Marohnić",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/471278?v=4",
+      "profile": "https://silvenon.com",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "Schubidu",
+      "name": "Stefan Schult",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/120432?v=4",
+      "profile": "http://schultstefan.de",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "wardpeet",
+      "name": "Ward Peeters",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1120926?v=4",
+      "profile": "http://www.coding-tech.be",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "radoslaw-medryk",
+      "name": "radoslaw-medryk",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/43260833?v=4",
+      "profile": "https://github.com/radoslaw-medryk",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "dr2009",
+      "name": "杨兴洲",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/8262650?v=4",
+      "profile": "http://dr2009.com",
+      "contributions": [
+        "code"
+      ]
     }
-  ]
+  ],
+  "repoType": "github"
 }
