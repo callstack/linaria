@@ -8,28 +8,21 @@ If you use Babel in your project, make sure to have a [config file for Babel](ht
 
 ### webpack
 
-To use Linaria wih webpack, in your webpack config, add `linaria/loader`:
+To use Linaria wih webpack, in your webpack config, add `linaria/loader` under `module.rules`:
 
 ```js
-/* rest of your config */
-module: {
-  /* rest of your module config */
-  rules: [
-    /* rest of your rules */
+{
+  test: /\.js$/,
+  use: [
+    { loader: 'babel-loader' },
     {
-      test: /\.js$/,
-      use: [
-        { loader: 'babel-loader' },
-        {
-          loader: 'linaria/loader',
-          options: {
-            sourceMap: process.env.NODE_ENV !== 'production',
-          },
-        }
-      ],
-    },
+      loader: 'linaria/loader',
+      options: {
+        sourceMap: process.env.NODE_ENV !== 'production',
+      },
+    }
   ],
-},
+}
 ```
 
 Make sure that `linaria/loader` is included after `babel-loader`.
@@ -40,44 +33,120 @@ In order to have your styles extracted, you'll also need to use **css-loader** a
 yarn add --dev css-loader mini-css-extract-plugin
 ```
 
-To do that, you can add the following snippet in your webpack config:
+Import `mini-css-extract-plugin` at the top of your webpack config:
 
 ```js
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-
-module.exports = {
-  /* rest of your config */
-  module: {
-    /* rest of your module config */
-    rules: [
-      /* rest of your rules */
-      {
-        test: /\.css$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: process.env.NODE_ENV !== 'production',
-            },
-          },
-        ],
-      },
-    ],
-  },
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: 'styles.css',
-    }),
-  ],
-};
 ```
 
-This will extract the CSS from all files into a single `styles.css`. Then you need to link to this file in your HTML file or use something like [`HTMLWebpackPlugin`](https://github.com/jantimon/html-webpack-plugin).
+Now add the following snippet in under `module.rules`:
+
+```js
+{
+  test: /\.css$/,
+  use: [
+    MiniCssExtractPlugin.loader,
+    {
+      loader: 'css-loader',
+      options: {
+        sourceMap: process.env.NODE_ENV !== 'production',
+      },
+    },
+  ],
+},
+```
+
+Then add the following under `plugins`:
+
+```js
+new MiniCssExtractPlugin({
+  filename: 'styles.css',
+});
+```
+
+This will extract the CSS from all files into a single `styles.css`. Then you can to link to this file in your HTML file manually or use something like [`HTMLWebpackPlugin`](https://github.com/jantimon/html-webpack-plugin).
 
 If you want to hot reload your styles when they change, you will also need to configure [`style-loader`](https://github.com/webpack-contrib/style-loader) or [`css-hot-loader`](https://github.com/shepherdwind/css-hot-loader).
 
 Linaria integrates with your CSS pipeline, so you can always perform additional operations on the CSS, for example, using [postcss](https://postcss.org/) plugins such as [clean-css](https://github.com/jakubpawlowicz/clean-css) to further minify your CSS.
+
+#### Full example
+
+Here is an example webpack config with Linaria:
+
+```js
+const webpack = require('webpack');
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+const dev = process.env.NODE_ENV !== 'production';
+
+module.exports = {
+  mode: dev ? 'development' : 'production',
+  devtool: 'source-map',
+  entry: {
+    app: './src/index',
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: '/dist/',
+    filename: '[name].bundle.js',
+  },
+  optimization: {
+    noEmitOnErrors: true,
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': { NODE_ENV: JSON.stringify(process.env.NODE_ENV) },
+    }),
+    new MiniCssExtractPlugin({ filename: 'styles.css' }),
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: [
+          { loader: 'babel-loader' },
+          {
+            loader: 'linaria/loader',
+            options: { sourceMap: dev },
+          },
+        ],
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'css-hot-loader',
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: { sourceMap: dev },
+          },
+        ],
+      },
+      {
+        test: /\.(jpg|png|gif|woff|woff2|eot|ttf|svg)$/,
+        use: [{ loader: 'file-loader' }],
+      },
+    ],
+  },
+  devServer: {
+    contentBase: [path.join(__dirname, 'public')],
+    historyApiFallback: true,
+  },
+};
+```
+
+You can copy this file to your project if you are starting from scratch.
+
+To install the dependencies used in the example config, run:
+
+```sh
+yarn add --dev webpack webpack-cli webpack-dev-server mini-css-extract-plugin css-loader css-hot-loader file-loader babel-loader
+```
+
+You can now run the dev server by running `webpack-dev-server` and build the files by running `webpack`.
 
 #### Options
 
@@ -105,7 +174,7 @@ The loader accepts the following options:
 
   - `Function`: You can pass a custom function which receives the `selector` and `cssText` strings. It should return the resulting CSS code.
 
-    A very basic implementation may look like this: ``(selector, cssText) => `${selector} { ${cssText} }`;``.
+    A very basic implementation may look like this: `` (selector, cssText) => `${selector} { ${cssText} }`; ``.
 
   Changing the `preprocessor` doesn't affect the following operations:
 

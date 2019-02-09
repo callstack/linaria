@@ -46,7 +46,10 @@ yarn add linaria
 
 ## Setup
 
-Linaria currently supports webpack and Rollup to extract the CSS at build time. See [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md) to configure your bundler.
+Linaria currently supports webpack and Rollup to extract the CSS at build time. To configure your bundler, check the following guides:
+
+- [webpack](/docs/BUNDLERS_INTEGRATION.md#webpack)
+- [Rollup](/docs/BUNDLERS_INTEGRATION.md#rollup)
 
 Optionally, add the `linaria/babel` preset to your Babel configuration at the end of the presets list to avoid errors when importing the components in your server code or tests:
 
@@ -134,7 +137,7 @@ See [Basics](/docs/BASICS.md) for a detailed information about the syntax.
 - [Theming](/docs/THEMING.md)
 - [Critical CSS extraction](/docs/CRITICAL_CSS.md)
 - [Bundlers integration](/docs/BUNDLERS_INTEGRATION.md)
-  - [Webpack](/docs/BUNDLERS_INTEGRATION.md#webpack)
+  - [webpack](/docs/BUNDLERS_INTEGRATION.md#webpack)
   - [Rollup](/docs/BUNDLERS_INTEGRATION.md#rollup)
 - [CLI](/docs/CLI.md)
 - [Linting](/docs/LINTING.md)
