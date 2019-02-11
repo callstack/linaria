@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 /* @flow */
 
-const { relative, dirname } = require('path');
+const { relative, dirname, basename } = require('path');
 const generator = require('@babel/generator').default;
 const { isValidElementType } = require('react-is');
 const Module = require('./module');
@@ -203,7 +203,7 @@ module.exports = function extract(babel: any, options: Options) {
         enter(path: any, state: State) {
           // Collect all the style rules from the styles we encounter
           state.rules = {};
-          state.index = 0;
+          state.index = -1;
           state.dependencies = [];
           state.replacements = [];
 
@@ -272,6 +272,11 @@ module.exports = function extract(babel: any, options: Options) {
           return;
         }
 
+        // Increment the index of the style we're processing
+        // This is used for slug generation to prevent collision
+        // Also used for display name if it couldn't be determined
+        state.index++;
+
         const interpolations = [];
 
         // Check if the variable is referenced anywhere for basic DCE
@@ -304,22 +309,36 @@ module.exports = function extract(babel: any, options: Options) {
         }
 
         if (!displayName) {
-          throw path.buildCodeFrameError(
-            "Couldn't determine a name for the component. Ensure that it's either:\n" +
-              '- Assigned to a variable\n' +
-              '- Is an object property\n' +
-              '- Is a prop in a JSX element\n'
-          );
+          // Try to derive the path from the filename
+          displayName = basename(state.file.opts.filename);
+
+          if (/^index\.[a-z0-9]+$/.test(displayName)) {
+            // If the file name is 'index', better to get name from parent folder
+            displayName = basename(dirname(state.file.opts.filename));
+          }
+
+          // Remove the file extension
+          displayName = displayName.replace(/\.[a-z0-9]+$/, '');
+
+          if (displayName) {
+            displayName += state.index;
+          } else {
+            throw path.buildCodeFrameError(
+              "Couldn't determine a name for the component. Ensure that it's either:\n" +
+                '- Assigned to a variable\n' +
+                '- Is an object property\n' +
+                '- Is a prop in a JSX element\n'
+            );
+          }
         }
 
         // Custom properties need to start with a letter, so we prefix the slug
         // Also use append the index of the class to the filename for uniqueness in the file
         const slug = toValidCSSIdentifier(
           `${displayName.charAt(0).toLowerCase()}${slugify(
-            `${relative(
-              state.file.opts.root,
-              state.file.opts.filename
-            )}:${state.index++}`
+            `${relative(state.file.opts.root, state.file.opts.filename)}:${
+              state.index
+            }`
           )}`
         );
 
