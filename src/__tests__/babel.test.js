@@ -369,3 +369,49 @@ it('supports both css and styled tags', async () => {
   expect(code).toMatchSnapshot();
   expect(metadata).toMatchSnapshot();
 });
+
+it('does not include styles if not referenced anywhere', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { css } from 'linaria';
+      import { styled } from 'linaria/react';
+
+      const Title = styled.h1\`
+        font-size: 14px;
+      \`;
+
+      const title = css\`
+        color: blue;
+      \`;
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('includes unreferenced styles for :global', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { css } from 'linaria';
+      import { styled } from 'linaria/react';
+
+      const a = css\`
+        :global {
+          .title {
+            font-size: 14px;
+          }
+        }
+      \`;
+
+      const B = styled.div\`
+        :global(.title) {
+          font-size: 14px;
+        }
+      \`;
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});

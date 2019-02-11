@@ -274,6 +274,10 @@ module.exports = function extract(babel: any, options: Options) {
 
         const interpolations = [];
 
+        // Check if the variable is referenced anywhere for basic DCE
+        // Only works when it's assigned to a variable
+        let isReferenced = true;
+
         // Try to determine a readable class name
         let displayName;
 
@@ -290,6 +294,11 @@ module.exports = function extract(babel: any, options: Options) {
           } else if (t.isJSXOpeningElement(parent)) {
             displayName = parent.node.name.name;
           } else if (t.isVariableDeclarator(parent)) {
+            const { referencePaths } = path.scope.getBinding(
+              parent.node.id.name
+            );
+
+            isReferenced = referencePaths.length !== 0;
             displayName = parent.node.id.name;
           }
         }
@@ -539,6 +548,10 @@ module.exports = function extract(babel: any, options: Options) {
           path.addComment('leading', '#__PURE__');
         } else {
           path.replaceWith(t.stringLiteral(className));
+        }
+
+        if (!isReferenced && !cssText.includes(':global')) {
+          return;
         }
 
         state.rules[selector] = {

@@ -1,5 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`does not include styles if not referenced anywhere 1`] = `
+"import { css } from 'linaria';
+import { styled } from 'linaria/react';
+const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"th6xni0\\"
+});
+const title = \\"t1u0rrat\\";"
+`;
+
+exports[`does not include styles if not referenced anywhere 2`] = `Object {}`;
+
 exports[`does not output CSS if none present 1`] = `
 "const number = 42;
 const title = String.raw\`This is something\`;"
@@ -136,6 +150,39 @@ CSS:
 
   @media (max-width: 200px) {
     width: 100%;
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`includes unreferenced styles for :global 1`] = `
+"import { css } from 'linaria';
+import { styled } from 'linaria/react';
+const a = \\"ah6xni0\\";
+const B =
+/*#__PURE__*/
+styled(\\"div\\")({
+  name: \\"B\\",
+  class: \\"b1u0rrat\\"
+});"
+`;
+
+exports[`includes unreferenced styles for :global 2`] = `
+
+CSS:
+
+.ah6xni0 {
+  :global {
+    .title {
+      font-size: 14px;
+    }
+  }
+}
+.b1u0rrat {
+  :global(.title) {
+    font-size: 14px;
   }
 }
 
