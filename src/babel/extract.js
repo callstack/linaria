@@ -273,7 +273,7 @@ module.exports = function extract(babel: any, options: Options) {
         }
 
         // Increment the index of the style we're processing
-        // This is used forslug generation to prevent collision
+        // This is used for slug generation to prevent collision
         // Also used for display name if it couldn't be determined
         state.index++;
 
