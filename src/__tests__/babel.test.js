@@ -22,7 +22,7 @@ it('transpiles styled template literal with object', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       font-size: 14px;
     \`;
     `
@@ -37,7 +37,7 @@ it('transpiles styled template literal with function and tag', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    const Title = styled('h1')\`
+    export const Title = styled('h1')\`
       font-size: 14px;
     \`;
     `
@@ -52,7 +52,7 @@ it('transpiles styled template literal with function and component', async () =>
     dedent`
     import { styled } from 'linaria/react';
 
-    const Title = styled(Heading)\`
+    export const Title = styled(Heading)\`
       font-size: 14px;
     \`;
     `
@@ -67,7 +67,7 @@ it('outputs valid CSS classname', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    const ᾩPage$Title = styled.h1\`
+    export const ᾩPage$Title = styled.h1\`
       font-size: 14px;
     \`;
     `
@@ -84,7 +84,7 @@ it('evaluates and inlines expressions in scope', async () => {
 
     const color = 'blue';
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       color: ${'${color}'};
       width: ${'${100 / 3}'}%;
     \`;
@@ -125,7 +125,7 @@ it('inlines object styles as CSS string', async () => {
       }
     };
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       ${'${cover}'}
     \`;
     `
@@ -140,7 +140,7 @@ it('replaces unknown expressions with CSS custom properties', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       font-size: ${'${size}'}px;
       color: ${'${props => props.color}'};
     \`;
@@ -156,7 +156,7 @@ it('handles interpolation followed by unit', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       font-size: ${'${size}'}em;
       text-shadow: black 1px ${'${shadow}'}px, white -2px -2px;
       margin: ${'${size}'}px;
@@ -177,7 +177,7 @@ it('uses the same custom property for the same identifier', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    const Box = styled.div\`
+    export const Box = styled.div\`
       height: ${'${size}'}px;
       width: ${'${size}'}px;
     \`;
@@ -193,7 +193,7 @@ it('uses the same custom property for the same expression', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    const Box = styled.div\`
+    export const Box = styled.div\`
       height: ${'${props => props.size}'}px;
       width: ${'${props => props.size}'}px;
     \`;
@@ -209,7 +209,7 @@ it('handles nested blocks', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    const Button = styled.button\`
+    export const Button = styled.button\`
       font-family: ${'${regular}'};
 
       &:hover {
@@ -232,15 +232,17 @@ it('prevents class name collision', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       font-size: ${'${size}'}px;
       color: ${'${props => props.color}'}
     \`;
 
-    function more() {
+    function Something() {
       const Title = styled.h1\`
         font-family: ${'${regular}'};
       \`;
+
+      return <Title />;
     }
     `
   );
@@ -288,7 +290,7 @@ it('transpiles css template literal', async () => {
     dedent`
     import { css } from 'linaria';
 
-    const title = css\`
+    export const title = css\`
       font-size: 14px;
     \`;
     `
@@ -354,12 +356,58 @@ it('supports both css and styled tags', async () => {
       import { css } from 'linaria';
       import { styled } from 'linaria/react';
 
+      export const Title = styled.h1\`
+        font-size: 14px;
+      \`;
+
+      export const title = css\`
+        color: blue;
+      \`;
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('does not include styles if not referenced anywhere', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { css } from 'linaria';
+      import { styled } from 'linaria/react';
+
       const Title = styled.h1\`
         font-size: 14px;
       \`;
 
       const title = css\`
         color: blue;
+      \`;
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('includes unreferenced styles for :global', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { css } from 'linaria';
+      import { styled } from 'linaria/react';
+
+      const a = css\`
+        :global {
+          .title {
+            font-size: 14px;
+          }
+        }
+      \`;
+
+      const B = styled.div\`
+        :global(.title) {
+          font-size: 14px;
+        }
       \`;
       `
   );

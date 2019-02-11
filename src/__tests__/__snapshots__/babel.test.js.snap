@@ -1,5 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`does not include styles if not referenced anywhere 1`] = `
+"import { css } from 'linaria';
+import { styled } from 'linaria/react';
+const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"th6xni0\\"
+});
+const title = \\"t1u0rrat\\";"
+`;
+
+exports[`does not include styles if not referenced anywhere 2`] = `Object {}`;
+
 exports[`does not output CSS if none present 1`] = `
 "const number = 42;
 const title = String.raw\`This is something\`;"
@@ -10,7 +24,7 @@ exports[`does not output CSS if none present 2`] = `Object {}`;
 exports[`evaluates and inlines expressions in scope 1`] = `
 "import { styled } from 'linaria/react';
 const color = 'blue';
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -67,7 +81,7 @@ Dependencies: NA
 
 exports[`handles interpolation followed by unit 1`] = `
 "import { styled } from 'linaria/react';
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -112,7 +126,7 @@ Dependencies: NA
 
 exports[`handles nested blocks 1`] = `
 "import { styled } from 'linaria/react';
-const Button =
+export const Button =
 /*#__PURE__*/
 styled(\\"button\\")({
   name: \\"Button\\",
@@ -136,6 +150,39 @@ CSS:
 
   @media (max-width: 200px) {
     width: 100%;
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`includes unreferenced styles for :global 1`] = `
+"import { css } from 'linaria';
+import { styled } from 'linaria/react';
+const a = \\"ah6xni0\\";
+const B =
+/*#__PURE__*/
+styled(\\"div\\")({
+  name: \\"B\\",
+  class: \\"b1u0rrat\\"
+});"
+`;
+
+exports[`includes unreferenced styles for :global 2`] = `
+
+CSS:
+
+.ah6xni0 {
+  :global {
+    .title {
+      font-size: 14px;
+    }
+  }
+}
+.b1u0rrat {
+  :global(.title) {
+    font-size: 14px;
   }
 }
 
@@ -168,7 +215,7 @@ const cover = {
     msTransition: '400ms'
   }
 };
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -190,7 +237,7 @@ Dependencies: NA
 
 exports[`outputs valid CSS classname 1`] = `
 "import { styled } from 'linaria/react';
-const ᾩPage$Title =
+export const ᾩPage$Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"\\\\u1FA9Page$Title\\",
@@ -212,7 +259,7 @@ Dependencies: NA
 
 exports[`prevents class name collision 1`] = `
 "import { styled } from 'linaria/react';
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -223,7 +270,7 @@ styled(\\"h1\\")({
   }
 });
 
-function more() {
+function Something() {
   const Title =
   /*#__PURE__*/
   styled(\\"h1\\")({
@@ -233,6 +280,7 @@ function more() {
       \\"t1u0rrat-0\\": [regular]
     }
   });
+  return <Title />;
 }"
 `;
 
@@ -254,7 +302,7 @@ Dependencies: NA
 
 exports[`replaces unknown expressions with CSS custom properties 1`] = `
 "import { styled } from 'linaria/react';
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -282,13 +330,13 @@ Dependencies: NA
 exports[`supports both css and styled tags 1`] = `
 "import { css } from 'linaria';
 import { styled } from 'linaria/react';
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"th6xni0\\"
 });
-const title = \\"t1u0rrat\\";"
+export const title = \\"t1u0rrat\\";"
 `;
 
 exports[`supports both css and styled tags 2`] = `
@@ -332,7 +380,7 @@ exports[`throws when not attached to a variable 1`] = `
 
 exports[`transpiles css template literal 1`] = `
 "import { css } from 'linaria';
-const title = \\"th6xni0\\";"
+export const title = \\"th6xni0\\";"
 `;
 
 exports[`transpiles css template literal 2`] = `
@@ -349,7 +397,7 @@ Dependencies: NA
 
 exports[`transpiles styled template literal with function and component 1`] = `
 "import { styled } from 'linaria/react';
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(Heading)({
   name: \\"Title\\",
@@ -371,7 +419,7 @@ Dependencies: NA
 
 exports[`transpiles styled template literal with function and tag 1`] = `
 "import { styled } from 'linaria/react';
-const Title =
+export const Title =
 /*#__PURE__*/
 styled('h1')({
   name: \\"Title\\",
@@ -393,7 +441,7 @@ Dependencies: NA
 
 exports[`transpiles styled template literal with object 1`] = `
 "import { styled } from 'linaria/react';
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -415,7 +463,7 @@ Dependencies: NA
 
 exports[`uses the same custom property for the same expression 1`] = `
 "import { styled } from 'linaria/react';
-const Box =
+export const Box =
 /*#__PURE__*/
 styled(\\"div\\")({
   name: \\"Box\\",
@@ -441,7 +489,7 @@ Dependencies: NA
 
 exports[`uses the same custom property for the same identifier 1`] = `
 "import { styled } from 'linaria/react';
-const Box =
+export const Box =
 /*#__PURE__*/
 styled(\\"div\\")({
   name: \\"Box\\",

@@ -37,8 +37,7 @@
     "flow": "flow",
     "typescript": "dtslint",
     "test": "jest",
-    "test:unit": "jest __tests__",
-    "test:integration": "jest __integration-tests__",
+    "test:integration": "jest --testRegex \"/__integration-tests__/.*\\.(test|spec)\\.js$\"",
     "add-contributor": "all-contributors add",
     "prebuild": "del lib",
     "build": "babel src --out-dir lib --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps && flow-copy-source -i '{**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**}' src lib",
@@ -104,7 +103,7 @@
     "**/babel-core": "7.0.0-bridge.0"
   },
   "jest": {
-    "testRegex": "/__(integration-)?tests__/.*\\.(test|spec)\\.js$",
+    "testRegex": "/__tests__/.*\\.(test|spec)\\.js$",
     "testEnvironment": "node"
   }
 }

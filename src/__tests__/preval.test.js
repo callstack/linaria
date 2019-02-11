@@ -38,7 +38,7 @@ it('evaluates identifier in scope', async () => {
     const foo = () => answer;
     const days = foo() + ' days';
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       &:before {
         content: "${'${days}'}"
       }
@@ -58,7 +58,7 @@ it('evaluates local expressions', async () => {
     const answer = 42;
     const foo = () => answer;
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       &:before {
         content: "${"${foo() + ' days'}"}"
       }
@@ -76,7 +76,7 @@ it('evaluates expressions with dependencies', async () => {
     import { styled } from 'linaria/react';
     import slugify from '../slugify';
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       &:before {
         content: "${"${slugify('test')}"}"
       }
@@ -97,7 +97,7 @@ it('evaluates expressions with expressions depending on shared dependency', asyn
     const boo = t => slugify(t) + 'boo';
     const bar = t => slugify(t) + 'bar';
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       &:before {
         content: "${"${boo('test') + bar('test')}"}"
       }
@@ -118,7 +118,7 @@ it('evaluates multiple expressions with shared dependency', async () => {
     const boo = t => slugify(t) + 'boo';
     const bar = t => slugify(t) + 'bar';
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       &:before {
         content: "${"${boo('test')}"}"
         content: "${"${bar('test')}"}"
@@ -136,11 +136,11 @@ it('evaluates component interpolations', async () => {
     dedent`
     const { styled } = require('../react');
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       color: red;
     \`;
 
-    const Paragraph = styled.p\`
+    export const Paragraph = styled.p\`
       ${'${Title}'} {
         color: blue;
       }
@@ -162,7 +162,7 @@ it('throws when interpolation evaluates to undefined', async () => {
 
       let fontSize;
 
-      const Title = styled.h1\`
+      export const Title = styled.h1\`
         font-size: ${'${fontSize}'};
       \`;
       `
@@ -184,7 +184,7 @@ it('throws when interpolation evaluates to null', async () => {
 
       const color = null;
 
-      const Title = styled.h1\`
+      export const Title = styled.h1\`
         color: ${'${color}'};
       \`;
       `
@@ -206,7 +206,7 @@ it('throws when interpolation evaluates to NaN', async () => {
 
       const height = NaN;
 
-      const Title = styled.h1\`
+      export const Title = styled.h1\`
         height: ${'${height}'}px;
       \`;
       `
@@ -228,7 +228,7 @@ it('throws when interpolation evaluates to an array', async () => {
 
       const borderRadius = ['2px', '0', '2px'];
 
-      const Title = styled.h1\`
+      export const Title = styled.h1\`
         border-radius: ${'${borderRadius}'}px;
       \`;
       `
@@ -249,7 +249,7 @@ it('handles wrapping another styled component', async () => {
       color: red;
     \`;
 
-    const CustomTitle = styled(Title)\`
+    export const CustomTitle = styled(Title)\`
       font-size: 24px;
       color: blue;
     \`;
@@ -273,7 +273,7 @@ it('inlines object styles as CSS string', async () => {
       left,
     });
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       ${'${fill(0, 0)}'}
     \`;
     `
@@ -288,7 +288,7 @@ it('ignores inline arrow function expressions', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       &:before {
         content: "${'${props => props.content}'}"
       }
@@ -305,7 +305,7 @@ it('ignores inline vanilla function expressions', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       &:before {
         content: "${'${function(props) { return props.content }}'}"
       }
@@ -324,7 +324,7 @@ it('ignores external expressions', async () => {
 
     const generate = props => props.content;
 
-    const Title = styled.h1\`
+    export const Title = styled.h1\`
       &:before {
         content: "${'${generate}'}"
       }
@@ -346,7 +346,7 @@ it('throws codeframe error when evaluation fails', async () => {
 
       const foo = props => { throw new Error('This will fail') };
 
-      const Title = styled.h1\`
+      export const Title = styled.h1\`
         font-size: ${'${foo()}'}px;
       \`;
       `
