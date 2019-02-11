@@ -367,3 +367,65 @@ it('handles escapes properly', async () => {
   expect(code).toMatchSnapshot();
   expect(metadata).toMatchSnapshot();
 });
+
+it('derives display name from filename', async () => {
+  const { code, metadata } = await babel.transformAsync(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    export default styled.h1\`
+      font-size: 14px;
+    \`;
+    `,
+    {
+      ...babelrc,
+      filename: path.join(__dirname, 'FancyName.js'),
+    }
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('derives display name from parent folder name', async () => {
+  const { code, metadata } = await babel.transformAsync(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    export default styled.h1\`
+      font-size: 14px;
+    \`;
+    `,
+    {
+      ...babelrc,
+      filename: path.join(__dirname, 'FancyName/index.js'),
+    }
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it("throws if couldn't determine a display name", async () => {
+  expect.assertions(1);
+
+  try {
+    await babel.transformAsync(
+      dedent`
+      import { styled } from 'linaria/react';
+
+      export default styled.h1\`
+        font-size: 14px;
+      \`;
+      `,
+      {
+        ...babelrc,
+        filename: path.join(__dirname, '/.js'),
+      }
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
+});

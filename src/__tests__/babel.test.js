@@ -251,27 +251,6 @@ it('prevents class name collision', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('throws when not attached to a variable', async () => {
-  expect.assertions(1);
-
-  try {
-    await transpile(
-      dedent`
-      import { styled } from 'linaria/react';
-
-      styled.h1\`
-        font-size: ${'${size}'}px;
-        color: ${'${props => props.color}'}
-      \`;
-      `
-    );
-  } catch (e) {
-    expect(
-      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
-    ).toMatchSnapshot();
-  }
-});
-
 it('does not output CSS if none present', async () => {
   const { code, metadata } = await transpile(
     dedent`

@@ -1,5 +1,49 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`derives display name from filename 1`] = `
+"import { styled } from 'linaria/react';
+export default
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"FancyName0\\",
+  class: \\"FancyName0_f1yjazsq\\"
+});"
+`;
+
+exports[`derives display name from filename 2`] = `
+
+CSS:
+
+.FancyName0_f1yjazsq {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`derives display name from parent folder name 1`] = `
+"import { styled } from 'linaria/react';
+export default
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"FancyName0\\",
+  class: \\"FancyName0_f1e8u5dq\\"
+});"
+`;
+
+exports[`derives display name from parent folder name 2`] = `
+
+CSS:
+
+.FancyName0_f1e8u5dq {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`evaluates component interpolations 1`] = `
 "const {
   styled
@@ -367,6 +411,20 @@ exports[`throws codeframe error when evaluation fails 1`] = `
 > 6 |   font-size: \${foo()}px;
     |                ^
   7 | \`;"
+`;
+
+exports[`throws if couldn't determine a display name 1`] = `
+"<<DIRNAME>>/.js: Couldn't determine a name for the component. Ensure that it's either:
+- Assigned to a variable
+- Is an object property
+- Is a prop in a JSX element
+
+  1 | import { styled } from 'linaria/react';
+  2 | 
+> 3 | export default styled.h1\`
+    |                ^
+  4 |   font-size: 14px;
+  5 | \`;"
 `;
 
 exports[`throws when interpolation evaluates to NaN 1`] = `
