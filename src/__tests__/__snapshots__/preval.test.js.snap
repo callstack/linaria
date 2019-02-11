@@ -5,13 +5,13 @@ exports[`evaluates component interpolations 1`] = `
   styled
 } = require('../react');
 
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });
-const Paragraph =
+export const Paragraph =
 /*#__PURE__*/
 styled(\\"p\\")({
   name: \\"Paragraph\\",
@@ -39,7 +39,7 @@ Dependencies: ../react
 exports[`evaluates expressions with dependencies 1`] = `
 "import { styled } from 'linaria/react';
 import slugify from '../slugify';
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -70,7 +70,7 @@ const boo = t => slugify(t) + 'boo';
 
 const bar = t => slugify(t) + 'bar';
 
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -99,7 +99,7 @@ const answer = 42;
 const foo = () => answer;
 
 const days = foo() + ' days';
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -127,7 +127,7 @@ const answer = 42;
 
 const foo = () => answer;
 
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -158,7 +158,7 @@ const boo = t => slugify(t) + 'boo';
 
 const bar = t => slugify(t) + 'bar';
 
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -219,7 +219,7 @@ styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });
-const CustomTitle =
+export const CustomTitle =
 /*#__PURE__*/
 styled(Title)({
   name: \\"CustomTitle\\",
@@ -248,7 +248,7 @@ exports[`ignores external expressions 1`] = `
 
 const generate = props => props.content;
 
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -275,7 +275,7 @@ Dependencies: NA
 
 exports[`ignores inline arrow function expressions 1`] = `
 "import { styled } from 'linaria/react';
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -302,7 +302,7 @@ Dependencies: NA
 
 exports[`ignores inline vanilla function expressions 1`] = `
 "import { styled } from 'linaria/react';
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -340,7 +340,7 @@ const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
   left
 });
 
-const Title =
+export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
@@ -363,7 +363,7 @@ Dependencies: NA
 exports[`throws codeframe error when evaluation fails 1`] = `
 "<<DIRNAME>>/source.js: An error occurred when evaluating the expression: This will fail. Make sure you are not using a browser or Node specific API.
   4 | 
-  5 | const Title = styled.h1\`
+  5 | export const Title = styled.h1\`
 > 6 |   font-size: \${foo()}px;
     |                ^
   7 | \`;"
@@ -372,7 +372,7 @@ exports[`throws codeframe error when evaluation fails 1`] = `
 exports[`throws when interpolation evaluates to NaN 1`] = `
 "<<DIRNAME>>/source.js: The expression evaluated to 'NaN', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(height)'.
   4 | 
-  5 | const Title = styled.h1\`
+  5 | export const Title = styled.h1\`
 > 6 |   height: \${height}px;
     |             ^
   7 | \`;"
@@ -381,7 +381,7 @@ exports[`throws when interpolation evaluates to NaN 1`] = `
 exports[`throws when interpolation evaluates to an array 1`] = `
 "<<DIRNAME>>/source.js: The expression evaluated to '[\\"2px\\",\\"0\\",\\"2px\\"]', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(borderRadius)'.
   4 | 
-  5 | const Title = styled.h1\`
+  5 | export const Title = styled.h1\`
 > 6 |   border-radius: \${borderRadius}px;
     |                    ^
   7 | \`;"
@@ -390,7 +390,7 @@ exports[`throws when interpolation evaluates to an array 1`] = `
 exports[`throws when interpolation evaluates to null 1`] = `
 "<<DIRNAME>>/source.js: The expression evaluated to 'null', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(color)'.
   4 | 
-  5 | const Title = styled.h1\`
+  5 | export const Title = styled.h1\`
 > 6 |   color: \${color};
     |            ^
   7 | \`;"
@@ -399,7 +399,7 @@ exports[`throws when interpolation evaluates to null 1`] = `
 exports[`throws when interpolation evaluates to undefined 1`] = `
 "<<DIRNAME>>/source.js: The expression evaluated to 'undefined', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(fontSize)'.
   4 | 
-  5 | const Title = styled.h1\`
+  5 | export const Title = styled.h1\`
 > 6 |   font-size: \${fontSize};
     |                ^
   7 | \`;"
