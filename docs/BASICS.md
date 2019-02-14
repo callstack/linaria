@@ -414,7 +414,7 @@ You can do the following to generate unscoped global styles:
 
 ```js
 export const globals = css`
-  :global {
+  :global() {
     html {
       box-sizing: border-box;
     }
