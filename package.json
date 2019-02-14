@@ -44,8 +44,8 @@
     "watch": "babel src --out-dir lib --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --watch",
     "prepare": "yarn build",
     "release": "release-it",
-    "now-build": "yarn --cwd website install && yarn --cwd website build",
-    "now-start": "yarn --cwd website server"
+    "website": "yarn --cwd website",
+    "bootstrap": "yarn && yarn website install"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
@@ -57,10 +57,12 @@
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "@callstack/eslint-config": "^3.0.0",
+    "@commitlint/config-conventional": "^7.5.0",
     "@types/react": "^16.4.18",
     "all-contributors-cli": "^5.4.1",
     "babel-core": "^7.0.0-bridge.0",
     "codecov": "^3.1.0",
+    "commitlint": "^7.5.2",
     "conventional-changelog-cli": "^2.0.5",
     "del-cli": "^1.1.0",
     "dtslint": "^0.3.0",
@@ -68,6 +70,7 @@
     "eslint-plugin-prettier": "^3.0.0",
     "flow-bin": "^0.90.0",
     "flow-copy-source": "^2.0.2",
+    "husky": "^1.3.1",
     "jest": "^23.6.0",
     "jest-image-snapshot": "^2.6.0",
     "prettier": "^1.14.3",
@@ -101,6 +104,12 @@
   },
   "resolutions": {
     "**/babel-core": "7.0.0-bridge.0"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "yarn lint && yarn flow && yarn test"
+    }
   },
   "jest": {
     "testRegex": "/__tests__/.*\\.(test|spec)\\.js$",
