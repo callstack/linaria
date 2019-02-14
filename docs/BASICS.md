@@ -371,12 +371,12 @@ Here, when you use `LargeButton`, it'll have all the same styles as `Button` exc
 
 ## Styling custom components
 
-You can use the `styled(..)` tag to style any component as long as they accept a `className` prop:
+You can use the `styled(..)` tag to style any component as long as they accept a `className` and a `style` prop:
 
 ```js
-function CoolComponent(props) {
+function CoolComponent({ className, style, ...rest }) {
   return (
-    <div className={props.className}>
+    <div className={className} style={style}>
       {...}
     </div>
   );
@@ -384,6 +384,25 @@ function CoolComponent(props) {
 
 const StyledCoolComponent = styled(CoolComponent)`
   background-color: tomato;
+`;
+```
+
+The `style` prop is necessary to apply CSS variables. If you're using a component library that doesn't support passing a `style` prop, you can wrap it in a `div` (or any other tag that makes sense) to apply it:
+
+```js
+import { Card } from 'some-library';
+
+function CustomCard({ className, style, ...rest }) {
+  return (
+    <div style={style}>
+      <Card className={className} {...rest} />
+    </div>
+  );
+}
+
+const StyledCustomCard = styled(CustomCard)`
+  margin: 16px;
+  height: ${props => props.height}px;
 `;
 ```
 

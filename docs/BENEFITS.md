@@ -54,9 +54,9 @@ const button = css`
 `;
 ```
 
-### 5. Easy to get rid of unused styles
+### 5. Automatic unused styles removal
 
-Like other JS variables, linters like [ESLint](https://eslint.org/) can warn you about when you have unused styles.
+Linaria automatically drops unused styles in a file unless it is exported. Linters like [ESLint](https://eslint.org/) can also warn you about when you have unused styles since they are just normal JS variables.
 
 ### 6. Automatic vendor prefixing
 
@@ -86,9 +86,9 @@ const Box = styled.div`
 
 Linaria's syntax is just like regular CSS, plus ability to nest selectors for convenience. There's no new syntax for variables, mixins or functions. It's just JavaScript.
 
-### 2. All aforementioned advantages
+### 2. Same advantages as regular CSS
 
-The same advantages over regular CSS apply to preprocessors.
+Linaria has all the same advantages mentioned in "Advantages over regular CSS" even when you are using a CSS pre-processor.
 
 ## Advantages over inline styles
 
