@@ -208,7 +208,17 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "hinok",
+      "name": "Dawid Karabin",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1313605?v=4",
+      "profile": "https://github.com/hinok",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
-  "repoType": "github"
+  "repoType": "github",
+  "contributorsPerLine": 7
 }
