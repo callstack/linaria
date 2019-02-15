@@ -174,7 +174,7 @@ exports[`includes unreferenced styles for :global 2`] = `
 CSS:
 
 .ah6xni0 {
-  :global {
+  :global() {
     .title {
       font-size: 14px;
     }

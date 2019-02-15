@@ -376,7 +376,7 @@ it('includes unreferenced styles for :global', async () => {
       import { styled } from 'linaria/react';
 
       const a = css\`
-        :global {
+        :global() {
           .title {
             font-size: 14px;
           }

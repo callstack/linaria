@@ -10,7 +10,7 @@ import constants from './styles/constants';
 ReactDOM.render(<App />, document.getElementById('root'));
 
 export const globals = css`
-  :global {
+  :global() {
     html {
       box-sizing: border-box;
       height: 100%;
