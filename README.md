@@ -126,6 +126,10 @@ Dynamic styles will be applied using CSS custom properties (aka CSS variables) a
 
 See [Basics](/docs/BASICS.md) for a detailed information about the syntax.
 
+## Demo
+
+[![Edit Linaria Demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/2x93v25p3j)
+
 ## Documentation
 
 - [Basics](/docs/BASICS.md)
