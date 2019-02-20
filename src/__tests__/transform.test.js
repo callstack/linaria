@@ -58,3 +58,49 @@ it("doesn't rewrite an absolute path in url() declarations", async () => {
 
   expect(cssText).toMatchSnapshot();
 });
+
+it('uses babelOptions', async () => {
+  expect(() =>
+    transform(
+      dedent`
+      import { css } from 'linaria';
+      export const error = <jsx />;
+      `,
+      {
+        filename: './test.js',
+        outputFilename: '../.linaria-cache/test.css',
+        babelOptions: {
+          babelrc: false,
+          presets: [
+            ['@babel/preset-env', { loose: true }],
+            // react preset is missing
+          ],
+        },
+      }
+    )
+  ).toThrowError('Unexpected token');
+
+  expect(() =>
+    transform(
+      dedent`
+      import { css } from 'linaria';
+      export const error = <jsx />;
+      export const title = css\`
+      background-image: url(/assets/test.jpg);
+    \`;
+      `,
+      {
+        filename: './test.js',
+        outputFilename: '../.linaria-cache/test.css',
+        babelOptions: {
+          babelrc: false,
+          presets: [
+            ['@babel/preset-env', { loose: true }],
+            '@babel/preset-react',
+            '@babel/preset-flow',
+          ],
+        },
+      }
+    )
+  ).not.toThrowError('Unexpected token');
+});

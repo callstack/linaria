@@ -71,7 +71,12 @@ module.exports = function transform(code: string, options: Options): Result {
     code,
     {
       filename: options.filename,
-      presets: [[require.resolve('./babel'), options.pluginOptions]],
+      presets: [
+        [
+          require.resolve('./babel'),
+          { ...options.pluginOptions, babelOptions: options.babelOptions },
+        ],
+      ],
       babelrc: false,
       configFile: false,
       sourceMaps: true,

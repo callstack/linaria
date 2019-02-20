@@ -158,18 +158,31 @@ module.exports = function evaluate(
             return { code: text };
           }
 
+          const babelOptions = (options && options.babelOptions) || {};
+
+          if (typeof babelOptions.plugins === 'undefined') {
+            babelOptions.plugins = [];
+          }
+
+          babelOptions.plugins.push(
+            // Include this plugin to avoid extra config when using { module: false } for webpack
+            '@babel/plugin-transform-modules-commonjs',
+            '@babel/plugin-proposal-export-namespace-from',
+            // We don't support dynamic imports when evaluating, but don't wanna syntax error
+            // This will replace dynamic imports with an object that does nothing
+            require.resolve('./dynamic-import-noop')
+          );
+
+          if (typeof babelOptions.presets === 'undefined') {
+            babelOptions.presets = [];
+          }
+
+          babelOptions.presets.push([require.resolve('./index'), options]);
+
           return babel.transformSync(text, {
             caller: { name: 'linaria', evaluate: true },
             filename: this.filename,
-            presets: [[require.resolve('./index'), options]],
-            plugins: [
-              // Include this plugin to avoid extra config when using { module: false } for webpack
-              '@babel/plugin-transform-modules-commonjs',
-              '@babel/plugin-proposal-export-namespace-from',
-              // We don't support dynamic imports when evaluating, but don't wanna syntax error
-              // This will replace dynamic imports with an object that does nothing
-              require.resolve('./dynamic-import-noop'),
-            ],
+            ...babelOptions,
           });
         };
 
