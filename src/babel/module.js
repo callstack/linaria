@@ -69,7 +69,7 @@ class Module {
     this.require.cache = cache;
 
     // We support following extensions by default
-    this.extensions = ['.json', '.js', '.ts', '.tsx'];
+    this.extensions = ['.json', '.js', '.jsx', '.ts', '.tsx'];
   }
 
   resolve(id: string) {

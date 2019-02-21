@@ -28,7 +28,7 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
   );
 
   const resolveOptions = {
-    extensions: ['.js', '.ts', '.tsx', '.json'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   };
 
   const resolveSync = enhancedResolve.create.sync(
