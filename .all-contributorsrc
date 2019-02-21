@@ -217,6 +217,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "Anber",
+      "name": "Anton Evzhakov",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/148258?v=4",
+      "profile": "http://twitter.com/anber_ru",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "repoType": "github",
