@@ -105,7 +105,7 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
 
     this.callback(
       null,
-      `${result.code}\n\nrequire("${normalize(outputFilename)}")`,
+      `${result.code}\n\nrequire("${normalize(outputFilename)}");`,
       result.sourceMap
     );
     return;
