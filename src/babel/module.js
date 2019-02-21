@@ -17,6 +17,44 @@ const vm = require('vm');
 const fs = require('fs');
 const path = require('path');
 
+// Supported node builtins based on the modules polyfilled by webpack
+// `true` means module is polyfilled, `false` means module is empty
+const builtins = {
+  assert: true,
+  buffer: true,
+  child_process: false,
+  cluster: false,
+  console: true,
+  constants: true,
+  crypto: true,
+  dgram: false,
+  dns: false,
+  domain: true,
+  events: true,
+  fs: false,
+  http: true,
+  https: true,
+  module: false,
+  net: false,
+  os: true,
+  path: true,
+  punycode: true,
+  process: true,
+  querystring: true,
+  readline: false,
+  repl: false,
+  stream: true,
+  string_decoder: true,
+  sys: true,
+  timers: true,
+  tls: false,
+  tty: true,
+  url: true,
+  util: true,
+  vm: true,
+  zlib: true,
+};
+
 // Separate cache for evaled modules
 let cache = {};
 
@@ -98,11 +136,23 @@ class Module {
   }
 
   require(id: string) {
+    if (id in builtins) {
+      // The module is in the allowed list of builtin node modules
+      // Ideally we should prevent importing them, but webpack polyfills some
+      // So we check for the list of polyfills to determine which ones to support
+      if (builtins[id]) {
+        /* $FlowFixMe */
+        return require(id);
+      }
+
+      return null;
+    }
+
     // Resolve module id (and filename) relatively to parent module
     const filename = this.resolve(id);
 
     if (filename === id && !path.isAbsolute(id)) {
-      // Native Node modules
+      // The module is a builtin node modules, but not in the allowed list
       throw new Error(
         `Unable to import "${id}". Importing Node builtins is not supported in the sandbox.`
       );

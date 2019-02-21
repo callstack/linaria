@@ -122,11 +122,23 @@ it('exports the path for non JS/JSON files', () => {
   expect(mod.require('./sample-asset.png')).toBe('./sample-asset.png');
 });
 
-it('throws when requiring native node modules', () => {
+it('returns module when requiring mocked builtin node modules', () => {
   const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
 
-  expect(() => mod.require('fs')).toThrow(
-    'Unable to import "fs". Importing Node builtins is not supported in the sandbox.'
+  expect(mod.require('path')).toBe(require('path'));
+});
+
+it('returns null when requiring empty builtin node modules', () => {
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+
+  expect(mod.require('fs')).toBe(null);
+});
+
+it('throws when requiring unmocked builtin node modules', () => {
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+
+  expect(() => mod.require('perf_hooks')).toThrow(
+    'Unable to import "perf_hooks". Importing Node builtins is not supported in the sandbox.'
   );
 });
 
