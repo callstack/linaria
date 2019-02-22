@@ -16,6 +16,7 @@ const NativeModule = require('module');
 const vm = require('vm');
 const fs = require('fs');
 const path = require('path');
+const process = require('./process');
 
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty
@@ -203,15 +204,10 @@ class Module {
     script.runInContext(
       vm.createContext({
         global,
-        window: global,
+        process,
         module: this,
         exports: this.exports,
         require: this.require,
-        process: Object.freeze({
-          env: Object.freeze({
-            NODE_ENV: process.env.NODE_ENV,
-          }),
-        }),
         __filename: this.filename,
         __dirname: path.dirname(this.filename),
       })

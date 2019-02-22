@@ -157,9 +157,9 @@ it("doesn't have access to the process object", () => {
 
   expect(() =>
     mod.evaluate(dedent`
-    process.exit();
+    process.abort();
   `)
-  ).toThrow('process.exit is not a function');
+  ).toThrow('process.abort is not a function');
 });
 
 it('has access to NODE_ENV', () => {
