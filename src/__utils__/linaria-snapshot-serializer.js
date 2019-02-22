@@ -4,8 +4,8 @@ module.exports = {
 CSS:
 
 ${Object.keys(linaria.rules)
-    .map(selector => `${selector} {${linaria.rules[selector].cssText}}`)
-    .join('\n')}
+  .map(selector => `${selector} {${linaria.rules[selector].cssText}}`)
+  .join('\n')}
 
 Dependencies: ${
     linaria.dependencies.length ? linaria.dependencies.join(', ') : 'NA'

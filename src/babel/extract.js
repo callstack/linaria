@@ -105,8 +105,8 @@ const imports = (t, scope, filename, identifier, source) => {
       (source === 'linaria'
         ? require.resolve('../index')
         : source === 'linaria/react'
-          ? require.resolve('../react/')
-          : resolveFromFile(source));
+        ? require.resolve('../react/')
+        : resolveFromFile(source));
 
   if (t.isImportSpecifier(p) && t.isImportDeclaration(p.parentPath)) {
     return isImportingModule(p.parentPath.node.source.value);
