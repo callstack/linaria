@@ -52,7 +52,7 @@ function styled(tag: React.ComponentType<*> | string) {
       let filteredProps;
 
       // Check if it's an HTML tag and not a custom element
-      if (typeof tag === 'string' && tag.indexOf('-') === -1) {
+      if (typeof component === 'string' && component.indexOf('-') === -1) {
         filteredProps = {};
 
         // eslint-disable-next-line guard-for-in

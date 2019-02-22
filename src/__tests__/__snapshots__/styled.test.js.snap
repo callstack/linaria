@@ -85,17 +85,34 @@ exports[`renders tag with display name and class name 1`] = `
 </h1>
 `;
 
-exports[`replaces custom component with as prop 1`] = `
+exports[`replaces custom component with as prop for primitive 1`] = `
 <a
   className="abcdefg"
+  id="test"
 >
   This is a test
 </a>
 `;
 
+exports[`replaces primitive with as prop for custom component 1`] = `
+<div
+  className="abcdefg"
+  foo="bar"
+  id="test"
+  style={
+    Object {
+      "fontSize": 12,
+    }
+  }
+>
+  This is a test
+</div>
+`;
+
 exports[`replaces simple component with as prop 1`] = `
 <a
   className="abcdefg"
+  id="test"
 >
   This is a test
 </a>
