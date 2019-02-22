@@ -142,6 +142,16 @@ it('throws when requiring unmocked builtin node modules', () => {
   );
 });
 
+it('has access to the global object', () => {
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+
+  expect(() =>
+    mod.evaluate(dedent`
+    new global.Set();
+  `)
+  ).not.toThrow();
+});
+
 it("doesn't have access to the process object", () => {
   const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
 

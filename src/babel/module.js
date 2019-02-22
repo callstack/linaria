@@ -202,6 +202,8 @@ class Module {
 
     script.runInContext(
       vm.createContext({
+        global,
+        window: global,
         module: this,
         exports: this.exports,
         require: this.require,
