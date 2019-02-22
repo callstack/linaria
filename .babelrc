@@ -1,6 +1,28 @@
 {
   "presets": [
-    ["@babel/preset-env", { "loose": true }],
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "browsers": [
+            "last 2 versions",
+            "not ie 11",
+            "not ie_mob 11",
+            "not op_mini all",
+            "not dead"
+          ]
+        },
+        "useBuiltIns": "usage",
+        "exclude": [
+          "transform-typeof-symbol",
+          "es6.object.assign",
+          "es6.object.keys",
+          "es6.array.iterator",
+          "web.dom.iterable"
+        ],
+        "loose": true
+      }
+    ],
     "@babel/preset-react",
     "@babel/preset-flow"
   ]

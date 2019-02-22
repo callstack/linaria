@@ -19,7 +19,8 @@ const warnIfInvalid = (value: any, componentName) => {
   if (process.env.NODE_ENV !== 'production') {
     if (
       typeof value === 'string' ||
-      (typeof value === 'number' && Number.isFinite(value))
+      // eslint-disable-next-line no-self-compare
+      (typeof value === 'number' && isFinite(value))
     ) {
       return;
     }
@@ -51,7 +52,7 @@ function styled(tag: React.ComponentType<*> | string) {
       let filteredProps;
 
       // Check if it's an HTML tag and not a custom element
-      if (typeof tag === 'string' && !tag.includes('-')) {
+      if (typeof tag === 'string' && tag.indexOf('-') === -1) {
         filteredProps = {};
 
         // eslint-disable-next-line guard-for-in
@@ -76,14 +77,15 @@ function styled(tag: React.ComponentType<*> | string) {
       if (vars) {
         const style = {};
 
-        Object.keys(vars).forEach(name => {
+        // eslint-disable-next-line guard-for-in
+        for (const name in vars) {
           const [result, unit = ''] = vars[name];
           const value = typeof result === 'function' ? result(props) : result;
 
           warnIfInvalid(value, options.name);
 
           style[`--${name}`] = `${value}${unit}`;
-        });
+        }
 
         filteredProps.style = Object.assign(style, filteredProps.style);
       }
