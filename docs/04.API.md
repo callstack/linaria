@@ -1,3 +1,7 @@
+---
+title: API reference
+---
+
 # API
 
 Linaria exposes a core `css` method alongside with small, but just enough amount of helpers. Inside `linaria` module you can find following methods:

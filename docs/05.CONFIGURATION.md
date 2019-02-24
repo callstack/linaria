@@ -1,3 +1,7 @@
+---
+title: Configuration
+---
+
 # Configuration
 
 Linaria can be customized using a JavaScript, JSON or YAML file. This can be in form of:

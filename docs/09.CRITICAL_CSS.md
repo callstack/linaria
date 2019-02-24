@@ -1,3 +1,8 @@
+---
+title: Critical CSS extraction
+link: critical-css
+---
+
 # Critical CSS extraction
 
 Since Linaria extracts the CSS statically at build time, you don't need to setup a server rendering. Usually, critical CSS extraction will be automatic if you are code splitting your code and using something like [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin) for webpack to generate your CSS files.

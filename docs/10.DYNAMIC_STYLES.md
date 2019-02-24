@@ -1,3 +1,8 @@
+---
+title: Dynamic styles
+link: dynamic-styles
+---
+
 # Dynamic styles with `css` tag
 
 Sometimes we have some styles based on component's props or state, or dynamic in some way. If you use the `styled` helper with React, this is automatically handled using CSS custom properties. But we cannot do the same for `css` tags since they aren't linked to any component, and so we don't have access to state and props. However, there are some approaches to tackle this, each with their own limitations.

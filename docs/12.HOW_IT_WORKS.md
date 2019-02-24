@@ -1,3 +1,8 @@
+---
+title: How it works
+link: how-it-works
+---
+
 # How it works
 
 Linaria consists of 2 parts:
