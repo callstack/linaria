@@ -1,3 +1,7 @@
+---
+title: Benefits
+---
+
 # Why use Linaria
 
 ## Advantages over regular CSS

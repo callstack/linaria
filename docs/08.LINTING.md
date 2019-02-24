@@ -1,3 +1,7 @@
+---
+title: Linting
+---
+
 # Linting
 
 ## stylelint

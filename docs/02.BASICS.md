@@ -1,3 +1,7 @@
+---
+title: Basics
+---
+
 # Basics
 
 ## Basic syntax
