@@ -37,7 +37,7 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
     // There is this.resolve, but it's asynchronous
     // Another option is to read the webpack.config.js, but it won't work for programmatic usage
     // This API is used by many loaders/plugins, so hope we're safe for a while
-    this._compilation.options.resolve
+    this._compilation && this._compilation.options.resolve
       ? {
           ...resolveOptions,
           alias: this._compilation.options.resolve.alias,
