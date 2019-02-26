@@ -300,6 +300,32 @@ Dependencies: ../slugify, ../slugify
 
 `;
 
+exports[`evalutes items within sequence expression 1`] = `
+"import { styled } from 'linaria/react';
+const color = (external, () => 'blue');
+export const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1xha7dm\\",
+  vars: {
+    \\"t1xha7dm-0\\": [color]
+  }
+});"
+`;
+
+exports[`evalutes items within sequence expression 2`] = `
+
+CSS:
+
+.Title_t1xha7dm {
+  color: var(--t1xha7dm-0);
+}
+
+Dependencies: NA
+
+`;
+
 exports[`handles escapes properly 1`] = `
 "import { styled } from 'linaria/react';
 const selectors = ['a', 'b'];

@@ -31,7 +31,20 @@ const resolve = (path, t, requirements) => {
       case 'const':
       case 'let':
       case 'var': {
-        result = t.variableDeclaration(binding.kind, [binding.path.node]);
+        let decl;
+
+        if (t.isSequenceExpression(binding.path.node.init)) {
+          const { node } = binding.path;
+
+          decl = t.variableDeclarator(
+            node.id,
+            node.init.expressions[node.init.expressions.length - 1]
+          );
+        } else {
+          decl = binding.path.node;
+        }
+
+        result = t.variableDeclaration(binding.kind, [decl]);
         break;
       }
       default:
@@ -74,15 +87,6 @@ module.exports = function evaluate(
       },
     });
   }
-
-  // Replace SequenceExpressions (expr1, expr2, expr3, ...) with the latest one.
-  requirements.forEach(requirement => {
-    requirement.path.traverse({
-      SequenceExpression(p) {
-        p.replaceWith(p.node.expressions[p.node.expressions.length - 1]);
-      },
-    });
-  });
 
   // Collect the list of dependencies that we import
   const dependencies = requirements.reduce((deps, req) => {
