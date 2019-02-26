@@ -131,7 +131,22 @@ it('evaluates multiple expressions with shared dependency', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('evalutes items within sequence expression', async () => {
+it('evalutes interpolations with sequence expression', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    export const Title = styled.h1\`
+      color: ${'${(external, () => "blue")}'};
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('evalutes dependencies with sequence expression', async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';

@@ -300,7 +300,7 @@ Dependencies: ../slugify, ../slugify
 
 `;
 
-exports[`evalutes items within sequence expression 1`] = `
+exports[`evalutes dependencies with sequence expression 1`] = `
 "import { styled } from 'linaria/react';
 const color = (external, () => 'blue');
 export const Title =
@@ -314,7 +314,32 @@ styled(\\"h1\\")({
 });"
 `;
 
-exports[`evalutes items within sequence expression 2`] = `
+exports[`evalutes dependencies with sequence expression 2`] = `
+
+CSS:
+
+.Title_t1xha7dm {
+  color: var(--t1xha7dm-0);
+}
+
+Dependencies: NA
+
+`;
+
+exports[`evalutes interpolations with sequence expression 1`] = `
+"import { styled } from 'linaria/react';
+export const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1xha7dm\\",
+  vars: {
+    \\"t1xha7dm-0\\": [(external, () => \\"blue\\")]
+  }
+});"
+`;
+
+exports[`evalutes interpolations with sequence expression 2`] = `
 
 CSS:
 

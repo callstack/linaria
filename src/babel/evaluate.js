@@ -33,6 +33,7 @@ const resolve = (path, t, requirements) => {
       case 'var': {
         let decl;
 
+        // Replace SequenceExpressions (expr1, expr2, expr3, ...) with the last one
         if (t.isSequenceExpression(binding.path.node.init)) {
           const { node } = binding.path;
 
@@ -76,6 +77,12 @@ module.exports = function evaluate(
   transformer?: (text: string) => { code: string },
   options?: PluginOptions
 ) {
+  if (t.isSequenceExpression(path)) {
+    // We only need to evaluate the last item in a sequence expression, e.g. (a, b, c)
+    // eslint-disable-next-line no-param-reassign
+    path = path.get('expressions')[path.node.expressions.length - 1];
+  }
+
   const requirements = [];
 
   if (t.isIdentifier(path)) {
