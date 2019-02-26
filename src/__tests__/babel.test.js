@@ -108,6 +108,10 @@ it('inlines object styles as CSS string', async () => {
       left: 0,
       opacity: 1,
       minHeight: 420,
+      
+      '&.shouldNotBeChanged': {
+        borderColor: '#fff',
+      },
 
       '@media (min-width: 200px)': {
         WebkitOpacity: .8,

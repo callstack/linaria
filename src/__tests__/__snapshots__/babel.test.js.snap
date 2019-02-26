@@ -200,6 +200,9 @@ const cover = {
   left: 0,
   opacity: 1,
   minHeight: 420,
+  '&.shouldNotBeChanged': {
+    borderColor: '#fff'
+  },
   '@media (min-width: 200px)': {
     WebkitOpacity: .8,
     MozOpacity: .8,
@@ -228,7 +231,7 @@ exports[`inlines object styles as CSS string 2`] = `
 CSS:
 
 .th6xni0 {
-  position: absolute; top: 0; right: 0; bottom: 0; left: 0; opacity: 1; min-height: 420px; @media (min-width: 200px) { -webkit-opacity: 0.8; -moz-opacity: 0.8; -ms-opacity: 0.8; -o-opacity: 0.8; -webkit-border-radius: 2px; -moz-border-radius: 2px; -ms-border-radius: 2px; -o-border-radius: 2px; -webkit-transition: 400ms; -moz-transition: 400ms; -o-transition: 400ms; -ms-transition: 400ms; }
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0; opacity: 1; min-height: 420px; &.shouldNotBeChanged { border-color: #fff; } @media (min-width: 200px) { -webkit-opacity: 0.8; -moz-opacity: 0.8; -ms-opacity: 0.8; -o-opacity: 0.8; -webkit-border-radius: 2px; -moz-border-radius: 2px; -ms-border-radius: 2px; -o-border-radius: 2px; -webkit-transition: 400ms; -moz-transition: 400ms; -o-transition: 400ms; -ms-transition: 400ms; }
 }
 
 Dependencies: NA
