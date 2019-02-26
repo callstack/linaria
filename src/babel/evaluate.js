@@ -75,6 +75,15 @@ module.exports = function evaluate(
     });
   }
 
+  // Replace SequenceExpressions (expr1, expr2, expr3, ...) with the latest one.
+  requirements.forEach(requirement => {
+    requirement.path.traverse({
+      SequenceExpression(p) {
+        p.replaceWith(p.node.expressions[p.node.expressions.length - 1]);
+      },
+    });
+  });
+
   // Collect the list of dependencies that we import
   const dependencies = requirements.reduce((deps, req) => {
     if (t.isImportDeclaration(req.path.parentPath)) {

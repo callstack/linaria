@@ -429,3 +429,28 @@ it("throws if couldn't determine a display name", async () => {
     ).toMatchSnapshot();
   }
 });
+
+it("evaluates and uses last item in variable's sequence expression", async () => {
+  const { code, metadata } = await babel.transformAsync(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    const blue = 'blue';
+    const { color: color1 } = (thisIsUndefined1, { color: 'red' });
+    const color2 = () => (thisIsUndefined1, thisIsUndefined2, blue);
+
+    export const Title = (coverage.e[0]++, styled.h1\`
+      color: ${'${color1}'};
+      backgroundColor: ${'${color2()}'};
+    \`);
+    `,
+    {
+      ...babelrc,
+      filename: path.join(__dirname, 'FancyName/index.js'),
+      // plugins: ['babel-plugin-istanbul'],
+    }
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});

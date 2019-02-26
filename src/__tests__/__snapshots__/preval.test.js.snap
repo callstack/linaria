@@ -44,6 +44,38 @@ Dependencies: NA
 
 `;
 
+exports[`evaluates and uses last item in variable's sequence expression 1`] = `
+"import { styled } from 'linaria/react';
+const blue = 'blue';
+const {
+  color: color1
+} = {
+  color: 'red'
+};
+
+const color2 = () => blue;
+
+export const Title = (coverage.e[0]++,
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1e8u5dq\\"
+}));"
+`;
+
+exports[`evaluates and uses last item in variable's sequence expression 2`] = `
+
+CSS:
+
+.Title_t1e8u5dq {
+  color: red;
+  backgroundColor: blue;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`evaluates component interpolations 1`] = `
 "const {
   styled
