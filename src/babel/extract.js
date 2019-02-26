@@ -32,7 +32,7 @@ const toCSS = o =>
     )
     .map(([key, value]) => {
       if (isPlainObject(value)) {
-        return `${hyphenate(key)} { ${toCSS(value)} }`;
+        return `${key} { ${toCSS(value)} }`;
       }
 
       return `${hyphenate(key)}: ${
