@@ -44,32 +44,75 @@ Dependencies: NA
 
 `;
 
-exports[`evaluates and uses last item in variable's sequence expression 1`] = `
-"import { styled } from 'linaria/react';
-const blue = 'blue';
-const {
-  color: color1
-} = {
-  color: 'red'
-};
+exports[`does not strip instanbul coverage sequences 1`] = `
+"var cov_2dr9r1nt95 = function () {
+  var path = \\"/home/user/project/file.js\\";
+  var hash = \\"23f56bbaeb2ebcd213f41374d3b2af1bce287bd3\\";
 
-const color2 = () => blue;
+  var Function = function () {}.constructor;
 
-export const Title = (coverage.e[0]++,
+  var global = new Function(\\"return this\\")();
+  var gcv = \\"__coverage__\\";
+  var coverageData = {
+    path: \\"/home/user/project/file.js\\",
+    statementMap: {
+      \\"0\\": {
+        start: {
+          line: 3,
+          column: 10
+        },
+        end: {
+          line: 3,
+          column: 12
+        }
+      },
+      \\"1\\": {
+        start: {
+          line: 5,
+          column: 21
+        },
+        end: {
+          line: 7,
+          column: 1
+        }
+      }
+    },
+    fnMap: {},
+    branchMap: {},
+    s: {
+      \\"0\\": 0,
+      \\"1\\": 0
+    },
+    f: {},
+    b: {},
+    _coverageSchema: \\"43e27e138ebf9cfc5966b082cf9a028302ed4184\\"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+
+  if (coverage[path] && coverage[path].hash === hash) {
+    return coverage[path];
+  }
+
+  coverageData.hash = hash;
+  return coverage[path] = coverageData;
+}();
+
+import { styled } from 'linaria/react';
+const a = (cov_2dr9r1nt95.s[0]++, 42);
+export const Title = (cov_2dr9r1nt95.s[1]++,
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"Title_t1e8u5dq\\"
+  class: \\"Title_tow9xsn\\"
 }));"
 `;
 
-exports[`evaluates and uses last item in variable's sequence expression 2`] = `
+exports[`does not strip instanbul coverage sequences 2`] = `
 
 CSS:
 
-.Title_t1e8u5dq {
-  color: red;
-  backgroundColor: blue;
+.Title_tow9xsn {
+  height: 42px;
 }
 
 Dependencies: NA

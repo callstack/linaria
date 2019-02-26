@@ -430,24 +430,28 @@ it("throws if couldn't determine a display name", async () => {
   }
 });
 
-it("evaluates and uses last item in variable's sequence expression", async () => {
+it('does not strip instanbul coverage sequences', async () => {
   const { code, metadata } = await babel.transformAsync(
     dedent`
     import { styled } from 'linaria/react';
 
-    const blue = 'blue';
-    const { color: color1 } = (thisIsUndefined1, { color: 'red' });
-    const color2 = () => (thisIsUndefined1, thisIsUndefined2, blue);
+    const a = 42;
 
-    export const Title = (coverage.e[0]++, styled.h1\`
-      color: ${'${color1}'};
-      backgroundColor: ${'${color2()}'};
-    \`);
+    export const Title = styled.h1\`
+      height: ${'${a}'}px;
+    \`;
     `,
     {
       ...babelrc,
-      filename: path.join(__dirname, 'FancyName/index.js'),
-      // plugins: ['babel-plugin-istanbul'],
+      cwd: '/home/user/project',
+      filename: 'file.js',
+      plugins: [
+        [
+          // eslint-disable-next-line import/no-extraneous-dependencies
+          require('babel-plugin-istanbul').default({ types: babel.types }),
+          { cwd: '/home/user/project' },
+        ],
+      ],
     }
   );
 
