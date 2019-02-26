@@ -1,3 +1,6 @@
+/* @flow */
+/* eslint-disable no-template-curly-in-string */
+
 import dedent from 'dedent';
 
 const transform = require('../transform');
@@ -60,6 +63,8 @@ it("doesn't rewrite an absolute path in url() declarations", async () => {
 });
 
 it('respects passed babel options', async () => {
+  expect.assertions(2);
+
   expect(() =>
     transform(
       dedent`
@@ -107,4 +112,38 @@ it('respects passed babel options', async () => {
       }
     )
   ).not.toThrowError('Unexpected token');
+});
+
+it("doesn't throw due to duplicate preset", async () => {
+  expect.assertions(1);
+
+  expect(() =>
+    transform(
+      dedent`
+      import { styled } from 'linaria/react';
+
+      const Title = styled.h1\` color: blue; \`;
+
+      const Article = styled.article\`
+        ${'${Title}'} {
+          font-size: 16px;
+        }
+      \`;
+      `,
+      {
+        filename: './test.js',
+        outputFilename: '../.linaria-cache/test.css',
+        pluginOptions: {
+          babelOptions: {
+            babelrc: false,
+            configFile: false,
+            presets: [require.resolve('../babel')],
+            plugins: [
+              require.resolve('@babel/plugin-transform-modules-commonjs'),
+            ],
+          },
+        },
+      }
+    )
+  ).not.toThrowError('Duplicate plugin/preset detected');
 });
