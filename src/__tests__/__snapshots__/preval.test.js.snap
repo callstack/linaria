@@ -211,6 +211,39 @@ Dependencies: ../slugify
 
 `;
 
+exports[`evaluates functions with nested identifiers 1`] = `
+"import { styled } from 'linaria/react';
+const objects = {
+  key: {
+    fontSize: 12
+  }
+};
+
+const foo = k => {
+  const obj = objects[k];
+  return obj;
+};
+
+export const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1xha7dm\\"
+});"
+`;
+
+exports[`evaluates functions with nested identifiers 2`] = `
+
+CSS:
+
+.Title_t1xha7dm {
+  font-size: 12px;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`evaluates identifier in scope 1`] = `
 "import { styled } from 'linaria/react';
 const answer = 42;

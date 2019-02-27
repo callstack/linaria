@@ -6,6 +6,18 @@ const generator = require('@babel/generator').default;
 const babel = require('@babel/core');
 const Module = require('./module');
 
+const isAdded = (requirements, path) => {
+  if (requirements.some(req => req.path === path)) {
+    return true;
+  }
+
+  if (path.parentPath) {
+    return isAdded(requirements, path.parentPath);
+  }
+
+  return false;
+};
+
 const resolve = (path, t, requirements) => {
   const binding = path.scope.getBinding(path.node.name);
 
@@ -13,7 +25,7 @@ const resolve = (path, t, requirements) => {
     path.isReferenced() &&
     binding &&
     binding.kind !== 'param' &&
-    !requirements.some(req => req.path === binding.path)
+    !isAdded(requirements, binding.path)
   ) {
     let result;
 

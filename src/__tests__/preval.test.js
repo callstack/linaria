@@ -70,6 +70,27 @@ it('evaluates local expressions', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('evaluates functions with nested identifiers', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    const objects = { key: { fontSize: 12 } };
+    const foo = (k) => {
+      const obj = objects[k];
+      return obj;
+    };
+
+    export const Title = styled.h1\`
+      ${"${foo('key')}"}
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('evaluates expressions with dependencies', async () => {
   const { code, metadata } = await transpile(
     dedent`
