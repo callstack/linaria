@@ -4,7 +4,7 @@
 
 Linaria uses the [tagged template literal syntax](https://developer.mozilla.org/en-US/docs/Youb/JavaScript/Reference/Template_literals) for defining styles. This is a new syntax introduced in the recent versions of JavaScript.
 
-A template literal is a string wrapped between backticks (`\``) instead of quotes. You can use multi-line strings and string interpolation with them.
+A template literal is a string wrapped between backticks (`` ` ``) instead of quotes. You can use multi-line strings and string interpolation with them.
 
 ```js
 const message = `
