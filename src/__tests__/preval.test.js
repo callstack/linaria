@@ -131,6 +131,38 @@ it('evaluates multiple expressions with shared dependency', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('evalutes interpolations with sequence expression', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    export const Title = styled.h1\`
+      color: ${'${(external, () => "blue")}'};
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('evalutes dependencies with sequence expression', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    const color = (external, () => 'blue');
+
+    export const Title = styled.h1\`
+      color: ${'${color}'};
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('evaluates component interpolations', async () => {
   const { code, metadata } = await transpile(
     dedent`
@@ -428,4 +460,33 @@ it("throws if couldn't determine a display name", async () => {
       stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
     ).toMatchSnapshot();
   }
+});
+
+it('does not strip instanbul coverage sequences', async () => {
+  const { code, metadata } = await babel.transformAsync(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    const a = 42;
+
+    export const Title = styled.h1\`
+      height: ${'${a}'}px;
+    \`;
+    `,
+    {
+      ...babelrc,
+      cwd: '/home/user/project',
+      filename: 'file.js',
+      plugins: [
+        [
+          // eslint-disable-next-line import/no-extraneous-dependencies
+          require('babel-plugin-istanbul').default({ types: babel.types }),
+          { cwd: '/home/user/project' },
+        ],
+      ],
+    }
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
