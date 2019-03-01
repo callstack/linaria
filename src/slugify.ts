@@ -2,7 +2,6 @@
 
 /**
  * murmurhash2 via https://gist.github.com/raycmorgan/588423
- * @flow
  */
 
 function doHash(str: string, seed: number = 0) {
@@ -51,7 +50,7 @@ function doHash(str: string, seed: number = 0) {
   return h >>> 0;
 }
 
-function UInt32(str, pos) {
+function UInt32(str: string, pos: number) {
   return (
     str.charCodeAt(pos++) +
     (str.charCodeAt(pos++) << 8) +
@@ -60,11 +59,11 @@ function UInt32(str, pos) {
   );
 }
 
-function UInt16(str, pos) {
+function UInt16(str: string, pos: number) {
   return str.charCodeAt(pos++) + (str.charCodeAt(pos++) << 8);
 }
 
-function Umul32(n, m) {
+function Umul32(n: number, m: number) {
   n |= 0;
   m |= 0;
   const nlo = n & 0xffff;
@@ -77,4 +76,4 @@ function slugify(code: string) {
   return doHash(code).toString(36);
 }
 
-module.exports = slugify;
+export default slugify;

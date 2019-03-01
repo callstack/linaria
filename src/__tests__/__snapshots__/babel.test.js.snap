@@ -413,6 +413,9 @@ Dependencies: NA
 
 exports[`transpiles styled template literal with function and component 1`] = `
 "import { styled } from 'linaria/react';
+
+const Heading = () => null;
+
 export const Title =
 /*#__PURE__*/
 styled(Heading)({

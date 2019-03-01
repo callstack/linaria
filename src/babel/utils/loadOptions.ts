@@ -1,18 +1,15 @@
-/* @flow */
-
 import cosmiconfig from 'cosmiconfig';
-import type { StrictOptions } from '../types';
+import { StrictOptions } from '../types';
 
-export type PluginOptions = $Shape<{
-  ...StrictOptions,
-  configFile: string,
-}>;
+export type PluginOptions = StrictOptions & {
+  configFile: string;
+};
 
 const explorer = cosmiconfig('linaria');
 
 export default function loadOptions(
-  overrides?: PluginOptions = {}
-): StrictOptions {
+  overrides: Partial<PluginOptions> = {}
+): Partial<StrictOptions> {
   const { configFile, ...rest } = overrides;
 
   const result =
@@ -20,13 +17,11 @@ export default function loadOptions(
       ? explorer.loadSync(configFile)
       : explorer.searchSync();
 
-  const options = {
+  return {
     displayName: false,
     evaluate: true,
     ignore: /node_modules/,
     ...(result ? result.config : null),
     ...rest,
   };
-
-  return options;
 }

@@ -1,5 +1,3 @@
-/* @flow */
-
 import { dirname } from 'path';
 
 // Verify if the binding is imported from the specified source
@@ -9,7 +7,7 @@ export default function hasImport(
   filename: string,
   identifier: string,
   source: string
-) {
+): boolean {
   const binding = scope.getAllBindings()[identifier];
 
   if (!binding) {
@@ -18,8 +16,7 @@ export default function hasImport(
 
   const p = binding.path;
 
-  const resolveFromFile = id => {
-    /* $FlowFixMe */
+  const resolveFromFile = (id: string) => {
     const M = require('module');
 
     try {
@@ -33,7 +30,7 @@ export default function hasImport(
     }
   };
 
-  const isImportingModule = value =>
+  const isImportingModule = (value: string) =>
     // If the value is an exact match, assume it imports the module
     value === source ||
     // Otherwise try to resolve both and check if they are the same file
