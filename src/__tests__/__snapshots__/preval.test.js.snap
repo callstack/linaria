@@ -407,7 +407,7 @@ CSS:
    ;
 }
 
-Dependencies: NA
+Dependencies: core-js/modules/es6.string.raw
 
 `;
 
