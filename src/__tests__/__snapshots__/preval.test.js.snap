@@ -532,6 +532,38 @@ Dependencies: NA
 
 `;
 
+exports[`inlines array styles as CSS string 1`] = `
+"import { styled } from 'linaria/react';
+
+const fill = (top = 0, left = 0, right = 0, bottom = 0) => [{
+  position: 'absolute'
+}, {
+  top,
+  right,
+  bottom,
+  left
+}];
+
+export const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1xha7dm\\"
+});"
+`;
+
+exports[`inlines array styles as CSS string 2`] = `
+
+CSS:
+
+.Title_t1xha7dm {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`inlines object styles as CSS string 1`] = `
 "import { styled } from 'linaria/react';
 
@@ -592,15 +624,6 @@ exports[`throws when interpolation evaluates to NaN 1`] = `
   5 | export const Title = styled.h1\`
 > 6 |   height: \${height}px;
     |             ^
-  7 | \`;"
-`;
-
-exports[`throws when interpolation evaluates to an array 1`] = `
-"<<DIRNAME>>/source.js: The expression evaluated to '[\\"2px\\",\\"0\\",\\"2px\\"]', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(borderRadius)'.
-  4 | 
-  5 | export const Title = styled.h1\`
-> 6 |   border-radius: \${borderRadius}px;
-    |                    ^
   7 | \`;"
 `;
 
