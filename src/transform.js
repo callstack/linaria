@@ -36,7 +36,7 @@ type Options = {
   preprocessor?: Preprocessor,
   outputFilename?: string,
   inputSourceMap?: Object,
-  pluginOptions?: $Shape<PluginOptions>,
+  pluginOptions?: $Shape<{ ...PluginOptions, configFile?: string }>,
 };
 
 export type Preprocessor =

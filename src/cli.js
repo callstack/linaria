@@ -10,6 +10,12 @@ const transform = require('./transform');
 
 const { argv } = yargs
   .usage('Usage: $0 [options] <files ...>')
+  .option('config', {
+    alias: 'c',
+    type: 'string',
+    description: 'Path to a config file',
+    requiresArg: true,
+  })
   .option('out-dir', {
     alias: 'o',
     type: 'string',
@@ -46,6 +52,7 @@ processFiles(argv._, {
   sourceMaps: argv['source-maps'],
   sourceRoot: argv['source-root'],
   insertCssRequires: argv['insert-css-requires'],
+  configFile: argv.config,
 });
 
 type Options = {
@@ -53,6 +60,7 @@ type Options = {
   sourceMaps?: boolean,
   sourceRoot?: string,
   insertCssRequires?: string,
+  configFile?: string,
 };
 
 function processFiles(files: string[], options: Options) {
@@ -71,7 +79,9 @@ function processFiles(files: string[], options: Options) {
       {
         filename,
         outputFilename,
-        pluginOptions: {},
+        pluginOptions: {
+          configFile: options.configFile,
+        },
       }
     );
 
