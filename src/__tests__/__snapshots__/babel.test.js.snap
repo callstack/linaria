@@ -190,6 +190,34 @@ Dependencies: NA
 
 `;
 
+exports[`inlines array styles as CSS string 1`] = `
+"import { styled } from 'linaria/react';
+const styles = [{
+  flex: 1
+}, {
+  display: 'block',
+  height: 24
+}];
+export const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"th6xni0\\"
+});"
+`;
+
+exports[`inlines array styles as CSS string 2`] = `
+
+CSS:
+
+.th6xni0 {
+  flex: 1; display: block; height: 24px;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`inlines object styles as CSS string 1`] = `
 "import { styled } from 'linaria/react';
 const cover = {

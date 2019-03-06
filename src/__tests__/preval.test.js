@@ -271,28 +271,6 @@ it('throws when interpolation evaluates to NaN', async () => {
   }
 });
 
-it('throws when interpolation evaluates to an array', async () => {
-  expect.assertions(1);
-
-  try {
-    await transpile(
-      dedent`
-      const { styled } = require('../react');
-
-      const borderRadius = ['2px', '0', '2px'];
-
-      export const Title = styled.h1\`
-        border-radius: ${'${borderRadius}'}px;
-      \`;
-      `
-    );
-  } catch (e) {
-    expect(
-      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
-    ).toMatchSnapshot();
-  }
-});
-
 it('handles wrapping another styled component', async () => {
   const { code, metadata } = await transpile(
     dedent`
@@ -325,6 +303,31 @@ it('inlines object styles as CSS string', async () => {
       bottom,
       left,
     });
+
+    export const Title = styled.h1\`
+      ${'${fill(0, 0)}'}
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('inlines array styles as CSS string', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    const fill = (top = 0, left = 0, right = 0, bottom = 0) => [
+      { position: 'absolute' },
+      {
+        top,
+        right,
+        bottom,
+        left,
+      }
+    ];
 
     export const Title = styled.h1\`
       ${'${fill(0, 0)}'}
