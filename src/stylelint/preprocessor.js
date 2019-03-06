@@ -1,13 +1,43 @@
 /* @flow */
 
+import type { Replacement } from '../transform';
+
+const stripAnsi = require('strip-ansi');
 const transform = require('../transform');
 
+type Errors = {
+  [key: string]: ?{
+    name?: string,
+    code?: string,
+    message: string,
+    pos?: number,
+    loc?: {
+      line: number,
+      column: number,
+    },
+  },
+};
+
+type Cache = {
+  [key: string]: ?(Replacement[]),
+};
+
+type Warning = {
+  rule?: string,
+  text: string,
+  severity: 'error' | 'warning',
+  line: number,
+  column: number,
+};
+
 type LintResult = {
-  warnings: { line: number, column: number }[],
+  errored: boolean,
+  warnings: Warning[],
 };
 
 function preprocessor() {
-  const cache = {};
+  const errors: Errors = {};
+  const cache: Cache = {};
 
   return {
     code(input: string, filename: string) {
@@ -17,8 +47,15 @@ function preprocessor() {
         result = transform(input, {
           filename,
         });
+
+        cache[filename] = undefined;
+        errors[filename] = undefined;
       } catch (e) {
-        // Ignore parse errors
+        cache[filename] = undefined;
+        errors[filename] = e;
+
+        // Ignore parse errors here
+        // We handle it separately
         return '';
       }
 
@@ -62,7 +99,55 @@ function preprocessor() {
       return cssText;
     },
     result(result: LintResult, filename: string) {
+      const error = errors[filename];
       const replacements = cache[filename];
+
+      if (error) {
+        // Babel adds this to the error message
+        const prefix = `${filename}: `;
+
+        let message = stripAnsi(
+          error.message.startsWith(prefix)
+            ? error.message.replace(prefix, '')
+            : error.message
+        );
+
+        let { loc } = error;
+
+        if (!loc) {
+          // If the error doesn't have location info, try to find it from the code frame
+          const line = message.split('\n').find(l => l.startsWith('>'));
+          const column = message.split('\n').find(l => l.includes('^'));
+
+          if (line && column) {
+            loc = {
+              line: Number(
+                line
+                  .replace(/^> /, '')
+                  .split('|')[0]
+                  .trim()
+              ),
+              column: column.replace(/[^|]+\|\s/, '').length,
+            };
+          }
+        }
+
+        if (loc) {
+          // Strip the codeframe text if we have location of the error
+          // It's formatted badly by stylelint, so not very helpful
+          message = message.replace(/^>?\s+\d?\s\|.*$/gm, '').trim();
+        }
+
+        // eslint-disable-next-line no-param-reassign
+        result.errored = true;
+        result.warnings.push({
+          rule: error.code || error.name,
+          text: message,
+          line: loc ? loc.line : 0,
+          column: loc ? loc.column : 0,
+          severity: 'error',
+        });
+      }
 
       if (replacements) {
         replacements.forEach(({ original, length }) => {

@@ -7,6 +7,11 @@ const babel = require('@babel/core');
 const stylis = require('stylis');
 const { SourceMapGenerator } = require('source-map');
 
+export type Replacement = {
+  original: { start: Location, end: Location },
+  length: number,
+};
+
 type Location = {
   line: number,
   column: number,
@@ -25,10 +30,7 @@ type Result = {
       start: ?Location,
     },
   },
-  replacements?: Array<{
-    original: { start: Location, end: Location },
-    length: number,
-  }>,
+  replacements?: Replacement[],
 };
 
 type Options = {

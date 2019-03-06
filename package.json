@@ -74,8 +74,7 @@
     "prettier": "^1.16.4",
     "react": "^16.8.3",
     "react-test-renderer": "^16.8.3",
-    "release-it": "^10.1.0",
-    "strip-ansi": "^5.0.0"
+    "release-it": "^10.1.0"
   },
   "dependencies": {
     "@babel/core": "^7.3.3",
@@ -93,6 +92,7 @@
     "mkdirp": "^0.5.1",
     "normalize-path": "^3.0.0",
     "postcss": "^7.0.14",
+    "strip-ansi": "^5.0.0",
     "react-is": "^16.8.3",
     "rollup-pluginutils": "^2.4.1",
     "source-map": "^0.7.3",
