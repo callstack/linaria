@@ -81,6 +81,8 @@ class Module {
 
   extensions: string[];
 
+  dependencies: ?(string[]);
+
   transform: ?(text: string) => { code: string };
 
   constructor(filename: string) {
@@ -158,6 +160,8 @@ class Module {
         `Unable to import "${id}". Importing Node builtins is not supported in the sandbox.`
       );
     }
+
+    this.dependencies && this.dependencies.push(id);
 
     let m = cache[filename];
 

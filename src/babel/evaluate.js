@@ -6,6 +6,18 @@ const generator = require('@babel/generator').default;
 const babel = require('@babel/core');
 const Module = require('./module');
 
+const isAdded = (requirements, path) => {
+  if (requirements.some(req => req.path === path)) {
+    return true;
+  }
+
+  if (path.parentPath) {
+    return isAdded(requirements, path.parentPath);
+  }
+
+  return false;
+};
+
 const resolve = (path, t, requirements) => {
   const binding = path.scope.getBinding(path.node.name);
 
@@ -13,7 +25,7 @@ const resolve = (path, t, requirements) => {
     path.isReferenced() &&
     binding &&
     binding.kind !== 'param' &&
-    !requirements.some(req => req.path === binding.path)
+    !isAdded(requirements, binding.path)
   ) {
     let result;
 
@@ -95,41 +107,6 @@ module.exports = function evaluate(
     });
   }
 
-  // Collect the list of dependencies that we import
-  const dependencies = requirements.reduce((deps, req) => {
-    if (t.isImportDeclaration(req.path.parentPath)) {
-      deps.push(req.path.parentPath.node.source.value);
-    } else {
-      req.path.traverse({
-        CallExpression(p) {
-          const { callee, arguments: args } = p.node;
-
-          let name;
-
-          if (callee.name === 'require' && args.length === 1) {
-            if (
-              args[0].type === 'Literal' ||
-              args[0].type === 'StringLiteral'
-            ) {
-              name = args[0].value;
-            } else if (
-              args[0].type === 'TemplateLiteral' &&
-              args[0].quasis.length === 1
-            ) {
-              name = args[0].quasis[0].value.cooked;
-            }
-          }
-
-          if (name) {
-            deps.push(name);
-          }
-        },
-      });
-    }
-
-    return deps;
-  }, []);
-
   const expression = t.expressionStatement(
     t.assignmentExpression(
       '=',
@@ -170,6 +147,7 @@ module.exports = function evaluate(
 
   const m = new Module(filename);
 
+  m.dependencies = [];
   m.transform =
     typeof transformer !== 'undefined'
       ? transformer
@@ -266,6 +244,6 @@ module.exports = function evaluate(
 
   return {
     value: m.exports,
-    dependencies,
+    dependencies: ((m.dependencies: any): string[]),
   };
 };

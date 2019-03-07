@@ -108,7 +108,7 @@ it('inlines object styles as CSS string', async () => {
       left: 0,
       opacity: 1,
       minHeight: 420,
-      
+
       '&.shouldNotBeChanged': {
         borderColor: '#fff',
       },
@@ -131,6 +131,26 @@ it('inlines object styles as CSS string', async () => {
 
     export const Title = styled.h1\`
       ${'${cover}'}
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('inlines array styles as CSS string', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    const styles = [
+      { flex: 1 },
+      { display: 'block', height: 24 },
+    ];
+
+    export const Title = styled.h1\`
+      ${'${styles}'}
     \`;
     `
   );

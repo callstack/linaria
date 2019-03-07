@@ -16,22 +16,27 @@ const hyphenate = s =>
     // Special case for `-ms` because in JS it starts with `ms` unlike `Webkit`
     .replace(/^ms-/, '-ms-');
 
-const isPlainObject = o =>
-  typeof o === 'object' && o != null && o.constructor.name === 'Object';
+const isSerializable = o =>
+  Array.isArray(o) ||
+  (typeof o === 'object' && o != null && o.constructor.name === 'Object');
 
 const toValidCSSIdentifier = s => s.replace(/[^_0-9a-z]/gi, '_');
 
 // Some tools such as polished.js output JS objects
 // To support them transparently, we convert JS objects to CSS strings
-const toCSS = o =>
-  Object.entries(o)
+const toCSS = o => {
+  if (Array.isArray(o)) {
+    return o.map(toCSS).join('\n');
+  }
+
+  return Object.entries(o)
     .filter(
       ([, value]) =>
         // Ignore all falsy values except numbers
         typeof value === 'number' || value
     )
     .map(([key, value]) => {
-      if (isPlainObject(value)) {
+      if (isSerializable(value)) {
         return `${key} { ${toCSS(value)} }`;
       }
 
@@ -51,6 +56,7 @@ const toCSS = o =>
       };`;
     })
     .join(' ');
+};
 
 // Stripping away the new lines ensures that we preserve line numbers
 // This is useful in case of tools such as the stylelint pre-processor
@@ -140,7 +146,7 @@ const throwIfInvalid = (value: any, ex: any) => {
     typeof value === 'function' ||
     typeof value === 'string' ||
     (typeof value === 'number' && Number.isFinite(value)) ||
-    isPlainObject(value)
+    isSerializable(value)
   ) {
     return;
   }
@@ -400,7 +406,7 @@ module.exports = function extract(babel: any, options: Options) {
             if (result.confident) {
               throwIfInvalid(result.value, ex);
 
-              if (isPlainObject(result.value)) {
+              if (isSerializable(result.value)) {
                 // If it's a plain object, convert it to a CSS string
                 cssText += stripLines(loc, toCSS(result.value));
               } else {
@@ -447,7 +453,7 @@ module.exports = function extract(babel: any, options: Options) {
                     // If it's an React component wrapped in styled, get the class name
                     // Useful for interpolating components
                     cssText += `.${value.__linaria.className}`;
-                  } else if (isPlainObject(value)) {
+                  } else if (isSerializable(value)) {
                     cssText += stripLines(loc, toCSS(value));
                   } else {
                     // For anything else, assume it'll be stringified
