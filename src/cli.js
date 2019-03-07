@@ -66,6 +66,11 @@ type Options = {
 function processFiles(files: string[], options: Options) {
   let count = 0;
 
+  const configFileOptions = options.configFile
+    ? // $FlowFixMe
+      require(options.configFile)
+    : {};
+
   const resolvedFiles = files.reduce(
     (acc, pattern) => [...acc, ...glob.sync(pattern, { absolute: true })],
     []
@@ -79,9 +84,7 @@ function processFiles(files: string[], options: Options) {
       {
         filename,
         outputFilename,
-        pluginOptions: {
-          configFile: options.configFile,
-        },
+        pluginOptions: configFileOptions,
       }
     );
 
