@@ -4,6 +4,7 @@ import type { Options as PluginOptions } from './babel/extract';
 
 const path = require('path');
 const babel = require('@babel/core');
+const cosmiconfig = require('cosmiconfig');
 const stylis = require('stylis');
 const { SourceMapGenerator } = require('source-map');
 
@@ -33,12 +34,17 @@ type Result = {
   replacements?: Replacement[],
 };
 
+type PluginOptionsWithConfigFile = $Shape<{
+  ...PluginOptions,
+  configFile?: string,
+}>;
+
 type Options = {
   filename: string,
   preprocessor?: Preprocessor,
   outputFilename?: string,
   inputSourceMap?: Object,
-  pluginOptions?: $Shape<{ ...PluginOptions, configFile?: string }>,
+  pluginOptions?: PluginOptionsWithConfigFile,
 };
 
 export type Preprocessor =
@@ -59,10 +65,12 @@ module.exports = function transform(code: string, options: Options): Result {
     };
   }
 
+  const pluginOptions = getProcessedPluginOptions(options);
+
   // Parse the code first so babel uses user's babel config for parsing
   // We don't want to use user's config when transforming the code
   const ast = babel.parseSync(code, {
-    ...(options.pluginOptions ? options.pluginOptions.babelOptions : null),
+    ...(pluginOptions ? pluginOptions.babelOptions : null),
     filename: options.filename,
     caller: { name: 'linaria' },
   });
@@ -72,7 +80,7 @@ module.exports = function transform(code: string, options: Options): Result {
     code,
     {
       filename: options.filename,
-      presets: [[require.resolve('./babel'), options.pluginOptions]],
+      presets: [[require.resolve('./babel'), pluginOptions]],
       babelrc: false,
       configFile: false,
       sourceMaps: true,
@@ -174,3 +182,28 @@ module.exports = function transform(code: string, options: Options): Result {
     },
   };
 };
+
+function getProcessedPluginOptions(options: Options): PluginOptions | void {
+  if (!options.pluginOptions) {
+    return undefined;
+  }
+
+  const explorer = cosmiconfig('linaria');
+
+  const {
+    configFile,
+    ...rest
+  } = ((options.pluginOptions: any): PluginOptionsWithConfigFile);
+
+  const configuration =
+    configFile !== undefined
+      ? explorer.loadSync(configFile)
+      : explorer.searchSync();
+
+  const pluginOptions = {
+    ...(configuration ? configuration.config : null),
+    ...rest,
+  };
+
+  return pluginOptions;
+}
