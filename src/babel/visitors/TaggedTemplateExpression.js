@@ -13,7 +13,7 @@ import stripLines from '../utils/stripLines';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
 import toCSS from '../utils/toCSS';
 import hasImport from '../utils/hasImport';
-import type { Options, State } from '../types';
+import type { StrictOptions, State } from '../types';
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
@@ -22,7 +22,7 @@ export default function TaggedTemplateExpression(
   path: any,
   state: State,
   t: any,
-  options: Options
+  options: StrictOptions
 ) {
   const { quasi, tag } = path.node;
 

@@ -3,9 +3,9 @@
 
 import Module from './module';
 import TaggedTemplateExpression from './visitors/TaggedTemplateExpression';
-import type { Options, State } from './types';
+import type { StrictOptions, State } from './types';
 
-module.exports = function extract(babel: any, options: Options) {
+module.exports = function extract(babel: any, options: StrictOptions) {
   const { types: t } = babel;
 
   return {

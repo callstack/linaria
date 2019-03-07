@@ -1,26 +1,9 @@
-const cosmiconfig = require('cosmiconfig');
+/* @flow */
 
-const explorer = cosmiconfig('linaria');
+import loadOptions, { type PluginOptions } from './utils/loadOptions';
 
-module.exports = function linaria(context, options) {
-  const { configFile, ...rest } = options;
-  // Load configuration file
-  const result =
-    configFile !== undefined
-      ? explorer.loadSync(configFile)
-      : explorer.searchSync();
-
-  // Set some defaults for options
-  // eslint-disable-next-line no-param-reassign
-  options = {
-    displayName: false,
-    evaluate: true,
-    ignore: /node_modules/,
-    ...(result ? result.config : null),
-    ...rest,
-  };
-
+module.exports = function linaria(context: any, options: PluginOptions) {
   return {
-    plugins: [[require('./extract'), options]],
+    plugins: [[require('./extract'), loadOptions(options)]],
   };
 };

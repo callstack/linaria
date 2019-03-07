@@ -1,11 +1,10 @@
 /* @flow */
 
-import type { Options as PluginOptions } from './babel/types';
-
-const path = require('path');
-const babel = require('@babel/core');
-const stylis = require('stylis');
-const { SourceMapGenerator } = require('source-map');
+import path from 'path';
+import * as babel from '@babel/core';
+import stylis from 'stylis';
+import { SourceMapGenerator } from 'source-map';
+import loadOptions, { type PluginOptions } from './babel/utils/loadOptions';
 
 export type Replacement = {
   original: { start: Location, end: Location },
@@ -38,7 +37,7 @@ type Options = {
   preprocessor?: Preprocessor,
   outputFilename?: string,
   inputSourceMap?: Object,
-  pluginOptions?: $Shape<{ ...PluginOptions, configFile?: string }>,
+  pluginOptions?: PluginOptions,
 };
 
 export type Preprocessor =
@@ -59,10 +58,12 @@ module.exports = function transform(code: string, options: Options): Result {
     };
   }
 
+  const pluginOptions = loadOptions(options.pluginOptions);
+
   // Parse the code first so babel uses user's babel config for parsing
   // We don't want to use user's config when transforming the code
   const ast = babel.parseSync(code, {
-    ...(options.pluginOptions ? options.pluginOptions.babelOptions : null),
+    ...(pluginOptions ? pluginOptions.babelOptions : null),
     filename: options.filename,
     caller: { name: 'linaria' },
   });
@@ -72,7 +73,7 @@ module.exports = function transform(code: string, options: Options): Result {
     code,
     {
       filename: options.filename,
-      presets: [[require.resolve('./babel'), options.pluginOptions]],
+      presets: [[require.resolve('./babel'), pluginOptions]],
       babelrc: false,
       configFile: false,
       sourceMaps: true,

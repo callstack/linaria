@@ -25,12 +25,12 @@ export type State = {|
   },
 |};
 
-export type Options = {
+export type StrictOptions = {|
   displayName: boolean,
   evaluate: boolean,
   ignore: RegExp,
   babelOptions: Object,
-};
+|};
 
 export type Location = {
   line: number,
