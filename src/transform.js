@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Options as PluginOptions } from './babel/extract';
+import type { Options as PluginOptions } from './babel/types';
 
 const path = require('path');
 const babel = require('@babel/core');
