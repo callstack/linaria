@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Options as PluginOptions } from './babel/extract';
+import type { Options as PluginOptions } from './babel/types';
 import type { Preprocessor } from './transform';
 
 const { createFilter } = require('rollup-pluginutils');

@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Options as PluginOptions } from './extract';
+import type { Options as PluginOptions } from './types';
 
 const generator = require('@babel/generator').default;
 const babel = require('@babel/core');
