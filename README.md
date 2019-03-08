@@ -129,7 +129,7 @@ See [Basics](/docs/BASICS.md) for a detailed information about the syntax.
 
 ## Demo
 
-[![Edit Linaria Demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/2x93v25p3j)
+[![Edit Linaria Demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/2x93v25p3j) [![Greenkeeper badge](https://badges.greenkeeper.io/callstack/linaria.svg)](https://greenkeeper.io/)
 
 ## Documentation
 
