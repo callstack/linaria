@@ -1,5 +1,6 @@
-import { dirname } from 'path';
-import Module from '../module';
+import { dirname } from "path";
+
+import Module from "../module";
 
 // Verify if the binding is imported from the specified source
 export default function hasImport(
@@ -22,7 +23,7 @@ export default function hasImport(
       return Module._resolveFilename(id, {
         id: filename,
         filename,
-        paths: Module._nodeModulePaths(dirname(filename)),
+        paths: Module._nodeModulePaths(dirname(filename))
       });
     } catch (e) {
       return null;
@@ -35,10 +36,10 @@ export default function hasImport(
     // Otherwise try to resolve both and check if they are the same file
     resolveFromFile(value) ===
       // eslint-disable-next-line no-nested-ternary
-      (source === 'linaria'
-        ? require.resolve('../../index')
-        : source === 'linaria/react'
-        ? require.resolve('../../react/')
+      (source === "linaria"
+        ? require.resolve("../../index")
+        : source === "linaria/react"
+        ? require.resolve("../../react/")
         : resolveFromFile(source));
 
   if (t.isImportSpecifier(p) && t.isImportDeclaration(p.parentPath)) {
@@ -49,7 +50,7 @@ export default function hasImport(
     if (
       t.isCallExpression(p.node.init) &&
       t.isIdentifier(p.node.init.callee) &&
-      p.node.init.callee.name === 'require' &&
+      p.node.init.callee.name === "require" &&
       p.node.init.arguments.length === 1
     ) {
       const node = p.node.init.arguments[0];

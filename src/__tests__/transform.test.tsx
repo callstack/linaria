@@ -1,10 +1,10 @@
 /* eslint-disable no-template-curly-in-string */
 
-import dedent from 'dedent';
+import dedent from "dedent";
 
-const transform = require('../transform');
+const transform = require("../transform");
 
-it('rewrites a relative path in url() declarations', async () => {
+it("rewrites a relative path in url() declarations", async () => {
   const { cssText } = await transform(
     dedent`
     import { css } from 'linaria';
@@ -14,15 +14,15 @@ it('rewrites a relative path in url() declarations', async () => {
     \`;
     `,
     {
-      filename: './test.js',
-      outputFilename: '../.linaria-cache/test.css',
+      filename: "./test.js",
+      outputFilename: "../.linaria-cache/test.css"
     }
   );
 
   expect(cssText).toMatchSnapshot();
 });
 
-it('rewrites multiple relative paths in url() declarations', async () => {
+it("rewrites multiple relative paths in url() declarations", async () => {
   const { cssText } = await transform(
     dedent`
     import { css } from 'linaria';
@@ -35,8 +35,8 @@ it('rewrites multiple relative paths in url() declarations', async () => {
     \`;
     `,
     {
-      filename: './test.js',
-      outputFilename: '../.linaria-cache/test.css',
+      filename: "./test.js",
+      outputFilename: "../.linaria-cache/test.css"
     }
   );
 
@@ -53,15 +53,15 @@ it("doesn't rewrite an absolute path in url() declarations", async () => {
     \`;
     `,
     {
-      filename: './test.js',
-      outputFilename: '../.linaria-cache/test.css',
+      filename: "./test.js",
+      outputFilename: "../.linaria-cache/test.css"
     }
   );
 
   expect(cssText).toMatchSnapshot();
 });
 
-it('respects passed babel options', async () => {
+it("respects passed babel options", async () => {
   expect.assertions(2);
 
   expect(() =>
@@ -72,18 +72,18 @@ it('respects passed babel options', async () => {
       export const error = <jsx />;
       `,
       {
-        filename: './test.js',
-        outputFilename: '../.linaria-cache/test.css',
+        filename: "./test.js",
+        outputFilename: "../.linaria-cache/test.css",
         pluginOptions: {
           babelOptions: {
             babelrc: false,
             configFile: false,
-            presets: [['@babel/preset-env', { loose: true }]],
-          },
-        },
+            presets: [["@babel/preset-env", { loose: true }]]
+          }
+        }
       }
     )
-  ).toThrowError('Unexpected token');
+  ).toThrowError("Unexpected token");
 
   expect(() =>
     transform(
@@ -96,21 +96,21 @@ it('respects passed babel options', async () => {
       \`;
       `,
       {
-        filename: './test.js',
-        outputFilename: '../.linaria-cache/test.css',
+        filename: "./test.js",
+        outputFilename: "../.linaria-cache/test.css",
         pluginOptions: {
           babelOptions: {
             babelrc: false,
             configFile: false,
             presets: [
-              ['@babel/preset-env', { loose: true }],
-              '@babel/preset-react',
-            ],
-          },
-        },
+              ["@babel/preset-env", { loose: true }],
+              "@babel/preset-react"
+            ]
+          }
+        }
       }
     )
-  ).not.toThrowError('Unexpected token');
+  ).not.toThrowError("Unexpected token");
 });
 
 it("doesn't throw due to duplicate preset", async () => {
@@ -124,25 +124,25 @@ it("doesn't throw due to duplicate preset", async () => {
       const Title = styled.h1\` color: blue; \`;
 
       const Article = styled.article\`
-        ${'${Title}'} {
+        ${"${Title}"} {
           font-size: 16px;
         }
       \`;
       `,
       {
-        filename: './test.js',
-        outputFilename: '../.linaria-cache/test.css',
+        filename: "./test.js",
+        outputFilename: "../.linaria-cache/test.css",
         pluginOptions: {
           babelOptions: {
             babelrc: false,
             configFile: false,
-            presets: [require.resolve('../babel')],
+            presets: [require.resolve("../babel")],
             plugins: [
-              require.resolve('@babel/plugin-transform-modules-commonjs'),
-            ],
-          },
-        },
+              require.resolve("@babel/plugin-transform-modules-commonjs")
+            ]
+          }
+        }
       }
     )
-  ).not.toThrowError('Duplicate plugin/preset detected');
+  ).not.toThrowError("Duplicate plugin/preset detected");
 });

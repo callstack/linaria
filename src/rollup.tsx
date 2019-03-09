@@ -1,15 +1,15 @@
-import { PluginOptions } from './babel/utils/loadOptions';
-import { Preprocessor } from './transform';
+import { createFilter } from "rollup-pluginutils";
 
-import { createFilter } from 'rollup-pluginutils';
-import transform from './transform';
-import slugify from './slugify';
+import { PluginOptions } from "./babel/utils/loadOptions";
+import slugify from "./slugify";
+import { Preprocessor } from "./transform";
+import transform from "./transform";
 
 type RollupPluginOptions = {
-  include?: string | string[],
-  exclude?: string | string[],
-  sourceMap?: boolean,
-  preprocessor?: Preprocessor
+  include?: string | string[];
+  exclude?: string | string[];
+  sourceMap?: boolean;
+  preprocessor?: Preprocessor;
 } & Partial<PluginOptions>;
 
 export default function linaria({
@@ -23,32 +23,38 @@ export default function linaria({
   const cssLookup = {};
 
   return {
-    name: 'linaria',
+    name: "linaria",
     load(id: string) {
       return cssLookup[id];
     },
     /* eslint-disable-next-line consistent-return */
     resolveId(importee: string) {
-      if (importee in cssLookup) return importee;
+      if (importee in cssLookup) {
+        return importee;
+      }
     },
     transform(code: string, id: string) {
-      if (!filter(id)) return;
+      if (!filter(id)) {
+        return;
+      }
 
       const result = transform(code, {
         filename: id,
-        preprocessor: (preprocessor),
-        pluginOptions: rest,
+        preprocessor,
+        pluginOptions: rest
       });
 
-      if (!result.cssText) return;
+      if (!result.cssText) {
+        return;
+      }
 
       let { cssText } = result;
 
       const slug = slugify(id);
-      const filename = `${id.replace(/\.js$/, '')}_${slug}.css`;
+      const filename = `${id.replace(/\.js$/, "")}_${slug}.css`;
 
       if (sourceMap && result.cssSourceMapText) {
-        const map = Buffer.from(result.cssSourceMapText).toString('base64');
+        const map = Buffer.from(result.cssSourceMapText).toString("base64");
         cssText += `/*# sourceMappingURL=data:application/json;base64,${map}*/`;
       }
 
@@ -58,6 +64,6 @@ export default function linaria({
 
       /* eslint-disable-next-line consistent-return */
       return { code: result.code, map: result.sourceMap };
-    },
+    }
   };
 }

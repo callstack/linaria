@@ -1,32 +1,33 @@
-import * as React from 'react';
-import renderer from 'react-test-renderer';
-import styled from '../react/styled';
+import * as React from "react";
+import renderer from "react-test-renderer";
 
-it('renders tag with display name and class name', () => {
-  const Test = styled('h1')({
-    name: 'TestComponent',
-    class: 'abcdefg',
+import styled from "../react/styled";
+
+it("renders tag with display name and class name", () => {
+  const Test = styled("h1")({
+    name: "TestComponent",
+    class: "abcdefg"
   });
 
-  expect(Test.displayName).toBe('TestComponent');
-  expect(Test.__linaria.className).toBe('abcdefg');
-  expect(Test.__linaria.extends).toBe('h1');
+  expect(Test.displayName).toBe("TestComponent");
+  expect(Test.__linaria.className).toBe("abcdefg");
+  expect(Test.__linaria.extends).toBe("h1");
 
   const tree = renderer.create(<Test>This is a test</Test>);
 
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('renders component with display name and class name', () => {
+it("renders component with display name and class name", () => {
   const Custom = props => <div {...props} />;
 
   const Test = styled(Custom)({
-    name: 'TestComponent',
-    class: 'abcdefg',
+    name: "TestComponent",
+    class: "abcdefg"
   });
 
-  expect(Test.displayName).toBe('TestComponent');
-  expect(Test.__linaria.className).toBe('abcdefg');
+  expect(Test.displayName).toBe("TestComponent");
+  expect(Test.__linaria.className).toBe("abcdefg");
   expect(Test.__linaria.extends).toBe(Custom);
 
   const tree = renderer.create(<Test>This is a test</Test>);
@@ -34,15 +35,15 @@ it('renders component with display name and class name', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('applies CSS variables in style prop', () => {
-  const Test = styled('div')({
-    name: 'TestComponent',
-    class: 'abcdefg',
+it("applies CSS variables in style prop", () => {
+  const Test = styled("div")({
+    name: "TestComponent",
+    class: "abcdefg",
     vars: {
-      foo: ['tomato'],
-      bar: [20, 'px'],
-      baz: [props => props.size, 'px'],
-    },
+      foo: ["tomato"],
+      bar: [20, "px"],
+      baz: [props => props.size, "px"]
+    }
   });
 
   const tree = renderer.create(<Test size={24}>This is a test</Test>);
@@ -50,26 +51,26 @@ it('applies CSS variables in style prop', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('merges CSS variables with custom style prop', () => {
-  const Test = styled('div')({
-    name: 'TestComponent',
-    class: 'abcdefg',
+it("merges CSS variables with custom style prop", () => {
+  const Test = styled("div")({
+    name: "TestComponent",
+    class: "abcdefg",
     vars: {
-      foo: ['tomato'],
-    },
+      foo: ["tomato"]
+    }
   });
 
   const tree = renderer.create(
-    <Test style={{ bar: 'baz' }}>This is a test</Test>
+    <Test style={{ bar: "baz" }}>This is a test</Test>
   );
 
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('supports extra className prop', () => {
-  const Test = styled('div')({
-    name: 'TestComponent',
-    class: 'abcdefg',
+it("supports extra className prop", () => {
+  const Test = styled("div")({
+    name: "TestComponent",
+    class: "abcdefg"
   });
 
   const tree = renderer.create(<Test className="primary">This is a test</Test>);
@@ -77,10 +78,10 @@ it('supports extra className prop', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('supports extra class prop', () => {
-  const Test = styled('div')({
-    name: 'TestComponent',
-    class: 'abcdefg',
+it("supports extra class prop", () => {
+  const Test = styled("div")({
+    name: "TestComponent",
+    class: "abcdefg"
   });
 
   const tree = renderer.create(<Test class="primary">This is a test</Test>);
@@ -88,10 +89,10 @@ it('supports extra class prop', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('replaces simple component with as prop', () => {
-  const Test = styled('button')({
-    name: 'TestComponent',
-    class: 'abcdefg',
+it("replaces simple component with as prop", () => {
+  const Test = styled("button")({
+    name: "TestComponent",
+    class: "abcdefg"
   });
 
   const tree = renderer.create(
@@ -103,12 +104,12 @@ it('replaces simple component with as prop', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('replaces custom component with as prop for primitive', () => {
+it("replaces custom component with as prop for primitive", () => {
   const Custom = props => <div {...props} style={{ fontSize: 12 }} />;
 
   const Test = styled(Custom)({
-    name: 'TestComponent',
-    class: 'abcdefg',
+    name: "TestComponent",
+    class: "abcdefg"
   });
 
   const tree = renderer.create(
@@ -120,12 +121,12 @@ it('replaces custom component with as prop for primitive', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('replaces primitive with as prop for custom component', () => {
+it("replaces primitive with as prop for custom component", () => {
   const Custom = props => <div {...props} style={{ fontSize: 12 }} />;
 
-  const Test = styled('div')({
-    name: 'TestComponent',
-    class: 'abcdefg',
+  const Test = styled("div")({
+    name: "TestComponent",
+    class: "abcdefg"
   });
 
   const tree = renderer.create(
@@ -137,15 +138,15 @@ it('replaces primitive with as prop for custom component', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('handles wrapping another styled component', () => {
-  const First = styled('div')({
-    name: 'FirstComponent',
-    class: 'abcdefg',
+it("handles wrapping another styled component", () => {
+  const First = styled("div")({
+    name: "FirstComponent",
+    class: "abcdefg"
   });
 
   const Second = styled(First)({
-    name: 'SecondComponent',
-    class: 'hijklmn',
+    name: "SecondComponent",
+    class: "hijklmn"
   });
 
   const tree = renderer.create(<Second>This is a test</Second>);
@@ -153,15 +154,15 @@ it('handles wrapping another styled component', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('forwards as prop when wrapping another styled component', () => {
-  const First = styled('div')({
-    name: 'FirstComponent',
-    class: 'abcdefg',
+it("forwards as prop when wrapping another styled component", () => {
+  const First = styled("div")({
+    name: "FirstComponent",
+    class: "abcdefg"
   });
 
   const Second = styled(First)({
-    name: 'SecondComponent',
-    class: 'hijklmn',
+    name: "SecondComponent",
+    class: "hijklmn"
   });
 
   const tree = renderer.create(<Second as="a">This is a test</Second>);
@@ -169,10 +170,10 @@ it('forwards as prop when wrapping another styled component', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('filters unknown html attributes for HTML tag', () => {
-  const Test = styled('div')({
-    name: 'TestComponent',
-    class: 'abcdefg',
+it("filters unknown html attributes for HTML tag", () => {
+  const Test = styled("div")({
+    name: "TestComponent",
+    class: "abcdefg"
   });
 
   const tree = renderer.create(
@@ -182,10 +183,10 @@ it('filters unknown html attributes for HTML tag', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('does not filter attributes for custom elements', () => {
-  const Test = styled('my-element')({
-    name: 'TestComponent',
-    class: 'abcdefg',
+it("does not filter attributes for custom elements", () => {
+  const Test = styled("my-element")({
+    name: "TestComponent",
+    class: "abcdefg"
   });
 
   const tree = renderer.create(
@@ -195,12 +196,12 @@ it('does not filter attributes for custom elements', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('does not filter attributes for components', () => {
+it("does not filter attributes for components", () => {
   const Custom = props => <div>{props.unknownAttribute}</div>;
 
   const Test = styled(Custom)({
-    name: 'TestComponent',
-    class: 'abcdefg',
+    name: "TestComponent",
+    class: "abcdefg"
   });
 
   const tree = renderer.create(
@@ -210,10 +211,10 @@ it('does not filter attributes for components', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('throws when using as tag for template literal', () => {
+it("throws when using as tag for template literal", () => {
   expect(
     () =>
-      styled('div')`
+      styled("div")`
         color: blue;
       `
   ).toThrowError('Using the "styled" tag in runtime is not supported');

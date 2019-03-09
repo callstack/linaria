@@ -1,64 +1,65 @@
-import path from 'path';
-import normalize from 'normalize-path';
-import fs from 'fs';
-import mkdirp from 'mkdirp';
-import glob from 'glob';
-import yargs from 'yargs';
-import transform from './transform';
+import fs from "fs";
+import glob from "glob";
+import mkdirp from "mkdirp";
+import normalize from "normalize-path";
+import path from "path";
+import yargs from "yargs";
+
+import transform from "./transform";
 
 const { argv } = yargs
-  .usage('Usage: $0 [options] <files ...>')
-  .option('config', {
-    alias: 'c',
-    type: 'string',
-    description: 'Path to a config file',
-    requiresArg: true,
+  .usage("Usage: $0 [options] <files ...>")
+  .option("config", {
+    alias: "c",
+    type: "string",
+    description: "Path to a config file",
+    requiresArg: true
   })
-  .option('out-dir', {
-    alias: 'o',
-    type: 'string',
-    description: 'Output directory for the extracted CSS files',
+  .option("out-dir", {
+    alias: "o",
+    type: "string",
+    description: "Output directory for the extracted CSS files",
     demandOption: true,
-    requiresArg: true,
+    requiresArg: true
   })
-  .option('source-maps', {
-    alias: 's',
-    type: 'boolean',
-    description: 'Generate source maps for the CSS files',
-    default: false,
+  .option("source-maps", {
+    alias: "s",
+    type: "boolean",
+    description: "Generate source maps for the CSS files",
+    default: false
   })
-  .option('source-root', {
-    alias: 'r',
-    type: 'string',
-    description: 'Directory containing the source JS files',
-    requiresArg: true,
+  .option("source-root", {
+    alias: "r",
+    type: "string",
+    description: "Directory containing the source JS files",
+    requiresArg: true
   })
-  .option('insert-css-requires', {
-    alias: 'i',
-    type: 'string',
+  .option("insert-css-requires", {
+    alias: "i",
+    type: "string",
     description:
-      'Directory containing JS files to insert require statements for the CSS files',
-    requiresArg: true,
+      "Directory containing JS files to insert require statements for the CSS files",
+    requiresArg: true
   })
-  .implies('insert-css-requires', 'source-root')
-  .alias('help', 'h')
-  .alias('version', 'v')
+  .implies("insert-css-requires", "source-root")
+  .alias("help", "h")
+  .alias("version", "v")
   .strict();
 
 processFiles(argv._, {
-  outDir: argv['out-dir'],
-  sourceMaps: argv['source-maps'],
-  sourceRoot: argv['source-root'],
-  insertCssRequires: argv['insert-css-requires'],
-  configFile: argv.config,
+  outDir: argv["out-dir"],
+  sourceMaps: argv["source-maps"],
+  sourceRoot: argv["source-root"],
+  insertCssRequires: argv["insert-css-requires"],
+  configFile: argv.config
 });
 
 type Options = {
-  outDir: string,
-  sourceMaps?: boolean,
-  sourceRoot?: string,
-  insertCssRequires?: string,
-  configFile?: string
+  outDir: string;
+  sourceMaps?: boolean;
+  sourceRoot?: string;
+  insertCssRequires?: string;
+  configFile?: string;
 };
 
 function processFiles(files: string[], options: Options) {
@@ -78,8 +79,8 @@ function processFiles(files: string[], options: Options) {
         filename,
         outputFilename,
         pluginOptions: {
-          configFile: options.configFile,
-        },
+          configFile: options.configFile
+        }
       }
     );
 
@@ -96,7 +97,7 @@ function processFiles(files: string[], options: Options) {
       if (
         options.sourceMaps &&
         sourceMap &&
-        typeof cssSourceMapText !== 'undefined'
+        typeof cssSourceMapText !== "undefined"
       ) {
         fs.writeFileSync(`${outputFilename}.map`, cssSourceMapText);
       }
@@ -112,10 +113,10 @@ function processFiles(files: string[], options: Options) {
         );
 
         const requireStatement = `\nrequire('${
-          relativePath.startsWith('.') ? relativePath : `./${relativePath}`
+          relativePath.startsWith(".") ? relativePath : `./${relativePath}`
         }');`;
 
-        const inputContent = fs.readFileSync(inputFilename, 'utf-8');
+        const inputContent = fs.readFileSync(inputFilename, "utf-8");
 
         if (!inputContent.trim().endsWith(requireStatement)) {
           fs.writeFileSync(
@@ -136,7 +137,7 @@ function resolveOutputFilename(filename: string, outDir: string) {
   const folderStructure = path.relative(process.cwd(), path.dirname(filename));
   const outputBasename = path
     .basename(filename)
-    .replace(path.extname(filename), '.css');
+    .replace(path.extname(filename), ".css");
 
   return path.join(outDir, folderStructure, outputBasename);
 }

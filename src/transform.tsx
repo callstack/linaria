@@ -1,47 +1,51 @@
-import path from 'path';
-import * as babel from '@babel/core';
-import stylis from 'stylis';
-import { SourceMapGenerator } from 'source-map';
-import loadOptions, { PluginOptions } from './babel/utils/loadOptions';
+import * as babel from "@babel/core";
+import path from "path";
+import { SourceMapGenerator } from "source-map";
+import stylis from "stylis";
+
+import loadOptions, { PluginOptions } from "./babel/utils/loadOptions";
 
 export type Replacement = {
   original: {
-    start: Location,
-    end: Location
-  },
-  length: number
+    start: Location;
+    end: Location;
+  };
+  length: number;
 };
 
 type Location = {
-  line: number,
-  column: number
+  line: number;
+  column: number;
 };
 
 type Result = {
-  code: string,
-  sourceMap: Object | null | undefined,
-  cssText?: string,
-  cssSourceMapText?: string,
-  dependencies?: string[],
+  code: string;
+  sourceMap: Object | null | undefined;
+  cssText?: string;
+  cssSourceMapText?: string;
+  dependencies?: string[];
   rules?: {
     [className: string]: {
-      cssText: string,
-      displayName: string,
-      start: Location | null | undefined
-    }
-  },
-  replacements?: Replacement[]
+      cssText: string;
+      displayName: string;
+      start: Location | null | undefined;
+    };
+  };
+  replacements?: Replacement[];
 };
 
 type Options = {
-  filename: string,
-  preprocessor?: Preprocessor,
-  outputFilename?: string,
-  inputSourceMap?: Object,
-  pluginOptions?: PluginOptions
+  filename: string;
+  preprocessor?: Preprocessor;
+  outputFilename?: string;
+  inputSourceMap?: Object;
+  pluginOptions?: PluginOptions;
 };
 
-export type Preprocessor = "none" | "stylis" | ((selector: string, cssText: string) => string);
+export type Preprocessor =
+  | "none"
+  | "stylis"
+  | ((selector: string, cssText: string) => string);
 
 const STYLIS_DECLARATION = 1;
 
@@ -51,7 +55,7 @@ export default function transform(code: string, options: Options): Result {
   if (!/\b(styled|css)/.test(code)) {
     return {
       code,
-      sourceMap: options.inputSourceMap,
+      sourceMap: options.inputSourceMap
     };
   }
 
@@ -62,7 +66,7 @@ export default function transform(code: string, options: Options): Result {
   const ast = babel.parseSync(code, {
     ...(pluginOptions ? pluginOptions.babelOptions : null),
     filename: options.filename,
-    caller: { name: 'linaria' },
+    caller: { name: "linaria" }
   }) as babel.types.File;
 
   const { metadata, code: transformedCode, map } = babel.transformFromAstSync(
@@ -70,38 +74,38 @@ export default function transform(code: string, options: Options): Result {
     code,
     {
       filename: options.filename,
-      presets: [[require.resolve('./babel'), pluginOptions]],
+      presets: [[require.resolve("./babel"), pluginOptions]],
       babelrc: false,
       configFile: false,
       sourceMaps: true,
       sourceFileName: options.filename,
-      inputSourceMap: options.inputSourceMap,
+      inputSourceMap: options.inputSourceMap
     }
   ) as babel.BabelFileResult;
 
   if (!metadata.linaria) {
     return {
       code,
-      sourceMap: options.inputSourceMap,
+      sourceMap: options.inputSourceMap
     };
   }
 
   const { rules, replacements, dependencies } = metadata.linaria;
   const mappings = [];
 
-  let cssText = '';
+  let cssText = "";
 
   let preprocessor: (selector: string, cssText: string) => string;
 
-  if (typeof options.preprocessor === 'function') {
+  if (typeof options.preprocessor === "function") {
     // eslint-disable-next-line prefer-destructuring
     preprocessor = options.preprocessor;
   } else {
     switch (options.preprocessor) {
-      case 'none':
+      case "none":
         preprocessor = (selector, text) => `${selector} {${text}}\n`;
         break;
-      case 'stylis':
+      case "stylis":
       default:
         stylis.use(null)((context, decl) => {
           if (context === STYLIS_DECLARATION && options.outputFilename) {
@@ -132,10 +136,10 @@ export default function transform(code: string, options: Options): Result {
     mappings.push({
       generated: {
         line: index + 1,
-        column: 0,
+        column: 0
       },
       original: rules[selector].start,
-      name: selector,
+      name: selector
     });
 
     // Run each rule through stylis to support nesting
@@ -143,7 +147,7 @@ export default function transform(code: string, options: Options): Result {
   });
 
   return {
-    code: transformedCode || '',
+    code: transformedCode || "",
     cssText,
     rules,
     replacements,
@@ -153,7 +157,7 @@ export default function transform(code: string, options: Options): Result {
     get cssSourceMapText() {
       if (mappings && mappings.length) {
         const generator = new SourceMapGenerator({
-          file: options.filename.replace(/\.js$/, '.css'),
+          file: options.filename.replace(/\.js$/, ".css")
         });
 
         mappings.forEach(mapping =>
@@ -167,7 +171,7 @@ export default function transform(code: string, options: Options): Result {
         return generator.toString();
       }
 
-      return '';
-    },
+      return "";
+    }
   };
-};
+}

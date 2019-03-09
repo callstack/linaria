@@ -1,8 +1,8 @@
-import postcss from 'postcss';
+import postcss from "postcss";
 
 type CollectResult = {
-  critical: string,
-  other: string
+  critical: string;
+  other: string;
 };
 
 const collect = (html: string, css: string): CollectResult => {
@@ -14,7 +14,7 @@ const collect = (html: string, css: string): CollectResult => {
 
   const isCritical = rule => {
     // Only check class names selectors
-    if (rule.selector.startsWith('.')) {
+    if (rule.selector.startsWith(".")) {
       return Boolean(rule.selector.match(htmlClassesRegExp));
     }
 
@@ -31,7 +31,7 @@ const collect = (html: string, css: string): CollectResult => {
       }
     });
 
-    if (rule.name === 'keyframes') {
+    if (rule.name === "keyframes") {
       return;
     }
 
@@ -43,11 +43,11 @@ const collect = (html: string, css: string): CollectResult => {
   };
 
   stylesheet.walkRules(rule => {
-    if (rule.parent.name === 'keyframes') {
+    if (rule.parent.name === "keyframes") {
       return;
     }
 
-    if (rule.parent.type === 'atrule') {
+    if (rule.parent.type === "atrule") {
       handleAtRule(rule.parent);
       return;
     }
@@ -60,10 +60,10 @@ const collect = (html: string, css: string): CollectResult => {
   });
 
   critical.walkDecls(/animation/, decl => {
-    animations.add(decl.value.split(' ')[0]);
+    animations.add(decl.value.split(" ")[0]);
   });
 
-  stylesheet.walkAtRules('keyframes', rule => {
+  stylesheet.walkAtRules("keyframes", rule => {
     if (animations.has(rule.params)) {
       critical.append(rule);
     }
@@ -71,7 +71,7 @@ const collect = (html: string, css: string): CollectResult => {
 
   return {
     critical: critical.toString(),
-    other: other.toString(),
+    other: other.toString()
   };
 };
 
@@ -81,11 +81,11 @@ const extractClassesFromHtml = (html: string): RegExp => {
   let match = regex.exec(html);
 
   while (match !== null) {
-    match[1].split(' ').forEach(className => htmlClasses.push(className));
+    match[1].split(" ").forEach(className => htmlClasses.push(className));
     match = regex.exec(html);
   }
 
-  return new RegExp(htmlClasses.join('|'), 'gm');
+  return new RegExp(htmlClasses.join("|"), "gm");
 };
 
 export default collect;

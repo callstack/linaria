@@ -1,29 +1,30 @@
-import path from 'path';
-import dedent from 'dedent';
-import * as babel from '@babel/core';
-import Module from '../babel/module';
+import * as babel from "@babel/core";
+import dedent from "dedent";
+import path from "path";
+
+import Module from "../babel/module";
 
 beforeEach(() => Module.invalidate());
 
 function transform(text) {
   return babel.transformSync(text, {
-    filename: this.filename,
+    filename: this.filename
   });
 }
 
-it('creates module for JS files', () => {
-  const filename = '/foo/bar/test.js';
+it("creates module for JS files", () => {
+  const filename = "/foo/bar/test.js";
   const mod = new Module(filename);
 
-  mod.evaluate('module.exports = () => 42');
+  mod.evaluate("module.exports = () => 42");
 
   expect(mod.exports()).toBe(42);
   expect(mod.id).toBe(filename);
   expect(mod.filename).toBe(filename);
 });
 
-it('requires JS files', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("requires JS files", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
   mod.evaluate(dedent`
     const answer = require('./sample-script');
@@ -31,11 +32,11 @@ it('requires JS files', () => {
     module.exports = 'The answer is ' + answer;
   `);
 
-  expect(mod.exports).toBe('The answer is 42');
+  expect(mod.exports).toBe("The answer is 42");
 });
 
-it('requires JSON files', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("requires JSON files", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
   mod.evaluate(dedent`
     const data = require('./sample-data.json');
@@ -43,11 +44,11 @@ it('requires JSON files', () => {
     module.exports = 'Our saviour, ' + data.name;
   `);
 
-  expect(mod.exports).toBe('Our saviour, Luke Skywalker');
+  expect(mod.exports).toBe("Our saviour, Luke Skywalker");
 });
 
-it('imports JS files', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("imports JS files", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
   mod.transform = transform;
   mod.evaluate(dedent`
@@ -56,11 +57,11 @@ it('imports JS files', () => {
     export const result = 'The answer is ' + answer;
   `);
 
-  expect(mod.exports.result).toBe('The answer is 42');
+  expect(mod.exports.result).toBe("The answer is 42");
 });
 
-it('imports TypeScript files', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.ts'));
+it("imports TypeScript files", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.ts"));
 
   mod.transform = transform;
   mod.evaluate(dedent`
@@ -69,11 +70,11 @@ it('imports TypeScript files', () => {
     export const result = 'The answer is ' + answer;
   `);
 
-  expect(mod.exports.result).toBe('The answer is 27');
+  expect(mod.exports.result).toBe("The answer is 27");
 });
 
-it('imports JSON files', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("imports JSON files", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
   mod.transform = transform;
   mod.evaluate(dedent`
@@ -84,15 +85,15 @@ it('imports JSON files', () => {
     export default result;
   `);
 
-  expect(mod.exports.default).toBe('Our saviour, Luke Skywalker');
+  expect(mod.exports.default).toBe("Our saviour, Luke Skywalker");
 });
 
-it('returns module from the cache', () => {
+it("returns module from the cache", () => {
   /* eslint-disable no-self-compare */
 
-  const filename = path.resolve(__dirname, '../__fixtures__/test.js');
+  const filename = path.resolve(__dirname, "../__fixtures__/test.js");
   const mod = new Module(filename);
-  const id = './sample-data.json';
+  const id = "./sample-data.json";
 
   expect(mod.require(id) === mod.require(id)).toBe(true);
 
@@ -101,9 +102,9 @@ it('returns module from the cache', () => {
   ).toBe(true);
 });
 
-it('clears modules from the cache', () => {
-  const filename = path.resolve(__dirname, '../__fixtures__/test.js');
-  const id = './sample-data.json';
+it("clears modules from the cache", () => {
+  const filename = path.resolve(__dirname, "../__fixtures__/test.js");
+  const id = "./sample-data.json";
 
   const result = new Module(filename).require(id);
 
@@ -114,34 +115,34 @@ it('clears modules from the cache', () => {
   expect(result === new Module(filename).require(id)).toBe(false);
 });
 
-it('exports the path for non JS/JSON files', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("exports the path for non JS/JSON files", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
-  expect(mod.require('./sample-asset.png')).toBe('./sample-asset.png');
+  expect(mod.require("./sample-asset.png")).toBe("./sample-asset.png");
 });
 
-it('returns module when requiring mocked builtin node modules', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("returns module when requiring mocked builtin node modules", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
-  expect(mod.require('path')).toBe(require('path'));
+  expect(mod.require("path")).toBe(require("path"));
 });
 
-it('returns null when requiring empty builtin node modules', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("returns null when requiring empty builtin node modules", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
-  expect(mod.require('fs')).toBe(null);
+  expect(mod.require("fs")).toBe(null);
 });
 
-it('throws when requiring unmocked builtin node modules', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("throws when requiring unmocked builtin node modules", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
-  expect(() => mod.require('perf_hooks')).toThrow(
+  expect(() => mod.require("perf_hooks")).toThrow(
     'Unable to import "perf_hooks". Importing Node builtins is not supported in the sandbox.'
   );
 });
 
-it('has access to the global object', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("has access to the global object", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
   expect(() =>
     mod.evaluate(dedent`
@@ -151,17 +152,17 @@ it('has access to the global object', () => {
 });
 
 it("doesn't have access to the process object", () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
   expect(() =>
     mod.evaluate(dedent`
     process.abort();
   `)
-  ).toThrow('process.abort is not a function');
+  ).toThrow("process.abort is not a function");
 });
 
-it('has access to NODE_ENV', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("has access to NODE_ENV", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
   mod.evaluate(dedent`
   module.exports = process.env.NODE_ENV;
@@ -170,20 +171,20 @@ it('has access to NODE_ENV', () => {
   expect(mod.exports).toBe(process.env.NODE_ENV);
 });
 
-it('has require.resolve available', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("has require.resolve available", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
   mod.evaluate(dedent`
   module.exports = require.resolve('./sample-script');
   `);
 
   expect(mod.exports).toBe(
-    path.resolve(path.dirname(mod.filename), 'sample-script.js')
+    path.resolve(path.dirname(mod.filename), "sample-script.js")
   );
 });
 
-it('has require.ensure available', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("has require.ensure available", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
   expect(() =>
     mod.evaluate(dedent`
@@ -192,8 +193,8 @@ it('has require.ensure available', () => {
   ).not.toThrowError();
 });
 
-it('has __filename available', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("has __filename available", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
   mod.evaluate(dedent`
   module.exports = __filename;
@@ -202,8 +203,8 @@ it('has __filename available', () => {
   expect(mod.exports).toBe(mod.filename);
 });
 
-it('has __dirname available', () => {
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+it("has __dirname available", () => {
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
   mod.evaluate(dedent`
   module.exports = __dirname;
@@ -212,12 +213,12 @@ it('has __dirname available', () => {
   expect(mod.exports).toBe(path.dirname(mod.filename));
 });
 
-it('changes resolve behaviour on overriding _resolveFilename', () => {
+it("changes resolve behaviour on overriding _resolveFilename", () => {
   const originalResolveFilename = Module._resolveFilename;
 
-  Module._resolveFilename = id => (id === 'foo' ? 'bar' : id);
+  Module._resolveFilename = id => (id === "foo" ? "bar" : id);
 
-  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+  const mod = new Module(path.resolve(__dirname, "../__fixtures__/test.js"));
 
   mod.evaluate(dedent`
   module.exports = [
@@ -229,5 +230,5 @@ it('changes resolve behaviour on overriding _resolveFilename', () => {
   // Restore old behavior
   Module._resolveFilename = originalResolveFilename;
 
-  expect(mod.exports).toEqual(['bar', 'test']);
+  expect(mod.exports).toEqual(["bar", "test"]);
 });

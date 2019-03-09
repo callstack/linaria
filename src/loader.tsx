@@ -1,16 +1,20 @@
-import fs from 'fs';
-import path from 'path';
-import mkdirp from 'mkdirp';
-import normalize from 'normalize-path';
-import loaderUtils from 'loader-utils';
-import enhancedResolve from 'enhanced-resolve/lib/node';
-import Module from './babel/module';
-import transform from './transform';
+import enhancedResolve from "enhanced-resolve/lib/node";
+import fs from "fs";
+import loaderUtils from "loader-utils";
+import mkdirp from "mkdirp";
+import normalize from "normalize-path";
+import path from "path";
 
-export default function loader(content: string, inputSourceMap: Object | null | undefined) {
+import Module from "./babel/module";
+import transform from "./transform";
+
+export default function loader(
+  content: string,
+  inputSourceMap: Object | null | undefined
+) {
   const {
     sourceMap,
-    cacheDirectory = '.linaria-cache',
+    cacheDirectory = ".linaria-cache",
     preprocessor,
     ...rest
   } = loaderUtils.getOptions(this) || {};
@@ -21,12 +25,12 @@ export default function loader(content: string, inputSourceMap: Object | null | 
       : path.join(process.cwd(), cacheDirectory),
     path.relative(
       process.cwd(),
-      this.resourcePath.replace(/\.[^.]+$/, '.linaria.css')
+      this.resourcePath.replace(/\.[^.]+$/, ".linaria.css")
     )
   );
 
   const resolveOptions = {
-    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+    extensions: [".js", ".jsx", ".ts", ".tsx", ".json"]
   };
 
   const resolveSync = enhancedResolve.create.sync(
@@ -38,7 +42,7 @@ export default function loader(content: string, inputSourceMap: Object | null | 
     this._compilation && this._compilation.options.resolve
       ? {
           ...resolveOptions,
-          alias: this._compilation.options.resolve.alias,
+          alias: this._compilation.options.resolve.alias
         }
       : resolveOptions
   );
@@ -57,7 +61,7 @@ export default function loader(content: string, inputSourceMap: Object | null | 
       inputSourceMap: inputSourceMap != null ? inputSourceMap : undefined,
       outputFilename,
       pluginOptions: rest,
-      preprocessor,
+      preprocessor
     });
   } finally {
     // Restore original behaviour
@@ -69,8 +73,8 @@ export default function loader(content: string, inputSourceMap: Object | null | 
 
     if (sourceMap) {
       cssText += `/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
-        result.cssSourceMapText || ''
-      ).toString('base64')}*/`;
+        result.cssSourceMapText || ""
+      ).toString("base64")}*/`;
     }
 
     if (result.dependencies && result.dependencies.length) {
@@ -91,7 +95,7 @@ export default function loader(content: string, inputSourceMap: Object | null | 
     let currentCssText;
 
     try {
-      currentCssText = fs.readFileSync(outputFilename, 'utf-8');
+      currentCssText = fs.readFileSync(outputFilename, "utf-8");
     } catch (e) {
       // Ignore error
     }
@@ -110,4 +114,4 @@ export default function loader(content: string, inputSourceMap: Object | null | 
   }
 
   this.callback(null, result.code, result.sourceMap);
-};
+}

@@ -1,22 +1,23 @@
 /* eslint-disable no-template-curly-in-string */
 
-import path from 'path';
-import * as babel from '@babel/core';
-import dedent from 'dedent';
-import stripAnsi from 'strip-ansi';
-import serializer from '../__utils__/linaria-snapshot-serializer';
+import * as babel from "@babel/core";
+import dedent from "dedent";
+import path from "path";
+import stripAnsi from "strip-ansi";
+
+import serializer from "../__utils__/linaria-snapshot-serializer";
 
 expect.addSnapshotSerializer(serializer);
 
 const transpile = input =>
   babel.transformAsync(input, {
     babelrc: false,
-    presets: [[require.resolve('../babel'), { evaluate: false }]],
-    plugins: ['@babel/plugin-syntax-jsx'],
-    filename: path.join(__dirname, 'app/index.js'),
+    presets: [[require.resolve("../babel"), { evaluate: false }]],
+    plugins: ["@babel/plugin-syntax-jsx"],
+    filename: path.join(__dirname, "app/index.js")
   });
 
-it('transpiles styled template literal with object', async () => {
+it("transpiles styled template literal with object", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -31,7 +32,7 @@ it('transpiles styled template literal with object', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('transpiles styled template literal with function and tag', async () => {
+it("transpiles styled template literal with function and tag", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -46,7 +47,7 @@ it('transpiles styled template literal with function and tag', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('transpiles styled template literal with function and component', async () => {
+it("transpiles styled template literal with function and component", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -61,7 +62,7 @@ it('transpiles styled template literal with function and component', async () =>
   expect(metadata).toMatchSnapshot();
 });
 
-it('outputs valid CSS classname', async () => {
+it("outputs valid CSS classname", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -76,7 +77,7 @@ it('outputs valid CSS classname', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('evaluates and inlines expressions in scope', async () => {
+it("evaluates and inlines expressions in scope", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -84,8 +85,8 @@ it('evaluates and inlines expressions in scope', async () => {
     const color = 'blue';
 
     export const Title = styled.h1\`
-      color: ${'${color}'};
-      width: ${'${100 / 3}'}%;
+      color: ${"${color}"};
+      width: ${"${100 / 3}"}%;
     \`;
     `
   );
@@ -94,7 +95,7 @@ it('evaluates and inlines expressions in scope', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('inlines object styles as CSS string', async () => {
+it("inlines object styles as CSS string", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -129,7 +130,7 @@ it('inlines object styles as CSS string', async () => {
     };
 
     export const Title = styled.h1\`
-      ${'${cover}'}
+      ${"${cover}"}
     \`;
     `
   );
@@ -138,7 +139,7 @@ it('inlines object styles as CSS string', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('inlines array styles as CSS string', async () => {
+it("inlines array styles as CSS string", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -149,7 +150,7 @@ it('inlines array styles as CSS string', async () => {
     ];
 
     export const Title = styled.h1\`
-      ${'${styles}'}
+      ${"${styles}"}
     \`;
     `
   );
@@ -158,14 +159,14 @@ it('inlines array styles as CSS string', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('replaces unknown expressions with CSS custom properties', async () => {
+it("replaces unknown expressions with CSS custom properties", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
 
     export const Title = styled.h1\`
-      font-size: ${'${size}'}px;
-      color: ${'${props => props.color}'};
+      font-size: ${"${size}"}px;
+      color: ${"${props => props.color}"};
     \`;
     `
   );
@@ -174,19 +175,19 @@ it('replaces unknown expressions with CSS custom properties', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('handles interpolation followed by unit', async () => {
+it("handles interpolation followed by unit", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
 
     export const Title = styled.h1\`
-      font-size: ${'${size}'}em;
-      text-shadow: black 1px ${'${shadow}'}px, white -2px -2px;
-      margin: ${'${size}'}px;
-      width: calc(2 * ${'${props => props.width}'}vw);
-      height: ${'${props => { if (true) { return props.height } else { return 200 } }}'}px;
-      grid-template-columns: ${'${unit}'}fr 1fr 1fr ${'${unit}'}fr;
-      border-radius: ${'${function(props) { return 200 }}'}px
+      font-size: ${"${size}"}em;
+      text-shadow: black 1px ${"${shadow}"}px, white -2px -2px;
+      margin: ${"${size}"}px;
+      width: calc(2 * ${"${props => props.width}"}vw);
+      height: ${"${props => { if (true) { return props.height } else { return 200 } }}"}px;
+      grid-template-columns: ${"${unit}"}fr 1fr 1fr ${"${unit}"}fr;
+      border-radius: ${"${function(props) { return 200 }}"}px
     \`;
     `
   );
@@ -195,14 +196,14 @@ it('handles interpolation followed by unit', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('uses the same custom property for the same identifier', async () => {
+it("uses the same custom property for the same identifier", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
 
     export const Box = styled.div\`
-      height: ${'${size}'}px;
-      width: ${'${size}'}px;
+      height: ${"${size}"}px;
+      width: ${"${size}"}px;
     \`;
     `
   );
@@ -211,14 +212,14 @@ it('uses the same custom property for the same identifier', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('uses the same custom property for the same expression', async () => {
+it("uses the same custom property for the same expression", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
 
     export const Box = styled.div\`
-      height: ${'${props => props.size}'}px;
-      width: ${'${props => props.size}'}px;
+      height: ${"${props => props.size}"}px;
+      width: ${"${props => props.size}"}px;
     \`;
     `
   );
@@ -227,13 +228,13 @@ it('uses the same custom property for the same expression', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('handles nested blocks', async () => {
+it("handles nested blocks", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
 
     export const Button = styled.button\`
-      font-family: ${'${regular}'};
+      font-family: ${"${regular}"};
 
       &:hover {
         border-color: blue;
@@ -250,19 +251,19 @@ it('handles nested blocks', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('prevents class name collision', async () => {
+it("prevents class name collision", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
 
     export const Title = styled.h1\`
-      font-size: ${'${size}'}px;
-      color: ${'${props => props.color}'}
+      font-size: ${"${size}"}px;
+      color: ${"${props => props.color}"}
     \`;
 
     function Something() {
       const Title = styled.h1\`
-        font-family: ${'${regular}'};
+        font-family: ${"${regular}"};
       \`;
 
       return <Title />;
@@ -274,7 +275,7 @@ it('prevents class name collision', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('does not output CSS if none present', async () => {
+it("does not output CSS if none present", async () => {
   const { code, metadata } = await transpile(
     dedent`
       const number = 42;
@@ -287,7 +288,7 @@ it('does not output CSS if none present', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('transpiles css template literal', async () => {
+it("transpiles css template literal", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { css } from 'linaria';
@@ -302,7 +303,7 @@ it('transpiles css template literal', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('handles css template literal in object property', async () => {
+it("handles css template literal in object property", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { css } from 'linaria';
@@ -319,7 +320,7 @@ it('handles css template literal in object property', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('handles css template literal in JSX element', async () => {
+it("handles css template literal in JSX element", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { css } from 'linaria';
@@ -332,7 +333,7 @@ it('handles css template literal in JSX element', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('throws when contains dynamic expression without evaluate: true in css tag', async () => {
+it("throws when contains dynamic expression without evaluate: true in css tag", async () => {
   expect.assertions(1);
 
   try {
@@ -341,18 +342,18 @@ it('throws when contains dynamic expression without evaluate: true in css tag', 
       import { css } from 'linaria';
 
       const title = css\`
-        font-size: ${'${size}'}px;
+        font-size: ${"${size}"}px;
       \`;
       `
     );
   } catch (e) {
     expect(
-      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+      stripAnsi(e.message.replace(__dirname, "<<DIRNAME>>"))
     ).toMatchSnapshot();
   }
 });
 
-it('supports both css and styled tags', async () => {
+it("supports both css and styled tags", async () => {
   const { code, metadata } = await transpile(
     dedent`
       import { css } from 'linaria';
@@ -372,7 +373,7 @@ it('supports both css and styled tags', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('does not include styles if not referenced anywhere', async () => {
+it("does not include styles if not referenced anywhere", async () => {
   const { code, metadata } = await transpile(
     dedent`
       import { css } from 'linaria';
@@ -392,7 +393,7 @@ it('does not include styles if not referenced anywhere', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('includes unreferenced styles for :global', async () => {
+it("includes unreferenced styles for :global", async () => {
   const { code, metadata } = await transpile(
     dedent`
       import { css } from 'linaria';

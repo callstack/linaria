@@ -25,5 +25,11 @@
     "target": "esnext",
     "plugins": [{ "name": "typescript-tslint-plugin" }]
   },
-  "exclude": ["typings/**/*", "lib/**/*", "dist/**/*", "coverage/**/*", "website/**/**"]
+  "exclude": [
+    "typings/**/*",
+    "lib/**/*",
+    "dist/**/*",
+    "coverage/**/*",
+    "website/**/**"
+  ]
 }

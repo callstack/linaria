@@ -1,16 +1,16 @@
-import * as React from 'react';
-import { styled } from 'linaria/react';
+import { styled } from "linaria/react";
+import * as React from "react";
 
-const white = 'white';
-const tomato = 'tomato';
+const white = "white";
+const tomato = "tomato";
 const border = 1;
 
 const absoluteFill = {
-  position: 'absolute',
+  position: "absolute",
   top: 0,
   left: 0,
   bottom: 0,
-  right: 0,
+  right: 0
 };
 
 const Button = styled.button`
@@ -55,7 +55,7 @@ const CustomTitle = styled(Title)`
 <Button onClick={42}>Hello world</Button>;
 
 // $Expect Element
-<CustomButton onClick={() => alert('Clicked')}>Hello world</CustomButton>;
+<CustomButton onClick={() => alert("Clicked")}>Hello world</CustomButton>;
 
 // $Expect Element
 <CustomTitle label="Hello world" />;

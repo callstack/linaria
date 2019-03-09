@@ -1,27 +1,28 @@
 /* eslint-disable no-param-reassign */
 
-import { relative, dirname, basename } from 'path';
-import { isValidElementType } from 'react-is';
-import { NodePath } from '@babel/traverse';
-import generator from '@babel/generator';
-import evaluate from '../evaluate';
-import slugify from '../../slugify';
-import { units } from '../units';
-import throwIfInvalid from '../utils/throwIfInvalid';
-import isSerializable from '../utils/isSerializable';
-import stripLines from '../utils/stripLines';
-import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
-import toCSS from '../utils/toCSS';
-import hasImport from '../utils/hasImport';
-import { StrictOptions, State } from '../types';
+import generator from "@babel/generator";
+import { NodePath } from "@babel/traverse";
+import { basename, dirname, relative } from "path";
+import { isValidElementType } from "react-is";
+
+import slugify from "../../slugify";
+import evaluate from "../evaluate";
+import { State, StrictOptions } from "../types";
+import { units } from "../units";
+import hasImport from "../utils/hasImport";
+import isSerializable from "../utils/isSerializable";
+import stripLines from "../utils/stripLines";
+import throwIfInvalid from "../utils/throwIfInvalid";
+import toCSS from "../utils/toCSS";
+import toValidCSSIdentifier from "../utils/toValidCSSIdentifier";
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
-const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
+const unitRegex = new RegExp(`^(${units.join("|")})(;|,|\n| |\\))`);
 
 export default function TaggedTemplateExpression(
   path: NodePath<babel.types.TaggedTemplateExpression>,
   state: State,
-  t: typeof import('@babel/types'),
+  t: typeof import("@babel/types"),
   options: StrictOptions
 ) {
   const { quasi, tag } = path.node;
@@ -33,36 +34,36 @@ export default function TaggedTemplateExpression(
     t.isCallExpression(tag) &&
     t.isIdentifier(tag.callee) &&
     tag.arguments.length === 1 &&
-    tag.callee.name === 'styled' &&
+    tag.callee.name === "styled" &&
     hasImport(
       t,
       path.scope,
       state.file.opts.filename,
-      'styled',
-      'linaria/react'
+      "styled",
+      "linaria/react"
     )
   ) {
-    styled = { component: path.get('tag').get('arguments')[0] };
+    styled = { component: path.get("tag").get("arguments")[0] };
   } else if (
     t.isMemberExpression(tag) &&
     t.isIdentifier(tag.object) &&
     t.isIdentifier(tag.property) &&
-    tag.object.name === 'styled' &&
+    tag.object.name === "styled" &&
     hasImport(
       t,
       path.scope,
       state.file.opts.filename,
-      'styled',
-      'linaria/react'
+      "styled",
+      "linaria/react"
     )
   ) {
     styled = {
-      component: { node: t.stringLiteral(tag.property.name) },
+      component: { node: t.stringLiteral(tag.property.name) }
     };
   } else if (
-    hasImport(t, path.scope, state.file.opts.filename, 'css', 'linaria')
+    hasImport(t, path.scope, state.file.opts.filename, "css", "linaria")
   ) {
-    css = t.isIdentifier(tag) && tag.name === 'css';
+    css = t.isIdentifier(tag) && tag.name === "css";
   }
 
   if (!(styled || css)) {
@@ -75,10 +76,10 @@ export default function TaggedTemplateExpression(
   state.index++;
 
   const interpolations: Array<{
-    id: string,
-    node: babel.Node,
-    source: string,
-    unit: string,
+    id: string;
+    node: babel.Node;
+    source: string;
+    unit: string;
   }> = [];
 
   // Check if the variable is referenced anywhere for basic DCE
@@ -118,16 +119,16 @@ export default function TaggedTemplateExpression(
     }
 
     // Remove the file extension
-    displayName = displayName.replace(/\.[a-z0-9]+$/, '');
+    displayName = displayName.replace(/\.[a-z0-9]+$/, "");
 
     if (displayName) {
       displayName += state.index;
     } else {
       throw path.buildCodeFrameError(
         "Couldn't determine a name for the component. Ensure that it's either:\n" +
-          '- Assigned to a variable\n' +
-          '- Is an object property\n' +
-          '- Is a prop in a JSX element\n'
+          "- Assigned to a variable\n" +
+          "- Is an object property\n" +
+          "- Is a prop in a JSX element\n"
       );
     }
   }
@@ -147,9 +148,9 @@ export default function TaggedTemplateExpression(
     : slug;
 
   // Serialize the tagged template literal to a string
-  let cssText = '';
+  let cssText = "";
 
-  const expressions = path.get('quasi').get('expressions');
+  const expressions = path.get("quasi").get("expressions");
 
   quasi.quasis.forEach((el, i, self) => {
     let appended = false;
@@ -169,7 +170,7 @@ export default function TaggedTemplateExpression(
 
         if (last && cssText.endsWith(`var(--${last.id})`)) {
           last.unit = unit;
-          cssText += el.value.cooked.replace(unitRegex, '$2');
+          cssText += el.value.cooked.replace(unitRegex, "$2");
           appended = true;
         }
       }
@@ -193,7 +194,7 @@ export default function TaggedTemplateExpression(
         start: { line: el.loc.end.line, column: el.loc.end.column + 1 },
         end: next
           ? { line: next.loc.start.line, column: next.loc.start.column }
-          : { line: end.line, column: end.column + 1 },
+          : { line: end.line, column: end.column + 1 }
       };
 
       if (result.confident) {
@@ -208,7 +209,7 @@ export default function TaggedTemplateExpression(
 
         state.replacements.push({
           original: loc,
-          length: cssText.length - beforeLength,
+          length: cssText.length - beforeLength
         });
       } else {
         // Try to preval the value
@@ -238,7 +239,7 @@ export default function TaggedTemplateExpression(
 
           throwIfInvalid(value, ex);
 
-          if (typeof value !== 'function') {
+          if (typeof value !== "function") {
             // Only insert text for non functions
             // We don't touch functions because they'll be interpolated at runtime
 
@@ -256,7 +257,7 @@ export default function TaggedTemplateExpression(
             state.dependencies.push(...dependencies);
             state.replacements.push({
               original: loc,
-              length: cssText.length - beforeLength,
+              length: cssText.length - beforeLength
             });
 
             return;
@@ -270,7 +271,7 @@ export default function TaggedTemplateExpression(
             id,
             node: ex.node,
             source: ex.getSource() || generator(ex.node).code,
-            unit: '',
+            unit: ""
           });
 
           cssText += `var(--${id})`;
@@ -308,11 +309,11 @@ export default function TaggedTemplateExpression(
     const props = [];
 
     props.push(
-      t.objectProperty(t.identifier('name'), t.stringLiteral(displayName))
+      t.objectProperty(t.identifier("name"), t.stringLiteral(displayName))
     );
 
     props.push(
-      t.objectProperty(t.identifier('class'), t.stringLiteral(className))
+      t.objectProperty(t.identifier("class"), t.stringLiteral(className))
     );
 
     // If we found any interpolations, also pass them so they can be applied
@@ -337,7 +338,7 @@ export default function TaggedTemplateExpression(
 
       props.push(
         t.objectProperty(
-          t.identifier('vars'),
+          t.identifier("vars"),
           t.objectExpression(
             Object.keys(result).map(key => {
               const { id, node, unit } = result[key];
@@ -359,17 +360,17 @@ export default function TaggedTemplateExpression(
 
     path.replaceWith(
       t.callExpression(
-        t.callExpression(t.identifier('styled'), [styled.component.node]),
+        t.callExpression(t.identifier("styled"), [styled.component.node]),
         [t.objectExpression(props)]
       )
     );
 
-    path.addComment('leading', '#__PURE__');
+    path.addComment("leading", "#__PURE__");
   } else {
     path.replaceWith(t.stringLiteral(className));
   }
 
-  if (!isReferenced && !cssText.includes(':global')) {
+  if (!isReferenced && !cssText.includes(":global")) {
     return;
   }
 
@@ -377,6 +378,6 @@ export default function TaggedTemplateExpression(
     cssText,
     className,
     displayName,
-    start: path.parent && path.parent.loc ? path.parent.loc.start : null,
+    start: path.parent && path.parent.loc ? path.parent.loc.start : null
   };
 }

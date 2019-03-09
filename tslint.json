@@ -1,11 +1,79 @@
 {
-  "extends": "dtslint/dtslint.json",
+  "extends": ["tslint:recommended", "tslint-config-prettier", "tslint-react-hooks"],
+  "rulesDirectory": ["tslint-plugin-prettier", "tslint-microsoft-contrib"],
   "rules": {
-    "file-name-casing": false,
+    "prettier": true,
+
+    "deprecation": true,
     "interface-over-type-literal": false,
-    "strict-export-declare-modifiers": false
+    "member-access": [true, "no-public"],
+    "member-ordering": false,
+    "no-default-export": false,
+    "no-floating-promises": true,
+    "no-for-in-array": true,
+    "no-inferred-empty-object-type": true,
+    "no-parameter-reassignment": false,
+    "no-redundant-jsdoc": false,
+    "no-unbound-method": [true, "ignore-static"],
+    "no-unnecessary-type-assertion": true,
+    "no-unsafe-any": true,
+    "no-unused-expression": [true, "allow-fast-null-checks"],
+    "no-void-expression": false,
+    "promise-function-async": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": [true, { "grouped-imports": true }],
+    "strict-boolean-expressions": [
+      true,
+      "allow-null-union",
+      "allow-undefined-union",
+      "allow-mix",
+      "allow-boolean-or-undefined",
+      "allow-number"
+    ],
+    "strict-type-predicates": true,
+    "use-default-type-parameter": true,
+
+    "no-constant-condition": true,
+    "no-control-regex": true,
+    "no-delete-expression": true,
+    "no-string-based-set-immediate": true,
+    "no-string-based-set-interval": true,
+    "no-string-based-set-timeout": true,
+    "no-typeof-undefined": true,
+    "no-unnecessary-field-initialization": true,
+    "no-unnecessary-override": true,
+    "no-with-statement": true,
+    "non-literal-require": true,
+    "prefer-array-literal": false,
+    "promise-must-complete": true,
+    "interface-name": false,
+    "unnecessary-bind": false,
+
+    "react-a11y-anchors": true,
+    "react-a11y-aria-unsupported-elements": true,
+    "react-a11y-event-has-role": true,
+    "react-a11y-image-button-has-alt": true,
+    "react-a11y-img-has-alt": true,
+    "react-a11y-input-elements": true,
+    "react-a11y-lang": true,
+    "react-a11y-meta": true,
+    "react-a11y-no-onchange": true,
+    "react-a11y-props": true,
+    "react-a11y-proptypes": true,
+    "react-a11y-required": true,
+    "react-a11y-role-has-required-aria-props": true,
+    "react-a11y-role-supports-aria-props": true,
+    "react-a11y-role": true,
+    "react-a11y-tabindex-no-positive": true,
+    "react-a11y-titles": true,
+    "react-anchor-blank-noopener": true,
+    "react-iframe-missing-sandbox": true,
+    "react-this-binding-issue": false
   },
   "linterOptions": {
-    "exclude": ["node_modules/**"]
+    "exclude": [
+      "*.json",
+      "**/*.json"
+    ]
   }
 }

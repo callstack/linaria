@@ -1,8 +1,8 @@
-import { PluginOptions } from './utils/loadOptions';
+import * as babel from "@babel/core";
+import generator from "@babel/generator";
 
-const generator = require('@babel/generator').default;
-const babel = require('@babel/core');
-const Module = require('./module');
+import Module from "./module";
+import { PluginOptions } from "./utils/loadOptions";
 
 const isAdded = (requirements, path) => {
   if (requirements.some(req => req.path === path)) {
@@ -22,13 +22,13 @@ const resolve = (path, t, requirements) => {
   if (
     path.isReferenced() &&
     binding &&
-    binding.kind !== 'param' &&
+    binding.kind !== "param" &&
     !isAdded(requirements, binding.path)
   ) {
     let result;
 
     switch (binding.kind) {
-      case 'module':
+      case "module":
         if (t.isImportSpecifier(binding.path)) {
           result = t.importDeclaration(
             [binding.path.node],
@@ -38,9 +38,9 @@ const resolve = (path, t, requirements) => {
           result = binding.path.parentPath.node;
         }
         break;
-      case 'const':
-      case 'let':
-      case 'var': {
+      case "const":
+      case "let":
+      case "var": {
         let decl;
 
         // Replace SequenceExpressions (expr1, expr2, expr3, ...) with the last one
@@ -69,13 +69,13 @@ const resolve = (path, t, requirements) => {
       result,
       path: binding.path,
       start: loc.start,
-      end: loc.end,
+      end: loc.end
     });
 
     binding.path.traverse({
       Identifier(p) {
         resolve(p, t, requirements);
-      },
+      }
     });
   }
 };
@@ -84,15 +84,17 @@ export default function evaluate(
   path: any,
   t: any,
   filename: string,
-  transformer?: (text: string) => {
-    code: string
+  transformer?: (
+    text: string
+  ) => {
+    code: string;
   },
   options?: PluginOptions
 ) {
   if (t.isSequenceExpression(path)) {
     // We only need to evaluate the last item in a sequence expression, e.g. (a, b, c)
     // eslint-disable-next-line no-param-reassign
-    path = path.get('expressions')[path.node.expressions.length - 1];
+    path = path.get("expressions")[path.node.expressions.length - 1];
   }
 
   const requirements = [];
@@ -103,14 +105,14 @@ export default function evaluate(
     path.traverse({
       Identifier(p) {
         resolve(p, t, requirements);
-      },
+      }
     });
   }
 
   const expression = t.expressionStatement(
     t.assignmentExpression(
-      '=',
-      t.memberExpression(t.identifier('module'), t.identifier('exports')),
+      "=",
+      t.memberExpression(t.identifier("module"), t.identifier("exports")),
       path.node
     )
   );
@@ -149,7 +151,7 @@ export default function evaluate(
 
   m.dependencies = [];
   m.transform =
-    typeof transformer !== 'undefined'
+    typeof transformer !== "undefined"
       ? transformer
       : function transform(text) {
           if (options && options.ignore && options.ignore.test(this.filename)) {
@@ -158,20 +160,20 @@ export default function evaluate(
 
           const plugins = [
             // Include these plugins to avoid extra config when using { module: false } for webpack
-            '@babel/plugin-transform-modules-commonjs',
-            '@babel/plugin-proposal-export-namespace-from',
+            "@babel/plugin-transform-modules-commonjs",
+            "@babel/plugin-proposal-export-namespace-from"
           ];
 
           const defaults = {
-            caller: { name: 'linaria', evaluate: true },
+            caller: { name: "linaria", evaluate: true },
             filename: this.filename,
-            presets: [[require.resolve('./index'), options]],
+            presets: [[require.resolve("./index"), options]],
             plugins: [
               ...plugins.map(name => require.resolve(name)),
               // We don't support dynamic imports when evaluating, but don't wanna syntax error
               // This will replace dynamic imports with an object that does nothing
-              require.resolve('./dynamic-import-noop'),
-            ],
+              require.resolve("./dynamic-import-noop")
+            ]
           };
 
           const babelOptions =
@@ -181,7 +183,7 @@ export default function evaluate(
           // If we programmtically pass babel options while there is a .babelrc, babel might throw
           // We need to filter out duplicate presets and plugins so that this doesn't happen
           // This workaround isn't full proof, but it's still better than nothing
-          ['presets', 'plugins'].forEach(field => {
+          ["presets", "plugins"].forEach(field => {
             babelOptions[field] = babelOptions[field]
               ? babelOptions[field].filter(item => {
                   // If item is an array it's a preset/plugin with options ([preset, options])
@@ -194,8 +196,8 @@ export default function evaluate(
                     // We require the file from internal path which is not the same one that we export
                     // This case won't get caught and the preset won't filtered, even if they are same
                     // So we add an extra check for top level linaria/babel
-                    name === 'linaria/babel' ||
-                    name === require.resolve('../../babel') ||
+                    name === "linaria/babel" ||
+                    name === require.resolve("../../babel") ||
                     // Also add a check for the plugin names we include for bundler support
                     plugins.includes(name)
                   ) {
@@ -220,27 +222,27 @@ export default function evaluate(
               // Preset order is last to first, so add the extra presets to start
               // This makes sure that our preset is always run first
               ...babelOptions.presets,
-              ...defaults.presets,
+              ...defaults.presets
             ],
             plugins: [
               ...defaults.plugins,
               // Plugin order is first to last, so add the extra presets to end
               // This makes sure that the plugins we specify always run first
-              ...babelOptions.plugins,
-            ],
+              ...babelOptions.plugins
+            ]
           });
         };
 
   m.evaluate(
     [
       // Use String.raw to preserve escapes such as '\n' in the code
-      imports.map(node => String.raw`${generator(node).code}`).join('\n'),
-      String.raw`${generator(wrapped).code}`,
-    ].join('\n')
+      imports.map(node => String.raw`${generator(node).code}`).join("\n"),
+      String.raw`${generator(wrapped).code}`
+    ].join("\n")
   );
 
   return {
     value: m.exports,
-    dependencies: (m.dependencies as string[]),
+    dependencies: m.dependencies
   };
 }

@@ -9,15 +9,16 @@
  * We also store source maps for it to provide correct error stacktraces.
  */
 
-import NativeModule from 'module';
-import vm from 'vm';
-import fs from 'fs';
-import path from 'path';
-import * as process from './process';
+import fs from "fs";
+import NativeModule from "module";
+import path from "path";
+import vm from "vm";
+
+import * as process from "./process";
 
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty
-const builtins = {
+const builtins: { [key: string]: boolean } = {
   assert: true,
   buffer: true,
   child_process: false,
@@ -50,7 +51,7 @@ const builtins = {
   url: true,
   util: true,
   vm: true,
-  zlib: true,
+  zlib: true
 };
 
 // Separate cache for evaled modules
@@ -59,26 +60,39 @@ let cache: { [key: string]: Module } = {};
 const NOOP = () => {};
 
 export default class Module {
-  static invalidate: () => undefined;
+  static invalidate = () => {
+    cache = {};
+  };
 
-  static _resolveFilename: (
+  // Alias to resolve the module using node's resolve algorithm
+  // This static property can be overriden by the webpack loader
+  // This allows us to use webpack's module resolution algorithm
+  static _resolveFilename = (
     id: string,
     options: {
       id: string;
       filename: string;
       paths: string[];
     }
-  ) => string;
+  ): string => {
+    // @ts-ignore
+    return NativeModule._resolveFilename(id, options);
+  };
+
+  static _nodeModulePaths: (p: string) => string[] =
+    // @ts-ignore
+    NativeModule._nodeModulePaths;
 
   // @ts-ignore
-  static _nodeModulePaths: (p: string) => string[] = NativeModule._nodeModulePaths;
-
   id: string;
 
+  // @ts-ignore
   filename: string;
 
+  // @ts-ignore
   paths: string[];
 
+  // @ts-ignore
   require: {
     (id: string): any;
     resolve(id: string): string;
@@ -92,39 +106,40 @@ export default class Module {
 
   dependencies: string[] | null | undefined;
 
-  transform: (text: string) => { code: string } | null | undefined;
+  // @ts-ignore
+  transform: (text: string) => { code: string };
 
   constructor(filename: string) {
     Object.defineProperties(this, {
       id: {
         value: filename,
-        writable: false,
+        writable: false
       },
       filename: {
         value: filename,
-        writable: false,
+        writable: false
       },
       paths: {
-        value: Object.freeze(
-          Module._nodeModulePaths(path.dirname(filename))
-        ),
-        writable: false,
-      },
+        value: Object.freeze(Module._nodeModulePaths(path.dirname(filename))),
+        writable: false
+      }
     });
 
     this.exports = {};
+    // @ts-ignore
     this.require = this.require.bind(this);
     this.require.resolve = this.resolve.bind(this);
     this.require.ensure = NOOP;
     this.require.cache = cache;
 
     // We support following extensions by default
-    this.extensions = ['.json', '.js', '.jsx', '.ts', '.tsx'];
+    this.extensions = [".json", ".js", ".jsx", ".ts", ".tsx"];
   }
 
   resolve(id: string) {
+    // @ts-ignore
     const extensions = NativeModule._extensions;
-    const added = [];
+    const added: string[] = [];
 
     try {
       // Check for supported extensions
@@ -147,6 +162,7 @@ export default class Module {
     }
   }
 
+  // @ts-ignore
   require(id: string) {
     if (id in builtins) {
       // The module is in the allowed list of builtin node modules
@@ -184,7 +200,7 @@ export default class Module {
 
       if (this.extensions.includes(path.extname(filename))) {
         // To evaluate the file, we need to read it first
-        const code = fs.readFileSync(filename, 'utf-8');
+        const code = fs.readFileSync(filename, "utf-8");
 
         if (/\.json$/.test(filename)) {
           // For JSON files, parse it to a JS object similar to Node
@@ -210,7 +226,7 @@ export default class Module {
     const code = this.transform ? this.transform(text).code : text;
 
     const script = new vm.Script(code, {
-      filename: this.filename,
+      filename: this.filename
     });
 
     script.runInContext(
@@ -221,18 +237,8 @@ export default class Module {
         exports: this.exports,
         require: this.require,
         __filename: this.filename,
-        __dirname: path.dirname(this.filename),
+        __dirname: path.dirname(this.filename)
       })
     );
   }
 }
-
-Module.invalidate = () => {
-  cache = {};
-};
-
-// Alias to resolve the module using node's resolve algorithm
-// This static property can be overriden by the webpack loader
-// This allows us to use webpack's module resolution algorithm
-Module._resolveFilename = (id, options) =>
-  NativeModule._resolveFilename(id, options);

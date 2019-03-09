@@ -1,27 +1,31 @@
-import * as React from 'react'; // eslint-disable-line import/no-extraneous-dependencies
-import validAttr from '@emotion/is-prop-valid';
-import { cx } from '../index';
+import validAttr from "@emotion/is-prop-valid";
+import * as React from "react"; // eslint-disable-line import/no-extraneous-dependencies
+
+import { cx } from "../index";
 
 type Options = {
-  name: string,
-  class: string,
+  name: string;
+  class: string;
   vars?: {
-    [a: string]: [string | number | ((props: any) => string | number), string | undefined]
-  }
+    [a: string]: [
+      string | number | ((props: any) => string | number),
+      string | undefined
+    ];
+  };
 };
 
 const warnIfInvalid = (value: any, componentName) => {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     if (
-      typeof value === 'string' ||
+      typeof value === "string" ||
       // eslint-disable-next-line no-self-compare
-      (typeof value === 'number' && isFinite(value))
+      (typeof value === "number" && isFinite(value))
     ) {
       return;
     }
 
     const stringified =
-      typeof value === 'object' ? JSON.stringify(value) : String(value);
+      typeof value === "object" ? JSON.stringify(value) : String(value);
 
     // eslint-disable-next-line no-console
     console.warn(
@@ -32,7 +36,7 @@ const warnIfInvalid = (value: any, componentName) => {
 
 function styled(tag: React.ComponentType<any> | string) {
   return (options: Options) => {
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== "production") {
       if (Array.isArray(options)) {
         // We received a strings array since it's used as a tag
         throw new Error(
@@ -47,12 +51,12 @@ function styled(tag: React.ComponentType<any> | string) {
       let filteredProps;
 
       // Check if it's an HTML tag and not a custom element
-      if (typeof component === 'string' && component.indexOf('-') === -1) {
+      if (typeof component === "string" && component.indexOf("-") === -1) {
         filteredProps = {};
 
         // eslint-disable-next-line guard-for-in
         for (const key in rest) {
-          if (key === 'as' || validAttr(key)) {
+          if (key === "as" || validAttr(key)) {
             // Don't pass through invalid attributes to HTML elements
             filteredProps[key] = rest[key];
           }
@@ -74,15 +78,15 @@ function styled(tag: React.ComponentType<any> | string) {
 
         // eslint-disable-next-line guard-for-in
         for (const name in vars) {
-          const [result, unit = ''] = vars[name];
-          const value = typeof result === 'function' ? result(props) : result;
+          const [result, unit = ""] = vars[name];
+          const value = typeof result === "function" ? result(props) : result;
 
           warnIfInvalid(value, options.name);
 
           style[`--${name}`] = `${value}${unit}`;
         }
 
-        filteredProps.style = {...style, ...filteredProps.style};
+        filteredProps.style = { ...style, ...filteredProps.style };
       }
 
       if (tag.__linaria && tag !== component) {
@@ -107,7 +111,7 @@ function styled(tag: React.ComponentType<any> | string) {
     // These properties will be read by the babel plugin for interpolation
     Result.__linaria = {
       className: options.class,
-      extends: tag,
+      extends: tag
     };
 
     return Result;
@@ -116,11 +120,11 @@ function styled(tag: React.ComponentType<any> | string) {
 
 let exported;
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   exported = new Proxy(styled, {
     get(o, prop) {
       return o(prop);
-    },
+    }
   });
 } else {
   exported = styled;

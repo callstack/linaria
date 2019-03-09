@@ -1,13 +1,14 @@
-import dedent from 'dedent';
-import prettier from 'prettier';
-import collect from '../collect';
+import dedent from "dedent";
+import prettier from "prettier";
 
-const prettyPrint = (src: string) => prettier.format(src, { parser: 'scss' });
+import collect from "../collect";
+
+const prettyPrint = (src: string) => prettier.format(src, { parser: "scss" });
 
 const testCollect = (html, css) => {
   const { critical, other } = collect(html, css);
-  test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
-  test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
+  test("critical", () => expect(prettyPrint(critical)).toMatchSnapshot());
+  test("other", () => expect(prettyPrint(other)).toMatchSnapshot());
 };
 
 const html = dedent`
@@ -16,7 +17,7 @@ const html = dedent`
   </div>
 `;
 
-describe('collects complex css', () => {
+describe("collects complex css", () => {
   const css = dedent`
     .lotus {
       vertical-align: top;
@@ -108,7 +109,7 @@ describe('collects complex css', () => {
   testCollect(html, css);
 });
 
-describe('simple class name', () => {
+describe("simple class name", () => {
   const css = dedent`
     .linaria {}
     .classname {}
@@ -117,7 +118,7 @@ describe('simple class name', () => {
   testCollect(html, css);
 });
 
-describe('classname in @rule', () => {
+describe("classname in @rule", () => {
   const css = dedent`
     @supports (object-fit: cover) { .linaria {} }
     @media (min-width: 600px) { .linaria {} }
@@ -153,7 +154,7 @@ describe('classname in @rule', () => {
   testCollect(html, css);
 });
 
-describe('works with CSS combinators', () => {
+describe("works with CSS combinators", () => {
   const css = dedent`
     .linaria + span {}
     .linaria ~ div {}
@@ -168,7 +169,7 @@ describe('works with CSS combinators', () => {
   testCollect(html, css);
 });
 
-describe('works with pseudo-class and pseudo-elements', () => {
+describe("works with pseudo-class and pseudo-elements", () => {
   const css = dedent`
     .linaria:active {}
     .linaria::before {}
@@ -179,7 +180,7 @@ describe('works with pseudo-class and pseudo-elements', () => {
   testCollect(html, css);
 });
 
-describe('works with global css', () => {
+describe("works with global css", () => {
   const css = dedent`
     body { font-size: 13.37px; }
 
@@ -196,6 +197,6 @@ describe('works with global css', () => {
 
   const { critical, other } = collect(html, css);
 
-  test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
-  test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
+  test("critical", () => expect(prettyPrint(critical)).toMatchSnapshot());
+  test("other", () => expect(prettyPrint(other)).toMatchSnapshot());
 });

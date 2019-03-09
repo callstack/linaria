@@ -1,11 +1,15 @@
 /* eslint-disable no-param-reassign */
 
-import { NodePath } from '@babel/traverse';
-import Module from './module';
-import TaggedTemplateExpression from './visitors/TaggedTemplateExpression';
-import { StrictOptions, State } from './types';
+import { NodePath } from "@babel/traverse";
 
-export default function extract(babel: typeof import('@babel/core'), options: StrictOptions) {
+import Module from "./module";
+import { State, StrictOptions } from "./types";
+import TaggedTemplateExpression from "./visitors/TaggedTemplateExpression";
+
+export default function extract(
+  babel: typeof import("@babel/core"),
+  options: StrictOptions
+) {
   const { types: t } = babel;
 
   return {
@@ -25,7 +29,7 @@ export default function extract(babel: typeof import('@babel/core'), options: St
           // So we traverse here instead of a in a visitor
           path.traverse({
             TaggedTemplateExpression: p =>
-              TaggedTemplateExpression(p, state, t, options),
+              TaggedTemplateExpression(p, state, t, options)
           });
         },
         exit(_: any, state: State) {
@@ -35,15 +39,15 @@ export default function extract(babel: typeof import('@babel/core'), options: St
               linaria: {
                 rules: state.rules,
                 replacements: state.replacements,
-                dependencies: state.dependencies,
-              },
+                dependencies: state.dependencies
+              }
             };
           }
 
           // Invalidate cache for module evaluation when we're done
           Module.invalidate();
-        },
-      },
-    },
+        }
+      }
+    }
   };
-};
+}

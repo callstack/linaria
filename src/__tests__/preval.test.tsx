@@ -1,34 +1,35 @@
 /* eslint-disable no-template-curly-in-string */
 
-import path from 'path';
-import * as babel from '@babel/core';
-import dedent from 'dedent';
-import stripAnsi from 'strip-ansi';
-import serializer from '../__utils__/linaria-snapshot-serializer';
+import * as babel from "@babel/core";
+import dedent from "dedent";
+import path from "path";
+import stripAnsi from "strip-ansi";
+
+import serializer from "../__utils__/linaria-snapshot-serializer";
 
 expect.addSnapshotSerializer(serializer);
 
 const babelrc = {
   babelrc: false,
   presets: [
-    [require.resolve('../babel'), { displayName: true, evaluate: true }],
-  ],
+    [require.resolve("../babel"), { displayName: true, evaluate: true }]
+  ]
 };
 
 const transpile = async input => {
   const { code, metadata } = await babel.transformAsync(input, {
     ...babelrc,
-    filename: path.join(__dirname, 'source.js'),
+    filename: path.join(__dirname, "source.js")
   });
 
   // The slug will be machine specific, so replace it with a consistent one
   return {
     metadata,
-    code,
+    code
   };
 };
 
-it('evaluates identifier in scope', async () => {
+it("evaluates identifier in scope", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -39,7 +40,7 @@ it('evaluates identifier in scope', async () => {
 
     export const Title = styled.h1\`
       &:before {
-        content: "${'${days}'}"
+        content: "${"${days}"}"
       }
     \`;
     `
@@ -49,7 +50,7 @@ it('evaluates identifier in scope', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('evaluates local expressions', async () => {
+it("evaluates local expressions", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -69,7 +70,7 @@ it('evaluates local expressions', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('evaluates functions with nested identifiers', async () => {
+it("evaluates functions with nested identifiers", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -90,7 +91,7 @@ it('evaluates functions with nested identifiers', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('evaluates expressions with dependencies', async () => {
+it("evaluates expressions with dependencies", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -108,7 +109,7 @@ it('evaluates expressions with dependencies', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('evaluates expressions with expressions depending on shared dependency', async () => {
+it("evaluates expressions with expressions depending on shared dependency", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -129,7 +130,7 @@ it('evaluates expressions with expressions depending on shared dependency', asyn
   expect(metadata).toMatchSnapshot();
 });
 
-it('evaluates multiple expressions with shared dependency', async () => {
+it("evaluates multiple expressions with shared dependency", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -151,7 +152,7 @@ it('evaluates multiple expressions with shared dependency', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('evalutes interpolations with sequence expression', async () => {
+it("evalutes interpolations with sequence expression", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -166,7 +167,7 @@ it('evalutes interpolations with sequence expression', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('evalutes dependencies with sequence expression', async () => {
+it("evalutes dependencies with sequence expression", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -174,7 +175,7 @@ it('evalutes dependencies with sequence expression', async () => {
     const color = (external, () => 'blue');
 
     export const Title = styled.h1\`
-      color: ${'${color}'};
+      color: ${"${color}"};
     \`;
     `
   );
@@ -183,7 +184,7 @@ it('evalutes dependencies with sequence expression', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('evaluates component interpolations', async () => {
+it("evaluates component interpolations", async () => {
   const { code, metadata } = await transpile(
     dedent`
     const { styled } = require('../react');
@@ -193,7 +194,7 @@ it('evaluates component interpolations', async () => {
     \`;
 
     export const Paragraph = styled.p\`
-      ${'${Title}'} {
+      ${"${Title}"} {
         color: blue;
       }
     \`;
@@ -204,7 +205,7 @@ it('evaluates component interpolations', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('throws when interpolation evaluates to undefined', async () => {
+it("throws when interpolation evaluates to undefined", async () => {
   expect.assertions(1);
 
   try {
@@ -215,18 +216,18 @@ it('throws when interpolation evaluates to undefined', async () => {
       let fontSize;
 
       export const Title = styled.h1\`
-        font-size: ${'${fontSize}'};
+        font-size: ${"${fontSize}"};
       \`;
       `
     );
   } catch (e) {
     expect(
-      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+      stripAnsi(e.message.replace(__dirname, "<<DIRNAME>>"))
     ).toMatchSnapshot();
   }
 });
 
-it('throws when interpolation evaluates to null', async () => {
+it("throws when interpolation evaluates to null", async () => {
   expect.assertions(1);
 
   try {
@@ -237,18 +238,18 @@ it('throws when interpolation evaluates to null', async () => {
       const color = null;
 
       export const Title = styled.h1\`
-        color: ${'${color}'};
+        color: ${"${color}"};
       \`;
       `
     );
   } catch (e) {
     expect(
-      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+      stripAnsi(e.message.replace(__dirname, "<<DIRNAME>>"))
     ).toMatchSnapshot();
   }
 });
 
-it('throws when interpolation evaluates to NaN', async () => {
+it("throws when interpolation evaluates to NaN", async () => {
   expect.assertions(1);
 
   try {
@@ -259,18 +260,18 @@ it('throws when interpolation evaluates to NaN', async () => {
       const height = NaN;
 
       export const Title = styled.h1\`
-        height: ${'${height}'}px;
+        height: ${"${height}"}px;
       \`;
       `
     );
   } catch (e) {
     expect(
-      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+      stripAnsi(e.message.replace(__dirname, "<<DIRNAME>>"))
     ).toMatchSnapshot();
   }
 });
 
-it('handles wrapping another styled component', async () => {
+it("handles wrapping another styled component", async () => {
   const { code, metadata } = await transpile(
     dedent`
     const { styled } = require('../react');
@@ -290,7 +291,7 @@ it('handles wrapping another styled component', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('inlines object styles as CSS string', async () => {
+it("inlines object styles as CSS string", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -304,7 +305,7 @@ it('inlines object styles as CSS string', async () => {
     });
 
     export const Title = styled.h1\`
-      ${'${fill(0, 0)}'}
+      ${"${fill(0, 0)}"}
     \`;
     `
   );
@@ -313,7 +314,7 @@ it('inlines object styles as CSS string', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('inlines array styles as CSS string', async () => {
+it("inlines array styles as CSS string", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -329,7 +330,7 @@ it('inlines array styles as CSS string', async () => {
     ];
 
     export const Title = styled.h1\`
-      ${'${fill(0, 0)}'}
+      ${"${fill(0, 0)}"}
     \`;
     `
   );
@@ -338,14 +339,14 @@ it('inlines array styles as CSS string', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('ignores inline arrow function expressions', async () => {
+it("ignores inline arrow function expressions", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
 
     export const Title = styled.h1\`
       &:before {
-        content: "${'${props => props.content}'}"
+        content: "${"${props => props.content}"}"
       }
     \`;
     `
@@ -355,14 +356,14 @@ it('ignores inline arrow function expressions', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('ignores inline vanilla function expressions', async () => {
+it("ignores inline vanilla function expressions", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
 
     export const Title = styled.h1\`
       &:before {
-        content: "${'${function(props) { return props.content }}'}"
+        content: "${"${function(props) { return props.content }}"}"
       }
     \`;
     `
@@ -372,7 +373,7 @@ it('ignores inline vanilla function expressions', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('ignores external expressions', async () => {
+it("ignores external expressions", async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -381,7 +382,7 @@ it('ignores external expressions', async () => {
 
     export const Title = styled.h1\`
       &:before {
-        content: "${'${generate}'}"
+        content: "${"${generate}"}"
       }
     \`;
     `
@@ -391,7 +392,7 @@ it('ignores external expressions', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('throws codeframe error when evaluation fails', async () => {
+it("throws codeframe error when evaluation fails", async () => {
   expect.assertions(1);
 
   try {
@@ -402,20 +403,20 @@ it('throws codeframe error when evaluation fails', async () => {
       const foo = props => { throw new Error('This will fail') };
 
       export const Title = styled.h1\`
-        font-size: ${'${foo()}'}px;
+        font-size: ${"${foo()}"}px;
       \`;
       `
     );
   } catch (e) {
     expect(
-      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+      stripAnsi(e.message.replace(__dirname, "<<DIRNAME>>"))
     ).toMatchSnapshot();
   }
 });
 
-it('handles escapes properly', async () => {
+it("handles escapes properly", async () => {
   const { code, metadata } = await babel.transformFileAsync(
-    path.resolve(__dirname, '../__fixtures__/escape-character.js'),
+    path.resolve(__dirname, "../__fixtures__/escape-character.js"),
     babelrc
   );
 
@@ -423,7 +424,7 @@ it('handles escapes properly', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('derives display name from filename', async () => {
+it("derives display name from filename", async () => {
   const { code, metadata } = await babel.transformAsync(
     dedent`
     import { styled } from 'linaria/react';
@@ -434,7 +435,7 @@ it('derives display name from filename', async () => {
     `,
     {
       ...babelrc,
-      filename: path.join(__dirname, 'FancyName.js'),
+      filename: path.join(__dirname, "FancyName.js")
     }
   );
 
@@ -442,7 +443,7 @@ it('derives display name from filename', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('derives display name from parent folder name', async () => {
+it("derives display name from parent folder name", async () => {
   const { code, metadata } = await babel.transformAsync(
     dedent`
     import { styled } from 'linaria/react';
@@ -453,7 +454,7 @@ it('derives display name from parent folder name', async () => {
     `,
     {
       ...babelrc,
-      filename: path.join(__dirname, 'FancyName/index.js'),
+      filename: path.join(__dirname, "FancyName/index.js")
     }
   );
 
@@ -475,17 +476,17 @@ it("throws if couldn't determine a display name", async () => {
       `,
       {
         ...babelrc,
-        filename: path.join(__dirname, '/.js'),
+        filename: path.join(__dirname, "/.js")
       }
     );
   } catch (e) {
     expect(
-      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+      stripAnsi(e.message.replace(__dirname, "<<DIRNAME>>"))
     ).toMatchSnapshot();
   }
 });
 
-it('does not strip instanbul coverage sequences', async () => {
+it("does not strip instanbul coverage sequences", async () => {
   const { code, metadata } = await babel.transformAsync(
     dedent`
     import { styled } from 'linaria/react';
@@ -493,20 +494,20 @@ it('does not strip instanbul coverage sequences', async () => {
     const a = 42;
 
     export const Title = styled.h1\`
-      height: ${'${a}'}px;
+      height: ${"${a}"}px;
     \`;
     `,
     {
       ...babelrc,
-      cwd: '/home/user/project',
-      filename: 'file.js',
+      cwd: "/home/user/project",
+      filename: "file.js",
       plugins: [
         [
           // eslint-disable-next-line import/no-extraneous-dependencies
-          require('babel-plugin-istanbul').default({ types: babel.types }),
-          { cwd: '/home/user/project' },
-        ],
-      ],
+          require("babel-plugin-istanbul").default({ types: babel.types }),
+          { cwd: "/home/user/project" }
+        ]
+      ]
     }
   );
 

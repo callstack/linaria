@@ -1,34 +1,38 @@
-import stripAnsi from 'strip-ansi';
-import transform, { Replacement } from '../transform';
+import stripAnsi from "strip-ansi";
+
+import transform, { Replacement } from "../transform";
 
 type Errors = {
-  [key: string]: {
-    name?: string,
-    code?: string,
-    message: string,
-    pos?: number,
-    loc?: {
-      line: number,
-      column: number
-    }
-  } | null | undefined
+  [key: string]:
+    | {
+        name?: string;
+        code?: string;
+        message: string;
+        pos?: number;
+        loc?: {
+          line: number;
+          column: number;
+        };
+      }
+    | null
+    | undefined;
 };
 
 type Cache = {
-  [key: string]: Replacement[] | null | undefined
+  [key: string]: Replacement[] | null | undefined;
 };
 
 type Warning = {
-  rule?: string,
-  text: string,
-  severity: "error" | "warning",
-  line: number,
-  column: number
+  rule?: string;
+  text: string;
+  severity: "error" | "warning";
+  line: number;
+  column: number;
 };
 
 type LintResult = {
-  errored: boolean,
-  warnings: Warning[]
+  errored: boolean;
+  warnings: Warning[];
 };
 
 export default function preprocessor() {
@@ -41,7 +45,7 @@ export default function preprocessor() {
 
       try {
         result = transform(input, {
-          filename,
+          filename
         });
 
         cache[filename] = undefined;
@@ -52,38 +56,38 @@ export default function preprocessor() {
 
         // Ignore parse errors here
         // We handle it separately
-        return '';
+        return "";
       }
 
       const { rules, replacements } = result;
 
       if (!rules) {
-        return '';
+        return "";
       }
 
       // Construct a CSS-ish file from the unprocessed style rules
-      let cssText = '';
+      let cssText = "";
 
       Object.keys(rules).forEach(selector => {
         const rule = rules[selector];
 
         // Append new lines until we get to the start line number
-        let line = cssText.split('\n').length;
+        let line = cssText.split("\n").length;
 
         while (rule.start && line < rule.start.line) {
-          cssText += '\n';
+          cssText += "\n";
           line++;
         }
 
         cssText += `.${rule.displayName} {`;
 
         // Append blank spaces until we get to the start column number
-        const last = cssText.split('\n').pop();
+        const last = cssText.split("\n").pop();
 
         let column = last ? last.length : 0;
 
         while (rule.start && column < rule.start.column) {
-          cssText += ' ';
+          cssText += " ";
           column++;
         }
 
@@ -104,7 +108,7 @@ export default function preprocessor() {
 
         let message = stripAnsi(
           error.message.startsWith(prefix)
-            ? error.message.replace(prefix, '')
+            ? error.message.replace(prefix, "")
             : error.message
         );
 
@@ -112,18 +116,18 @@ export default function preprocessor() {
 
         if (!loc) {
           // If the error doesn't have location info, try to find it from the code frame
-          const line = message.split('\n').find(l => l.startsWith('>'));
-          const column = message.split('\n').find(l => l.includes('^'));
+          const line = message.split("\n").find(l => l.startsWith(">"));
+          const column = message.split("\n").find(l => l.includes("^"));
 
           if (line && column) {
             loc = {
               line: Number(
                 line
-                  .replace(/^> /, '')
-                  .split('|')[0]
+                  .replace(/^> /, "")
+                  .split("|")[0]
                   .trim()
               ),
-              column: column.replace(/[^|]+\|\s/, '').length,
+              column: column.replace(/[^|]+\|\s/, "").length
             };
           }
         }
@@ -131,7 +135,7 @@ export default function preprocessor() {
         if (loc) {
           // Strip the codeframe text if we have location of the error
           // It's formatted badly by stylelint, so not very helpful
-          message = message.replace(/^>?\s+\d?\s\|.*$/gm, '').trim();
+          message = message.replace(/^>?\s+\d?\s\|.*$/gm, "").trim();
         }
 
         // eslint-disable-next-line no-param-reassign
@@ -141,7 +145,7 @@ export default function preprocessor() {
           text: message,
           line: loc ? loc.line : 0,
           column: loc ? loc.column : 0,
-          severity: 'error',
+          severity: "error"
         });
       }
 
@@ -179,6 +183,6 @@ export default function preprocessor() {
       }
 
       return result;
-    },
+    }
   };
 }
