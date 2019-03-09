@@ -37,7 +37,6 @@ jobs:
             at: ~/linaria
         - run: |
             yarn lint
-            yarn flow check
             yarn typescript
   unit-tests:
       <<: *defaults

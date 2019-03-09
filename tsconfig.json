@@ -1,21 +1,18 @@
 {
   "compilerOptions": {
-    "baseUrl": "..",
-    "rootDir": "__ts-tests__",
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
+    "alwaysStrict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
     "jsx": "react",
-    "lib": ["es6", "dom"],
-    "module": "es6",
+    "lib": ["esnext"],
+    "module": "esnext",
     "moduleResolution": "node",
-    "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
-    "noImplicitThis": true,
     "noImplicitReturns": true,
+    "noImplicitThis": true,
     "noImplicitUseStrict": false,
     "noStrictGenericChecks": false,
     "noUnusedLocals": true,
@@ -23,8 +20,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "strictFunctionTypes": true,
-    "strictNullChecks": true,
-    "target": "esnext"
-  }
+    "target": "esnext",
+    "plugins": [{ "name": "typescript-tslint-plugin" }]
+  },
+  "exclude": ["typings/**/*", "lib/**/*", "dist/**/*", "coverage/**/*", "website/**/**"]
 }

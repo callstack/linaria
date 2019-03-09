@@ -1,6 +1,5 @@
 __fixtures__/
 coverage/
-flow-typed/
 lib/
 dist/
 build/

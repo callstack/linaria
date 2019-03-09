@@ -1,4 +1,5 @@
 {
+  'parser': '@typescript-eslint/parser',
   'extends': '@callstack/eslint-config',
   'rules': { 'global-require': 'off' },
 }
