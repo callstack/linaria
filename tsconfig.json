@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "*": ["types/*"] },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "alwaysStrict": true,

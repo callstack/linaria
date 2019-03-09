@@ -2,6 +2,7 @@
 
 import { relative, dirname, basename } from 'path';
 import { isValidElementType } from 'react-is';
+import { NodePath } from '@babel/traverse';
 import generator from '@babel/generator';
 import evaluate from '../evaluate';
 import slugify from '../../slugify';
@@ -18,15 +19,15 @@ import { StrictOptions, State } from '../types';
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
 
 export default function TaggedTemplateExpression(
-  path: any,
+  path: NodePath<babel.types.TaggedTemplateExpression>,
   state: State,
-  t: any,
+  t: typeof import('@babel/types'),
   options: StrictOptions
 ) {
   const { quasi, tag } = path.node;
 
-  let styled;
-  let css;
+  let styled: { component: { node: babel.Node } } | undefined;
+  let css: boolean | undefined;
 
   if (
     t.isCallExpression(tag) &&
@@ -73,7 +74,12 @@ export default function TaggedTemplateExpression(
   // Also used for display name if it couldn't be determined
   state.index++;
 
-  const interpolations = [];
+  const interpolations: Array<{
+    id: string,
+    node: babel.Node,
+    source: string,
+    unit: string,
+  }> = [];
 
   // Check if the variable is referenced anywhere for basic DCE
   // Only works when it's assigned to a variable

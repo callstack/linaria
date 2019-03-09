@@ -10,7 +10,7 @@ type RollupPluginOptions = {
   exclude?: string | string[],
   sourceMap?: boolean,
   preprocessor?: Preprocessor
-} & $Shape<PluginOptions>;
+} & Partial<PluginOptions>;
 
 export default function linaria({
   include,

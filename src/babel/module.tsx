@@ -9,11 +9,11 @@
  * We also store source maps for it to provide correct error stacktraces.
  */
 
-const NativeModule = require('module');
-const vm = require('vm');
-const fs = require('fs');
-const path = require('path');
-const process = require('./process');
+import NativeModule from 'module';
+import vm from 'vm';
+import fs from 'fs';
+import path from 'path';
+import * as process from './process';
 
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty
@@ -54,7 +54,7 @@ const builtins = {
 };
 
 // Separate cache for evaled modules
-let cache = {};
+let cache: { [key: string]: Module } = {};
 
 const NOOP = () => {};
 
@@ -64,11 +64,14 @@ export default class Module {
   static _resolveFilename: (
     id: string,
     options: {
-      id: string,
-      filename: string,
-      paths: string[]
+      id: string;
+      filename: string;
+      paths: string[];
     }
   ) => string;
+
+  // @ts-ignore
+  static _nodeModulePaths: (p: string) => string[] = NativeModule._nodeModulePaths;
 
   id: string;
 
@@ -76,7 +79,12 @@ export default class Module {
 
   paths: string[];
 
-  require: (id: string) => any;
+  require: {
+    (id: string): any;
+    resolve(id: string): string;
+    ensure(): void;
+    cache: { [key: string]: Module };
+  };
 
   exports: any;
 
@@ -84,9 +92,7 @@ export default class Module {
 
   dependencies: string[] | null | undefined;
 
-  transform: (text: string) => {
-    code: string
-  } | null | undefined;
+  transform: (text: string) => { code: string } | null | undefined;
 
   constructor(filename: string) {
     Object.defineProperties(this, {
@@ -100,7 +106,7 @@ export default class Module {
       },
       paths: {
         value: Object.freeze(
-          NativeModule._nodeModulePaths(path.dirname(filename))
+          Module._nodeModulePaths(path.dirname(filename))
         ),
         writable: false,
       },

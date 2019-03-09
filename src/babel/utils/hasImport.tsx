@@ -1,4 +1,5 @@
 import { dirname } from 'path';
+import Module from '../module';
 
 // Verify if the binding is imported from the specified source
 export default function hasImport(
@@ -16,21 +17,19 @@ export default function hasImport(
 
   const p = binding.path;
 
-  const resolveFromFile = id => {
-    const M = require('module');
-
+  const resolveFromFile = (id: string) => {
     try {
-      return M._resolveFilename(id, {
+      return Module._resolveFilename(id, {
         id: filename,
         filename,
-        paths: M._nodeModulePaths(dirname(filename)),
+        paths: Module._nodeModulePaths(dirname(filename)),
       });
     } catch (e) {
       return null;
     }
   };
 
-  const isImportingModule = value =>
+  const isImportingModule = (value: string) =>
     // If the value is an exact match, assume it imports the module
     value === source ||
     // Otherwise try to resolve both and check if they are the same file

@@ -1,5 +1,5 @@
 // https://www.w3.org/TR/css-values-4/
-const units = [
+export const units = [
   // font relative lengths
   'em',
   'ex',
@@ -54,7 +54,7 @@ const units = [
   '%',
 ];
 
-const unitless = {
+export const unitless = {
   animationIterationCount: true,
   borderImageOutset: true,
   borderImageSlice: true,
@@ -99,6 +99,3 @@ const unitless = {
   strokeOpacity: true,
   strokeWidth: true,
 };
-
-exports.units = units;
-exports.unitless = unitless;
