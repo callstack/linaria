@@ -8,7 +8,7 @@ If you use Babel in your project, make sure to have a [config file for Babel](ht
 
 ### webpack
 
-To use Linaria wih webpack, in your webpack config, add `linaria/loader` under `module.rules`:
+To use Linaria with webpack, in your webpack config, add `linaria/loader` under `module.rules`:
 
 ```js
 {
