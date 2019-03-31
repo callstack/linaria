@@ -30,6 +30,8 @@ export type StrictOptions = {|
   evaluate: boolean,
   ignore: RegExp,
   babelOptions: Object,
+  classPrefix: string,
+  pkgVersionString: string,
 |};
 
 export type Location = {

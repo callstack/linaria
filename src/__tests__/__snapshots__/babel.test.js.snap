@@ -7,9 +7,9 @@ const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th6xni0\\"
+  class: \\"t1ed7x2f\\"
 });
-const title = \\"t1u0rrat\\";"
+const title = \\"t13ic3q2\\";"
 `;
 
 exports[`does not include styles if not referenced anywhere 2`] = `Object {}`;
@@ -28,7 +28,7 @@ export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th6xni0\\"
+  class: \\"t1ed7x2f\\"
 });"
 `;
 
@@ -36,7 +36,7 @@ exports[`evaluates and inlines expressions in scope 2`] = `
 
 CSS:
 
-.th6xni0 {
+.t1ed7x2f {
   color: blue;
   width: 33.333333333333336%;
 }
@@ -47,14 +47,14 @@ Dependencies: NA
 
 exports[`handles css template literal in JSX element 1`] = `
 "import { css } from 'linaria';
-<Title class={\\"th6xni0\\"} />;"
+<Title class={\\"t1ed7x2f\\"} />;"
 `;
 
 exports[`handles css template literal in JSX element 2`] = `
 
 CSS:
 
-.th6xni0 { font-size: 14px; }
+.t1ed7x2f { font-size: 14px; }
 
 Dependencies: NA
 
@@ -63,7 +63,7 @@ Dependencies: NA
 exports[`handles css template literal in object property 1`] = `
 "import { css } from 'linaria';
 const components = {
-  title: \\"th6xni0\\"
+  title: \\"t1ed7x2f\\"
 };"
 `;
 
@@ -71,7 +71,7 @@ exports[`handles css template literal in object property 2`] = `
 
 CSS:
 
-.th6xni0 {
+.t1ed7x2f {
     font-size: 14px;
   }
 
@@ -85,21 +85,21 @@ export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th6xni0\\",
+  class: \\"t1ed7x2f\\",
   vars: {
-    \\"th6xni0-0\\": [size, \\"em\\"],
-    \\"th6xni0-1\\": [shadow, \\"px\\"],
-    \\"th6xni0-2\\": [size, \\"px\\"],
-    \\"th6xni0-3\\": [props => props.width, \\"vw\\"],
-    \\"th6xni0-4\\": [props => {
+    \\"t1ed7x2f-0\\": [size, \\"em\\"],
+    \\"t1ed7x2f-1\\": [shadow, \\"px\\"],
+    \\"t1ed7x2f-2\\": [size, \\"px\\"],
+    \\"t1ed7x2f-3\\": [props => props.width, \\"vw\\"],
+    \\"t1ed7x2f-4\\": [props => {
       if (true) {
         return props.height;
       } else {
         return 200;
       }
     }, \\"px\\"],
-    \\"th6xni0-5\\": [unit, \\"fr\\"],
-    \\"th6xni0-7\\": [function (props) {
+    \\"t1ed7x2f-5\\": [unit, \\"fr\\"],
+    \\"t1ed7x2f-7\\": [function (props) {
       return 200;
     }, \\"px\\"]
   }
@@ -110,14 +110,14 @@ exports[`handles interpolation followed by unit 2`] = `
 
 CSS:
 
-.th6xni0 {
-  font-size: var(--th6xni0-0);
-  text-shadow: black 1px var(--th6xni0-1), white -2px -2px;
-  margin: var(--th6xni0-2);
-  width: calc(2 * var(--th6xni0-3));
-  height: var(--th6xni0-4);
-  grid-template-columns: var(--th6xni0-5) 1fr 1fr var(--th6xni0-5);
-  border-radius: var(--th6xni0-7)
+.t1ed7x2f {
+  font-size: var(--t1ed7x2f-0);
+  text-shadow: black 1px var(--t1ed7x2f-1), white -2px -2px;
+  margin: var(--t1ed7x2f-2);
+  width: calc(2 * var(--t1ed7x2f-3));
+  height: var(--t1ed7x2f-4);
+  grid-template-columns: var(--t1ed7x2f-5) 1fr 1fr var(--t1ed7x2f-5);
+  border-radius: var(--t1ed7x2f-7)
 }
 
 Dependencies: NA
@@ -130,9 +130,9 @@ export const Button =
 /*#__PURE__*/
 styled(\\"button\\")({
   name: \\"Button\\",
-  class: \\"bh6xni0\\",
+  class: \\"b1ed7x2f\\",
   vars: {
-    \\"bh6xni0-0\\": [regular]
+    \\"b1ed7x2f-0\\": [regular]
   }
 });"
 `;
@@ -141,8 +141,8 @@ exports[`handles nested blocks 2`] = `
 
 CSS:
 
-.bh6xni0 {
-  font-family: var(--bh6xni0-0);
+.b1ed7x2f {
+  font-family: var(--b1ed7x2f-0);
 
   &:hover {
     border-color: blue;
@@ -160,12 +160,12 @@ Dependencies: NA
 exports[`includes unreferenced styles for :global 1`] = `
 "import { css } from 'linaria';
 import { styled } from 'linaria/react';
-const a = \\"ah6xni0\\";
+const a = \\"a1ed7x2f\\";
 const B =
 /*#__PURE__*/
 styled(\\"div\\")({
   name: \\"B\\",
-  class: \\"b1u0rrat\\"
+  class: \\"b13ic3q2\\"
 });"
 `;
 
@@ -173,14 +173,14 @@ exports[`includes unreferenced styles for :global 2`] = `
 
 CSS:
 
-.ah6xni0 {
+.a1ed7x2f {
   :global() {
     .title {
       font-size: 14px;
     }
   }
 }
-.b1u0rrat {
+.b13ic3q2 {
   :global(.title) {
     font-size: 14px;
   }
@@ -202,7 +202,7 @@ export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th6xni0\\"
+  class: \\"t1ed7x2f\\"
 });"
 `;
 
@@ -210,7 +210,7 @@ exports[`inlines array styles as CSS string 2`] = `
 
 CSS:
 
-.th6xni0 {
+.t1ed7x2f {
   flex: 1; display: block; height: 24px;
 }
 
@@ -250,7 +250,7 @@ export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th6xni0\\"
+  class: \\"t1ed7x2f\\"
 });"
 `;
 
@@ -258,7 +258,7 @@ exports[`inlines object styles as CSS string 2`] = `
 
 CSS:
 
-.th6xni0 {
+.t1ed7x2f {
   position: absolute; top: 0; right: 0; bottom: 0; left: 0; opacity: 1; min-height: 420px; &.shouldNotBeChanged { border-color: #fff; } @media (min-width: 200px) { -webkit-opacity: 0.8; -moz-opacity: 0.8; -ms-opacity: 0.8; -o-opacity: 0.8; -webkit-border-radius: 2px; -moz-border-radius: 2px; -ms-border-radius: 2px; -o-border-radius: 2px; -webkit-transition: 400ms; -moz-transition: 400ms; -o-transition: 400ms; -ms-transition: 400ms; }
 }
 
@@ -272,7 +272,7 @@ export const ᾩPage$Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"\\\\u1FA9Page$Title\\",
-  class: \\"_h6xni0\\"
+  class: \\"_1ed7x2f\\"
 });"
 `;
 
@@ -280,7 +280,7 @@ exports[`outputs valid CSS classname 2`] = `
 
 CSS:
 
-._h6xni0 {
+._1ed7x2f {
   font-size: 14px;
 }
 
@@ -294,10 +294,10 @@ export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th6xni0\\",
+  class: \\"t1ed7x2f\\",
   vars: {
-    \\"th6xni0-0\\": [size, \\"px\\"],
-    \\"th6xni0-1\\": [props => props.color]
+    \\"t1ed7x2f-0\\": [size, \\"px\\"],
+    \\"t1ed7x2f-1\\": [props => props.color]
   }
 });
 
@@ -306,9 +306,9 @@ function Something() {
   /*#__PURE__*/
   styled(\\"h1\\")({
     name: \\"Title\\",
-    class: \\"t1u0rrat\\",
+    class: \\"t13ic3q2\\",
     vars: {
-      \\"t1u0rrat-0\\": [regular]
+      \\"t13ic3q2-0\\": [regular]
     }
   });
   return <Title />;
@@ -319,12 +319,12 @@ exports[`prevents class name collision 2`] = `
 
 CSS:
 
-.th6xni0 {
-  font-size: var(--th6xni0-0);
-  color: var(--th6xni0-1)
+.t1ed7x2f {
+  font-size: var(--t1ed7x2f-0);
+  color: var(--t1ed7x2f-1)
 }
-.t1u0rrat {
-    font-family: var(--t1u0rrat-0);
+.t13ic3q2 {
+    font-family: var(--t13ic3q2-0);
   }
 
 Dependencies: NA
@@ -337,10 +337,10 @@ export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th6xni0\\",
+  class: \\"t1ed7x2f\\",
   vars: {
-    \\"th6xni0-0\\": [size, \\"px\\"],
-    \\"th6xni0-1\\": [props => props.color]
+    \\"t1ed7x2f-0\\": [size, \\"px\\"],
+    \\"t1ed7x2f-1\\": [props => props.color]
   }
 });"
 `;
@@ -349,9 +349,9 @@ exports[`replaces unknown expressions with CSS custom properties 2`] = `
 
 CSS:
 
-.th6xni0 {
-  font-size: var(--th6xni0-0);
-  color: var(--th6xni0-1);
+.t1ed7x2f {
+  font-size: var(--t1ed7x2f-0);
+  color: var(--t1ed7x2f-1);
 }
 
 Dependencies: NA
@@ -365,19 +365,19 @@ export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th6xni0\\"
+  class: \\"t1ed7x2f\\"
 });
-export const title = \\"t1u0rrat\\";"
+export const title = \\"t13ic3q2\\";"
 `;
 
 exports[`supports both css and styled tags 2`] = `
 
 CSS:
 
-.th6xni0 {
+.t1ed7x2f {
   font-size: 14px;
 }
-.t1u0rrat {
+.t13ic3q2 {
   color: blue;
 }
 
@@ -396,14 +396,14 @@ exports[`throws when contains dynamic expression without evaluate: true in css t
 
 exports[`transpiles css template literal 1`] = `
 "import { css } from 'linaria';
-export const title = \\"th6xni0\\";"
+export const title = \\"t1ed7x2f\\";"
 `;
 
 exports[`transpiles css template literal 2`] = `
 
 CSS:
 
-.th6xni0 {
+.t1ed7x2f {
   font-size: 14px;
 }
 
@@ -417,7 +417,7 @@ export const Title =
 /*#__PURE__*/
 styled(Heading)({
   name: \\"Title\\",
-  class: \\"th6xni0\\"
+  class: \\"t1ed7x2f\\"
 });"
 `;
 
@@ -425,7 +425,7 @@ exports[`transpiles styled template literal with function and component 2`] = `
 
 CSS:
 
-.th6xni0 {
+.t1ed7x2f {
   font-size: 14px;
 }
 
@@ -439,7 +439,7 @@ export const Title =
 /*#__PURE__*/
 styled('h1')({
   name: \\"Title\\",
-  class: \\"th6xni0\\"
+  class: \\"t1ed7x2f\\"
 });"
 `;
 
@@ -447,7 +447,7 @@ exports[`transpiles styled template literal with function and tag 2`] = `
 
 CSS:
 
-.th6xni0 {
+.t1ed7x2f {
   font-size: 14px;
 }
 
@@ -461,7 +461,7 @@ export const Title =
 /*#__PURE__*/
 styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th6xni0\\"
+  class: \\"t1ed7x2f\\"
 });"
 `;
 
@@ -469,7 +469,7 @@ exports[`transpiles styled template literal with object 2`] = `
 
 CSS:
 
-.th6xni0 {
+.t1ed7x2f {
   font-size: 14px;
 }
 
@@ -483,9 +483,9 @@ export const Box =
 /*#__PURE__*/
 styled(\\"div\\")({
   name: \\"Box\\",
-  class: \\"bh6xni0\\",
+  class: \\"b1ed7x2f\\",
   vars: {
-    \\"bh6xni0-0\\": [props => props.size, \\"px\\"]
+    \\"b1ed7x2f-0\\": [props => props.size, \\"px\\"]
   }
 });"
 `;
@@ -494,9 +494,9 @@ exports[`uses the same custom property for the same expression 2`] = `
 
 CSS:
 
-.bh6xni0 {
-  height: var(--bh6xni0-0);
-  width: var(--bh6xni0-0);
+.b1ed7x2f {
+  height: var(--b1ed7x2f-0);
+  width: var(--b1ed7x2f-0);
 }
 
 Dependencies: NA
@@ -509,9 +509,9 @@ export const Box =
 /*#__PURE__*/
 styled(\\"div\\")({
   name: \\"Box\\",
-  class: \\"bh6xni0\\",
+  class: \\"b1ed7x2f\\",
   vars: {
-    \\"bh6xni0-0\\": [size, \\"px\\"]
+    \\"b1ed7x2f-0\\": [size, \\"px\\"]
   }
 });"
 `;
@@ -520,9 +520,9 @@ exports[`uses the same custom property for the same identifier 2`] = `
 
 CSS:
 
-.bh6xni0 {
-  height: var(--bh6xni0-0);
-  width: var(--bh6xni0-0);
+.b1ed7x2f {
+  height: var(--b1ed7x2f-0);
+  width: var(--b1ed7x2f-0);
 }
 
 Dependencies: NA

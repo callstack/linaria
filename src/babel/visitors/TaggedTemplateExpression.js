@@ -131,15 +131,20 @@ export default function TaggedTemplateExpression(
   // Also use append the index of the class to the filename for uniqueness in the file
   const slug = toValidCSSIdentifier(
     `${displayName.charAt(0).toLowerCase()}${slugify(
-      `${relative(state.file.opts.root, state.file.opts.filename)}:${
-        state.index
-      }`
+      `${options.pkgVersionString}${relative(
+        state.file.opts.root,
+        state.file.opts.filename
+      )}:${state.index}`
     )}`
   );
 
-  const className = options.displayName
-    ? `${toValidCSSIdentifier(displayName)}_${slug}`
-    : slug;
+  const className =
+    (options.classPrefix
+      ? toValidCSSIdentifier(`${options.classPrefix}_`)
+      : '') +
+    (options.displayName
+      ? `${toValidCSSIdentifier(displayName)}_${slug}`
+      : slug);
 
   // Serialize the tagged template literal to a string
   let cssText = '';

@@ -34,6 +34,10 @@ module.exports = {
 
   If you need to specify custom babel configuration, you can pass them here. These babel options will be used by Linaria when parsing and evaluating modules.
 
+- `classPrefix: string` (default: `""`):
+
+  Adds a string before generated class names, e.g. `.myCustomPrefix_abcdef` instead of `abcdef`.
+
 ## `linaria/babel` preset
 
 The preset pre-processes and evaluates the CSS. The bundler plugins use this preset under the hood. You also might want to use this preset if you import the components outside of the files handled by your bundler, such as on your server or in unit tests.

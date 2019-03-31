@@ -1,12 +1,98 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`doesn't rewrite an absolute path in url() declarations 1`] = `
-".tpyglzj{background-image:url(/assets/test.jpg);}
+".t6mue4t{background-image:url(/assets/test.jpg);}
 "
 `;
 
+exports[`respects classPrefix option 1`] = `
+Object {
+  "code": "import { css } from 'linaria';
+export const test = \\"t6mue4t\\";",
+  "cssSourceMapText": "{\\"version\\":3,\\"sources\\":[\\"./test.js\\"],\\"names\\":[\\".t6mue4t\\"],\\"mappings\\":\\"AAEaA\\",\\"file\\":\\"./test.css\\",\\"sourcesContent\\":[\\"import { css } from 'linaria';\\\\n\\\\nexport const test = css\`\\\\n  color: red;\\\\n\`;\\"]}",
+  "cssText": ".t6mue4t{color:red;}
+",
+  "dependencies": Array [],
+  "replacements": Array [],
+  "rules": Object {
+    ".t6mue4t": Object {
+      "className": "t6mue4t",
+      "cssText": "
+  color: red;
+",
+      "displayName": "test",
+      "start": Position {
+        "column": 13,
+        "line": 3,
+      },
+    },
+  },
+  "sourceMap": Object {
+    "mappings": "AAAA,SAASA,GAAT,QAAoB,SAApB;AAEA,OAAO,MAAMC,IAAI,YAAV",
+    "names": Array [
+      "css",
+      "test",
+    ],
+    "sources": Array [
+      "./test.js",
+    ],
+    "sourcesContent": Array [
+      "import { css } from 'linaria';
+
+export const test = css\`
+  color: red;
+\`;",
+    ],
+    "version": 3,
+  },
+}
+`;
+
+exports[`respects classPrefix option 2`] = `
+Object {
+  "code": "import { css } from 'linaria';
+export const test = \\"customPrefix_t6mue4t\\";",
+  "cssSourceMapText": "{\\"version\\":3,\\"sources\\":[\\"./test.js\\"],\\"names\\":[\\".customPrefix_t6mue4t\\"],\\"mappings\\":\\"AAEaA\\",\\"file\\":\\"./test.css\\",\\"sourcesContent\\":[\\"import { css } from 'linaria';\\\\n\\\\nexport const test = css\`\\\\n  color: red;\\\\n\`;\\"]}",
+  "cssText": ".customPrefix_t6mue4t{color:red;}
+",
+  "dependencies": Array [],
+  "replacements": Array [],
+  "rules": Object {
+    ".customPrefix_t6mue4t": Object {
+      "className": "customPrefix_t6mue4t",
+      "cssText": "
+  color: red;
+",
+      "displayName": "test",
+      "start": Position {
+        "column": 13,
+        "line": 3,
+      },
+    },
+  },
+  "sourceMap": Object {
+    "mappings": "AAAA,SAASA,GAAT,QAAoB,SAApB;AAEA,OAAO,MAAMC,IAAI,yBAAV",
+    "names": Array [
+      "css",
+      "test",
+    ],
+    "sources": Array [
+      "./test.js",
+    ],
+    "sourcesContent": Array [
+      "import { css } from 'linaria';
+
+export const test = css\`
+  color: red;
+\`;",
+    ],
+    "version": 3,
+  },
+}
+`;
+
 exports[`rewrites a relative path in url() declarations 1`] = `
-".tpyglzj{background-image:url(../linaria/assets/test.jpg);}
+".t6mue4t{background-image:url(../linaria/assets/test.jpg);}
 "
 `;
 

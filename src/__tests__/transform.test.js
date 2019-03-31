@@ -147,3 +147,35 @@ it("doesn't throw due to duplicate preset", async () => {
     )
   ).not.toThrowError('Duplicate plugin/preset detected');
 });
+
+it('respects classPrefix option', async () => {
+  const testFile = dedent`
+  import { css } from 'linaria';
+
+  export const test = css\`
+    color: red;
+  \`;
+  `;
+
+  const baseResult = transform(testFile, {
+    filename: './test.js',
+    outputFilename: '../.linaria-cache/test.css',
+    pluginOptions: {
+      classPrefix: '',
+    },
+  });
+
+  expect(baseResult).toMatchSnapshot();
+
+  const customPrefixResult = transform(testFile, {
+    filename: './test.js',
+    outputFilename: '../.linaria-cache/test.css',
+    pluginOptions: {
+      classPrefix: 'customPrefix',
+    },
+  });
+
+  expect(customPrefixResult).toMatchSnapshot();
+  expect(customPrefixResult.cssText).toContain('customPrefix_');
+  expect(customPrefixResult.cssText).not.toBe(baseResult.cssText);
+});
