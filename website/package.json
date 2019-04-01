@@ -46,6 +46,6 @@
     "stylelint-config-recommended": "^2.1.0",
     "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3",
-    "webpack-serve": "^2.0.3"
+    "webpack-serve": "^3.0.0"
   }
 }
