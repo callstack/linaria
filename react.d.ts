@@ -13,7 +13,7 @@ type StyledComponent<T> = React.StatelessComponent<
 type StyledTag<T> = <Props = T>(
   strings: TemplateStringsArray,
   ...exprs: Array<
-    string | number | CSSProperties | ((props: Props) => string | number)
+    string | number | CSSProperties | ((props: Props) => string | number) | StyledComponent<any>
   >
 ) => StyledComponent<Props>;
 
