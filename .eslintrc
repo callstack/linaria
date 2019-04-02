@@ -1,4 +1,8 @@
 {
-  'extends': '@callstack/eslint-config',
-  'rules': { 'global-require': 'off' },
+  "extends": "@callstack",
+  "rules": {
+      "global-require": "off",
+      "react-native/no-raw-text": "off",
+      "react-native/no-inline-styles": "off"
+  }
 }
