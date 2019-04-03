@@ -11,4 +11,7 @@ emoji=true
 
 module.name_mapper='^linaria' -> '<PROJECT_ROOT>/src'
 
+# flow crashes less on circleci with this
+server.max_workers=1
+
 [strict]
