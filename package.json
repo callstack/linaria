@@ -33,13 +33,13 @@
     "webpack"
   ],
   "scripts": {
-    "lint": "eslint .",
-    "flow": "flow",
+    "lint": "eslint --ext .js,.ts,.tsx .",
+    "typecheck": "tsc && flow",
     "typescript": "dtslint",
     "test": "jest",
     "add-contributor": "all-contributors add",
-    "build": "babel src --out-dir lib --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start && flow-copy-source -i '{**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**}' src lib",
-    "watch": "babel src --out-dir lib --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start --watch",
+    "build": "babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start && flow-copy-source -i '{**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**}' src lib",
+    "watch": "babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start --watch",
     "prepare": "yarn build",
     "release": "release-it",
     "website": "yarn --cwd website",
@@ -50,16 +50,20 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
     "@babel/plugin-syntax-jsx": "^7.2.0",
     "@babel/preset-env": "^7.3.1",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
-    "@callstack/eslint-config": "^3.0.2",
+    "@babel/preset-typescript": "^7.3.3",
+    "@callstack/eslint-config": "^4.1.0",
     "@commitlint/config-conventional": "^7.5.0",
     "@release-it/conventional-changelog": "^1.0.2",
     "@types/react": "^16.8.4",
+    "@typescript-eslint/eslint-plugin": "^1.5.0",
     "all-contributors-cli": "^6.1.1",
     "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^24.5.0",
     "codecov": "^3.2.0",
     "commitlint": "^7.5.2",
     "del-cli": "^1.1.0",
@@ -69,11 +73,12 @@
     "flow-bin": "^0.94.0",
     "flow-copy-source": "^2.0.3",
     "husky": "^1.3.1",
-    "jest": "^24.1.0",
+    "jest": "^24.5.0",
     "prettier": "^1.16.4",
     "react": "^16.8.3",
     "react-test-renderer": "^16.8.3",
-    "release-it": "^12.2.0"
+    "release-it": "^12.2.0",
+    "typescript": "^3.3.4000"
   },
   "dependencies": {
     "@babel/core": "^7.3.3",
@@ -110,7 +115,17 @@
     }
   },
   "jest": {
-    "testRegex": "/__tests__/.*\\.(test|spec)\\.js$",
-    "testEnvironment": "node"
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "jsx",
+      "ts",
+      "tsx"
+    ],
+    "testRegex": "/__tests__/.*\\.(test|spec)\\.(j|t)sx?$",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
+    }
   }
 }

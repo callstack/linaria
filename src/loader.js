@@ -86,6 +86,7 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
 
           this.addDependency(f);
         } catch (e) {
+          // eslint-disable-next-line no-console
           console.warn(`[linaria] failed to add dependency for: ${dep}`, e);
         }
       });

@@ -135,6 +135,7 @@ function processFiles(files: string[], options: Options) {
     }
   });
 
+  // eslint-disable-next-line no-console
   console.log(`Successfully extracted ${count} CSS files.`);
 }
 

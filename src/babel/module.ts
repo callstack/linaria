@@ -8,15 +8,13 @@
  * We also use it to transpile the code with Babel by default.
  * We also store source maps for it to provide correct error stacktraces.
  *
- * @flow
  */
 
-/* $FlowFixMe */
-const NativeModule = require('module');
-const vm = require('vm');
-const fs = require('fs');
-const path = require('path');
-const process = require('./process');
+import NativeModule from 'module';
+import vm from 'vm';
+import fs from 'fs';
+import path from 'path';
+import process from './process';
 
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty
@@ -57,7 +55,7 @@ const builtins = {
 };
 
 // Separate cache for evaled modules
-let cache = {};
+let cache: { [id: string]: Module } = {};
 
 const NOOP = () => {};
 
@@ -67,29 +65,26 @@ const wrap = code => wrapper[0] + code + wrapper[1];
 
 class Module {
   static invalidate: () => void;
-
   static _resolveFilename: (
     id: string,
-    options: { id: string, filename: string, paths: string[] }
+    options: { id: string; filename: string; paths: string[] }
   ) => string;
 
   id: string;
-
   filename: string;
-
   paths: string[];
-
-  require: (id: string) => any;
-
   exports: any;
-
   extensions: string[];
-
-  dependencies: ?(string[]);
-
-  transform: ?(text: string) => { code: string };
+  dependencies: (string[]) | null;
+  transform: ((text: string) => { code: string }) | null;
 
   constructor(filename: string) {
+    this.id = filename;
+    this.filename = filename;
+    this.paths = [];
+    this.dependencies = null;
+    this.transform = null;
+
     Object.defineProperties(this, {
       id: {
         value: filename,
@@ -101,25 +96,25 @@ class Module {
       },
       paths: {
         value: Object.freeze(
-          NativeModule._nodeModulePaths(path.dirname(filename))
+          ((NativeModule as unknown) as {
+            _nodeModulePaths(filename: string): string[];
+          })._nodeModulePaths(path.dirname(filename))
         ),
         writable: false,
       },
     });
 
     this.exports = {};
-    this.require = this.require.bind(this);
-    this.require.resolve = this.resolve.bind(this);
-    this.require.ensure = NOOP;
-    this.require.cache = cache;
 
     // We support following extensions by default
     this.extensions = ['.json', '.js', '.jsx', '.ts', '.tsx'];
   }
 
-  resolve(id: string) {
-    const extensions = NativeModule._extensions;
-    const added = [];
+  resolve = (id: string) => {
+    const extensions = ((NativeModule as unknown) as {
+      _extensions: { [key: string]: Function };
+    })._extensions;
+    const added: string[] = [];
 
     try {
       // Check for supported extensions
@@ -140,66 +135,77 @@ class Module {
       // Cleanup the extensions we added to restore previous behaviour
       added.forEach(ext => delete extensions[ext]);
     }
-  }
+  };
 
-  require(id: string) {
-    if (id in builtins) {
-      // The module is in the allowed list of builtin node modules
-      // Ideally we should prevent importing them, but webpack polyfills some
-      // So we check for the list of polyfills to determine which ones to support
-      if (builtins[id]) {
-        /* $FlowFixMe */
-        return require(id);
-      }
-
-      return null;
-    }
-
-    // Resolve module id (and filename) relatively to parent module
-    const filename = this.resolve(id);
-
-    if (filename === id && !path.isAbsolute(id)) {
-      // The module is a builtin node modules, but not in the allowed list
-      throw new Error(
-        `Unable to import "${id}". Importing Node builtins is not supported in the sandbox.`
-      );
-    }
-
-    this.dependencies && this.dependencies.push(id);
-
-    let m = cache[filename];
-
-    if (!m) {
-      // Create the module if cached module is not available
-      m = new Module(filename);
-      m.transform = this.transform;
-
-      // Store it in cache at this point with, otherwise
-      // we would end up in infinite loop with cyclic dependencies
-      cache[filename] = m;
-
-      if (this.extensions.includes(path.extname(filename))) {
-        // To evaluate the file, we need to read it first
-        const code = fs.readFileSync(filename, 'utf-8');
-
-        if (/\.json$/.test(filename)) {
-          // For JSON files, parse it to a JS object similar to Node
-          m.exports = JSON.parse(code);
-        } else {
-          // For JS/TS files, evaluate the module
-          // The module will be transpiled using provided transform
-          m.evaluate(code);
+  require: {
+    (id: string): any;
+    resolve: (id: string) => string;
+    ensure: () => void;
+    cache: typeof cache;
+  } = Object.assign(
+    (id: string) => {
+      if (id in builtins) {
+        // The module is in the allowed list of builtin node modules
+        // Ideally we should prevent importing them, but webpack polyfills some
+        // So we check for the list of polyfills to determine which ones to support
+        if (builtins[id as keyof typeof builtins]) {
+          return require(id);
         }
-      } else {
-        // For non JS/JSON requires, just export the id
-        // This is to support importing assets in webpack
-        // The module will be resolved by css-loader
-        m.exports = id;
-      }
-    }
 
-    return m.exports;
-  }
+        return null;
+      }
+
+      // Resolve module id (and filename) relatively to parent module
+      const filename = this.resolve(id);
+
+      if (filename === id && !path.isAbsolute(id)) {
+        // The module is a builtin node modules, but not in the allowed list
+        throw new Error(
+          `Unable to import "${id}". Importing Node builtins is not supported in the sandbox.`
+        );
+      }
+
+      this.dependencies && this.dependencies.push(id);
+
+      let m = cache[filename];
+
+      if (!m) {
+        // Create the module if cached module is not available
+        m = new Module(filename);
+        m.transform = this.transform;
+
+        // Store it in cache at this point with, otherwise
+        // we would end up in infinite loop with cyclic dependencies
+        cache[filename] = m;
+
+        if (this.extensions.includes(path.extname(filename))) {
+          // To evaluate the file, we need to read it first
+          const code = fs.readFileSync(filename, 'utf-8');
+
+          if (/\.json$/.test(filename)) {
+            // For JSON files, parse it to a JS object similar to Node
+            m.exports = JSON.parse(code);
+          } else {
+            // For JS/TS files, evaluate the module
+            // The module will be transpiled using provided transform
+            m.evaluate(code);
+          }
+        } else {
+          // For non JS/JSON requires, just export the id
+          // This is to support importing assets in webpack
+          // The module will be resolved by css-loader
+          m.exports = id;
+        }
+      }
+
+      return m.exports;
+    },
+    {
+      ensure: NOOP,
+      cache,
+      resolve: this.resolve,
+    }
+  );
 
   evaluate(text: string) {
     // For JavaScript files, we need to transpile it and to get the exports of the module
@@ -231,6 +237,8 @@ Module.invalidate = () => {
 // This static property can be overriden by the webpack loader
 // This allows us to use webpack's module resolution algorithm
 Module._resolveFilename = (id, options) =>
-  NativeModule._resolveFilename(id, options);
+  ((NativeModule as unknown) as {
+    _resolveFilename: (id: string, options: any) => string;
+  })._resolveFilename(id, options);
 
 module.exports = Module;
