@@ -1,3 +1,5 @@
+// TypeScript Version: 3.2
+
 /**
  * This is a custom implementation for the module system for evaluating code.
  *
@@ -14,7 +16,8 @@ import NativeModule from 'module';
 import vm from 'vm';
 import fs from 'fs';
 import path from 'path';
-import process from './process';
+import * as process from './process';
+import { BabelFileResult } from '@babel/core';
 
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty
@@ -59,10 +62,6 @@ let cache: { [id: string]: Module } = {};
 
 const NOOP = () => {};
 
-const wrapper = ['(function (exports) { ', '\n})(exports);'];
-
-const wrap = code => wrapper[0] + code + wrapper[1];
-
 class Module {
   static invalidate: () => void;
   static _resolveFilename: (
@@ -76,7 +75,7 @@ class Module {
   exports: any;
   extensions: string[];
   dependencies: (string[]) | null;
-  transform: ((text: string) => { code: string }) | null;
+  transform: ((text: string) => BabelFileResult | null) | null;
 
   constructor(filename: string) {
     this.id = filename;
@@ -209,9 +208,9 @@ class Module {
 
   evaluate(text: string) {
     // For JavaScript files, we need to transpile it and to get the exports of the module
-    const code = this.transform ? this.transform(text).code : text;
+    const code = this.transform ? this.transform(text)!.code : text;
 
-    const script = new vm.Script(wrap(code), {
+    const script = new vm.Script(code!, {
       filename: this.filename,
     });
 
@@ -241,4 +240,4 @@ Module._resolveFilename = (id, options) =>
     _resolveFilename: (id: string, options: any) => string;
   })._resolveFilename(id, options);
 
-module.exports = Module;
+export default Module;

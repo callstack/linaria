@@ -1,13 +1,11 @@
-/* @flow */
-
-import type { Location } from '../types';
+import { Location } from '../types';
 
 // Stripping away the new lines ensures that we preserve line numbers
 // This is useful in case of tools such as the stylelint pre-processor
 // This should be safe because strings cannot contain newline: https://www.w3.org/TR/CSS2/syndata.html#strings
 export default function stripLines(
-  loc: { start: Location, end: Location },
-  text: string
+  loc: { start: Location; end: Location },
+  text: string | number
 ) {
   let result = String(text)
     .replace(/[\r\n]+/g, ' ')

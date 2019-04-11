@@ -1,4 +1,12 @@
 {
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "__ts-tests__"
+  ],
   "compilerOptions": {
     "jsx": "react",
     "lib": ["es6", "dom"],

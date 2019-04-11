@@ -1,12 +1,30 @@
-/* @flow */
+// TypeScript Version: 3.2
 
-import type { PluginOptions } from './utils/loadOptions';
+import {
+  transformSync,
+  BabelFileResult,
+  PluginItem,
+  TransformOptions,
+  types,
+} from '@babel/core';
+import generator from '@babel/generator';
+import Module from './module';
+import { Location, StrictOptions, Value } from './types';
+import { NodePath } from '@babel/traverse';
 
-const generator = require('@babel/generator').default;
-const babel = require('@babel/core');
-const Module = require('./module');
+type DefaultOptions = Partial<TransformOptions> & {
+  plugins: PluginItem[];
+  presets: PluginItem[];
+};
 
-const isAdded = (requirements, path) => {
+interface IRequirement {
+  result: types.Node;
+  path: NodePath;
+  start: Location;
+  end: Location;
+}
+
+const isAdded = (requirements: IRequirement[], path: NodePath): boolean => {
   if (requirements.some(req => req.path === path)) {
     return true;
   }
@@ -18,23 +36,28 @@ const isAdded = (requirements, path) => {
   return false;
 };
 
-const resolve = (path, t, requirements) => {
+const resolve = (
+  path: NodePath<types.Identifier>,
+  requirements: IRequirement[]
+) => {
   const binding = path.scope.getBinding(path.node.name);
 
   if (
     path.isReferenced() &&
     binding &&
-    binding.kind !== 'param' &&
+    // Next condition it's always true because `params` isn't valid value
+    (binding.kind as string) !== 'param' &&
     !isAdded(requirements, binding.path)
   ) {
     let result;
 
     switch (binding.kind) {
       case 'module':
-        if (t.isImportSpecifier(binding.path)) {
-          result = t.importDeclaration(
-            [binding.path.node],
-            binding.path.parentPath.node.source
+        if (types.isImportSpecifier(binding.path)) {
+          const p = binding.path as NodePath<types.ImportSpecifier>;
+          result = types.importDeclaration(
+            [p.node],
+            (p.parentPath.node as types.ImportDeclaration).source
           );
         } else {
           result = binding.path.parentPath.node;
@@ -43,21 +66,20 @@ const resolve = (path, t, requirements) => {
       case 'const':
       case 'let':
       case 'var': {
+        const { node } = binding.path as NodePath<types.VariableDeclarator>;
         let decl;
 
         // Replace SequenceExpressions (expr1, expr2, expr3, ...) with the last one
-        if (t.isSequenceExpression(binding.path.node.init)) {
-          const { node } = binding.path;
-
-          decl = t.variableDeclarator(
+        if (types.isSequenceExpression(node.init)) {
+          decl = types.variableDeclarator(
             node.id,
             node.init.expressions[node.init.expressions.length - 1]
           );
         } else {
-          decl = binding.path.node;
+          decl = node;
         }
 
-        result = t.variableDeclaration(binding.kind, [decl]);
+        result = types.variableDeclaration(binding.kind, [decl]);
         break;
       }
       default:
@@ -70,24 +92,24 @@ const resolve = (path, t, requirements) => {
     requirements.push({
       result,
       path: binding.path,
-      start: loc.start,
-      end: loc.end,
+      start: loc!.start,
+      end: loc!.end,
     });
 
     binding.path.traverse({
       Identifier(p) {
-        resolve(p, t, requirements);
+        resolve(p, requirements);
       },
     });
   }
 };
 
-module.exports = function evaluate(
+export default function evaluate(
   path: any,
   t: any,
   filename: string,
-  transformer?: (text: string) => { code: string },
-  options?: PluginOptions
+  transformer?: (text: string) => BabelFileResult | null,
+  options?: StrictOptions
 ) {
   if (t.isSequenceExpression(path)) {
     // We only need to evaluate the last item in a sequence expression, e.g. (a, b, c)
@@ -95,14 +117,14 @@ module.exports = function evaluate(
     path = path.get('expressions')[path.node.expressions.length - 1];
   }
 
-  const requirements = [];
+  const requirements: IRequirement[] = [];
 
   if (t.isIdentifier(path)) {
-    resolve(path, t, requirements);
+    resolve(path, requirements);
   } else {
     path.traverse({
-      Identifier(p) {
-        resolve(p, t, requirements);
+      Identifier(p: NodePath<types.Identifier>) {
+        resolve(p, requirements);
       },
     });
   }
@@ -137,7 +159,7 @@ module.exports = function evaluate(
 
       return acc;
     },
-    { imports: [], others: [] }
+    { imports: [] as types.Node[], others: [] as types.Node[] }
   );
 
   const wrapped = others.reduce(
@@ -151,23 +173,23 @@ module.exports = function evaluate(
   m.transform =
     typeof transformer !== 'undefined'
       ? transformer
-      : function transform(text) {
+      : function transform(this: Module, text) {
           if (options && options.ignore && options.ignore.test(this.filename)) {
             return { code: text };
           }
 
-          const plugins = [
+          const plugins: Array<string | object> = [
             // Include these plugins to avoid extra config when using { module: false } for webpack
             '@babel/plugin-transform-modules-commonjs',
             '@babel/plugin-proposal-export-namespace-from',
           ];
 
-          const defaults = {
+          const defaults: DefaultOptions = {
             caller: { name: 'linaria', evaluate: true },
             filename: this.filename,
             presets: [[require.resolve('./index'), options]],
             plugins: [
-              ...plugins.map(name => require.resolve(name)),
+              ...plugins.map(name => require.resolve(name as string)),
               // We don't support dynamic imports when evaluating, but don't wanna syntax error
               // This will replace dynamic imports with an object that does nothing
               require.resolve('./dynamic-import-noop'),
@@ -181,9 +203,12 @@ module.exports = function evaluate(
           // If we programmtically pass babel options while there is a .babelrc, babel might throw
           // We need to filter out duplicate presets and plugins so that this doesn't happen
           // This workaround isn't full proof, but it's still better than nothing
-          ['presets', 'plugins'].forEach(field => {
+          const keys: Array<
+            keyof TransformOptions & ('presets' | 'plugins')
+          > = ['presets', 'plugins'];
+          keys.forEach(field => {
             babelOptions[field] = babelOptions[field]
-              ? babelOptions[field].filter(item => {
+              ? babelOptions[field]!.filter((item: PluginItem) => {
                   // If item is an array it's a preset/plugin with options ([preset, options])
                   // Get the first item to get the preset.plugin name
                   // Otheriwse it's a plugin name (can be a function too)
@@ -211,7 +236,7 @@ module.exports = function evaluate(
               : [];
           });
 
-          return babel.transformSync(text, {
+          return transformSync(text, {
             // Passed options shouldn't be able to override the options we pass
             // Linaria's plugins rely on these (such as filename to generate consistent hash)
             ...babelOptions,
@@ -219,14 +244,14 @@ module.exports = function evaluate(
             presets: [
               // Preset order is last to first, so add the extra presets to start
               // This makes sure that our preset is always run first
-              ...babelOptions.presets,
+              ...babelOptions.presets!,
               ...defaults.presets,
             ],
             plugins: [
               ...defaults.plugins,
               // Plugin order is first to last, so add the extra presets to end
               // This makes sure that the plugins we specify always run first
-              ...babelOptions.plugins,
+              ...babelOptions.plugins!,
             ],
           });
         };
@@ -243,7 +268,7 @@ module.exports = function evaluate(
   );
 
   return {
-    value: m.exports,
-    dependencies: ((m.dependencies: any): string[]),
+    value: m.exports as Value,
+    dependencies: m.dependencies,
   };
-};
+}
