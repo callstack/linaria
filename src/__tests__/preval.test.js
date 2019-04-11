@@ -1,11 +1,11 @@
 /* eslint-disable no-template-curly-in-string */
-/* @flow */
 
-const path = require('path');
-const babel = require('@babel/core');
-const dedent = require('dedent');
-const stripAnsi = require('strip-ansi');
-const serializer = require('../__utils__/linaria-snapshot-serializer');
+import * as babel from '@babel/core';
+import dedent from 'dedent';
+import { join, resolve } from 'path';
+import stripAnsi from 'strip-ansi';
+
+import serializer from '../__utils__/linaria-snapshot-serializer';
 
 expect.addSnapshotSerializer(serializer);
 
@@ -19,7 +19,7 @@ const babelrc = {
 const transpile = async input => {
   const { code, metadata } = await babel.transformAsync(input, {
     ...babelrc,
-    filename: path.join(__dirname, 'source.js'),
+    filename: join(__dirname, 'source.js'),
   });
 
   // The slug will be machine specific, so replace it with a consistent one
@@ -113,7 +113,7 @@ it('evaluates expressions with expressions depending on shared dependency', asyn
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
-    const slugify = require('../slugify');
+    const slugify = require('../slugify').default;
 
     const boo = t => slugify(t) + 'boo';
     const bar = t => slugify(t) + 'bar';
@@ -134,7 +134,7 @@ it('evaluates multiple expressions with shared dependency', async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
-    const slugify = require('../slugify');
+    const slugify = require('../slugify').default;
 
     const boo = t => slugify(t) + 'boo';
     const bar = t => slugify(t) + 'bar';
@@ -416,7 +416,7 @@ it('throws codeframe error when evaluation fails', async () => {
 
 it('handles escapes properly', async () => {
   const { code, metadata } = await babel.transformFileAsync(
-    path.resolve(__dirname, '../__fixtures__/escape-character.js'),
+    resolve(__dirname, '../__fixtures__/escape-character.js'),
     babelrc
   );
 
@@ -435,7 +435,7 @@ it('derives display name from filename', async () => {
     `,
     {
       ...babelrc,
-      filename: path.join(__dirname, 'FancyName.js'),
+      filename: join(__dirname, 'FancyName.js'),
     }
   );
 
@@ -454,7 +454,7 @@ it('derives display name from parent folder name', async () => {
     `,
     {
       ...babelrc,
-      filename: path.join(__dirname, 'FancyName/index.js'),
+      filename: join(__dirname, 'FancyName/index.js'),
     }
   );
 
@@ -476,7 +476,7 @@ it("throws if couldn't determine a display name", async () => {
       `,
       {
         ...babelrc,
-        filename: path.join(__dirname, '/.js'),
+        filename: join(__dirname, '/.js'),
       }
     );
   } catch (e) {

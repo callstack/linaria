@@ -51,6 +51,7 @@ it('transpiles styled template literal with function and component', async () =>
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
+    const Heading = () => null;
 
     export const Title = styled(Heading)\`
       font-size: 14px;

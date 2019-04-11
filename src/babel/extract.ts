@@ -1,17 +1,19 @@
 /* eslint-disable no-param-reassign */
-/* @flow */
 
+import { types } from '@babel/core';
+import { NodePath } from '@babel/traverse';
 import Module from './module';
+import {
+  State,
+  StrictOptions,
+} from './types';
 import TaggedTemplateExpression from './visitors/TaggedTemplateExpression';
-import type { StrictOptions, State } from './types';
 
-module.exports = function extract(babel: any, options: StrictOptions) {
-  const { types: t } = babel;
-
+export default function extract(_babel: any, options: StrictOptions) {
   return {
     visitor: {
       Program: {
-        enter(path: any, state: State) {
+        enter(path: NodePath<types.Program>, state: State) {
           // Collect all the style rules from the styles we encounter
           state.rules = {};
           state.index = -1;
@@ -25,10 +27,10 @@ module.exports = function extract(babel: any, options: StrictOptions) {
           // So we traverse here instead of a in a visitor
           path.traverse({
             TaggedTemplateExpression: p =>
-              TaggedTemplateExpression(p, state, t, options),
+              TaggedTemplateExpression(p, state, options),
           });
         },
-        exit(path: any, state: State) {
+        exit(_: any, state: State) {
           if (Object.keys(state.rules).length) {
             // Store the result as the file metadata
             state.file.metadata = {
@@ -46,4 +48,4 @@ module.exports = function extract(babel: any, options: StrictOptions) {
       },
     },
   };
-};
+}
