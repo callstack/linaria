@@ -1,9 +1,10 @@
-/* @flow */
 /* eslint-disable no-param-reassign */
 
 import { relative, dirname, basename } from 'path';
 import { isValidElementType } from 'react-is';
+import { types } from '@babel/core';
 import generator from '@babel/generator';
+import { NodePath } from '@babel/traverse';
 import evaluate from '../evaluate';
 import slugify from '../../slugify';
 import { units } from '../units';
@@ -13,43 +14,58 @@ import stripLines from '../utils/stripLines';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
 import toCSS from '../utils/toCSS';
 import hasImport from '../utils/hasImport';
-import type { StrictOptions, State } from '../types';
+import { State, StrictOptions, Styled } from '../types';
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
 
+type Interpolation = {
+  id: string;
+  node: types.Expression;
+  source: string;
+  unit: string;
+};
+
+function isStyled(value: any): value is Styled {
+  return isValidElementType(value) && (value as any).__linaria;
+}
+
 export default function TaggedTemplateExpression(
-  path: any,
+  path: NodePath<types.TaggedTemplateExpression>,
   state: State,
-  t: any,
   options: StrictOptions
 ) {
   const { quasi, tag } = path.node;
 
-  let styled;
-  let css;
+  let styled: {
+    component: any;
+  } | null = null;
+  let css: boolean = false;
 
   if (
-    t.isCallExpression(tag) &&
-    t.isIdentifier(tag.callee) &&
+    types.isCallExpression(tag) &&
+    types.isIdentifier(tag.callee) &&
     tag.arguments.length === 1 &&
     tag.callee.name === 'styled' &&
     hasImport(
-      t,
+      types,
       path.scope,
       state.file.opts.filename,
       'styled',
       'linaria/react'
     )
   ) {
-    styled = { component: path.get('tag').get('arguments')[0] };
+    const tagPath = path.get('tag') as NodePath<types.CallExpression>;
+    styled = {
+      component: tagPath.get('arguments')[0] as NodePath<types.Expression>,
+    };
   } else if (
-    t.isMemberExpression(tag) &&
-    t.isIdentifier(tag.object) &&
-    t.isIdentifier(tag.property) &&
+    types.isMemberExpression(tag) &&
+    types.isIdentifier(tag.object) &&
+    types.isIdentifier(tag.property) &&
     tag.object.name === 'styled' &&
     hasImport(
-      t,
+      types,
       path.scope,
       state.file.opts.filename,
       'styled',
@@ -57,15 +73,15 @@ export default function TaggedTemplateExpression(
     )
   ) {
     styled = {
-      component: { node: t.stringLiteral(tag.property.name) },
+      component: { node: types.stringLiteral(tag.property.name) },
     };
   } else if (
-    hasImport(t, path.scope, state.file.opts.filename, 'css', 'linaria')
+    hasImport(types, path.scope, state.file.opts.filename, 'css', 'linaria')
   ) {
-    css = t.isIdentifier(tag) && tag.name === 'css';
+    css = types.isIdentifier(tag) && tag.name === 'css';
   }
 
-  if (!(styled || css)) {
+  if (!styled && !css) {
     return;
   }
 
@@ -74,7 +90,7 @@ export default function TaggedTemplateExpression(
   // Also used for display name if it couldn't be determined
   state.index++;
 
-  const interpolations = [];
+  const interpolations: Interpolation[] = [];
 
   // Check if the variable is referenced anywhere for basic DCE
   // Only works when it's assigned to a variable
@@ -85,21 +101,30 @@ export default function TaggedTemplateExpression(
 
   const parent = path.findParent(
     p =>
-      t.isObjectProperty(p) ||
-      t.isJSXOpeningElement(p) ||
-      t.isVariableDeclarator(p)
+      types.isObjectProperty(p) ||
+      types.isJSXOpeningElement(p) ||
+      types.isVariableDeclarator(p)
   );
 
   if (parent) {
-    if (t.isObjectProperty(parent)) {
-      displayName = parent.node.key.name || parent.node.key.value;
-    } else if (t.isJSXOpeningElement(parent)) {
-      displayName = parent.node.name.name;
-    } else if (t.isVariableDeclarator(parent)) {
-      const { referencePaths } = path.scope.getBinding(parent.node.id.name);
+    const parentNode = parent.node;
+    if (types.isObjectProperty(parentNode)) {
+      displayName = parentNode.key.name || parentNode.key.value;
+    } else if (
+      types.isJSXOpeningElement(parentNode) &&
+      types.isJSXIdentifier(parentNode.name)
+    ) {
+      displayName = parentNode.name.name;
+    } else if (
+      types.isVariableDeclarator(parentNode) &&
+      types.isIdentifier(parentNode.id)
+    ) {
+      const { referencePaths } = path.scope.getBinding(parentNode.id.name) || {
+        referencePaths: [],
+      };
 
       isReferenced = referencePaths.length !== 0;
-      displayName = parent.node.id.name;
+      displayName = parentNode.id.name;
     }
   }
 
@@ -201,7 +226,7 @@ export default function TaggedTemplateExpression(
     const ex = expressions[i];
 
     if (ex) {
-      const { end } = ex.node.loc;
+      const { end } = ex.node.loc!;
       const result = ex.evaluate();
       const beforeLength = cssText.length;
 
@@ -209,9 +234,9 @@ export default function TaggedTemplateExpression(
       const next = self[i + 1];
       const loc = {
         // +1 because the expressions location always shows 1 column before
-        start: { line: el.loc.end.line, column: el.loc.end.column + 1 },
+        start: { line: el.loc!.end.line, column: el.loc!.end.column + 1 },
         end: next
-          ? { line: next.loc.start.line, column: next.loc.start.column }
+          ? { line: next.loc!.start.line, column: next.loc!.start.column }
           : { line: end.line, column: end.column + 1 },
       };
 
@@ -233,14 +258,17 @@ export default function TaggedTemplateExpression(
         // Try to preval the value
         if (
           options.evaluate &&
-          !(t.isFunctionExpression(ex) || t.isArrowFunctionExpression(ex))
+          !(
+            types.isFunctionExpression(ex) ||
+            types.isArrowFunctionExpression(ex)
+          )
         ) {
           let evaluation;
 
           try {
             evaluation = evaluate(
               ex,
-              t,
+              types,
               state.file.opts.filename,
               undefined,
               options
@@ -261,7 +289,7 @@ export default function TaggedTemplateExpression(
             // Only insert text for non functions
             // We don't touch functions because they'll be interpolated at runtime
 
-            if (isValidElementType(value) && value.__linaria) {
+            if (isStyled(value)) {
               // If it's an React component wrapped in styled, get the class name
               // Useful for interpolating components
               cssText += `.${value.__linaria.className}`;
@@ -309,10 +337,10 @@ export default function TaggedTemplateExpression(
     // If `styled` wraps another component and not a primitive,
     // get its class name to create a more specific selector
     // it'll ensure that styles are overridden properly
-    if (options.evaluate && t.isIdentifier(styled.component.node)) {
+    if (options.evaluate && types.isIdentifier(styled.component.node)) {
       let { value } = evaluate(
         styled.component,
-        t,
+        types,
         state.file.opts.filename,
         undefined,
         options
@@ -327,11 +355,17 @@ export default function TaggedTemplateExpression(
     const props = [];
 
     props.push(
-      t.objectProperty(t.identifier('name'), t.stringLiteral(displayName))
+      types.objectProperty(
+        types.identifier('name'),
+        types.stringLiteral(displayName)
+      )
     );
 
     props.push(
-      t.objectProperty(t.identifier('class'), t.stringLiteral(className))
+      types.objectProperty(
+        types.identifier('class'),
+        types.stringLiteral(className)
+      )
     );
 
     // If we found any interpolations, also pass them so they can be applied
@@ -339,7 +373,7 @@ export default function TaggedTemplateExpression(
       // De-duplicate interpolations based on the source and unit
       // If two interpolations have the same source code and same unit,
       // we don't need to use 2 custom properties for them, we can use a single one
-      const result = {};
+      const result: { [key: string]: Interpolation } = {};
 
       interpolations.forEach(it => {
         const key = it.source + it.unit;
@@ -355,20 +389,20 @@ export default function TaggedTemplateExpression(
       });
 
       props.push(
-        t.objectProperty(
-          t.identifier('vars'),
-          t.objectExpression(
+        types.objectProperty(
+          types.identifier('vars'),
+          types.objectExpression(
             Object.keys(result).map(key => {
               const { id, node, unit } = result[key];
               const items = [node];
 
               if (unit) {
-                items.push(t.stringLiteral(unit));
+                items.push(types.stringLiteral(unit));
               }
 
-              return t.objectProperty(
-                t.stringLiteral(id),
-                t.arrayExpression(items)
+              return types.objectProperty(
+                types.stringLiteral(id),
+                types.arrayExpression(items)
               );
             })
           )
@@ -377,15 +411,17 @@ export default function TaggedTemplateExpression(
     }
 
     path.replaceWith(
-      t.callExpression(
-        t.callExpression(t.identifier('styled'), [styled.component.node]),
-        [t.objectExpression(props)]
+      types.callExpression(
+        types.callExpression(types.identifier('styled'), [
+          styled.component.node,
+        ]),
+        [types.objectExpression(props)]
       )
     );
 
     path.addComment('leading', '#__PURE__');
   } else {
-    path.replaceWith(t.stringLiteral(className));
+    path.replaceWith(types.stringLiteral(className));
   }
 
   if (!isReferenced && !cssText.includes(':global')) {
