@@ -15,7 +15,7 @@ function isNode(obj: any): obj is types.Node {
   return !!obj;
 }
 
-function dumpNode<T extends types.Node>(
+export default function dumpNode<T extends types.Node>(
   node: T,
   alive: Set<types.Node> | null = null,
   level = 0,
@@ -38,8 +38,7 @@ function dumpNode<T extends types.Node>(
   }
 
   process.stdout.write('\n');
-  // VISITOR_KEYS is not defined in babel typings
-  const keys: Array<keyof T> = (types as any).VISITOR_KEYS[type] || [];
+  const keys = types.VISITOR_KEYS[type] as Array<keyof T>;
   for (const key of keys) {
     const subNode = node[key];
 
@@ -54,5 +53,3 @@ function dumpNode<T extends types.Node>(
     }
   }
 }
-
-module.exports = dumpNode;

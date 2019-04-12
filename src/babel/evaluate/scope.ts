@@ -11,49 +11,49 @@ const getId = (scope: Scope, identifier: Identifier): string =>
   `${scopeIds.get(scope)}:${identifier.name}`;
 
 export default class ScopeManager {
-  private _nextId = 0;
-  private readonly _stack: Array<Scope> = [];
-  private readonly _map: Map<ScopeId, Scope> = new Map();
-  private readonly _handlers: Map<ScopeId, Array<DeclareHandler>> = new Map();
+  private nextId = 0;
+  private readonly stack: Array<Scope> = [];
+  private readonly map: Map<ScopeId, Scope> = new Map();
+  private readonly handlers: Map<ScopeId, Array<DeclareHandler>> = new Map();
   private readonly declarations: Map<string, Identifier> = new Map();
 
   private get global(): Scope {
-    return this._map.get('global')!;
+    return this.map.get('global')!;
   }
 
   constructor() {
     this.new('global');
   }
 
-  new(scopeId: ScopeId = this._nextId++): Scope {
+  new(scopeId: ScopeId = this.nextId++): Scope {
     const scope: Scope = new Map();
     scopeIds.set(scope, scopeId);
-    this._map.set(scopeId, scope);
-    this._handlers.set(scopeId, []);
-    this._stack.unshift(scope);
+    this.map.set(scopeId, scope);
+    this.handlers.set(scopeId, []);
+    this.stack.unshift(scope);
     return scope;
   }
 
   dispose(): Scope | undefined {
-    const disposed = this._stack.shift();
+    const disposed = this.stack.shift();
     if (disposed) {
-      this._map.delete(scopeIds.get(disposed)!);
+      this.map.delete(scopeIds.get(disposed)!);
     }
 
     return disposed;
   }
 
   declare(identifier: Identifier): void {
-    const scope = this._stack[0];
+    const scope = this.stack[0];
     scope.set(identifier.name, new Set([identifier]));
     this.declarations.set(getId(scope, identifier), identifier);
-    const handlers = this._handlers.get(scopeIds.get(scope)!)!;
+    const handlers = this.handlers.get(scopeIds.get(scope)!)!;
     handlers.forEach(handler => handler(identifier));
   }
 
   addReference(identifier: Identifier): Identifier | undefined {
     const name = identifier.name;
-    const scope = this._stack.find(s => s.has(name)) || this.global;
+    const scope = this.stack.find(s => s.has(name)) || this.global;
     const id = getId(scope, identifier);
     if (scope === this.global && !scope.has(name)) {
       scope.set(name, new Set());
@@ -65,11 +65,17 @@ export default class ScopeManager {
 
   whereIsDeclared(identifier: Identifier): ScopeId | undefined {
     const name = identifier.name;
-    const scope = this._stack.find(
+    const scope = this.stack.find(
       s => s.has(name) && s.get(name)!.has(identifier)
     );
-    if (scope) return scopeIds.get(scope);
-    if (this.global.has(name)) return 'global';
+    if (scope) {
+      return scopeIds.get(scope);
+    }
+
+    if (this.global.has(name)) {
+      return 'global';
+    }
+
     return undefined;
   }
 
@@ -85,19 +91,22 @@ export default class ScopeManager {
       name = identifierOrName;
     } else {
       const scopeId = this.whereIsDeclared(identifierOrName);
-      if (scopeId === undefined || scopeId === 'global') return undefined;
-      name = getId(this._map.get(scopeId)!, identifierOrName);
+      if (scopeId === undefined || scopeId === 'global') {
+        return undefined;
+      }
+
+      name = getId(this.map.get(scopeId)!, identifierOrName);
     }
 
     return this.declarations.get(name);
   }
 
   addDeclareHandler(handler: DeclareHandler): () => void {
-    const scopeId = scopeIds.get(this._stack[0])!;
-    this._handlers.get(scopeId)!.push(handler);
+    const scopeId = scopeIds.get(this.stack[0])!;
+    this.handlers.get(scopeId)!.push(handler);
     return () => {
-      const handlers = this._handlers.get(scopeId)!.filter(h => h !== handler);
-      this._handlers.set(scopeId, handlers);
+      const handlers = this.handlers.get(scopeId)!.filter(h => h !== handler);
+      this.handlers.set(scopeId, handlers);
     };
   }
 }

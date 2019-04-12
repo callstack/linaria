@@ -1,12 +1,16 @@
 import { parseSync, types as t } from '@babel/core';
-import build, { ExternalDep } from './depsGraph';
+import build from './graphBuilder';
+import { ExternalDep } from './DepsGraph';
 import isNode from '../utils/isNode';
-// import dumpNode from './dumpNode';
+import getVisitorKeys from '../utils/getVisitorKeys';
 
 /*
  * Returns new tree without dead nodes
  */
-function shakeNode<T extends t.Node>(node: T, alive: Set<t.Node>): T {
+function shakeNode<TNode extends t.Node>(
+  node: TNode,
+  alive: Set<t.Node>
+): TNode {
   if (t.isExportNamedDeclaration(node)) {
     /*
      * We don't need exports so just replace it by declaration
@@ -14,18 +18,17 @@ function shakeNode<T extends t.Node>(node: T, alive: Set<t.Node>): T {
      * + const a = 42;
      */
 
-    return shakeNode(node.declaration!, alive) as T;
+    return shakeNode(node.declaration!, alive) as TNode;
   }
 
-  const { type } = node;
-  // VISITOR_KEYS is not defined in babel typings
-  const keys: [keyof T] = (t as any).VISITOR_KEYS[type] || [];
-  const changes: Partial<T> = {};
+  const keys = getVisitorKeys(node) as Array<keyof TNode>;
+  const changes: Partial<TNode> = {};
+
   for (const key of keys) {
     const subNode = node[key];
 
     if (Array.isArray(subNode)) {
-      const list = [];
+      const list: any = [];
       let hasChanges = false;
       for (let i = 0; i < subNode.length; i++) {
         const child = subNode[i];
@@ -41,17 +44,17 @@ function shakeNode<T extends t.Node>(node: T, alive: Set<t.Node>): T {
         }
       }
       if (hasChanges) {
-        (changes as any)[key] = list;
+        changes[key] = list;
       }
     } else if (isNode(subNode) && alive.has(subNode)) {
       const shaken = shakeNode(subNode, alive);
       if (shaken && shaken !== subNode) {
-        (changes as any)[key] = shaken;
+        changes[key] = shaken;
       }
     }
   }
 
-  return Object.keys(changes).length ? Object.assign({}, node, changes) : node;
+  return Object.keys(changes).length ? { ...node, ...changes } : node;
 }
 
 // All exported values will be wrapped with this function
@@ -73,7 +76,7 @@ const expWrapper = exprStatement.expression;
  * Adds to the end of module export of array of evaluated values or evaluation errors.
  * Returns new AST and an array of external dependencies.
  */
-function shake(
+export default function shake(
   rootPath: t.Program,
   nodes: Array<t.Expression | string>
 ): [t.Program, ExternalDep[]] {
@@ -90,7 +93,10 @@ function shake(
   }
 
   const shaken = shakeNode(rootPath, alive) as t.Program;
-  // dumpNode(program, alive);
+  /*
+   * If we want to know what is really happen with our code tree,
+   * we can print formatted tree here by `dumpNode(program, alive)`
+   */
 
   // By default `wrap` is used as a name of the function …
   let wrapName = 'wrap';
@@ -138,5 +144,3 @@ function shake(
     depsGraph.externalDeps.filter(({ local }) => alive.has(local)),
   ];
 }
-
-export default shake;

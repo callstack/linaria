@@ -2,7 +2,7 @@
 
 import dedent from 'dedent';
 import * as babel from '@babel/core';
-import { ExternalDep } from '../babel/evaluate/depsGraph';
+import { ExternalDep } from '../babel/evaluate/DepsGraph';
 import shake from '../babel/evaluate/shaker';
 
 function _build(literal: TemplateStringsArray, ...placeholders: string[]) {
