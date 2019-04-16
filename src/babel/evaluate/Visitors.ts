@@ -247,6 +247,11 @@ const visitors: Visitors = {
 
       const { value: source } = firstArg;
       const declared = this.meta.get('declared') as t.Identifier[];
+      if (!declared) {
+        // This is a standalone `require`
+        return;
+      }
+
       declared.forEach(n =>
         this.graph.externalDeps.push({
           source,

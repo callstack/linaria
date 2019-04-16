@@ -75,6 +75,7 @@ it('shakes imports', () => {
     import defaultColor from '…';
     import anotherDefaultColor from '…';
     import '…';
+    require('…');
     export default color;
   `;
 
