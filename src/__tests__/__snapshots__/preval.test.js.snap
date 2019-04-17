@@ -119,6 +119,32 @@ Dependencies: NA
 
 `;
 
+exports[`evaluates complex styles with functions and nested selectors 1`] = `
+"import { css } from '../';
+export const bareIconClass = \\"bareIconClass_b1xha7dm\\";
+
+const getSizeStyles = fs => ({
+  [\`&.\${bareIconClass}\`]: {
+    fontSize: fs * 1.5
+  }
+});
+
+export const SIZES = {
+  XS: \\"XS_x1rsdnkv\\"
+};"
+`;
+
+exports[`evaluates complex styles with functions and nested selectors 2`] = `
+
+CSS:
+
+.bareIconClass_b1xha7dm {}
+.XS_x1rsdnkv {&.bareIconClass_b1xha7dm { font-size: 16.5px; }}
+
+Dependencies: ../
+
+`;
+
 exports[`evaluates component interpolations 1`] = `
 "const {
   styled
@@ -329,7 +355,7 @@ CSS:
   }
 }
 
-Dependencies: ../slugify, ../slugify
+Dependencies: ../slugify
 
 `;
 
@@ -384,6 +410,50 @@ Dependencies: NA
 
 `;
 
+exports[`handles complex component 1`] = `
+"// Dead code in this file should be ignored
+import deadDep from 'unknown-dependency';
+import { styled } from 'linaria/react';
+export const deadValue = deadDep();
+const objects = {
+  font: {
+    fontSize: 12
+  },
+  box: {
+    border: \\"1px solid red\\"
+  }
+};
+
+const foo = k => {
+  const {
+    [k]: obj
+  } = objects;
+  return obj;
+};
+
+objects.font.fontWeight = 'bold';
+export const whiteColor = '#fff';
+export const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1us8k4s\\"
+});"
+`;
+
+exports[`handles complex component 2`] = `
+
+CSS:
+
+.Title_t1us8k4s {
+  font-size: 12px; font-weight: bold;
+  border: 1px solid red;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`handles escapes properly 1`] = `
 "import { styled } from 'linaria/react';
 const selectors = ['a', 'b'];
@@ -407,7 +477,7 @@ CSS:
    ;
 }
 
-Dependencies: core-js/modules/es.string.raw
+Dependencies: NA
 
 `;
 
@@ -442,7 +512,7 @@ CSS:
   color: blue;
 }
 
-Dependencies: NA
+Dependencies: ../react
 
 `;
 
@@ -597,7 +667,7 @@ Dependencies: NA
 
 exports[`throws codeframe error when evaluation fails 1`] = `
 "<<DIRNAME>>/source.js: An error occurred when evaluating the expression: This will fail. Make sure you are not using a browser or Node specific API.
-  4 | 
+  4 |
   5 | export const Title = styled.h1\`
 > 6 |   font-size: \${foo()}px;
     |                ^^^^^
@@ -611,7 +681,7 @@ exports[`throws if couldn't determine a display name 1`] = `
 - Is a prop in a JSX element
 
   1 | import { styled } from 'linaria/react';
-  2 | 
+  2 |
 > 3 | export default styled.h1\`
     |                ^
   4 |   font-size: 14px;
@@ -620,7 +690,7 @@ exports[`throws if couldn't determine a display name 1`] = `
 
 exports[`throws when interpolation evaluates to NaN 1`] = `
 "<<DIRNAME>>/source.js: The expression evaluated to 'NaN', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(height)'.
-  4 | 
+  4 |
   5 | export const Title = styled.h1\`
 > 6 |   height: \${height}px;
     |             ^^^^^^
@@ -629,7 +699,7 @@ exports[`throws when interpolation evaluates to NaN 1`] = `
 
 exports[`throws when interpolation evaluates to null 1`] = `
 "<<DIRNAME>>/source.js: The expression evaluated to 'null', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(color)'.
-  4 | 
+  4 |
   5 | export const Title = styled.h1\`
 > 6 |   color: \${color};
     |            ^^^^^
@@ -638,7 +708,7 @@ exports[`throws when interpolation evaluates to null 1`] = `
 
 exports[`throws when interpolation evaluates to undefined 1`] = `
 "<<DIRNAME>>/source.js: The expression evaluated to 'undefined', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(fontSize)'.
-  4 | 
+  4 |
   5 | export const Title = styled.h1\`
 > 6 |   font-size: \${fontSize};
     |                ^^^^^^^^
