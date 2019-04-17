@@ -1,5 +1,5 @@
 import { ElementType } from 'react';
-import { types, TransformOptions } from '@babel/core';
+import { types as t, TransformOptions } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 
 export type JSONValue = string | number | boolean | JSONObject | JSONArray;
@@ -27,11 +27,11 @@ export enum ValueType {
 
 export type Value = Function | Styled | string | number;
 
-export type ValueCache = Map<types.Expression | string, Value>;
+export type ValueCache = Map<t.Expression | string, Value>;
 
 export type LazyValue = {
   kind: ValueType.LAZY;
-  ex: NodePath<types.Expression> | types.Expression | string;
+  ex: NodePath<t.Expression> | t.Expression | string;
 };
 
 export type FunctionValue = {
@@ -48,7 +48,7 @@ export type ExpressionValue = LazyValue | FunctionValue | EvaluatedValue;
 
 export type TemplateExpression = {
   styled?: { component: any };
-  path: NodePath<types.TaggedTemplateExpression>;
+  path: NodePath<t.TaggedTemplateExpression>;
   expressionValues: ExpressionValue[];
 };
 
@@ -93,3 +93,30 @@ export type Location = {
   line: number;
   column: number;
 };
+
+type AllNodes = { [T in t.Node['type']]: Extract<t.Node, { type: T }> };
+
+declare module '@babel/core' {
+  namespace types {
+    type VisitorKeys = {
+      [T in keyof AllNodes]: Extract<
+        keyof AllNodes[T],
+        {
+          [Key in keyof AllNodes[T]]: AllNodes[T][Key] extends (
+            | t.Node
+            | t.Node[]
+            | null)
+            ? Key
+            : never
+        }[keyof AllNodes[T]]
+      >
+    };
+
+    const VISITOR_KEYS: { [T in keyof VisitorKeys]: VisitorKeys[T][] };
+    const FLIPPED_ALIAS_KEYS: {
+      [T in keyof t.Aliases]: t.Aliases[T]['type'][]
+    };
+
+    function shallowEqual(actual: object, expected: object): boolean;
+  }
+}
