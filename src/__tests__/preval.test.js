@@ -392,6 +392,28 @@ it('ignores external expressions', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('evaluates complex styles with functions and nested selectors', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { css } from '../';
+    export const bareIconClass = css\`\`;
+    
+    const getSizeStyles = (fs) => ({
+      [\`${'&.${bareIconClass}'}\`]: {
+        fontSize: fs * 1.5,
+      },
+    });
+    
+    export const SIZES = {
+      XS: css\`${'${getSizeStyles(11)}'}\`,
+    };
+  `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('throws codeframe error when evaluation fails', async () => {
   expect.assertions(1);
 
@@ -417,6 +439,16 @@ it('throws codeframe error when evaluation fails', async () => {
 it('handles escapes properly', async () => {
   const { code, metadata } = await babel.transformFileAsync(
     resolve(__dirname, '../__fixtures__/escape-character.js'),
+    babelrc
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('handles complex component', async () => {
+  const { code, metadata } = await babel.transformFileAsync(
+    resolve(__dirname, '../__fixtures__/complex-component.js'),
     babelrc
   );
 

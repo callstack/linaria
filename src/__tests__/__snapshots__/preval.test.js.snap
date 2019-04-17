@@ -119,6 +119,32 @@ Dependencies: NA
 
 `;
 
+exports[`evaluates complex styles with functions and nested selectors 1`] = `
+"import { css } from '../';
+export const bareIconClass = \\"bareIconClass_b1xha7dm\\";
+
+const getSizeStyles = fs => ({
+  [\`&.\${bareIconClass}\`]: {
+    fontSize: fs * 1.5
+  }
+});
+
+export const SIZES = {
+  XS: \\"XS_x1rsdnkv\\"
+};"
+`;
+
+exports[`evaluates complex styles with functions and nested selectors 2`] = `
+
+CSS:
+
+.bareIconClass_b1xha7dm {}
+.XS_x1rsdnkv {&.bareIconClass_b1xha7dm { font-size: 16.5px; }}
+
+Dependencies: ../
+
+`;
+
 exports[`evaluates component interpolations 1`] = `
 "const {
   styled
@@ -329,7 +355,7 @@ CSS:
   }
 }
 
-Dependencies: ../slugify, ../slugify
+Dependencies: ../slugify
 
 `;
 
@@ -384,6 +410,50 @@ Dependencies: NA
 
 `;
 
+exports[`handles complex component 1`] = `
+"// Dead code in this file should be ignored
+import deadDep from 'unknown-dependency';
+import { styled } from 'linaria/react';
+export const deadValue = deadDep();
+const objects = {
+  font: {
+    fontSize: 12
+  },
+  box: {
+    border: \\"1px solid red\\"
+  }
+};
+
+const foo = k => {
+  const {
+    [k]: obj
+  } = objects;
+  return obj;
+};
+
+objects.font.fontWeight = 'bold';
+export const whiteColor = '#fff';
+export const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1us8k4s\\"
+});"
+`;
+
+exports[`handles complex component 2`] = `
+
+CSS:
+
+.Title_t1us8k4s {
+  font-size: 12px; font-weight: bold;
+  border: 1px solid red;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`handles escapes properly 1`] = `
 "import { styled } from 'linaria/react';
 const selectors = ['a', 'b'];
@@ -407,7 +477,7 @@ CSS:
    ;
 }
 
-Dependencies: core-js/modules/es6.string.raw
+Dependencies: NA
 
 `;
 
@@ -442,7 +512,7 @@ CSS:
   color: blue;
 }
 
-Dependencies: NA
+Dependencies: ../react
 
 `;
 
