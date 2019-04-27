@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   processors: [require.resolve('./preprocessor')],
   syntax: 'scss',
   rules: {

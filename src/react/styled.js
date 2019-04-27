@@ -1,8 +1,7 @@
 /* @flow */
-
-const React = require('react'); // eslint-disable-line import/no-extraneous-dependencies
-const { default: validAttr } = require('@emotion/is-prop-valid');
-const { cx } = require('../index');
+import React from 'react'; // eslint-disable-line import/no-extraneous-dependencies
+import validAttr from '@emotion/is-prop-valid';
+import { cx } from '../index';
 
 type Options = {
   name: string,
@@ -15,7 +14,7 @@ type Options = {
   },
 };
 
-const warnIfInvalid = (value: any, componentName) => {
+const warnIfInvalid = (value: any, componentName: string) => {
   if (process.env.NODE_ENV !== 'production') {
     if (
       typeof value === 'string' ||
@@ -30,7 +29,7 @@ const warnIfInvalid = (value: any, componentName) => {
 
     // eslint-disable-next-line no-console
     console.warn(
-      `An inteprolation evaluated to '${stringified}' in the component '${componentName}', which is probably a mistake. You should explicitly cast or transform the value to a string.`
+      `An interpolation evaluated to '${stringified}' in the component '${componentName}', which is probably a mistake. You should explicitly cast or transform the value to a string.`
     );
   }
 };
@@ -121,15 +120,13 @@ function styled(tag: React.ComponentType<*> | string) {
   };
 }
 
-if (process.env.NODE_ENV !== 'production') {
-  module.exports = new Proxy(styled, {
-    get(o, prop) {
-      return o(prop);
-    },
-  });
-} else {
-  module.exports = styled;
-}
+export default (process.env.NODE_ENV !== 'production'
+  ? new Proxy(styled, {
+      get(o, prop) {
+        return o(prop);
+      },
+    })
+  : styled);
 
 type CSSProperties = {
   [key: string]: string | number | CSSProperties,

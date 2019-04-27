@@ -1,38 +1,37 @@
-/* @flow */
-
-import type { Replacement } from '../transform';
-
-const stripAnsi = require('strip-ansi');
-const transform = require('../transform');
+import stripAnsi from 'strip-ansi';
+import transform, { Replacement } from '../transform';
 
 type Errors = {
-  [key: string]: ?{
-    name?: string,
-    code?: string,
-    message: string,
-    pos?: number,
-    loc?: {
-      line: number,
-      column: number,
-    },
-  },
+  [key: string]:
+    | {
+        name?: string;
+        code?: string;
+        message: string;
+        pos?: number;
+        loc?: {
+          line: number;
+          column: number;
+        };
+      }
+    | null
+    | undefined;
 };
 
 type Cache = {
-  [key: string]: ?(Replacement[]),
+  [key: string]: Replacement[] | null | undefined;
 };
 
 type Warning = {
-  rule?: string,
-  text: string,
-  severity: 'error' | 'warning',
-  line: number,
-  column: number,
+  rule?: string;
+  text: string;
+  severity: 'error' | 'warning';
+  line: number;
+  column: number;
 };
 
 type LintResult = {
-  errored: boolean,
-  warnings: Warning[],
+  errored: boolean;
+  warnings: Warning[];
 };
 
 function preprocessor() {

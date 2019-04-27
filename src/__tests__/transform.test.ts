@@ -1,9 +1,7 @@
-/* @flow */
 /* eslint-disable no-template-curly-in-string */
 
 import dedent from 'dedent';
-
-const transform = require('../transform');
+import transform from '../transform';
 
 it('rewrites a relative path in url() declarations', async () => {
   const { cssText } = await transform(
@@ -84,7 +82,7 @@ it('respects passed babel options', async () => {
         },
       }
     )
-  ).toThrowError('Unexpected token');
+  ).toThrow('Unexpected token');
 
   expect(() =>
     transform(
@@ -111,7 +109,7 @@ it('respects passed babel options', async () => {
         },
       }
     )
-  ).not.toThrowError('Unexpected token');
+  ).not.toThrow('Unexpected token');
 });
 
 it("doesn't throw due to duplicate preset", async () => {
@@ -145,5 +143,5 @@ it("doesn't throw due to duplicate preset", async () => {
         },
       }
     )
-  ).not.toThrowError('Duplicate plugin/preset detected');
+  ).not.toThrow('Duplicate plugin/preset detected');
 });

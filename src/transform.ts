@@ -3,52 +3,52 @@
 import path from 'path';
 import * as babel from '@babel/core';
 import stylis from 'stylis';
-import { SourceMapGenerator } from 'source-map';
-import loadOptions, { type PluginOptions } from './babel/utils/loadOptions';
+import { SourceMapGenerator, Mapping } from 'source-map';
+import loadOptions, { PluginOptions } from './babel/utils/loadOptions';
+import { Optional } from './typeUtils';
 
 export type Replacement = {
-  original: { start: Location, end: Location },
-  length: number,
+  original: { start: Location; end: Location };
+  length: number;
 };
 
 type Location = {
-  line: number,
-  column: number,
+  line: number;
+  column: number;
+};
+
+type Rules = {
+  [className: string]: {
+    cssText: string;
+    displayName: string;
+    start: Location | null;
+  };
 };
 
 type Result = {
-  code: string,
-  sourceMap: ?Object,
-  cssText?: string,
-  cssSourceMapText?: string,
-  dependencies?: string[],
-  rules?: {
-    [className: string]: {
-      cssText: string,
-      displayName: string,
-      start: ?Location,
-    },
-  },
-  replacements?: Replacement[],
+  code: string;
+  sourceMap: Object | null | undefined;
+  cssText?: string;
+  cssSourceMapText?: string;
+  dependencies?: string[];
+  rules?: Rules;
+  replacements?: Replacement[];
 };
 
 type Options = {
-  filename: string,
-  preprocessor?: Preprocessor,
-  outputFilename?: string,
-  inputSourceMap?: Object,
-  pluginOptions?: PluginOptions,
+  filename: string;
+  preprocessor?: Preprocessor;
+  outputFilename?: string;
+  inputSourceMap?: Object;
+  pluginOptions?: Optional<PluginOptions>;
 };
 
-export type Preprocessor =
-  | 'none'
-  | 'stylis'
-  | ((selector: string, cssText: string) => string)
-  | void;
+export type PreprocessorFn = (selector: string, cssText: string) => string;
+export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
 
 const STYLIS_DECLARATION = 1;
 
-module.exports = function transform(code: string, options: Options): Result {
+export default function transform(code: string, options: Options): Result {
   // Check if the file contains `css` or `styled` words first
   // Otherwise we should skip transforming
   if (!/\b(styled|css)/.test(code)) {
@@ -69,7 +69,7 @@ module.exports = function transform(code: string, options: Options): Result {
   });
 
   const { metadata, code: transformedCode, map } = babel.transformFromAstSync(
-    ast,
+    ast!,
     code,
     {
       filename: options.filename,
@@ -80,22 +80,25 @@ module.exports = function transform(code: string, options: Options): Result {
       sourceFileName: options.filename,
       inputSourceMap: options.inputSourceMap,
     }
-  );
+  )!;
 
-  if (!metadata.linaria) {
+  if (!metadata || !(metadata as any).linaria) {
     return {
       code,
       sourceMap: options.inputSourceMap,
     };
   }
 
-  const { rules, replacements, dependencies } = metadata.linaria;
-  const mappings = [];
+  const { rules, replacements, dependencies } = (metadata as any).linaria as {
+    rules: Rules;
+    replacements: Replacement[];
+    dependencies: string[];
+  };
+  const mappings: Mapping[] = [];
 
   let cssText = '';
 
-  let preprocessor;
-
+  let preprocessor: PreprocessorFn;
   if (typeof options.preprocessor === 'function') {
     // eslint-disable-next-line prefer-destructuring
     preprocessor = options.preprocessor;
@@ -107,7 +110,8 @@ module.exports = function transform(code: string, options: Options): Result {
       case 'stylis':
       default:
         stylis.use(null)((context, decl) => {
-          if (context === STYLIS_DECLARATION && options.outputFilename) {
+          const { outputFilename } = options;
+          if (context === STYLIS_DECLARATION && outputFilename) {
             // When writing to a file, we need to adjust the relative paths inside url(..) expressions
             // It'll allow css-loader to resolve an imported asset properly
             return decl.replace(
@@ -117,7 +121,7 @@ module.exports = function transform(code: string, options: Options): Result {
                 // Replace asset path with new path relative to the output CSS
                 path.relative(
                   /* $FlowFixMe */
-                  path.dirname(options.outputFilename),
+                  path.dirname(outputFilename),
                   // Get the absolute path to the asset from the path relative to the JS file
                   path.resolve(path.dirname(options.filename), p2)
                 ) +
@@ -138,8 +142,9 @@ module.exports = function transform(code: string, options: Options): Result {
         line: index + 1,
         column: 0,
       },
-      original: rules[selector].start,
+      original: rules[selector].start!,
       name: selector,
+      source: '',
     });
 
     // Run each rule through stylis to support nesting
@@ -147,7 +152,7 @@ module.exports = function transform(code: string, options: Options): Result {
   });
 
   return {
-    code: transformedCode,
+    code: transformedCode || '',
     cssText,
     rules,
     replacements,
@@ -174,4 +179,4 @@ module.exports = function transform(code: string, options: Options): Result {
       return '';
     },
   };
-};
+}

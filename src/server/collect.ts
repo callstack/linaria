@@ -1,29 +1,27 @@
-/* @flow */
-
-const postcss = require('postcss');
+import postcss, { AtRule, ChildNode } from 'postcss';
 
 type CollectResult = {
-  critical: string,
-  other: string,
+  critical: string;
+  other: string;
 };
 
-const collect = (html: string, css: string): CollectResult => {
+export default function collect(html: string, css: string): CollectResult {
   const animations = new Set();
   const other = postcss.root();
   const critical = postcss.root();
   const stylesheet = postcss.parse(css);
   const htmlClassesRegExp = extractClassesFromHtml(html);
 
-  const isCritical = rule => {
+  const isCritical = (rule: ChildNode) => {
     // Only check class names selectors
-    if (rule.selector.startsWith('.')) {
+    if ('selector' in rule && rule.selector.startsWith('.')) {
       return Boolean(rule.selector.match(htmlClassesRegExp));
     }
 
     return true;
   };
 
-  const handleAtRule = rule => {
+  const handleAtRule = (rule: AtRule) => {
     let addedToCritical = false;
 
     rule.each(childRule => {
@@ -45,7 +43,7 @@ const collect = (html: string, css: string): CollectResult => {
   };
 
   stylesheet.walkRules(rule => {
-    if (rule.parent.name === 'keyframes') {
+    if ('name' in rule.parent && rule.parent.name === 'keyframes') {
       return;
     }
 
@@ -75,10 +73,10 @@ const collect = (html: string, css: string): CollectResult => {
     critical: critical.toString(),
     other: other.toString(),
   };
-};
+}
 
 const extractClassesFromHtml = (html: string): RegExp => {
-  const htmlClasses = [];
+  const htmlClasses: string[] = [];
   const regex = /\s+class="([^"]*)"/gm;
   let match = regex.exec(html);
 
@@ -89,5 +87,3 @@ const extractClassesFromHtml = (html: string): RegExp => {
 
   return new RegExp(htmlClasses.join('|'), 'gm');
 };
-
-module.exports = collect;

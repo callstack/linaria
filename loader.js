@@ -1,3 +1,3 @@
 /* eslint-disable import/no-unresolved */
 
-module.exports = require('./lib/loader');
+module.exports = require('./lib/loader').default;

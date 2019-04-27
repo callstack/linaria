@@ -1,15 +1,17 @@
-/* @flow */
+import fs from 'fs';
+import path from 'path';
+import mkdirp from 'mkdirp';
+import normalize from 'normalize-path';
+import loaderUtils from 'loader-utils';
+import enhancedResolve from 'enhanced-resolve';
+import Module from './babel/module';
+import transform from './transform';
 
-const fs = require('fs');
-const path = require('path');
-const mkdirp = require('mkdirp');
-const normalize = require('normalize-path');
-const loaderUtils = require('loader-utils');
-const enhancedResolve = require('enhanced-resolve/lib/node');
-const Module = require('./babel/module');
-const transform = require('./transform');
-
-module.exports = function loader(content: string, inputSourceMap: ?Object) {
+export default function loader(
+  this: any,
+  content: string,
+  inputSourceMap: Object | null
+) {
   const {
     sourceMap,
     cacheDirectory = '.linaria-cache',
@@ -113,4 +115,4 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
   }
 
   this.callback(null, result.code, result.sourceMap);
-};
+}

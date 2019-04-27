@@ -1,12 +1,10 @@
-/* @flow */
-
-const path = require('path');
-const normalize = require('normalize-path');
-const fs = require('fs');
-const mkdirp = require('mkdirp');
-const glob = require('glob');
-const yargs = require('yargs');
-const transform = require('./transform');
+import path from 'path';
+import normalize from 'normalize-path';
+import fs from 'fs';
+import mkdirp from 'mkdirp';
+import glob from 'glob';
+import yargs from 'yargs';
+import transform from './transform';
 
 const { argv } = yargs
   .usage('Usage: $0 [options] <files ...>')
@@ -56,11 +54,11 @@ processFiles(argv._, {
 });
 
 type Options = {
-  outDir: string,
-  sourceMaps?: boolean,
-  sourceRoot?: string,
-  insertCssRequires?: string,
-  configFile?: string,
+  outDir: string;
+  sourceMaps?: boolean;
+  sourceRoot?: string;
+  insertCssRequires?: string;
+  configFile?: string;
 };
 
 function processFiles(files: string[], options: Options) {
@@ -68,7 +66,7 @@ function processFiles(files: string[], options: Options) {
 
   const resolvedFiles = files.reduce(
     (acc, pattern) => [...acc, ...glob.sync(pattern, { absolute: true })],
-    []
+    [] as string[]
   );
 
   resolvedFiles.forEach(filename => {

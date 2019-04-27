@@ -1,21 +1,17 @@
-/* @flow */
-
-import type { PluginOptions } from './babel/utils/loadOptions';
-import type { Preprocessor } from './transform';
-
-const { createFilter } = require('rollup-pluginutils');
-const transform = require('./transform');
-const slugify = require('./slugify');
+import { createFilter } from 'rollup-pluginutils';
+import transform, { Preprocessor } from './transform';
+import slugify from './slugify';
+import { PluginOptions } from './babel/utils/loadOptions';
+import { Optional } from './typeUtils';
 
 type RollupPluginOptions = {
-  include?: string | string[],
-  exclude?: string | string[],
-  sourceMap?: boolean,
-  preprocessor?: Preprocessor,
-  ...$Shape<PluginOptions>,
-};
+  include?: string | string[];
+  exclude?: string | string[];
+  sourceMap?: boolean;
+  preprocessor?: Preprocessor;
+} & Optional<PluginOptions>;
 
-module.exports = function linaria({
+export default function linaria({
   include,
   exclude,
   sourceMap,
@@ -23,7 +19,7 @@ module.exports = function linaria({
   ...rest
 }: RollupPluginOptions = {}) {
   const filter = createFilter(include, exclude);
-  const cssLookup = {};
+  const cssLookup: { [key: string]: string } = {};
 
   return {
     name: 'linaria',
@@ -39,7 +35,7 @@ module.exports = function linaria({
 
       const result = transform(code, {
         filename: id,
-        preprocessor: ((preprocessor: any): Preprocessor),
+        preprocessor,
         pluginOptions: rest,
       });
 
@@ -63,4 +59,4 @@ module.exports = function linaria({
       return { code: result.code, map: result.sourceMap };
     },
   };
-};
+}
