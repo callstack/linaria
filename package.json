@@ -73,7 +73,7 @@
     "prettier": "^1.16.4",
     "react": "^16.8.3",
     "react-test-renderer": "^16.8.3",
-    "release-it": "^10.1.0"
+    "release-it": "^11.0.0"
   },
   "dependencies": {
     "@babel/core": "^7.3.3",
