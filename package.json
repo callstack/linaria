@@ -61,7 +61,6 @@
     "babel-core": "^7.0.0-bridge.0",
     "codecov": "^3.2.0",
     "commitlint": "^7.5.2",
-    "conventional-changelog-cli": "^2.0.12",
     "del-cli": "^1.1.0",
     "dtslint": "^0.5.3",
     "eslint": "^5.14.1",
@@ -73,7 +72,7 @@
     "prettier": "^1.16.4",
     "react": "^16.8.3",
     "react-test-renderer": "^16.8.3",
-    "release-it": "^10.1.0"
+    "release-it": "^11.0.0"
   },
   "dependencies": {
     "@babel/core": "^7.3.3",
@@ -83,6 +82,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.2.0",
     "@babel/register": "^7.0.0",
     "@emotion/is-prop-valid": "^0.7.3",
+    "@release-it/conventional-changelog": "^1.0.0",
     "core-js": "^2.0.0",
     "cosmiconfig": "^5.1.0",
     "dedent": "^0.7.0",
