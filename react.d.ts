@@ -1,5 +1,6 @@
 // TypeScript Version: 2.9
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import * as React from 'react';
 
 type CSSProperties = {

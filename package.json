@@ -31,7 +31,7 @@
   ],
   "scripts": {
     "lint": "eslint --ext .js,.ts,.tsx .",
-    "typecheck": "tsc --noEmit && flow",
+    "typecheck": "tsc --noEmit",
     "test": "jest",
     "add-contributor": "all-contributors add",
     "build": "babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start",
@@ -115,21 +115,14 @@
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "yarn lint && yarn flow && yarn test"
+      "pre-commit": "yarn lint && yarn typecheck && yarn test"
     }
   },
   "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "jsx",
-      "ts",
-      "tsx"
-    ],
-    "testRegex": "/__tests__/.*\\.(test|spec)\\.(j|t)sx?$",
     "testEnvironment": "node",
+    "testRegex": "/__tests__/.*\\.(test|spec)\\.(js|tsx?)$",
     "transform": {
-      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
+      "^.+\\.(js|ts|tsx)$": "babel-jest"
     }
   }
 }
