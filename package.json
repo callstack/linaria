@@ -56,6 +56,7 @@
     "@babel/preset-react": "^7.0.0",
     "@callstack/eslint-config": "^3.0.2",
     "@commitlint/config-conventional": "^7.5.0",
+    "@release-it/conventional-changelog": "^1.0.2",
     "@types/react": "^16.8.4",
     "all-contributors-cli": "^6.1.1",
     "babel-core": "^7.0.0-bridge.0",
@@ -72,7 +73,7 @@
     "prettier": "^1.16.4",
     "react": "^16.8.3",
     "react-test-renderer": "^16.8.3",
-    "release-it": "^11.0.0"
+    "release-it": "^12.2.0"
   },
   "dependencies": {
     "@babel/core": "^7.3.3",
@@ -82,7 +83,6 @@
     "@babel/plugin-transform-modules-commonjs": "^7.2.0",
     "@babel/register": "^7.0.0",
     "@emotion/is-prop-valid": "^0.7.3",
-    "@release-it/conventional-changelog": "^1.0.0",
     "core-js": "^2.0.0",
     "cosmiconfig": "^5.1.0",
     "dedent": "^0.7.0",
