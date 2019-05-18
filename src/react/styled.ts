@@ -121,8 +121,8 @@ type CSSProperties = {
   [key: string]: string | number | CSSProperties;
 };
 
-type StyledComponent<T> = React.StatelessComponent<
-  T & { as?: React.ReactType }
+type StyledComponent<T> = React.FunctionComponent<
+  T & { as?: React.ElementType }
 >;
 
 type StyledTag<T> = <Props = T>(
@@ -139,7 +139,7 @@ type StyledJSXIntrinsics = {
 };
 
 type Styled = StyledJSXIntrinsics & {
-  <T>(component: React.ReactType<T>): StyledTag<T>;
+  <T>(component: React.ElementType<T>): StyledTag<T>;
 
   readonly [key: string]: StyledTag<{
     children?: React.ReactNode;
