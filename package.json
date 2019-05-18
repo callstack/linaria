@@ -35,8 +35,9 @@
     "test": "jest",
     "add-contributor": "all-contributors add",
     "build": "babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start",
-    "watch": "babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start --watch",
-    "prepare": "yarn build",
+    "build:declarations": "tsc --emitDeclarationOnly --outDir lib",
+    "watch": "yarn build --watch",
+    "prepare": "yarn build && yarn build:declarations",
     "release": "release-it",
     "website": "yarn --cwd website",
     "bootstrap": "yarn && yarn website install"
@@ -123,6 +124,9 @@
     "testRegex": "/__tests__/.*\\.(test|spec)\\.(js|tsx?)$",
     "transform": {
       "^.+\\.(js|ts|tsx)$": "babel-jest"
-    }
+    },
+    "setupFiles": [
+      "<rootDir>/jest/resolveTypescript.js"
+    ]
   }
 }

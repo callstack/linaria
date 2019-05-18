@@ -1,17 +1,16 @@
-/* @flow */
 import React from 'react'; // eslint-disable-line import/no-extraneous-dependencies
 import validAttr from '@emotion/is-prop-valid';
 import { cx } from '../index';
 
 type Options = {
-  name: string,
-  class: string,
+  name: string;
+  class: string;
   vars?: {
-    [string]: [
-      string | number | ((props: *) => string | number),
-      string | void,
-    ],
-  },
+    [key: string]: [
+      string | number | ((props: any) => string | number),
+      string | void
+    ];
+  };
 };
 
 const warnIfInvalid = (value: any, componentName: string) => {
@@ -34,7 +33,7 @@ const warnIfInvalid = (value: any, componentName: string) => {
   }
 };
 
-function styled(tag: React.ComponentType<*> | string) {
+function styled(tag: React.ComponentType<any> | string) {
   return (options: Options) => {
     if (process.env.NODE_ENV !== 'production') {
       if (Array.isArray(options)) {
@@ -45,14 +44,14 @@ function styled(tag: React.ComponentType<*> | string) {
       }
     }
 
-    const render = (props, ref) => {
+    const render = (props: any, ref: any) => {
       const { as: component = tag, class: className, ...rest } = props;
 
       let filteredProps;
 
       // Check if it's an HTML tag and not a custom element
       if (typeof component === 'string' && component.indexOf('-') === -1) {
-        filteredProps = {};
+        filteredProps = {} as { [key: string]: any };
 
         // eslint-disable-next-line guard-for-in
         for (const key in rest) {
@@ -74,7 +73,7 @@ function styled(tag: React.ComponentType<*> | string) {
       const { vars } = options;
 
       if (vars) {
-        const style = {};
+        const style: { [key: string]: string } = {};
 
         // eslint-disable-next-line guard-for-in
         for (const name in vars) {
@@ -89,8 +88,7 @@ function styled(tag: React.ComponentType<*> | string) {
         filteredProps.style = Object.assign(style, filteredProps.style);
       }
 
-      /* $FlowFixMe */
-      if (tag.__linaria && tag !== component) {
+      if ((tag as any).__linaria && tag !== component) {
         // If the underlying tag is a styled component, forward the `as` prop
         // Otherwise the styles from the underlying component will be ignored
         filteredProps.as = component;
@@ -105,13 +103,12 @@ function styled(tag: React.ComponentType<*> | string) {
       ? React.forwardRef(render)
       : // React.forwardRef won't available on older React versions and in Preact
         // Fallback to a innerRef prop in that case
-        ({ innerRef, ...rest }) => render(rest, innerRef);
+        ({ innerRef, ...rest }: any) => render(rest, innerRef);
 
-    Result.displayName = options.name;
+    (Result as any).displayName = options.name;
 
     // These properties will be read by the babel plugin for interpolation
-    /* $FlowFixMe */
-    Result.__linaria = {
+    (Result as any).__linaria = {
       className: options.class,
       extends: tag,
     };
@@ -120,30 +117,42 @@ function styled(tag: React.ComponentType<*> | string) {
   };
 }
 
-export default (process.env.NODE_ENV !== 'production'
+type CSSProperties = {
+  [key: string]: string | number | CSSProperties;
+};
+
+type StyledComponent<T> = React.StatelessComponent<
+  T & { as?: React.ReactType }
+>;
+
+type StyledTag<T> = <Props = T>(
+  strings: TemplateStringsArray,
+  ...exprs: Array<
+    string | number | CSSProperties | ((props: Props) => string | number)
+  >
+) => StyledComponent<Props>;
+
+type StyledJSXIntrinsics = {
+  readonly [P in keyof JSX.IntrinsicElements]: StyledTag<
+    JSX.IntrinsicElements[P]
+  >
+};
+
+type Styled = StyledJSXIntrinsics & {
+  <T>(component: React.ReactType<T>): StyledTag<T>;
+
+  readonly [key: string]: StyledTag<{
+    children?: React.ReactNode;
+    [key: string]: any;
+  }>;
+};
+
+export default ((process.env.NODE_ENV !== 'production'
   ? new Proxy(styled, {
       get(o, prop) {
+        prop = typeof prop === 'number' ? prop.toString() : prop;
+        prop = typeof prop === 'symbol' ? prop.toString() : prop;
         return o(prop);
       },
     })
-  : styled);
-
-type CSSProperties = {
-  [key: string]: string | number | CSSProperties,
-};
-
-type StyledComponent<T> = React.ComponentType<T & { as?: React$ElementType }>;
-
-type StyledTag<T> = (
-  strings: string[],
-  ...exprs: Array<string | number | CSSProperties | (T => string | number)>
-) => StyledComponent<T>;
-
-type StyledJSXIntrinsics = $ObjMap<
-  $JSXIntrinsics,
-  () => StyledTag<{ children?: React$Node, [key: string]: any }>
->;
-
-declare module.exports: StyledJSXIntrinsics & {|
-  <T>(T): StyledTag<React.ElementConfig<T>>,
-|};
+  : styled) as any) as Styled;

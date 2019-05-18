@@ -13,9 +13,9 @@ export default function loader(
   inputSourceMap: Object | null
 ) {
   const {
-    sourceMap,
+    sourceMap = undefined,
     cacheDirectory = '.linaria-cache',
-    preprocessor,
+    preprocessor = undefined,
     ...rest
   } = loaderUtils.getOptions(this) || {};
 
