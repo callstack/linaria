@@ -43,6 +43,7 @@ export default function loader(
       ? {
           ...resolveOptions,
           alias: this._compilation.options.resolve.alias,
+          modules: this._compilation.options.resolve.modules,
         }
       : resolveOptions
   );
