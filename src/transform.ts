@@ -35,6 +35,12 @@ type Result = {
   replacements?: Replacement[];
 };
 
+type LinariaMetadata = {
+  rules: Rules;
+  replacements: Replacement[];
+  dependencies: string[];
+};
+
 type Options = {
   filename: string;
   preprocessor?: Preprocessor;
@@ -82,18 +88,24 @@ export default function transform(code: string, options: Options): Result {
     }
   )!;
 
-  if (!metadata || !(metadata as any).linaria) {
+  if (
+    !metadata ||
+    !(metadata as babel.BabelFileMetadata & { linaria: LinariaMetadata })
+      .linaria
+  ) {
     return {
       code,
       sourceMap: options.inputSourceMap,
     };
   }
 
-  const { rules, replacements, dependencies } = (metadata as any).linaria as {
-    rules: Rules;
-    replacements: Replacement[];
-    dependencies: string[];
-  };
+  const {
+    rules,
+    replacements,
+    dependencies,
+  } = (metadata as babel.BabelFileMetadata & {
+    linaria: LinariaMetadata;
+  }).linaria;
   const mappings: Mapping[] = [];
 
   let cssText = '';

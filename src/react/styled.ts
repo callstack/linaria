@@ -33,6 +33,7 @@ const warnIfInvalid = (value: any, componentName: string) => {
   }
 };
 
+// TODO: improve types
 function styled(tag: React.ComponentType<any> | string) {
   return (options: Options) => {
     if (process.env.NODE_ENV !== 'production') {
