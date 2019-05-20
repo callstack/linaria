@@ -120,7 +120,6 @@ export default function transform(code: string, options: Options): Result {
                 p1 +
                 // Replace asset path with new path relative to the output CSS
                 path.relative(
-                  /* $FlowFixMe */
                   path.dirname(outputFilename),
                   // Get the absolute path to the asset from the path relative to the JS file
                   path.resolve(path.dirname(options.filename), p2)
