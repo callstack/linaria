@@ -7,7 +7,7 @@ type Options = {
   class: string;
   vars?: {
     [key: string]: [
-      string | number | ((props: any) => string | number),
+      string | number | ((props: unknown) => string | number),
       string | void
     ];
   };
