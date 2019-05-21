@@ -410,6 +410,40 @@ Dependencies: NA
 
 `;
 
+exports[`generates stable class names 1`] = `
+"import { styled } from '../react';
+export const T1 =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"T1\\",
+  class: \\"T1_t11kcpnd\\"
+});
+export const T2 =
+/*#__PURE__*/
+styled(\\"h2\\")({
+  name: \\"T2\\",
+  class: \\"T2_t1xdipzs\\"
+});
+export const T3 =
+/*#__PURE__*/
+styled(\\"h3\\")({
+  name: \\"T3\\",
+  class: \\"T3_tmgfls7\\"
+});"
+`;
+
+exports[`generates stable class names 2`] = `
+
+CSS:
+
+.T1_t11kcpnd {background: #111;}
+.T2_t1xdipzs {background: #222;}
+.T3_tmgfls7 {.T2_t1xdipzs { background: #333; }}
+
+Dependencies: ../react
+
+`;
+
 exports[`handles complex component 1`] = `
 "// Dead code in this file should be ignored
 import deadDep from 'unknown-dependency';
