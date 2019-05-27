@@ -12,10 +12,7 @@
     "server.js",
     "babel.js",
     "loader.js",
-    "stylelint-config.js",
-    "index.d.ts",
-    "react.d.ts",
-    "server.d.ts"
+    "stylelint-config.js"
   ],
   "license": "MIT",
   "repository": "git@github.com:callstack/linaria.git",
@@ -34,13 +31,13 @@
   ],
   "scripts": {
     "lint": "eslint --ext .js,.ts,.tsx .",
-    "typecheck": "tsc --noEmit && flow",
-    "typescript": "dtslint",
+    "typecheck": "tsc --noEmit",
     "test": "jest",
     "add-contributor": "all-contributors add",
-    "build": "babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start && flow-copy-source -i '{**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**}' src lib",
-    "watch": "babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start --watch",
-    "prepare": "yarn build",
+    "build": "babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start",
+    "build:declarations": "tsc --emitDeclarationOnly --outDir lib",
+    "watch": "yarn build --watch",
+    "prepare": "yarn build && yarn build:declarations",
     "release": "release-it",
     "website": "yarn --cwd website",
     "bootstrap": "yarn && yarn website install"
@@ -61,7 +58,13 @@
     "@release-it/conventional-changelog": "^1.0.2",
     "@types/cosmiconfig": "^5.0.3",
     "@types/dedent": "^0.7.0",
+    "@types/enhanced-resolve": "^3.0.6",
+    "@types/glob": "^7.1.1",
     "@types/jest": "^24.0.11",
+    "@types/loader-utils": "^1.1.3",
+    "@types/mkdirp": "^0.5.2",
+    "@types/normalize-path": "^3.0.0",
+    "@types/prettier": "^1.16.3",
     "@types/react": "^16.8.12",
     "@types/react-is": "^16.7.1",
     "@typescript-eslint/eslint-plugin": "^1.6.0",
@@ -71,11 +74,8 @@
     "codecov": "^3.2.0",
     "commitlint": "^7.5.2",
     "del-cli": "^1.1.0",
-    "dtslint": "^0.5.3",
     "eslint": "^5.14.1",
     "eslint-plugin-prettier": "^3.0.1",
-    "flow-bin": "^0.94.0",
-    "flow-copy-source": "^2.0.3",
     "husky": "^1.3.1",
     "jest": "^24.7.1",
     "prettier": "^1.16.4",
@@ -106,7 +106,7 @@
     "react-is": "^16.8.3",
     "rollup-pluginutils": "^2.4.1",
     "source-map": "^0.7.3",
-    "strip-ansi": "^5.0.0",
+    "strip-ansi": "^5.2.0",
     "stylis": "^3.5.4",
     "yargs": "^13.2.1"
   },
@@ -117,21 +117,17 @@
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "yarn lint && yarn flow && yarn test"
+      "pre-commit": "yarn lint && yarn typecheck && yarn test"
     }
   },
   "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "jsx",
-      "ts",
-      "tsx"
-    ],
-    "testRegex": "/__tests__/.*\\.(test|spec)\\.(j|t)sx?$",
     "testEnvironment": "node",
+    "testRegex": "/__tests__/.*\\.(test|spec)\\.(js|tsx?)$",
     "transform": {
-      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
-    }
+      "^.+\\.(js|ts|tsx)$": "babel-jest"
+    },
+    "setupFiles": [
+      "<rootDir>/jest/resolveTypescript.js"
+    ]
   }
 }

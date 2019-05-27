@@ -2,7 +2,7 @@ import cosmiconfig from 'cosmiconfig';
 import { StrictOptions } from '../types';
 
 export type PluginOptions = StrictOptions & {
-  configFile: string;
+  configFile?: string;
 };
 
 const explorer = cosmiconfig('linaria');

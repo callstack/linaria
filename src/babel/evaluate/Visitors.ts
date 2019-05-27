@@ -12,7 +12,9 @@ export type Visitor<TNode extends t.Node> = <TParent extends t.Node>(
   listIdx: number | null
 ) => void;
 
-export type Visitors = { [TMethod in t.Node['type']]?: Visitor<NodeOfType<TMethod>> };
+export type Visitors = {
+  [TMethod in t.Node['type']]?: Visitor<NodeOfType<TMethod>>
+};
 
 const visitors: Visitors = {
   Identifier<TParent extends t.Node>(

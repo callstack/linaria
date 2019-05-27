@@ -2,7 +2,7 @@
 
 const React = require('react');
 const renderer = require('react-test-renderer');
-const styled: any = require('../react/styled');
+const styled: any = require('../react/styled').default;
 
 it('renders tag with display name and class name', () => {
   const Test = styled('h1')({
@@ -218,12 +218,12 @@ it('throws when using as tag for template literal', () => {
       styled('div')`
         color: blue;
       `
-  ).toThrowError('Using the "styled" tag in runtime is not supported');
+  ).toThrow('Using the "styled" tag in runtime is not supported');
 
   expect(
     () =>
       styled.div`
         color: blue;
       `
-  ).toThrowError('Using the "styled" tag in runtime is not supported');
+  ).toThrow('Using the "styled" tag in runtime is not supported');
 });

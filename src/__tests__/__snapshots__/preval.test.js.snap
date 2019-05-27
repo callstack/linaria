@@ -120,7 +120,7 @@ Dependencies: NA
 `;
 
 exports[`evaluates complex styles with functions and nested selectors 1`] = `
-"import { css } from '../';
+"import { css } from '../index.ts';
 export const bareIconClass = \\"bareIconClass_b1xha7dm\\";
 
 const getSizeStyles = fs => ({
@@ -141,7 +141,7 @@ CSS:
 .bareIconClass_b1xha7dm {}
 .XS_x1rsdnkv {&.bareIconClass_b1xha7dm { font-size: 16.5px; }}
 
-Dependencies: ../
+Dependencies: ../index.ts
 
 `;
 

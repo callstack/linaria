@@ -202,7 +202,7 @@ it('has require.ensure available', () => {
     mod.evaluate(dedent`
   require.ensure(['./sample-script']);
   `)
-  ).not.toThrowError();
+  ).not.toThrow();
 });
 
 it('has __filename available', () => {

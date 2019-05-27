@@ -41,7 +41,7 @@ commands:
               at: ~/linaria
           - run: |
               yarn lint
-              yarn typescript
+            yarn typecheck
     unit-tests:
         steps:
           - attach_workspace:

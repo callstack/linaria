@@ -68,6 +68,7 @@ class Module {
     id: string,
     options: { id: string; filename: string; paths: string[] }
   ) => string;
+  static _nodeModulePaths: (filename: string) => string[];
 
   id: string;
   filename: string;
@@ -239,5 +240,10 @@ Module._resolveFilename = (id, options) =>
   ((NativeModule as unknown) as {
     _resolveFilename: (id: string, options: any) => string;
   })._resolveFilename(id, options);
+
+Module._nodeModulePaths = (filename: string) =>
+  ((NativeModule as unknown) as {
+    _nodeModulePaths: (filename: string) => string[];
+  })._nodeModulePaths(filename);
 
 export default Module;
