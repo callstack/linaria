@@ -395,15 +395,15 @@ it('ignores external expressions', async () => {
 it('evaluates complex styles with functions and nested selectors', async () => {
   const { code, metadata } = await transpile(
     dedent`
-    import { css } from '../';
+    import { css } from '../index.ts';
     export const bareIconClass = css\`\`;
-    
+
     const getSizeStyles = (fs) => ({
       [\`${'&.${bareIconClass}'}\`]: {
         fontSize: fs * 1.5,
       },
     });
-    
+
     export const SIZES = {
       XS: css\`${'${getSizeStyles(11)}'}\`,
     };

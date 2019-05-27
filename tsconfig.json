@@ -1,23 +1,25 @@
 {
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
+    "src/**/*.ts",
+    "src/**/*.tsx"
   ],
   "exclude": [
     "node_modules",
-    "__ts-tests__"
+    "__ts-tests__",
+    "**/__tests__/**",
+    "**/__fixtures__/**",
   ],
   "compilerOptions": {
     "jsx": "react",
     "lib": ["es6", "dom"],
     "module": "es6",
     "moduleResolution": "node",
-    "noEmit": true,
     "strict": true,
     "target": "esnext",
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "typeRoots": ["node_modules/@types", "typings"]
   }
 }
