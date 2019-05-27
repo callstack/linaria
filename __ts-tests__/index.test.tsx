@@ -1,3 +1,5 @@
+/* eslint-disable import/no-unresolved */
+
 import { css, cx } from 'linaria';
 
 const tomato = 'tomato';
@@ -22,16 +24,24 @@ css`
 `;
 
 // $ExpectType string
-css`font-family: sans-serif`;
+css`
+  font-family: sans-serif;
+`;
 
 // $ExpectError
-css`color: ${true}`;
+css`
+  color: ${true};
+`;
 
 // $ExpectError
-css`color: ${undefined}`;
+css`
+  color: ${undefined};
+`;
 
 // $ExpectError
-css`color: ${null}`;
+css`
+  color: ${null};
+`;
 
 // $ExpectType string
 cx('test', false, undefined, null, 0);

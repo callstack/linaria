@@ -1,3 +1,3 @@
 /* eslint-disable import/no-unresolved */
 
-module.exports = require('./lib/stylelint/config');
+module.exports = require('./lib/stylelint/config').default;
