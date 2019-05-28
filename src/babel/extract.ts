@@ -62,8 +62,7 @@ export default function extract(_babel: any, options: StrictOptions) {
 
           let lazyValues: any[] = [];
           if (lazyDeps.length) {
-            const [shaken, deps] = shake(path.node, lazyDeps);
-            state.dependencies.push(...deps.map(d => d.source));
+            const [shaken] = shake(path.node, lazyDeps);
             const evaluation = evaluate(
               shaken,
               types,
@@ -72,6 +71,7 @@ export default function extract(_babel: any, options: StrictOptions) {
               options
             );
 
+            state.dependencies.push(...evaluation.dependencies);
             lazyValues = evaluation.value;
           }
 
