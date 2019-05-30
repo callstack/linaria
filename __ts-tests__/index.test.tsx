@@ -1,5 +1,5 @@
 /* eslint-disable import/no-unresolved */
-
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { css, cx } from 'linaria';
 
 const tomato = 'tomato';
