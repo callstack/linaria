@@ -13,6 +13,7 @@
           ]
         },
         "useBuiltIns": "usage",
+        "corejs": "2",
         "exclude": [
           "transform-typeof-symbol",
           "es6.object.assign",
