@@ -1,7 +1,9 @@
 import { types as t } from '@babel/core';
 
+type Keys<T extends t.Node> = (t.VisitorKeys[T['type']] & keyof T)[];
+
 export default function getVisitorKeys<TNode extends t.Node>(
   node: TNode
-): t.VisitorKeys[TNode['type']][] {
-  return t.VISITOR_KEYS[node.type];
+): Keys<TNode> {
+  return t.VISITOR_KEYS[node.type] as Keys<TNode>;
 }

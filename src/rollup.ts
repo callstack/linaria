@@ -1,15 +1,15 @@
 import { createFilter } from 'rollup-pluginutils';
-import transform, { Preprocessor } from './transform';
+import transform from './transform';
 import slugify from './slugify';
+import { Preprocessor } from './types';
 import { PluginOptions } from './babel/utils/loadOptions';
-import { Optional } from './typeUtils';
 
 type RollupPluginOptions = {
   include?: string | string[];
   exclude?: string | string[];
   sourceMap?: boolean;
   preprocessor?: Preprocessor;
-} & Optional<PluginOptions>;
+} & Partial<PluginOptions>;
 
 export default function linaria({
   include,

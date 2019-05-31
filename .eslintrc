@@ -14,6 +14,15 @@
       }
     ]
   },
+  "overrides": [
+    {
+      "files": ["types/styled.ts"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": false,
+        "import/no-extraneous-dependencies": false
+      }
+    }
+  ],
   "settings": {
     "import/resolver": {
       "node": {

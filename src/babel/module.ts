@@ -16,8 +16,11 @@ import NativeModule from 'module';
 import vm from 'vm';
 import fs from 'fs';
 import path from 'path';
-import * as process from './process';
 import { BabelFileResult } from '@babel/core';
+import * as EvalCache from './eval-cache';
+import * as process from './process';
+import { debug } from './utils/logger';
+import { StrictOptions } from './types';
 
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty
@@ -64,6 +67,7 @@ const NOOP = () => {};
 
 class Module {
   static invalidate: () => void;
+  static invalidateEvalCache: () => void;
   static _resolveFilename: (
     id: string,
     options: { id: string; filename: string; paths: string[] }
@@ -72,15 +76,19 @@ class Module {
 
   id: string;
   filename: string;
+  options: StrictOptions;
+  imports: Map<string, string[]> | null;
   paths: string[];
   exports: any;
   extensions: string[];
-  dependencies: (string[]) | null;
+  dependencies: string[] | null;
   transform: ((text: string) => BabelFileResult | null) | null;
 
-  constructor(filename: string) {
+  constructor(filename: string, options: StrictOptions) {
     this.id = filename;
     this.filename = filename;
+    this.options = options;
+    this.imports = null;
     this.paths = [];
     this.dependencies = null;
     this.transform = null;
@@ -125,7 +133,7 @@ class Module {
 
         // When an extension is not supported, add it
         // And keep track of it to clean it up after resolving
-        // Use noop for the tranform function since we handle it
+        // Use noop for the transform function since we handle it
         extensions[ext] = NOOP;
         added.push(ext);
       });
@@ -157,7 +165,6 @@ class Module {
 
       // Resolve module id (and filename) relatively to parent module
       const filename = this.resolve(id);
-
       if (filename === id && !path.isAbsolute(id)) {
         // The module is a builtin node modules, but not in the allowed list
         throw new Error(
@@ -167,16 +174,30 @@ class Module {
 
       this.dependencies && this.dependencies.push(id);
 
-      let m = cache[filename];
+      let cacheKey = filename;
+      let only: string[] = [];
+      if (this.imports && this.imports.has(id)) {
+        // We know what exactly we need from this module. Let's shake it!
+        only = this.imports.get(id)!.sort();
+        if (only.length === 0) {
+          // Probably the module is used as a value itself
+          // like `'The answer is ' + require('./module')`
+          only = ['default'];
+        }
+
+        cacheKey += `:${only.join(',')}`;
+      }
+
+      let m = cache[cacheKey];
 
       if (!m) {
         // Create the module if cached module is not available
-        m = new Module(filename);
+        m = new Module(filename, this.options);
         m.transform = this.transform;
 
         // Store it in cache at this point with, otherwise
         // we would end up in infinite loop with cyclic dependencies
-        cache[filename] = m;
+        cache[cacheKey] = m;
 
         if (this.extensions.includes(path.extname(filename))) {
           // To evaluate the file, we need to read it first
@@ -188,7 +209,7 @@ class Module {
           } else {
             // For JS/TS files, evaluate the module
             // The module will be transpiled using provided transform
-            m.evaluate(code);
+            m.evaluate(code, only);
           }
         } else {
           // For non JS/JSON requires, just export the id
@@ -207,9 +228,58 @@ class Module {
     }
   );
 
-  evaluate(text: string) {
-    // For JavaScript files, we need to transpile it and to get the exports of the module
-    const code = this.transform ? this.transform(text)!.code : text;
+  evaluate(text: string, only: string[] | null = null) {
+    const filename = this.filename;
+    const matchedRules = this.options.rules
+      .filter(({ test }) => {
+        if (!test) {
+          return true;
+        }
+
+        if (typeof test === 'function') {
+          // eslint-disable-next-line jest/no-disabled-tests this is not a test
+          return test(filename);
+        }
+
+        if (test instanceof RegExp) {
+          return test.test(filename);
+        }
+
+        return false;
+      })
+      .reverse();
+
+    const cacheKey = only
+      ? `${this.filename}:${only.join(',')}`
+      : this.filename;
+
+    if (EvalCache.has(cacheKey, text)) {
+      this.exports = EvalCache.get(cacheKey, text);
+      return;
+    }
+
+    let code: string | null | undefined;
+    const action = matchedRules.length > 0 ? matchedRules[0].action : 'ignore';
+    if (
+      action === 'ignore' ||
+      (this.options.ignore && this.options.ignore.test(filename))
+    ) {
+      debug(`Ignore ${filename}`);
+      code = text;
+    } else {
+      // Action can be a function or a module name
+      const evaluator =
+        typeof action === 'function' ? action : require(action).default;
+
+      // For JavaScript files, we need to transpile it and to get the exports of the module
+      let imports: Module['imports'];
+      [code, imports] = evaluator(this.filename, this.options, text, only);
+      this.imports = imports;
+
+      debug(
+        `Evaluate ${this.filename} (only ${(only || []).join(', ')}):\n${code}`
+      );
+    }
 
     const script = new vm.Script(code!, {
       filename: this.filename,
@@ -226,11 +296,17 @@ class Module {
         __dirname: path.dirname(this.filename),
       })
     );
+
+    EvalCache.set(cacheKey, text, this.exports);
   }
 }
 
 Module.invalidate = () => {
   cache = {};
+};
+
+Module.invalidateEvalCache = () => {
+  EvalCache.clear();
 };
 
 // Alias to resolve the module using node's resolve algorithm
