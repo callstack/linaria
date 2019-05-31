@@ -82,6 +82,16 @@ it('shakes imports', () => {
   expect(shaken).toMatchSnapshot();
 });
 
+it('should keep member expression key', () => {
+  const [shaken] = _shake(['blue'])`
+    const key = 'blue';
+    const obj = { blue: '#00F' };
+    const blue = obj[key];
+  `;
+
+  expect(shaken).toMatchSnapshot();
+});
+
 it('shakes exports', () => {
   const [shaken] = _shake(['a'])`
     import { whiteColor as color, anotherColor } from '…';

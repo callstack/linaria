@@ -130,6 +130,24 @@ const wrap = fn => {
 module.exports = [wrap(() => color2)];"
 `;
 
+exports[`should keep member expression key 1`] = `
+"const key = 'blue';
+const obj = {
+  blue: '#00F'
+};
+const blue = obj[key];
+
+const wrap = fn => {
+  try {
+    return fn();
+  } catch (e) {
+    return e;
+  }
+};
+
+module.exports = [wrap(() => blue)];"
+`;
+
 exports[`should throw away any side effects 1`] = `
 "const objects = {
   key: {
