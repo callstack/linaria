@@ -5,20 +5,24 @@ import * as babel from '@babel/core';
 import { ExternalDep } from '../babel/evaluate/DepsGraph';
 import shake from '../babel/evaluate/shaker';
 
-function _build(literal: TemplateStringsArray, ...placeholders: string[]) {
+function _build(
+  opts: babel.TransformOptions | undefined,
+  literal: TemplateStringsArray,
+  ...placeholders: string[]
+) {
   const code = dedent(literal, ...placeholders);
   return {
-    ast: babel.parseSync(code),
+    ast: babel.parseSync(code, opts),
     code,
   };
 }
 
-function _shake(names: string[]) {
+function _shake(names: string[], opts?: babel.TransformOptions) {
   return (
     literal: TemplateStringsArray,
     ...placeholders: string[]
   ): [string, ExternalDep[]] => {
-    const { ast, code } = _build(literal, ...placeholders);
+    const { ast, code } = _build(opts, literal, ...placeholders);
     if (!ast || !babel.types.isFile(ast)) return ['', []];
     const [shaken, deps] = shake(ast.program, names);
     const { code: transformed } = babel.transformFromAstSync(shaken, code)!;
@@ -63,6 +67,24 @@ it('keeps only code which is related to `a`', () => {
     const { whiteColor: color, anotherColor } = require('…');
     const a = color || anotherColor;
     color.green = '#0f0';
+  `;
+
+  expect(shaken).toMatchSnapshot();
+});
+
+it('processes enums', () => {
+  const opts = {
+    filename: 'test.ts',
+    presets: ['@babel/preset-typescript'],
+  };
+  const [shaken] = _shake(['color'], opts)`
+    enum Color {
+      Red = '#F00',
+      Green = '#0F0',
+      Blue = '#00F',
+    }
+    
+    export const color = Color.Red;
   `;
 
   expect(shaken).toMatchSnapshot();

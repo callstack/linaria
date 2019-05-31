@@ -84,6 +84,25 @@ const wrap_1 = fn => {
 module.exports = [wrap_1(() => color)];"
 `;
 
+exports[`processes enums 1`] = `
+"enum Color {
+  Red = '#F00',
+  Green = '#0F0',
+  Blue = '#00F',
+}
+const color = Color.Red;
+
+const wrap = fn => {
+  try {
+    return fn();
+  } catch (e) {
+    return e;
+  }
+};
+
+module.exports = [wrap(() => color)];"
+`;
+
 exports[`shakes exports 1`] = `
 "import { whiteColor as color } from '…';
 const a = color;

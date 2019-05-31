@@ -99,6 +99,7 @@ export default function shake(
   /*
    * If we want to know what is really happen with our code tree,
    * we can print formatted tree here by `dumpNode(program, alive)`
+   * we can print formatted tree here by `dumpNode(rootPath, alive)`
    */
 
   // By default `wrap` is used as a name of the function …

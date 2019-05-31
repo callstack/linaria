@@ -53,6 +53,7 @@ batchDefineHandlers(
     ['ImportSpecifier', 'local'],
     ['RestElement', 'argument'],
     ['VariableDeclarator', 'id'],
+    ['TSEnumDeclaration', 'id'],
   ],
   'declare'
 );

@@ -231,6 +231,33 @@ const visitors: Visitors = {
     }
   },
 
+  TSEnumDeclaration(
+    this: GraphBuilderState,
+    node: t.TSEnumDeclaration,
+    parent: t.Node | null = null
+  ) {
+    this.baseVisit(node);
+
+    node.members.forEach(member => {
+      this.graph.addEdge(node.id, member);
+      this.graph.addEdge(node, member);
+    });
+
+    this.graph.addEdge(node.id, node);
+    if (parent) {
+      this.graph.addEdge(node, parent);
+    }
+  },
+
+  TSEnumMember(this: GraphBuilderState, node: t.TSEnumMember) {
+    this.baseVisit(node);
+
+    this.graph.addEdge(node, node.id);
+    if (node.initializer) {
+      this.graph.addEdge(node, node.initializer);
+    }
+  },
+
   CallExpression(this: GraphBuilderState, node: t.CallExpression) {
     this.baseVisit(node);
 
