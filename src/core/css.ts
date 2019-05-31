@@ -3,7 +3,7 @@ type CSSProperties = {
 };
 
 export default function css(
-  _strings: string[],
+  _strings: TemplateStringsArray,
   ..._exprs: Array<string | number | CSSProperties>
 ): string {
   throw new Error(
