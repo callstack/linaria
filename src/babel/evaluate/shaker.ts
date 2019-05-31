@@ -58,7 +58,8 @@ function shakeNode<TNode extends t.Node>(
 }
 
 // All exported values will be wrapped with this function
-const file = parseSync(`
+const file = parseSync(
+  `
   fn => {
     try {
       return fn();
@@ -66,7 +67,9 @@ const file = parseSync(`
       return e;
     }
   };
-`) as t.File;
+`,
+  { filename: 'wrapper.ts' } // preset-typescript wants to see a filename (#428)
+) as t.File;
 const exprStatement = file.program.body[0] as t.ExpressionStatement;
 const expWrapper = exprStatement.expression;
 
