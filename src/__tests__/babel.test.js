@@ -22,8 +22,78 @@ it('transpiles styled template literal with object', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    export const Title = styled.h1\`
+    export const Title = props => styled.h1\`
       font-size: 14px;
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('handles basic properties', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    export const Title = props => styled.h1\`
+      font-size: ${'${props.size}'}px;
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('handles variant classes', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    export const Button = props => styled.button\`
+      background: ${'${props.color}'};
+      padding: 16px 24px;
+      transition: 200ms;
+      font-size: 24px;
+      &:hover {
+        color: ${'${props.color}'};
+        background: white;
+      }
+
+
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('handles array attribute selector', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    export const Button = props => styled.button\`
+      background: ${'${props.color}'};
+      padding: 16px 24px;
+      transition: 200ms;
+      font-size: 24px;
+      &:hover {
+        color: ${'${props.color}'};
+        background: white;
+      }
+
+      ${'${[props.primary, 1]}'} {
+        border-radius: 30px;
+        background: #18b09d;
+        color: white;
+        &:hover {
+          background: #087b6d;
+        }
+      }
     \`;
     `
   );

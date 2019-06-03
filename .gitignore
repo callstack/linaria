@@ -65,3 +65,4 @@ dist/
 build/
 
 .linaria-cache
+debug

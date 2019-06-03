@@ -45,6 +45,73 @@ Dependencies: NA
 
 `;
 
+exports[`handles array attribute selector 1`] = `
+"import { styled } from 'linaria/react';
+export const Button =
+/*#__PURE__*/
+styled(\\"button\\")({
+  name: \\"Button\\",
+  class: \\"bh6xni0\\",
+  vars: {
+    \\"bh6xni0-0\\": [props => props.color],
+    \\"bh6xni0-2\\": [[props.primary, 1]]
+  }
+});"
+`;
+
+exports[`handles array attribute selector 2`] = `
+
+CSS:
+
+.bh6xni0 {
+  background: var(--bh6xni0-0);
+  padding: 16px 24px;
+  transition: 200ms;
+  font-size: 24px;
+  &:hover {
+    color: var(--bh6xni0-0);
+    background: white;
+  }
+
+  var(--bh6xni0-2) {
+    border-radius: 30px;
+    background: #18b09d;
+    color: white;
+    &:hover {
+      background: #087b6d;
+    }
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`handles basic properties 1`] = `
+"import { styled } from 'linaria/react';
+export const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"th6xni0\\",
+  vars: {
+    \\"th6xni0-0\\": [props => props.size, \\"px\\"]
+  }
+});"
+`;
+
+exports[`handles basic properties 2`] = `
+
+CSS:
+
+.th6xni0 {
+  font-size: var(--th6xni0-0);
+}
+
+Dependencies: NA
+
+`;
+
 exports[`handles css template literal in JSX element 1`] = `
 "import { css } from 'linaria';
 <Title class={\\"th6xni0\\"} />;"
@@ -151,6 +218,40 @@ CSS:
   @media (max-width: 200px) {
     width: 100%;
   }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`handles variant classes 1`] = `
+"import { styled } from 'linaria/react';
+export const Button =
+/*#__PURE__*/
+styled(\\"button\\")({
+  name: \\"Button\\",
+  class: \\"bh6xni0\\",
+  vars: {
+    \\"bh6xni0-0\\": [props => props.color]
+  }
+});"
+`;
+
+exports[`handles variant classes 2`] = `
+
+CSS:
+
+.bh6xni0 {
+  background: var(--bh6xni0-0);
+  padding: 16px 24px;
+  transition: 200ms;
+  font-size: 24px;
+  &:hover {
+    color: var(--bh6xni0-0);
+    background: white;
+  }
+
+
 }
 
 Dependencies: NA
