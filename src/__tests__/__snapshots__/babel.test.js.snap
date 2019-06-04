@@ -54,7 +54,7 @@ styled(\\"button\\")({
   class: \\"bh6xni0\\",
   vars: {
     \\"bh6xni0-0\\": [props => props.color],
-    \\"bh6xni0-2\\": [[props.primary, 1]]
+    \\"bh6xni0-2\\": [[props => props.primary, 1]]
   }
 });"
 `;
@@ -73,7 +73,7 @@ CSS:
     background: white;
   }
 
-  var(--bh6xni0-2) {
+  &.var(--bh6xni0-2) {
     border-radius: 30px;
     background: #18b09d;
     color: white;
@@ -480,6 +480,37 @@ CSS:
 }
 .t1u0rrat {
   color: blue;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`throws when array attribute is not in root scope 1`] = `
+"import { styled } from 'linaria/react';
+const size = 18;
+export const Array =
+/*#__PURE__*/
+styled(\\"div\\")({
+  name: \\"Array\\",
+  class: \\"ah6xni0\\",
+  vars: {
+    \\"ah6xni0-0\\": [[props => props.primary, 1]]
+  }
+});"
+`;
+
+exports[`throws when array attribute is not in root scope 2`] = `
+
+CSS:
+
+.ah6xni0 {
+  &:hover {
+    &.var(--ah6xni0-0) {
+      color: blue;
+    }
+    font-size: 18px;
+  }
 }
 
 Dependencies: NA

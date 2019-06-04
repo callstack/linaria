@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 
-import { types } from '@babel/core';
+import { types as t } from '@babel/core';
 import { relative, dirname, basename } from 'path';
 import { isValidElementType } from 'react-is';
 import generator from '@babel/generator';
@@ -26,7 +26,7 @@ const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
 
 type Interpolation = {
   id: string;
-  node: types.Expression;
+  node: t.Expression;
   source: string;
   unit: string;
 };
@@ -59,23 +59,23 @@ export default function getTemplateProcessor(options: StrictOptions) {
 
     const parent = path.findParent(
       p =>
-        types.isObjectProperty(p) ||
-        types.isJSXOpeningElement(p) ||
-        types.isVariableDeclarator(p)
+        t.isObjectProperty(p) ||
+        t.isJSXOpeningElement(p) ||
+        t.isVariableDeclarator(p)
     );
 
     if (parent) {
       const parentNode = parent.node;
-      if (types.isObjectProperty(parentNode)) {
+      if (t.isObjectProperty(parentNode)) {
         displayName = parentNode.key.name || parentNode.key.value;
       } else if (
-        types.isJSXOpeningElement(parentNode) &&
-        types.isJSXIdentifier(parentNode.name)
+        t.isJSXOpeningElement(parentNode) &&
+        t.isJSXIdentifier(parentNode.name)
       ) {
         displayName = parentNode.name.name;
       } else if (
-        types.isVariableDeclarator(parentNode) &&
-        types.isIdentifier(parentNode.id)
+        t.isVariableDeclarator(parentNode) &&
+        t.isIdentifier(parentNode.id)
       ) {
         const { referencePaths } = path.scope.getBinding(
           parentNode.id.name
@@ -192,10 +192,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
           // Try to preval the value
           if (
             options.evaluate &&
-            !(
-              types.isFunctionExpression(ex) ||
-              types.isArrowFunctionExpression(ex)
-            )
+            !(t.isFunctionExpression(ex) || t.isArrowFunctionExpression(ex))
           ) {
             const value = valueCache.get(ex.node);
             throwIfInvalid(value, ex);
@@ -251,7 +248,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
       // If `styled` wraps another component and not a primitive,
       // get its class name to create a more specific selector
       // it'll ensure that styles are overridden properly
-      if (options.evaluate && types.isIdentifier(styled.component.node)) {
+      if (options.evaluate && t.isIdentifier(styled.component.node)) {
         let value = valueCache.get(styled.component.node.name);
         while (isValidElementType(value) && value.__linaria) {
           selector += `.${value.__linaria.className}`;
@@ -262,17 +259,11 @@ export default function getTemplateProcessor(options: StrictOptions) {
       const props = [];
 
       props.push(
-        types.objectProperty(
-          types.identifier('name'),
-          types.stringLiteral(displayName)
-        )
+        t.objectProperty(t.identifier('name'), t.stringLiteral(displayName))
       );
 
       props.push(
-        types.objectProperty(
-          types.identifier('class'),
-          types.stringLiteral(className)
-        )
+        t.objectProperty(t.identifier('class'), t.stringLiteral(className))
       );
 
       // If we found any interpolations, also pass them so they can be applied
@@ -296,20 +287,20 @@ export default function getTemplateProcessor(options: StrictOptions) {
         });
 
         props.push(
-          types.objectProperty(
-            types.identifier('vars'),
-            types.objectExpression(
+          t.objectProperty(
+            t.identifier('vars'),
+            t.objectExpression(
               Object.keys(result).map(key => {
                 const { id, node, unit } = result[key];
                 const items = [node];
 
                 if (unit) {
-                  items.push(types.stringLiteral(unit));
+                  items.push(t.stringLiteral(unit));
                 }
 
-                return types.objectProperty(
-                  types.stringLiteral(id),
-                  types.arrayExpression(items)
+                return t.objectProperty(
+                  t.stringLiteral(id),
+                  t.arrayExpression(items)
                 );
               })
             )
@@ -318,17 +309,15 @@ export default function getTemplateProcessor(options: StrictOptions) {
       }
 
       path.replaceWith(
-        types.callExpression(
-          types.callExpression(types.identifier('styled'), [
-            styled.component.node,
-          ]),
-          [types.objectExpression(props)]
+        t.callExpression(
+          t.callExpression(t.identifier('styled'), [styled.component.node]),
+          [t.objectExpression(props)]
         )
       );
 
       path.addComment('leading', '#__PURE__');
     } else {
-      path.replaceWith(types.stringLiteral(className));
+      path.replaceWith(t.stringLiteral(className));
     }
 
     if (!isReferenced && !cssText.includes(':global')) {

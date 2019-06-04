@@ -5,6 +5,15 @@ import { NodePath } from '@babel/traverse';
 import throwIfInvalid from '../utils/throwIfInvalid';
 import hasImport from '../utils/hasImport';
 import { State, StrictOptions, ValueType, ExpressionValue } from '../types';
+import calcExpressionStats from '../utils/calcExpressionStats';
+
+function makeArrow(ex: NodePath<t.Expression>) {
+  let loc = ex.node.loc;
+  let ident = t.identifier('props');
+  let fn = t.arrowFunctionExpression([ident], ex.node);
+  fn.loc = loc;
+  ex.replaceWith(fn);
+}
 
 export default function TaggedTemplateExpression(
   path: NodePath<t.TaggedTemplateExpression>,
@@ -68,30 +77,98 @@ export default function TaggedTemplateExpression(
    * `const A = props => styled.a` becomes `const A = styled.a`
    */
   const isArrow = t.isArrowFunctionExpression(path.parentPath);
-  let ident = t.identifier('props');
+
   // Remove Arrow Function Wrapper
   if (isArrow) {
     path.parentPath.replaceWith(path.node);
     return;
   }
   const expressions = path.get('quasi').get('expressions');
-
-  expressions.forEach(ex => {
-    // Transform to arrow function if props are referenced
-    if (t.isMemberExpression(ex)) {
-      // Todo, check if props is name
-      let obj = ex.get('object');
-      if (
-        t.isIdentifier(obj) &&
-        t.isIdentifier(ex.get('property')) &&
-        (obj as any).node.name === 'props'
-      ) {
-        // replace with arrow function
-        let loc = ex.node.loc;
-        let fn = t.arrowFunctionExpression([ident], ex.node);
-        fn.loc = loc;
-        ex.replaceWith(fn);
+  const quasis = path.get('quasi').get('quasis');
+  // Evaluate CSS comment location and nesting depth
+  const expMeta = calcExpressionStats(quasis, expressions);
+  // Validate and transform all expressions
+  expressions.forEach((ex, i) => {
+    if (t.isStringLiteral(ex)) {
+      return;
+    } else if (t.isArrayExpression(ex)) {
+      // Validate
+      let elements = ex.get('elements') as NodePath<any>[];
+      if (elements.length > 2) {
+        throw ex.buildCodeFrameError(
+          'Property array selectors must contain 1 or 2 elements'
+        );
       }
+
+      let el1 = elements[0];
+      if (!el1.getSource().includes('props.')) {
+        throw ex.buildCodeFrameError(
+          'Expected property array condition to access props'
+        );
+      }
+      if (!t.isExpression(el1.node)) {
+        throw ex.buildCodeFrameError(
+          'Expected property array condition to be an expression'
+        );
+      }
+
+      if (expMeta[i].nestLevel > 0) {
+        throw ex.buildCodeFrameError(
+          'Property array expression must not be nested.'
+        );
+      }
+
+      if (expMeta[i].remove) {
+        ex.replaceWith(t.stringLiteral(expMeta[i].placeholder));
+        return;
+        // throw ex.buildCodeFrameError('TEMP: will remove expression in comment');
+      }
+
+      if (!expMeta[i].valid) {
+        throw ex.buildCodeFrameError(
+          'Property array expressions can only be used as a root selector.'
+        );
+      }
+
+      if (
+        !t.isFunctionExpression(el1.node) &&
+        !t.isArrowFunctionExpression(el1.node)
+      ) {
+        makeArrow(el1);
+      }
+
+      let pass = elements[1];
+      (pass => {
+        const loc = pass.node.loc;
+        if (t.isBooleanLiteral(pass)) {
+          if (pass.node.value === true) {
+            let replacement = t.numericLiteral(1);
+            replacement.loc = loc;
+            pass.replaceWith(replacement);
+          } else if (pass.node.value === false) {
+            let replacement = t.numericLiteral(0);
+            replacement.loc = loc;
+            pass.replaceWith(replacement);
+          }
+        }
+        if (
+          !t.isNumericLiteral(pass) ||
+          (pass.node.value !== 1 && pass.node.value !== 0)
+        ) {
+          throw ex.buildCodeFrameError(
+            'Expected property array passthrough must be one of 1, 0, true, false'
+          );
+        }
+      })(pass);
+
+      // Transform to arrow function if props are referenced
+    } else if (
+      t.isExpression(ex.node) &&
+      ex.getSource().includes('props.') &&
+      !t.isFunctionExpression(ex.node) &&
+      !t.isArrowFunctionExpression(ex.node)
+    ) {
+      makeArrow(ex);
     }
   });
 

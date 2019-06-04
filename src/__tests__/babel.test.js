@@ -79,6 +79,7 @@ it('handles array attribute selector', async () => {
     export const Button = props => styled.button\`
       background: ${'${props.color}'};
       padding: 16px 24px;
+      color: ${"${'red'}"};
       transition: 200ms;
       font-size: 24px;
       &:hover {
@@ -86,7 +87,7 @@ it('handles array attribute selector', async () => {
         background: white;
       }
 
-      ${'${[props.primary, 1]}'} {
+      &.${'${[props.primary, true]}'} {
         border-radius: 30px;
         background: #18b09d;
         color: white;
@@ -422,6 +423,34 @@ it('throws when contains dynamic expression without evaluate: true in css tag', 
       stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
     ).toMatchSnapshot();
   }
+});
+
+it('throws when array attribute is not in root scope', async () => {
+  // expect.assertions(1);
+
+  // try {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { styled } from 'linaria/react';
+      const size = 18;
+
+      export const Array = props => styled.div\`
+        &:hover {
+          &.${'${[props.primary, 1]}'} {
+            color: blue;
+          }
+          font-size: ${'${size}'}px;
+        }
+      \`;
+      `
+  );
+  // } catch (e) {
+  // expect(
+  //   stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+  // ).toMatchSnapshot();
+  // }
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
 });
 
 it('supports both css and styled tags', async () => {
