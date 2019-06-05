@@ -93,6 +93,7 @@
     "@babel/register": "^7.4.0",
     "@babel/traverse": "^7.4.3",
     "@emotion/is-prop-valid": "^0.7.3",
+    "camelcase": "^5.3.1",
     "core-js": "^2.0.0",
     "cosmiconfig": "^5.1.0",
     "dedent": "^0.7.0",

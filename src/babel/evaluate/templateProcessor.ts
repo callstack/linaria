@@ -5,6 +5,7 @@ import { relative, dirname, basename } from 'path';
 import { isValidElementType } from 'react-is';
 import { NodePath } from '@babel/traverse';
 import generator from '@babel/generator';
+import generateModifierName from '../utils/generateModifierName';
 
 import slugify from '../../slugify';
 import { units } from '../units';
@@ -165,15 +166,17 @@ export default function getTemplateProcessor(options: StrictOptions) {
         // If it is an array expression, evaluate both values seperately.
         let isModifier = false;
         let firewall;
+        let modName: string;
         if (t.isArrayExpression(ex)) {
           // Validate
           // Track if prop should pass through
           let elements = ex.get('elements') as NodePath<any>[];
+
           if (elements.length === 1) {
             firewall = 0;
             isModifier = true;
           } else {
-            let fireEl = elements[0];
+            let fireEl = elements[1];
             const result = fireEl.evaluate();
             if (result.confident) {
               let val = result.value;
@@ -197,6 +200,35 @@ export default function getTemplateProcessor(options: StrictOptions) {
             }
           }
           // Generate BEM name from source
+          let modEl = elements[0] as NodePath<t.FunctionExpression>;
+          let param = modEl.node.params[0];
+          let paramText = 'props';
+          if ('name' in param) {
+            paramText = param.name;
+          }
+          const body = modEl.get('body');
+          let returns: string[] = [];
+          const returnVisitor = {
+            ReturnStatement(path: NodePath<t.ReturnStatement>) {
+              let arg = path.get('argument');
+              if (arg) {
+                const src =
+                  arg.getSource() ||
+                  (arg.node && generator(arg.node).code) ||
+                  'unknown';
+                returns.push(src);
+              }
+            },
+          };
+          body.traverse(returnVisitor);
+          // If no explicit return statement is found, it is likely an arrow return.
+          let bodyText =
+            returns[0] === 'unknown'
+              ? body.getSource() ||
+                (body.node && generator(body.node).code) ||
+                'unknown'
+              : returns[0];
+          modName = generateModifierName(paramText, bodyText);
         } else {
           // Evaluate normal interpolation
           const { end } = ex.node.loc!;
