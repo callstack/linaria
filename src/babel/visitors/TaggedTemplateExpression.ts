@@ -101,7 +101,7 @@ export default function TaggedTemplateExpression(
       }
 
       let el1 = elements[0];
-      if (!el1.getSource().includes('props.')) {
+      if (!el1 || !el1.getSource().includes('props.')) {
         throw ex.buildCodeFrameError(
           'Expected property array condition to access props'
         );

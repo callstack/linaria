@@ -3,6 +3,7 @@
 import { types as t } from '@babel/core';
 import { relative, dirname, basename } from 'path';
 import { isValidElementType } from 'react-is';
+import { NodePath } from '@babel/traverse';
 import generator from '@babel/generator';
 
 import slugify from '../../slugify';
@@ -160,83 +161,122 @@ export default function getTemplateProcessor(options: StrictOptions) {
       const ex = expressions[i];
 
       if (ex) {
-        const { end } = ex.node.loc!;
-        const result = ex.evaluate();
-        const beforeLength = cssText.length;
-
-        // The location will be end of the current string to start of next string
-        const next = self[i + 1];
-        const loc = {
-          // +1 because the expressions location always shows 1 column before
-          start: { line: el.loc!.end.line, column: el.loc!.end.column + 1 },
-          end: next
-            ? { line: next.loc!.start.line, column: next.loc!.start.column }
-            : { line: end.line, column: end.column + 1 },
-        };
-
-        if (result.confident) {
-          throwIfInvalid(result.value, ex);
-
-          if (isSerializable(result.value)) {
-            // If it's a plain object or an array, convert it to a CSS string
-            cssText += stripLines(loc, toCSS(result.value));
+        // Test if ex is inline array expression. This has already been validated.
+        // If it is an array expression, evaluate both values seperately.
+        let isModifier = false;
+        let firewall;
+        if (t.isArrayExpression(ex)) {
+          // Validate
+          // Track if prop should pass through
+          let elements = ex.get('elements') as NodePath<any>[];
+          if (elements.length === 1) {
+            firewall = 0;
+            isModifier = true;
           } else {
-            cssText += stripLines(loc, result.value);
-          }
-
-          state.replacements.push({
-            original: loc,
-            length: cssText.length - beforeLength,
-          });
-        } else {
-          // Try to preval the value
-          if (
-            options.evaluate &&
-            !(t.isFunctionExpression(ex) || t.isArrowFunctionExpression(ex))
-          ) {
-            const value = valueCache.get(ex.node);
-            throwIfInvalid(value, ex);
-
-            if (value && typeof value !== 'function') {
-              // Only insert text for non functions
-              // We don't touch functions because they'll be interpolated at runtime
-
-              if (isStyled(value)) {
-                // If it's an React component wrapped in styled, get the class name
-                // Useful for interpolating components
-                cssText += `.${value.__linaria.className}`;
-              } else if (isSerializable(value)) {
-                cssText += stripLines(loc, toCSS(value));
+            let fireEl = elements[0];
+            const result = fireEl.evaluate();
+            if (result.confident) {
+              let val = result.value;
+              firewall = getFirewall(val, fireEl);
+              isModifier = true;
+            } else {
+              // Try to preval the value
+              if (
+                options.evaluate &&
+                !(
+                  t.isFunctionExpression(fireEl) ||
+                  t.isArrowFunctionExpression(fireEl)
+                )
+              ) {
+                const value = valueCache.get(fireEl.node);
+                firewall = getFirewall(value, fireEl);
+                isModifier = true;
               } else {
-                // For anything else, assume it'll be stringified
-                cssText += stripLines(loc, value);
+                throwFirewall(fireEl);
               }
-
-              state.replacements.push({
-                original: loc,
-                length: cssText.length - beforeLength,
-              });
-
-              return;
             }
           }
+          // Generate BEM name from source
+        } else {
+          // Evaluate normal interpolation
+          const { end } = ex.node.loc!;
+          const result = ex.evaluate();
+          const beforeLength = cssText.length;
 
-          if (styled) {
-            const id = `${slug}-${i}`;
+          // The location will be end of the current string to start of next string
+          const next = self[i + 1];
+          const loc = {
+            // +1 because the expressions location always shows 1 column before
+            start: { line: el.loc!.end.line, column: el.loc!.end.column + 1 },
+            end: next
+              ? { line: next.loc!.start.line, column: next.loc!.start.column }
+              : { line: end.line, column: end.column + 1 },
+          };
 
-            interpolations.push({
-              id,
-              node: ex.node,
-              source: ex.getSource() || generator(ex.node).code,
-              unit: '',
+          if (result.confident) {
+            throwIfInvalid(result.value, ex);
+
+            if (isSerializable(result.value)) {
+              // If it's a plain object or an array, convert it to a CSS string
+              cssText += stripLines(loc, toCSS(result.value));
+            } else {
+              cssText += stripLines(loc, result.value);
+            }
+
+            state.replacements.push({
+              original: loc,
+              length: cssText.length - beforeLength,
             });
-
-            cssText += `var(--${id})`;
           } else {
-            // CSS custom properties can't be used outside components
-            throw ex.buildCodeFrameError(
-              `The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.`
-            );
+            // Try to preval the value
+            if (
+              options.evaluate &&
+              !(t.isFunctionExpression(ex) || t.isArrowFunctionExpression(ex))
+            ) {
+              const value = valueCache.get(ex.node);
+              throwIfInvalid(value, ex);
+
+              if (value && typeof value !== 'function') {
+                // Only insert text for non functions
+                // We don't touch functions because they'll be interpolated at runtime
+
+                if (isStyled(value)) {
+                  // If it's an React component wrapped in styled, get the class name
+                  // Useful for interpolating components
+                  cssText += `.${value.__linaria.className}`;
+                } else if (isSerializable(value)) {
+                  cssText += stripLines(loc, toCSS(value));
+                } else {
+                  // For anything else, assume it'll be stringified
+                  cssText += stripLines(loc, value);
+                }
+
+                state.replacements.push({
+                  original: loc,
+                  length: cssText.length - beforeLength,
+                });
+
+                return;
+              }
+            }
+
+            if (styled) {
+              const id = `${slug}-${i}`;
+
+              interpolations.push({
+                id,
+                node: ex.node,
+                source: ex.getSource() || generator(ex.node).code,
+                unit: '',
+              });
+
+              cssText += `var(--${id})`;
+            } else {
+              // CSS custom properties can't be used outside components
+              throw ex.buildCodeFrameError(
+                `The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.`
+              );
+            }
           }
         }
       }
@@ -331,4 +371,24 @@ export default function getTemplateProcessor(options: StrictOptions) {
       start: path.parent && path.parent.loc ? path.parent.loc.start : null,
     };
   };
+
+  function getFirewall(val: any, path: NodePath<any>) {
+    let firewall;
+    if (val === 1 || val === true) {
+      firewall = 1;
+    } else if (val === 0 || val === false) {
+      firewall = 0;
+    } else {
+      throwFirewall(path);
+    }
+    return firewall;
+  }
+
+  function throwFirewall(path: NodePath<any>) {
+    throw path.buildCodeFrameError(
+      'Firewall passthrough value must statically evaluate to one of:\
+            - 1, true, 0, or false. It may also be ommitted in which case passthrough is assumed.\
+              Pass a value of 1 or true to block prop passthrough.'
+    );
+  }
 }
