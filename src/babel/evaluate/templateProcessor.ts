@@ -33,6 +33,13 @@ type Interpolation = {
   unit: string;
 };
 
+type Modifier = {
+  id: string;
+  node: t.Expression;
+  source: string;
+  isFirewalled: boolean;
+};
+
 function isStyled(value: any): value is Styled {
   return isValidElementType(value) && (value as any).__linaria;
 }
@@ -51,6 +58,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
     state.index++;
 
     const interpolations: Interpolation[] = [];
+    const modifiers: Modifier[] = [];
 
     // Check if the variable is referenced anywhere for basic DCE
     // Only works when it's assigned to a variable
@@ -162,26 +170,35 @@ export default function getTemplateProcessor(options: StrictOptions) {
       const ex = expressions[i];
 
       if (ex) {
+        const getLoc = () => {
+          const { end } = ex.node.loc!;
+          // The location will be end of the current string to start of next string
+          const next = self[i + 1];
+          const loc = {
+            // +1 because the expressions location always shows 1 column before
+            start: { line: el.loc!.end.line, column: el.loc!.end.column + 1 },
+            end: next
+              ? { line: next.loc!.start.line, column: next.loc!.start.column }
+              : { line: end.line, column: end.column + 1 },
+          };
+          return loc;
+        };
         // Test if ex is inline array expression. This has already been validated.
         // If it is an array expression, evaluate both values seperately.
-        let isModifier = false;
-        let firewall;
-        let modName: string;
-        if (t.isArrayExpression(ex)) {
+        if (t.isArrayExpression(ex) && styled) {
+          let firewall: boolean;
           // Validate
           // Track if prop should pass through
           let elements = ex.get('elements') as NodePath<any>[];
 
           if (elements.length === 1) {
-            firewall = 0;
-            isModifier = true;
+            firewall = false;
           } else {
             let fireEl = elements[1];
             const result = fireEl.evaluate();
             if (result.confident) {
               let val = result.value;
               firewall = getFirewall(val, fireEl);
-              isModifier = true;
             } else {
               // Try to preval the value
               if (
@@ -193,9 +210,9 @@ export default function getTemplateProcessor(options: StrictOptions) {
               ) {
                 const value = valueCache.get(fireEl.node);
                 firewall = getFirewall(value, fireEl);
-                isModifier = true;
               } else {
                 throwFirewall(fireEl);
+                firewall = false; // Unreachable but will keep TS happy.
               }
             }
           }
@@ -223,27 +240,29 @@ export default function getTemplateProcessor(options: StrictOptions) {
           body.traverse(returnVisitor);
           // If no explicit return statement is found, it is likely an arrow return.
           let bodyText =
+            returns[0] === undefined ||
+            returns[0] === null ||
             returns[0] === 'unknown'
               ? body.getSource() ||
                 (body.node && generator(body.node).code) ||
                 'unknown'
               : returns[0];
-          modName = generateModifierName(paramText, bodyText);
+          const modName = generateModifierName(paramText, bodyText);
+          // Push modifier to array
+          const id = `${slug}--${modName}-${i}`;
+          modifiers.push({
+            id,
+            node: modEl.node,
+            source: generator(modEl.node).code,
+            isFirewalled: firewall,
+          });
+
+          cssText += id;
         } else {
           // Evaluate normal interpolation
-          const { end } = ex.node.loc!;
           const result = ex.evaluate();
           const beforeLength = cssText.length;
-
-          // The location will be end of the current string to start of next string
-          const next = self[i + 1];
-          const loc = {
-            // +1 because the expressions location always shows 1 column before
-            start: { line: el.loc!.end.line, column: el.loc!.end.column + 1 },
-            end: next
-              ? { line: next.loc!.start.line, column: next.loc!.start.column }
-              : { line: end.line, column: end.column + 1 },
-          };
+          const loc = getLoc();
 
           if (result.confident) {
             throwIfInvalid(result.value, ex);
@@ -260,7 +279,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
               length: cssText.length - beforeLength,
             });
           } else {
-            // Try to preval the value
+            // Try to preval the value. If preval, return early.
             if (
               options.evaluate &&
               !(t.isFunctionExpression(ex) || t.isArrowFunctionExpression(ex))
@@ -338,6 +357,43 @@ export default function getTemplateProcessor(options: StrictOptions) {
         t.objectProperty(t.identifier('class'), t.stringLiteral(className))
       );
 
+      // If any modifiers were found, also pass them so they can be applied.
+      if (modifiers.length) {
+        // De-duplicate modifiers based on the source
+        // If two modifiers have the same source code,
+        // we don't need to use 2 classNames for them, we can use a single one.
+        const result: { [key: string]: Modifier } = {};
+        modifiers.forEach(mod => {
+          const key = mod.source;
+          if (key in result) {
+            cssText = cssText.replace(mod.id, result[key].id);
+          } else {
+            result[key] = mod;
+          }
+        });
+
+        props.push(
+          t.objectProperty(
+            t.identifier('mod'),
+            t.objectExpression(
+              Object.keys(result).map(key => {
+                const { id, node, isFirewalled } = result[key];
+                const items = [node];
+
+                if (isFirewalled) {
+                  items.push(t.numericLiteral(1));
+                }
+
+                return t.objectProperty(
+                  t.stringLiteral(id),
+                  t.arrayExpression(items)
+                );
+              })
+            )
+          )
+        );
+      }
+
       // If we found any interpolations, also pass them so they can be applied
       if (interpolations.length) {
         // De-duplicate interpolations based on the source and unit
@@ -405,11 +461,11 @@ export default function getTemplateProcessor(options: StrictOptions) {
   };
 
   function getFirewall(val: any, path: NodePath<any>) {
-    let firewall;
+    let firewall = false;
     if (val === 1 || val === true) {
-      firewall = 1;
+      firewall = true;
     } else if (val === 0 || val === false) {
-      firewall = 0;
+      firewall = false;
     } else {
       throwFirewall(path);
     }

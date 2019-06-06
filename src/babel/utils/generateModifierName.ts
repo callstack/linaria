@@ -13,18 +13,19 @@ export default function generateModifierName(
   bodyText: string
 ): string {
   let replacements = [
-    ['!==', '-is-not-'],
-    ['!=', '-is-not-'],
+    ['\\!==', '-is-not-'],
+    ['\\!=', '-is-not-'],
     ['===', '-is-'],
     ['==', '-is-'],
     ['&&', '-and-'],
-    ['||', '-or-'],
-    ['!!', '-is-'],
-    ['!', '-not-'],
+    ['\\|\\|', '-or-'],
+    ['\\!\\!', '-is-'],
+    ['\\!', '-not-'],
     // Use a single quote type for easier "parsing"
     ["'", '"'], // single to double
     ['`', '"'], // template to double
   ];
+
   // Remove lines and tab chars:
   let str = bodyText
     .replace(/[\r\n]+/g, '-')
@@ -39,39 +40,39 @@ export default function generateModifierName(
 
   // replace logic operators with words:
   replacements.forEach(r => {
-    bodyText.replace(r[0], r[1]);
+    const re = new RegExp(r[0], 'g');
+    str = str.replace(re, r[1]);
   });
 
   // camelCase strings in quotes (to support spaces)
-  str.replace(/"(.*?)"/, ($0, $1) => {
+  str = str.replace(/"(.*?)"/g, ($0, $1) => {
     return $0.replace(/.*/, `"${camelCase($1)}"`);
   });
 
   // Remove parameter name for shorter dev classnames
-  const propRegex = new RegExp(paramName + '(\\.|\\[)', 'g');
-  str.replace(propRegex, '');
+  const propRegex = new RegExp(`${paramName}(\\.|\\[)`, 'g');
+  str = str.replace(propRegex, '');
 
-  // Remove all special characters
-  str.replace(/[^\w-]/g, '');
+  // Remove all special characters including spaces
+  str = str.replace(/[^\w-]/g, '');
 
   // Remove duplicate dashes
-  str.replace(/--+/g, '');
+  str = str.replace(/--+/g, '-');
   // Remove leading is
-  str.replace(/^-is-/, '');
+  str = str.replace(/^-is-/, '');
+
   // Simplify short classnames `type-is-primary` -> `type-primary`
+  // Simplify short classnames `type-is-not-primary` -> `type-not-primary`
   // Count logic operators
-  let count = 0;
-  for (let i = 0; count > 1 || i === replacements.length; i += 1) {
-    let find = replacements[i];
-    const re = new RegExp(find[1], 'g');
-    const subCount = (str.match(re) || []).length;
-    count += subCount;
-  }
+  const toFind = /-is-not-|-is-|-and-|-or-|-not-/g;
+  const count = (str.match(toFind) || []).length;
   if (count === 1) {
-    str.replace('-is-', '-');
+    str = str.replace('-is-', '-');
   }
 
-  return str.trim();
+  // remove leading and trailing dashes
+  str = str.replace(/^-|-$/g, '');
+  return str;
 }
 
 function spaceReplacer(_: string, $1: string, $2: string) {
