@@ -137,30 +137,6 @@ export default function TaggedTemplateExpression(
         makeArrow(el1);
       }
 
-      let pass = elements[1];
-      (pass => {
-        const loc = pass.node.loc;
-        if (t.isBooleanLiteral(pass)) {
-          if (pass.node.value === true) {
-            let replacement = t.numericLiteral(1);
-            replacement.loc = loc;
-            pass.replaceWith(replacement);
-          } else if (pass.node.value === false) {
-            let replacement = t.numericLiteral(0);
-            replacement.loc = loc;
-            pass.replaceWith(replacement);
-          }
-        }
-        if (
-          !t.isNumericLiteral(pass) ||
-          (pass.node.value !== 1 && pass.node.value !== 0)
-        ) {
-          throw ex.buildCodeFrameError(
-            'Expected property array passthrough must be one of 1, 0, true, false'
-          );
-        }
-      })(pass);
-
       // Transform to arrow function if props are referenced
     } else if (
       t.isExpression(ex.node) &&

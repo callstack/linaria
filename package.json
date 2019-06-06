@@ -129,6 +129,6 @@
     "setupFiles": [
       "<rootDir>/jest/resolveTypescript.js"
     ],
-    "collectCoverage": true
+    "collectCoverage": false
   }
 }

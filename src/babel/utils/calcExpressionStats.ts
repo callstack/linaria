@@ -80,14 +80,14 @@ export default function(quasis: any, expressions: any[]) {
   let closeBraces = findBraces('}', dummyCSS);
 
   expressionMeta.forEach(exMeta => {
-    let openDepth = openBraces.reduce(
-      (acc, current) => (acc + current < exMeta.index ? 1 : 0),
-      0
-    );
-    let closeDepth = closeBraces.reduce(
-      (acc, current) => (acc + current < exMeta.index ? 1 : 0),
-      0
-    );
+    let openDepth = 0;
+    openBraces.forEach(pos => {
+      if (pos < exMeta.index) openDepth += 1;
+    });
+    let closeDepth = 0;
+    closeBraces.forEach(pos => {
+      if (pos < exMeta.index) openDepth -= 1;
+    });
     exMeta.nestLevel = openDepth - closeDepth;
 
     /**
@@ -97,12 +97,20 @@ export default function(quasis: any, expressions: any[]) {
      * Invalid line: background: ${[props.primary, 1]};
      * Nesting is also invalid:
      * span { &.${[props.primary, 1]} }
+     * However, we do allow parent selectors with spaces for theming:
+     * .dark-mode &.${[props.primary]}
+     * More complex nesting is not allowed and would require traversing the CSS AST:
+     * &.${[props.round]} { &.${[props.primary]} }
      * Array attributes cannot be nested. All state is managed on the top level component.
      * We check for this early to bail out if required.
+     * We do this because dynamic selectors only apply to the current styled element.
+     * These restrictions also enable better optimization.
      */
     if (exMeta.array) {
       const dynamicAttrRegex = new RegExp(
-        `^[\\v|\\t| ]*&*\\.${exMeta.placeholder}.*{`,
+        `^[\\v|\\t| ]*(\\.\\w)?([\\w|-]*[\\v|\\t| ])*&+\\.${
+          exMeta.placeholder
+        }.*{`,
         'm'
       );
       exMeta.valid = dynamicAttrRegex.test(dummyCSS) && exMeta.nestLevel <= 0;

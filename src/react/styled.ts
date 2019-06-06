@@ -11,6 +11,9 @@ type Options = {
       string | void
     ];
   };
+  mod?: {
+    [key: string]: [((props: unknown) => string | number | boolean), 1 | void];
+  };
 };
 
 const warnIfInvalid = (value: any, componentName: string) => {
@@ -65,13 +68,19 @@ function styled(tag: React.ComponentType<any> | string) {
         filteredProps = rest;
       }
 
-      filteredProps.ref = ref;
-      filteredProps.className = cx(
-        filteredProps.className || className,
-        options.class
-      );
+      const { vars, mod } = options;
+      let cn = [];
 
-      const { vars } = options;
+      if (mod) {
+        for (const name in mod) {
+          const [result, noPass = 0] = mod[name];
+          const apply = typeof result === 'function' ? result(props) : result;
+          apply && cn.push(name);
+          if (noPass) {
+            delete filteredProps[name];
+          }
+        }
+      }
 
       if (vars) {
         const style: { [key: string]: string } = {};
@@ -80,7 +89,6 @@ function styled(tag: React.ComponentType<any> | string) {
         for (const name in vars) {
           const [result, unit = ''] = vars[name];
           const value = typeof result === 'function' ? result(props) : result;
-
           warnIfInvalid(value, options.name);
 
           style[`--${name}`] = `${value}${unit}`;
@@ -88,6 +96,13 @@ function styled(tag: React.ComponentType<any> | string) {
 
         filteredProps.style = Object.assign(style, filteredProps.style);
       }
+
+      filteredProps.ref = ref;
+      filteredProps.className = cx(
+        filteredProps.className || className,
+        options.class,
+        ...cn
+      );
 
       if ((tag as any).__linaria && tag !== component) {
         // If the underlying tag is a styled component, forward the `as` prop

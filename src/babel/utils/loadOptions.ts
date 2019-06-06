@@ -20,6 +20,8 @@ export default function loadOptions(
   return {
     displayName: false,
     evaluate: true,
+    prefix: '',
+    suffix: '',
     ignore: /node_modules/,
     ...(result ? result.config : null),
     ...rest,

@@ -426,11 +426,11 @@ it('throws when contains dynamic expression without evaluate: true in css tag', 
 });
 
 it('throws when array attribute is not in root scope', async () => {
-  // expect.assertions(1);
+  expect.assertions(1);
 
-  // try {
-  const { code, metadata } = await transpile(
-    dedent`
+  try {
+    await transpile(
+      dedent`
       import { styled } from 'linaria/react';
       const size = 18;
 
@@ -443,12 +443,53 @@ it('throws when array attribute is not in root scope', async () => {
         }
       \`;
       `
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
+});
+
+it('throws if state selector is nested', async () => {
+  expect.assertions(1);
+  try {
+    await transpile(
+      dedent`
+      import { styled } from 'linaria/react';
+
+      const Page = props => styled.div\`
+        color: #fff;
+        &.${'${[props.primary]}'} {
+          color: #241047;
+          /* This should not work */
+          body &.${'${[props.input === "I agree"]}'} {
+            text-shadow: 9px 9px 9px rgba(0, 255, 0, 0.28);
+          }
+        }
+      \`
+      `
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
+});
+
+it('allows simple parent selector for state selector', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { styled } from 'linaria/react';
+
+      export const Page = props => styled.div\`
+        color: #fff;
+        .dark-theme &.${'${[props.primary]}'} {
+          color: #241047;
+        }
+      \`
+      `
   );
-  // } catch (e) {
-  // expect(
-  //   stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
-  // ).toMatchSnapshot();
-  // }
   expect(code).toMatchSnapshot();
   expect(metadata).toMatchSnapshot();
 });

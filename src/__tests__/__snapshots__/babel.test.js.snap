@@ -1,5 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`allows simple parent selector for state selector 1`] = `
+"import { styled } from 'linaria/react';
+export const Page =
+/*#__PURE__*/
+styled(\\"div\\")({
+  name: \\"Page\\",
+  class: \\"ph6xni0\\",
+  mod: {
+    \\"ph6xni0--primary-0\\": [props => props.primary]
+  }
+});"
+`;
+
+exports[`allows simple parent selector for state selector 2`] = `
+
+CSS:
+
+.ph6xni0 {
+  color: #fff;
+  .dark-theme &.ph6xni0--primary-0 {
+    color: #241047;
+  }
+}
+
+Dependencies: NA
+
+`;
+
 exports[`does not include styles if not referenced anywhere 1`] = `
 "import { css } from 'linaria';
 import { styled } from 'linaria/react';
@@ -489,35 +517,26 @@ Dependencies: NA
 
 `;
 
-exports[`throws when array attribute is not in root scope 1`] = `
-"import { styled } from 'linaria/react';
-const size = 18;
-export const Array =
-/*#__PURE__*/
-styled(\\"div\\")({
-  name: \\"Array\\",
-  class: \\"ah6xni0\\",
-  mod: {
-    \\"ah6xni0--primary-0\\": [props => props.primary, 1]
-  }
-});"
+exports[`throws if state selector is nested 1`] = `
+"<<DIRNAME>>/app/index.js: Property array expression must not be nested.
+   6 |     color: #241047;
+   7 |     /* This should not work */
+>  8 |     body &.\${[props.input === \\"I agree\\"]} {
+     |              ^
+   9 |       text-shadow: 9px 9px 9px rgba(0, 255, 0, 0.28);
+  10 |     }
+  11 |   }"
 `;
 
-exports[`throws when array attribute is not in root scope 2`] = `
-
-CSS:
-
-.ah6xni0 {
-  &:hover {
-    &.ah6xni0--primary-0 {
-      color: blue;
-    }
-    font-size: 18px;
-  }
-}
-
-Dependencies: NA
-
+exports[`throws when array attribute is not in root scope 1`] = `
+"<<DIRNAME>>/app/index.js: Property array expression must not be nested.
+  4 | export const Array = props => styled.div\`
+  5 |   &:hover {
+> 6 |     &.\${[props.primary, 1]} {
+    |         ^
+  7 |       color: blue;
+  8 |     }
+  9 |     font-size: \${size}px;"
 `;
 
 exports[`throws when contains dynamic expression without evaluate: true in css tag 1`] = `

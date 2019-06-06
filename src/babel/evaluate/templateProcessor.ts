@@ -130,9 +130,11 @@ export default function getTemplateProcessor(options: StrictOptions) {
       )}`
     );
 
-    const className = options.displayName
+    const cls = options.displayName
       ? `${toValidCSSIdentifier(displayName)}_${slug}`
       : slug;
+
+    const className = options.prefix + cls + options.suffix;
 
     // Serialize the tagged template literal to a string
     let cssText = '';
@@ -249,7 +251,9 @@ export default function getTemplateProcessor(options: StrictOptions) {
               : returns[0];
           const modName = generateModifierName(paramText, bodyText);
           // Push modifier to array
-          const id = `${slug}--${modName}-${i}`;
+          const id = `${options.prefix}${slug}--${modName}-${i}${
+            options.suffix
+          }`;
           modifiers.push({
             id,
             node: modEl.node,
@@ -312,7 +316,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
             }
 
             if (styled) {
-              const id = `${slug}-${i}`;
+              const id = `${options.prefix}${slug}-${i}${options.suffix}`;
 
               interpolations.push({
                 id,
