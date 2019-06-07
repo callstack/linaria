@@ -6,6 +6,7 @@ import loaderUtils from 'loader-utils';
 import enhancedResolve from 'enhanced-resolve';
 import Module from './babel/module';
 import transform from './transform';
+import tinyId from './tinyId';
 
 export default function loader(
   this: any,
@@ -69,8 +70,12 @@ export default function loader(
     Module._resolveFilename = originalResolveFilename;
   }
 
+  if (result.code) {
+    result.code = tinyId(result.code);
+  }
+
   if (result.cssText) {
-    let { cssText } = result;
+    let cssText = tinyId(result.cssText);
 
     if (sourceMap) {
       cssText += `/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
