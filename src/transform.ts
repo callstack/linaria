@@ -1,5 +1,3 @@
-/* @flow */
-
 import path from 'path';
 import * as babel from '@babel/core';
 import stylis from 'stylis';

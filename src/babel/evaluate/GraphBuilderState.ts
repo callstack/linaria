@@ -8,7 +8,7 @@ export default abstract class GraphBuilderState {
   public readonly meta = new Map<string, any>();
 
   /*
-   * For expressions like `{ foo: bar }` we need to now context
+   * For expressions like `{ foo: bar }` we need to know context
    *
    * const obj = { foo: bar };
    * Here context is `expression`, `bar` is a variable which depends from its declaration.
