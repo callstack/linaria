@@ -7,9 +7,9 @@ import hasImport from '../utils/hasImport';
 import { State, StrictOptions, ValueType, ExpressionValue } from '../types';
 import calcExpressionStats from '../utils/calcExpressionStats';
 
-function makeArrow(ex: NodePath<t.Expression>) {
+function makeArrow(ex: NodePath<t.Expression>, propsName = 'props') {
   let loc = ex.node.loc;
-  let ident = t.identifier('props');
+  let ident = t.identifier(propsName);
   let fn = t.arrowFunctionExpression([ident], ex.node);
   fn.loc = loc;
   ex.replaceWith(fn);
@@ -72,17 +72,48 @@ export default function TaggedTemplateExpression(
     return;
   }
 
+  let propsName = 'props';
+  let parentWasArrow = false;
+
+  if (path.state) {
+    propsName = path.state.propsName;
+    parentWasArrow = path.state.propsName;
+  }
+
   /**
    *  Transform Styled Components wrapped in an arrow function:
    * `const A = props => styled.a` becomes `const A = styled.a`
    */
-  const isArrow = t.isArrowFunctionExpression(path.parentPath);
+  const parentIsArrow = t.isArrowFunctionExpression(path.parentPath);
 
   // Remove Arrow Function Wrapper
-  if (isArrow) {
+  if (!parentWasArrow && parentIsArrow) {
+    const params = path.parentPath.get('params') as any[];
+    if (!params || params.length !== 1) {
+      throw path.parentPath.buildCodeFrameError(
+        'Styled component arrow function can only accept one props argument or things may break from rewrite.\
+        If this is not an error, wrap it in another arrow function:\
+        const Button = (props, config) => props => styled.button``'
+      );
+    }
+    const param = params[0];
+    if (!t.isIdentifier(param.node)) {
+      throw param.buildCodeFrameError(
+        'Unexpected element. Expected props argument name. Rest spread and destructuring are not supported.'
+      );
+    }
+    let propsName;
+    if (param && param.node && param.node.name) {
+      propsName = param.node.name;
+    }
+    // Save metadata for next visit.
+    path.parentPath.state = {};
+    path.parentPath.state.propsName = propsName;
+    path.parentPath.state.parentWasArrow = true;
     path.parentPath.replaceWith(path.node);
     return;
   }
+
   const expressions = path.get('quasi').get('expressions');
   const quasis = path.get('quasi').get('quasis');
   // Evaluate CSS comment location and nesting depth
@@ -101,9 +132,9 @@ export default function TaggedTemplateExpression(
       }
 
       let el1 = elements[0];
-      if (!el1 || !el1.getSource().includes('props.')) {
+      if (!el1 || (propsName && !el1.getSource().includes(propsName))) {
         throw ex.buildCodeFrameError(
-          'Expected property array condition to access props'
+          `Expected property array condition to access ${propsName}`
         );
       }
       if (!t.isExpression(el1.node)) {
@@ -121,7 +152,6 @@ export default function TaggedTemplateExpression(
       if (expMeta[i].remove) {
         ex.replaceWith(t.stringLiteral(expMeta[i].placeholder));
         return;
-        // throw ex.buildCodeFrameError('TEMP: will remove expression in comment');
       }
 
       if (!expMeta[i].valid) {
@@ -134,17 +164,23 @@ export default function TaggedTemplateExpression(
         !t.isFunctionExpression(el1.node) &&
         !t.isArrowFunctionExpression(el1.node)
       ) {
-        makeArrow(el1);
+        if (parentWasArrow) {
+          makeArrow(el1, propsName);
+        } else {
+          throw el1.buildCodeFrameError(
+            'You must wrap the styled tag in an arrow function or this condition must be a function.'
+          );
+        }
       }
 
       // Transform to arrow function if props are referenced
     } else if (
-      t.isExpression(ex.node) &&
-      ex.getSource().includes('props.') &&
+      parentWasArrow &&
+      ex.getSource().includes(propsName) &&
       !t.isFunctionExpression(ex.node) &&
       !t.isArrowFunctionExpression(ex.node)
     ) {
-      makeArrow(ex);
+      makeArrow(ex, propsName);
     }
   });
 

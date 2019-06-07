@@ -28,6 +28,34 @@ Dependencies: NA
 
 `;
 
+exports[`collapses only one arrow function parent 1`] = `
+"import { styled } from 'linaria/react';
+export const Page = (props, options) =>
+/*#__PURE__*/
+styled(\\"div\\")({
+  name: \\"Page\\",
+  class: \\"ph6xni0\\",
+  mod: {
+    \\"ph6xni0--primary-0\\": [props => props.primary]
+  }
+});"
+`;
+
+exports[`collapses only one arrow function parent 2`] = `
+
+CSS:
+
+.ph6xni0 {
+color: #fff;
+&.ph6xni0--primary-0 {
+  color: #241047;
+}
+}
+
+Dependencies: NA
+
+`;
+
 exports[`does not include styles if not referenced anywhere 1`] = `
 "import { css } from 'linaria';
 import { styled } from 'linaria/react';
@@ -72,6 +100,21 @@ CSS:
 Dependencies: NA
 
 `;
+
+exports[`handles alternative propNames 1`] = `
+"import { styled } from 'linaria/react';
+const Page =
+/*#__PURE__*/
+styled(\\"div\\")({
+  name: \\"Page\\",
+  class: \\"ph6xni0\\",
+  mod: {
+    \\"ph6xni0--primary-0\\": [state => state.primary]
+  }
+});"
+`;
+
+exports[`handles alternative propNames 2`] = `Object {}`;
 
 exports[`handles array attribute selector 1`] = `
 "import { styled } from 'linaria/react';
@@ -515,6 +558,28 @@ CSS:
 
 Dependencies: NA
 
+`;
+
+exports[`thows if alternative propName is used and an array attribute selector is not a function of it. 1`] = `
+"<<DIRNAME>>/app/index.js: Expected property array condition to access state
+  3 | const Page = state => styled.div\`
+  4 |   color: #fff;
+> 5 |   &.\${[props.primary]} {
+    |       ^
+  6 |     color: #241047;
+  7 |   }
+  8 | \`"
+`;
+
+exports[`thows if state selector not not wrapped in arrow function 1`] = `
+"<<DIRNAME>>/app/index.js: You must wrap the styled tag in an arrow function or this condition must be a function.
+  3 | const Page = styled.div\`
+  4 |   color: #fff;
+> 5 |   &.\${[props.primary]} {
+    |        ^
+  6 |     color: #241047;
+  7 |   }
+  8 | \`"
 `;
 
 exports[`throws if state selector is nested 1`] = `

@@ -477,6 +477,84 @@ it('throws if state selector is nested', async () => {
   }
 });
 
+it('thows if state selector not not wrapped in arrow function', async () => {
+  expect.assertions(1);
+  try {
+    await transpile(
+      dedent`
+      import { styled } from 'linaria/react';
+
+      const Page = styled.div\`
+        color: #fff;
+        &.${'${[props.primary]}'} {
+          color: #241047;
+        }
+      \`
+      `
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
+});
+
+it('thows if alternative propName is used and an array attribute selector is not a function of it.', async () => {
+  expect.assertions(1);
+  try {
+    await transpile(
+      dedent`
+      import { styled } from 'linaria/react';
+
+      const Page = state => styled.div\`
+        color: #fff;
+        &.${'${[props.primary]}'} {
+          color: #241047;
+        }
+      \`
+      `
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
+});
+
+it('handles alternative propNames', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { styled } from 'linaria/react';
+
+      const Page = state => styled.div\`
+        color: #fff;
+        &.${'${[state.primary]}'} {
+          color: #241047;
+        }
+      \`
+      `
+  );
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('collapses only one arrow function parent', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { styled } from 'linaria/react';
+
+      export const Page = (props, options) => props => styled.div\`
+      color: #fff;
+      &.${'${[props.primary]}'} {
+        color: #241047;
+      }
+      \`
+      `
+  );
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('allows simple parent selector for state selector', async () => {
   const { code, metadata } = await transpile(
     dedent`
