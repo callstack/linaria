@@ -1,5 +1,5 @@
+const isDev = process.env.NODE_ENV !== 'production';
+
 module.exports = {
-  displayName: process.env.NODE_ENV !== 'production',
-  prefix: 'linaria--',
-  suffix: '--linaria',
+  displayName: isDev,
 };
