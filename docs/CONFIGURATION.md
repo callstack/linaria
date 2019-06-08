@@ -13,7 +13,7 @@ Example `linaria.config.js`:
 module.exports = {
   evaluate: true,
   displayName: false,
-}
+};
 ```
 
 ## Options
@@ -25,6 +25,18 @@ module.exports = {
 - `displayName: boolean` (default: `false`):
 
   Enabling this will add a display name to generated class names, e.g. `.Title_abcdef` instead of `.abcdef'. It is disabled by default to generate smaller CSS files.
+
+- `prefix: string` (default: `''`):
+
+  Add a prefix to generated class and variable names. You may find this useful for publishing style libraries.
+
+- `suffix: string` (default: `''`):
+
+  Add a suffix to generated class and variable names. You may find this useful for publishing style libraries.
+
+- `optimize: boolean` (default: `process.env.NODE_ENV === 'production'`):
+
+  Enabling this will optimize class and variable names to extremely short identifiers. e.g. `.a` indstead of `Title_abcdef`. It is enabled by default for production builds to generate smaller CSS files.
 
 - `ignore: RegExp` (default: `/node_modules/`):
 
