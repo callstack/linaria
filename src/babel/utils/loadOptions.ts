@@ -22,6 +22,7 @@ export default function loadOptions(
     evaluate: true,
     prefix: '',
     suffix: '',
+    optimize: process.env.NODE_ENV === 'production',
     ignore: /node_modules/,
     ...(result ? result.config : null),
     ...rest,

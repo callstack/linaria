@@ -6,6 +6,7 @@ import { isValidElementType } from 'react-is';
 import { NodePath } from '@babel/traverse';
 import generator from '@babel/generator';
 import generateModifierName from '../utils/generateModifierName';
+import makeTinyId from './tinyId';
 
 import slugify from '../../slugify';
 import { units } from '../units';
@@ -45,6 +46,7 @@ function isStyled(value: any): value is Styled {
 }
 
 export default function getTemplateProcessor(options: StrictOptions) {
+  const tinyId = makeTinyId(options);
   return function process(
     { styled, path }: TemplateExpression,
     state: State,
@@ -134,7 +136,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
       ? `${toValidCSSIdentifier(displayName)}_${slug}`
       : slug;
 
-    const className = options.prefix + cls + options.suffix;
+    const className = tinyId(cls);
 
     // Serialize the tagged template literal to a string
     let cssText = '';
@@ -251,9 +253,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
               : returns[0];
           const modName = generateModifierName(paramText, bodyText);
           // Push modifier to array
-          const id = `${options.prefix}${slug}--${modName}-${i}${
-            options.suffix
-          }`;
+          const id = tinyId(`${slug}--${modName}-${i}`);
           modifiers.push({
             id,
             node: modEl.node,
@@ -316,7 +316,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
             }
 
             if (styled) {
-              const id = `${options.prefix}${slug}-${i}${options.suffix}`;
+              const id = tinyId(`${slug}-${i}`);
 
               interpolations.push({
                 id,

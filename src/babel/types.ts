@@ -87,6 +87,7 @@ export type StrictOptions = {
   ignore: RegExp;
   prefix: string;
   suffix: string;
+  optimize: boolean;
   babelOptions: TransformOptions;
 };
 
