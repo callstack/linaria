@@ -116,51 +116,6 @@ styled(\\"div\\")({
 
 exports[`handles alternative propNames 2`] = `Object {}`;
 
-exports[`handles array attribute selector 1`] = `
-"import { styled } from 'linaria/react';
-export const Button =
-/*#__PURE__*/
-styled(\\"button\\")({
-  name: \\"Button\\",
-  class: \\"bh6xni0\\",
-  mod: {
-    \\"bh6xni0--primary-3\\": [props => props.primary, 1]
-  },
-  vars: {
-    \\"bh6xni0-0\\": [props => props.color]
-  }
-});"
-`;
-
-exports[`handles array attribute selector 2`] = `
-
-CSS:
-
-.bh6xni0 {
-  background: var(--bh6xni0-0);
-  padding: 16px 24px;
-  color: red;
-  transition: 200ms;
-  font-size: 24px;
-  &:hover {
-    color: var(--bh6xni0-0);
-    background: white;
-  }
-
-  &.bh6xni0--primary-3 {
-    border-radius: 30px;
-    background: #18b09d;
-    color: white;
-    &:hover {
-      background: #087b6d;
-    }
-  }
-}
-
-Dependencies: NA
-
-`;
-
 exports[`handles basic properties 1`] = `
 "import { styled } from 'linaria/react';
 export const Title =
@@ -259,6 +214,51 @@ CSS:
   height: var(--th6xni0-4);
   grid-template-columns: var(--th6xni0-5) 1fr 1fr var(--th6xni0-5);
   border-radius: var(--th6xni0-7)
+}
+
+Dependencies: NA
+
+`;
+
+exports[`handles modifier condition selector 1`] = `
+"import { styled } from 'linaria/react';
+export const Button =
+/*#__PURE__*/
+styled(\\"button\\")({
+  name: \\"Button\\",
+  class: \\"bh6xni0\\",
+  mod: {
+    \\"bh6xni0--primary-3\\": [props => props.primary]
+  },
+  vars: {
+    \\"bh6xni0-0\\": [props => props.color]
+  }
+});"
+`;
+
+exports[`handles modifier condition selector 2`] = `
+
+CSS:
+
+.bh6xni0 {
+  background: var(--bh6xni0-0);
+  padding: 16px 24px;
+  color: red;
+  transition: 200ms;
+  font-size: 24px;
+  &:hover {
+    color: var(--bh6xni0-0);
+    background: white;
+  }
+
+  &.bh6xni0--primary-3 {
+    border-radius: 30px;
+    background: #18b09d;
+    color: white;
+    &:hover {
+      background: #087b6d;
+    }
+  }
 }
 
 Dependencies: NA
@@ -561,7 +561,7 @@ Dependencies: NA
 `;
 
 exports[`thows if alternative propName is used and an array attribute selector is not a function of it. 1`] = `
-"<<DIRNAME>>/app/index.js: Expected property array condition to access state
+"<<DIRNAME>>/app/index.js: Expected modifier condition to access state
   3 | const Page = state => styled.div\`
   4 |   color: #fff;
 > 5 |   &.\${[props.primary]} {
@@ -583,7 +583,7 @@ exports[`thows if state selector not not wrapped in arrow function 1`] = `
 `;
 
 exports[`throws if state selector is nested 1`] = `
-"<<DIRNAME>>/app/index.js: Property array expression must not be nested.
+"<<DIRNAME>>/app/index.js: Modifier expression must not be nested.
    6 |     color: #241047;
    7 |     /* This should not work */
 >  8 |     body &.\${[props.input === \\"I agree\\"]} {
@@ -594,7 +594,7 @@ exports[`throws if state selector is nested 1`] = `
 `;
 
 exports[`throws when array attribute is not in root scope 1`] = `
-"<<DIRNAME>>/app/index.js: Property array expression must not be nested.
+"<<DIRNAME>>/app/index.js: Modifier expression array must contain only 1 element
   4 | export const Array = props => styled.div\`
   5 |   &:hover {
 > 6 |     &.\${[props.primary, 1]} {

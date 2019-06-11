@@ -71,7 +71,7 @@ it('handles variant classes', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('handles array attribute selector', async () => {
+it('handles modifier condition selector', async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
@@ -87,7 +87,7 @@ it('handles array attribute selector', async () => {
         background: white;
       }
 
-      &.${'${[props.primary, true]}'} {
+      &.${'${[props.primary]}'} {
         border-radius: 30px;
         background: #18b09d;
         color: white;

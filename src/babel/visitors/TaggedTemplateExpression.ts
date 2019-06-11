@@ -125,28 +125,26 @@ export default function TaggedTemplateExpression(
     } else if (t.isArrayExpression(ex)) {
       // Validate
       let elements = ex.get('elements') as NodePath<any>[];
-      if (elements.length > 2) {
+      if (elements.length !== 1) {
         throw ex.buildCodeFrameError(
-          'Property array selectors must contain 1 or 2 elements'
+          'Modifier expression array must contain only 1 element'
         );
       }
 
       let el1 = elements[0];
       if (!el1 || (propsName && !el1.getSource().includes(propsName))) {
         throw ex.buildCodeFrameError(
-          `Expected property array condition to access ${propsName}`
+          `Expected modifier condition to access ${propsName}`
         );
       }
       if (!t.isExpression(el1.node)) {
         throw ex.buildCodeFrameError(
-          'Expected property array condition to be an expression'
+          'Expected modifier condition to be an expression'
         );
       }
 
       if (expMeta[i].nestLevel > 0) {
-        throw ex.buildCodeFrameError(
-          'Property array expression must not be nested.'
-        );
+        throw ex.buildCodeFrameError('Modifier expression must not be nested.');
       }
 
       if (expMeta[i].remove) {
@@ -156,7 +154,7 @@ export default function TaggedTemplateExpression(
 
       if (!expMeta[i].valid) {
         throw ex.buildCodeFrameError(
-          'Property array expressions can only be used as a root selector.'
+          'Modifier expressions can only target the root selector.'
         );
       }
 
