@@ -12,7 +12,7 @@ type Options = {
     ];
   };
   mod?: {
-    [key: string]: [((props: unknown) => string | number | boolean), 1 | void];
+    [key: string]: (props: unknown) => string | number | boolean;
   };
 };
 
@@ -73,12 +73,8 @@ function styled(tag: React.ComponentType<any> | string) {
 
       if (mod) {
         for (const name in mod) {
-          const [result, noPass = 0] = mod[name];
-          const apply = typeof result === 'function' ? result(props) : result;
-          apply && cn.push(name);
-          if (noPass) {
-            delete filteredProps[name];
-          }
+          const result = mod[name](props);
+          result && cn.push(name);
         }
       }
 

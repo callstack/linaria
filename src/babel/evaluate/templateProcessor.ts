@@ -38,7 +38,6 @@ type Modifier = {
   id: string;
   node: t.Expression;
   source: string;
-  isFirewalled: boolean;
 };
 
 function isStyled(value: any): value is Styled {
@@ -190,36 +189,10 @@ export default function getTemplateProcessor(options: StrictOptions) {
         // Test if ex is inline array expression. This has already been validated.
         // If it is an array expression, evaluate both values seperately.
         if (t.isArrayExpression(ex) && styled) {
-          let firewall: boolean;
           // Validate
           // Track if prop should pass through
           let elements = ex.get('elements') as NodePath<any>[];
 
-          if (elements.length === 1) {
-            firewall = false;
-          } else {
-            let fireEl = elements[1];
-            const result = fireEl.evaluate();
-            if (result.confident) {
-              let val = result.value;
-              firewall = getFirewall(val, fireEl);
-            } else {
-              // Try to preval the value
-              if (
-                options.evaluate &&
-                !(
-                  t.isFunctionExpression(fireEl) ||
-                  t.isArrowFunctionExpression(fireEl)
-                )
-              ) {
-                const value = valueCache.get(fireEl.node);
-                firewall = getFirewall(value, fireEl);
-              } else {
-                throwFirewall(fireEl);
-                firewall = false; // Unreachable but will keep TS happy.
-              }
-            }
-          }
           // Generate BEM name from source
           let modEl = elements[0] as NodePath<t.FunctionExpression>;
           let param = modEl.node.params[0];
@@ -258,7 +231,6 @@ export default function getTemplateProcessor(options: StrictOptions) {
             id,
             node: modEl.node,
             source: generator(modEl.node).code,
-            isFirewalled: firewall,
           });
 
           cssText += id;
@@ -381,17 +353,8 @@ export default function getTemplateProcessor(options: StrictOptions) {
             t.identifier('mod'),
             t.objectExpression(
               Object.keys(result).map(key => {
-                const { id, node, isFirewalled } = result[key];
-                const items = [node];
-
-                if (isFirewalled) {
-                  items.push(t.numericLiteral(1));
-                }
-
-                return t.objectProperty(
-                  t.stringLiteral(id),
-                  t.arrayExpression(items)
-                );
+                const { id, node } = result[key];
+                return t.objectProperty(t.stringLiteral(id), node);
               })
             )
           )
@@ -463,18 +426,6 @@ export default function getTemplateProcessor(options: StrictOptions) {
       start: path.parent && path.parent.loc ? path.parent.loc.start : null,
     };
   };
-
-  function getFirewall(val: any, path: NodePath<any>) {
-    let firewall = false;
-    if (val === 1 || val === true) {
-      firewall = true;
-    } else if (val === 0 || val === false) {
-      firewall = false;
-    } else {
-      throwFirewall(path);
-    }
-    return firewall;
-  }
 
   function throwFirewall(path: NodePath<any>) {
     throw path.buildCodeFrameError(

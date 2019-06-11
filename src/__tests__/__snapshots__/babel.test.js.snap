@@ -8,7 +8,7 @@ styled(\\"div\\")({
   name: \\"Page\\",
   class: \\"ph6xni0\\",
   mod: {
-    \\"ph6xni0--primary-0\\": [props => props.primary]
+    \\"ph6xni0--primary-0\\": props => props.primary
   }
 });"
 `;
@@ -36,7 +36,7 @@ styled(\\"div\\")({
   name: \\"Page\\",
   class: \\"ph6xni0\\",
   mod: {
-    \\"ph6xni0--primary-0\\": [props => props.primary]
+    \\"ph6xni0--primary-0\\": props => props.primary
   }
 });"
 `;
@@ -109,7 +109,7 @@ styled(\\"div\\")({
   name: \\"Page\\",
   class: \\"ph6xni0\\",
   mod: {
-    \\"ph6xni0--primary-0\\": [state => state.primary]
+    \\"ph6xni0--primary-0\\": state => state.primary
   }
 });"
 `;
@@ -228,7 +228,7 @@ styled(\\"button\\")({
   name: \\"Button\\",
   class: \\"bh6xni0\\",
   mod: {
-    \\"bh6xni0--primary-3\\": [props => props.primary]
+    \\"bh6xni0--primary-3\\": props => props.primary
   },
   vars: {
     \\"bh6xni0-0\\": [props => props.color]
