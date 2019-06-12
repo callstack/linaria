@@ -332,6 +332,29 @@ Dependencies: NA
 
 `;
 
+exports[`ignores commented out expressions 1`] = `
+"import { styled } from 'linaria/react';
+export const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"th6xni0\\"
+});"
+`;
+
+exports[`ignores commented out expressions 2`] = `
+
+CSS:
+
+.th6xni0 {
+  /* .th6xni0--primary-0 */
+  font-size: /* var(--th6xni0-1) */ 10px;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`includes unreferenced styles for :global 1`] = `
 "import { css } from 'linaria';
 import { styled } from 'linaria/react';
@@ -560,23 +583,23 @@ Dependencies: NA
 
 `;
 
-exports[`thows if alternative propName is used and an array attribute selector is not a function of it. 1`] = `
+exports[`thows if alternative propName is used and a modifier selector is not a function of the propName. 1`] = `
 "<<DIRNAME>>/app/index.js: Expected modifier condition to access state
-  3 | const Page = state => styled.div\`
+  3 | const Page = (state => styled.div\`
   4 |   color: #fff;
-> 5 |   &.\${[props.primary]} {
-    |       ^
+> 5 |   &\${[props.primary]} {
+    |      ^
   6 |     color: #241047;
   7 |   }
-  8 | \`"
+  8 | \`)({})"
 `;
 
 exports[`thows if state selector not not wrapped in arrow function 1`] = `
 "<<DIRNAME>>/app/index.js: You must wrap the styled tag in an arrow function or this condition must be a function.
   3 | const Page = styled.div\`
   4 |   color: #fff;
-> 5 |   &.\${[props.primary]} {
-    |        ^
+> 5 |   &\${[props.primary]} {
+    |       ^
   6 |     color: #241047;
   7 |   }
   8 | \`"
@@ -586,22 +609,41 @@ exports[`throws if state selector is nested 1`] = `
 "<<DIRNAME>>/app/index.js: Modifier expression must not be nested.
    6 |     color: #241047;
    7 |     /* This should not work */
->  8 |     body &.\${[props.input === \\"I agree\\"]} {
-     |              ^
+>  8 |     body &\${[props.input === \\"I agree\\"]} {
+     |             ^
    9 |       text-shadow: 9px 9px 9px rgba(0, 255, 0, 0.28);
   10 |     }
   11 |   }"
 `;
 
-exports[`throws when array attribute is not in root scope 1`] = `
-"<<DIRNAME>>/app/index.js: Modifier expression array must contain only 1 element
-  4 | export const Array = props => styled.div\`
-  5 |   &:hover {
-> 6 |     &.\${[props.primary, 1]} {
-    |         ^
-  7 |       color: blue;
-  8 |     }
-  9 |     font-size: \${size}px;"
+exports[`throws if wrapping arrow function contains more than one argument 1`] = `
+"<<DIRNAME>>/app/index.js: Styled component arrow function can only accept one props argument or things may break from rewrite.
+If this is not an error, wrap it in another arrow function:
+const Button = config => (props => styled.button\`\`)({})
+  1 | import { styled } from 'linaria/react';
+  2 | 
+> 3 | export const Title = ((props, options) => styled.h1\`
+    |                       ^
+  4 |   font-size: 14px;
+  5 | \`)({});"
+`;
+
+exports[`throws if wrapping arrow function is not called immediately 1`] = `
+"<<DIRNAME>>/app/index.js: A styled component's wrapping function must be called immediately
+  1 | import { styled } from 'linaria/react';
+  2 | 
+> 3 | export const Title = props => styled.h1\`
+    |                      ^
+  4 |   font-size: 14px;
+  5 | \`;"
+`;
+
+exports[`throws if wrapping arrow function is not called with empty object 1`] = `
+"<<DIRNAME>>/app/index.js: A styled component's wrapping function must be called immediately with an empty expression
+  3 | export const Title = (props => styled.h1\`
+  4 |   font-size: 14px;
+> 5 | \`)('break');
+    |    ^"
 `;
 
 exports[`throws when contains dynamic expression without evaluate: true in css tag 1`] = `
@@ -611,6 +653,17 @@ exports[`throws when contains dynamic expression without evaluate: true in css t
 > 4 |   font-size: \${size}px;
     |                ^
   5 | \`;"
+`;
+
+exports[`throws when modifier selector array contains more than one element 1`] = `
+"<<DIRNAME>>/app/index.js: Modifier expression array must contain only 1 element
+  4 | export const Modified = (props => styled.div\`
+  5 |   &:hover {
+> 6 |     &\${[props.primary, 1]} {
+    |        ^
+  7 |       color: blue;
+  8 |     }
+  9 |     font-size: \${size}px;"
 `;
 
 exports[`transpiles css template literal 1`] = `

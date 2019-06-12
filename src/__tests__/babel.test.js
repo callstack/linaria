@@ -22,9 +22,9 @@ it('transpiles styled template literal with object', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    export const Title = props => styled.h1\`
+    export const Title = (props => styled.h1\`
       font-size: 14px;
-    \`;
+    \`)({});
     `
   );
 
@@ -32,14 +32,87 @@ it('transpiles styled template literal with object', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('ignores commented out expressions', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    export const Title = (props => styled.h1\`
+      /* ${'${[props.primary]}'} */
+      font-size: /* ${'${props.big ? 28 : 14}px'} */ 10px;
+    \`)({});
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('throws if wrapping arrow function is not called immediately', async () => {
+  expect.assertions(1);
+  try {
+    await transpile(
+      dedent`
+    import { styled } from 'linaria/react';
+
+    export const Title = props => styled.h1\`
+      font-size: 14px;
+    \`;
+    `
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
+});
+
+it('throws if wrapping arrow function is not called with empty object', async () => {
+  expect.assertions(1);
+  try {
+    await transpile(
+      dedent`
+    import { styled } from 'linaria/react';
+
+    export const Title = (props => styled.h1\`
+      font-size: 14px;
+    \`)('break');
+    `
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
+});
+
+it('throws if wrapping arrow function contains more than one argument', async () => {
+  expect.assertions(1);
+  try {
+    await transpile(
+      dedent`
+    import { styled } from 'linaria/react';
+
+    export const Title = ((props, options) => styled.h1\`
+      font-size: 14px;
+    \`)({});
+    `
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
+});
+
 it('handles basic properties', async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
 
-    export const Title = props => styled.h1\`
+    export const Title = (props => styled.h1\`
       font-size: ${'${props.size}'}px;
-    \`;
+    \`)({});
     `
   );
 
@@ -52,7 +125,7 @@ it('handles variant classes', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    export const Button = props => styled.button\`
+    export const Button = (props => styled.button\`
       background: ${'${props.color}'};
       padding: 16px 24px;
       transition: 200ms;
@@ -63,7 +136,7 @@ it('handles variant classes', async () => {
       }
 
 
-    \`;
+    \`)({});
     `
   );
 
@@ -76,7 +149,7 @@ it('handles modifier condition selector', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    export const Button = props => styled.button\`
+    export const Button = (props => styled.button\`
       background: ${'${props.color}'};
       padding: 16px 24px;
       color: ${"${'red'}"};
@@ -87,7 +160,7 @@ it('handles modifier condition selector', async () => {
         background: white;
       }
 
-      &.${'${[props.primary]}'} {
+      &${'${[props.primary]}'} {
         border-radius: 30px;
         background: #18b09d;
         color: white;
@@ -95,7 +168,7 @@ it('handles modifier condition selector', async () => {
           background: #087b6d;
         }
       }
-    \`;
+    \`)({});
     `
   );
 
@@ -407,7 +480,6 @@ it('handles css template literal in JSX element', async () => {
 
 it('throws when contains dynamic expression without evaluate: true in css tag', async () => {
   expect.assertions(1);
-
   try {
     await transpile(
       dedent`
@@ -425,23 +497,22 @@ it('throws when contains dynamic expression without evaluate: true in css tag', 
   }
 });
 
-it('throws when array attribute is not in root scope', async () => {
+it('throws when modifier selector array contains more than one element', async () => {
   expect.assertions(1);
-
   try {
     await transpile(
       dedent`
       import { styled } from 'linaria/react';
       const size = 18;
 
-      export const Array = props => styled.div\`
+      export const Modified = (props => styled.div\`
         &:hover {
-          &.${'${[props.primary, 1]}'} {
+          &${'${[props.primary, 1]}'} {
             color: blue;
           }
           font-size: ${'${size}'}px;
         }
-      \`;
+      \`)({});
       `
     );
   } catch (e) {
@@ -458,16 +529,16 @@ it('throws if state selector is nested', async () => {
       dedent`
       import { styled } from 'linaria/react';
 
-      const Page = props => styled.div\`
+      const Page = (props => styled.div\`
         color: #fff;
-        &.${'${[props.primary]}'} {
+        &${'${[props.primary]}'} {
           color: #241047;
           /* This should not work */
-          body &.${'${[props.input === "I agree"]}'} {
+          body &${'${[props.input === "I agree"]}'} {
             text-shadow: 9px 9px 9px rgba(0, 255, 0, 0.28);
           }
         }
-      \`
+      \`)({})
       `
     );
   } catch (e) {
@@ -486,7 +557,7 @@ it('thows if state selector not not wrapped in arrow function', async () => {
 
       const Page = styled.div\`
         color: #fff;
-        &.${'${[props.primary]}'} {
+        &${'${[props.primary]}'} {
           color: #241047;
         }
       \`
@@ -499,19 +570,19 @@ it('thows if state selector not not wrapped in arrow function', async () => {
   }
 });
 
-it('thows if alternative propName is used and an array attribute selector is not a function of it.', async () => {
+it('thows if alternative propName is used and a modifier selector is not a function of the propName.', async () => {
   expect.assertions(1);
   try {
     await transpile(
       dedent`
       import { styled } from 'linaria/react';
 
-      const Page = state => styled.div\`
+      const Page = (state => styled.div\`
         color: #fff;
-        &.${'${[props.primary]}'} {
+        &${'${[props.primary]}'} {
           color: #241047;
         }
-      \`
+      \`)({})
       `
     );
   } catch (e) {
@@ -526,12 +597,12 @@ it('handles alternative propNames', async () => {
     dedent`
       import { styled } from 'linaria/react';
 
-      const Page = state => styled.div\`
+      const Page = (state => styled.div\`
         color: #fff;
-        &.${'${[state.primary]}'} {
+        &${'${[state.primary]}'} {
           color: #241047;
         }
-      \`
+      \`)({})
       `
   );
   expect(code).toMatchSnapshot();
@@ -543,12 +614,12 @@ it('collapses only one arrow function parent', async () => {
     dedent`
       import { styled } from 'linaria/react';
 
-      export const Page = (props, options) => props => styled.div\`
+      export const Page = (props, options) => (props => styled.div\`
       color: #fff;
-      &.${'${[props.primary]}'} {
+      &${'${[props.primary]}'} {
         color: #241047;
       }
-      \`
+      \`)({})
       `
   );
   expect(code).toMatchSnapshot();
@@ -560,12 +631,12 @@ it('allows simple parent selector for state selector', async () => {
     dedent`
       import { styled } from 'linaria/react';
 
-      export const Page = props => styled.div\`
+      export const Page = (props => styled.div\`
         color: #fff;
-        .dark-theme &.${'${[props.primary]}'} {
+        .dark-theme &${'${[props.primary]}'} {
           color: #241047;
         }
-      \`
+      \`)({})
       `
   );
   expect(code).toMatchSnapshot();

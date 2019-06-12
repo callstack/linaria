@@ -3,8 +3,8 @@ import { types as t } from '@babel/core';
 const cssCommentRegex = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//gm;
 
 export type ExpressionMeta = {
-  /* remove is true if the replacement is found within a CSS comment block */
-  remove: boolean;
+  /* If the replacement is found within a CSS comment block */
+  inComment: boolean;
   nestLevel: number;
   index: number;
   placeholder: string;
@@ -67,7 +67,8 @@ export default function(quasis: any, expressions: any[]) {
   placeholders.forEach((placeholder, i) => {
     let index = dummyCSS.indexOf(placeholder.name);
     expressionMeta[i] = {
-      remove: index === -1,
+      // A placeholder not found after removing comments is in a comment.
+      inComment: index === -1,
       nestLevel: 0,
       index: index,
       placeholder: placeholder.name,
@@ -92,15 +93,15 @@ export default function(quasis: any, expressions: any[]) {
 
     /**
      * Validate correct usage of dynamic attribute selectors:
-     * Valid line  : &.${[props.primary, 1]} span {
+     * Valid line  : &${[props.primary, 1]} span {
      * Invalid line: &.span ${[props.primary, 1]} {
      * Invalid line: background: ${[props.primary, 1]};
      * Nesting is also invalid:
-     * span { &.${[props.primary, 1]} }
+     * span { &${[props.primary, 1]} }
      * However, we do allow parent selectors with spaces for theming:
-     * .dark-mode &.${[props.primary]}
+     * .dark-mode &${[props.primary]}
      * More complex nesting is not allowed and would require traversing the CSS AST:
-     * &.${[props.round]} { &.${[props.primary]} }
+     * &${[props.round]} { &${[props.primary]} }
      * Array attributes cannot be nested. All state is managed on the top level component.
      * We check for this early to bail out if required.
      * We do this because dynamic selectors only apply to the current styled element.
@@ -108,9 +109,7 @@ export default function(quasis: any, expressions: any[]) {
      */
     if (exMeta.array) {
       const dynamicAttrRegex = new RegExp(
-        `^[\\v|\\t| ]*(\\.\\w)?([\\w|-]*[\\v|\\t| ])*&+\\.${
-          exMeta.placeholder
-        }.*{`,
+        `(^|})[\\t| ]*(\\.\\w)?([\\w|-]*[\\t| ])*&+${exMeta.placeholder}[^{]*?`,
         'm'
       );
       exMeta.valid = dynamicAttrRegex.test(dummyCSS) && exMeta.nestLevel <= 0;

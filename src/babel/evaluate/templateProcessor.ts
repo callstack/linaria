@@ -7,6 +7,7 @@ import { NodePath } from '@babel/traverse';
 import generator from '@babel/generator';
 import generateModifierName from '../utils/generateModifierName';
 import makeTinyId from './tinyId';
+import { ExpressionMeta } from '../utils/calcExpressionStats';
 
 import slugify from '../../slugify';
 import { units } from '../units';
@@ -32,12 +33,14 @@ type Interpolation = {
   node: t.Expression;
   source: string;
   unit: string;
+  inComment: boolean;
 };
 
 type Modifier = {
   id: string;
   node: t.Expression;
   source: string;
+  inComment: boolean;
 };
 
 function isStyled(value: any): value is Styled {
@@ -141,6 +144,8 @@ export default function getTemplateProcessor(options: StrictOptions) {
     let cssText = '';
 
     const expressions = path.get('quasi').get('expressions');
+    const expMeta: ExpressionMeta[] =
+      path.state && path.state.expMeta ? path.state.expMeta : [];
 
     quasi.quasis.forEach((el, i, self) => {
       let appended = false;
@@ -187,7 +192,6 @@ export default function getTemplateProcessor(options: StrictOptions) {
           return loc;
         };
         // Test if ex is inline array expression. This has already been validated.
-        // If it is an array expression, evaluate both values seperately.
         if (t.isArrayExpression(ex) && styled) {
           // Validate
           // Track if prop should pass through
@@ -231,9 +235,10 @@ export default function getTemplateProcessor(options: StrictOptions) {
             id,
             node: modEl.node,
             source: generator(modEl.node).code,
+            inComment: expMeta[i].inComment,
           });
 
-          cssText += id;
+          cssText += `.${id}`;
         } else {
           // Evaluate normal interpolation
           const result = ex.evaluate();
@@ -255,7 +260,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
               length: cssText.length - beforeLength,
             });
           } else {
-            // Try to preval the value. If preval, return early.
+            // Try to fetch preval-ed value. If preval, return early.
             if (
               options.evaluate &&
               !(t.isFunctionExpression(ex) || t.isArrowFunctionExpression(ex))
@@ -295,6 +300,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
                 node: ex.node,
                 source: ex.getSource() || generator(ex.node).code,
                 unit: '',
+                inComment: expMeta[i].inComment,
               });
 
               cssText += `var(--${id})`;
@@ -343,22 +349,25 @@ export default function getTemplateProcessor(options: StrictOptions) {
           const key = mod.source;
           if (key in result) {
             cssText = cssText.replace(mod.id, result[key].id);
-          } else {
+          } else if (!mod.inComment) {
             result[key] = mod;
           }
         });
 
-        props.push(
-          t.objectProperty(
-            t.identifier('mod'),
-            t.objectExpression(
-              Object.keys(result).map(key => {
-                const { id, node } = result[key];
-                return t.objectProperty(t.stringLiteral(id), node);
-              })
+        let keys = Object.keys(result);
+        if (keys.length > 0) {
+          props.push(
+            t.objectProperty(
+              t.identifier('mod'),
+              t.objectExpression(
+                keys.map(key => {
+                  const { id, node } = result[key];
+                  return t.objectProperty(t.stringLiteral(id), node);
+                })
+              )
             )
-          )
-        );
+          );
+        }
       }
 
       // If we found any interpolations, also pass them so they can be applied
@@ -376,31 +385,34 @@ export default function getTemplateProcessor(options: StrictOptions) {
               `var(--${it.id})`,
               `var(--${result[key].id})`
             );
-          } else {
+          } else if (!it.inComment) {
             result[key] = it;
           }
         });
 
-        props.push(
-          t.objectProperty(
-            t.identifier('vars'),
-            t.objectExpression(
-              Object.keys(result).map(key => {
-                const { id, node, unit } = result[key];
-                const items = [node];
+        let keys = Object.keys(result);
+        if (keys.length > 0) {
+          props.push(
+            t.objectProperty(
+              t.identifier('vars'),
+              t.objectExpression(
+                keys.map(key => {
+                  const { id, node, unit } = result[key];
+                  const items = [node];
 
-                if (unit) {
-                  items.push(t.stringLiteral(unit));
-                }
+                  if (unit) {
+                    items.push(t.stringLiteral(unit));
+                  }
 
-                return t.objectProperty(
-                  t.stringLiteral(id),
-                  t.arrayExpression(items)
-                );
-              })
+                  return t.objectProperty(
+                    t.stringLiteral(id),
+                    t.arrayExpression(items)
+                  );
+                })
+              )
             )
-          )
-        );
+          );
+        }
       }
 
       path.replaceWith(
@@ -426,12 +438,4 @@ export default function getTemplateProcessor(options: StrictOptions) {
       start: path.parent && path.parent.loc ? path.parent.loc.start : null,
     };
   };
-
-  function throwFirewall(path: NodePath<any>) {
-    throw path.buildCodeFrameError(
-      'Firewall passthrough value must statically evaluate to one of:\
-            - 1, true, 0, or false. It may also be ommitted in which case passthrough is assumed.\
-              Pass a value of 1 or true to block prop passthrough.'
-    );
-  }
 }

@@ -77,7 +77,7 @@ export default function TaggedTemplateExpression(
 
   if (path.state) {
     propsName = path.state.propsName;
-    parentWasArrow = path.state.propsName;
+    parentWasArrow = path.state.parentWasArrow;
   }
 
   /**
@@ -91,26 +91,51 @@ export default function TaggedTemplateExpression(
     const params = path.parentPath.get('params') as any[];
     if (!params || params.length !== 1) {
       throw path.parentPath.buildCodeFrameError(
-        'Styled component arrow function can only accept one props argument or things may break from rewrite.\
-        If this is not an error, wrap it in another arrow function:\
-        const Button = (props, config) => props => styled.button``'
+        'Styled component arrow function can only accept one props argument or things may break from rewrite.\n' +
+          'If this is not an error, wrap it in another arrow function:\n' +
+          'const Button = config => (props => styled.button``)({})'
       );
     }
     const param = params[0];
     if (!t.isIdentifier(param.node)) {
       throw param.buildCodeFrameError(
-        'Unexpected element. Expected props argument name. Rest spread and destructuring are not supported.'
+        'Unexpected element. Expected props argument name. Rest spread and destructuring are not supported here.'
       );
     }
+    // Ensure arrow function is immediately called with an empty object
+    let callExpPath = path.parentPath.parentPath;
+    let callExpNode = path.parentPath.parentPath.node;
+    if (!t.isCallExpression(callExpNode)) {
+      throw path.parentPath.buildCodeFrameError(
+        "A styled component's wrapping function must be called immediately"
+      );
+    }
+    let args = callExpPath.get('arguments');
+    const isEmptyObjExpression = (theArgs: NodePath<t.Node>[]) =>
+      theArgs.length === 1 &&
+      t.isObjectExpression(theArgs[0].node) &&
+      theArgs[0].node.properties.length === 0;
+
+    if (!Array.isArray(args)) {
+      throw callExpPath.buildCodeFrameError(
+        "A styled component's wrapping function must be called immediately with an empty expression"
+      );
+    }
+    if (!isEmptyObjExpression(args)) {
+      throw args[0].buildCodeFrameError(
+        "A styled component's wrapping function must be called immediately with an empty expression"
+      );
+    }
+    //
     let propsName;
     if (param && param.node && param.node.name) {
       propsName = param.node.name;
     }
     // Save metadata for next visit.
-    path.parentPath.state = {};
-    path.parentPath.state.propsName = propsName;
-    path.parentPath.state.parentWasArrow = true;
-    path.parentPath.replaceWith(path.node);
+    callExpPath.state = {};
+    callExpPath.state.parentWasArrow = true;
+    callExpPath.state.propsName = propsName;
+    callExpPath.replaceWith(path.node);
     return;
   }
 
@@ -143,18 +168,13 @@ export default function TaggedTemplateExpression(
         );
       }
 
-      if (expMeta[i].nestLevel > 0) {
+      if (expMeta[i].nestLevel > 0 && !expMeta[i].inComment) {
         throw ex.buildCodeFrameError('Modifier expression must not be nested.');
       }
 
-      if (expMeta[i].remove) {
-        ex.replaceWith(t.stringLiteral(expMeta[i].placeholder));
-        return;
-      }
-
-      if (!expMeta[i].valid) {
+      if (!expMeta[i].valid && !expMeta[i].inComment) {
         throw ex.buildCodeFrameError(
-          'Modifier expressions can only target the root selector.'
+          'Modifier expressions must target the root selector and may not be preceded by a dot.'
         );
       }
 
@@ -183,7 +203,10 @@ export default function TaggedTemplateExpression(
   });
 
   const expressionValues: ExpressionValue[] = expressions.map(
-    (ex: NodePath<t.Expression>) => {
+    (ex: NodePath<t.Expression>, i) => {
+      if (expMeta[i].inComment) {
+        return { kind: ValueType.VALUE, value: expMeta[i].placeholder };
+      }
       const result = ex.evaluate();
       if (result.confident) {
         throwIfInvalid(result.value, ex);
@@ -207,6 +230,12 @@ export default function TaggedTemplateExpression(
       ex: styled.component.node.name,
     });
   }
+
+  // Add expression metadata to state
+  if (!path.state) {
+    path.state = {};
+  }
+  path.state.expMeta = expMeta;
 
   state.queue.push({
     styled: styled || undefined,
