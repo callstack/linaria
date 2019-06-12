@@ -36,7 +36,6 @@ const warnIfInvalid = (value: any, componentName: string) => {
   }
 };
 
-// TODO: improve types
 function styled(tag: React.ComponentType<any> | string) {
   return (options: Options) => {
     if (process.env.NODE_ENV !== 'production') {
@@ -129,34 +128,55 @@ function styled(tag: React.ComponentType<any> | string) {
   };
 }
 
-type CSSProperties = {
+/**
+ * @desc Utility type for getting props type of React component.
+ */
+export type PropsOf<
+  Tag extends React.ComponentType<any>
+> = Tag extends React.SFC<infer Props>
+  ? Props & React.Attributes
+  : Tag extends React.ComponentClass<infer Props>
+  ? (Tag extends new (...args: Array<any>) => infer Instance
+      ? Props & React.ClassAttributes<Instance>
+      : never)
+  : never;
+
+type AsProp = { as?: React.ElementType };
+
+export type CSSProperties = {
   [key: string]: string | number | CSSProperties;
 };
 
-type StyledComponent<T> = React.FunctionComponent<
-  T & { as?: React.ElementType }
->;
+// Private type to validate that selectors are Styled Components
+type _isStyled = { __linaria: true };
 
-type StyledTag<T> = <Props = T>(
+// The tagged template function
+type StyledTag<Tag> = <ExtraProps = {}>(
   strings: TemplateStringsArray,
   ...exprs: Array<
-    string | number | CSSProperties | ((props: Props) => string | number)
+    | string
+    | number
+    | CSSProperties
+    | ((props: GetProps<Tag> & ExtraProps) => string | number)
+    | _isStyled
+    | [unknown] // Modifier selectors
   >
-) => StyledComponent<Props>;
+) => React.FunctionComponent<GetProps<Tag> & AsProp & ExtraProps> & _isStyled;
 
-type StyledJSXIntrinsics = {
-  readonly [P in keyof JSX.IntrinsicElements]: StyledTag<
-    JSX.IntrinsicElements[P]
-  >
-};
+type JSXInEl = JSX.IntrinsicElements;
 
-type Styled = StyledJSXIntrinsics & {
-  <T>(component: React.ElementType<T>): StyledTag<T>;
+type GetProps<T> = T extends keyof JSXInEl
+  ? JSXInEl[T]
+  : T extends React.ComponentType<any>
+  ? PropsOf<T>
+  : {};
 
-  readonly [key: string]: StyledTag<{
-    children?: React.ReactNode;
-    [key: string]: any;
-  }>;
+// The main styled constructor function
+export type CreateStyled = {
+  readonly [key in keyof JSXInEl]: StyledTag<key>
+} & {
+  <Tag extends keyof JSXInEl>(tag: Tag): StyledTag<Tag>;
+  <Tag extends React.ComponentType<any>>(tag: Tag): StyledTag<Tag>;
 };
 
 export default ((process.env.NODE_ENV !== 'production'
@@ -167,4 +187,4 @@ export default ((process.env.NODE_ENV !== 'production'
         return o(prop);
       },
     })
-  : styled) as any) as Styled;
+  : styled) as any) as CreateStyled;
