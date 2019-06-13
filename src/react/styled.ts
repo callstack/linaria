@@ -147,8 +147,18 @@ export type CSSProperties = {
   [key: string]: string | number | CSSProperties;
 };
 
-// Private type to validate that selectors are Styled Components
+/**
+ * _isStyled is a private type to validate that selectors are Styled Components.
+ * This is required to ensure extra properties are not attached to StyledComponents that style others:
+ * ``const Dialog = styled.div` ${Button} { color: red; } ``
+ * Without the _isStyled type, Button's properties could appear on Dialog which would be incorrect.
+ */
 type _isStyled = { __linaria: true };
+
+export type StyledComponent<Tag, ExtraProps> = React.FunctionComponent<
+  GetProps<Tag> & AsProp & ExtraProps
+> &
+  _isStyled;
 
 // The tagged template function
 type StyledTag<Tag> = <ExtraProps = {}>(
@@ -157,11 +167,12 @@ type StyledTag<Tag> = <ExtraProps = {}>(
     | string
     | number
     | CSSProperties
-    | ((props: GetProps<Tag> & ExtraProps) => string | number)
-    | _isStyled
+    // Strictly typing props argument would break the generated StyledComponent.
+    | ((props: any) => string | number)
+    | StyledComponent<any, any>
     | [unknown] // Modifier selectors
   >
-) => React.FunctionComponent<GetProps<Tag> & AsProp & ExtraProps> & _isStyled;
+) => StyledComponent<Tag, ExtraProps>;
 
 type JSXInEl = JSX.IntrinsicElements;
 
