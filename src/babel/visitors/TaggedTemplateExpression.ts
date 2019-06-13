@@ -111,19 +111,20 @@ export default function TaggedTemplateExpression(
       );
     }
     let args = callExpPath.get('arguments');
-    const isEmptyObjExpression = (theArgs: NodePath<t.Node>[]) =>
+    const isEmptyObjOrAsExpression = (theArgs: NodePath<t.Node>[]) =>
       theArgs.length === 1 &&
-      t.isObjectExpression(theArgs[0].node) &&
-      theArgs[0].node.properties.length === 0;
+      (t.isTSAsExpression(theArgs[0].node) ||
+        (t.isObjectExpression(theArgs[0].node) &&
+          theArgs[0].node.properties.length === 0));
 
     if (!Array.isArray(args)) {
       throw callExpPath.buildCodeFrameError(
-        "A styled component's wrapping function must be called immediately with an empty expression"
+        "A styled component's wrapping function must be called immediately"
       );
     }
-    if (!isEmptyObjExpression(args)) {
+    if (!isEmptyObjOrAsExpression(args)) {
       throw args[0].buildCodeFrameError(
-        "A styled component's wrapping function must be called immediately with an empty expression"
+        "A styled component's wrapping function expects an empty object literal"
       );
     }
     //

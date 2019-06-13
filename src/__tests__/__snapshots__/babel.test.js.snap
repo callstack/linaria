@@ -639,7 +639,7 @@ exports[`throws if wrapping arrow function is not called immediately 1`] = `
 `;
 
 exports[`throws if wrapping arrow function is not called with empty object 1`] = `
-"<<DIRNAME>>/app/index.js: A styled component's wrapping function must be called immediately with an empty expression
+"<<DIRNAME>>/app/index.js: A styled component's wrapping function expects an empty object literal
   3 | export const Title = (props => styled.h1\`
   4 |   font-size: 14px;
 > 5 | \`)('break');
