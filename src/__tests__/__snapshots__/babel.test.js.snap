@@ -1,5 +1,45 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`accepts filterProps argument 1`] = `
+"import { styled } from 'linaria/react';
+
+const CustomButton = props => <button {...props} />;
+
+export const Button =
+/*#__PURE__*/
+styled(CustomButton)({
+  name: \\"Button\\",
+  class: \\"bh6xni0\\",
+  vars: {
+    \\"bh6xni0-2\\": [props => props.color]
+  },
+  mod: {
+    \\"bh6xni0--primary-1\\": props => props.primary
+  },
+  f: ({
+    primary,
+    ...o
+  }) => o
+});"
+`;
+
+exports[`accepts filterProps argument 2`] = `
+
+CSS:
+
+.bh6xni0 {
+  
+  padding: 16px 24px;
+  &.bh6xni0--primary-1:hover {
+    color: var(--bh6xni0-2);
+    background: white;
+  }
+}
+
+Dependencies: NA
+
+`;
+
 exports[`allows simple parent selector for state selector 1`] = `
 "import { styled } from 'linaria/react';
 export const Page =
@@ -227,11 +267,11 @@ export const Button =
 styled(\\"button\\")({
   name: \\"Button\\",
   class: \\"bh6xni0\\",
-  mod: {
-    \\"bh6xni0--primary-3\\": props => props.primary
-  },
   vars: {
     \\"bh6xni0-0\\": [props => props.color]
+  },
+  mod: {
+    \\"bh6xni0--primary-3\\": props => props.primary
   }
 });"
 `;

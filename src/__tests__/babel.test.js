@@ -144,6 +144,29 @@ it('handles variant classes', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('accepts filterProps argument', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    const CustomButton = props => <button {...props} />
+
+    export const Button = (props => styled(CustomButton)\`
+      ${'${{ filterProps: ({ primary, ...o }) => o }}'}
+      ${'${{ filterProps: ({ primary, ...o }) => o }}'}
+      padding: 16px 24px;
+      &${'${[props.primary]}'}:hover {
+        color: ${'${props.color}'};
+        background: white;
+      }
+    \`)({});
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('handles modifier condition selector', async () => {
   const { code, metadata } = await transpile(
     dedent`

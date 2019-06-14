@@ -14,6 +14,7 @@ type Options = {
   mod?: {
     [key: string]: (props: unknown) => string | number | boolean;
   };
+  f?: (propsToFilter: any) => any;
 };
 
 const warnIfInvalid = (value: any, componentName: string) => {
@@ -67,13 +68,17 @@ function styled(tag: React.ComponentType<any> | string) {
         filteredProps = rest;
       }
 
-      const { vars, mod } = options;
-      let cn = [];
+      const { vars, mod, f } = options;
 
+      if (f) {
+        filteredProps = f(filteredProps);
+      }
+
+      let modifiers = [];
       if (mod) {
         for (const name in mod) {
           const result = mod[name](props);
-          result && cn.push(name);
+          result && modifiers.push(name);
         }
       }
 
@@ -96,7 +101,7 @@ function styled(tag: React.ComponentType<any> | string) {
       filteredProps.className = cx(
         filteredProps.className || className,
         options.class,
-        ...cn
+        ...modifiers
       );
 
       if ((tag as any).__linaria && tag !== component) {
@@ -160,6 +165,12 @@ export type StyledComponent<Tag, ExtraProps> = React.FunctionComponent<
 > &
   _isStyled;
 
+interface Filter<T> {
+  filterProps: {
+    (initial: T): Partial<T>;
+  };
+}
+
 // The tagged template function
 type StyledTag<Tag> = <ExtraProps = {}>(
   strings: TemplateStringsArray,
@@ -167,10 +178,11 @@ type StyledTag<Tag> = <ExtraProps = {}>(
     | string
     | number
     | CSSProperties
+    | StyledComponent<any, any>
     // Strictly typing props argument would break the generated StyledComponent.
     | ((props: any) => string | number)
-    | StyledComponent<any, any>
     | [unknown] // Modifier selectors
+    | Filter<GetProps<Tag> & ExtraProps>
   >
 ) => StyledComponent<Tag, ExtraProps>;
 

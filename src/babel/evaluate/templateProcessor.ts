@@ -63,6 +63,10 @@ export default function getTemplateProcessor(options: StrictOptions) {
 
     const interpolations: Interpolation[] = [];
     const modifiers: Modifier[] = [];
+    let filterFunction:
+      | t.ArrowFunctionExpression
+      | t.FunctionExpression
+      | undefined = undefined;
 
     // Check if the variable is referenced anywhere for basic DCE
     // Only works when it's assigned to a variable
@@ -192,53 +196,60 @@ export default function getTemplateProcessor(options: StrictOptions) {
           return loc;
         };
         // Test if ex is inline array expression. This has already been validated.
-        if (t.isArrayExpression(ex) && styled) {
-          // Validate
-          // Track if prop should pass through
-          let elements = ex.get('elements') as NodePath<any>[];
+        if (t.isArrayExpression(ex)) {
+          if (styled) {
+            // Validate
+            // Track if prop should pass through
+            let elements = ex.get('elements') as NodePath<any>[];
 
-          // Generate BEM name from source
-          let modEl = elements[0] as NodePath<t.FunctionExpression>;
-          let param = modEl.node.params[0];
-          let paramText = 'props';
-          if ('name' in param) {
-            paramText = param.name;
+            // Generate BEM name from source
+            let modEl = elements[0] as NodePath<t.FunctionExpression>;
+            let param = modEl.node.params[0];
+            let paramText = 'props';
+            if ('name' in param) {
+              paramText = param.name;
+            }
+            const body = modEl.get('body');
+            let returns: string[] = [];
+            const returnVisitor = {
+              ReturnStatement(path: NodePath<t.ReturnStatement>) {
+                let arg = path.get('argument');
+                if (arg) {
+                  const src =
+                    arg.getSource() ||
+                    (arg.node && generator(arg.node).code) ||
+                    'unknown';
+                  returns.push(src);
+                }
+              },
+            };
+            body.traverse(returnVisitor);
+            // If no explicit return statement is found, it is likely an arrow return.
+            let bodyText =
+              returns[0] === undefined ||
+              returns[0] === null ||
+              returns[0] === 'unknown'
+                ? body.getSource() ||
+                  (body.node && generator(body.node).code) ||
+                  'unknown'
+                : returns[0];
+            const modName = generateModifierName(paramText, bodyText);
+            // Push modifier to array
+            const id = tinyId(`${slug}--${modName}-${i}`);
+            modifiers.push({
+              id,
+              node: modEl.node,
+              source: generator(modEl.node).code,
+              inComment: expMeta[i].inComment,
+            });
+
+            cssText += `.${id}`;
+          } else {
+            // CSS modifiers can't be used outside components
+            throw ex.buildCodeFrameError(
+              "The CSS cannot contain modifier expressions when using the 'css' tag."
+            );
           }
-          const body = modEl.get('body');
-          let returns: string[] = [];
-          const returnVisitor = {
-            ReturnStatement(path: NodePath<t.ReturnStatement>) {
-              let arg = path.get('argument');
-              if (arg) {
-                const src =
-                  arg.getSource() ||
-                  (arg.node && generator(arg.node).code) ||
-                  'unknown';
-                returns.push(src);
-              }
-            },
-          };
-          body.traverse(returnVisitor);
-          // If no explicit return statement is found, it is likely an arrow return.
-          let bodyText =
-            returns[0] === undefined ||
-            returns[0] === null ||
-            returns[0] === 'unknown'
-              ? body.getSource() ||
-                (body.node && generator(body.node).code) ||
-                'unknown'
-              : returns[0];
-          const modName = generateModifierName(paramText, bodyText);
-          // Push modifier to array
-          const id = tinyId(`${slug}--${modName}-${i}`);
-          modifiers.push({
-            id,
-            node: modEl.node,
-            source: generator(modEl.node).code,
-            inComment: expMeta[i].inComment,
-          });
-
-          cssText += `.${id}`;
         } else {
           // Evaluate normal interpolation
           const result = ex.evaluate();
@@ -261,6 +272,24 @@ export default function getTemplateProcessor(options: StrictOptions) {
             });
           } else {
             // Try to fetch preval-ed value. If preval, return early.
+            if (t.isObjectExpression(ex.node)) {
+              let property = ex.node.properties[0];
+              if (
+                t.isObjectProperty(property) &&
+                property.key.name === 'filterProps' &&
+                (t.isFunctionExpression(property.value) ||
+                  t.isArrowFunctionExpression(property.value))
+              ) {
+                if (filterFunction) {
+                  throw ex.buildCodeFrameError(
+                    'Found duplicate filterProps function definition. Expected only one per component.'
+                  );
+                }
+                filterFunction = property.value;
+                return;
+              }
+            }
+
             if (
               options.evaluate &&
               !(t.isFunctionExpression(ex) || t.isArrowFunctionExpression(ex))
@@ -339,37 +368,6 @@ export default function getTemplateProcessor(options: StrictOptions) {
         t.objectProperty(t.identifier('class'), t.stringLiteral(className))
       );
 
-      // If any modifiers were found, also pass them so they can be applied.
-      if (modifiers.length) {
-        // De-duplicate modifiers based on the source
-        // If two modifiers have the same source code,
-        // we don't need to use 2 classNames for them, we can use a single one.
-        const result: { [key: string]: Modifier } = {};
-        modifiers.forEach(mod => {
-          const key = mod.source;
-          if (key in result) {
-            cssText = cssText.replace(mod.id, result[key].id);
-          } else if (!mod.inComment) {
-            result[key] = mod;
-          }
-        });
-
-        let keys = Object.keys(result);
-        if (keys.length > 0) {
-          props.push(
-            t.objectProperty(
-              t.identifier('mod'),
-              t.objectExpression(
-                keys.map(key => {
-                  const { id, node } = result[key];
-                  return t.objectProperty(t.stringLiteral(id), node);
-                })
-              )
-            )
-          );
-        }
-      }
-
       // If we found any interpolations, also pass them so they can be applied
       if (interpolations.length) {
         // De-duplicate interpolations based on the source and unit
@@ -413,6 +411,41 @@ export default function getTemplateProcessor(options: StrictOptions) {
             )
           );
         }
+      }
+
+      // If any modifiers were found, also pass them so they can be applied.
+      if (modifiers.length) {
+        // De-duplicate modifiers based on the source
+        // If two modifiers have the same source code,
+        // we don't need to use 2 classNames for them, we can use a single one.
+        const result: { [key: string]: Modifier } = {};
+        modifiers.forEach(mod => {
+          const key = mod.source;
+          if (key in result) {
+            cssText = cssText.replace(mod.id, result[key].id);
+          } else if (!mod.inComment) {
+            result[key] = mod;
+          }
+        });
+
+        let keys = Object.keys(result);
+        if (keys.length > 0) {
+          props.push(
+            t.objectProperty(
+              t.identifier('mod'),
+              t.objectExpression(
+                keys.map(key => {
+                  const { id, node } = result[key];
+                  return t.objectProperty(t.stringLiteral(id), node);
+                })
+              )
+            )
+          );
+        }
+      }
+
+      if (filterFunction) {
+        props.push(t.objectProperty(t.identifier('f'), filterFunction));
       }
 
       path.replaceWith(
