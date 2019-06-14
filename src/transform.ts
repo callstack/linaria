@@ -47,7 +47,12 @@ type Options = {
   pluginOptions?: Optional<PluginOptions>;
 };
 
-export type PreprocessorFn = (selector: string, cssText: string) => string;
+export type PreprocessorFn = (
+  selector: string,
+  cssText: string,
+  outputLine?: number,
+  originalLocation?: Location
+) => string;
 export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
 
 const STYLIS_DECLARATION = 1;
@@ -113,51 +118,87 @@ export default function transform(code: string, options: Options): Result {
     // eslint-disable-next-line prefer-destructuring
     preprocessor = options.preprocessor;
   } else {
+    const fixUrls = (context: number, decl: string) => {
+      const { outputFilename } = options;
+      if (context === STYLIS_DECLARATION && outputFilename) {
+        // When writing to a file, we need to adjust the relative paths inside url(..) expressions
+        // It'll allow css-loader to resolve an imported asset properly
+        return decl.replace(
+          /\b(url\()(\.[^)]+)(\))/g,
+          (match, p1, p2, p3) =>
+            p1 +
+            // Replace asset path with new path relative to the output CSS
+            path.relative(
+              path.dirname(outputFilename),
+              // Get the absolute path to the asset from the path relative to the JS file
+              path.resolve(path.dirname(options.filename), p2)
+            ) +
+            p3
+        );
+      }
+
+      return decl;
+    };
+
+    const getSourceMapPlugin = (
+      outLine: number,
+      origLocation: Location | undefined
+    ) => {
+      /**
+       * Generate source maps for nested rules.
+       */
+      return function sourceMapsPlugin(...args: any[]) {
+        const [context, , , , line, column, length] = args;
+        // Selector/property, update source map
+        if (context === 1 || context === 2) {
+          mappings.push({
+            generated: {
+              line: outLine,
+              column: length,
+            },
+            source: '',
+            original: {
+              line: line + origLocation!.line,
+              column: column + origLocation!.column,
+            },
+          });
+        }
+      };
+    };
+
     switch (options.preprocessor) {
       case 'none':
         preprocessor = (selector, text) => `${selector} {${text}}\n`;
         break;
       case 'stylis':
       default:
-        stylis.use(null)((context, decl) => {
-          const { outputFilename } = options;
-          if (context === STYLIS_DECLARATION && outputFilename) {
-            // When writing to a file, we need to adjust the relative paths inside url(..) expressions
-            // It'll allow css-loader to resolve an imported asset properly
-            return decl.replace(
-              /\b(url\()(\.[^)]+)(\))/g,
-              (match, p1, p2, p3) =>
-                p1 +
-                // Replace asset path with new path relative to the output CSS
-                path.relative(
-                  path.dirname(outputFilename),
-                  // Get the absolute path to the asset from the path relative to the JS file
-                  path.resolve(path.dirname(options.filename), p2)
-                ) +
-                p3
-            );
+        preprocessor = (selector, text, outLine, origLoc) => {
+          let sourceMapPlugin = null;
+          if (outLine && origLoc) {
+            sourceMapPlugin = getSourceMapPlugin(outLine, origLoc);
           }
-
-          return decl;
-        });
-
-        preprocessor = stylis;
+          // reset stylis
+          stylis.use(null)(sourceMapPlugin)(fixUrls);
+          return stylis(selector, text);
+        };
     }
   }
 
-  Object.keys(rules).forEach((selector, index) => {
+  Object.keys(rules).forEach((selector, i) => {
+    let text = rules[selector].cssText;
+    let origLoc = rules[selector].start!;
     mappings.push({
       generated: {
-        line: index + 1,
+        line: i + 1,
         column: 0,
       },
-      original: rules[selector].start!,
+      original: origLoc,
       name: selector,
       source: '',
     });
 
     // Run each rule through stylis to support nesting
-    cssText += `${preprocessor(selector, rules[selector].cssText)}\n`;
+    cssText += `${preprocessor(selector, text, i, origLoc)}\n`;
   });
 
   return {
