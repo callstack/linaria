@@ -300,7 +300,6 @@ export default function getTemplateProcessor(options: StrictOptions) {
               if (value && typeof value !== 'function') {
                 // Only insert text for non functions
                 // We don't touch functions because they'll be interpolated at runtime
-
                 if (isStyled(value)) {
                   // If it's an React component wrapped in styled, get the class name
                   // Useful for interpolating components

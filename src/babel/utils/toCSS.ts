@@ -7,7 +7,7 @@ import { JSONValue } from '../types';
 const hyphenate = (s: string) =>
   s
     // Hyphenate CSS property names from camelCase version from JS string
-    .replace(/([A-Z])/g, (match, p1) => `-${p1.toLowerCase()}`)
+    .replace(/([A-Z])/g, (_, p1) => `-${p1.toLowerCase()}`)
     // Special case for `-ms` because in JS it starts with `ms` unlike `Webkit`
     .replace(/^ms-/, '-ms-');
 
@@ -36,7 +36,7 @@ export default function toCSS(o: JSONValue): string {
         !(
           key.replace(
             /^(Webkit|Moz|O|ms)([A-Z])(.+)$/,
-            (match, p1, p2, p3) => `${p2.toLowerCase()}${p3}`
+            (_, p1, p2, p3) => `${p2.toLowerCase()}${p3}`
           ) in unitless
         )
           ? `${value}px`
