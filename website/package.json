@@ -17,6 +17,7 @@
     "lint:css": "stylelint src/**/*.js"
   },
   "dependencies": {
+    "autoprefixer": "^9.6.0",
     "babel-plugin-file-loader": "^1.1.1",
     "dedent": "^0.7.0",
     "escape-html": "^1.0.3",
@@ -25,6 +26,8 @@
     "koa-compress": "^3.0.0",
     "koa-router": "^7.4.0",
     "koa-send": "^5.0.0",
+    "postcss-loader": "^3.0.0",
+    "postcss-nested": "^4.1.2",
     "react": "^16.8.3",
     "react-dom": "^16.8.3"
   },

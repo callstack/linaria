@@ -43,8 +43,18 @@ module.exports = {
           'css-hot-loader',
           MiniCssExtractPlugin.loader,
           {
+            loader: require.resolve('../lib/fixSourceMap.js'),
+          },
+          {
             loader: 'css-loader',
             options: { sourceMap: dev },
+          },
+          {
+            loader: 'postcss-loader',
+            options: { sourceMap: true },
+          },
+          {
+            loader: require.resolve('../lib/attachSourceMap.js'),
           },
         ],
       },

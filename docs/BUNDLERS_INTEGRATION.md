@@ -41,10 +41,10 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 Linaria handles evaluation of Javascript in your CSS. It is expected that you integrate Linaria with your existing CSS build pipeline, using a tool like postcss-loader or stylis to use features such as nesting and auto-prefixing. A minimal config to use these features.
 
-A minimal config would be to use postcss-nesting and autoprefixer:
+A minimal config would be to use postcss-nested and autoprefixer:
 
 ```sh
-yarn add --dev postcss postcss-nesting autoprefixer
+yarn add --dev postcss-loader postcss-nested autoprefixer
 ```
 
 Then create a postcss.config.js file:
