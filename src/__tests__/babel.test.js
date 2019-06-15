@@ -153,7 +153,6 @@ it('accepts filterProps argument', async () => {
 
     export const Button = (props => styled(CustomButton)\`
       ${'${{ filterProps: ({ primary, ...o }) => o }}'}
-      ${'${{ filterProps: ({ primary, ...o }) => o }}'}
       padding: 16px 24px;
       &${'${[props.primary]}'}:hover {
         color: ${'${props.color}'};
@@ -165,6 +164,33 @@ it('accepts filterProps argument', async () => {
 
   expect(code).toMatchSnapshot();
   expect(metadata).toMatchSnapshot();
+});
+
+it('throws when duplicate filterProps arguments found', async () => {
+  expect.assertions(1);
+  try {
+    await transpile(
+      dedent`
+      import { styled } from 'linaria/react';
+
+      const CustomButton = props => <button {...props} />
+
+      export const Button = (props => styled(CustomButton)\`
+        ${'${{ filterProps: ({ primary, ...o }) => o }}'}
+        ${'${{ filterProps: ({ primary, ...o }) => o }}'}
+        padding: 16px 24px;
+        &${'${[props.primary]}'}:hover {
+          color: ${'${props.color}'};
+          background: white;
+        }
+      \`)({});
+      `
+    );
+  } catch (e) {
+    expect(
+      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+    ).toMatchSnapshot();
+  }
 });
 
 it('handles modifier condition selector', async () => {

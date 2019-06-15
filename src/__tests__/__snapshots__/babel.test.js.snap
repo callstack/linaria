@@ -695,6 +695,17 @@ exports[`throws when contains dynamic expression without evaluate: true in css t
   5 | \`;"
 `;
 
+exports[`throws when duplicate filterProps arguments found 1`] = `
+"<<DIRNAME>>/app/index.js: Found duplicate filterProps function definition. Expected only one per component.
+   5 | export const Button = (props => styled(CustomButton)\`
+   6 |   \${{ filterProps: ({ primary, ...o }) => o }}
+>  7 |   \${{ filterProps: ({ primary, ...o }) => o }}
+     |     ^
+   8 |   padding: 16px 24px;
+   9 |   &\${[props.primary]}:hover {
+  10 |     color: \${props.color};"
+`;
+
 exports[`throws when modifier selector array contains more than one element 1`] = `
 "<<DIRNAME>>/app/index.js: Modifier expression array must contain only 1 element
   4 | export const Modified = (props => styled.div\`

@@ -59,7 +59,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
     // Increment the index of the style we're processing
     // This is used for slug generation to prevent collision
     // Also used for display name if it couldn't be determined
-    state.index++;
+    state.index += 1;
 
     const interpolations: Interpolation[] = [];
     const modifiers: Modifier[] = [];
