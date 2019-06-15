@@ -36,7 +36,7 @@ module.exports = {
 
 - `optimize: boolean` (default: `process.env.NODE_ENV === 'production'`):
 
-  Enabling this will optimize class and variable names to extremely short identifiers. e.g. `.a` indstead of `Title_abcdef`. It is enabled by default for production builds to generate smaller CSS files.
+  Enabling this will optimize class and variable names to extremely short identifiers. e.g. `.a` instead of `Title_abcdef`. It is enabled by default for production builds to generate smaller CSS files.
 
 - `ignore: RegExp` (default: `/node_modules/`):
 

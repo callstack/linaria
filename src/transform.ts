@@ -1,7 +1,6 @@
 import path from 'path';
 import * as babel from '@babel/core';
-import stylis from 'stylis';
-import { SourceMapGenerator, Mapping } from 'source-map';
+import { SourceMapGenerator } from 'source-map';
 import loadOptions, { PluginOptions } from './babel/utils/loadOptions';
 import { Optional } from './typeUtils';
 
@@ -55,8 +54,6 @@ export type PreprocessorFn = (
 ) => string;
 export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
 
-const STYLIS_DECLARATION = 1;
-
 export default function transform(code: string, options: Options): Result {
   // Check if the file contains `css` or `styled` words first
   // Otherwise we should skip transforming
@@ -109,97 +106,53 @@ export default function transform(code: string, options: Options): Result {
   } = (metadata as babel.BabelFileMetadata & {
     linaria: LinariaMetadata;
   }).linaria;
-  const mappings: Mapping[] = [];
 
+  // Construct a CSS-ish file from the unprocessed style rules
   let cssText = '';
 
-  let preprocessor: PreprocessorFn;
-  if (typeof options.preprocessor === 'function') {
-    // eslint-disable-next-line prefer-destructuring
-    preprocessor = options.preprocessor;
-  } else {
-    const fixUrls = (context: number, decl: string) => {
-      const { outputFilename } = options;
-      if (context === STYLIS_DECLARATION && outputFilename) {
-        // When writing to a file, we need to adjust the relative paths inside url(..) expressions
-        // It'll allow css-loader to resolve an imported asset properly
-        return decl.replace(
-          /\b(url\()(\.[^)]+)(\))/g,
-          (match, p1, p2, p3) =>
-            p1 +
-            // Replace asset path with new path relative to the output CSS
-            path.relative(
-              path.dirname(outputFilename),
-              // Get the absolute path to the asset from the path relative to the JS file
-              path.resolve(path.dirname(options.filename), p2)
-            ) +
-            p3
-        );
-      }
+  Object.keys(rules).forEach(selector => {
+    const rule = rules[selector];
 
-      return decl;
-    };
+    // Append new lines until we get to the start line number
+    let line = cssText.split('\n').length;
 
-    const getSourceMapPlugin = (
-      outLine: number,
-      origLocation: Location | undefined
-    ) => {
-      /**
-       * Generate source maps for nested rules.
-       */
-      return function sourceMapsPlugin(...args: any[]) {
-        const [context, , , , line, column, length] = args;
-        // Selector/property, update source map
-        if (context === 1 || context === 2) {
-          mappings.push({
-            generated: {
-              line: outLine,
-              column: length,
-            },
-            source: '',
-            original: {
-              line: line + origLocation!.line,
-              column: column + origLocation!.column,
-            },
-          });
-        }
-      };
-    };
-
-    switch (options.preprocessor) {
-      case 'none':
-        preprocessor = (selector, text) => `${selector} {${text}}\n`;
-        break;
-      case 'stylis':
-      default:
-        preprocessor = (selector, text, outLine, origLoc) => {
-          let sourceMapPlugin = null;
-          if (outLine && origLoc) {
-            sourceMapPlugin = getSourceMapPlugin(outLine, origLoc);
-          }
-          // reset stylis
-          stylis.use(null)(sourceMapPlugin)(fixUrls);
-          return stylis(selector, text);
-        };
+    while (rule.start && line < rule.start.line) {
+      cssText += '\n';
+      line++;
     }
-  }
 
-  Object.keys(rules).forEach((selector, i) => {
-    let text = rules[selector].cssText;
-    let origLoc = rules[selector].start!;
-    mappings.push({
-      generated: {
-        line: i + 1,
-        column: 0,
-      },
-      original: origLoc,
-      name: selector,
-      source: '',
-    });
+    cssText += `${selector} {`;
 
-    // Run each rule through stylis to support nesting
-    cssText += `${preprocessor(selector, text, i, origLoc)}\n`;
+    // Append blank spaces until we get to the start column number
+    const last = cssText.split('\n').pop();
+
+    let column = last ? last.length : 0;
+
+    while (rule.start && column < rule.start.column) {
+      cssText += ' ';
+      column++;
+    }
+
+    cssText += `${rule.cssText} }`;
   });
+
+  // When writing to a file, we need to adjust the relative paths inside url(..) expressions
+  // It'll allow css-loader to resolve an imported asset properly
+  if (options.outputFilename) {
+    cssText = cssText.replace(
+      /\b(url\()(\.[^)]+)(\))/g,
+      (_, p1, p2, p3) =>
+        p1 +
+        // Replace asset path with new path relative to the output CSS
+        path.relative(
+          path.dirname(options.outputFilename!),
+          // Get the absolute path to the asset from the path relative to the JS file
+          path.resolve(path.dirname(options.filename), p2)
+        ) +
+        p3
+    );
+  }
+  cssText += '\n';
 
   return {
     code: transformedCode || '',
@@ -210,23 +163,22 @@ export default function transform(code: string, options: Options): Result {
     sourceMap: map,
 
     get cssSourceMapText() {
-      if (mappings && mappings.length) {
-        const generator = new SourceMapGenerator({
-          file: options.filename.replace(/\.js$/, '.css'),
-        });
-
-        mappings.forEach(mapping =>
-          generator.addMapping(
-            Object.assign({}, mapping, { source: options.filename })
-          )
-        );
-
-        generator.setSourceContent(options.filename, code);
-
-        return generator.toString();
-      }
-
-      return '';
+      const generator = new SourceMapGenerator({
+        file: options.filename,
+      });
+      generator.addMapping({
+        generated: {
+          line: 1,
+          column: 0,
+        },
+        original: {
+          line: 1,
+          column: 0,
+        },
+        source: options.filename,
+      });
+      generator.setSourceContent(options.filename, code);
+      return generator.toString();
     },
   };
 }
