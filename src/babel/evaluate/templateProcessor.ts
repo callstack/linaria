@@ -50,7 +50,7 @@ function isStyled(value: any): value is Styled {
 export default function getTemplateProcessor(options: StrictOptions) {
   const tinyId = makeTinyId(options);
   return function process(
-    { styled, path }: TemplateExpression,
+    { styled, path, isGlobal }: TemplateExpression,
     state: State,
     valueCache: ValueCache
   ) {
@@ -73,6 +73,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
     let isReferenced = true;
 
     // Try to determine a readable class name
+    // Even for injectGlobal, we create a classname as the rules key
     let displayName;
 
     const parent = path.findParent(
@@ -129,7 +130,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
     }
 
     // Custom properties need to start with a letter, so we prefix the slug
-    // Also use append the index of the class to the filename for uniqueness in the file
+    // Also append the index of the class to the filename for uniqueness in the file
     const slug = toValidCSSIdentifier(
       `${displayName.charAt(0).toLowerCase()}${slugify(
         `${relative(state.file.opts.root, state.file.opts.filename)}:${
@@ -142,7 +143,9 @@ export default function getTemplateProcessor(options: StrictOptions) {
       ? `${toValidCSSIdentifier(displayName)}_${slug}`
       : slug;
 
-    const className = tinyId(cls);
+    const className = isGlobal ? `global_${cls}` : tinyId(cls);
+    // We only need a short id for classNames that end in the CSS file.
+    let selector = `.${className}`;
 
     // Serialize the tagged template literal to a string
     let cssText = '';
@@ -186,14 +189,13 @@ export default function getTemplateProcessor(options: StrictOptions) {
           const { end } = ex.node.loc!;
           // The location will be end of the current string to start of next string
           const next = self[i + 1];
-          const loc = {
+          return {
             // +1 because the expressions location always shows 1 column before
             start: { line: el.loc!.end.line, column: el.loc!.end.column + 1 },
             end: next
               ? { line: next.loc!.start.line, column: next.loc!.start.column }
               : { line: end.line, column: end.column + 1 },
           };
-          return loc;
         };
         // Test if ex is inline array expression. This has already been validated.
         if (t.isArrayExpression(ex)) {
@@ -247,7 +249,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
           } else {
             // CSS modifiers can't be used outside components
             throw ex.buildCodeFrameError(
-              "The CSS cannot contain modifier expressions when using the 'css' tag."
+              "The CSS cannot contain modifier expressions outside of the 'styled' tag."
             );
           }
         } else {
@@ -280,6 +282,11 @@ export default function getTemplateProcessor(options: StrictOptions) {
                 (t.isFunctionExpression(property.value) ||
                   t.isArrowFunctionExpression(property.value))
               ) {
+                if (!styled) {
+                  throw ex.buildCodeFrameError(
+                    "Filter props function definitions can only be defined within a 'styled' tag."
+                  );
+                }
                 if (filterFunction) {
                   throw ex.buildCodeFrameError(
                     'Found duplicate filterProps function definition. Expected only one per component.'
@@ -335,15 +342,14 @@ export default function getTemplateProcessor(options: StrictOptions) {
             } else {
               // CSS custom properties can't be used outside components
               throw ex.buildCodeFrameError(
-                `The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.`
+                "The CSS cannot contain JavaScript expressions when using the 'css' or 'injectGlobal' tag.\n" +
+                  "To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin."
               );
             }
           }
         }
       }
     });
-
-    let selector = `.${className}`;
 
     if (styled) {
       // If `styled` wraps another component and not a primitive,
@@ -455,11 +461,13 @@ export default function getTemplateProcessor(options: StrictOptions) {
       );
 
       path.addComment('leading', '#__PURE__');
+    } else if (isGlobal) {
+      path.remove();
     } else {
       path.replaceWith(t.stringLiteral(className));
     }
 
-    if (!isReferenced && !cssText.includes(':global')) {
+    if (!isReferenced && !cssText.includes(':global') && !isGlobal) {
       return;
     }
 
@@ -468,6 +476,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
       className,
       displayName,
       start: path.parent && path.parent.loc ? path.parent.loc.start : null,
+      isGlobal,
     };
   };
 }

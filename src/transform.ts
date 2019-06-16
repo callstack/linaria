@@ -19,6 +19,7 @@ type Rules = {
     cssText: string;
     displayName: string;
     start: Location | null;
+    isGlobal: boolean;
   };
 };
 
@@ -55,9 +56,9 @@ export type PreprocessorFn = (
 export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
 
 export default function transform(code: string, options: Options): Result {
-  // Check if the file contains `css` or `styled` words first
+  // Check if the file contains `css`, `styled`, or injectGlobal words first
   // Otherwise we should skip transforming
-  if (!/\b(styled|css)/.test(code)) {
+  if (!/\b(styled|css|injectGlobal)/.test(code)) {
     return {
       code,
       sourceMap: options.inputSourceMap,
@@ -108,33 +109,7 @@ export default function transform(code: string, options: Options): Result {
   }).linaria;
 
   // Construct a CSS-ish file from the unprocessed style rules
-  let cssText = '';
-
-  Object.keys(rules).forEach(selector => {
-    const rule = rules[selector];
-
-    // Append new lines until we get to the start line number
-    let line = cssText.split('\n').length;
-
-    while (rule.start && line < rule.start.line) {
-      cssText += '\n';
-      line++;
-    }
-
-    cssText += `${selector} {`;
-
-    // Append blank spaces until we get to the start column number
-    const last = cssText.split('\n').pop();
-
-    let column = last ? last.length : 0;
-
-    while (rule.start && column < rule.start.column) {
-      cssText += ' ';
-      column++;
-    }
-
-    cssText += `${rule.cssText} }`;
-  });
+  let cssText = buildCSS(rules);
 
   // When writing to a file, we need to adjust the relative paths inside url(..) expressions
   // It'll allow css-loader to resolve an imported asset properly
@@ -181,4 +156,35 @@ export default function transform(code: string, options: Options): Result {
       return generator.toString();
     },
   };
+}
+
+function buildCSS(rules: Rules) {
+  let cssText = '';
+  if (!rules) {
+    return cssText;
+  }
+  Object.keys(rules).forEach(selector => {
+    const rule = rules[selector];
+    // Append new lines until we get to the start line number
+    let line = cssText.split('\n').length;
+    while (rule.start && line < rule.start.line) {
+      cssText += '\n';
+      line++;
+    }
+    if (!rule.isGlobal) {
+      cssText += `${selector} {`;
+    }
+    // Append blank spaces until we get to the start column number
+    const last = cssText.split('\n').pop();
+    let column = last ? last.length : 0;
+    while (rule.start && column < rule.start.column) {
+      cssText += ' ';
+      column++;
+    }
+    cssText += rule.cssText;
+    if (!rule.isGlobal) {
+      cssText += ' }';
+    }
+  });
+  return cssText;
 }

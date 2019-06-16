@@ -9,6 +9,25 @@ exports[`doesn't rewrite an absolute path in url() declarations 1`] = `
 "
 `;
 
+exports[`injects global rules to the global scope 1`] = `
+"
+
+
+  /* an invalid rule */
+  font-size: 10px;
+
+  html {
+    margin: 0;
+  }
+
+  body {
+    color: black;
+  }
+
+
+"
+`;
+
 exports[`rewrites a relative path in url() declarations 1`] = `
 "
 

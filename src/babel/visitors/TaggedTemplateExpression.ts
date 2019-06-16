@@ -28,6 +28,7 @@ export default function TaggedTemplateExpression(
     };
   } | null = null;
   let css: boolean = false;
+  let isGlobal: boolean = false;
 
   if (
     t.isCallExpression(tag) &&
@@ -66,9 +67,19 @@ export default function TaggedTemplateExpression(
     hasImport(t, path.scope, state.file.opts.filename, 'css', 'linaria')
   ) {
     css = t.isIdentifier(tag) && tag.name === 'css';
+  } else if (
+    hasImport(
+      t,
+      path.scope,
+      state.file.opts.filename,
+      'injectGlobal',
+      'linaria'
+    )
+  ) {
+    isGlobal = t.isIdentifier(tag) && tag.name === 'injectGlobal';
   }
 
-  if (!styled && !css) {
+  if (!styled && !css && !isGlobal) {
     return;
   }
 
@@ -84,7 +95,7 @@ export default function TaggedTemplateExpression(
    *  Transform Styled Components wrapped in an arrow function:
    * `const A = props => styled.a` becomes `const A = styled.a`
    */
-  const parentIsArrow = t.isArrowFunctionExpression(path.parentPath);
+  const parentIsArrow = styled && t.isArrowFunctionExpression(path.parentPath);
 
   // Remove Arrow Function Wrapper
   if (!parentWasArrow && parentIsArrow) {
@@ -148,7 +159,7 @@ export default function TaggedTemplateExpression(
   expressions.forEach((ex, i) => {
     if (t.isStringLiteral(ex)) {
       return;
-    } else if (t.isArrayExpression(ex)) {
+    } else if (t.isArrayExpression(ex) && styled) {
       // Validate
       let elements = ex.get('elements') as NodePath<any>[];
       if (elements.length !== 1) {
@@ -193,6 +204,10 @@ export default function TaggedTemplateExpression(
       }
 
       // Transform to arrow function if props are referenced
+    } else if (t.isArrayExpression(ex) && !styled) {
+      throw ex.buildCodeFrameError(
+        'Modifier expressions can only be used with styled components'
+      );
     } else if (
       parentWasArrow &&
       ex.getSource().includes(propsName) &&
@@ -242,5 +257,6 @@ export default function TaggedTemplateExpression(
     styled: styled || undefined,
     path,
     expressionValues,
+    isGlobal,
   });
 }

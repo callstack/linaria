@@ -497,6 +497,21 @@ it('transpiles css template literal', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('transpiles injectGlobal template literal', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { injectGlobal } from 'linaria';
+
+    injectGlobal\`
+      font-size: 14px;
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('handles css template literal in object property', async () => {
   const { code, metadata } = await transpile(
     dedent`

@@ -50,6 +50,7 @@ export type TemplateExpression = {
   styled?: { component: any };
   path: NodePath<t.TaggedTemplateExpression>;
   expressionValues: ExpressionValue[];
+  isGlobal: boolean;
 };
 
 export type State = {
@@ -60,6 +61,7 @@ export type State = {
       displayName: string;
       cssText: string;
       start: Location | null | undefined;
+      isGlobal: boolean;
     };
   };
   replacements: Array<{

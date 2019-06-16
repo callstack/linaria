@@ -21,6 +21,34 @@ it('rewrites a relative path in url() declarations', async () => {
   expect(cssText).toMatchSnapshot();
 });
 
+it('injects global rules to the global scope', async () => {
+  const { cssText } = await transform(
+    dedent`
+    import { injectGlobal } from 'linaria';
+
+    injectGlobal\`
+      /* an invalid rule */
+      font-size: 10px;
+
+      html {
+        margin: 0;
+      }
+
+      body {
+        color: black;
+      }
+
+    \`;
+    `,
+    {
+      filename: './test.js',
+      outputFilename: '../.linaria-cache/test.css',
+    }
+  );
+
+  expect(cssText).toMatchSnapshot();
+});
+
 it('rewrites multiple relative paths in url() declarations', async () => {
   const { cssText } = await transform(
     dedent`

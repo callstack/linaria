@@ -687,7 +687,8 @@ exports[`throws if wrapping arrow function is not called with empty object 1`] =
 `;
 
 exports[`throws when contains dynamic expression without evaluate: true in css tag 1`] = `
-"<<DIRNAME>>/app/index.js: The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.
+"<<DIRNAME>>/app/index.js: The CSS cannot contain JavaScript expressions when using the 'css' or 'injectGlobal' tag.
+To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.
   2 | 
   3 | const title = css\`
 > 4 |   font-size: \${size}px;
@@ -727,6 +728,20 @@ exports[`transpiles css template literal 2`] = `
 CSS:
 
 .th6xni0 {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`transpiles injectGlobal template literal 1`] = `"import { injectGlobal } from 'linaria';"`;
+
+exports[`transpiles injectGlobal template literal 2`] = `
+
+CSS:
+
+.global_ah6xni0 {
   font-size: 14px;
 }
 
