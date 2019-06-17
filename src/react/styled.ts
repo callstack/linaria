@@ -18,23 +18,20 @@ type Options = {
 };
 
 const warnIfInvalid = (value: any, componentName: string) => {
-  if (process.env.NODE_ENV !== 'production') {
-    if (
-      typeof value === 'string' ||
-      // eslint-disable-next-line no-self-compare
-      (typeof value === 'number' && isFinite(value))
-    ) {
-      return;
-    }
-
-    const stringified =
-      typeof value === 'object' ? JSON.stringify(value) : String(value);
-
-    // eslint-disable-next-line no-console
-    console.warn(
-      `An interpolation evaluated to '${stringified}' in the component '${componentName}', which is probably a mistake. You should explicitly cast or transform the value to a string.`
-    );
+  if (
+    typeof value === 'string' ||
+    // eslint-disable-next-line no-self-compare
+    (typeof value === 'number' && isFinite(value))
+  ) {
+    return;
   }
+  const stringified =
+    typeof value === 'object' ? JSON.stringify(value) : String(value);
+
+  // eslint-disable-next-line no-console
+  console.warn(
+    `An interpolation evaluated to '${stringified}' in the component '${componentName}', which is probably a mistake. You should explicitly cast or transform the value to a string.`
+  );
 };
 
 function styled(tag: React.ComponentType<any> | string) {
@@ -89,7 +86,9 @@ function styled(tag: React.ComponentType<any> | string) {
         for (const name in vars) {
           const [result, unit = ''] = vars[name];
           const value = typeof result === 'function' ? result(props) : result;
-          warnIfInvalid(value, options.name);
+          if (process.env.NODE_ENV !== 'production') {
+            warnIfInvalid(value, options.name);
+          }
 
           style[`--${name}`] = `${value}${unit}`;
         }
