@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 
-import { types } from '@babel/core';
+import { types as t } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import getTemplateProcessor from './evaluate/templateProcessor';
 import shake from './evaluate/shaker';
@@ -30,7 +30,7 @@ export default function extract(_babel: any, options: StrictOptions) {
   return {
     visitor: {
       Program: {
-        enter(path: NodePath<types.Program>, state: State) {
+        enter(path: NodePath<t.Program>, state: State) {
           // Collect all the style rules from the styles we encounter
           state.queue = [];
           state.rules = {};
@@ -57,7 +57,7 @@ export default function extract(_babel: any, options: StrictOptions) {
               );
               return acc;
             },
-            [] as Array<types.Expression | string>
+            [] as Array<t.Expression | string>
           );
 
           let lazyValues: any[] = [];
@@ -65,7 +65,6 @@ export default function extract(_babel: any, options: StrictOptions) {
             const [shaken] = shake(path.node, lazyDeps);
             const evaluation = evaluate(
               shaken,
-              types,
               state.file.opts.filename,
               undefined,
               options

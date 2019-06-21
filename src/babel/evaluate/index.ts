@@ -5,6 +5,7 @@ import {
   BabelFileResult,
   PluginItem,
   TransformOptions,
+  types as t,
 } from '@babel/core';
 import generator from '@babel/generator';
 import Module from '../module';
@@ -16,8 +17,7 @@ type DefaultOptions = Partial<TransformOptions> & {
 };
 
 export default function evaluate(
-  path: any,
-  t: any,
+  path: t.Node,
   filename: string,
   transformer?: (text: string) => BabelFileResult | null,
   options?: StrictOptions

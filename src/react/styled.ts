@@ -179,7 +179,7 @@ type StyledTag<Tag> = <ExtraProps = {}>(
     | CSSProperties
     | StyledComponent<any, any>
     // Strictly typing props argument would break the generated StyledComponent.
-    | ((props: any) => string | number)
+    | ((props?: any) => string | number)
     | [unknown] // Modifier selectors
     | Filter<GetProps<Tag> & ExtraProps>
   >
