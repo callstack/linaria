@@ -1,0 +1,57 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`handles basic typescript 1`] = `
+"import { styled } from 'linaria/react';
+export const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"th6xni0\\",
+  vars: {
+    \\"th6xni0-0\\": [props => props.size, \\"px\\"]
+  }
+});"
+`;
+
+exports[`handles basic typescript 2`] = `
+
+CSS:
+
+.th6xni0 {
+  font-size: var(--th6xni0-0);
+}
+
+Dependencies: NA
+
+`;
+
+exports[`handles object access 1`] = `
+"import { styled } from 'linaria/react';
+const theme = {
+  size: {
+    small: '5em',
+    big: '10em'
+  }
+};
+export const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"th6xni0\\",
+  vars: {
+    \\"th6xni0-0\\": [props => theme.size[props.size], \\"px\\"]
+  }
+});"
+`;
+
+exports[`handles object access 2`] = `
+
+CSS:
+
+.th6xni0 {
+  font-size: var(--th6xni0-0);
+}
+
+Dependencies: NA
+
+`;
