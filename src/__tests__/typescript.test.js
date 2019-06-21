@@ -3,7 +3,6 @@
 const path = require('path');
 const babel = require('@babel/core');
 const dedent = require('dedent');
-const stripAnsi = require('strip-ansi');
 const serializer = require('../__utils__/linaria-snapshot-serializer');
 
 expect.addSnapshotSerializer(serializer);
@@ -17,7 +16,6 @@ const transpile = input =>
   });
 
 it('handles basic typescript', async () => {
-  debugger;
   const { code, metadata } = await transpile(
     dedent`
     import { styled } from 'linaria/react';
