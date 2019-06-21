@@ -370,3 +370,26 @@ it('SequenceExpression', () => {
   expect(graph.findDependents(bool)).toHaveLength(0);
   expect(graph.findDependencies(bool)).toHaveLength(0);
 });
+
+it('MemberExpression', () => {
+  const graph = _buildGraph`
+    const key = 'blue';
+    const obj = { blue: '#00F' };
+    const blue = obj[key];
+  `;
+
+  const memberExprDeps = graph.findDependencies({
+    type: 'MemberExpression',
+  });
+
+  expect(memberExprDeps).toMatchObject([
+    {
+      type: 'Identifier',
+      name: 'obj',
+    },
+    {
+      type: 'Identifier',
+      name: 'key',
+    },
+  ]);
+});

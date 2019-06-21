@@ -81,6 +81,7 @@ batchDefineHandlers(
     ['Function', 'body'],
     ['LogicalExpression', 'left'],
     ['LogicalExpression', 'right'],
+    ['MemberExpression', 'property'],
     ['MemberExpression', 'object'],
     ['NewExpression', 'callee'],
     ['ReturnStatement', 'argument'],
