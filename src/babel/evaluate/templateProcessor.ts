@@ -1,11 +1,9 @@
 /* eslint-disable no-param-reassign */
 
 import { types } from '@babel/core';
-import { relative, dirname, basename } from 'path';
 import { isValidElementType } from 'react-is';
 import generator from '@babel/generator';
 
-import slugify from '../../slugify';
 import { units } from '../units';
 import {
   State,
@@ -20,6 +18,7 @@ import isSerializable from '../utils/isSerializable';
 import stripLines from '../utils/stripLines';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
 import toCSS from '../utils/toCSS';
+import getLinariaComment from '../utils/getLinariaComment';
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
@@ -43,19 +42,13 @@ export default function getTemplateProcessor(options: StrictOptions) {
   ) {
     const { quasi } = path.node;
 
-    // Increment the index of the style we're processing
-    // This is used for slug generation to prevent collision
-    // Also used for display name if it couldn't be determined
-    state.index++;
-
     const interpolations: Interpolation[] = [];
 
     // Check if the variable is referenced anywhere for basic DCE
     // Only works when it's assigned to a variable
     let isReferenced = true;
 
-    // Try to determine a readable class name
-    let displayName;
+    const [slug, displayName] = getLinariaComment(path);
 
     const parent = path.findParent(
       p =>
@@ -66,14 +59,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
 
     if (parent) {
       const parentNode = parent.node;
-      if (types.isObjectProperty(parentNode)) {
-        displayName = parentNode.key.name || parentNode.key.value;
-      } else if (
-        types.isJSXOpeningElement(parentNode) &&
-        types.isJSXIdentifier(parentNode.name)
-      ) {
-        displayName = parentNode.name.name;
-      } else if (
+      if (
         types.isVariableDeclarator(parentNode) &&
         types.isIdentifier(parentNode.id)
       ) {
@@ -82,47 +68,12 @@ export default function getTemplateProcessor(options: StrictOptions) {
         ) || { referencePaths: [] };
 
         isReferenced = referencePaths.length !== 0;
-        displayName = parentNode.id.name;
       }
     }
-
-    if (!displayName) {
-      // Try to derive the path from the filename
-      displayName = basename(state.file.opts.filename);
-
-      if (/^index\.[a-z0-9]+$/.test(displayName)) {
-        // If the file name is 'index', better to get name from parent folder
-        displayName = basename(dirname(state.file.opts.filename));
-      }
-
-      // Remove the file extension
-      displayName = displayName.replace(/\.[a-z0-9]+$/, '');
-
-      if (displayName) {
-        displayName += state.index;
-      } else {
-        throw path.buildCodeFrameError(
-          "Couldn't determine a name for the component. Ensure that it's either:\n" +
-            '- Assigned to a variable\n' +
-            '- Is an object property\n' +
-            '- Is a prop in a JSX element\n'
-        );
-      }
-    }
-
-    // Custom properties need to start with a letter, so we prefix the slug
-    // Also use append the index of the class to the filename for uniqueness in the file
-    const slug = toValidCSSIdentifier(
-      `${displayName.charAt(0).toLowerCase()}${slugify(
-        `${relative(state.file.opts.root, state.file.opts.filename)}:${
-          state.index
-        }`
-      )}`
-    );
 
     const className = options.displayName
-      ? `${toValidCSSIdentifier(displayName)}_${slug}`
-      : slug;
+      ? `${toValidCSSIdentifier(displayName!)}_${slug!}`
+      : slug!;
 
     // Serialize the tagged template literal to a string
     let cssText = '';
@@ -264,7 +215,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
       props.push(
         types.objectProperty(
           types.identifier('name'),
-          types.stringLiteral(displayName)
+          types.stringLiteral(displayName!)
         )
       );
 
@@ -338,7 +289,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
     state.rules[selector] = {
       cssText,
       className,
-      displayName,
+      displayName: displayName!,
       start: path.parent && path.parent.loc ? path.parent.loc.start : null,
     };
   };

@@ -456,6 +456,16 @@ it('handles complex component', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('generates stable class names', async () => {
+  const { code, metadata } = await babel.transformFileAsync(
+    resolve(__dirname, '../__fixtures__/components-library.js'),
+    babelrc
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('derives display name from filename', async () => {
   const { code, metadata } = await babel.transformAsync(
     dedent`
