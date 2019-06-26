@@ -25,6 +25,37 @@ Dependencies: NA
 
 `;
 
+exports[`handles filterProps with typescript 1`] = `
+"import { styled } from 'linaria/react';
+export const Title =
+/*#__PURE__*/
+styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"th6xni0\\",
+  vars: {
+    \\"th6xni0-1\\": [props => props.size, \\"px\\"]
+  },
+  f: ({
+    size,
+    ...o
+  }) => o
+});"
+`;
+
+exports[`handles filterProps with typescript 2`] = `
+
+CSS:
+
+.th6xni0 {
+  /* do: comment */
+  
+  font-size: var(--th6xni0-1);
+}
+
+Dependencies: NA
+
+`;
+
 exports[`handles object access 1`] = `
 "import { styled } from 'linaria/react';
 const theme = {

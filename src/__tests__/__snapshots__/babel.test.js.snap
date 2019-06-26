@@ -40,6 +40,34 @@ Dependencies: NA
 
 `;
 
+exports[`accepts filterProps argument 2 1`] = `
+"import { styled } from 'linaria/react';
+export const Button =
+/*#__PURE__*/
+styled(\\"button\\")({
+  name: \\"Button\\",
+  class: \\"bh6xni0\\",
+  f: ({
+    primary,
+    ...o
+  }) => o
+});"
+`;
+
+exports[`accepts filterProps argument 2 2`] = `
+
+CSS:
+
+.bh6xni0 {
+  /* Comment */
+  
+  padding: 16px 24px;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`allows simple parent selector for state selector 1`] = `
 "import { styled } from 'linaria/react';
 export const Page =

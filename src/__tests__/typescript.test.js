@@ -34,6 +34,27 @@ it('handles basic typescript', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('handles filterProps with typescript', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    interface TitleProps {
+      size?: number
+    }
+
+    export const Title = (props => styled.h1<TitleProps>\`
+      /* do: comment */
+      ${'${{ filterProps: ({ size, ...o }) => o }}'}
+      font-size: ${'${props.size}'}px;
+    \`)({} as TitleProps);
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('handles object access', async () => {
   const { code, metadata } = await transpile(
     dedent`

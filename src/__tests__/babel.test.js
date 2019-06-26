@@ -166,6 +166,23 @@ it('accepts filterProps argument', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('accepts filterProps argument 2', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    export const Button = (props => styled.button\`
+      /* Comment */
+      ${'${{ filterProps: ({ primary, ...o }) => o }}'}
+      padding: 16px 24px;
+    \`)({});
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('throws when duplicate filterProps arguments found', async () => {
   expect.assertions(1);
   try {
