@@ -218,8 +218,13 @@ function styled(tag: React.ComponentType<*> | string) {
       }
     }
 
-    // const Result = React.forwardRef(Component);
-    const Result = Component;
+    const Result = React.forwardRef
+      ? React.forwardRef((props, ref) => (
+          <Component {...props} innerRef={ref} />
+        ))
+      : // React.forwardRef won't available on older React versions and in Preact
+        // Fallback to a innerRef prop directly in that case
+        Component;
 
     Result.displayName = options.name;
 
