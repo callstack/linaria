@@ -48,14 +48,37 @@ function ieInitRulesCache() {
   document.head.appendChild(document.createElement('style'));
   // Last style sheet is ours.
   ieRulesSheet = document.styleSheets[document.styleSheets.length - 1];
+
+  ieRulesCache = {
+    map: new Map(),
+    list: [],
+  };
 }
 
 function ieInsertRule(id: string, rule: string) {
   ieInitRulesCache();
-  ieRulesSheet.insertRule(rule, 0);
+
+  // Ensure no rule.
+  ieDeleteRule(id);
+
+  ieRulesSheet.insertRule(rule, ieRulesSheet.cssRules.length);
+
+  const cachedRule = {};
+
+  ieRulesCache.map.set(id, cachedRule);
+  ieRulesCache.list.push(cachedRule);
 }
 
-function ieDeleteRule(id: string) {}
+function ieDeleteRule(id: string) {
+  const rule = ieRulesCache.map.get(id);
+  if (rule) {
+    const i = ieRulesCache.list.indexOf(rule);
+
+    ieRulesSheet.removeRule(i);
+    ieRulesCache.list.splice(i, 1);
+    ieRulesCache.map.delete(id);
+  }
+}
 
 function handleIE(comp, options, filteredProps, name, value, unit) {
   // IE does not support CSS variables. We need to replace every instance of
@@ -64,8 +87,8 @@ function handleIE(comp, options, filteredProps, name, value, unit) {
   for (let i = 0; i < document.styleSheets.length; i++) {
     const sheet = document.styleSheets[i];
 
-    for (let j = 0; j < sheet.rules.length; j++) {
-      const rule = sheet.rules[j];
+    for (let j = 0; j < sheet.cssRules.length; j++) {
+      const rule = sheet.cssRules[j];
 
       // If the selector contains our class name and the css text includes the variable,
       // then we need to adjust our rule for this particular component instance.
@@ -174,7 +197,7 @@ function styled(tag: React.ComponentType<*> | string) {
 
             style[`--${name}`] = `${value}${unit}`;
 
-            if (!onInternetExplorer()) {
+            if (onInternetExplorer()) {
               handleIE(this, options, filteredProps, name, value, unit);
             }
           }
