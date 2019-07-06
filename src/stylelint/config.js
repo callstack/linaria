@@ -8,5 +8,11 @@ module.exports = {
     'no-empty-source': null,
     'no-extra-semicolons': null,
     'no-missing-end-of-source-newline': null,
+    'selector-pseudo-class-no-unknown': [
+      null,
+      {
+        ignorePseudoClasses: ['/^global$/'],
+      },
+    ],
   },
 };
