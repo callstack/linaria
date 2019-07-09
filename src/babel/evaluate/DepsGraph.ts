@@ -11,6 +11,7 @@ export default class DepsGraph {
   public readonly externalDeps: ExternalDep[] = [];
 
   private readonly edges: Array<[t.Node, t.Node]> = [];
+  private readonly replacements: Map<t.Node, t.Node> = new Map();
   private readonly dependencies: Map<t.Node, t.Node[]> = new Map();
   private readonly dependents: Map<t.Node, t.Node[]> = new Map();
   private readonly bindingsDependencies: Map<string, t.Node[]> = new Map();
@@ -56,6 +57,10 @@ export default class DepsGraph {
     }
   }
 
+  replace(a: t.Node, b: t.Node) {
+    this.replacements.set(a, b);
+  }
+
   getDependenciesByBinding(id: string) {
     return this.bindingsDependencies.get(id) || [];
   }
@@ -96,6 +101,10 @@ export default class DepsGraph {
         typeof node === 'string' ? this.scope.getDeclaration(`0:${node}`) : node
       )
       .filter(n => n) as t.Expression[];
+  }
+
+  getReplacements() {
+    return this.replacements;
   }
 
   isDeclared(name: string) {

@@ -18,9 +18,15 @@ function isNode(obj: any): obj is types.Node {
 export default function dumpNode<T extends types.Node>(
   node: T,
   alive: Set<types.Node> | null = null,
+  replacements: Map<types.Node, types.Node> = new Map(),
   level = 0,
   idx: number | null = null
 ) {
+  if (replacements.has(node)) {
+    dumpNode(replacements.get(node)!, alive, replacements, level, idx);
+    return;
+  }
+
   const prefix =
     level === 0
       ? ''
@@ -46,10 +52,10 @@ export default function dumpNode<T extends types.Node>(
     if (Array.isArray(subNode)) {
       for (let i = 0; i < subNode.length; i++) {
         const child = subNode[i];
-        if (child) dumpNode(child, alive, level + 2, i);
+        if (child) dumpNode(child, alive, replacements, level + 2, i);
       }
     } else if (isNode(subNode)) {
-      dumpNode(subNode, alive, level + 2);
+      dumpNode(subNode, alive, replacements, level + 2);
     }
   }
 }

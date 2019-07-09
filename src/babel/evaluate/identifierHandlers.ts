@@ -1,6 +1,10 @@
 import { types as t } from '@babel/core';
 import GraphBuilderState from './GraphBuilderState';
 import peek from '../utils/peek';
+import { IdentifierHandlerType, NodeType } from './types';
+import { identifierHandlers as core } from './langs/core';
+import { identifierHandlers as es2015 } from './langs/es2015';
+import { identifierHandlers as typescript } from './langs/typescript';
 
 type HandlerFn = <TParent extends t.Node = t.Node>(
   builder: GraphBuilderState,
@@ -10,9 +14,7 @@ type HandlerFn = <TParent extends t.Node = t.Node>(
   listIdx: number | null
 ) => void;
 
-type Handler = 'declare' | 'keep' | 'refer' | HandlerFn;
-
-type NodeType = t.Node['type'] | keyof t.Aliases;
+type Handler = IdentifierHandlerType | HandlerFn;
 
 const handlers: {
   [key: string]: Handler;
@@ -37,7 +39,7 @@ export function defineHandler<T extends NodeType>(
 
 export function batchDefineHandlers(
   typesAndFields: [NodeType, string][],
-  handler: Handler
+  handler: IdentifierHandlerType
 ) {
   typesAndFields.forEach(([type, field]) =>
     defineHandler(type, field, handler)
@@ -45,53 +47,14 @@ export function batchDefineHandlers(
 }
 
 batchDefineHandlers(
-  [
-    ['ArrayPattern', 'elements'],
-    ['AssignmentPattern', 'left'],
-    ['Function', 'params'],
-    ['ImportDefaultSpecifier', 'local'],
-    ['ImportSpecifier', 'local'],
-    ['RestElement', 'argument'],
-    ['VariableDeclarator', 'id'],
-    ['TSEnumDeclaration', 'id'],
-  ],
+  [...core.declare, ...es2015.declare, ...typescript.declare],
   'declare'
 );
 
-batchDefineHandlers(
-  [
-    ['ExportSpecifier', 'exported'],
-    ['ImportSpecifier', 'imported'],
-    ['MemberExpression', 'property'],
-    ['ObjectProperty', 'key'],
-  ],
-  'keep'
-);
+batchDefineHandlers([...core.keep, ...es2015.keep, ...typescript.keep], 'keep');
 
 batchDefineHandlers(
-  [
-    ['AssignmentExpression', 'left'],
-    ['AssignmentExpression', 'right'],
-    ['AssignmentPattern', 'right'],
-    ['BinaryExpression', 'left'],
-    ['BinaryExpression', 'right'],
-    ['CallExpression', 'arguments'],
-    ['CallExpression', 'callee'],
-    ['ExportDefaultDeclaration', 'declaration'],
-    ['ExportSpecifier', 'local'],
-    ['Function', 'body'],
-    ['LogicalExpression', 'left'],
-    ['LogicalExpression', 'right'],
-    ['MemberExpression', 'property'],
-    ['MemberExpression', 'object'],
-    ['NewExpression', 'callee'],
-    ['ReturnStatement', 'argument'],
-    ['SequenceExpression', 'expressions'],
-    ['SpreadElement', 'argument'],
-    ['TaggedTemplateExpression', 'tag'],
-    ['TemplateLiteral', 'expressions'],
-    ['VariableDeclarator', 'init'],
-  ],
+  [...core.refer, ...es2015.refer, ...typescript.refer],
   'refer'
 );
 

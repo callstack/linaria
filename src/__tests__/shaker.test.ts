@@ -72,12 +72,14 @@ it('keeps only code which is related to `a`', () => {
   expect(shaken).toMatchSnapshot();
 });
 
-it('processes enums', () => {
+describe('typescript', () => {
   const opts = {
     filename: 'test.ts',
     presets: ['@babel/preset-typescript'],
   };
-  const [shaken] = _shake(['color'], opts)`
+
+  it('supports enums', () => {
+    const [shaken] = _shake(['color'], opts)`
     enum Color {
       Red = '#F00',
       Green = '#0F0',
@@ -87,7 +89,28 @@ it('processes enums', () => {
     export const color = Color.Red;
   `;
 
-  expect(shaken).toMatchSnapshot();
+    expect(shaken).toMatchSnapshot();
+  });
+
+  it('stripes type casts', () => {
+    const [shaken] = _shake(['color'], opts)`
+    type Color = 'red' | 'green';
+    
+    export const color = 'red' as Color;
+  `;
+
+    expect(shaken).toMatchSnapshot();
+  });
+
+  it('stripes type annotations', () => {
+    const [shaken] = _shake(['num'], opts)`
+    const fn = <T extends string>(str: T): number => parseInt(str, 10);
+    
+    export const num: number = fn('42');
+  `;
+
+    expect(shaken).toMatchSnapshot();
+  });
 });
 
 it('shakes imports', () => {

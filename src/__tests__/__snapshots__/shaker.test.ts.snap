@@ -84,25 +84,6 @@ const wrap_1 = fn => {
 module.exports = [wrap_1(() => color)];"
 `;
 
-exports[`processes enums 1`] = `
-"enum Color {
-  Red = '#F00',
-  Green = '#0F0',
-  Blue = '#00F',
-}
-const color = Color.Red;
-
-const wrap = fn => {
-  try {
-    return fn();
-  } catch (e) {
-    return e;
-  }
-};
-
-module.exports = [wrap(() => color)];"
-`;
-
 exports[`shakes exports 1`] = `
 "import { whiteColor as color } from '…';
 const a = color;
@@ -188,4 +169,53 @@ const wrap = fn => {
 };
 
 module.exports = [wrap(() => foo)];"
+`;
+
+exports[`typescript stripes type annotations 1`] = `
+"const fn = str => parseInt(str, 10);
+
+const num = fn('42');
+
+const wrap = fn => {
+  try {
+    return fn();
+  } catch (e) {
+    return e;
+  }
+};
+
+module.exports = [wrap(() => num)];"
+`;
+
+exports[`typescript stripes type casts 1`] = `
+"const color = 'red';
+
+const wrap = fn => {
+  try {
+    return fn();
+  } catch (e) {
+    return e;
+  }
+};
+
+module.exports = [wrap(() => color)];"
+`;
+
+exports[`typescript supports enums 1`] = `
+"enum Color {
+  Red = '#F00',
+  Green = '#0F0',
+  Blue = '#00F',
+}
+const color = Color.Red;
+
+const wrap = fn => {
+  try {
+    return fn();
+  } catch (e) {
+    return e;
+  }
+};
+
+module.exports = [wrap(() => color)];"
 `;

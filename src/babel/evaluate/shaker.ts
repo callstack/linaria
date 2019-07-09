@@ -9,20 +9,17 @@ import getVisitorKeys from '../utils/getVisitorKeys';
  */
 function shakeNode<TNode extends t.Node>(
   node: TNode,
-  alive: Set<t.Node>
-): TNode {
-  if (t.isExportNamedDeclaration(node)) {
-    /*
-     * We don't need exports so just replace it by declaration
-     * - export const a = 42;
-     * + const a = 42;
-     */
-
-    return shakeNode(node.declaration!, alive) as TNode;
+  alive: Set<t.Node>,
+  replacements: Map<t.Node, t.Node>
+): t.Node {
+  if (replacements.has(node)) {
+    return shakeNode(replacements.get(node)!, alive, replacements);
   }
 
   const keys = getVisitorKeys(node) as Array<keyof TNode>;
   const changes: Partial<TNode> = {};
+  const isNodeAlive = (n: t.Node) =>
+    alive.has(n) || alive.has(replacements.has(n) ? replacements.get(n)! : n);
 
   for (const key of keys) {
     const subNode = node[key];
@@ -32,10 +29,10 @@ function shakeNode<TNode extends t.Node>(
       let hasChanges = false;
       for (let i = 0; i < subNode.length; i++) {
         const child = subNode[i];
-        const isAlive = alive.has(child);
+        const isAlive = isNodeAlive(child);
         hasChanges = hasChanges || !isAlive;
         if (child && isAlive) {
-          const shaken = shakeNode(child, alive);
+          const shaken = shakeNode(child, alive, replacements);
           if (shaken) {
             list.push(shaken);
           }
@@ -46,10 +43,14 @@ function shakeNode<TNode extends t.Node>(
       if (hasChanges) {
         changes[key] = list;
       }
-    } else if (isNode(subNode) && alive.has(subNode)) {
-      const shaken = shakeNode(subNode, alive);
-      if (shaken && shaken !== subNode) {
-        changes[key] = shaken;
+    } else if (isNode(subNode)) {
+      if (isNodeAlive(subNode)) {
+        const shaken = shakeNode(subNode, alive, replacements);
+        if (shaken && shaken !== subNode) {
+          changes[key] = shaken as any;
+        }
+      } else {
+        changes[key] = undefined;
       }
     }
   }
@@ -86,6 +87,7 @@ export default function shake(
   const depsGraph = build(rootPath);
   const topLevelDeps = depsGraph.getLeafs(nodes);
   const alive = new Set<t.Node>();
+  const replacements = depsGraph.getReplacements();
   let deps: t.Node[] = topLevelDeps;
   while (deps.length > 0) {
     // Mark all dependencies as alive
@@ -95,12 +97,12 @@ export default function shake(
     deps = depsGraph.getDependencies(deps).filter(d => !alive.has(d));
   }
 
-  const shaken = shakeNode(rootPath, alive) as t.Program;
+  const shaken = shakeNode(rootPath, alive, replacements) as t.Program;
   /*
    * If we want to know what is really happen with our code tree,
-   * we can print formatted tree here by `dumpNode(program, alive)`
-   * we can print formatted tree here by `dumpNode(rootPath, alive)`
+   * we can print formatted tree here
    */
+  // dumpNode(rootPath, alive);
 
   // By default `wrap` is used as a name of the function …
   let wrapName = 'wrap';
@@ -114,7 +116,7 @@ export default function shake(
 
   const forExport = topLevelDeps
     // Shake each exported node to avoid dead code in it …
-    .map(ex => shakeNode(ex, alive))
+    .map(ex => shakeNode(ex, alive, replacements) as t.Expression)
 
     // … and wrap it with the function
     .map(ex =>
