@@ -122,16 +122,20 @@ type CSSProperties = {
   [key: string]: string | number | CSSProperties;
 };
 
+type StyledComponentSelector = {
+  __styled__: any
+}
+
 type StyledComponent<T> = React.FunctionComponent<
   T & { as?: React.ElementType }
->;
+> & StyledComponentSelector;
 
 type StyledTag<T> = <Props = T>(
   strings: TemplateStringsArray,
   ...exprs: Array<
-    string | number | CSSProperties | ((props: Props) => string | number)
+    string | number | CSSProperties | ((props: Props) => string | number) | StyledComponentSelector
   >
-) => StyledComponent<Props>;
+) => StyledComponent<Props & T>;
 
 type StyledJSXIntrinsics = {
   readonly [P in keyof JSX.IntrinsicElements]: StyledTag<
