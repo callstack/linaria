@@ -123,17 +123,22 @@ type CSSProperties = {
 };
 
 type StyledComponentSelector = {
-  __styled__: any
-}
+  __styled__: any;
+};
 
 type StyledComponent<T> = React.FunctionComponent<
   T & { as?: React.ElementType }
-> & StyledComponentSelector;
+> &
+  StyledComponentSelector;
 
 type StyledTag<T> = <Props = T>(
   strings: TemplateStringsArray,
   ...exprs: Array<
-    string | number | CSSProperties | ((props: Props) => string | number) | StyledComponentSelector
+    | string
+    | number
+    | CSSProperties
+    | ((props: Props) => string | number)
+    | StyledComponentSelector
   >
 ) => StyledComponent<Props & T>;
 
