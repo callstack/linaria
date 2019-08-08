@@ -24,6 +24,18 @@ it('creates module for JS files', () => {
   expect(mod.filename).toBe(filename);
 });
 
+it('evaluates files with global exports in strict mode', () => {
+  const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
+
+  mod.evaluate(dedent`
+      'use strict'
+      exports = module.exports = function funcToExport() {}
+      exports['default'] = exports;
+  `);
+  expect(typeof mod.exports).toBe('function');
+  expect(typeof mod.exports.default).toBe('function');
+});
+
 it('requires JS files', () => {
   const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
 
