@@ -73,6 +73,16 @@ This will extract the CSS from all files into a single `styles.css`. Then you ca
 
 It will also hot reload your styles when in a development environment.
 
+For production usage, you should include a hash in the filename:
+
+```js
+new MiniCssExtractPlugin({
+  filename: 'styles-[contenthash].css',
+});
+```
+
+Using a hash like this allows for a far future `Expires` header to be used, to improve cache efficiency. To link to the correct filename, you can either use [`HTMLWebpackPlugin`](https://github.com/jantimon/html-webpack-plugin) for a static HTML file, or [`assets-webpack-plugin`](https://yarn.pm/assets-webpack-plugin) to save the filename to a JSON file which you can then read in your server-side code.
+
 Linaria integrates with your CSS pipeline, so you can always perform additional operations on the CSS, for example, using [postcss](https://postcss.org/) plugins such as [clean-css](https://github.com/jakubpawlowicz/clean-css) to further minify your CSS.
 
 #### Full example
