@@ -14,6 +14,7 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
     sourceMap,
     cacheDirectory = '.linaria-cache',
     preprocessor,
+    extension = '.linaria.css',
     ...rest
   } = loaderUtils.getOptions(this) || {};
 
@@ -23,7 +24,7 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
       : path.join(process.cwd(), cacheDirectory),
     path.relative(
       process.cwd(),
-      this.resourcePath.replace(/\.[^.]+$/, '.linaria.css')
+      this.resourcePath.replace(/\.[^.]+$/, extension)
     )
   );
 
