@@ -137,9 +137,12 @@ export default function TaggedTemplateExpression(
     )}`
   );
 
-  const className = options.displayName
-    ? `${toValidCSSIdentifier(displayName)}_${slug}`
-    : slug;
+  const classNameMode =
+    options.classNameMode && options.classNameMode === 'simple'
+      ? toValidCSSIdentifier(displayName)
+      : `${toValidCSSIdentifier(displayName)}_${slug}`;
+
+  const className = options.displayName ? classNameMode : slug;
 
   // Serialize the tagged template literal to a string
   let cssText = '';

@@ -226,6 +226,17 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "chrisabrams",
+      "name": "Chris Abrams",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/527740?s=460&v=4",
+      "profile": "https://github.com/chrisabrams",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas"
+      ]
     }
   ],
   "repoType": "github",

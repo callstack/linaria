@@ -26,6 +26,17 @@ module.exports = {
 
   Enabling this will add a display name to generated class names, e.g. `.Title_abcdef` instead of `.abcdef'. It is disabled by default to generate smaller CSS files.
 
+- `classNameMode: string` (default: `default`):
+
+  Using this will provide one of two options for how the `className` renders. If you use `displayName` but do not specify a `classNameMode`, the the option `default` will be used.
+
+  ### Options
+
+  - `default`: Will render the `className` as the `displayName` as well as the hash, e.g. `.Title_abcdef`
+  - `simple`: Will render the `className` as just the `displayName`, e.g. `.Title`
+
+  Simple mode was created for projects which need the ability to manually define the `className` and cannot support constant `className` changes when the file contents change.
+
 - `ignore: RegExp` (default: `/node_modules/`):
 
   If you specify a regex here, files matching the regex won't be processed, i.e. the matching files won't be transformed with Babel during evaluation. If you need to compile certain modules under `/node_modules/`, it's recommended to do it on a module by module basis for faster transforms, e.g. `ignore: /node_modules[\/\\](?!some-module|other-module)/`.
