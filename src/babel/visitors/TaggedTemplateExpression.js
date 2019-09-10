@@ -153,16 +153,16 @@ export default function TaggedTemplateExpression(
 
     // Variables that were used in the config for `classNameSlug`
     const optionVariables = classNameSlug.match(/\[.*?\]/g) || [];
-    let _slug = classNameSlug;
+    let cnSlug = classNameSlug;
 
     for (let i = 0, l = optionVariables.length; i < l; i++) {
       const _var = optionVariables[i].slice(1, -1); // Remove the brackets around the variable name
 
       // Replace the var if it key and value exist otherwise place an empty string
-      _slug = _slug.replace(`[${_var}]`, classNameSlugVars[_var] || '');
+      cnSlug = cnSlug.replace(`[${_var}]`, classNameSlugVars[_var] || '');
     }
 
-    className = toValidCSSIdentifier(_slug);
+    className = toValidCSSIdentifier(cnSlug);
   }
 
   // Serialize the tagged template literal to a string
