@@ -26,6 +26,7 @@ export type State = {|
 |};
 
 export type StrictOptions = {|
+  classNameSlug: string,
   displayName: boolean,
   evaluate: boolean,
   ignore: RegExp,

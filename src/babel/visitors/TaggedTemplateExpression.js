@@ -137,9 +137,33 @@ export default function TaggedTemplateExpression(
     )}`
   );
 
-  const className = options.displayName
+  let className = options.displayName
     ? `${toValidCSSIdentifier(displayName)}_${slug}`
     : slug;
+
+  // Optionall the className can be defined by the user
+  if (typeof options.classNameSlug === 'string') {
+    const { classNameSlug } = options;
+
+    // Available variables for the square brackets used in `classNameSlug` options
+    const classNameSlugVars = {
+      hash: slug,
+      title: displayName,
+    };
+
+    // Variables that were used in the config for `classNameSlug`
+    const optionVariables = classNameSlug.match(/\[.*?\]/g) || [];
+    let _slug = classNameSlug;
+
+    for (let i = 0, l = optionVariables.length; i < l; i++) {
+      const _var = optionVariables[i].slice(1, -1); // Remove the brackets around the variable name
+
+      // Replace the var if it key and value exist otherwise place an empty string
+      _slug = _slug.replace(`[${_var}]`, classNameSlugVars[_var] || '');
+    }
+
+    className = toValidCSSIdentifier(_slug);
+  }
 
   // Serialize the tagged template literal to a string
   let cssText = '';
