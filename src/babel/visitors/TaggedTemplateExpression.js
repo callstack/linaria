@@ -156,10 +156,10 @@ export default function TaggedTemplateExpression(
     let cnSlug = classNameSlug;
 
     for (let i = 0, l = optionVariables.length; i < l; i++) {
-      const _var = optionVariables[i].slice(1, -1); // Remove the brackets around the variable name
+      const v = optionVariables[i].slice(1, -1); // Remove the brackets around the variable name
 
       // Replace the var if it key and value exist otherwise place an empty string
-      cnSlug = cnSlug.replace(`[${_var}]`, classNameSlugVars[_var] || '');
+      cnSlug = cnSlug.replace(`[${v}]`, classNameSlugVars[v] || '');
     }
 
     className = toValidCSSIdentifier(cnSlug);
