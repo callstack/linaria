@@ -180,6 +180,10 @@ See [Basics](/docs/BASICS.md) for a detailed information about the syntax.
 
 - Syntax Highlighting and Autocompletion - [language-babel](https://atom.io/packages/language-babel)
 
+### Webstorm
+
+- Syntax Highlighting & Autocompletion - [webstorm-styled-components](https://github.com/styled-components/webstorm-styled-components)
+
 ## Recommended Libraries
 
 - [gatsby-plugin-linaria](https://github.com/silvenon/gatsby-plugin-linaria) – Gatsby plugin that sets up Babel and webpack configuration for Linaria.
