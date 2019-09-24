@@ -212,6 +212,21 @@ it('does not filter attributes for components', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
+it('provides linaria component className for composition', () => {
+  const Custom = props => (
+    <div className={props.className}>{props.linariaClassName}</div>
+  );
+
+  const Test = styled(Custom)({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  const tree = renderer.create(<Test>This is a test</Test>);
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
 it('throws when using as tag for template literal', () => {
   expect(
     () =>

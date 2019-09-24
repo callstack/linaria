@@ -70,6 +70,7 @@ function styled(tag: React.ComponentType<any> | string) {
         filteredProps.className || className,
         options.class
       );
+      filteredProps.linariaClassName = options.class;
 
       const { vars } = options;
 

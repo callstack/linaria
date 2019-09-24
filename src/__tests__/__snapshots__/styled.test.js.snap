@@ -3,6 +3,7 @@
 exports[`applies CSS variables in style prop 1`] = `
 <div
   className="abcdefg"
+  linariaClassName="abcdefg"
   size={24}
   style={
     Object {
@@ -25,6 +26,7 @@ exports[`does not filter attributes for components 1`] = `
 exports[`does not filter attributes for custom elements 1`] = `
 <my-element
   className="abcdefg"
+  linariaClassName="abcdefg"
   unknownAttribute="voila"
 >
   This is a test
@@ -34,6 +36,7 @@ exports[`does not filter attributes for custom elements 1`] = `
 exports[`filters unknown html attributes for HTML tag 1`] = `
 <div
   className="abcdefg"
+  linariaClassName="abcdefg"
 >
   This is a test
 </div>
@@ -42,6 +45,7 @@ exports[`filters unknown html attributes for HTML tag 1`] = `
 exports[`forwards as prop when wrapping another styled component 1`] = `
 <a
   className="hijklmn abcdefg"
+  linariaClassName="abcdefg"
 >
   This is a test
 </a>
@@ -50,6 +54,7 @@ exports[`forwards as prop when wrapping another styled component 1`] = `
 exports[`handles wrapping another styled component 1`] = `
 <div
   className="hijklmn abcdefg"
+  linariaClassName="abcdefg"
 >
   This is a test
 </div>
@@ -58,6 +63,7 @@ exports[`handles wrapping another styled component 1`] = `
 exports[`merges CSS variables with custom style prop 1`] = `
 <div
   className="abcdefg"
+  linariaClassName="abcdefg"
   style={
     Object {
       "--foo": "tomato",
@@ -69,9 +75,18 @@ exports[`merges CSS variables with custom style prop 1`] = `
 </div>
 `;
 
+exports[`provides linaria component className for composition 1`] = `
+<div
+  className="abcdefg"
+>
+  abcdefg
+</div>
+`;
+
 exports[`renders component with display name and class name 1`] = `
 <div
   className="abcdefg"
+  linariaClassName="abcdefg"
 >
   This is a test
 </div>
@@ -80,6 +95,7 @@ exports[`renders component with display name and class name 1`] = `
 exports[`renders tag with display name and class name 1`] = `
 <h1
   className="abcdefg"
+  linariaClassName="abcdefg"
 >
   This is a test
 </h1>
@@ -89,6 +105,7 @@ exports[`replaces custom component with as prop for primitive 1`] = `
 <a
   className="abcdefg"
   id="test"
+  linariaClassName="abcdefg"
 >
   This is a test
 </a>
@@ -99,6 +116,7 @@ exports[`replaces primitive with as prop for custom component 1`] = `
   className="abcdefg"
   foo="bar"
   id="test"
+  linariaClassName="abcdefg"
   style={
     Object {
       "fontSize": 12,
@@ -113,6 +131,7 @@ exports[`replaces simple component with as prop 1`] = `
 <a
   className="abcdefg"
   id="test"
+  linariaClassName="abcdefg"
 >
   This is a test
 </a>
@@ -121,6 +140,7 @@ exports[`replaces simple component with as prop 1`] = `
 exports[`supports extra class prop 1`] = `
 <div
   className="primary abcdefg"
+  linariaClassName="abcdefg"
 >
   This is a test
 </div>
@@ -129,6 +149,7 @@ exports[`supports extra class prop 1`] = `
 exports[`supports extra className prop 1`] = `
 <div
   className="primary abcdefg"
+  linariaClassName="abcdefg"
 >
   This is a test
 </div>
