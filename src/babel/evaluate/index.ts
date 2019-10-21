@@ -13,6 +13,7 @@ import { StrictOptions } from '../types';
 type DefaultOptions = Partial<TransformOptions> & {
   plugins: PluginItem[];
   presets: PluginItem[];
+  caller: { evaluate: boolean };
 };
 
 export default function evaluate(

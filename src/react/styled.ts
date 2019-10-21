@@ -1,6 +1,7 @@
 import React from 'react'; // eslint-disable-line import/no-extraneous-dependencies
 import validAttr from '@emotion/is-prop-valid';
 import { cx } from '../index';
+import { StyledMeta } from '../types';
 
 type Options = {
   name: string;
@@ -33,8 +34,21 @@ const warnIfInvalid = (value: any, componentName: string) => {
   }
 };
 
-// TODO: improve types
-function styled(tag: React.ComponentType<any> | string) {
+// If styled wraps custom component, that component should have className property
+function styled<TConstructor extends React.FunctionComponent<any>>(
+  tag: TConstructor extends React.FunctionComponent<infer T>
+    ? T extends { className?: string }
+      ? TConstructor
+      : never
+    : never
+): StyledTag<TConstructor>;
+function styled<T>(
+  tag: T extends { className?: string } ? React.ComponentType<T> : never
+): StyledTag<T>;
+function styled<T extends keyof JSX.IntrinsicElements>(
+  tag: T
+): StyledTag<JSX.IntrinsicElements[T]>;
+function styled(tag: any): any {
   return (options: Options) => {
     if (process.env.NODE_ENV !== 'production') {
       if (Array.isArray(options)) {
@@ -122,16 +136,24 @@ type CSSProperties = {
   [key: string]: string | number | CSSProperties;
 };
 
-type StyledComponent<T> = React.FunctionComponent<
-  T & { as?: React.ElementType }
->;
+type StyledComponent<T> = StyledMeta &
+  (T extends React.FunctionComponent<any>
+    ? T
+    : React.FunctionComponent<T & { as?: React.ElementType }>);
 
-type StyledTag<T> = <Props = T>(
+type StaticPlaceholder = string | number | CSSProperties | StyledMeta;
+
+type StyledTag<T> = <
+  Props = T extends React.FunctionComponent<infer TProps> ? TProps : T
+>(
   strings: TemplateStringsArray,
-  ...exprs: Array<
-    string | number | CSSProperties | ((props: Props) => string | number)
-  >
-) => StyledComponent<Props>;
+  // Expressions can contain functions only if wrapped component has style property
+  ...exprs: Props extends { style?: React.CSSProperties }
+    ? Array<StaticPlaceholder | ((props: Props) => string | number)>
+    : StaticPlaceholder[]
+) => T extends React.FunctionComponent<any>
+  ? StyledMeta & T
+  : StyledComponent<Props>;
 
 type StyledJSXIntrinsics = {
   readonly [P in keyof JSX.IntrinsicElements]: StyledTag<
@@ -139,21 +161,12 @@ type StyledJSXIntrinsics = {
   >
 };
 
-type Styled = StyledJSXIntrinsics & {
-  <T>(component: React.ElementType<T>): StyledTag<T>;
+export type Styled = typeof styled & StyledJSXIntrinsics;
 
-  readonly [key: string]: StyledTag<{
-    children?: React.ReactNode;
-    [key: string]: any;
-  }>;
-};
-
-export default ((process.env.NODE_ENV !== 'production'
+export default (process.env.NODE_ENV !== 'production'
   ? new Proxy(styled, {
-      get(o, prop) {
-        prop = typeof prop === 'number' ? prop.toString() : prop;
-        prop = typeof prop === 'symbol' ? prop.toString() : prop;
+      get(o, prop: keyof JSX.IntrinsicElements) {
         return o(prop);
       },
     })
-  : styled) as any) as Styled;
+  : styled) as Styled;
