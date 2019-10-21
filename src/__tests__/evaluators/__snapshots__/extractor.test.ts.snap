@@ -1,0 +1,286 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`keeps objects as is 1`] = `
+"{
+  var fill1 = function fill1(top, left, right, bottom) {
+    if (top === void 0) {
+      top = 0;
+    }
+
+    if (left === void 0) {
+      left = 0;
+    }
+
+    if (right === void 0) {
+      right = 0;
+    }
+
+    if (bottom === void 0) {
+      bottom = 0;
+    }
+
+    return {
+      position: 'absolute',
+      top: top,
+      right: right,
+      bottom: bottom,
+      left: left
+    };
+  };
+
+  {
+    var fill2 = function fill2(top, left, right, bottom) {
+      if (top === void 0) {
+        top = 0;
+      }
+
+      if (left === void 0) {
+        left = 0;
+      }
+
+      if (right === void 0) {
+        right = 0;
+      }
+
+      if (bottom === void 0) {
+        bottom = 0;
+      }
+
+      return {
+        position: 'absolute',
+        top: top,
+        right: right,
+        bottom: bottom,
+        left: left
+      };
+    };
+
+    {
+      exports.__linariaPreval = [fill1, fill2];
+    }
+  }
+}"
+`;
+
+exports[`keeps only code which is related to \`a\` 1`] = `
+"{
+  var _require = require('…');
+
+  {
+    var anotherColor = _require.anotherColor;
+    {
+      var color = _require.whiteColor;
+      {
+        var a = color || anotherColor;
+        {
+          exports.__linariaPreval = [a];
+        }
+      }
+    }
+  }
+}"
+`;
+
+exports[`keeps only code which is related to \`anotherColor\` 1`] = `
+"{
+  var _require = require('…');
+
+  {
+    var anotherColor = _require.anotherColor;
+    {
+      exports.__linariaPreval = [anotherColor];
+    }
+  }
+}"
+`;
+
+exports[`keeps only code which is related to \`color\` 1`] = `
+"{
+  var _require = require('…');
+
+  {
+    var color = _require.whiteColor;
+    {
+      exports.__linariaPreval = [color];
+    }
+  }
+}"
+`;
+
+exports[`removes all 1`] = `
+"{
+  exports.__linariaPreval = [];
+}"
+`;
+
+exports[`shakes assignment patterns 1`] = `
+"{
+  var _ = 2;
+  {
+    var _a$b = {
+      a: 1,
+      b: 2
+    };
+    {
+      var _ref = [1, 2, 3, 4];
+      {
+        var obj = {
+          member: null
+        };
+        {
+          var identifier = _ === void 0 ? 1 : _;
+          {
+            var object = Object.assign({}, _a$b);
+            {
+              var array = _ref.slice(0);
+
+              {
+                exports.__linariaPreval = [identifier, object, array, obj];
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}"
+`;
+
+exports[`shakes es5 exports 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+exports.redColor = 'red';
+Object.defineProperty(exports, \\"blueColor\\", {
+  enumerable: true,
+  get: function get() {
+    return 'blue';
+  }
+});
+Object.defineProperty(exports, \\"greenColor\\", {
+  enumerable: true,
+  get: function get() {
+    return 'green';
+  }
+});"
+`;
+
+exports[`shakes exports 1`] = `
+"{
+  var _ = require(\\"\\\\u2026\\");
+
+  {
+    var a = _.whiteColor;
+    {
+      exports.__linariaPreval = [a];
+    }
+  }
+}"
+`;
+
+exports[`shakes imports 1`] = `
+"{
+  function _getRequireWildcardCache() {
+    if (typeof WeakMap !== \\"function\\") return null;
+    var cache = new WeakMap();
+
+    _getRequireWildcardCache = function _getRequireWildcardCache() {
+      return cache;
+    };
+
+    return cache;
+  }
+
+  {
+    function _interopRequireWildcard(obj) {
+      if (obj && obj.__esModule) {
+        return obj;
+      }
+
+      var cache = _getRequireWildcardCache();
+
+      if (cache && cache.has(obj)) {
+        return cache.get(obj);
+      }
+
+      var newObj = {};
+
+      if (obj != null) {
+        var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor;
+
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null;
+
+            if (desc && (desc.get || desc.set)) {
+              Object.defineProperty(newObj, key, desc);
+            } else {
+              newObj[key] = obj[key];
+            }
+          }
+        }
+      }
+
+      newObj.default = obj;
+
+      if (cache) {
+        cache.set(obj, newObj);
+      }
+
+      return newObj;
+    }
+
+    {
+      var _ = _interopRequireWildcard(require(\\"\\\\u2026\\"));
+
+      {
+        exports.__linariaPreval = [_.whiteColor, _.default];
+      }
+    }
+  }
+}"
+`;
+
+exports[`shakes sequence expression 1`] = `
+"{
+  var _ = require(\\"\\\\u2026\\");
+
+  {
+    var local = '';
+    {
+      var color1 = function () {
+        return 'blue';
+      };
+
+      {
+        var color2 = function () {
+          return local;
+        };
+
+        {
+          exports.__linariaPreval = [color2];
+        }
+      }
+    }
+  }
+}"
+`;
+
+exports[`should keep member expression key 1`] = `
+"{
+  var obj = {
+    blue: '#00F'
+  };
+  {
+    var key = 'blue';
+    {
+      var blue = obj[key];
+      {
+        exports.__linariaPreval = [blue];
+      }
+    }
+  }
+}"
+`;

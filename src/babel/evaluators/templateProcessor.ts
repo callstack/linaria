@@ -1,7 +1,6 @@
 /* eslint-disable no-param-reassign */
 
 import { types } from '@babel/core';
-import { isValidElementType } from 'react-is';
 import generator from '@babel/generator';
 
 import { units } from '../units';
@@ -11,7 +10,6 @@ import { StyledMeta } from '../../types';
 import throwIfInvalid from '../utils/throwIfInvalid';
 import isSerializable from '../utils/isSerializable';
 import stripLines from '../utils/stripLines';
-import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
 import toCSS from '../utils/toCSS';
 import getLinariaComment from '../utils/getLinariaComment';
 
@@ -43,7 +41,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
     // Only works when it's assigned to a variable
     let isReferenced = true;
 
-    const [slug, displayName] = getLinariaComment(path);
+    const [slug, displayName, className] = getLinariaComment(path);
 
     const parent = path.findParent(
       p =>
@@ -65,10 +63,6 @@ export default function getTemplateProcessor(options: StrictOptions) {
         isReferenced = referencePaths.length !== 0;
       }
     }
-
-    const className = options.displayName
-      ? `${toValidCSSIdentifier(displayName!)}_${slug!}`
-      : slug!;
 
     // Serialize the tagged template literal to a string
     let cssText = '';
@@ -199,7 +193,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
       // it'll ensure that styles are overridden properly
       if (options.evaluate && types.isIdentifier(styled.component.node)) {
         let value = valueCache.get(styled.component.node.name);
-        while (isValidElementType(value) && hasMeta(value)) {
+        while (hasMeta(value)) {
           selector += `.${value.__linaria.className}`;
           value = value.__linaria.extends;
         }
@@ -217,7 +211,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
       props.push(
         types.objectProperty(
           types.identifier('class'),
-          types.stringLiteral(className)
+          types.stringLiteral(className!)
         )
       );
 
@@ -274,7 +268,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
 
       path.addComment('leading', '#__PURE__');
     } else {
-      path.replaceWith(types.stringLiteral(className));
+      path.replaceWith(types.stringLiteral(className!));
     }
 
     if (!isReferenced && !cssText.includes(':global')) {
@@ -283,7 +277,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
 
     state.rules[selector] = {
       cssText,
-      className,
+      className: className!,
       displayName: displayName!,
       start: path.parent && path.parent.loc ? path.parent.loc.start : null,
     };

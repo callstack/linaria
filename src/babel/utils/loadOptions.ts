@@ -20,7 +20,15 @@ export default function loadOptions(
   return {
     displayName: false,
     evaluate: true,
-    ignore: /node_modules/,
+    rules: [
+      {
+        action: require('../evaluators/extractor').default,
+      },
+      {
+        test: /\/node_modules\//,
+        action: 'ignore',
+      },
+    ],
     ...(result ? result.config : null),
     ...rest,
   };

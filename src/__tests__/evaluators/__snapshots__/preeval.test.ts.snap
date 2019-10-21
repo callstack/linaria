@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`preserves classNames 1`] = `
+"import { styled } from 'linaria/react';
+const Component =
+/*linaria ca1zxek Component Component_ca1zxek*/
+styled.div\`\`;"
+`;
+
+exports[`replaces class component 1`] = `
+"import React from 'react';
+
+function Component() {
+  return <></>;
+}"
+`;
+
+exports[`replaces constant 1`] = `
+"import React from 'react';
+const tag = <></>;
+
+const Component = props => tag;"
+`;
+
+exports[`replaces functional component 1`] = `
+"import React from 'react';
+
+const Component = props => {
+  return <></>;
+};"
+`;

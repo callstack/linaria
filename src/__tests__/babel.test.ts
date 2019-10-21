@@ -1,21 +1,18 @@
-/* eslint-disable no-template-curly-in-string */
-/* @flow */
-
-const path = require('path');
-const babel = require('@babel/core');
-const dedent = require('dedent');
-const stripAnsi = require('strip-ansi');
+import * as babel from '@babel/core';
+import dedent from 'dedent';
+import { join } from 'path';
+import stripAnsi from 'strip-ansi';
 import serializer from '../__utils__/linaria-snapshot-serializer';
 
 expect.addSnapshotSerializer(serializer);
 
-const transpile = input =>
-  babel.transformAsync(input, {
+const transpile = async (input: string) =>
+  (await babel.transformAsync(input, {
     babelrc: false,
     presets: [[require.resolve('../babel'), { evaluate: false }]],
     plugins: ['@babel/plugin-syntax-jsx'],
-    filename: path.join(__dirname, 'app/index.js'),
-  });
+    filename: join(__dirname, 'app/index.js'),
+  }))!;
 
 it('transpiles styled template literal with object', async () => {
   const { code, metadata } = await transpile(
