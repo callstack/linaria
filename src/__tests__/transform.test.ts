@@ -2,6 +2,14 @@
 
 import dedent from 'dedent';
 import transform from '../transform';
+import evaluator from '../babel/evaluators/extractor';
+
+const rules = [
+  {
+    test: () => true,
+    action: evaluator,
+  },
+];
 
 it('rewrites a relative path in url() declarations', async () => {
   const { cssText } = await transform(
@@ -15,6 +23,9 @@ it('rewrites a relative path in url() declarations', async () => {
     {
       filename: './test.js',
       outputFilename: '../.linaria-cache/test.css',
+      pluginOptions: {
+        rules,
+      },
     }
   );
 
@@ -36,6 +47,9 @@ it('rewrites multiple relative paths in url() declarations', async () => {
     {
       filename: './test.js',
       outputFilename: '../.linaria-cache/test.css',
+      pluginOptions: {
+        rules,
+      },
     }
   );
 
@@ -54,6 +68,9 @@ it("doesn't rewrite an absolute path in url() declarations", async () => {
     {
       filename: './test.js',
       outputFilename: '../.linaria-cache/test.css',
+      pluginOptions: {
+        rules,
+      },
     }
   );
 
@@ -74,6 +91,7 @@ it('respects passed babel options', async () => {
         filename: './test.js',
         outputFilename: '../.linaria-cache/test.css',
         pluginOptions: {
+          rules,
           babelOptions: {
             babelrc: false,
             configFile: false,
@@ -98,6 +116,7 @@ it('respects passed babel options', async () => {
         filename: './test.js',
         outputFilename: '../.linaria-cache/test.css',
         pluginOptions: {
+          rules,
           babelOptions: {
             babelrc: false,
             configFile: false,
@@ -132,6 +151,7 @@ it("doesn't throw due to duplicate preset", async () => {
         filename: './test.js',
         outputFilename: '../.linaria-cache/test.css',
         pluginOptions: {
+          rules,
           babelOptions: {
             babelrc: false,
             configFile: false,

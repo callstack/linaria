@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 
 import { basename, dirname, relative } from 'path';
-import { types } from '@babel/core';
+import { types as t } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import throwIfInvalid from '../utils/throwIfInvalid';
 import hasImport from '../utils/hasImport';
@@ -11,7 +11,7 @@ import slugify from '../../slugify';
 import getLinariaComment from '../utils/getLinariaComment';
 
 export default function TaggedTemplateExpression(
-  path: NodePath<types.TaggedTemplateExpression>,
+  path: NodePath<t.TaggedTemplateExpression>,
   state: State,
   options: StrictOptions
 ) {
@@ -19,35 +19,35 @@ export default function TaggedTemplateExpression(
 
   let styled: {
     component: {
-      node: types.Expression | NodePath<types.Expression>;
+      node: t.Expression | NodePath<t.Expression>;
     };
   } | null = null;
   let css: boolean = false;
 
   if (
-    types.isCallExpression(tag) &&
-    types.isIdentifier(tag.callee) &&
+    t.isCallExpression(tag) &&
+    t.isIdentifier(tag.callee) &&
     tag.arguments.length === 1 &&
     tag.callee.name === 'styled' &&
     hasImport(
-      types,
+      t,
       path.scope,
       state.file.opts.filename,
       'styled',
       'linaria/react'
     )
   ) {
-    const tagPath = path.get('tag') as NodePath<types.CallExpression>;
+    const tagPath = path.get('tag') as NodePath<t.CallExpression>;
     styled = {
-      component: tagPath.get('arguments')[0] as NodePath<types.Expression>,
+      component: tagPath.get('arguments')[0] as NodePath<t.Expression>,
     };
   } else if (
-    types.isMemberExpression(tag) &&
-    types.isIdentifier(tag.object) &&
-    types.isIdentifier(tag.property) &&
+    t.isMemberExpression(tag) &&
+    t.isIdentifier(tag.object) &&
+    t.isIdentifier(tag.property) &&
     tag.object.name === 'styled' &&
     hasImport(
-      types,
+      t,
       path.scope,
       state.file.opts.filename,
       'styled',
@@ -55,12 +55,12 @@ export default function TaggedTemplateExpression(
     )
   ) {
     styled = {
-      component: { node: types.stringLiteral(tag.property.name) },
+      component: { node: t.stringLiteral(tag.property.name) },
     };
   } else if (
-    hasImport(types, path.scope, state.file.opts.filename, 'css', 'linaria')
+    hasImport(t, path.scope, state.file.opts.filename, 'css', 'linaria')
   ) {
-    css = types.isIdentifier(tag) && tag.name === 'css';
+    css = t.isIdentifier(tag) && tag.name === 'css';
   }
 
   if (!styled && !css) {
@@ -70,7 +70,7 @@ export default function TaggedTemplateExpression(
   const expressions = path.get('quasi').get('expressions');
 
   const expressionValues: ExpressionValue[] = expressions.map(
-    (ex: NodePath<types.Expression>) => {
+    (ex: NodePath<t.Expression>) => {
       const result = ex.evaluate();
       if (result.confident) {
         throwIfInvalid(result.value, ex);
@@ -79,7 +79,7 @@ export default function TaggedTemplateExpression(
 
       if (
         options.evaluate &&
-        !(types.isFunctionExpression(ex) || types.isArrowFunctionExpression(ex))
+        !(t.isFunctionExpression(ex) || t.isArrowFunctionExpression(ex))
       ) {
         return { kind: ValueType.LAZY, ex };
       }
@@ -93,27 +93,27 @@ export default function TaggedTemplateExpression(
   // Also used for display name if it couldn't be determined
   state.index++;
 
-  let [slug, displayName] = getLinariaComment(path);
+  let [slug, displayName, predefinedClassName] = getLinariaComment(path);
 
   const parent = path.findParent(
     p =>
-      types.isObjectProperty(p) ||
-      types.isJSXOpeningElement(p) ||
-      types.isVariableDeclarator(p)
+      t.isObjectProperty(p) ||
+      t.isJSXOpeningElement(p) ||
+      t.isVariableDeclarator(p)
   );
 
   if (!displayName && parent) {
     const parentNode = parent.node;
-    if (types.isObjectProperty(parentNode)) {
+    if (t.isObjectProperty(parentNode)) {
       displayName = parentNode.key.name || parentNode.key.value;
     } else if (
-      types.isJSXOpeningElement(parentNode) &&
-      types.isJSXIdentifier(parentNode.name)
+      t.isJSXOpeningElement(parentNode) &&
+      t.isJSXIdentifier(parentNode.name)
     ) {
       displayName = parentNode.name.name;
     } else if (
-      types.isVariableDeclarator(parentNode) &&
-      types.isIdentifier(parentNode.id)
+      t.isVariableDeclarator(parentNode) &&
+      t.isIdentifier(parentNode.id)
     ) {
       displayName = parentNode.id.name;
     }
@@ -155,11 +155,44 @@ export default function TaggedTemplateExpression(
       )}`
     );
 
+  let className = predefinedClassName
+    ? predefinedClassName
+    : options.displayName
+    ? `${toValidCSSIdentifier(displayName!)}_${slug!}`
+    : slug!;
+
+  // Optional the className can be defined by the user
+  if (typeof options.classNameSlug === 'string') {
+    const { classNameSlug } = options;
+
+    // Available variables for the square brackets used in `classNameSlug` options
+    const classNameSlugVars: Record<string, string | null> = {
+      hash: slug,
+      title: displayName,
+    };
+
+    // Variables that were used in the config for `classNameSlug`
+    const optionVariables = classNameSlug.match(/\[.*?\]/g) || [];
+    let cnSlug = classNameSlug;
+
+    for (let i = 0, l = optionVariables.length; i < l; i++) {
+      const v = optionVariables[i].slice(1, -1); // Remove the brackets around the variable name
+
+      // Replace the var if it key and value exist otherwise place an empty string
+      cnSlug = cnSlug.replace(`[${v}]`, classNameSlugVars[v] || '');
+    }
+
+    className = toValidCSSIdentifier(cnSlug);
+  }
+
   // Save evaluated slug and displayName for future usage in templateProcessor
-  path.addComment('leading', `linaria ${slug} ${displayName}`);
+  path.addComment('leading', `linaria ${slug} ${displayName} ${className}`);
 
   if (styled && 'name' in styled.component.node) {
+    // It's not a real dependency.
+    // It can be simplified because we need just a className.
     expressionValues.push({
+      // kind: ValueType.COMPONENT,
       kind: ValueType.LAZY,
       ex: styled.component.node.name,
     });
