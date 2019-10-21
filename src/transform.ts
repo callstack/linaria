@@ -1,56 +1,9 @@
-/* @flow */
-
 import path from 'path';
 import * as babel from '@babel/core';
 import stylis from 'stylis';
 import { SourceMapGenerator, Mapping } from 'source-map';
-import loadOptions, { PluginOptions } from './babel/utils/loadOptions';
-import { Optional } from './typeUtils';
-
-export type Replacement = {
-  original: { start: Location; end: Location };
-  length: number;
-};
-
-type Location = {
-  line: number;
-  column: number;
-};
-
-type Rules = {
-  [className: string]: {
-    cssText: string;
-    displayName: string;
-    start: Location | null;
-  };
-};
-
-type Result = {
-  code: string;
-  sourceMap: Object | null | undefined;
-  cssText?: string;
-  cssSourceMapText?: string;
-  dependencies?: string[];
-  rules?: Rules;
-  replacements?: Replacement[];
-};
-
-type LinariaMetadata = {
-  rules: Rules;
-  replacements: Replacement[];
-  dependencies: string[];
-};
-
-type Options = {
-  filename: string;
-  preprocessor?: Preprocessor;
-  outputFilename?: string;
-  inputSourceMap?: Object;
-  pluginOptions?: Optional<PluginOptions>;
-};
-
-export type PreprocessorFn = (selector: string, cssText: string) => string;
-export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
+import loadOptions from './babel/utils/loadOptions';
+import { LinariaMetadata, Options, PreprocessorFn, Result } from './types';
 
 const STYLIS_DECLARATION = 1;
 

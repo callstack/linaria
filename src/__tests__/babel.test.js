@@ -5,7 +5,7 @@ const path = require('path');
 const babel = require('@babel/core');
 const dedent = require('dedent');
 const stripAnsi = require('strip-ansi');
-const serializer = require('../__utils__/linaria-snapshot-serializer');
+import serializer from '../__utils__/linaria-snapshot-serializer';
 
 expect.addSnapshotSerializer(serializer);
 
