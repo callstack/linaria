@@ -1,6 +1,6 @@
-import { ElementType } from 'react';
 import { types as t, TransformOptions } from '@babel/core';
 import { NodePath } from '@babel/traverse';
+import { StyledMeta } from '../types';
 
 export type JSONValue = string | number | boolean | JSONObject | JSONArray;
 
@@ -12,22 +12,21 @@ export interface JSONArray extends Array<JSONValue> {}
 
 export type Serializable = JSONArray | JSONObject;
 
-export type Styled = ElementType & {
-  __linaria: {
-    className: string;
-    extends: ElementType | Styled;
-  };
-};
-
 export enum ValueType {
+  COMPONENT,
   LAZY,
   FUNCTION,
   VALUE,
 }
 
-export type Value = Function | Styled | string | number;
+export type Value = Function | StyledMeta | string | number;
 
 export type ValueCache = Map<t.Expression | string, Value>;
+
+export type ComponentValue = {
+  kind: ValueType.COMPONENT;
+  ex: NodePath<t.Expression> | t.Expression | string;
+};
 
 export type LazyValue = {
   kind: ValueType.LAZY;
@@ -44,7 +43,11 @@ export type EvaluatedValue = {
   value: Value;
 };
 
-export type ExpressionValue = LazyValue | FunctionValue | EvaluatedValue;
+export type ExpressionValue =
+  | ComponentValue
+  | LazyValue
+  | FunctionValue
+  | EvaluatedValue;
 
 export type TemplateExpression = {
   styled?: { component: any };
@@ -81,12 +84,26 @@ export type State = {
   };
 };
 
+export type Evaluator = (
+  filename: string,
+  options: StrictOptions,
+  text: string,
+  only: string[] | null
+) => [string, Map<string, string[]> | null];
+
+export type EvalRule = {
+  test?: RegExp | ((path: string) => boolean);
+  action: Evaluator | 'ignore' | string;
+};
+
 export type StrictOptions = {
   classNameSlug: string;
   displayName: boolean;
   evaluate: boolean;
-  ignore: RegExp;
+  ignore?: RegExp;
   babelOptions: TransformOptions;
+  disabled?: boolean;
+  rules: EvalRule[];
 };
 
 export type Location = {
@@ -113,6 +130,12 @@ declare module '@babel/core' {
     };
 
     const VISITOR_KEYS: { [T in keyof VisitorKeys]: VisitorKeys[T][] };
+    const ALIAS_KEYS: {
+      [T in t.Node['type']]: {
+        [K in keyof t.Aliases]: AllNodes[T] extends t.Aliases[K] ? K : never
+      }[keyof t.Aliases][]
+    };
+
     const FLIPPED_ALIAS_KEYS: {
       [T in keyof t.Aliases]: t.Aliases[T]['type'][]
     };
