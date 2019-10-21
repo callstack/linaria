@@ -5,13 +5,8 @@ import { isValidElementType } from 'react-is';
 import generator from '@babel/generator';
 
 import { units } from '../units';
-import {
-  State,
-  Styled,
-  StrictOptions,
-  TemplateExpression,
-  ValueCache,
-} from '../types';
+import { State, StrictOptions, TemplateExpression, ValueCache } from '../types';
+import { StyledMeta } from '../../types';
 
 import throwIfInvalid from '../utils/throwIfInvalid';
 import isSerializable from '../utils/isSerializable';
@@ -30,8 +25,8 @@ type Interpolation = {
   unit: string;
 };
 
-function isStyled(value: any): value is Styled {
-  return isValidElementType(value) && (value as any).__linaria;
+function hasMeta(value: any): value is StyledMeta {
+  return value && typeof value === 'object' && (value as any).__linaria;
 }
 
 export default function getTemplateProcessor(options: StrictOptions) {
@@ -108,7 +103,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
     quasi.quasis.forEach((el, i, self) => {
       let appended = false;
 
-      if (i !== 0) {
+      if (i !== 0 && el.value.cooked !== undefined) {
         // Check if previous expression was a CSS variable that we replaced
         // If it has a unit after it, we need to move the unit into the interpolation
         // e.g. `var(--size)px` should actually be `var(--size)`
@@ -180,7 +175,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
               // Only insert text for non functions
               // We don't touch functions because they'll be interpolated at runtime
 
-              if (isStyled(value)) {
+              if (hasMeta(value)) {
                 // If it's an React component wrapped in styled, get the class name
                 // Useful for interpolating components
                 cssText += `.${value.__linaria.className}`;
@@ -229,7 +224,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
       // it'll ensure that styles are overridden properly
       if (options.evaluate && types.isIdentifier(styled.component.node)) {
         let value = valueCache.get(styled.component.node.name);
-        while (isValidElementType(value) && value.__linaria) {
+        while (isValidElementType(value) && hasMeta(value)) {
           selector += `.${value.__linaria.className}`;
           value = value.__linaria.extends;
         }

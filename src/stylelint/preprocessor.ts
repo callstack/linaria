@@ -1,5 +1,6 @@
 import stripAnsi from 'strip-ansi';
-import transform, { Replacement } from '../transform';
+import transform from '../transform';
+import { Replacement } from '../types';
 
 type Errors = {
   [key: string]:
