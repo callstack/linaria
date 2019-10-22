@@ -229,7 +229,7 @@ This project follows the [all-contributors](https://github.com/kentcdodds/all-co
 [license-badge]: https://img.shields.io/npm/l/linaria.svg?style=flat-square
 [license]: https://opensource.org/licenses/MIT
 [prs-welcome-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
-[prs-welcome]: http://makeapullrequest.com
+[prs-welcome]: https://github.com/callstack/linaria/blob/master/CONTRIBUTING.md
 [coc-badge]: https://img.shields.io/badge/code%20of-conduct-ff69b4.svg?style=flat-square
 [coc]: https://github.com/callstack/linaria/blob/master/CODE_OF_CONDUCT.md
 [all-contributors-badge]: https://img.shields.io/badge/all_contributors-23-orange.svg?style=flat-square
