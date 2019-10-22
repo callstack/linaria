@@ -406,6 +406,34 @@ const StyledCustomCard = styled(CustomCard)`
 `;
 ```
 
+If you want to use linaria classname, which is generated for component, you can get it as last item from `className` prop:
+
+```js
+function CoolComponent({ className, style, variant, ...rest }) {
+  const allClasses = className.split(' ');
+  const linariaClassName = allClasses[allClasses.length - 1];
+
+  const classes = cx(
+    className,
+    variant === 'primary' && `${linariaClassName}--primary`
+  );
+
+  return (
+    <div className={classes} style={style}>
+      {...}
+    </div>
+  );
+}
+
+const StyledCoolComponent = styled(CoolComponent)`
+  background-color: tomato;
+
+  &--primary {
+    background-color: yellow;
+  }
+`;
+```
+
 ## Adding global styles
 
 Normally, the styles are scoped to specific components. But sometimes you may need to write some global styles, for example, to normalize browser inconsistencies, define a font-family etc.
