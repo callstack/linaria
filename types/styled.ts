@@ -65,7 +65,9 @@ styled(Fabric<{ className: string; style: {} }>())`
 `;
 
 styled(Fabric<{ className: string; style: {}; color: 'red' | 'blue' }>())`
-  color: ${props => props.color};
+  & > ${SimplestComponent} {
+    color: ${props => props.color};
+  }
 `;
 
 // $ExpectType number
@@ -74,3 +76,9 @@ Generic({ children: 123 }).props.children;
 const StyledGeneric = styled(Generic)``;
 // $ExpectType number
 StyledGeneric({ children: 123 }).props.children;
+
+styled.a`
+  & > ${SimplestComponent} {
+    color: red;
+  }
+`({ href: 'about:blank' });
