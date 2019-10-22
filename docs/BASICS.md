@@ -406,14 +406,17 @@ const StyledCustomCard = styled(CustomCard)`
 `;
 ```
 
-If you want to use linaria classname, which is generated for component, you can use `linariaClassName` prop:
+If you want to use linaria classname, which is generated for component, you can get it as last item from `className` prop:
 
 ```js
-function CoolComponent({ className, style, linariaClassName, variant, ...rest }) {
-  const classes = classnames(
+function CoolComponent({ className, style, variant, ...rest }) {
+  const allClasses = className.split(' ');
+  const linariaClassName = allClasses[allClasses.length - 1];
+
+  const classes = cx(
     className,
-    [`${linariaClassName}--primary`]: (variant === 'primary')
-  )
+    variant === 'primary' && `${linariaClassName}--primary`
+  );
 
   return (
     <div className={classes} style={style}>
