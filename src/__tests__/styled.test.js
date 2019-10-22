@@ -212,6 +212,35 @@ it('does not filter attributes for components', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
+it('provides linaria component className for composition as last item in props.className', () => {
+  const Custom = props => {
+    const classnames = props.className.split(' ');
+    const linariaClassName = classnames[classnames.length - 1];
+    const newClassNames = [
+      props.className,
+      `${linariaClassName}--primary`,
+      `${linariaClassName}--accessibility`,
+    ].join(' ');
+
+    return (
+      <div className={newClassNames}>
+        original classname used for composition
+      </div>
+    );
+  };
+
+  const Test = styled(Custom)({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  const tree = renderer.create(
+    <Test className="some-another-class">This is a test</Test>
+  );
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
 it('throws when using as tag for template literal', () => {
   expect(
     () =>

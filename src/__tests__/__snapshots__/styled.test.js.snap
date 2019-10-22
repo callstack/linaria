@@ -69,6 +69,14 @@ exports[`merges CSS variables with custom style prop 1`] = `
 </div>
 `;
 
+exports[`provides linaria component className for composition as last item in props.className 1`] = `
+<div
+  className="some-another-class abcdefg abcdefg--primary abcdefg--accessibility"
+>
+  original classname used for composition
+</div>
+`;
+
 exports[`renders component with display name and class name 1`] = `
 <div
   className="abcdefg"
