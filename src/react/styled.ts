@@ -41,13 +41,13 @@ function styled<TConstructor extends React.FunctionComponent<any>>(
       ? TConstructor
       : never
     : never
-): StyledTag<TConstructor>;
+): ComponentStyledTag<TConstructor>;
 function styled<T>(
   tag: T extends { className?: string } ? React.ComponentType<T> : never
-): StyledTag<T>;
-function styled<T extends keyof JSX.IntrinsicElements>(
-  tag: T
-): StyledTag<JSX.IntrinsicElements[T]>;
+): ComponentStyledTag<T>;
+function styled<TName extends keyof JSX.IntrinsicElements>(
+  tag: TName
+): HtmlStyledTag<TName>;
 function styled(tag: any): any {
   return (options: Options) => {
     if (process.env.NODE_ENV !== 'production') {
@@ -143,7 +143,15 @@ type StyledComponent<T> = StyledMeta &
 
 type StaticPlaceholder = string | number | CSSProperties | StyledMeta;
 
-type StyledTag<T> = <
+type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = (
+  strings: TemplateStringsArray,
+  ...exprs: Array<
+    | StaticPlaceholder
+    | ((props: JSX.IntrinsicElements[TName]) => string | number)
+  >
+) => StyledComponent<JSX.IntrinsicElements[TName]>;
+
+type ComponentStyledTag<T> = <
   Props = T extends React.FunctionComponent<infer TProps> ? TProps : T
 >(
   strings: TemplateStringsArray,
@@ -156,9 +164,7 @@ type StyledTag<T> = <
   : StyledComponent<Props>;
 
 type StyledJSXIntrinsics = {
-  readonly [P in keyof JSX.IntrinsicElements]: StyledTag<
-    JSX.IntrinsicElements[P]
-  >
+  readonly [P in keyof JSX.IntrinsicElements]: HtmlStyledTag<P>
 };
 
 export type Styled = typeof styled & StyledJSXIntrinsics;
