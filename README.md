@@ -88,7 +88,7 @@ const header = css`
 `;
 
 // Then use it as a class name
-<h1 class={header}>Hello world</h1>;
+<h1 className={header}>Hello world</h1>;
 ```
 
 You can use imported variables and functions for logic inside the CSS code. They will be evaluated at build time.
