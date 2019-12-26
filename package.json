@@ -56,7 +56,7 @@
     "@babel/preset-typescript": "^7.6.0",
     "@callstack/eslint-config": "^4.1.0",
     "@commitlint/config-conventional": "^7.5.0",
-    "@release-it/conventional-changelog": "^1.0.2",
+    "@release-it/conventional-changelog": "^1.1.0",
     "@types/cosmiconfig": "^5.0.3",
     "@types/dedent": "^0.7.0",
     "@types/enhanced-resolve": "^3.0.6",
@@ -84,7 +84,7 @@
     "prettier": "^1.16.4",
     "react": "^16.8.3",
     "react-test-renderer": "^16.8.3",
-    "release-it": "^12.2.0",
+    "release-it": "^12.4.3",
     "typescript": "^3.5.3"
   },
   "dependencies": {
