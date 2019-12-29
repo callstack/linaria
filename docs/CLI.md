@@ -33,3 +33,5 @@ where `source-root` is directory with source JS files and `insert-css-requires` 
 * `-r, --source-root <dir>` - Directory containing the source JS files
 * `-i, --insert-css-requires <dir>` - Directory containing JS files to insert require statements for the CSS files (__works only if `-r, --source-root` is provided__)
 * `-c, --config-file <filepath>` - Path to the configuration file. If a relative path is given, it'll be resolved relative to the current working directory.
+* `-x, --ignore "<pattern>"` - Pattern of files to ignore. Be sure to wrap with quotes.
+ 

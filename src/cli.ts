@@ -41,6 +41,12 @@ const { argv } = yargs
     requiresArg: true,
   })
   .implies('insert-css-requires', 'source-root')
+  .option('ignore', {
+    alias: 'x',
+    type: 'string',
+    description: 'Pattern of files to ignore. Be sure to provide a string',
+    requiresArg: true,
+  })
   .alias('help', 'h')
   .alias('version', 'v')
   .strict();
@@ -51,6 +57,7 @@ processFiles(argv._, {
   sourceRoot: argv['source-root'],
   insertCssRequires: argv['insert-css-requires'],
   configFile: argv.config,
+  ignore: argv.ignore,
 });
 
 type Options = {
@@ -59,13 +66,17 @@ type Options = {
   sourceRoot?: string;
   insertCssRequires?: string;
   configFile?: string;
+  ignore?: string;
 };
 
 function processFiles(files: string[], options: Options) {
   let count = 0;
 
   const resolvedFiles = files.reduce(
-    (acc, pattern) => [...acc, ...glob.sync(pattern, { absolute: true })],
+    (acc, pattern) => [
+      ...acc,
+      ...glob.sync(pattern, { absolute: true, ignore: options.ignore }),
+    ],
     [] as string[]
   );
 
