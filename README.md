@@ -174,7 +174,7 @@ See [Basics](/docs/BASICS.md) for a detailed information about the syntax.
 
 - Syntax Highlighting - [language-babel](https://marketplace.visualstudio.com/items?itemName=mgmcdermott.vscode-language-babel)
 - Autocompletion - [vscode-styled-components](https://marketplace.visualstudio.com/items?itemName=jpoissonnier.vscode-styled-components)
-- Linting - [stylelint](https://marketplace.visualstudio.com/items?itemName=shinnn.stylelint)
+- Linting - [stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint)
 
 ### Atom
 
