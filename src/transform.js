@@ -4,7 +4,6 @@ import path from 'path';
 import * as babel from '@babel/core';
 import stylis from 'stylis';
 import { SourceMapGenerator } from 'source-map';
-import merge from 'babel-merge';
 import loadOptions, { type PluginOptions } from './babel/utils/loadOptions';
 
 export type Replacement = {
@@ -61,20 +60,26 @@ module.exports = function transform(code: string, options: Options): Result {
 
   const pluginOptions = loadOptions(options.pluginOptions);
 
-  const { metadata, code: transformedCode, map } = babel.transformSync(
+  // Parse the code first so babel uses user's babel config for parsing
+  // We don't want to use user's config when transforming the code
+  const ast = babel.parseSync(code, {
+    ...(pluginOptions ? pluginOptions.babelOptions : null),
+    filename: options.filename,
+    caller: { name: 'linaria' },
+  });
+
+  const { metadata, code: transformedCode, map } = babel.transformFromAstSync(
+    ast,
     code,
-    merge(
-      ...[
-        ...(pluginOptions ? [pluginOptions.babelOptions] : []),
-        {
-          filename: options.filename,
-          presets: [[require.resolve('./babel'), pluginOptions]],
-          sourceMaps: true,
-          sourceFileName: options.filename,
-          inputSourceMap: options.inputSourceMap,
-        },
-      ]
-    )
+    {
+      filename: options.filename,
+      presets: [[require.resolve('./babel'), pluginOptions]],
+      babelrc: false,
+      configFile: false,
+      sourceMaps: true,
+      sourceFileName: options.filename,
+      inputSourceMap: options.inputSourceMap,
+    }
   );
 
   if (!metadata.linaria) {
