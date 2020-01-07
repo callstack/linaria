@@ -66,7 +66,7 @@ module.exports = function transform(code: string, options: Options): Result {
     ...(pluginOptions ? pluginOptions.babelOptions : null),
     filename: options.filename,
     caller: { name: 'linaria' },
-    createParenthesizedExpressions: true,
+    parserOpts: { createParenthesizedExpressions: true },
   });
 
   const { metadata, code: transformedCode, map } = babel.transformFromAstSync(
