@@ -390,7 +390,7 @@ exports[`throws when contains dynamic expression without evaluate: true in css t
   2 | 
   3 | const title = css\`
 > 4 |   font-size: \${size}px;
-    |                ^
+    |                ^^^^
   5 | \`;"
 `;
 

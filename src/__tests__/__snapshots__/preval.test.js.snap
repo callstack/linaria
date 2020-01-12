@@ -407,7 +407,7 @@ CSS:
    ;
 }
 
-Dependencies: core-js/modules/es6.string.raw
+Dependencies: core-js/modules/es.string.raw
 
 `;
 
@@ -600,7 +600,7 @@ exports[`throws codeframe error when evaluation fails 1`] = `
   4 | 
   5 | export const Title = styled.h1\`
 > 6 |   font-size: \${foo()}px;
-    |                ^
+    |                ^^^^^
   7 | \`;"
 `;
 
@@ -623,7 +623,7 @@ exports[`throws when interpolation evaluates to NaN 1`] = `
   4 | 
   5 | export const Title = styled.h1\`
 > 6 |   height: \${height}px;
-    |             ^
+    |             ^^^^^^
   7 | \`;"
 `;
 
@@ -632,7 +632,7 @@ exports[`throws when interpolation evaluates to null 1`] = `
   4 | 
   5 | export const Title = styled.h1\`
 > 6 |   color: \${color};
-    |            ^
+    |            ^^^^^
   7 | \`;"
 `;
 
@@ -641,6 +641,6 @@ exports[`throws when interpolation evaluates to undefined 1`] = `
   4 | 
   5 | export const Title = styled.h1\`
 > 6 |   font-size: \${fontSize};
-    |                ^
+    |                ^^^^^^^^
   7 | \`;"
 `;
