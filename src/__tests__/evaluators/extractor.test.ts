@@ -36,7 +36,7 @@ function _shake(
       only
     );
 
-    return [shaken, deps];
+    return [shaken, deps!];
   };
 }
 

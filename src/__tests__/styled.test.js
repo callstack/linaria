@@ -1,8 +1,6 @@
-/* @flow */
-
 const React = require('react');
 const renderer = require('react-test-renderer');
-const styled: any = require('../react/styled').default;
+const styled = require('../react/styled').default;
 
 it('renders tag with display name and class name', () => {
   const Test = styled('h1')({
