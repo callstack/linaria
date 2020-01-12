@@ -97,7 +97,7 @@ export type EvalRule = {
 };
 
 export type StrictOptions = {
-  classNameSlug: string;
+  classNameSlug?: string;
   displayName: boolean;
   evaluate: boolean;
   ignore?: RegExp;
