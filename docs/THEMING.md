@@ -19,7 +19,7 @@ const b = css`
 `;
 
 // Apply a theme to the root element
-<Container class={a} />;
+<Container className={a} />;
 ```
 
 Now, we can use these variables in any of the child elements:
@@ -39,7 +39,7 @@ Another approach is to add a class name representing the theme (e.g. - `theme-da
 For example, let's add the theme to the root component:
 
 ```js
-<Container class="theme-dark" />
+<Container className="theme-dark" />
 ```
 
 Now, we can conditionally style any child element according to the theme:

@@ -26,7 +26,7 @@ However, it's not possible to use inline styles with pseudo-selectors or media q
 
 ```js
 import React from 'react';
-import { css, styles } from 'linaria';
+import { css } from 'linaria';
 
 const box = css`
   height: var(--box-size);
@@ -51,7 +51,7 @@ For color values, browsers support a `currentColor` property which points to the
 
 ```js
 import React from 'react';
-import { css, styles } from 'linaria';
+import { css } from 'linaria';
 
 const box = css`
   background-color: currentColor;

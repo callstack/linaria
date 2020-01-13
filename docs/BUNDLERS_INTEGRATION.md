@@ -45,7 +45,12 @@ Now add the following snippet in under `module.rules`:
 {
   test: /\.css$/,
   use: [
-    MiniCssExtractPlugin.loader,
+    {
+      loader: MiniCssExtractPlugin.loader,
+      options: {
+        hmr: process.env.NODE_ENV !== 'production',
+      },
+    },
     {
       loader: 'css-loader',
       options: {
@@ -66,7 +71,17 @@ new MiniCssExtractPlugin({
 
 This will extract the CSS from all files into a single `styles.css`. Then you can to link to this file in your HTML file manually or use something like [`HTMLWebpackPlugin`](https://github.com/jantimon/html-webpack-plugin).
 
-If you want to hot reload your styles when they change, you will also need to configure [`style-loader`](https://github.com/webpack-contrib/style-loader) or [`css-hot-loader`](https://github.com/shepherdwind/css-hot-loader).
+It will also hot reload your styles when in a development environment.
+
+For production usage, you should include a hash in the filename:
+
+```js
+new MiniCssExtractPlugin({
+  filename: 'styles-[contenthash].css',
+});
+```
+
+Using a hash like this allows for a far future `Expires` header to be used, to improve cache efficiency. To link to the correct filename, you can either use [`HTMLWebpackPlugin`](https://github.com/jantimon/html-webpack-plugin) for a static HTML file, or [`assets-webpack-plugin`](https://yarn.pm/assets-webpack-plugin) to save the filename to a JSON file which you can then read in your server-side code.
 
 Linaria integrates with your CSS pipeline, so you can always perform additional operations on the CSS, for example, using [postcss](https://postcss.org/) plugins such as [clean-css](https://github.com/jakubpawlowicz/clean-css) to further minify your CSS.
 
@@ -117,8 +132,12 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          'css-hot-loader',
-          MiniCssExtractPlugin.loader,
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              hmr: process.env.NODE_ENV !== 'production',
+            },
+          },
           {
             loader: 'css-loader',
             options: { sourceMap: dev },
@@ -143,7 +162,7 @@ You can copy this file to your project if you are starting from scratch.
 To install the dependencies used in the example config, run:
 
 ```sh
-yarn add --dev webpack webpack-cli webpack-dev-server mini-css-extract-plugin css-loader css-hot-loader file-loader babel-loader
+yarn add --dev webpack webpack-cli webpack-dev-server mini-css-extract-plugin css-loader file-loader babel-loader
 ```
 
 You can now run the dev server by running `webpack-dev-server` and build the files by running `webpack`.

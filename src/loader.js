@@ -43,6 +43,7 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
       ? {
           ...resolveOptions,
           alias: this._compilation.options.resolve.alias,
+          modules: this._compilation.options.resolve.modules,
         }
       : resolveOptions
   );
