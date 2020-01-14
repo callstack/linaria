@@ -25,11 +25,13 @@ export default function loader(
 
   const root = workspaceRoot !== null ? workspaceRoot : process.cwd();
 
-  const outputFilename = path.join(
-    path.isAbsolute(cacheDirectory)
-      ? cacheDirectory
-      : path.join(process.cwd(), cacheDirectory),
-    path.relative(root, this.resourcePath.replace(/\.[^.]+$/, extension))
+  const outputFilename = normalize(
+    path.join(
+      path.isAbsolute(cacheDirectory)
+        ? cacheDirectory
+        : path.join(process.cwd(), cacheDirectory),
+      path.relative(root, this.resourcePath.replace(/\.[^.]+$/, extension))
+    )
   );
 
   const resolveOptions = {
@@ -61,7 +63,7 @@ export default function loader(
       resolveSync(path.dirname(filename), id);
 
     result = transform(content, {
-      filename: this.resourcePath,
+      filename: path.relative(root, this.resourcePath),
       inputSourceMap: inputSourceMap != null ? inputSourceMap : undefined,
       outputFilename,
       pluginOptions: rest,
@@ -112,7 +114,10 @@ export default function loader(
 
     this.callback(
       null,
-      `${result.code}\n\nrequire("${normalize(outputFilename)}");`,
+      `${result.code}\n\nrequire(${loaderUtils.stringifyRequest(
+        this,
+        outputFilename
+      )});`,
       result.sourceMap
     );
     return;
