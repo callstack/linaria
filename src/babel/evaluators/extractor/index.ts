@@ -52,7 +52,7 @@ const extractor: Evaluator = (filename, options, text, only = null) => {
   // because there is some kind of cache inside `traverse` which
   // reuses `NodePath` with a wrong scope.
   // There is probably a better solution, but I haven't found it yet.
-  const ast = parseSync(code!);
+  const ast = parseSync(code!, { filename: filename + '.preval' });
 
   // First of all, let's find a __linariaPreval export
   traverse(ast!, {
