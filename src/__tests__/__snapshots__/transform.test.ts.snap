@@ -6,11 +6,11 @@ exports[`doesn't rewrite an absolute path in url() declarations 1`] = `
 `;
 
 exports[`rewrites a relative path in url() declarations 1`] = `
-".tpyglzj{background-image:url(../linaria/assets/test.jpg);}
+".tpyglzj{background-image:url(../assets/test.jpg);}
 "
 `;
 
 exports[`rewrites multiple relative paths in url() declarations 1`] = `
-"@font-face{font-family:Test;src:url(../linaria/assets/font.woff2) format(\\"woff2\\"),url(../linaria/assets/font.woff) format(\\"woff\\");}
+"@font-face{font-family:Test;src:url(../assets/font.woff2) format(\\"woff2\\"),url(../assets/font.woff) format(\\"woff\\");}
 "
 `;
