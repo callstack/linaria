@@ -6,8 +6,11 @@ const mkdirp = require('mkdirp');
 const normalize = require('normalize-path');
 const loaderUtils = require('loader-utils');
 const enhancedResolve = require('enhanced-resolve/lib/node');
+const findYarnWorkspaceRoot = require('find-yarn-workspace-root');
 const Module = require('./babel/module');
 const transform = require('./transform');
+
+const workspaceRoot = findYarnWorkspaceRoot();
 
 module.exports = function loader(content: string, inputSourceMap: ?Object) {
   const {
@@ -17,14 +20,13 @@ module.exports = function loader(content: string, inputSourceMap: ?Object) {
     ...rest
   } = loaderUtils.getOptions(this) || {};
 
+  const root = workspaceRoot !== null ? workspaceRoot : process.cwd();
+
   const outputFilename = path.join(
     path.isAbsolute(cacheDirectory)
       ? cacheDirectory
       : path.join(process.cwd(), cacheDirectory),
-    path.relative(
-      process.cwd(),
-      this.resourcePath.replace(/\.[^.]+$/, '.linaria.css')
-    )
+    path.relative(root, this.resourcePath.replace(/\.[^.]+$/, '.linaria.css'))
   );
 
   const resolveOptions = {
