@@ -767,6 +767,10 @@ function run(evaluator: Evaluator): void {
   });
 }
 
+describe('shaker', () => {
+  run(require('../babel/evaluators/shaker').default);
+});
+
 describe('extractor', () => {
   run(require('../babel/evaluators/extractor').default);
 });
