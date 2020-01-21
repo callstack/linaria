@@ -54,13 +54,13 @@ import React from 'react';
 import { css } from 'linaria';
 
 const box = css`
-  &[data-validation] {
+  &[data-valid] {
     color: yellow;
   }
-  &[data-validation="invalid"] {
+  &[data-valid="invalid"] {
     color: red;
   }
-  &[data-validation="valid"] {
+  &[data-valid="valid"] {
     color: green;
   }
 `
