@@ -63,7 +63,7 @@ export default function loader(
       resolveSync(path.dirname(filename), id);
 
     result = transform(content, {
-      filename: path.relative(root, this.resourcePath),
+      filename: path.relative(process.cwd(), this.resourcePath),
       inputSourceMap: inputSourceMap != null ? inputSourceMap : undefined,
       outputFilename,
       pluginOptions: rest,
