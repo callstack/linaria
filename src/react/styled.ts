@@ -1,4 +1,4 @@
-import React from 'react'; // eslint-disable-line import/no-extraneous-dependencies
+import * as React from 'react'; // eslint-disable-line import/no-extraneous-dependencies
 import validAttr from '@emotion/is-prop-valid';
 import { cx } from '../index';
 import { StyledMeta } from '../types';
