@@ -45,6 +45,36 @@ export function Box({ size }) {
 
 The [browser support for CSS custom properties](http://caniuse.com/#feat=css-variables) is limited, and it's not polyfilled. Therefore it's not a viable approach if you need to support older browsers. Worth noting that custom properties cascade, so if you don't override the value for the current element, and a custom property with the same name exists for a parent element, it'll be used instead.
 
+## Data attributes
+
+In cases where you know the values ahead of time, you can use [data attributes](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) to dynamically switch the styles that are applied.
+
+```js
+import React from 'react';
+import { css } from 'linaria';
+
+const box = css`
+  &[data-valid] {
+    color: yellow;
+  }
+  &[data-valid="invalid"] {
+    color: red;
+  }
+  &[data-valid="valid"] {
+    color: green;
+  }
+`
+
+export function Box({ color, valid }) {
+  return (
+    <div
+      className={box}
+      data-valid={valid ? 'valid' : 'invalid'}
+    />
+  );
+}
+```
+
 ## `currentColor`
 
 For color values, browsers support a `currentColor` property which points to the text color of the element. It is well supported in all browsers.
