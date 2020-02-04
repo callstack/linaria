@@ -1,75 +1,110 @@
-version: 2
-defaults: &defaults
-  docker:
-    - image: circleci/node:10
-  working_directory: ~/linaria
-jobs:
-  install-dependencies:
-    <<: *defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/linaria
-      - restore_cache:
-          keys:
-            - dependencies-{{ checksum "package.json" }}
-            - dependencies-
-      - restore_cache:
-          keys:
-            - dependencies-website-{{ checksum "website/package.json" }}
-            - dependencies-website-
-      - run: |
-          yarn install --frozen-lockfile
-          yarn install --frozen-lockfile --cwd website
-      - save_cache:
-          key: dependencies-{{ checksum "package.json" }}
-          paths: node_modules
-      - save_cache:
-          key: dependencies-website-{{ checksum "website/package.json" }}
-          paths: website/node_modules
-      - persist_to_workspace:
-          root: .
-          paths: .
-  lint-and-typecheck:
-      <<: *defaults
-      steps:
-        - attach_workspace:
-            at: ~/linaria
-        - run: |
-            yarn lint
-            yarn typescript
-  unit-tests:
-      <<: *defaults
-      steps:
-        - attach_workspace:
-            at: ~/linaria
-        - run: |
-            yarn test --coverage
-            cat ./coverage/lcov.info | ./node_modules/.bin/codecov
-            bash .circleci/comment-artifacts.sh
-        - store_artifacts:
-            path: coverage
-            destination: coverage
-  lint-website:
-      <<: *defaults
-      steps:
-        - attach_workspace:
-            at: ~/linaria
-        - run: |
-            yarn prepare
-            yarn --cwd website lint:css
+version: 2.1
 
+executors:
+    node-v12:
+        docker:
+            - image: circleci/node:12
+        working_directory: ~/linaria
+    node-v10:
+        docker:
+            - image: circleci/node:10
+        working_directory: ~/linaria
+commands:
+    install-dependencies:
+        steps:
+            - checkout
+            - attach_workspace:
+                at: ~/linaria
+            - restore_cache:
+                keys:
+                  - dependencies-{{ checksum "package.json" }}
+                  - dependencies-
+            - restore_cache:
+                keys:
+                  - dependencies-website-{{ checksum "website/package.json" }}
+                  - dependencies-website-
+            - run: |
+                yarn install --frozen-lockfile
+                yarn install --frozen-lockfile --cwd website
+            - save_cache:
+                key: dependencies-{{ checksum "package.json" }}
+                paths: node_modules
+            - save_cache:
+                key: dependencies-website-{{ checksum "website/package.json" }}
+                paths: website/node_modules
+            - persist_to_workspace:
+                root: .
+                paths: .
+    lint-and-typecheck:
+        steps:
+          - attach_workspace:
+              at: ~/linaria
+          - run: |
+              yarn lint
+              yarn typescript
+    unit-tests:
+        steps:
+          - attach_workspace:
+              at: ~/linaria
+          - run: |
+              yarn test
+    unit-tests-and-coverage:
+        steps:
+          - attach_workspace:
+              at: ~/linaria
+          - run: |
+              yarn test --coverage
+              cat ./coverage/lcov.info | ./node_modules/.bin/codecov
+              bash .circleci/comment-artifacts.sh
+          - store_artifacts:
+              path: coverage
+              destination: coverage
+    lint-website:
+        steps:
+          - attach_workspace:
+              at: ~/linaria
+          - run: |
+              yarn prepare
+              yarn --cwd website lint:css
+jobs:
+    install-dependencies:
+        executor: node-v12
+        steps:
+            - install-dependencies
+    install-dependencies-v10:
+        executor: node-v10
+        steps:
+            - install-dependencies
+    lint-and-typecheck:
+        executor: node-v12
+        steps:
+            - lint-and-typecheck
+    lint-website:
+        executor: node-v12
+        steps:
+            - lint-website
+    unit-tests-and-coverage:
+        executor: node-v12
+        steps:
+            - unit-tests-and-coverage
+    unit-tests-node-v10:
+        executor: node-v10
+        steps:
+            - unit-tests
 workflows:
-  version: 2
-  build-and-test:
-    jobs:
-      - install-dependencies
-      - lint-and-typecheck:
-          requires:
+    multiple_builds:
+        jobs:
+            - install-dependencies-v10
             - install-dependencies
-      - unit-tests:
-          requires:
-            - install-dependencies
-      - lint-website:
-          requires:
-            - install-dependencies
+            - lint-and-typecheck:
+                requires:
+                    - install-dependencies
+            - lint-website:
+                requires:
+                    - install-dependencies
+            - unit-tests-and-coverage:
+                requires:
+                    - install-dependencies
+            - unit-tests-node-v10:
+                requires:
+                    - install-dependencies-v10
