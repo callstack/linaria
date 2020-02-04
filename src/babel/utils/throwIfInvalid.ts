@@ -3,12 +3,10 @@ import isSerializable from './isSerializable';
 import { Serializable } from '../types';
 
 // Throw if we can't handle the interpolated value
-function throwIfInvalid(value: Function, ex: any): void;
-function throwIfInvalid(value: string, ex: any): void;
-function throwIfInvalid(value: number, ex: any): void;
-function throwIfInvalid(value: Serializable, ex: any): void;
-function throwIfInvalid(value: any, ex: any): never;
-function throwIfInvalid(value: any, ex: any): void | never {
+function throwIfInvalid(
+  value: Error | Function | string | number | Serializable | undefined,
+  ex: any
+): void {
   if (
     typeof value === 'function' ||
     typeof value === 'string' ||
@@ -19,11 +17,9 @@ function throwIfInvalid(value: any, ex: any): void | never {
   }
 
   // We can't use instanceof here so let's use duck typing
-  if (value && value.stack && value.message) {
+  if (value && typeof value !== 'number' && value.stack && value.message) {
     throw ex.buildCodeFrameError(
-      `An error occurred when evaluating the expression: ${
-        value.message
-      }. Make sure you are not using a browser or Node specific API.`
+      `An error occurred when evaluating the expression: ${value.message}. Make sure you are not using a browser or Node specific API.`
     );
   }
 

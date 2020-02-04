@@ -23,8 +23,8 @@ function isAlias(type: NodeType): type is keyof t.Aliases {
   return type in t.FLIPPED_ALIAS_KEYS;
 }
 
-export function defineHandler<T extends NodeType>(
-  typeOrAlias: T,
+export function defineHandler(
+  typeOrAlias: NodeType,
   field: string,
   handler: Handler
 ) {

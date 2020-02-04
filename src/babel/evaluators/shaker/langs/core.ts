@@ -510,7 +510,10 @@ export const identifierHandlers: IdentifierHandlers = {
     ['ThrowStatement', 'argument'],
     ['VariableDeclarator', 'id'],
   ],
-  keep: [['FunctionExpression', 'id'], ['ObjectProperty', 'key']],
+  keep: [
+    ['FunctionExpression', 'id'],
+    ['ObjectProperty', 'key'],
+  ],
   refer: [
     ['ArrayExpression', 'elements'],
     ['AssignmentExpression', 'left', 'right'],

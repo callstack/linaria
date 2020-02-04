@@ -84,11 +84,11 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       const answer = 42;
       const foo = () => answer;
       const days = foo() + ' days';
-  
+
       export const Title = styled.h1\`
         &:before {
           content: "${'${days}'}"
@@ -105,11 +105,11 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       {
         var days = 42;
       }
-  
+
       export const Title = styled.h1\`
         &:before {
           content: "${'${days}'}"
@@ -129,11 +129,11 @@ function run(evaluator: Evaluator): void {
       await transpile(
         dedent`
         import { styled } from 'linaria/react';
-    
+
         {
           const days = 42;
         }
-    
+
         export const Title = styled.h1\`
           &:before {
             content: "${'${days}'}"
@@ -152,13 +152,13 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       function copyAndExtend(a, b) {
         return { ...a, ...b };
       }
-      
+
       const obj = copyAndExtend({ a: 1 }, { a: 2 });
-  
+
       export const Title = styled.h1\`
         &:before {
           content: "${'${obj.a}'}"
@@ -199,10 +199,10 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       const answer = 42;
       const foo = () => answer;
-  
+
       export const Title = styled.h1\`
         &:before {
           content: "${"${foo() + ' days'}"}"
@@ -219,13 +219,13 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       const objects = { key: { fontSize: 12 } };
       const foo = (k) => {
         const obj = objects[k];
         return obj;
       };
-  
+
       export const Title = styled.h1\`
         ${"${foo('key')}"}
       \`;
@@ -241,7 +241,7 @@ function run(evaluator: Evaluator): void {
       dedent`
       import { styled } from 'linaria/react';
       import slugify from '../slugify';
-  
+
       export const Title = styled.h1\`
         &:before {
           content: "${"${slugify('test')}"}"
@@ -259,10 +259,10 @@ function run(evaluator: Evaluator): void {
       dedent`
       import { styled } from 'linaria/react';
       const slugify = require('../slugify').default;
-  
+
       const boo = t => slugify(t) + 'boo';
       const bar = t => slugify(t) + 'bar';
-  
+
       export const Title = styled.h1\`
         &:before {
           content: "${"${boo('test') + bar('test')}"}"
@@ -280,10 +280,10 @@ function run(evaluator: Evaluator): void {
       dedent`
       import { styled } from 'linaria/react';
       const slugify = require('../slugify').default;
-  
+
       const boo = t => slugify(t) + 'boo';
       const bar = t => slugify(t) + 'bar';
-  
+
       export const Title = styled.h1\`
         &:before {
           content: "${"${boo('test')}"}"
@@ -301,7 +301,7 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       export const Title = styled.h1\`
         color: ${'${(external, () => "blue")}'};
       \`;
@@ -316,9 +316,9 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       const color = (external, () => 'blue');
-  
+
       export const Title = styled.h1\`
         color: ${'${color}'};
       \`;
@@ -333,11 +333,11 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       const { styled } = require('../react');
-  
+
       export const Title = styled.h1\`
         color: red;
       \`;
-  
+
       export const Paragraph = styled.p\`
         ${'${Title}'} {
           color: blue;
@@ -357,9 +357,9 @@ function run(evaluator: Evaluator): void {
       await transpile(
         dedent`
         const { styled } = require('../react');
-  
+
         let fontSize;
-  
+
         export const Title = styled.h1\`
           font-size: ${'${fontSize}'};
         \`;
@@ -379,9 +379,9 @@ function run(evaluator: Evaluator): void {
       await transpile(
         dedent`
         const { styled } = require('../react');
-  
+
         const color = null;
-  
+
         export const Title = styled.h1\`
           color: ${'${color}'};
         \`;
@@ -401,9 +401,9 @@ function run(evaluator: Evaluator): void {
       await transpile(
         dedent`
         const { styled } = require('../react');
-  
+
         const height = NaN;
-  
+
         export const Title = styled.h1\`
           height: ${'${height}'}px;
         \`;
@@ -421,16 +421,16 @@ function run(evaluator: Evaluator): void {
       dedent`
       const { css } = require('..');
       const { styled } = require('../react');
-  
+
       const Title = styled.h1\`
         color: red;
       \`;
-      
+
       export const BlueTitle = styled(Title)\`
         font-size: 24px;
         color: blue;
       \`;
-      
+
       export const GreenTitle = styled(BlueTitle)\`
         color: green;
       \`;
@@ -445,13 +445,13 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       const { styled } = require('../react');
-  
+
       const Title = styled.h1\`
         color: red;
       \`;
-      
+
       const hoc = Cmp => Cmp;
-  
+
       export const CustomTitle = styled(hoc(Title))\`
         font-size: 24px;
         color: blue;
@@ -467,7 +467,7 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
         position: 'absolute',
         top,
@@ -475,7 +475,7 @@ function run(evaluator: Evaluator): void {
         bottom,
         left,
       });
-  
+
       export const Title = styled.h1\`
         ${'${fill(0, 0)}'}
       \`;
@@ -490,7 +490,7 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       const fill = (top = 0, left = 0, right = 0, bottom = 0) => [
         { position: 'absolute' },
         {
@@ -500,7 +500,7 @@ function run(evaluator: Evaluator): void {
           left,
         }
       ];
-  
+
       export const Title = styled.h1\`
         ${'${fill(0, 0)}'}
       \`;
@@ -515,7 +515,7 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       export const Title = styled.h1\`
         &:before {
           content: "${'${props => props.content}'}"
@@ -535,19 +535,19 @@ function run(evaluator: Evaluator): void {
       import React from 'react';
       import { styled } from 'linaria/react';
       import constant from './broken-dependency';
-      
+
       const FuncComponent = (props) => ${div};
-      
+
       class ClassComponent extends React.PureComponent {
-        method() { 
+        method() {
             return constant;
         }
-      
+
         render() {
             return ${div};
         }
       }
-  
+
       export const StyledFunc = styled(FuncComponent)\`
         color: red;
       \`;
@@ -569,7 +569,7 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       export const Title = styled.h1\`
         &:before {
           content: "${'${function(props) { return props.content }}'}"
@@ -586,9 +586,9 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       const generate = props => props.content;
-  
+
       export const Title = styled.h1\`
         &:before {
           content: "${'${generate}'}"
@@ -606,13 +606,13 @@ function run(evaluator: Evaluator): void {
       dedent`
       import { css } from '../index.ts';
       export const bareIconClass = css\`\`;
-  
+
       const getSizeStyles = (fs) => ({
         [\`${'&.${bareIconClass}'}\`]: {
           fontSize: fs * 1.5,
         },
       });
-  
+
       export const SIZES = {
         XS: css\`${'${getSizeStyles(11)}'}\`,
       };
@@ -630,9 +630,9 @@ function run(evaluator: Evaluator): void {
       await transpile(
         dedent`
         import { styled } from 'linaria/react';
-  
+
         const foo = props => { throw new Error('This will fail') };
-  
+
         export const Title = styled.h1\`
           font-size: ${'${foo()}'}px;
         \`;
@@ -679,7 +679,7 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transformAsync(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       export default styled.h1\`
         font-size: 14px;
       \`;
@@ -698,7 +698,7 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transformAsync(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       export default styled.h1\`
         font-size: 14px;
       \`;
@@ -720,7 +720,7 @@ function run(evaluator: Evaluator): void {
       await transformAsync(
         dedent`
         import { styled } from 'linaria/react';
-  
+
         export default styled.h1\`
           font-size: 14px;
         \`;
@@ -741,9 +741,9 @@ function run(evaluator: Evaluator): void {
     const { code, metadata } = await transformAsync(
       dedent`
       import { styled } from 'linaria/react';
-  
+
       const a = 42;
-  
+
       export const Title = styled.h1\`
         height: ${'${a}'}px;
       \`;
@@ -755,7 +755,10 @@ function run(evaluator: Evaluator): void {
         plugins: [
           [
             // eslint-disable-next-line import/no-extraneous-dependencies
-            require('babel-plugin-istanbul').default({ types: babel.types }),
+            require('babel-plugin-istanbul').default({
+              ...babel,
+              assertVersion: () => {},
+            }),
             { cwd: '/home/user/project' },
           ],
         ],

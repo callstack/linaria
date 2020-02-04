@@ -2,50 +2,16 @@
 
 exports[`keeps objects as is 1`] = `
 "{
-  const fill1 = function fill1(top, left, right, bottom) {
-    if (top === void 0) {
-      top = 0;
-    }
-
-    if (left === void 0) {
-      left = 0;
-    }
-
-    if (right === void 0) {
-      right = 0;
-    }
-
-    if (bottom === void 0) {
-      bottom = 0;
-    }
-
-    return {
-      position: 'absolute',
-      top,
-      right,
-      bottom,
-      left
-    };
-  };
+  const fill1 = (top = 0, left = 0, right = 0, bottom = 0) => ({
+    position: 'absolute',
+    top,
+    right,
+    bottom,
+    left
+  });
 
   {
-    const fill2 = function fill2(top, left, right, bottom) {
-      if (top === void 0) {
-        top = 0;
-      }
-
-      if (left === void 0) {
-        left = 0;
-      }
-
-      if (right === void 0) {
-        right = 0;
-      }
-
-      if (bottom === void 0) {
-        bottom = 0;
-      }
-
+    const fill2 = (top = 0, left = 0, right = 0, bottom = 0) => {
       return {
         position: 'absolute',
         top,

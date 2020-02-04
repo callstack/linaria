@@ -164,7 +164,7 @@ type ComponentStyledTag<T> = <
   : StyledComponent<Props>;
 
 type StyledJSXIntrinsics = {
-  readonly [P in keyof JSX.IntrinsicElements]: HtmlStyledTag<P>
+  readonly [P in keyof JSX.IntrinsicElements]: HtmlStyledTag<P>;
 };
 
 export type Styled = typeof styled & StyledJSXIntrinsics;

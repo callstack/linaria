@@ -18,5 +18,5 @@ export type Visitors = { [TMethod in NodeType]?: Visitor<NodeOfType<TMethod>> };
 export type IdentifierHandlerType = 'declare' | 'keep' | 'refer';
 
 export type IdentifierHandlers = {
-  [key in IdentifierHandlerType]: [NodeType, ...string[]][]
+  [key in IdentifierHandlerType]: [NodeType, ...string[]][];
 };

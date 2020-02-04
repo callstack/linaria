@@ -237,7 +237,8 @@ class Module {
         }
 
         if (typeof test === 'function') {
-          // eslint-disable-next-line jest/no-disabled-tests this is not a test
+          // this is not a test
+          // eslint-disable-next-line jest/no-disabled-tests
           return test(filename);
         }
 

@@ -119,25 +119,25 @@ declare module '@babel/core' {
       [T in keyof AllNodes]: Extract<
         keyof AllNodes[T],
         {
-          [Key in keyof AllNodes[T]]: AllNodes[T][Key] extends (
+          [Key in keyof AllNodes[T]]: AllNodes[T][Key] extends
             | t.Node
             | t.Node[]
-            | null)
+            | null
             ? Key
-            : never
+            : never;
         }[keyof AllNodes[T]]
-      >
+      >;
     };
 
     const VISITOR_KEYS: { [T in keyof VisitorKeys]: VisitorKeys[T][] };
     const ALIAS_KEYS: {
       [T in t.Node['type']]: {
-        [K in keyof t.Aliases]: AllNodes[T] extends t.Aliases[K] ? K : never
-      }[keyof t.Aliases][]
+        [K in keyof t.Aliases]: AllNodes[T] extends t.Aliases[K] ? K : never;
+      }[keyof t.Aliases][];
     };
 
     const FLIPPED_ALIAS_KEYS: {
-      [T in keyof t.Aliases]: t.Aliases[T]['type'][]
+      [T in keyof t.Aliases]: t.Aliases[T]['type'][];
     };
 
     function shallowEqual(actual: object, expected: object): boolean;

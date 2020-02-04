@@ -45,7 +45,7 @@ it('removes all', () => {
     const { whiteColor: color, anotherColor } = require('…');
     const a = color || anotherColor;
     color.green = '#0f0';
-    
+
     exports.__linariaPreval = [];
   `;
 
@@ -149,7 +149,8 @@ it('shakes es5 exports', () => {
   expect(shaken).toMatchSnapshot();
 });
 
-// eslint-disable-next-line jest/no-disabled-tests this test will be disabled until the shaker is fully implemented
+// TODO: this test will be disabled until the shaker is fully implemented
+// eslint-disable-next-line jest/no-disabled-tests
 it.skip('should throw away any side effects', () => {
   const [shaken] = _shake()`
     const objects = { key: { fontSize: 12 } };
@@ -208,7 +209,7 @@ it('shakes assignment patterns', () => {
     const [{...object} = {}] = [{ a: 1, b: 2 }];
     const [[...array] = []] = [[1,2,3,4]];
     const obj = { member: null };
-    ([obj.member = 42] = [1]);        
+    ([obj.member = 42] = [1]);
     exports.__linariaPreval = [identifier, object, array, obj];
   `;
 
