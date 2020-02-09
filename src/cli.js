@@ -109,6 +109,10 @@ function processFiles(files: string[], options: Options) {
           path.relative(options.sourceRoot, filename)
         );
 
+        const normalizedInputFilename = resolveRequireInsertionFilename(
+          inputFilename
+        );
+
         const relativePath = normalize(
           path.relative(path.dirname(inputFilename), outputFilename)
         );
@@ -117,11 +121,11 @@ function processFiles(files: string[], options: Options) {
           relativePath.startsWith('.') ? relativePath : `./${relativePath}`
         }');`;
 
-        const inputContent = fs.readFileSync(inputFilename, 'utf-8');
+        const inputContent = fs.readFileSync(normalizedInputFilename, 'utf-8');
 
         if (!inputContent.trim().endsWith(requireStatement)) {
           fs.writeFileSync(
-            inputFilename,
+            normalizedInputFilename,
             `${inputContent}\n${requireStatement}\n`
           );
         }
@@ -132,6 +136,10 @@ function processFiles(files: string[], options: Options) {
   });
 
   console.log(`Successfully extracted ${count} CSS files.`);
+}
+
+function resolveRequireInsertionFilename(filename: string) {
+  return filename.replace(/\.tsx?/, '.js');
 }
 
 function resolveOutputFilename(filename: string, outDir: string) {
