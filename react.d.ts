@@ -15,7 +15,7 @@ type StyledTag<T> = <Props = T>(
   ...exprs: Array<
     string | number | CSSProperties | ((props: Props) => string | number)
   >
-) => StyledComponent<Props>;
+) => StyledComponent<Props & T>;
 
 type StyledJSXIntrinsics = {
   readonly [P in keyof JSX.IntrinsicElements]: StyledTag<
