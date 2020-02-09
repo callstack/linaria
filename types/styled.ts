@@ -82,3 +82,11 @@ styled.a`
     color: red;
   }
 `({ href: 'about:blank' });
+
+// Issue #536
+const Title = styled.div<{ background: string }>`
+  background: ${props => props.background};
+`;
+
+// $ExpectType "extends"
+isExtends<typeof Title, React.FC<{ background: string }>>();

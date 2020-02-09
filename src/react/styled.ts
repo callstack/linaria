@@ -143,13 +143,19 @@ type StyledComponent<T> = StyledMeta &
 
 type StaticPlaceholder = string | number | CSSProperties | StyledMeta;
 
-type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = (
+type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
+  TAdditionalProps = {}
+>(
   strings: TemplateStringsArray,
   ...exprs: Array<
     | StaticPlaceholder
-    | ((props: JSX.IntrinsicElements[TName]) => string | number)
+    | ((
+        // Without Omit here TS tries to infer TAdditionalProps
+        // from a component passed for interpolation
+        props: JSX.IntrinsicElements[TName] & Omit<TAdditionalProps, never>
+      ) => string | number)
   >
-) => StyledComponent<JSX.IntrinsicElements[TName]>;
+) => StyledComponent<JSX.IntrinsicElements[TName] & TAdditionalProps>;
 
 type ComponentStyledTag<T> = <
   Props = T extends React.FunctionComponent<infer TProps> ? TProps : T
