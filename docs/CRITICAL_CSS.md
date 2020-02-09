@@ -58,4 +58,4 @@ app.get('/styles/:slug', (req, res) => {
 app.listen(3242);
 ```
 
-By placing the non-critical CSS at the end of `body`, you can make sure that page rendering is not blocked untill the CSS is loaded. You can also load the non-critical CSS lazily with JavaScript once the page has loaded for a more efficient strategy. However, it's highly recommended that you take advantage of code splitting in webpack which gives you automatic CSS chunks in addition to critical CSS.
+By placing the non-critical CSS at the end of `body`, you can make sure that page rendering is not blocked until the CSS is loaded. You can also load the non-critical CSS lazily with JavaScript once the page has loaded for a more efficient strategy. However, it's highly recommended that you take advantage of code splitting in webpack which gives you automatic CSS chunks in addition to critical CSS.

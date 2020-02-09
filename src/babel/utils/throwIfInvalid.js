@@ -8,7 +8,9 @@ export default function throwIfInvalid(value: any, ex: any) {
   if (
     typeof value === 'function' ||
     typeof value === 'string' ||
-    (typeof value === 'number' && Number.isFinite(value)) ||
+    value instanceof String ||
+    ((typeof value === 'number' || value instanceof Number) &&
+      Number.isFinite(value)) ||
     isSerializable(value)
   ) {
     return;

@@ -13,12 +13,15 @@
           ]
         },
         "useBuiltIns": "usage",
+        "corejs": 3,
         "exclude": [
+          "es.array.iterator",
+          "es.array.map",
+          "es.array.slice",
+          "es.object.assign",
+          "es.object.keys",
           "transform-typeof-symbol",
-          "es6.object.assign",
-          "es6.object.keys",
-          "es6.array.iterator",
-          "web.dom.iterable"
+          "web.dom-collections.iterator"
         ],
         "loose": true
       }
