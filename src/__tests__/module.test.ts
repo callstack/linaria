@@ -266,3 +266,14 @@ it('changes resolve behaviour on overriding _resolveFilename', () => {
 
   expect(mod.exports).toEqual(['bar', 'test']);
 });
+
+it('correctly processes export declarations in strict mode', () => {
+  const filename = '/foo/bar/test.js';
+  const mod = new Module(filename, options);
+
+  mod.evaluate('"use strict"; exports = module.exports = () => 42');
+
+  expect(mod.exports()).toBe(42);
+  expect(mod.id).toBe(filename);
+  expect(mod.filename).toBe(filename);
+});

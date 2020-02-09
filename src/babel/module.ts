@@ -282,9 +282,12 @@ class Module {
       );
     }
 
-    const script = new vm.Script(code!, {
-      filename: this.filename,
-    });
+    const script = new vm.Script(
+      `(function (exports) { ${code}\n})(exports);`,
+      {
+        filename: this.filename,
+      }
+    );
 
     script.runInContext(
       vm.createContext({
