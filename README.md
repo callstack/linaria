@@ -188,6 +188,7 @@ See [Basics](/docs/BASICS.md) for a detailed information about the syntax.
 
 - [gatsby-plugin-linaria](https://github.com/silvenon/gatsby-plugin-linaria) – Gatsby plugin that sets up Babel and webpack configuration for Linaria.
 - [polished.js](https://polished.js.org/) - A lightweight toolset for writing styles in JavaScript.
+- [craco-linaria](https://github.com/jedmao/craco-linaria) - A [Craco](https://www.npmjs.com/package/@craco/craco) plugin that allows you to use Linaria [without ejecting](https://create-react-app.dev/docs/alternatives-to-ejecting) from a [CRA](https://create-react-app.dev/).
 
 ## Inspiration
 
