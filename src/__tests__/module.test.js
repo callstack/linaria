@@ -24,6 +24,17 @@ it('creates module for JS files', () => {
   expect(mod.filename).toBe(filename);
 });
 
+it('correctly processes export declarations in strict mode', () => {
+  const filename = '/foo/bar/test.js';
+  const mod = new Module(filename);
+
+  mod.evaluate('"use strict"; exports = module.exports = () => 42');
+
+  expect(mod.exports()).toBe(42);
+  expect(mod.id).toBe(filename);
+  expect(mod.filename).toBe(filename);
+});
+
 it('requires JS files', () => {
   const mod = new Module(path.resolve(__dirname, '../__fixtures__/test.js'));
 

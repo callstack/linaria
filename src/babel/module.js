@@ -61,6 +61,10 @@ let cache = {};
 
 const NOOP = () => {};
 
+const wrapper = ['(function (exports) { ', '\n})(exports);'];
+
+const wrap = code => wrapper[0] + code + wrapper[1];
+
 class Module {
   static invalidate: () => void;
 
@@ -201,7 +205,7 @@ class Module {
     // For JavaScript files, we need to transpile it and to get the exports of the module
     const code = this.transform ? this.transform(text).code : text;
 
-    const script = new vm.Script(code, {
+    const script = new vm.Script(wrap(code), {
       filename: this.filename,
     });
 
