@@ -178,6 +178,10 @@ The loader accepts the following options:
 - `cacheDirectory: string` (default: `'.linaria-cache'`):
 
   Path to the directory where the loader will output the intermediate CSS files. You can pass a relative or absolute directory path. Make sure the directory is inside the working directory for things to work properly. **You should add this directory to `.gitignore` so you don't accidentally commit them.**
+  
+- `extension: string` (default: `'.linaria.css'`):
+
+  An extension of the intermediate CSS files.
 
 - `preprocessor: 'none' | 'stylis' | Function` (default: `'stylis'`)
 
