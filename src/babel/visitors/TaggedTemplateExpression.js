@@ -173,7 +173,7 @@ export default function TaggedTemplateExpression(
   quasi.quasis.forEach((el, i, self) => {
     let appended = false;
 
-    if (i !== 0) {
+    if (i !== 0 && el.value.cooked) {
       // Check if previous expression was a CSS variable that we replaced
       // If it has a unit after it, we need to move the unit into the interpolation
       // e.g. `var(--size)px` should actually be `var(--size)`
