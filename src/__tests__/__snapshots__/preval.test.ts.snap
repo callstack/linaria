@@ -834,6 +834,24 @@ exports[`extractor non-hoistable identifiers 1`] = `
   11 | \`;"
 `;
 
+exports[`extractor should work with String and Number object 1`] = `
+"import { css } from 'linaria';
+export const style = \\"style_s1xha7dm\\";"
+`;
+
+exports[`extractor should work with String and Number object 2`] = `
+
+CSS:
+
+.style_s1xha7dm {
+  width: 100%;
+  opacity: 0.75;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`extractor simplifies react components 1`] = `
 "import React from 'react';
 import { styled } from 'linaria/react';
@@ -1763,6 +1781,24 @@ exports[`shaker non-hoistable identifiers 1`] = `
      |                 ^^^^
   10 |   }
   11 | \`;"
+`;
+
+exports[`shaker should work with String and Number object 1`] = `
+"import { css } from 'linaria';
+export const style = \\"style_s1xha7dm\\";"
+`;
+
+exports[`shaker should work with String and Number object 2`] = `
+
+CSS:
+
+.style_s1xha7dm {
+  width: 100%;
+  opacity: 0.75;
+}
+
+Dependencies: NA
+
 `;
 
 exports[`shaker simplifies react components 1`] = `

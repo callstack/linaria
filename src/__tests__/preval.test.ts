@@ -768,6 +768,23 @@ function run(evaluator: Evaluator): void {
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
+
+  // PR #524
+  it('should work with String and Number object', async () => {
+    const { code, metadata } = await transpile(
+      dedent`
+      import { css } from 'linaria';
+
+      export const style = css\`
+        width: ${'${new String("100%")}'};
+        opacity: ${'${new Number(0.75)}'};
+      \`;
+      `
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 }
 
 describe('shaker', () => {

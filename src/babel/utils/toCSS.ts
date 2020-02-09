@@ -3,6 +3,7 @@
 import isSerializable from './isSerializable';
 import { unitless } from '../units';
 import { JSONValue } from '../types';
+import isBoxedPrimitive from './isBoxedPrimitive';
 
 const hyphenate = (s: string) =>
   s
@@ -16,6 +17,10 @@ const hyphenate = (s: string) =>
 export default function toCSS(o: JSONValue): string {
   if (Array.isArray(o)) {
     return o.map(toCSS).join('\n');
+  }
+
+  if (isBoxedPrimitive(o)) {
+    return o.valueOf().toString();
   }
 
   return Object.entries(o)
