@@ -19,17 +19,13 @@ export default function CallExpression(path: NodePath<types.CallExpression>) {
     return;
   }
 
-  if (types.isIdentifier(path.node.callee) && path.node.callee.name === 'css') {
-    path.replaceWith(types.stringLiteral(className));
-  } else {
-    path.replaceWith(
-      linariaComponentTpl({
-        className: types.stringLiteral(className),
-        displayName: displayName ? types.stringLiteral(displayName) : null,
-        extends: types.isCallExpression(path.node.callee)
-          ? path.node.callee.arguments[0]
-          : types.nullLiteral(),
-      })
-    );
-  }
+  path.replaceWith(
+    linariaComponentTpl({
+      className: types.stringLiteral(className),
+      displayName: displayName ? types.stringLiteral(displayName) : null,
+      extends: types.isCallExpression(path.node.callee)
+        ? path.node.callee.arguments[0]
+        : types.nullLiteral(),
+    })
+  );
 }

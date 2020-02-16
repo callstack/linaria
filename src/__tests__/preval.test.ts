@@ -6,27 +6,25 @@ import stripAnsi from 'strip-ansi';
 import Module from '../babel/module';
 import serializer from '../__utils__/linaria-snapshot-serializer';
 import { Evaluator, StrictOptions } from '../babel/types';
-import { TransformOptions } from '@babel/core';
-import { BabelFileResult } from '@babel/core';
 
 expect.addSnapshotSerializer(serializer);
 
 async function transformAsync(
   code: string,
-  opts?: TransformOptions
-): Promise<BabelFileResult> {
+  opts?: babel.TransformOptions
+): Promise<babel.BabelFileResult> {
   return (await babel.transformAsync(code, opts))!;
 }
 
 async function transformFileAsync(
   filename: string,
-  opts?: TransformOptions
-): Promise<BabelFileResult> {
+  opts?: babel.TransformOptions
+): Promise<babel.BabelFileResult> {
   return (await babel.transformFileAsync(filename, opts))!;
 }
 
 function run(evaluator: Evaluator): void {
-  const babelrc: TransformOptions = {
+  const babelrc: babel.TransformOptions = {
     babelrc: false,
     plugins: [],
     presets: [
@@ -780,6 +778,25 @@ function run(evaluator: Evaluator): void {
         opacity: ${'${new Number(0.75)}'};
       \`;
       `
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should work with generated classnames as selectors', async () => {
+    const { code, metadata } = await transpile(
+      dedent`
+      import { css } from "linaria";
+
+      export const text = css\`\`;
+
+      export const square = css\`
+        .${'${text}'} {
+          color: red;
+        }
+      \`;
+    `
     );
 
     expect(code).toMatchSnapshot();

@@ -4,6 +4,7 @@ import TaggedTemplateExpression from '../visitors/TaggedTemplateExpression';
 import JSXElement from '../visitors/JSXElement';
 import CallExpression from '../visitors/CallExpression';
 import { State, StrictOptions } from '../types';
+import CSSTemplateExpression from '../visitors/CSSTemplateExpression';
 
 function preeval(_babel: any, options: StrictOptions) {
   return {
@@ -28,6 +29,7 @@ function preeval(_babel: any, options: StrictOptions) {
         },
       },
       CallExpression,
+      TaggedTemplateExpression: CSSTemplateExpression,
     },
   };
 }

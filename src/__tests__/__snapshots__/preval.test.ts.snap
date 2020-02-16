@@ -852,6 +852,27 @@ Dependencies: NA
 
 `;
 
+exports[`extractor should work with generated classnames as selectors 1`] = `
+"import { css } from \\"linaria\\";
+export const text = \\"text_t1xha7dm\\";
+export const square = \\"square_s1rsdnkv\\";"
+`;
+
+exports[`extractor should work with generated classnames as selectors 2`] = `
+
+CSS:
+
+.text_t1xha7dm {}
+.square_s1rsdnkv {
+  .text_t1xha7dm {
+    color: red;
+  }
+}
+
+Dependencies: NA
+
+`;
+
 exports[`extractor simplifies react components 1`] = `
 "import React from 'react';
 import { styled } from 'linaria/react';
@@ -1795,6 +1816,27 @@ CSS:
 .style_s1xha7dm {
   width: 100%;
   opacity: 0.75;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`shaker should work with generated classnames as selectors 1`] = `
+"import { css } from \\"linaria\\";
+export const text = \\"text_t1xha7dm\\";
+export const square = \\"square_s1rsdnkv\\";"
+`;
+
+exports[`shaker should work with generated classnames as selectors 2`] = `
+
+CSS:
+
+.text_t1xha7dm {}
+.square_s1rsdnkv {
+  .text_t1xha7dm {
+    color: red;
+  }
 }
 
 Dependencies: NA
