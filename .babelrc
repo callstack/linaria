@@ -15,6 +15,7 @@
         "useBuiltIns": "usage",
         "corejs": 3,
         "exclude": [
+          "es.array.filter",
           "es.array.iterator",
           "es.array.map",
           "es.array.slice",
