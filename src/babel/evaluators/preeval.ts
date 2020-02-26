@@ -5,6 +5,7 @@ import JSXElement from '../visitors/JSXElement';
 import CallExpression from '../visitors/CallExpression';
 import { State, StrictOptions } from '../types';
 import CSSTemplateExpression from '../visitors/CSSTemplateExpression';
+import ImportDeclaration from '../visitors/ImportDeclaration';
 
 function preeval(_babel: any, options: StrictOptions) {
   return {
@@ -21,6 +22,7 @@ function preeval(_babel: any, options: StrictOptions) {
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
+            ImportDeclaration: p => ImportDeclaration(p, state),
             TaggedTemplateExpression: p =>
               TaggedTemplateExpression(p, state, options),
 

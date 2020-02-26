@@ -44,6 +44,21 @@ it('transpiles styled template literal with function and tag', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('transpiles renamed styled import', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled as custom } from 'linaria/react';
+
+    export const Title = custom('h1')\`
+      font-size: 14px;
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('transpiles styled template literal with function and component', async () => {
   const { code, metadata } = await transpile(
     dedent`

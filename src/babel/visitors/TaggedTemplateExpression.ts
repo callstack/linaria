@@ -17,6 +17,8 @@ export default function TaggedTemplateExpression(
 ) {
   const { tag } = path.node;
 
+  const localName = state.file.metadata.localName || 'styled';
+
   let styled: {
     component: {
       node: t.Expression | NodePath<t.Expression>;
@@ -28,12 +30,12 @@ export default function TaggedTemplateExpression(
     t.isCallExpression(tag) &&
     t.isIdentifier(tag.callee) &&
     tag.arguments.length === 1 &&
-    tag.callee.name === 'styled' &&
+    tag.callee.name === localName &&
     hasImport(
       t,
       path.scope,
       state.file.opts.filename,
-      'styled',
+      localName,
       'linaria/react'
     )
   ) {
@@ -45,12 +47,12 @@ export default function TaggedTemplateExpression(
     t.isMemberExpression(tag) &&
     t.isIdentifier(tag.object) &&
     t.isIdentifier(tag.property) &&
-    tag.object.name === 'styled' &&
+    tag.object.name === localName &&
     hasImport(
       t,
       path.scope,
       state.file.opts.filename,
-      'styled',
+      localName,
       'linaria/react'
     )
   ) {

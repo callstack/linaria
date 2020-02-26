@@ -411,6 +411,28 @@ Dependencies: NA
 
 `;
 
+exports[`transpiles renamed styled import 1`] = `
+"import { styled as custom } from 'linaria/react';
+export const Title =
+/*#__PURE__*/
+custom('h1')({
+  name: \\"Title\\",
+  class: \\"th6xni0\\"
+});"
+`;
+
+exports[`transpiles renamed styled import 2`] = `
+
+CSS:
+
+.th6xni0 {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`transpiles styled template literal with function and component 1`] = `
 "import { styled } from 'linaria/react';
 
