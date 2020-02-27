@@ -259,9 +259,10 @@ export default function getTemplateProcessor(options: StrictOptions) {
 
       path.replaceWith(
         types.callExpression(
-          types.callExpression(types.identifier('styled'), [
-            styled.component.node,
-          ]),
+          types.callExpression(
+            types.identifier(state.file.metadata.localName || 'styled'),
+            [styled.component.node]
+          ),
           [types.objectExpression(props)]
         )
       );

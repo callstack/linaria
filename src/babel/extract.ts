@@ -16,6 +16,7 @@ import {
   ValueCache,
 } from './types';
 import TaggedTemplateExpression from './visitors/TaggedTemplateExpression';
+import ImportDeclaration from './visitors/ImportDeclaration';
 
 function isLazyValue(v: ExpressionValue): v is LazyValue {
   return v.kind === ValueType.LAZY;
@@ -100,6 +101,7 @@ export default function extract(_babel: any, options: StrictOptions) {
           // So we traverse here instead of a in a visitor
           path.traverse({
             // Identifier: p => Identifier(p, state, options),
+            ImportDeclaration: p => ImportDeclaration(p, state),
             TaggedTemplateExpression: p =>
               TaggedTemplateExpression(p, state, options),
           });

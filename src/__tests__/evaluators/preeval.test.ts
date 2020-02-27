@@ -34,6 +34,18 @@ it('preserves classNames', async () => {
   expect(code).toMatchSnapshot();
 });
 
+it('handles locally named import', async () => {
+  const { code } = await transpile(
+    dedent`
+      import { styled as custom } from 'linaria/react';
+      
+      const Component = custom.div\`\`;
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+});
+
 it('replaces functional component', async () => {
   const div = '<div>{props.children}</div>';
   const { code } = await transpile(
