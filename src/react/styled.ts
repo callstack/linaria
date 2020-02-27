@@ -65,7 +65,7 @@ function styled(tag: any): any {
       let filteredProps;
 
       // Check if it's an HTML tag and not a custom element
-      if (typeof component === 'string' && component.indexOf('-') === -1) {
+      if (typeof component === 'string' && !component.includes('-')) {
         filteredProps = {} as { [key: string]: any };
 
         // eslint-disable-next-line guard-for-in
