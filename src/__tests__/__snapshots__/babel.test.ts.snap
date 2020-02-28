@@ -79,6 +79,28 @@ Dependencies: NA
 
 `;
 
+exports[`handles fn passed in as classNameSlug 1`] = `
+"import { styled } from 'linaria/react';
+export const Title =
+/*#__PURE__*/
+styled('h1')({
+  name: \\"Title\\",
+  class: \\"th6xni0_42_Title\\"
+});"
+`;
+
+exports[`handles fn passed in as classNameSlug 2`] = `
+
+CSS:
+
+.th6xni0_42_Title {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`handles interpolation followed by unit 1`] = `
 "import { styled } from 'linaria/react';
 export const Title =
@@ -495,6 +517,28 @@ exports[`transpiles styled template literal with object 2`] = `
 CSS:
 
 .th6xni0 {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`uses string passed in as classNameSlug 1`] = `
+"import { styled } from 'linaria/react';
+export const Title =
+/*#__PURE__*/
+styled('h1')({
+  name: \\"Title\\",
+  class: \\"testSlug\\"
+});"
+`;
+
+exports[`uses string passed in as classNameSlug 2`] = `
+
+CSS:
+
+.testSlug {
   font-size: 14px;
 }
 

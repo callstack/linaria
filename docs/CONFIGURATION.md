@@ -26,13 +26,19 @@ module.exports = {
 
   Enabling this will add a display name to generated class names, e.g. `.Title_abcdef` instead of `.abcdef'. It is disabled by default to generate smaller CSS files.
 
-- `classNameSlug: string` (default: `default`):
+- `classNameSlug: string | (hash: string, title: string) => string` (default: `default`):
 
   Using this will provide an interface to customize the output of the CSS class name. Example:
 
       classNameSlug: '[title]',
 
   Would generate a class name such as `.header` instead of the default `.header_absdjfsdf` which includes a hash.
+
+  You may also use a function to define the slug. The function will be evaluated at build time and must return a string:
+
+      classNameSlug: (hash, title) => `${hash}__${7 * 6}__${title}`,
+
+  Would generate the class name `.absdjfsdf__42__header`.
 
   ### Variables
 

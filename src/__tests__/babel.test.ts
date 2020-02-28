@@ -3,13 +3,17 @@ import dedent from 'dedent';
 import { join } from 'path';
 import stripAnsi from 'strip-ansi';
 import serializer from '../__utils__/linaria-snapshot-serializer';
+import { StrictOptions } from '../babel/types';
 
 expect.addSnapshotSerializer(serializer);
 
-const transpile = async (input: string) =>
+const transpile = async (
+  input: string,
+  opts: Partial<StrictOptions> = { evaluate: false }
+) =>
   (await babel.transformAsync(input, {
     babelrc: false,
-    presets: [[require.resolve('../babel'), { evaluate: false }]],
+    presets: [[require.resolve('../babel'), opts]],
     plugins: ['@babel/plugin-syntax-jsx'],
     filename: join(__dirname, 'app/index.js'),
   }))!;
@@ -23,6 +27,42 @@ it('transpiles styled template literal with object', async () => {
       font-size: 14px;
     \`;
     `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('uses string passed in as classNameSlug', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    export const Title = styled('h1')\`
+      font-size: 14px;
+    \`;
+`,
+    { classNameSlug: 'testSlug' }
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('handles fn passed in as classNameSlug', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from 'linaria/react';
+
+    export const Title = styled('h1')\`
+      font-size: 14px;
+    \`;
+`,
+    {
+      classNameSlug: (hash, title) => {
+        return `${hash}_${7 * 6}_${title}`;
+      },
+    }
   );
 
   expect(code).toMatchSnapshot();
