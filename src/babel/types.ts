@@ -96,8 +96,10 @@ export type EvalRule = {
   action: Evaluator | 'ignore' | string;
 };
 
+type ClassNameFn = (hash: string, title: string) => string;
+
 export type StrictOptions = {
-  classNameSlug?: string;
+  classNameSlug?: string | ClassNameFn;
   displayName: boolean;
   evaluate: boolean;
   ignore?: RegExp;

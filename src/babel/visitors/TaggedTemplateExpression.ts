@@ -163,7 +163,17 @@ export default function TaggedTemplateExpression(
     ? `${toValidCSSIdentifier(displayName!)}_${slug!}`
     : slug!;
 
-  // Optional the className can be defined by the user
+  // The className can be defined by the user either as fn or a string
+  if (typeof options.classNameSlug === 'function') {
+    try {
+      className = toValidCSSIdentifier(
+        options.classNameSlug(slug, displayName)
+      );
+    } catch {
+      throw new Error(`classNameSlug option must return a string`);
+    }
+  }
+
   if (typeof options.classNameSlug === 'string') {
     const { classNameSlug } = options;
 
