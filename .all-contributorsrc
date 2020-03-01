@@ -237,6 +237,33 @@
         "doc",
         "ideas"
       ]
+    },
+    {
+      "login": "Jayphen",
+      "name": "Jayphen",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/329184?v=4",
+      "profile": "http://hyperlab.se",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "bolasblack",
+      "name": "c4605",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/382011?v=4",
+      "profile": "https://github.com/bolasblack",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "koba04",
+      "name": "Toru Kobayashi",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/250407?v=4",
+      "profile": "https://koba04.com/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "repoType": "github",
