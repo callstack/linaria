@@ -1804,6 +1804,44 @@ exports[`shaker non-hoistable identifiers 1`] = `
   11 | \`;"
 `;
 
+exports[`shaker should interpolate imported components 1`] = `
+"import { css } from \\"linaria\\";
+import { Title } from \\"../__fixtures__/complex-component\\";
+export const square = \\"square_s1xha7dm\\";"
+`;
+
+exports[`shaker should interpolate imported components 2`] = `
+
+CSS:
+
+.square_s1xha7dm {
+  .Title_t1us8k4s {
+    color: red;
+  }
+}
+
+Dependencies: ../__fixtures__/complex-component
+
+`;
+
+exports[`shaker should interpolate imported variables 1`] = `
+"import { css } from \\"linaria\\";
+import { whiteColor } from \\"../__fixtures__/complex-component\\";
+export const square = \\"square_s1xha7dm\\";"
+`;
+
+exports[`shaker should interpolate imported variables 2`] = `
+
+CSS:
+
+.square_s1xha7dm {
+  color: #fff
+}
+
+Dependencies: ../__fixtures__/complex-component
+
+`;
+
 exports[`shaker should work with String and Number object 1`] = `
 "import { css } from 'linaria';
 export const style = \\"style_s1xha7dm\\";"
@@ -1840,6 +1878,26 @@ CSS:
 }
 
 Dependencies: NA
+
+`;
+
+exports[`shaker should work with wildcard imports 1`] = `
+"import { css } from \\"linaria\\";
+import * as mod from \\"../__fixtures__/complex-component\\";
+export const square = \\"square_s1xha7dm\\";"
+`;
+
+exports[`shaker should work with wildcard imports 2`] = `
+
+CSS:
+
+.square_s1xha7dm {
+  .Title_t1us8k4s {
+    color: red;
+  }
+}
+
+Dependencies: ../__fixtures__/complex-component
 
 `;
 

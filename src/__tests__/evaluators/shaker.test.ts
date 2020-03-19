@@ -215,3 +215,16 @@ it('shakes assignment patterns', () => {
 
   expect(shaken).toMatchSnapshot();
 });
+
+it('shakes for-in statements', () => {
+  const [shaken] = _shake()`
+    const obj1 = { a: 1, b: 2 };
+    const obj2 = {};
+    for (const key in obj1) {
+      obj2[key] = obj1[key];
+    }
+    exports.__linariaPreval = [obj2];
+  `;
+
+  expect(shaken).toMatchSnapshot();
+});

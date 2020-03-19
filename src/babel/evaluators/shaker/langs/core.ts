@@ -245,6 +245,22 @@ export const visitors: Visitors = {
   },
 
   /*
+   * ForInStatement
+   * for (const k in o) { body }
+   */
+  ForInStatement(this: GraphBuilderState, node: t.ForInStatement) {
+    this.baseVisit(node);
+
+    if (node.body) {
+      this.graph.addEdge(node.body, node);
+      this.graph.addEdge(node, node.body);
+      this.graph.addEdge(node.body, node.left);
+    }
+
+    this.graph.addEdge(node.left, node.right);
+  },
+
+  /*
    * BreakStatement | ContinueStatement | ReturnStatement | ThrowStatement | YieldExpression | AwaitExpression
    * All these nodes are required to evaluate the value of a function in which they are defined.
    * Also, the value of these nodes depends on the argument if it is presented.

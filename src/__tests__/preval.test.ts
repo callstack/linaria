@@ -23,7 +23,15 @@ async function transformFileAsync(
   return (await babel.transformFileAsync(filename, opts))!;
 }
 
-function run(evaluator: Evaluator): void {
+type TranspileFn = (
+  input: string,
+  conf?: (original: babel.TransformOptions) => babel.TransformOptions
+) => Promise<babel.BabelFileResult>;
+
+function run(
+  evaluator: Evaluator,
+  strategyDependentTests: (transpile: TranspileFn) => void = () => {}
+): void {
   const babelrc: babel.TransformOptions = {
     babelrc: false,
     plugins: [],
@@ -60,7 +68,7 @@ function run(evaluator: Evaluator): void {
     ],
   };
 
-  const transpile = async (
+  const transpile: TranspileFn = async (
     input: string,
     conf: (original: typeof babelrc) => typeof babelrc = i => i
   ) => {
@@ -802,10 +810,64 @@ function run(evaluator: Evaluator): void {
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
+
+  strategyDependentTests(transpile);
 }
 
 describe('shaker', () => {
-  run(require('../babel/evaluators/shaker').default);
+  run(require('../babel/evaluators/shaker').default, transpile => {
+    it('should work with wildcard imports', async () => {
+      const { code, metadata } = await transpile(
+        dedent`
+      import { css } from "linaria";
+      import * as mod from "../__fixtures__/complex-component";
+
+      export const square = css\`
+        ${'${mod.Title}'} {
+          color: red;
+        }
+      \`;
+    `
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+
+    it('should interpolate imported components', async () => {
+      const { code, metadata } = await transpile(
+        dedent`
+      import { css } from "linaria";
+      import { Title } from "../__fixtures__/complex-component";
+
+      export const square = css\`
+        ${'${Title}'} {
+          color: red;
+        }
+      \`;
+    `
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+
+    it('should interpolate imported variables', async () => {
+      const { code, metadata } = await transpile(
+        dedent`
+      import { css } from "linaria";
+      import { whiteColor } from "../__fixtures__/complex-component";
+
+      export const square = css\`
+        color: ${'${whiteColor}'}
+      \`;
+    `
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+  });
 });
 
 describe('extractor', () => {

@@ -65,8 +65,8 @@ export default class DepsGraph {
 
   constructor(protected scope: ScopeManager) {}
 
-  addEdge(a: t.Node | PromisedNode, b: t.Node | PromisedNode) {
-    this.actionQueue.push([addEdge, a, b]);
+  addEdge(dependent: t.Node | PromisedNode, dependency: t.Node | PromisedNode) {
+    this.actionQueue.push([addEdge, dependent, dependency]);
   }
 
   addExport(name: string, node: t.Node) {
