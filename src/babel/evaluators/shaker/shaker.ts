@@ -88,10 +88,16 @@ export default function shake(
 
   const imports = new Map<string, string[]>();
   for (let [source, members] of depsGraph.imports.entries()) {
+    const defaultMembers =
+      depsGraph.importTypes.get(source) === 'wildcard' ? ['*'] : [];
     const aliveMembers = new Set(
       members.filter(i => alive.has(i)).map(i => i.name)
     );
-    imports.set(source, Array.from(aliveMembers));
+
+    imports.set(
+      source,
+      aliveMembers.size > 0 ? Array.from(aliveMembers) : defaultMembers
+    );
   }
 
   return [shaken, imports];

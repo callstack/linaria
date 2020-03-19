@@ -26,6 +26,7 @@ function addEdge(this: DepsGraph, a: t.Node, b: t.Node) {
 export default class DepsGraph {
   public readonly imports: Map<string, t.Identifier[]> = new Map();
   public readonly importAliases: Map<t.Identifier, string> = new Map();
+  public readonly importTypes: Map<string, 'wildcard' | 'default'> = new Map();
 
   protected readonly edges: Array<[t.Node, t.Node]> = [];
   protected readonly exports: Map<string, t.Node> = new Map();
