@@ -96,7 +96,7 @@
     "@babel/register": "^7.8.0",
     "@babel/template": "^7.8.0",
     "@babel/traverse": "^7.8.0",
-    "@emotion/is-prop-valid": "^0.7.3",
+    "@emotion/is-prop-valid": "^0.8.8",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "core-js": "^3.6.3",
     "cosmiconfig": "^5.1.0",
