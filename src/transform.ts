@@ -7,6 +7,8 @@ import { LinariaMetadata, Options, PreprocessorFn, Result } from './types';
 
 const STYLIS_DECLARATION = 1;
 
+const babelPreset = require.resolve('./babel');
+
 export default function transform(code: string, options: Options): Result {
   // Check if the file contains `css` or `styled` words first
   // Otherwise we should skip transforming
@@ -32,7 +34,7 @@ export default function transform(code: string, options: Options): Result {
     code,
     {
       filename: options.filename,
-      presets: [[require.resolve('./babel'), pluginOptions]],
+      presets: [[babelPreset, pluginOptions]],
       babelrc: false,
       configFile: false,
       sourceMaps: true,

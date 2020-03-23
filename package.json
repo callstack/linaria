@@ -58,6 +58,7 @@
     "@commitlint/config-conventional": "^8.3.4",
     "@release-it/conventional-changelog": "^1.1.0",
     "@types/cosmiconfig": "^5.0.3",
+    "@types/debug": "^4.1.5",
     "@types/dedent": "^0.7.0",
     "@types/enhanced-resolve": "^3.0.6",
     "@types/glob": "^7.1.1",

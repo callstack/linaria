@@ -21,7 +21,12 @@ function prepareForShake(
   transformOptions.plugins!.unshift('transform-react-remove-prop-types');
 
   debug(
-    `Transform ${filename} with options ${JSON.stringify(transformOptions)}`
+    'evaluator:shaker:transform',
+    `Transform ${filename} with options ${JSON.stringify(
+      transformOptions,
+      null,
+      2
+    )}`
   );
   const transformed = transformSync(code, transformOptions);
 
@@ -39,7 +44,7 @@ const shaker: Evaluator = (filename, options, text, only = null) => {
     only
   );
 
-  debug(`Generate shaken source code ${filename}`);
+  debug('evaluator:shaker:generate', `Generate shaken source code ${filename}`);
   const { code: shakenCode } = generator(shaken!);
   return [shakenCode, imports];
 };
