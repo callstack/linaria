@@ -5,14 +5,24 @@ type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 const levels = ['error', 'warn', 'info', 'debug'];
 const currentLevel = levels.indexOf(process.env.LINARIA_LOG || 'error');
 
+const linariaLogger = genericDebug('linaria');
+
 const loggers = new Map<string, Debugger>();
-const gerOrCreate = (namespaces: string): Debugger => {
-  if (!loggers.has(namespaces)) {
-    loggers.set(namespaces, genericDebug(namespaces));
+
+function gerOrCreate(namespace: string | null | undefined): Debugger {
+  if (!namespace) return linariaLogger;
+  const lastIndexOf = namespace.lastIndexOf(':');
+  if (!loggers.has(namespace)) {
+    loggers.set(
+      namespace,
+      gerOrCreate(namespace.substr(0, lastIndexOf)).extend(
+        namespace.substr(lastIndexOf + 1)
+      )
+    );
   }
 
-  return loggers.get(namespaces)!;
-};
+  return loggers.get(namespace)!;
+}
 
 const format = <T>(text: T) => {
   if (typeof text === 'string') {
@@ -32,7 +42,7 @@ function log(
     return;
   }
 
-  const logger = gerOrCreate(`linaria:${namespaces}`);
+  const logger = gerOrCreate(namespaces);
   if (!logger.enabled) return;
 
   if (typeof arg1 === 'function') {

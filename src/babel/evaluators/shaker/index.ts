@@ -10,7 +10,7 @@ function prepareForShake(
   options: StrictOptions,
   code: string
 ): types.Program {
-  const transformOptions = buildOptions(filename, options, true);
+  const transformOptions = buildOptions(filename, options);
 
   transformOptions.ast = true;
   transformOptions.presets!.unshift([

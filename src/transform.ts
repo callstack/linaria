@@ -3,6 +3,7 @@ import * as babel from '@babel/core';
 import stylis from 'stylis';
 import { SourceMapGenerator, Mapping } from 'source-map';
 import loadOptions from './babel/utils/loadOptions';
+import { debug } from './babel/utils/logger';
 import { LinariaMetadata, Options, PreprocessorFn, Result } from './types';
 
 const STYLIS_DECLARATION = 1;
@@ -19,12 +20,17 @@ export default function transform(code: string, options: Options): Result {
     };
   }
 
+  debug(
+    'transform',
+    `${options.filename} to ${options.outputFilename}\n${code}`
+  );
+
   const pluginOptions = loadOptions(options.pluginOptions);
 
   // Parse the code first so babel uses user's babel config for parsing
   // We don't want to use user's config when transforming the code
   const ast = babel.parseSync(code, {
-    ...(pluginOptions ? pluginOptions.babelOptions : null),
+    ...(pluginOptions?.babelOptions ?? null),
     filename: options.filename,
     caller: { name: 'linaria' },
   });
@@ -123,10 +129,15 @@ export default function transform(code: string, options: Options): Result {
     rules,
     replacements,
     dependencies,
-    sourceMap: map,
+    sourceMap: map
+      ? {
+          ...map,
+          version: map.version.toString(),
+        }
+      : null,
 
     get cssSourceMapText() {
-      if (mappings && mappings.length) {
+      if (mappings?.length) {
         const generator = new SourceMapGenerator({
           file: options.filename.replace(/\.js$/, '.css'),
         });

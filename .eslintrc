@@ -1,6 +1,7 @@
 {
   "extends": "@callstack",
   "rules": {
+    "jest/no-try-expect": "off",
     "global-require": "off",
     "react-native/no-raw-text": "off",
     "react-native/no-inline-styles": "off",

@@ -80,7 +80,8 @@ exports[`shakes assignment patterns 1`] = `
 "{
   const [identifier = 1] = [2];
   {
-    const [_ref = {}] = [{
+    const [{ ...object
+    } = {}] = [{
       a: 1,
       b: 2
     }];
@@ -91,10 +92,7 @@ exports[`shakes assignment patterns 1`] = `
           member: null
         };
         {
-          const object = Object.assign({}, _ref);
-          {
-            exports.__linariaPreval = [identifier, object, array, obj];
-          }
+          exports.__linariaPreval = [identifier, object, array, obj];
         }
       }
     }
@@ -142,7 +140,7 @@ exports[`shakes imports 1`] = `
     if (typeof WeakMap !== \\"function\\") return null;
     var cache = new WeakMap();
 
-    _getRequireWildcardCache = function _getRequireWildcardCache() {
+    _getRequireWildcardCache = function () {
       return cache;
     };
 

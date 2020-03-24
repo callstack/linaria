@@ -9,8 +9,7 @@ type DefaultOptions = Partial<TransformOptions> & {
 
 export default function buildOptions(
   filename: string,
-  options?: StrictOptions,
-  disabledLinaria: boolean = false
+  options?: StrictOptions
 ): TransformOptions {
   const plugins: Array<string | object> = [
     // Include these plugins to avoid extra config when using { module: false } for webpack
@@ -26,7 +25,6 @@ export default function buildOptions(
         require.resolve('../index'),
         {
           ...(options || {}),
-          disabled: disabledLinaria,
         },
       ],
     ],
@@ -40,7 +38,7 @@ export default function buildOptions(
 
   const babelOptions =
     // Shallow copy the babel options because we mutate it later
-    options && options.babelOptions ? { ...options.babelOptions } : {};
+    options?.babelOptions ? { ...options.babelOptions } : {};
 
   // If we programmatically pass babel options while there is a .babelrc, babel might throw
   // We need to filter out duplicate presets and plugins so that this doesn't happen

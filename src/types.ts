@@ -1,4 +1,5 @@
 import { PluginOptions } from './babel/utils/loadOptions';
+import { RawSourceMap } from 'source-map';
 
 export type Replacement = {
   original: { start: Location; end: Location };
@@ -20,7 +21,7 @@ export type Rules = {
 
 export type Result = {
   code: string;
-  sourceMap: Object | null | undefined;
+  sourceMap?: RawSourceMap | null;
   cssText?: string;
   cssSourceMapText?: string;
   dependencies?: string[];
@@ -38,7 +39,7 @@ export type Options = {
   filename: string;
   preprocessor?: Preprocessor;
   outputFilename?: string;
-  inputSourceMap?: Object;
+  inputSourceMap?: RawSourceMap;
   pluginOptions?: Partial<PluginOptions>;
 };
 

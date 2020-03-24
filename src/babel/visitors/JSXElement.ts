@@ -30,7 +30,7 @@ export default function JSXElement(path: NodePath<types.JSXElement>) {
       const decl = scopePath.findParent(p => p.isClassDeclaration());
 
       // Replace the whole component
-      if (decl !== null && decl.isClassDeclaration()) {
+      if (decl?.isClassDeclaration()) {
         decl.replaceWith(
           types.functionDeclaration(decl.node.id, [], emptyBody)
         );
