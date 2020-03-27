@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as React from 'react';
+import { css } from '../src';
 import { styled } from '../src/react';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -90,3 +91,9 @@ const Title = styled.div<{ background: string }>`
 
 // $ExpectType "extends"
 isExtends<typeof Title, React.FC<{ background: string }>>();
+
+css`
+  ${Title} {
+    color: green;
+  }
+`;

@@ -104,7 +104,6 @@ export type StrictOptions = {
   evaluate: boolean;
   ignore?: RegExp;
   babelOptions: TransformOptions;
-  disabled?: boolean;
   rules: EvalRule[];
 };
 

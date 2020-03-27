@@ -5,16 +5,21 @@ import normalize from 'normalize-path';
 import loaderUtils from 'loader-utils';
 import enhancedResolve from 'enhanced-resolve';
 import findYarnWorkspaceRoot from 'find-yarn-workspace-root';
+import { loader as webpackLoader } from 'webpack';
 import Module from './babel/module';
+import { debug } from './babel/utils/logger';
 import transform from './transform';
+import { RawSourceMap } from 'source-map';
 
 const workspaceRoot = findYarnWorkspaceRoot();
 
 export default function loader(
-  this: any,
+  this: webpackLoader.LoaderContext,
   content: string,
-  inputSourceMap: Object | null
+  inputSourceMap: RawSourceMap | null
 ) {
+  debug('loader', this.resourcePath, this.hot ? 'with HMR' : 'without HMR');
+
   const {
     sourceMap = undefined,
     cacheDirectory = '.linaria-cache',
@@ -64,7 +69,7 @@ export default function loader(
 
     result = transform(content, {
       filename: path.relative(process.cwd(), this.resourcePath),
-      inputSourceMap: inputSourceMap != null ? inputSourceMap : undefined,
+      inputSourceMap: inputSourceMap ?? undefined,
       outputFilename,
       pluginOptions: rest,
       preprocessor,
@@ -118,10 +123,10 @@ export default function loader(
         this,
         outputFilename
       )});`,
-      result.sourceMap
+      result.sourceMap ?? undefined
     );
     return;
   }
 
-  this.callback(null, result.code, result.sourceMap);
+  this.callback(null, result.code, result.sourceMap ?? undefined);
 }

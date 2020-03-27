@@ -38,7 +38,7 @@ function isLinariaPrevalExport(
 }
 
 const extractor: Evaluator = (filename, options, text, only = null) => {
-  const transformOptions = buildOptions(filename, options, true);
+  const transformOptions = buildOptions(filename, options);
   transformOptions.presets!.unshift([require.resolve('../preeval'), options]);
 
   // Expressions will be extracted only for __linariaPreval.

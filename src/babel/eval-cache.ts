@@ -29,14 +29,14 @@ export const clear = () => {
 
 export const has = (filename: string, text: string): boolean => {
   const textHash = memoizedHash(text);
-  debug(`EVAL CACHE has ${filename} ${textHash}`);
+  debug('eval-cache:has', `${filename} ${textHash}`);
 
   return fileHashes.get(filename) === textHash;
 };
 
 export const get = (filename: string, text: string): any => {
   const textHash = memoizedHash(text);
-  debug(`EVAL CACHE get ${filename} ${textHash}`);
+  debug('eval-cache:get', `${filename} ${textHash}`);
 
   if (fileHashes.get(filename) !== textHash) {
     return undefined;
@@ -47,7 +47,7 @@ export const get = (filename: string, text: string): any => {
 
 export const set = (filename: string, text: string, value: any): void => {
   const textHash = memoizedHash(text);
-  debug(`EVAL CACHE set ${filename} ${textHash}`);
+  debug('eval-cache:set', `${filename} ${textHash}`);
 
   fileHashes.set(filename, textHash);
   evalCache.set(filename, value);

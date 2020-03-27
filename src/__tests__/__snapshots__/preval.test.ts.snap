@@ -2,9 +2,7 @@
 
 exports[`extractor derives display name from filename 1`] = `
 "import { styled } from 'linaria/react';
-export default
-/*#__PURE__*/
-styled(\\"h1\\")({
+export default /*#__PURE__*/styled(\\"h1\\")({
   name: \\"FancyName0\\",
   class: \\"FancyName0_f1yjazsq\\"
 });"
@@ -24,9 +22,7 @@ Dependencies: NA
 
 exports[`extractor derives display name from parent folder name 1`] = `
 "import { styled } from 'linaria/react';
-export default
-/*#__PURE__*/
-styled(\\"h1\\")({
+export default /*#__PURE__*/styled(\\"h1\\")({
   name: \\"FancyName0\\",
   class: \\"FancyName0_f1e8u5dq\\"
 });"
@@ -96,9 +92,7 @@ exports[`extractor does not strip instanbul coverage sequences 1`] = `
 
 import { styled } from 'linaria/react';
 const a = (cov_2dr9r1nt95.s[0]++, 42);
-export const Title = (cov_2dr9r1nt95.s[1]++,
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = (cov_2dr9r1nt95.s[1]++, /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_tow9xsn\\"
 }));"
@@ -130,9 +124,7 @@ const obj = copyAndExtend({
 }, {
   a: 2
 });
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -183,15 +175,11 @@ exports[`extractor evaluates component interpolations 1`] = `
   styled
 } = require('../react');
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });
-export const Paragraph =
-/*#__PURE__*/
-styled(\\"p\\")({
+export const Paragraph = /*#__PURE__*/styled(\\"p\\")({
   name: \\"Paragraph\\",
   class: \\"Paragraph_p1rsdnkv\\"
 });"
@@ -217,9 +205,7 @@ Dependencies: NA
 exports[`extractor evaluates dependencies with sequence expression 1`] = `
 "import { styled } from 'linaria/react';
 const color = (external, () => 'blue');
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\",
   vars: {
@@ -243,9 +229,7 @@ Dependencies: NA
 exports[`extractor evaluates expressions with dependencies 1`] = `
 "import { styled } from 'linaria/react';
 import slugify from '../slugify';
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -274,9 +258,7 @@ const boo = t => slugify(t) + 'boo';
 
 const bar = t => slugify(t) + 'bar';
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -309,9 +291,7 @@ const foo = k => {
   return obj;
 };
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -336,9 +316,7 @@ const answer = 42;
 const foo = () => answer;
 
 const days = foo() + ' days';
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -360,9 +338,7 @@ Dependencies: NA
 
 exports[`extractor evaluates interpolations with sequence expression 1`] = `
 "import { styled } from 'linaria/react';
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\",
   vars: {
@@ -389,9 +365,7 @@ const answer = 42;
 
 const foo = () => answer;
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -420,9 +394,7 @@ const boo = t => slugify(t) + 'boo';
 
 const bar = t => slugify(t) + 'bar';
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -459,21 +431,15 @@ exports[`extractor evaluates typescript enums 2`] = `Object {}`;
 
 exports[`extractor generates stable class names 1`] = `
 "import { styled } from '../react';
-export const T1 =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const T1 = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"T1\\",
   class: \\"T1_t11kcpnd\\"
 });
-export const T2 =
-/*#__PURE__*/
-styled(\\"h2\\")({
+export const T2 = /*#__PURE__*/styled(\\"h2\\")({
   name: \\"T2\\",
   class: \\"T2_t1xdipzs\\"
 });
-export const T3 =
-/*#__PURE__*/
-styled(\\"h3\\")({
+export const T3 = /*#__PURE__*/styled(\\"h3\\")({
   name: \\"T3\\",
   class: \\"T3_tmgfls7\\"
 });"
@@ -514,9 +480,7 @@ const foo = k => {
 
 objects.font.fontWeight = 'bold';
 export const whiteColor = '#fff';
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1us8k4s\\"
 });"
@@ -538,9 +502,7 @@ Dependencies: NA
 exports[`extractor handles escapes properly 1`] = `
 "import { styled } from 'linaria/react';
 const selectors = ['a', 'b'];
-export const Block =
-/*#__PURE__*/
-styled(\\"div\\")({
+export const Block = /*#__PURE__*/styled(\\"div\\")({
   name: \\"Block\\",
   class: \\"Block_b3rflbm\\"
 });"
@@ -567,18 +529,14 @@ exports[`extractor handles indirect wrapping another styled component 1`] = `
   styled
 } = require('../react');
 
-const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });
 
 const hoc = Cmp => Cmp;
 
-export const CustomTitle =
-/*#__PURE__*/
-styled(hoc(Title))({
+export const CustomTitle = /*#__PURE__*/styled(hoc(Title))({
   name: \\"CustomTitle\\",
   class: \\"CustomTitle_c1rsdnkv\\"
 });"
@@ -609,21 +567,15 @@ const {
   styled
 } = require('../react');
 
-const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });
-export const BlueTitle =
-/*#__PURE__*/
-styled(Title)({
+export const BlueTitle = /*#__PURE__*/styled(Title)({
   name: \\"BlueTitle\\",
   class: \\"BlueTitle_b1rsdnkv\\"
 });
-export const GreenTitle =
-/*#__PURE__*/
-styled(BlueTitle)({
+export const GreenTitle = /*#__PURE__*/styled(BlueTitle)({
   name: \\"GreenTitle\\",
   class: \\"GreenTitle_gdu5vkq\\"
 });"
@@ -653,9 +605,7 @@ exports[`extractor hoistable identifiers 1`] = `
 {
   var days = 42;
 }
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -680,9 +630,7 @@ exports[`extractor ignores external expressions 1`] = `
 
 const generate = props => props.content;
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\",
   vars: {
@@ -707,9 +655,7 @@ Dependencies: NA
 
 exports[`extractor ignores inline arrow function expressions 1`] = `
 "import { styled } from 'linaria/react';
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\",
   vars: {
@@ -734,9 +680,7 @@ Dependencies: NA
 
 exports[`extractor ignores inline vanilla function expressions 1`] = `
 "import { styled } from 'linaria/react';
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\",
   vars: {
@@ -773,9 +717,7 @@ const fill = (top = 0, left = 0, right = 0, bottom = 0) => [{
   left
 }];
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -804,9 +746,7 @@ const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
   left
 });
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -891,15 +831,11 @@ class ClassComponent extends React.PureComponent {
 
 }
 
-export const StyledFunc =
-/*#__PURE__*/
-styled(FuncComponent)({
+export const StyledFunc = /*#__PURE__*/styled(FuncComponent)({
   name: \\"StyledFunc\\",
   class: \\"StyledFunc_s1xha7dm\\"
 });
-export const StyledClass =
-/*#__PURE__*/
-styled(ClassComponent)({
+export const StyledClass = /*#__PURE__*/styled(ClassComponent)({
   name: \\"StyledClass\\",
   class: \\"StyledClass_s1rsdnkv\\"
 });"
@@ -972,9 +908,7 @@ exports[`extractor throws when interpolation evaluates to undefined 1`] = `
 
 exports[`shaker derives display name from filename 1`] = `
 "import { styled } from 'linaria/react';
-export default
-/*#__PURE__*/
-styled(\\"h1\\")({
+export default /*#__PURE__*/styled(\\"h1\\")({
   name: \\"FancyName0\\",
   class: \\"FancyName0_f1yjazsq\\"
 });"
@@ -994,9 +928,7 @@ Dependencies: NA
 
 exports[`shaker derives display name from parent folder name 1`] = `
 "import { styled } from 'linaria/react';
-export default
-/*#__PURE__*/
-styled(\\"h1\\")({
+export default /*#__PURE__*/styled(\\"h1\\")({
   name: \\"FancyName0\\",
   class: \\"FancyName0_f1e8u5dq\\"
 });"
@@ -1066,9 +998,7 @@ exports[`shaker does not strip instanbul coverage sequences 1`] = `
 
 import { styled } from 'linaria/react';
 const a = (cov_2dr9r1nt95.s[0]++, 42);
-export const Title = (cov_2dr9r1nt95.s[1]++,
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = (cov_2dr9r1nt95.s[1]++, /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_tow9xsn\\"
 }));"
@@ -1100,9 +1030,7 @@ const obj = copyAndExtend({
 }, {
   a: 2
 });
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -1153,15 +1081,11 @@ exports[`shaker evaluates component interpolations 1`] = `
   styled
 } = require('../react');
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });
-export const Paragraph =
-/*#__PURE__*/
-styled(\\"p\\")({
+export const Paragraph = /*#__PURE__*/styled(\\"p\\")({
   name: \\"Paragraph\\",
   class: \\"Paragraph_p1rsdnkv\\"
 });"
@@ -1187,9 +1111,7 @@ Dependencies: NA
 exports[`shaker evaluates dependencies with sequence expression 1`] = `
 "import { styled } from 'linaria/react';
 const color = (external, () => 'blue');
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\",
   vars: {
@@ -1213,9 +1135,7 @@ Dependencies: NA
 exports[`shaker evaluates expressions with dependencies 1`] = `
 "import { styled } from 'linaria/react';
 import slugify from '../slugify';
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -1244,9 +1164,7 @@ const boo = t => slugify(t) + 'boo';
 
 const bar = t => slugify(t) + 'bar';
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -1279,9 +1197,7 @@ const foo = k => {
   return obj;
 };
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -1306,9 +1222,7 @@ const answer = 42;
 const foo = () => answer;
 
 const days = foo() + ' days';
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -1330,9 +1244,7 @@ Dependencies: NA
 
 exports[`shaker evaluates interpolations with sequence expression 1`] = `
 "import { styled } from 'linaria/react';
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\",
   vars: {
@@ -1359,9 +1271,7 @@ const answer = 42;
 
 const foo = () => answer;
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -1390,9 +1300,7 @@ const boo = t => slugify(t) + 'boo';
 
 const bar = t => slugify(t) + 'bar';
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -1429,21 +1337,15 @@ exports[`shaker evaluates typescript enums 2`] = `Object {}`;
 
 exports[`shaker generates stable class names 1`] = `
 "import { styled } from '../react';
-export const T1 =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const T1 = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"T1\\",
   class: \\"T1_t11kcpnd\\"
 });
-export const T2 =
-/*#__PURE__*/
-styled(\\"h2\\")({
+export const T2 = /*#__PURE__*/styled(\\"h2\\")({
   name: \\"T2\\",
   class: \\"T2_t1xdipzs\\"
 });
-export const T3 =
-/*#__PURE__*/
-styled(\\"h3\\")({
+export const T3 = /*#__PURE__*/styled(\\"h3\\")({
   name: \\"T3\\",
   class: \\"T3_tmgfls7\\"
 });"
@@ -1484,9 +1386,7 @@ const foo = k => {
 
 objects.font.fontWeight = 'bold';
 export const whiteColor = '#fff';
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1us8k4s\\"
 });"
@@ -1508,9 +1408,7 @@ Dependencies: NA
 exports[`shaker handles escapes properly 1`] = `
 "import { styled } from 'linaria/react';
 const selectors = ['a', 'b'];
-export const Block =
-/*#__PURE__*/
-styled(\\"div\\")({
+export const Block = /*#__PURE__*/styled(\\"div\\")({
   name: \\"Block\\",
   class: \\"Block_b3rflbm\\"
 });"
@@ -1537,18 +1435,14 @@ exports[`shaker handles indirect wrapping another styled component 1`] = `
   styled
 } = require('../react');
 
-const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });
 
 const hoc = Cmp => Cmp;
 
-export const CustomTitle =
-/*#__PURE__*/
-styled(hoc(Title))({
+export const CustomTitle = /*#__PURE__*/styled(hoc(Title))({
   name: \\"CustomTitle\\",
   class: \\"CustomTitle_c1rsdnkv\\"
 });"
@@ -1579,21 +1473,15 @@ const {
   styled
 } = require('../react');
 
-const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });
-export const BlueTitle =
-/*#__PURE__*/
-styled(Title)({
+export const BlueTitle = /*#__PURE__*/styled(Title)({
   name: \\"BlueTitle\\",
   class: \\"BlueTitle_b1rsdnkv\\"
 });
-export const GreenTitle =
-/*#__PURE__*/
-styled(BlueTitle)({
+export const GreenTitle = /*#__PURE__*/styled(BlueTitle)({
   name: \\"GreenTitle\\",
   class: \\"GreenTitle_gdu5vkq\\"
 });"
@@ -1623,9 +1511,7 @@ exports[`shaker hoistable identifiers 1`] = `
 {
   var days = 42;
 }
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -1650,9 +1536,7 @@ exports[`shaker ignores external expressions 1`] = `
 
 const generate = props => props.content;
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\",
   vars: {
@@ -1677,9 +1561,7 @@ Dependencies: NA
 
 exports[`shaker ignores inline arrow function expressions 1`] = `
 "import { styled } from 'linaria/react';
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\",
   vars: {
@@ -1704,9 +1586,7 @@ Dependencies: NA
 
 exports[`shaker ignores inline vanilla function expressions 1`] = `
 "import { styled } from 'linaria/react';
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\",
   vars: {
@@ -1743,9 +1623,7 @@ const fill = (top = 0, left = 0, right = 0, bottom = 0) => [{
   left
 }];
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -1774,9 +1652,7 @@ const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
   left
 });
 
-export const Title =
-/*#__PURE__*/
-styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1xha7dm\\"
 });"
@@ -1919,15 +1795,11 @@ class ClassComponent extends React.PureComponent {
 
 }
 
-export const StyledFunc =
-/*#__PURE__*/
-styled(FuncComponent)({
+export const StyledFunc = /*#__PURE__*/styled(FuncComponent)({
   name: \\"StyledFunc\\",
   class: \\"StyledFunc_s1xha7dm\\"
 });
-export const StyledClass =
-/*#__PURE__*/
-styled(ClassComponent)({
+export const StyledClass = /*#__PURE__*/styled(ClassComponent)({
   name: \\"StyledClass\\",
   class: \\"StyledClass_s1rsdnkv\\"
 });"

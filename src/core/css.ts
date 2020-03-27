@@ -1,10 +1,12 @@
+import { StyledMeta } from '../types';
+
 type CSSProperties = {
   [key: string]: string | number | CSSProperties;
 };
 
 export default function css(
   _strings: TemplateStringsArray,
-  ..._exprs: Array<string | number | CSSProperties>
+  ..._exprs: Array<string | number | CSSProperties | StyledMeta>
 ): string {
   throw new Error(
     'Using the "css" tag in runtime is not supported. Make sure you have set up the Babel plugin correctly.'

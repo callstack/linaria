@@ -57,7 +57,14 @@ const visitors: Visitors = {
      * There is an unhandled identifier.
      * This case should be added to ./identifierHandlers.ts
      */
-    warn('Unhandled identifier', node.name, parent.type, parentKey, listIdx);
+    warn(
+      'evaluator:shaker',
+      'Unhandled identifier',
+      node.name,
+      parent.type,
+      parentKey,
+      listIdx
+    );
   },
 
   ...core,

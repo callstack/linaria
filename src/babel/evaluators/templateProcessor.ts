@@ -7,8 +7,9 @@ import { units } from '../units';
 import { State, StrictOptions, TemplateExpression, ValueCache } from '../types';
 import { StyledMeta } from '../../types';
 
-import throwIfInvalid from '../utils/throwIfInvalid';
 import isSerializable from '../utils/isSerializable';
+import { debug } from '../utils/logger';
+import throwIfInvalid from '../utils/throwIfInvalid';
 import stripLines from '../utils/stripLines';
 import toCSS from '../utils/toCSS';
 import getLinariaComment from '../utils/getLinariaComment';
@@ -275,6 +276,11 @@ export default function getTemplateProcessor(options: StrictOptions) {
     if (!isReferenced && !cssText.includes(':global')) {
       return;
     }
+
+    debug(
+      'evaluator:template-processor:extracted-rule',
+      `\n${selector} {${cssText}\n}`
+    );
 
     state.rules[selector] = {
       cssText,

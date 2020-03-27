@@ -65,7 +65,11 @@ export default function shake(
   exports: string[] | null
 ): [t.Program, Map<string, string[]>] {
   debug(
-    () => `Shake (${(exports || []).join(', ')}):\n${generator(rootPath).code}`
+    'evaluator:shaker:shake',
+    () =>
+      `source (exports: ${(exports || []).join(', ')}):\n${
+        generator(rootPath).code
+      }`
   );
 
   const depsGraph = build(rootPath);
@@ -84,7 +88,7 @@ export default function shake(
    * If we want to know what is really happen with our code tree,
    * we can print formatted tree here by setting env variable LINARIA_LOG=debug
    */
-  debug(() => dumpNode(rootPath, alive));
+  debug('evaluator:shaker:shake', () => dumpNode(rootPath, alive));
 
   const imports = new Map<string, string[]>();
   for (let [source, members] of depsGraph.imports.entries()) {

@@ -21,6 +21,7 @@ export default function dumpNode<T extends types.Node>(
   level = 0,
   idx: number | null = null
 ) {
+  let result = level === 0 ? '\n' : '';
   const prefix =
     level === 0
       ? ''
@@ -29,27 +30,27 @@ export default function dumpNode<T extends types.Node>(
         }`;
 
   const { type } = node;
-  process.stdout.write(
-    `${prefix}${type}${type in hooks ? ` ${hooks[type](node)}` : ''}`
-  );
+  result += `${prefix}${type}${type in hooks ? ` ${hooks[type](node)}` : ''}`;
 
   if (alive) {
-    process.stdout.write(alive.has(node) ? ' ✅' : ' ❌');
+    result += alive.has(node) ? ' ✅' : ' ❌';
   }
 
-  process.stdout.write('\n');
+  result += '\n';
   const keys = types.VISITOR_KEYS[type] as Array<keyof T>;
   for (const key of keys) {
     const subNode = node[key];
 
-    process.stdout.write(`${'| '.repeat(level)}|-${key}\n`);
+    result += `${'| '.repeat(level)}|-${key}\n`;
     if (Array.isArray(subNode)) {
       for (let i = 0; i < subNode.length; i++) {
         const child = subNode[i];
-        if (child) dumpNode(child, alive, level + 2, i);
+        if (child) result += dumpNode(child, alive, level + 2, i);
       }
     } else if (isNode(subNode)) {
-      dumpNode(subNode, alive, level + 2);
+      result += dumpNode(subNode, alive, level + 2);
     }
   }
+
+  return result;
 }

@@ -23,7 +23,7 @@ function isLazyValue(v: ExpressionValue): v is LazyValue {
 }
 
 function isNodePath(obj: any): obj is NodePath {
-  return obj && obj.node !== undefined;
+  return obj?.node !== undefined;
 }
 
 function findFreeName(scope: Scope, name: string): string {
