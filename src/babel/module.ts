@@ -250,9 +250,7 @@ class Module {
       })
       .reverse();
 
-    const cacheKey = only
-      ? `${this.filename}:${only.join(',')}`
-      : this.filename;
+    const cacheKey = [this.filename, ...(only ?? [])];
 
     if (EvalCache.has(cacheKey, text)) {
       this.exports = EvalCache.get(cacheKey, text);

@@ -6,10 +6,11 @@ import loaderUtils from 'loader-utils';
 import enhancedResolve from 'enhanced-resolve';
 import findYarnWorkspaceRoot from 'find-yarn-workspace-root';
 import { loader as webpackLoader } from 'webpack';
+import { RawSourceMap } from 'source-map';
+import * as EvalCache from './babel/eval-cache';
 import Module from './babel/module';
 import { debug } from './babel/utils/logger';
 import transform from './transform';
-import { RawSourceMap } from 'source-map';
 
 const workspaceRoot = findYarnWorkspaceRoot();
 
@@ -18,7 +19,9 @@ export default function loader(
   content: string,
   inputSourceMap: RawSourceMap | null
 ) {
-  debug('loader', this.resourcePath, this.hot ? 'with HMR' : 'without HMR');
+  debug('loader', this.resourcePath);
+
+  EvalCache.clearForFile(this.resourcePath);
 
   const {
     sourceMap = undefined,
