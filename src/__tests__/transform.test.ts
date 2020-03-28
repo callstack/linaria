@@ -20,6 +20,8 @@ it('rewrites a relative path in url() declarations', async () => {
 
     export const title = css\`
       background-image: url(./assets/test.jpg);
+      background-image: url("./assets/test.jpg");
+      background-image: url('./assets/test.jpg');
     \`;
     `,
     {

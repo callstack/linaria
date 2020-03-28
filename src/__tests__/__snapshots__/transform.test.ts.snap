@@ -6,7 +6,7 @@ exports[`doesn't rewrite an absolute path in url() declarations 1`] = `
 `;
 
 exports[`rewrites a relative path in url() declarations 1`] = `
-".tpyglzj{background-image:url(../assets/test.jpg);}
+".tpyglzj{background-image:url(../assets/test.jpg);background-image:url(\\"../assets/test.jpg\\");background-image:url('../assets/test.jpg');}
 "
 `;
 

@@ -88,16 +88,16 @@ export default function transform(code: string, options: Options): Result {
             // When writing to a file, we need to adjust the relative paths inside url(..) expressions
             // It'll allow css-loader to resolve an imported asset properly
             return decl.replace(
-              /\b(url\()(\.[^)]+)(\))/g,
-              (match, p1, p2, p3) =>
+              /\b(url\((["']?))(\.[^)]+?)(\2\))/g,
+              (match, p1, p2, p3, p4) =>
                 p1 +
                 // Replace asset path with new path relative to the output CSS
                 posixPath.relative(
                   posixPath.dirname(outputFilename),
                   // Get the absolute path to the asset from the path relative to the JS file
-                  posixPath.resolve(posixPath.dirname(options.filename), p2)
+                  posixPath.resolve(posixPath.dirname(options.filename), p3)
                 ) +
-                p3
+                p4
             );
           }
 
