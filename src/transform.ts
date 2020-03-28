@@ -7,7 +7,7 @@ import { debug } from './babel/utils/logger';
 import { LinariaMetadata, Options, PreprocessorFn, Result } from './types';
 
 const STYLIS_DECLARATION = 1;
-
+const posixPath = path.posix;
 const babelPreset = require.resolve('./babel');
 
 export default function transform(code: string, options: Options): Result {
@@ -92,10 +92,10 @@ export default function transform(code: string, options: Options): Result {
               (match, p1, p2, p3) =>
                 p1 +
                 // Replace asset path with new path relative to the output CSS
-                path.relative(
-                  path.dirname(outputFilename),
+                posixPath.relative(
+                  posixPath.dirname(outputFilename),
                   // Get the absolute path to the asset from the path relative to the JS file
-                  path.resolve(path.dirname(options.filename), p2)
+                  posixPath.resolve(posixPath.dirname(options.filename), p2)
                 ) +
                 p3
             );
