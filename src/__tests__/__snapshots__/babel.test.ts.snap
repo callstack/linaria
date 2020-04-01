@@ -276,7 +276,7 @@ exports[`outputs valid CSS classname 1`] = `
 "import { styled } from 'linaria/react';
 export const ᾩPage$Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"\\\\u1FA9Page$Title\\",
-  class: \\"_h6xni0\\"
+  class: \\"\\\\u1FA1h6xni0\\"
 });"
 `;
 
@@ -284,7 +284,7 @@ exports[`outputs valid CSS classname 2`] = `
 
 CSS:
 
-._h6xni0 {
+.ᾡh6xni0 {
   font-size: 14px;
 }
 
