@@ -40,6 +40,8 @@ module.exports = {
 
   Would generate the class name `.absdjfsdf__42__header`.
 
+  **note** invalid characters will be replaced with an underscore (`_`).
+
   ### Variables
 
   - `hash`: The hash of the content.
