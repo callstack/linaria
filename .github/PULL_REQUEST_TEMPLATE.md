@@ -1,9 +1,31 @@
-<!-- Thanks for submitting a pull request! Please provide enough information so that others can review your pull request. The two fields below are mandatory. -->
+<!--
+Thanks for submitting a pull request!
+Please provide enough information so that others can review your pull request.
+Motivation and Test plan are mandatory.
+-->
 
-**Summary**
+## Motivation
 
-<!-- Explain the **motivation** for making this change. What existing problem does the pull request solve? -->
+<!--
+If pull request address existing issues, link the issues, thats all.
 
-**Test plan**
+If issue for this soled problem does not exist,
+please share your motivation and describe the problem.
+We may ask you to open issue to discuss the problem first.
+-->
 
-<!-- Demonstrate the code is solid. Example: The exact commands you ran and their output, screenshots / videos if the pull request changes UI. -->
+## Summary
+
+<!--
+Explain how your implementation works and your thoughts behind the solution.
+It will help maintainers to review your PR.
+You can skip it if PR is trivial.
+-->
+
+## Test plan
+
+<!--
+Demonstrate the code is solid.
+Example: The exact commands you ran and their output.
+Write down steps on how maintainers can test your PR.
+-->
