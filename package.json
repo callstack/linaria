@@ -100,7 +100,6 @@
     "@babel/traverse": "^7.9.0",
     "@emotion/is-prop-valid": "^0.7.3",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "core-js": "^3.6.3",
     "cosmiconfig": "^5.1.0",
     "debug": "^4.1.1",
     "dedent": "^0.7.0",
