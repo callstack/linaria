@@ -1,7 +1,8 @@
 ---
-name: Report a bug 🐛
-about: Report a reproducible bug or reproducible regression.
-labels: 'bug report 🦗', 'needs: triage 🏷', 'needs: complete repro 🖥️'
+name: "Report a bug 🐛"
+about: "Report a reproducible bug or reproducible regression."
+labels: "bug report 🦗, needs: triage 🏷, needs: complete repro 🖥️"
+
 ---
 
 ## Environment
