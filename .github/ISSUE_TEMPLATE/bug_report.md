@@ -1,7 +1,7 @@
 ---
 name: Report a bug 🐛
 about: Report a reproducible bug or reproducible regression.
-labels: 'bug 🐛'
+labels: 'bug report 🦗', 'needs: triage 🏷', 'needs: complete repro 🖥️'
 ---
 
 ## Environment
@@ -11,14 +11,13 @@ All necessary environmental info that will help triage this
 -->
 
 <!--
-Especially include
-- version of Linaria you are using
-  - check exact version in lock file
-- used bundler eg. webpack with it's version
-- platform/framework eg. react or next.js
-- node version
-- operating system with version
+Especially include:
 -->
+
+- Linaria version:
+- Bundler (+ version):
+- Node.js version:
+- OS:
 
 ## Description
 
