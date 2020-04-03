@@ -76,7 +76,6 @@
     "babel-jest": "^24.5.0",
     "codecov": "^3.2.0",
     "commitlint": "^8.3.5",
-    "core-js": "^3.6.4",
     "del-cli": "^1.1.0",
     "dtslint": "^0.9.8",
     "eslint": "^6.8.0",

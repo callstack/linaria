@@ -7,7 +7,7 @@ import buildDepsGraph from '../babel/evaluators/shaker/graphBuilder';
 function _build(literal: TemplateStringsArray, ...placeholders: string[]) {
   const code = dedent(literal, ...placeholders);
   return {
-    ast: babel.parseSync(code, { filename: 'file.test.js' })!,
+    ast: babel.parseSync(code, { filename: 'source.js' })!,
     code,
   };
 }

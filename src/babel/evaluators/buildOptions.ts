@@ -20,7 +20,6 @@ export default function buildOptions(
   const defaults: DefaultOptions = {
     caller: { name: 'linaria', evaluate: true },
     filename: filename,
-    // configFile: false,
     presets: [
       [
         require.resolve('../index'),
