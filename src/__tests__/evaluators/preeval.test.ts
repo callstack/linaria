@@ -20,6 +20,7 @@ const transpile = async (input: string) =>
       '@babel/plugin-syntax-jsx',
     ],
     filename: join(__dirname, 'app/index.js'),
+    configFile: false,
   }))!;
 
 it('preserves classNames', async () => {

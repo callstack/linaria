@@ -16,6 +16,7 @@ const transpile = async (
     presets: [[require.resolve('../babel'), opts]],
     plugins: ['@babel/plugin-syntax-jsx'],
     filename: join(__dirname, 'app/index.js'),
+    configFile: false,
   }))!;
 
 it('transpiles styled template literal with object', async () => {

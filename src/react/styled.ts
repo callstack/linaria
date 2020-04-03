@@ -61,7 +61,6 @@ function styled(tag: any): any {
 
     const render = (props: any, ref: any) => {
       const { as: component = tag, class: className, ...rest } = props;
-
       let filteredProps;
 
       // Check if it's an HTML tag and not a custom element
@@ -92,7 +91,9 @@ function styled(tag: any): any {
 
         // eslint-disable-next-line guard-for-in
         for (const name in vars) {
-          const [result, unit = ''] = vars[name];
+          const variable = vars[name];
+          const result = variable[0];
+          const unit = variable[1] || '';
           const value = typeof result === 'function' ? result(props) : result;
 
           warnIfInvalid(value, options.name);
@@ -110,7 +111,6 @@ function styled(tag: any): any {
 
         return React.createElement(tag, filteredProps);
       }
-
       return React.createElement(component, filteredProps);
     };
 

@@ -13,12 +13,13 @@ module.exports = {
   plugins: ['@babel/plugin-proposal-class-properties'],
   overrides: [
     {
-      test: /src\/(react)\//,
-      presets: ['@babel/preset-react'], // We don't use JSX in react package currently, so it's for future error proof
-    },
-    {
-      test: /src\/((react)|(core))\//, // only those modules are supposed to be run in the browser
+      /**
+       * only src/react and src/core are targeted to be run in the browser
+       * we use the same config for src/__tests__ and src/__fixtures__ to not break existing tests
+       */
+      test: /src\/((react)|(core)|(__tests__)|(__fixtures__))\//,
       presets: [
+        '@babel/preset-react',
         [
           '@babel/preset-env',
           {
@@ -31,18 +32,12 @@ module.exports = {
                 'not dead',
               ],
             },
+            loose: true,
+            // our styled component should not need to use any polyfill. We do not include core-js in dependencies. However, we leave this to detect if future changes would not introduce any need for polyfill
             useBuiltIns: 'usage',
             corejs: 3,
-            exclude: [
-              'es.array.iterator',
-              'es.array.map',
-              'es.array.slice',
-              'es.object.assign',
-              'es.object.keys',
-              'transform-typeof-symbol',
-              'web.dom-collections.iterator',
-            ],
-            loose: true,
+            // this is used to test if we do not introduced core-js polyfill
+            debug: process.env.NODE_ENV === 'debug',
           },
         ],
       ],
