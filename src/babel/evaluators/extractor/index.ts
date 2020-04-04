@@ -40,6 +40,10 @@ function isLinariaPrevalExport(
 const extractor: Evaluator = (filename, options, text, only = null) => {
   const transformOptions = buildOptions(filename, options);
   transformOptions.presets!.unshift([require.resolve('../preeval'), options]);
+  transformOptions.plugins!.unshift([
+    '@babel/plugin-transform-runtime',
+    { useESModules: false },
+  ]);
 
   // Expressions will be extracted only for __linariaPreval.
   // In all other cases a code will be returned as is.
