@@ -245,7 +245,7 @@ CSS:
   }
 }
 
-Dependencies: ../slugify
+Dependencies: @babel/runtime/helpers/interopRequireDefault, ../slugify
 
 `;
 
@@ -520,7 +520,7 @@ CSS:
    ;
 }
 
-Dependencies: NA
+Dependencies: @babel/runtime/helpers/interopRequireDefault, @babel/runtime/helpers/taggedTemplateLiteralLoose
 
 `;
 
@@ -852,7 +852,7 @@ CSS:
   color: blue;
 }
 
-Dependencies: react
+Dependencies: @babel/runtime/helpers/interopRequireDefault, react
 
 `;
 
@@ -1046,7 +1046,7 @@ CSS:
   }
 }
 
-Dependencies: NA
+Dependencies: @babel/runtime/helpers/interopRequireDefault, @babel/runtime/helpers/defineProperty
 
 `;
 
@@ -1072,7 +1072,7 @@ CSS:
 .bareIconClass_b1xha7dm {}
 .XS_x1rsdnkv {&.bareIconClass_b1xha7dm { font-size: 16.5px; }}
 
-Dependencies: NA
+Dependencies: @babel/runtime/helpers/interopRequireDefault, @babel/runtime/helpers/defineProperty
 
 `;
 
@@ -1151,7 +1151,7 @@ CSS:
   }
 }
 
-Dependencies: ../slugify
+Dependencies: @babel/runtime/helpers/interopRequireDefault, ../slugify
 
 `;
 
@@ -1426,7 +1426,7 @@ CSS:
    ;
 }
 
-Dependencies: NA
+Dependencies: @babel/runtime/helpers/interopRequireDefault, @babel/runtime/helpers/taggedTemplateLiteral
 
 `;
 
@@ -1773,7 +1773,7 @@ CSS:
   }
 }
 
-Dependencies: ../__fixtures__/complex-component
+Dependencies: @babel/runtime/helpers/interopRequireWildcard, ../__fixtures__/complex-component
 
 `;
 
@@ -1816,7 +1816,7 @@ CSS:
   color: blue;
 }
 
-Dependencies: react
+Dependencies: @babel/runtime/helpers/interopRequireDefault, react
 
 `;
 

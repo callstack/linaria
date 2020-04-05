@@ -19,6 +19,10 @@ function prepareForShake(
   ]);
   transformOptions.presets!.unshift([require.resolve('../preeval'), options]);
   transformOptions.plugins!.unshift('transform-react-remove-prop-types');
+  transformOptions.plugins!.unshift([
+    '@babel/plugin-transform-runtime',
+    { useESModules: false },
+  ]);
 
   debug(
     'evaluator:shaker:transform',
