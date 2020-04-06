@@ -8,7 +8,6 @@ import serializer from '../__utils__/linaria-snapshot-serializer';
 import { Evaluator, StrictOptions } from '../babel/types';
 
 expect.addSnapshotSerializer(serializer);
-
 async function transformAsync(
   code: string,
   opts?: babel.TransformOptions
@@ -34,6 +33,7 @@ function run(
 ): void {
   const babelrc: babel.TransformOptions = {
     babelrc: false,
+    configFile: false,
     plugins: [],
     presets: [
       [
@@ -76,7 +76,6 @@ function run(
       ...conf(babelrc),
       filename: join(__dirname, 'source.js'),
     });
-
     // The slug will be machine specific, so replace it with a consistent one
     return {
       metadata,
@@ -102,7 +101,6 @@ function run(
       \`;
       `
     );
-
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
@@ -330,7 +328,6 @@ function run(
       \`;
       `
     );
-
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
@@ -442,7 +439,6 @@ function run(
       \`;
       `
     );
-
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
