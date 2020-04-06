@@ -16,8 +16,12 @@ it('Ensures that package do not include core-js dependency after build', async (
   const packageJSON = require('../../package.json');
   const buildScript = packageJSON.scripts.build;
 
-  const proc = cp.exec(`NODE_ENV=debug ${buildScript}`, {
+  const proc = cp.exec(buildScript, {
     stdio: 'ignore',
+    env: {
+      ...process.env,
+      NODE_ENV: 'debug',
+    },
   });
   const result = await waitForProcess(proc);
   // run `NODE_ENV=debug yarn build` to debug issues with introduced core-js dependency
