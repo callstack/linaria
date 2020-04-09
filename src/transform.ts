@@ -133,7 +133,11 @@ export default function transform(code: string, options: Options): Result {
     });
 
     // Run each rule through stylis to support nesting
-    cssText += `${preprocessor(selector, rules[selector].cssText)}\n`;
+    cssText += `${preprocessor(
+      selector,
+      rules[selector].cssText,
+      options.filename
+    )}\n`;
   });
 
   return {
