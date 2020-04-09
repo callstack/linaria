@@ -178,7 +178,7 @@ The loader accepts the following options:
 - `cacheDirectory: string` (default: `'.linaria-cache'`):
 
   Path to the directory where the loader will output the intermediate CSS files. You can pass a relative or absolute directory path. Make sure the directory is inside the working directory for things to work properly. **You should add this directory to `.gitignore` so you don't accidentally commit them.**
-  
+
 - `extension: string` (default: `'.linaria.css'`):
 
   An extension of the intermediate CSS files.
@@ -195,7 +195,7 @@ The loader accepts the following options:
 
     This option also applies a custom `stylis` plugin to correct the relative paths inside `url(...)` expressions so that `css-loader` can resolve them properly.
 
-  - `Function`: You can pass a custom function which receives the `selector` and `cssText` strings. It should return the resulting CSS code.
+  - `Function`: You can pass a custom function which receives the `selector` and `cssText` strings as the first two arguments and a bundler `options` object as the third argument. It should return the resulting CSS code.
 
     A very basic implementation may look like this: `` (selector, cssText) => `${selector} { ${cssText} }`; ``.
 

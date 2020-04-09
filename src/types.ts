@@ -53,6 +53,6 @@ export type StyledMeta = {
 export type PreprocessorFn = (
   selector: string,
   cssText: string,
-  filename: string
+  options: Options
 ) => string;
 export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
