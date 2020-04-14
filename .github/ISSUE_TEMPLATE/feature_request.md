@@ -1,5 +1,5 @@
 ---
-name: Feature proposal 💬
+name: '💬 Feature proposal'
 about: Suggest introduction of a new feature.
 labels: 'feature: proposal 💬'
 ---

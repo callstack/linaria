@@ -1,5 +1,5 @@
 ---
-name: Enhancement proposal 💬
+name: '💬 Enhancement proposal'
 about: Suggest an possible improvement of existing features.
 labels: 'enhancement: proposal 💬'
 ---
