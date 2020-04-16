@@ -1,0 +1,429 @@
+{
+  "labels": {
+    "babel-plugin": {
+      "name": "babel-plugin",
+      "description": "",
+      "colour": "006b75"
+    },
+    "bug-report": {
+      "name": "bug report 🦗",
+      "description": "Issue is probably a bug, but it needs to be checked",
+      "colour": "f8c4c4"
+    },
+    "bug": {
+      "name": "bug 🐛",
+      "description": "Issue is a confirmed bug",
+      "colour": "ee0701"
+    },
+    "bundler-parcel": {
+      "name": "bundler: parcel 🎁",
+      "description": "Issue is related to parcel bundler",
+      "colour": "e5e5e5"
+    },
+    "bundler-rollup": {
+      "name": "bundler: rollup 🗞️",
+      "description": "Issue is related to rollup bundler",
+      "colour": "e5e5e5"
+    },
+    "bundler-webpack": {
+      "name": "bundler: webpack 📦",
+      "description": "Issue is related to webpack bundler",
+      "colour": "e5e5e5"
+    },
+    "cat-documentation": {
+      "name": "cat: documentation 📖",
+      "description": "Work focused on writing documentation",
+      "colour": "f9acca"
+    },
+    "cat-extend-support": {
+      "name": "cat: extend support 🤝",
+      "description": "Support for a new bundler/platform",
+      "colour": "f9acca"
+    },
+    "cat-extend-syntax": {
+      "name": "cat: extend syntax ✍",
+      "description": "Support for a new syntax",
+      "colour": "f9acca"
+    },
+    "cat-improve-publishing": {
+      "name": "cat: improve publishing 🚢",
+      "description": "Issues about improvement of publishing libs with Linaria",
+      "colour": "f9acca"
+    },
+    "cat-modules-aliasing": {
+      "name": "cat: modules aliasing 🔗",
+      "description": "Issue related to modules aliasing",
+      "colour": "f9acca"
+    },
+    "cat-monorepo": {
+      "name": "cat: monorepo 🔱",
+      "description": "Issues related to usage of linaria in monorepo",
+      "colour": "f9acca"
+    },
+    "cat-performance": {
+      "name": "cat: performance 🚀",
+      "description": "Issue is related to performance",
+      "colour": "f9acca"
+    },
+    "cat-testing": {
+      "name": "cat: testing 🛡",
+      "description": "Issue related to testing components",
+      "colour": "f9acca"
+    },
+    "cat-typings": {
+      "name": "cat: typings 👮",
+      "description": "Typescript types related issues",
+      "colour": "f9acca"
+    },
+    "core-team": {
+      "name": "core team 🧬",
+      "description": "Issues reserved for the core team",
+      "colour": "fef2c0"
+    },
+    "duplicate": {
+      "name": "duplicate",
+      "description": "Issue is a duplicate of another issue",
+      "colour": "cccccc"
+    },
+    "enhancement-approved": {
+      "name": "enhancement: approved ✅",
+      "description": "Improvement of the current behaviour that has been approved",
+      "colour": "1d76db"
+    },
+    "enhancement-proposal": {
+      "name": "enhancement: proposal 💬",
+      "description": "Improvement of current behaviour that needs to be discussed",
+      "colour": "1d76db"
+    },
+    "enhancement-rejected": {
+      "name": "enhancement: rejected ❌",
+      "description": "Improvement of the current behaviour that has been rejected",
+      "colour": "1d76db"
+    },
+    "feature-approved": {
+      "name": "feature: approved ✅",
+      "description": "New feature that has been approved",
+      "colour": "1d3082"
+    },
+    "feature-proposal": {
+      "name": "feature: proposal 💬",
+      "description": "New feature proposal that needs to be discussed",
+      "colour": "1d3082"
+    },
+    "feature-rejected": {
+      "name": "feature: rejected ❌",
+      "description": "New feature that has been rejected",
+      "colour": "1d3082"
+    },
+    "good-first-issue": {
+      "name": "good first issue 😊",
+      "description": "It is a good issue for new comers",
+      "colour": "5319e7"
+    },
+    "greenkeeper": {
+      "name": "greenkeeper",
+      "description": "",
+      "colour": "00c775"
+    },
+    "hacktoberfest": {
+      "name": "hacktoberfest 🍺",
+      "description": "https://hacktoberfest.digitalocean.com/",
+      "colour": "FF8C00"
+    },
+    "needs-complete-repro": {
+      "name": "needs: complete repro 🖥️",
+      "description": "Issue need to have complete repro provided",
+      "colour": "b2ffbb"
+    },
+    "needs-help": {
+      "name": "needs: help 🆘",
+      "description": "Help is needed",
+      "colour": "b2ffbb"
+    },
+    "needs-investigation": {
+      "name": "needs: investigation 🔎",
+      "description": "Issue has to be investigated for reason or solution",
+      "colour": "b2ffbb"
+    },
+    "needs-more-info": {
+      "name": "needs: more info ℹ",
+      "description": "Not enough information was provided to work on issue",
+      "colour": "b2ffbb"
+    },
+    "needs-response": {
+      "name": "needs: response 📩",
+      "description": "Response from author/commenters is requested",
+      "colour": "b2ffbb"
+    },
+    "needs-to-be-grouped": {
+      "name": "needs: to be grouped",
+      "description": "Issue needs to be grouped with other similar issues",
+      "colour": "b2ffbb"
+    },
+    "needs-triage": {
+      "name": "needs: triage 🏷",
+      "description": "Issue needs to be checked and prioritized",
+      "colour": "b2ffbb"
+    },
+    "platform-electron": {
+      "name": "platform: electron 🛠️",
+      "description": "Issue related to electron platform",
+      "colour": "00e5e5"
+    },
+    "platform-next.js": {
+      "name": "platform: next.js 🛠️",
+      "description": "Issue related to next.js",
+      "colour": "00e5e5"
+    },
+    "platform-react": {
+      "name": "platform: react 🛠️",
+      "description": "Issue related to react",
+      "colour": "00e5e5"
+    },
+    "platform-ssr": {
+      "name": "platform: ssr 🛠️",
+      "description": "Issue related to SSR",
+      "colour": "00e5e5"
+    },
+    "platform-vanilla": {
+      "name": "platform: vanilla 🛠️",
+      "description": "Issue related to vanilla css tags",
+      "colour": "00e5e5"
+    },
+    "platform-svelte": {
+      "name": "platform: svelte 🛠️",
+      "description": "Issue related to svelte",
+      "colour": "00e5e5"
+    },
+    "priority-critical": {
+      "name": "priority: critical  ☢️",
+      "description": "Issue is a critical bug that affects most of the users",
+      "colour": "000000"
+    },
+    "priority-high": {
+      "name": "priority: high ⚠️",
+      "description": "Issue is important and should be prioritized among others",
+      "colour": "e093f7"
+    },
+    "priority-low": {
+      "name": "priority: low 📉",
+      "description": "Something nice to have",
+      "colour": "ebebeb"
+    },
+    "priority-medium": {
+      "name": "priority: medium 💻",
+      "description": "Issue is important but not the most important",
+      "colour": "ffb732"
+    },
+    "question": {
+      "name": "question ❔",
+      "description": "Question related to the library",
+      "colour": "f9acca"
+    },
+    "status-has-PR": {
+      "name": "status: has PR 😍",
+      "description": "Issue has opened PR",
+      "colour": "feffa5"
+    },
+    "status-in-progress": {
+      "name": "status: in progress 🚧",
+      "description": "Someone is working on the issue",
+      "colour": "feffa5"
+    },
+    "status-merged": {
+      "name": "status: merged 🎉",
+      "description": "Solution was merged",
+      "colour": "feffa5"
+    },
+    "status-up-for-grabs": {
+      "name": "status: up for grabs 🙏",
+      "description": "research is done and issue  is ready to be grabbed",
+      "colour": "feffa5"
+    },
+    "status-wontfix": {
+      "name": "status: wontfix ⚰",
+      "description": "Issue will not be fixed",
+      "colour": "feffa5"
+    },
+    "workaround-exist": {
+      "name": "workaround exist",
+      "description": "Workaround for the issue exist",
+      "colour": "70f488"
+    },
+    "skip-labeling": {
+      "name": "skip autolabeling",
+      "description": "Use it to disable auto laberer bot for an issue/pr",
+      "colour": "D9BBF9"
+    }
+  },
+  "issue": {
+    "bundler-rollup": {
+      "requires": 1,
+      "conditions": [
+        {
+          "type": "titleMatches",
+          "pattern": "/rollup/i"
+        },
+        {
+          "type": "descriptionMatches",
+          "pattern": "/rollup/i"
+        }
+      ]
+    },
+    "bundler-webpack": {
+      "requires": 1,
+      "conditions": [
+        {
+          "type": "titleMatches",
+          "pattern": "/webpack/i"
+        },
+        {
+          "type": "descriptionMatches",
+          "pattern": "/webpack/i"
+        }
+      ]
+    },
+    "bundler-parcel": {
+      "requires": 1,
+      "conditions": [
+        {
+          "type": "titleMatches",
+          "pattern": "/parcel/i"
+        },
+        {
+          "type": "descriptionMatches",
+          "pattern": "/parcel/i"
+        }
+      ]
+    },
+    "platform-svelte": {
+      "requires": 1,
+      "conditions": [
+        {
+          "type": "titleMatches",
+          "pattern": "/svelte/i"
+        },
+        {
+          "type": "descriptionMatches",
+          "pattern": "/svelte/i"
+        }
+      ]
+    },
+    "platform-next.js": {
+      "requires": 1,
+      "conditions": [
+        {
+          "type": "titleMatches",
+          "pattern": "/next(\\.){0,1}js/i"
+        },
+        {
+          "type": "descriptionMatches",
+          "pattern": "/next(\\.){0,1}js/i"
+        }
+      ]
+    },
+    "platform-ssr": {
+      "requires": 1,
+      "conditions": [
+        {
+          "type": "titleMatches",
+          "pattern": "/(ssr)|(server)/i"
+        },
+        {
+          "type": "descriptionMatches",
+          "pattern": "/(ssr)|(server)/i"
+        }
+      ]
+    },
+    "platform-electron": {
+      "requires": 1,
+      "conditions": [
+        {
+          "type": "titleMatches",
+          "pattern": "/electron/i"
+        },
+        {
+          "type": "descriptionMatches",
+          "pattern": "/electron/i"
+        }
+      ]
+    },
+    "cat-performance": {
+      "requires": 1,
+      "conditions": [
+        {
+          "type": "titleMatches",
+          "pattern": "/(slow)|(build[\\s\\S]*time)|(time[\\s\\S]*build)(performance)/i"
+        },
+        {
+          "type": "descriptionMatches",
+          "pattern": "/(slow)|(build[\\s\\S]*time)|(time[\\s\\S]*build)(performance)/i"
+        }
+      ]
+    },
+    "cat-testing": {
+      "requires": 1,
+      "conditions": [
+        {
+          "type": "titleMatches",
+          "pattern": "/(test)|(jest)/i"
+        }
+      ]
+    },
+    "cat-monorepo": {
+      "requires": 1,
+      "conditions": [
+        {
+          "type": "titleMatches",
+          "pattern": "/(monorepo)|(workspace)|(lerna)/i"
+        },
+        {
+          "type": "descriptionMatches",
+          "pattern": "/(monorepo)|(workspace)|(lerna)/i"
+        }
+      ]
+    },
+    "cat-modules-aliasing": {
+      "requires": 1,
+      "conditions": [
+        {
+          "type": "titleMatches",
+          "pattern": "/(alias)|(namemapper)/i"
+        },
+        {
+          "type": "descriptionMatches",
+          "pattern": "/(alias)|(namemapper)/i"
+        }
+      ]
+    },
+    "cat-typings": {
+      "requires": 1,
+      "conditions": [
+        {
+          "type": "titleMatches",
+          "pattern": "/type/i"
+        },
+        {
+          "type": "titleMatches",
+          "pattern": "/TS/"
+        },
+        {
+          "type": "descriptionMatches",
+          "pattern": "/type/i"
+        },
+        {
+          "type": "descriptionMatches",
+          "pattern": "/TS/"
+        }
+      ]
+    }
+  },
+  "issue_fallback": {
+    "fallbackActivationValue": 2,
+    "labels": [
+      "needs-triage"
+    ]
+  },
+  "pr": {},
+  "skip_labeling": "skip-labeling"
+}

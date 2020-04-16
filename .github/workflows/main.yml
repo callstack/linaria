@@ -1,0 +1,21 @@
+name: labeler
+on:
+  issues:
+    types: [opened, edited, reopened]
+  pull_request:
+    types: [opened, edited, reopened, ready_for_review, synchronize]
+
+jobs:
+  labeler:
+    runs-on: ubuntu-latest
+    name: label issues and pull requests
+    steps:
+      - name: check-out-repository
+        uses: actions/checkout@v2
+
+      - name: labeler
+        uses: jayu/super-labeler-action@develop
+        env:
+          ACTIONS_STEP_DEBUG: ${{ secrets.ACTIONS_STEP_DEBUG }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
