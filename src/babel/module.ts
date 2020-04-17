@@ -259,10 +259,7 @@ class Module {
 
     let code: string | null | undefined;
     const action = matchedRules.length > 0 ? matchedRules[0].action : 'ignore';
-    if (
-      action === 'ignore' ||
-      (this.options.ignore && this.options.ignore.test(filename))
-    ) {
+    if (action === 'ignore') {
       debug('module:ignore', `${filename}`);
       code = text;
     } else {

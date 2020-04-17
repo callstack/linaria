@@ -10,7 +10,7 @@ const explorer = cosmiconfig('linaria');
 export default function loadOptions(
   overrides: Partial<PluginOptions> = {}
 ): Partial<StrictOptions> {
-  const { configFile, ...rest } = overrides;
+  const { configFile, ignore, ...rest } = overrides;
 
   const result =
     configFile !== undefined
@@ -25,7 +25,8 @@ export default function loadOptions(
         action: require('../evaluators/extractor').default,
       },
       {
-        test: /\/node_modules\//,
+        // The old `ignore` option is used as a default value for `ignore` rule.
+        test: ignore ?? /\/node_modules\//,
         action: 'ignore',
       },
     ],
