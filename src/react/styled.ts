@@ -98,7 +98,7 @@ function styled(tag: any): any {
 
           warnIfInvalid(value, options.name);
           // skip empty values
-          if(value !== null && typeof value !== undefined && value !== "") {
+          if (value !== null && typeof value !== undefined && value !== '') {
             style[`--${name}`] = `${value}${unit}`;
           }
         }
