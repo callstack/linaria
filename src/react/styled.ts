@@ -97,8 +97,10 @@ function styled(tag: any): any {
           const value = typeof result === 'function' ? result(props) : result;
 
           warnIfInvalid(value, options.name);
-
-          style[`--${name}`] = `${value}${unit}`;
+          // skip empty values
+          if(value !== null && typeof value !== undefined && value !== "") {
+            style[`--${name}`] = `${value}${unit}`;
+          }
         }
 
         filteredProps.style = Object.assign(style, filteredProps.style);
