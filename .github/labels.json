@@ -401,18 +401,10 @@
       "conditions": [
         {
           "type": "titleMatches",
-          "pattern": "/type/i"
+          "pattern": "/typescript/i"
         },
         {
           "type": "titleMatches",
-          "pattern": "/TS/"
-        },
-        {
-          "type": "descriptionMatches",
-          "pattern": "/type/i"
-        },
-        {
-          "type": "descriptionMatches",
           "pattern": "/TS/"
         }
       ]
