@@ -1,3 +1,7 @@
+/**
+ * This file handles preparing babel config for Linaria babel plugin.
+ */
+
 import { PluginItem, TransformOptions } from '@babel/core';
 import { StrictOptions } from '../types';
 

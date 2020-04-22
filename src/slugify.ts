@@ -1,3 +1,7 @@
+/**
+ * This file contains a utility to generate hashes to be used as generated class names
+ */
+
 /* eslint-disable no-bitwise, default-case, no-param-reassign, prefer-destructuring */
 
 /**

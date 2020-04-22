@@ -38,7 +38,6 @@ function prepareForShake(
     throw new Error(`${filename} cannot be transformed`);
   }
 
-  // const { code } = generator(transformed.ast!);
   return transformed.ast.program;
 }
 

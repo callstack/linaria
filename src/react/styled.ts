@@ -1,3 +1,9 @@
+/**
+ * This file contains an runtime version of `styled` component. Responsibilities of the component are:
+ * - returns ReactElement based on HTML tag used with `styled` or custom React Component
+ * - injects classNames for the returned component
+ * - injects CSS variables used to define dynamic styles based on props
+ */
 import * as React from 'react'; // eslint-disable-line import/no-extraneous-dependencies
 import validAttr from '@emotion/is-prop-valid';
 import { cx } from '../index';

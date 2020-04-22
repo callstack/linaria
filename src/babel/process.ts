@@ -1,3 +1,6 @@
+/**
+ * It contains API for mocked process variable available in node environment used to evaluate scripts with node's `vm` in ./module.ts
+ */
 export const nextTick = (fn: Function) => setTimeout(fn, 0);
 
 export const platform = 'browser';

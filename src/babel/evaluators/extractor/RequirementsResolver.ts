@@ -1,3 +1,9 @@
+/**
+ * This file is used to extract statements required to evaluate dependencies.
+ * Starting from the exports.__linariaPreval passed as argument to static method on class RequirementsResolver,
+ * it recursively extracts paths that contains identifiers that are needed to evaluate the dependency.
+ */
+
 import { types as t } from '@babel/core';
 import { Binding, NodePath } from '@babel/traverse';
 

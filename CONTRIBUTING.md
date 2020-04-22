@@ -20,9 +20,9 @@ The core team works directly on GitHub and all work is public.
 
 1. When working on the code, you can use the watch mode to watch and compiles changed files:
 
-    ```sh
-    yarn watch
-    ```
+   ```sh
+   yarn watch
+   ```
 
 1. If you've added code that should be tested, add tests.
 
@@ -88,6 +88,19 @@ To unlink it:
 ```sh
 yarn unlink linaria
 ```
+
+### Debugging and deep dive into babel plugin
+
+To understand what is actually going in under the hood of Linaria we recommend to first read the top-level [How it works](/docs/HOW_IT_WORKS.md).
+Then you can run Linaria in debug mode for a specific file from you project and see step-by-step logs informing what is happening.
+
+```sh
+DEBUG=linaria* LINARIA_LOG=debug npx babel -d dist PATH_TO_COMPONENT
+```
+
+> In example we use `npx` to run babel, but you can also put this script into package.json with removed `npx` to run it.
+
+You will see how the babel part of Linaria work, result JS file will be stored in `dist` directory. You will not see the resulting CSS file, because this is the role of next layer - bundlers (CSS content is stored in babel metadata to be consumed by bundler).
 
 ### Publishing a release
 

@@ -1,3 +1,7 @@
+/**
+ * This file contains a CLI for Linaria.
+ */
+
 import path from 'path';
 import normalize from 'normalize-path';
 import fs from 'fs';

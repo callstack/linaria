@@ -1,5 +1,15 @@
 /* eslint-disable no-param-reassign */
 
+/**
+ * This is an entry point for styles extraction.
+ * On enter, It:
+ *  - traverse the code using visitors (TaggedTemplateExpression, ImportDeclaration)
+ *  - schedule evaluation of lazy dependencies (those who are not simple expressions //TODO does they have it's name?)
+ *  - let templateProcessor to save evaluated values in babel state as `replacements`.
+ * On exit, It:
+ *  - store result of extraction in babel's file metadata
+ */
+
 import { types } from '@babel/core';
 import { NodePath, Scope } from '@babel/traverse';
 import { expression, statement } from '@babel/template';
@@ -17,6 +27,7 @@ import {
 } from './types';
 import TaggedTemplateExpression from './visitors/TaggedTemplateExpression';
 import ImportDeclaration from './visitors/ImportDeclaration';
+import { debug } from './utils/logger';
 
 function isLazyValue(v: ExpressionValue): v is LazyValue {
   return v.kind === ValueType.LAZY;
@@ -93,6 +104,7 @@ export default function extract(_babel: any, options: StrictOptions) {
           state.index = -1;
           state.dependencies = [];
           state.replacements = [];
+          debug('extraction:start', state.file.opts.filename);
 
           // Invalidate cache for module evaluation to get fresh modules
           Module.invalidate();
@@ -100,7 +112,6 @@ export default function extract(_babel: any, options: StrictOptions) {
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
-            // Identifier: p => Identifier(p, state, options),
             ImportDeclaration: p => ImportDeclaration(p, state),
             TaggedTemplateExpression: p =>
               TaggedTemplateExpression(p, state, options),
@@ -117,21 +128,33 @@ export default function extract(_babel: any, options: StrictOptions) {
             },
             [] as Array<types.Expression | string>
           );
+          debug('lazy-deps:count', lazyDeps.length);
 
           let lazyValues: any[] = [];
 
           if (lazyDeps.length > 0) {
+            debug(
+              'lazy-deps:list',
+              lazyDeps.map(node =>
+                typeof node !== 'string' ? generator(node).code : node
+              )
+            );
+
             const program = addLinariaPreval(path, lazyDeps);
             const { code } = generator(program);
+            debug('lazy-deps:evaluate', '');
+
             const evaluation = evaluate(
               code,
               types,
               state.file.opts.filename,
               options
             );
+            debug('lazy-deps:sub-files', evaluation.dependencies);
 
             state.dependencies.push(...evaluation.dependencies);
             lazyValues = evaluation.value.__linariaPreval || [];
+            debug('lazy-deps:values', evaluation.value.__linariaPreval);
           }
 
           const valueCache: ValueCache = new Map();
@@ -153,6 +176,8 @@ export default function extract(_babel: any, options: StrictOptions) {
 
           // Invalidate cache for module evaluation when we're done
           Module.invalidate();
+
+          debug('extraction:end', state.file.opts.filename);
         },
       },
     },

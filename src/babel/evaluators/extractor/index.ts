@@ -1,3 +1,9 @@
+/**
+ * This file is a main file of extractor evaluation strategy.
+ * It finds __linariaPreval statements starting from the end of the program and
+ * invoke RequirementsResolver to get parts of code that needs to be executed in order to evaluate the dependency.
+ */
+
 import { parseSync, transformSync, types as t } from '@babel/core';
 import traverse, { NodePath } from '@babel/traverse';
 import generator from '@babel/generator';
@@ -51,7 +57,6 @@ const extractor: Evaluator = (filename, options, text, only = null) => {
   if (!only || only.length !== 1 || only[0] !== '__linariaPreval') {
     return [code!, null];
   }
-
   // We cannot just use `ast` that was returned by `transformSync`,
   // because there is some kind of cache inside `traverse` which
   // reuses `NodePath` with a wrong scope.

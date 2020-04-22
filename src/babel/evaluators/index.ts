@@ -1,4 +1,7 @@
 // TypeScript Version: 3.2
+/**
+ * This file is an entry point for module evaluation for getting lazy dependencies.
+ */
 
 import Module from '../module';
 import { StrictOptions } from '../types';
