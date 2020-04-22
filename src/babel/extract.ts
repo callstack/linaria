@@ -27,7 +27,7 @@ import {
 } from './types';
 import TaggedTemplateExpression from './visitors/TaggedTemplateExpression';
 import ImportDeclaration from './visitors/ImportDeclaration';
-import { debug, debugNewLine } from './utils/logger';
+import { debug } from './utils/logger';
 
 function isLazyValue(v: ExpressionValue): v is LazyValue {
   return v.kind === ValueType.LAZY;
@@ -104,8 +104,7 @@ export default function extract(_babel: any, options: StrictOptions) {
           state.index = -1;
           state.dependencies = [];
           state.replacements = [];
-          debugNewLine();
-          debug('start extraction for:', state.file.opts.filename);
+          debug('extraction:start', state.file.opts.filename);
 
           // Invalidate cache for module evaluation to get fresh modules
           Module.invalidate();
@@ -178,7 +177,7 @@ export default function extract(_babel: any, options: StrictOptions) {
           // Invalidate cache for module evaluation when we're done
           Module.invalidate();
 
-          debug('end extraction for:', state.file.opts.filename);
+          debug('extraction:end', state.file.opts.filename);
         },
       },
     },

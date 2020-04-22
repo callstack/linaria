@@ -60,9 +60,3 @@ export const debug = log.bind(null, 'debug');
 export const info = log.bind(null, 'info');
 export const warn = log.bind(null, 'warn');
 export const error = log.bind(null, 'error');
-
-export const debugNewLine = () => {
-  if (process.env.DEBUG === 'linaria*') {
-    console.log('\n');
-  }
-};

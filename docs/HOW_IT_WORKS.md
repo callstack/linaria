@@ -106,7 +106,7 @@ It's necessary since if we just replaced the interpolation as is, it wouldn't be
 
 ```css
 .Title_t1ugh8t9 {
-  font-size: var(--t1ugh8t9-0-0) px; /* you can't have 'px' after the `var(..)` */
+  font-size: var(--t1ugh8t9-0-0)px; /* you can't have 'px' after the `var(..)` */
 }
 ```
 
@@ -119,7 +119,7 @@ const absoluteFill = {
   right: 0,
   bottom: 0,
   left: 0,
-};
+}
 
 const Container = styled.h1`
   background-color: papayawhip;

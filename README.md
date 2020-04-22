@@ -57,7 +57,11 @@ Optionally, add the `linaria/babel` preset to your Babel configuration at the en
 
 ```json
 {
-  "presets": ["@babel/preset-env", "@babel/preset-react", "linaria/babel"]
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react",
+    "linaria/babel"
+  ]
 }
 ```
 
