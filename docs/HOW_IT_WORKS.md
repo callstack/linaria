@@ -9,6 +9,8 @@ Linaria consists of 2 parts:
 
 The Babel plugin will look for `css` and `styled` tags in your code, extract the CSS out and return it in the file's metadata. It will also generate unique class names based on the hash of the filename.
 
+> To get a deep dive into Linaria babel plugin internals, check [debugging section of Contributing docs](../CONTRIBUTING.md#debugging-and-deep-dive-into-babel-plugin)
+
 When using the `styled` tag, dynamic interpolations will be replaced with CSS custom properties. References to constants in the scope will also be inlined. If the same expression is used multiple times, the plugin will create a single CSS custom property for those.
 
 The interpolations used for the CSS custom properties are left in the file, and are passed to the helper which creates the React components. Function interpolations receive the component's props and their return value will be used as the value for the CSS custom property. For other expressions, their result is used as is. If the resulting values aren't strings, they'll be converted to a string before setting the property. Inline styles are used to set the custom properties.
@@ -104,7 +106,7 @@ It's necessary since if we just replaced the interpolation as is, it wouldn't be
 
 ```css
 .Title_t1ugh8t9 {
-  font-size: var(--t1ugh8t9-0-0)px; /* you can't have 'px' after the `var(..)` */
+  font-size: var(--t1ugh8t9-0-0) px; /* you can't have 'px' after the `var(..)` */
 }
 ```
 
@@ -117,7 +119,7 @@ const absoluteFill = {
   right: 0,
   bottom: 0,
   left: 0,
-}
+};
 
 const Container = styled.h1`
   background-color: papayawhip;
