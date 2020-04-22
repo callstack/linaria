@@ -1,3 +1,9 @@
+/**
+ * This file contains a Webpack loader for Linaria.
+ * It uses the transform.ts function to generate class names from source code,
+ * returns transformed code without template literals and attaches generated source maps
+ */
+
 import fs from 'fs';
 import path from 'path';
 import mkdirp from 'mkdirp';

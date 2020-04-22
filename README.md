@@ -150,6 +150,12 @@ See [Basics](/docs/BASICS.md) for a detailed information about the syntax.
 - [How it works](/docs/HOW_IT_WORKS.md)
 - [Example](/website)
 
+## Contributing
+
+We appreciate any support in library development!
+
+Take a look on [Contributing](CONTRIBUTING.md) docs to check how you can run Linaria in development mode.
+
 ## Trade-offs
 
 - No IE11 support when using dynamic styles in components with `styled`, since it uses CSS custom properties
@@ -221,6 +227,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
 This project follows the [all-contributors](https://github.com/kentcdodds/all-contributors) specification. Contributions of any kind welcome!
 
 <!-- badges -->
+
 [build-badge]: https://img.shields.io/circleci/project/github/callstack/linaria/master.svg?style=flat-square
 [build]: https://circleci.com/gh/callstack/linaria
 [coverage-badge]: https://img.shields.io/codecov/c/github/callstack/linaria.svg?style=flat-square

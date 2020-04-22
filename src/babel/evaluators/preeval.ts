@@ -1,3 +1,7 @@
+/**
+ * This file is a babel prest used to transform files inside evaluators.
+ * It works the same as main `babel/extract` preset, but do not evaluate lazy dependencies.
+ */
 import { NodePath } from '@babel/traverse';
 import { types } from '@babel/core';
 import TaggedTemplateExpression from '../visitors/TaggedTemplateExpression';

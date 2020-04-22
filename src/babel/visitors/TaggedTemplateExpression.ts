@@ -1,3 +1,10 @@
+/**
+ * This file is a visitor that checks TaggedTemplateExpressions and look for Linaria css or styled templates.
+ * For each template it makes a list of dependencies, try to evaluate expressions, and if it is not possible, mark them as lazy dependencies.
+ * It also generates a slug that will be used as a CSS class for particular Template Expression,
+ * and generates a display name for class or styled components.
+ * It saves that meta data as comment above the template, to be later used in templateProcessor.
+ */
 /* eslint-disable no-param-reassign */
 
 import { basename, dirname, relative } from 'path';
@@ -9,6 +16,7 @@ import { State, StrictOptions, ValueType, ExpressionValue } from '../types';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
 import slugify from '../../slugify';
 import getLinariaComment from '../utils/getLinariaComment';
+import { debug } from '../utils/logger';
 
 export default function TaggedTemplateExpression(
   path: NodePath<t.TaggedTemplateExpression>,
@@ -71,6 +79,8 @@ export default function TaggedTemplateExpression(
 
   const expressions = path.get('quasi').get('expressions');
 
+  debug('template-parse:identify-expressions', expressions.length);
+
   const expressionValues: ExpressionValue[] = expressions.map(
     (ex: NodePath<t.Expression>) => {
       const result = ex.evaluate();
@@ -88,6 +98,13 @@ export default function TaggedTemplateExpression(
 
       return { kind: ValueType.FUNCTION, ex };
     }
+  );
+
+  debug(
+    'template-parse:evaluate-expressions',
+    expressionValues.map(expressionValue =>
+      expressionValue.kind === ValueType.VALUE ? expressionValue.value : 'lazy'
+    )
   );
 
   // Increment the index of the style we're processing
@@ -196,6 +213,10 @@ export default function TaggedTemplateExpression(
 
     className = toValidCSSIdentifier(cnSlug);
   }
+  debug(
+    'template-parse:generated-meta',
+    `slug: ${slug}, displayName: ${displayName}, className: ${className}`
+  );
 
   // Save evaluated slug and displayName for future usage in templateProcessor
   path.addComment('leading', `linaria ${slug} ${displayName} ${className}`);

@@ -1,3 +1,12 @@
+/**
+ * This file exposes transform function that:
+ * - parse the passed code to AST
+ * - transforms the AST using Linaria babel preset ('./babel/index.js) and additional config defined in Linaria config file or passed to bundler configuration.
+ * - runs generated CSS files through default of user-defined preprocessor
+ * - generates source maps for CSS files
+ * - return transformed code (without Linaria template literals), generated CSS, source maps and babel metadata from transform step.
+ */
+
 import path from 'path';
 import * as babel from '@babel/core';
 import stylis from 'stylis';
