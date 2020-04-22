@@ -1,3 +1,8 @@
+/**
+ * This file handles transforming template literals to class names or styled components and generates CSS content.
+ * It uses CSS code from template literals and evaluated values of lazy dependencies stored in ValueCache.
+ */
+
 /* eslint-disable no-param-reassign */
 
 import { types } from '@babel/core';

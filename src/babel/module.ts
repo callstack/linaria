@@ -1,10 +1,11 @@
 // TypeScript Version: 3.2
 
 /**
- * This is a custom implementation for the module system for evaluating code.
+ * This is a custom implementation for the module system for evaluating code,
+ * used for resolving values for dependencies interpolated in `css` or `styled`.
  *
  * This serves 2 purposes:
- * - Avoid leakage from evaled code to module cache in current context, e.g. `babel-register`
+ * - Avoid leakage from evaluated code to module cache in current context, e.g. `babel-register`
  * - Allow us to invalidate the module cache without affecting other stuff, necessary for rebuilds
  *
  * We also use it to transpile the code with Babel by default.
@@ -65,6 +66,14 @@ let cache: { [id: string]: Module } = {};
 
 const NOOP = () => {};
 
+const createCustomDebug = (depth: number) => (
+  ..._args: Parameters<typeof debug>
+) => {
+  const [namespaces, arg1, ...args] = _args;
+  const modulePrefix = depth === 0 ? 'module' : `sub-module-${depth}`;
+  debug(`${modulePrefix}:${namespaces}`, arg1, ...args);
+};
+
 class Module {
   static invalidate: () => void;
   static invalidateEvalCache: () => void;
@@ -83,8 +92,14 @@ class Module {
   extensions: string[];
   dependencies: string[] | null;
   transform: ((text: string) => BabelFileResult | null) | null;
+  debug: typeof debug;
+  debuggerDepth: number;
 
-  constructor(filename: string, options: StrictOptions) {
+  constructor(
+    filename: string,
+    options: StrictOptions,
+    debuggerDepth: number = 0
+  ) {
     this.id = filename;
     this.filename = filename;
     this.options = options;
@@ -92,6 +107,8 @@ class Module {
     this.paths = [];
     this.dependencies = null;
     this.transform = null;
+    this.debug = createCustomDebug(debuggerDepth);
+    this.debuggerDepth = debuggerDepth;
 
     Object.defineProperties(this, {
       id: {
@@ -116,6 +133,7 @@ class Module {
 
     // We support following extensions by default
     this.extensions = ['.json', '.js', '.jsx', '.ts', '.tsx'];
+    this.debug('prepare', filename);
   }
 
   resolve = (id: string) => {
@@ -152,6 +170,7 @@ class Module {
     cache: typeof cache;
   } = Object.assign(
     (id: string) => {
+      this.debug('require', id);
       if (id in builtins) {
         // The module is in the allowed list of builtin node modules
         // Ideally we should prevent importing them, but webpack polyfills some
@@ -191,8 +210,9 @@ class Module {
       let m = cache[cacheKey];
 
       if (!m) {
+        this.debug('cached:not-exist', id);
         // Create the module if cached module is not available
-        m = new Module(filename, this.options);
+        m = new Module(filename, this.options, this.debuggerDepth + 1);
         m.transform = this.transform;
 
         // Store it in cache at this point with, otherwise
@@ -202,7 +222,6 @@ class Module {
         if (this.extensions.includes(path.extname(filename))) {
           // To evaluate the file, we need to read it first
           const code = fs.readFileSync(filename, 'utf-8');
-
           if (/\.json$/.test(filename)) {
             // For JSON files, parse it to a JS object similar to Node
             m.exports = JSON.parse(code);
@@ -217,6 +236,8 @@ class Module {
           // The module will be resolved by css-loader
           m.exports = id;
         }
+      } else {
+        this.debug('cached:exist', id);
       }
 
       return m.exports;
@@ -260,7 +281,7 @@ class Module {
     let code: string | null | undefined;
     const action = matchedRules.length > 0 ? matchedRules[0].action : 'ignore';
     if (action === 'ignore') {
-      debug('module:ignore', `${filename}`);
+      this.debug('ignore', `${filename}`);
       code = text;
     } else {
       // Action can be a function or a module name
@@ -269,11 +290,14 @@ class Module {
 
       // For JavaScript files, we need to transpile it and to get the exports of the module
       let imports: Module['imports'];
+
+      this.debug('prepare-evaluation', this.filename, 'using', evaluator.name);
+
       [code, imports] = evaluator(this.filename, this.options, text, only);
       this.imports = imports;
 
-      debug(
-        'module:evaluate',
+      this.debug(
+        'evaluate',
         `${this.filename} (only ${(only || []).join(', ')}):\n${code}`
       );
     }
