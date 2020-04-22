@@ -31,7 +31,7 @@ function throwIfInvalid(
     - method,
     - loop,
   because it cannot be statically determined in which context you use them.
-  That's why some variables may be not defined.
+  That's why some variables may be not defined during evaluation.
       `
     );
   }

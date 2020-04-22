@@ -121,7 +121,7 @@ it('outputs valid CSS classname', async () => {
     dedent`
     import { styled } from 'linaria/react';
 
-    export const ᾩPage$Title = styled.h1\`
+    export const ΩPage$Title = styled.h1\`
       font-size: 14px;
     \`;
     `
