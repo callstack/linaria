@@ -143,18 +143,26 @@ export default function extract(_babel: any, options: StrictOptions) {
             const program = addLinariaPreval(path, lazyDeps);
             const { code } = generator(program);
             debug('lazy-deps:evaluate', '');
+            try {
+              const evaluation = evaluate(
+                code,
+                types,
+                state.file.opts.filename,
+                options
+              );
+              debug('lazy-deps:sub-files', evaluation.dependencies);
 
-            const evaluation = evaluate(
-              code,
-              types,
-              state.file.opts.filename,
-              options
-            );
-            debug('lazy-deps:sub-files', evaluation.dependencies);
-
-            state.dependencies.push(...evaluation.dependencies);
-            lazyValues = evaluation.value.__linariaPreval || [];
-            debug('lazy-deps:values', evaluation.value.__linariaPreval);
+              state.dependencies.push(...evaluation.dependencies);
+              lazyValues = evaluation.value.__linariaPreval || [];
+              debug('lazy-deps:values', evaluation.value.__linariaPreval);
+            } catch (e) {
+              throw new Error(
+                'An unexpected runtime error ocurred during dependencies evaluation: \n' +
+                  e.stack +
+                  '\n\nIt may happen when your code or third party module is invalid or uses identifiers not available in Node environment, eg. window. \n' +
+                  'Note that line numbers in above stack trace will most likely not match, because Linaria needed to transform your code a bit.\n'
+              );
+            }
           }
 
           const valueCache: ValueCache = new Map();

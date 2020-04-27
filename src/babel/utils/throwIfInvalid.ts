@@ -19,7 +19,20 @@ function throwIfInvalid(
   // We can't use instanceof here so let's use duck typing
   if (value && typeof value !== 'number' && value.stack && value.message) {
     throw ex.buildCodeFrameError(
-      `An error occurred when evaluating the expression: ${value.message}. Make sure you are not using a browser or Node specific API.`
+      `An error occurred when evaluating the expression: 
+
+  > ${value.message}. 
+
+  Make sure you are not using a browser or Node specific API and all the variables are available in static context.
+  Linaria have to extract pieces of your code to resolve the interpolated values.
+  Defining styled component or class will not work inside:
+    - function,
+    - class,
+    - method,
+    - loop,
+  because it cannot be statically determined in which context you use them.
+  That's why some variables may be not defined during evaluation.
+      `
     );
   }
 
