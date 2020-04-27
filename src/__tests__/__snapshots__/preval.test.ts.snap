@@ -765,7 +765,20 @@ Dependencies: NA
 `;
 
 exports[`extractor non-hoistable identifiers 1`] = `
-"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: days is not defined. Make sure you are not using a browser or Node specific API.
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: 
+
+  > days is not defined. 
+
+  Make sure you are not using a browser or Node specific API and all the variables are available in static context.
+  Linaria have to extract pieces of your code to resolve the interpolated values.
+  Defining styled component or class will not work inside:
+    - function,
+    - class,
+    - method,
+    - loop,
+  because it cannot be statically determined in which context you use them.
+  That's why some variables may be not defined during evaluation.
+      
    7 | export const Title = styled.h1\`
    8 |   &:before {
 >  9 |     content: \\"\${days}\\"
@@ -857,7 +870,20 @@ Dependencies: @babel/runtime/helpers/interopRequireDefault, react
 `;
 
 exports[`extractor throws codeframe error when evaluation fails 1`] = `
-"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: This will fail. Make sure you are not using a browser or Node specific API.
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: 
+
+  > This will fail. 
+
+  Make sure you are not using a browser or Node specific API and all the variables are available in static context.
+  Linaria have to extract pieces of your code to resolve the interpolated values.
+  Defining styled component or class will not work inside:
+    - function,
+    - class,
+    - method,
+    - loop,
+  because it cannot be statically determined in which context you use them.
+  That's why some variables may be not defined during evaluation.
+      
   4 | 
   5 | export const Title = styled.h1\`
 > 6 |   font-size: \${foo()}px;
@@ -1671,7 +1697,20 @@ Dependencies: NA
 `;
 
 exports[`shaker non-hoistable identifiers 1`] = `
-"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: days is not defined. Make sure you are not using a browser or Node specific API.
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: 
+
+  > days is not defined. 
+
+  Make sure you are not using a browser or Node specific API and all the variables are available in static context.
+  Linaria have to extract pieces of your code to resolve the interpolated values.
+  Defining styled component or class will not work inside:
+    - function,
+    - class,
+    - method,
+    - loop,
+  because it cannot be statically determined in which context you use them.
+  That's why some variables may be not defined during evaluation.
+      
    7 | export const Title = styled.h1\`
    8 |   &:before {
 >  9 |     content: \\"\${days}\\"
@@ -1821,7 +1860,20 @@ Dependencies: @babel/runtime/helpers/interopRequireDefault, react
 `;
 
 exports[`shaker throws codeframe error when evaluation fails 1`] = `
-"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: This will fail. Make sure you are not using a browser or Node specific API.
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: 
+
+  > This will fail. 
+
+  Make sure you are not using a browser or Node specific API and all the variables are available in static context.
+  Linaria have to extract pieces of your code to resolve the interpolated values.
+  Defining styled component or class will not work inside:
+    - function,
+    - class,
+    - method,
+    - loop,
+  because it cannot be statically determined in which context you use them.
+  That's why some variables may be not defined during evaluation.
+      
   4 | 
   5 | export const Title = styled.h1\`
 > 6 |   font-size: \${foo()}px;
