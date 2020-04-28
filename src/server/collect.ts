@@ -29,7 +29,7 @@ export default function collect(html: string, css: string): CollectResult {
     let addedToCritical = false;
 
     rule.each(childRule => {
-      if (isCritical(childRule)) {
+      if (isCritical(childRule) && !addedToCritical) {
         critical.append(rule.clone());
         addedToCritical = true;
       }
@@ -56,13 +56,18 @@ export default function collect(html: string, css: string): CollectResult {
     }
   });
 
+  const walkedAtRules = new Set();
+
   stylesheet.walkRules(rule => {
     if ('name' in rule.parent && rule.parent.name === 'keyframes') {
       return;
     }
 
     if (rule.parent.type === 'atrule') {
-      handleAtRule(rule.parent);
+      if (!walkedAtRules.has(rule.parent)) {
+        handleAtRule(rule.parent);
+        walkedAtRules.add(rule.parent);
+      }
       return;
     }
 

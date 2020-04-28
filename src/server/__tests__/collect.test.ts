@@ -212,3 +212,24 @@ describe('handles top-level @font-face', () => {
   test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
   test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
 });
+
+// there was a bug when the whole atrule was included for each child rule
+describe('include atrule once', () => {
+  const css = dedent`
+    @media screen {
+      body {
+        font-size: 10px;
+      }
+      h1 {
+        font-size: 20px;
+      }
+      .class {
+        font-size: 15px;
+      }
+    }
+  `;
+  const { critical, other } = collect(html, css);
+
+  test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
+  test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
+});

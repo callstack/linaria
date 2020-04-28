@@ -124,39 +124,6 @@ exports[`collects complex css critical 1`] = `
     object-fit: contain;
   }
 }
-@supports (object-fit: contain) {
-  .lotus {
-    object-fit: contain;
-  }
-
-  .linaria::before,
-  .linaria::after {
-    content: \\"\\";
-    object-fit: contain;
-  }
-}
-@supports (object-fit: contain) {
-  .lotus {
-    object-fit: contain;
-  }
-
-  .linaria::before,
-  .linaria::after {
-    content: \\"\\";
-    object-fit: contain;
-  }
-}
-@supports (object-fit: contain) {
-  .lotus {
-    object-fit: contain;
-  }
-
-  .linaria::before,
-  .linaria::after {
-    content: \\"\\";
-    object-fit: contain;
-  }
-}
 .linaria {
   float: left;
   flex: 1;
@@ -237,6 +204,23 @@ exports[`handles top-level @font-face critical 1`] = `
 `;
 
 exports[`handles top-level @font-face other 1`] = `""`;
+
+exports[`include atrule once critical 1`] = `
+"@media screen {
+  body {
+    font-size: 10px;
+  }
+  h1 {
+    font-size: 20px;
+  }
+  .class {
+    font-size: 15px;
+  }
+}
+"
+`;
+
+exports[`include atrule once other 1`] = `""`;
 
 exports[`simple class name critical 1`] = `
 ".linaria {
