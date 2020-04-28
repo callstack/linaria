@@ -1,5 +1,5 @@
 import { types as t, TransformOptions } from '@babel/core';
-import { NodePath } from '@babel/traverse';
+import { NodePath, Scope } from '@babel/traverse';
 import { StyledMeta } from '../types';
 
 export type JSONValue = string | number | boolean | JSONObject | JSONArray;
@@ -53,6 +53,7 @@ export type TemplateExpression = {
   styled?: { component: any };
   path: NodePath<t.TaggedTemplateExpression>;
   expressionValues: ExpressionValue[];
+  scope: Scope;
 };
 
 export type State = {

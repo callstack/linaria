@@ -29,7 +29,6 @@ function preeval(_babel: any, options: StrictOptions) {
             ImportDeclaration: p => ImportDeclaration(p, state),
             TaggedTemplateExpression: p =>
               TaggedTemplateExpression(p, state, options),
-
             JSXElement,
           });
         },

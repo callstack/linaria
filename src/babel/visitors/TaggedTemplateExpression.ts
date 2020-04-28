@@ -235,5 +235,6 @@ export default function TaggedTemplateExpression(
     styled: styled || undefined,
     path,
     expressionValues,
+    scope: path.scope,
   });
 }

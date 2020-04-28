@@ -17,6 +17,7 @@ export default class RequirementsResolver {
   public static resolve(
     path: NodePath<t.Node> | NodePath<t.Node>[]
   ): t.Statement[] {
+    console.log('RESOLVE', path.type);
     const resolver = new RequirementsResolver();
     if (Array.isArray(path)) {
       path.forEach(p => this.resolve(p));
@@ -120,6 +121,9 @@ export default class RequirementsResolver {
       return binding;
     }
 
+    if (binding === null) {
+      console.log('no binding');
+    }
     return null;
   }
 
@@ -131,8 +135,10 @@ export default class RequirementsResolver {
   private resolve(path: NodePath<t.Node>): Set<NodePath> {
     const set = new Set<NodePath>();
     if (path.isIdentifier()) {
+      console.log('Identifier', path.node.name);
       const binding = this.resolveIdentifier(path);
       if (binding !== null) {
+        console.log('binding', binding);
         set.add(binding.path);
       }
 
@@ -141,9 +147,13 @@ export default class RequirementsResolver {
 
     path.traverse({
       Identifier: p => {
+        console.log('Traversed identifier', p.node.name);
         const binding = this.resolveIdentifier(p);
         if (binding !== null) {
+          // console.log('Traversed binding', binding);
           set.add(binding.path);
+        } else {
+          console.log('binding not found');
         }
       },
     });

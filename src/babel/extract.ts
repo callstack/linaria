@@ -13,6 +13,8 @@
 import { types } from '@babel/core';
 import { NodePath, Scope } from '@babel/traverse';
 import { expression, statement } from '@babel/template';
+import { types as t } from '@babel/core';
+
 import generator from '@babel/generator';
 import evaluate from './evaluators';
 import getTemplateProcessor from './evaluators/templateProcessor';
@@ -91,6 +93,99 @@ function addLinariaPreval(
   );
 }
 
+type IdentifierPath = NodePath<t.ThisExpression | t.Identifier>;
+
+const traverseForIdentifiers = (
+  identifierPaths: Array<IdentifierPath> = []
+) => ({
+  MemberExpression: (path: NodePath<types.MemberExpression>) => {
+    console.log('Member Expression');
+    if (t.isThisExpression(path.node.object)) {
+      identifierPaths.push(path.get('node.object') as IdentifierPath);
+    } else {
+      path.get('object').traverse(traverseForIdentifiers(identifierPaths));
+    }
+    path.skip();
+  },
+  ObjectProperty: (path: NodePath<types.ObjectProperty>) => {
+    console.log('Object Property');
+    path.get('value').traverse(traverseForIdentifiers(identifierPaths));
+    path.skip();
+  },
+
+  Identifier: (path: NodePath<types.Identifier>) => {
+    console.log('identifier', path.node.name);
+    identifierPaths.push(path);
+  },
+});
+
+const predictDependencyResolveError = (
+  path: NodePath<types.TaggedTemplateExpression>
+) => {
+  const identifierPaths: Array<IdentifierPath> = [];
+  console.log(generator(path.node).code);
+  path.traverse(traverseForIdentifiers(identifierPaths));
+
+  console.log(
+    identifierPaths.map(identifierPath =>
+      types.isIdentifier(identifierPath)
+        ? (identifierPath.node as types.Identifier).name
+        : identifierPath.node.type
+    )
+  );
+
+  const findNonStaticIdentifiers = (identifierPath: IdentifierPath) => {
+    if ((identifierPath.node as types.Identifier).name === 'css') {
+      return;
+    }
+
+    if (types.isThisExpression(identifierPath)) {
+      throw new Error('this identifierPath used');
+    }
+    // Look for params declarations inside functions, methods, conditions, loops
+    const parent = identifierPath.findParent((path: NodePath) => {
+      // Nodes that have "params" field
+      if (
+        types.isFunctionDeclaration(path) ||
+        types.isFunctionExpression(path) ||
+        types.isArrowFunctionExpression(path) ||
+        types.isClassMethod(path) ||
+        types.isClassPrivateMethod(path) ||
+        types.isObjectMethod(path)
+      ) {
+        console.log('found function declaration');
+        const paramPaths: string[] = [];
+
+        path.traverse({
+          BlockStatement: (path: NodePath) => {
+            path.skip();
+          },
+          Identifier: (path: NodePath<types.Identifier>) => {
+            paramPaths.push(path.node.name);
+          },
+        });
+
+        return paramPaths.includes(
+          (identifierPath.node as types.Identifier).name
+        );
+      }
+      // Nodes that have "test" field
+
+      // if (types.isC(path)) {
+      // }
+      return false;
+    });
+
+    console.log(
+      'Illegal param found in',
+      parent !== null ? parent.type : false
+    );
+
+    throw parent.buildCodeFrameError('Illegal non-static param declaration');
+  };
+  identifierPaths.forEach(findNonStaticIdentifiers);
+};
+
 export default function extract(_babel: any, options: StrictOptions) {
   const process = getTemplateProcessor(options);
 
@@ -115,6 +210,31 @@ export default function extract(_babel: any, options: StrictOptions) {
             ImportDeclaration: p => ImportDeclaration(p, state),
             TaggedTemplateExpression: p =>
               TaggedTemplateExpression(p, state, options),
+          });
+
+          // const localLazyDeps = state.queue.filter(
+          //   ({ scope }) => scope !== path.scope
+          // );
+
+          // localLazyDeps.forEach(({ path }) => {
+          //   console.log(path.parent);
+          //   console.warn(
+          //     'Ability to use Linaria in local scopes will be restricted in next major version. Please move component/class declaration to top-level scope'
+          //   );
+          //   console.log(path.buildCodeFrameError().message);
+          // });
+
+          state.queue.forEach(({ path, expressionValues }) => {
+            if (
+              expressionValues
+                .filter(isLazyValue)
+                .map(v => (isNodePath(v.ex) ? v.ex.node : v.ex)).length > 0
+            ) {
+              console.log('lazy values detected');
+              predictDependencyResolveError(path);
+            } else {
+              console.log('no lazy values detected');
+            }
           });
 
           const lazyDeps = state.queue.reduce(
