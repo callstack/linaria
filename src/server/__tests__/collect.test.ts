@@ -128,7 +128,6 @@ describe('classname in @rule', () => {
     @supports () { .linaria {} }
     @document () { .linaria {} }
     @page () { .linaria {} }
-    @font-face () { .linaria {} }
     @keyframes () { .linaria {} }
     @viewport () { .linaria {} }
     @counter-style () { .linaria {} }
@@ -143,7 +142,6 @@ describe('classname in @rule', () => {
     @supports () { .other {} }
     @document () { .other {} }
     @page () { .other {} }
-    @font-face () { .other {} }
     @keyframes () { .other {} }
     @viewport () { .other {} }
     @counter-style () { .other {} }
@@ -194,6 +192,21 @@ describe('works with global css', () => {
     .other::before {}
   `;
 
+  const { critical, other } = collect(html, css);
+
+  test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
+  test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
+});
+
+describe('handles top-level @font-face', () => {
+  const css = dedent`
+    @font-face {
+      font-family: MyFont;
+      font-weight: normal;
+      font-style: normal;
+      src: url(MyFont.woff);
+    }
+  `;
   const { critical, other } = collect(html, css);
 
   test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());

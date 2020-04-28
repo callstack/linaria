@@ -46,6 +46,16 @@ export default function collect(html: string, css: string): CollectResult {
     }
   };
 
+  stylesheet.walkAtRules('font-face', rule => {
+    /**
+     * @font-face rules may be defined also in CSS conditional groups (eg. @media)
+     * we want only handle those from top-level, rest will be handled in stylesheet.walkRules
+     */
+    if (rule.parent.type === 'root') {
+      critical.append(rule);
+    }
+  });
+
   stylesheet.walkRules(rule => {
     if ('name' in rule.parent && rule.parent.name === 'keyframes') {
       return;

@@ -37,10 +37,6 @@ exports[`classname in @rule critical 1`] = `
   .linaria {
   }
 }
-@font-face() {
-  .linaria {
-  }
-}
 @viewport() {
   .linaria {
   }
@@ -90,10 +86,6 @@ exports[`classname in @rule other 1`] = `
   }
 }
 @page() {
-  .other {
-  }
-}
-@font-face() {
   .other {
   }
 }
@@ -233,6 +225,18 @@ exports[`collects complex css other 1`] = `
 }
 "
 `;
+
+exports[`handles top-level @font-face critical 1`] = `
+"@font-face {
+  font-family: MyFont;
+  font-weight: normal;
+  font-style: normal;
+  src: url(MyFont.woff);
+}
+"
+`;
+
+exports[`handles top-level @font-face other 1`] = `""`;
 
 exports[`simple class name critical 1`] = `
 ".linaria {
