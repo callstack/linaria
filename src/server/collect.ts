@@ -29,7 +29,7 @@ export default function collect(html: string, css: string): CollectResult {
     let addedToCritical = false;
 
     rule.each(childRule => {
-      if (isCritical(childRule)) {
+      if (isCritical(childRule) && !addedToCritical) {
         critical.append(rule.clone());
         addedToCritical = true;
       }
@@ -46,13 +46,28 @@ export default function collect(html: string, css: string): CollectResult {
     }
   };
 
+  stylesheet.walkAtRules('font-face', rule => {
+    /**
+     * @font-face rules may be defined also in CSS conditional groups (eg. @media)
+     * we want only handle those from top-level, rest will be handled in stylesheet.walkRules
+     */
+    if (rule.parent.type === 'root') {
+      critical.append(rule);
+    }
+  });
+
+  const walkedAtRules = new Set();
+
   stylesheet.walkRules(rule => {
     if ('name' in rule.parent && rule.parent.name === 'keyframes') {
       return;
     }
 
     if (rule.parent.type === 'atrule') {
-      handleAtRule(rule.parent);
+      if (!walkedAtRules.has(rule.parent)) {
+        handleAtRule(rule.parent);
+        walkedAtRules.add(rule.parent);
+      }
       return;
     }
 
