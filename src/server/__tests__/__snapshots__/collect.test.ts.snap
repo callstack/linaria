@@ -37,10 +37,6 @@ exports[`classname in @rule critical 1`] = `
   .linaria {
   }
 }
-@font-face() {
-  .linaria {
-  }
-}
 @viewport() {
   .linaria {
   }
@@ -93,10 +89,6 @@ exports[`classname in @rule other 1`] = `
   .other {
   }
 }
-@font-face() {
-  .other {
-  }
-}
 @viewport() {
   .other {
   }
@@ -119,39 +111,6 @@ exports[`collects complex css critical 1`] = `
 @media (max-width: 1200px) {
   .lotus {
     vertical-align: bottom;
-  }
-}
-@supports (object-fit: contain) {
-  .lotus {
-    object-fit: contain;
-  }
-
-  .linaria::before,
-  .linaria::after {
-    content: \\"\\";
-    object-fit: contain;
-  }
-}
-@supports (object-fit: contain) {
-  .lotus {
-    object-fit: contain;
-  }
-
-  .linaria::before,
-  .linaria::after {
-    content: \\"\\";
-    object-fit: contain;
-  }
-}
-@supports (object-fit: contain) {
-  .lotus {
-    object-fit: contain;
-  }
-
-  .linaria::before,
-  .linaria::after {
-    content: \\"\\";
-    object-fit: contain;
   }
 }
 @supports (object-fit: contain) {
@@ -233,6 +192,35 @@ exports[`collects complex css other 1`] = `
 }
 "
 `;
+
+exports[`handles top-level @font-face critical 1`] = `
+"@font-face {
+  font-family: MyFont;
+  font-weight: normal;
+  font-style: normal;
+  src: url(MyFont.woff);
+}
+"
+`;
+
+exports[`handles top-level @font-face other 1`] = `""`;
+
+exports[`include atrule once critical 1`] = `
+"@media screen {
+  body {
+    font-size: 10px;
+  }
+  h1 {
+    font-size: 20px;
+  }
+  .class {
+    font-size: 15px;
+  }
+}
+"
+`;
+
+exports[`include atrule once other 1`] = `""`;
 
 exports[`simple class name critical 1`] = `
 ".linaria {
