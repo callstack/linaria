@@ -311,12 +311,12 @@ class Module {
 
     script.runInContext(
       vm.createContext({
-        clearImmediate,
-        clearInterval,
-        clearTimeout,
-        setImmediate,
-        setInterval,
-        setTimeout,
+        clearImmediate: NOOP,
+        clearInterval: NOOP,
+        clearTimeout: NOOP,
+        setImmediate: NOOP,
+        setInterval: NOOP,
+        setTimeout: NOOP,
         global,
         process,
         module: this,
