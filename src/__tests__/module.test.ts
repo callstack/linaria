@@ -236,6 +236,58 @@ it('has __dirname available', () => {
   expect(mod.exports).toBe(path.dirname(mod.filename));
 });
 
+it('has setTimeout, clearTimeout available', () => {
+  const mod = new Module(getFileName(), options);
+
+  expect(() =>
+    mod.evaluate(dedent`
+  const x = setTimeout(() => {
+    console.log('test');
+  },0);
+
+  clearTimeout(x);
+  `)
+  ).not.toThrow();
+});
+
+it('has setInterval, clearInterval available', () => {
+  const mod = new Module(getFileName(), options);
+
+  expect(() =>
+    mod.evaluate(dedent`
+  const x = setInterval(() => {
+    console.log('test');
+  }, 1000);
+
+  clearInterval(x);
+  `)
+  ).not.toThrow();
+});
+
+it('has setImmediate, clearImmediate available', () => {
+  const mod = new Module(getFileName(), options);
+
+  expect(() =>
+    mod.evaluate(dedent`
+  const x = setImmediate(() => {
+    console.log('test');
+  });
+
+  clearImmediate(x);
+  `)
+  ).not.toThrow();
+});
+
+it('has global objects available without referencing global', () => {
+  const mod = new Module(getFileName(), options);
+
+  expect(() =>
+    mod.evaluate(dedent`
+  const x = new Set();
+  `)
+  ).not.toThrow();
+});
+
 it('changes resolve behaviour on overriding _resolveFilename', () => {
   const originalResolveFilename = Module._resolveFilename;
 

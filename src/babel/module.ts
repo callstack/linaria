@@ -311,6 +311,12 @@ class Module {
 
     script.runInContext(
       vm.createContext({
+        clearImmediate,
+        clearInterval,
+        clearTimeout,
+        setImmediate,
+        setInterval,
+        setTimeout,
         global,
         process,
         module: this,
