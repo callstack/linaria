@@ -342,6 +342,22 @@ it('does not output CSS if none present', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('does not output CSS property when value is a blank string', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { css } from 'linaria';
+
+    export const title = css\`
+      font-size: ${''};
+      margin: 6px;
+    \`;
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('transpiles css template literal', async () => {
   const { code, metadata } = await transpile(
     dedent`

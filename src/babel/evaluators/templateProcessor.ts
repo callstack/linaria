@@ -146,6 +146,11 @@ export default function getTemplateProcessor(options: StrictOptions) {
             const value = valueCache.get(ex.node);
             throwIfInvalid(value, ex);
 
+            // Skip the blank string instead of throwing an error
+            if (value === '') {
+              return;
+            }
+
             if (value && typeof value !== 'function') {
               // Only insert text for non functions
               // We don't touch functions because they'll be interpolated at runtime
