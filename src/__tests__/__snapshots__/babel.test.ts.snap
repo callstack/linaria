@@ -19,6 +19,24 @@ const title = String.raw\`This is something\`;"
 
 exports[`does not output CSS if none present 2`] = `Object {}`;
 
+exports[`does not output CSS property when value is a blank string 1`] = `
+"import { css } from 'linaria';
+export const title = \\"th6xni0\\";"
+`;
+
+exports[`does not output CSS property when value is a blank string 2`] = `
+
+CSS:
+
+.th6xni0 {
+  font-size: ;
+  margin: 6px;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`evaluates and inlines expressions in scope 1`] = `
 "import { styled } from 'linaria/react';
 const color = 'blue';
