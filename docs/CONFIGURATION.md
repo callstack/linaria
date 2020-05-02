@@ -227,3 +227,5 @@ export default Header;
 > You can also use the `styled` variant, importing from `linaria/react`.
 
 If you run `npm run dev`, you should be able to see a button next to the nav title, with red bold text.
+
+You can take a look at this example [here](../examples/Preact)
