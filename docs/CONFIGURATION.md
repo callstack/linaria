@@ -75,9 +75,9 @@ To use this preset, add `linaria/babel` to your Babel configuration at the end o
 
 The babel preset can accept the same options supported by the configuration file, however it's recommended to use the configuration file directly.
 
-## Working with Preact X/Preact-cli
+## Preact
 
-If you wish you use Preact, we recommend you use the preact-cli and start from there. The following configuration assumes you are using the default template provided by preact-cli. Start by creating your project using;
+If you wish you use Preact, we recommend you to use the `preact-cli` and start from there. The following configuration assumes you are using the default template provided by preact-cli. Start by creating your project using;
 
 ```
 npx preact-cli create default my-project
@@ -87,9 +87,9 @@ On top of the default template, you will need to install `@babel/preset-react`. 
 
 After that, your `package.json` should look like the following:
 
-```
+```diff
 "devDependencies": {
-    "@babel/preset-react": "^7.8.3", //Here is preset-react
++   "@babel/preset-react": "^7.8.3",
     "enzyme": "^3.10.0",
     "enzyme-adapter-preact-pure": "^2.0.0",
     "eslint": "^6.0.1",
@@ -103,7 +103,7 @@ After that, your `package.json` should look like the following:
     "sirv-cli": "^0.4.5"
   },
   "dependencies": {
-    "linaria": "^1.3.3",
++   "linaria": "^1.3.3",
     "preact": "^10.3.2",
     "preact-render-to-string": "^5.1.4",
     "preact-router": "^3.2.1"

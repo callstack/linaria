@@ -53,6 +53,10 @@ Linaria currently supports webpack and Rollup to extract the CSS at build time. 
 - [webpack](/docs/BUNDLERS_INTEGRATION.md#webpack)
 - [Rollup](/docs/BUNDLERS_INTEGRATION.md#rollup)
 
+Or configure Linaria with one of the following integrations:
+
+- [Preact](/docs/CONFIGURATION.md#preact)
+
 Optionally, add the `linaria/babel` preset to your Babel configuration at the end of the presets list to avoid errors when importing the components in your server code or tests:
 
 ```json
