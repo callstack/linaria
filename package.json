@@ -3,6 +3,7 @@
   "version": "2.0.0-alpha.2",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "main": "lib/index.js",
+  "module": "esm/index.js",
   "bin": "bin/linaria.js",
   "files": [
     "bin/",
