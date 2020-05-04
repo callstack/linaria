@@ -2,6 +2,7 @@ __fixtures__/
 coverage/
 flow-typed/
 lib/
+esm/
 dist/
 build/
 node_modules/
