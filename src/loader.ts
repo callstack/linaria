@@ -17,8 +17,14 @@ import * as EvalCache from './babel/eval-cache';
 import Module from './babel/module';
 import { debug } from './babel/utils/logger';
 import transform from './transform';
+import cosmiconfig from 'cosmiconfig';
 
 const workspaceRoot = findYarnWorkspaceRoot();
+const lernaConfig = cosmiconfig('lerna', {
+  searchPlaces: ['lerna.json'],
+}).searchSync();
+const lernaRoot =
+  lernaConfig !== null ? path.dirname(lernaConfig.filepath) : null;
 
 export default function loader(
   this: webpackLoader.LoaderContext,
@@ -37,14 +43,18 @@ export default function loader(
     ...rest
   } = loaderUtils.getOptions(this) || {};
 
-  const root = workspaceRoot !== null ? workspaceRoot : process.cwd();
+  const root = workspaceRoot || lernaRoot || process.cwd();
+
+  const baseOutputFileName = this.resourcePath.replace(/\.[^.]+$/, extension);
 
   const outputFilename = normalize(
     path.join(
       path.isAbsolute(cacheDirectory)
         ? cacheDirectory
         : path.join(process.cwd(), cacheDirectory),
-      path.relative(root, this.resourcePath.replace(/\.[^.]+$/, extension))
+      this.resourcePath.includes(root)
+        ? path.relative(root, baseOutputFileName)
+        : baseOutputFileName
     )
   );
 
