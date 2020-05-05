@@ -807,6 +807,56 @@ function run(
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should process `css` calls inside components', async () => {
+    const { code, metadata } = await transpile(
+      dedent`
+      import React from 'react'
+      import {css} from 'linaria'
+
+      export function Component() {
+        const opacity = 0.2;
+        const className = css\`
+          opacity: ${'${opacity}'};
+        \`;
+
+        return React.createElement("div", { className });
+      }
+      `
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should process `css` calls with complex interpolation inside components', async () => {
+    const { code, metadata } = await transpile(
+      dedent`
+      import React from 'react'
+      import {css} from 'linaria'
+
+      export function Component() {
+        const classes = {
+          value: 0.2,
+          cell: css\`
+            opacity: 0;
+          \`,
+        };
+
+        const className = css\`
+          &:hover .${'${classes.cell}'} {
+            opacity: ${'${classes.value}'};
+          }
+        \`;
+
+        return React.createElement("div", { className });
+      }
+      `
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   strategyDependentTests(transpile);
 }
 

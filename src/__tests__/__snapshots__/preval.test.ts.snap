@@ -787,6 +787,62 @@ exports[`extractor non-hoistable identifiers 1`] = `
   11 | \`;"
 `;
 
+exports[`extractor should process \`css\` calls inside components 1`] = `
+"import React from 'react';
+import { css } from 'linaria';
+export function Component() {
+  const opacity = 0.2;
+  const className = \\"className_c1xha7dm\\";
+  return React.createElement(\\"div\\", {
+    className
+  });
+}"
+`;
+
+exports[`extractor should process \`css\` calls inside components 2`] = `
+
+CSS:
+
+.className_c1xha7dm {
+    opacity: 0.2;
+  }
+
+Dependencies: NA
+
+`;
+
+exports[`extractor should process \`css\` calls with complex interpolation inside components 1`] = `
+"import React from 'react';
+import { css } from 'linaria';
+export function Component() {
+  const classes = {
+    value: 0.2,
+    cell: \\"cell_c1xha7dm\\"
+  };
+  const className = \\"className_c1rsdnkv\\";
+  return React.createElement(\\"div\\", {
+    className
+  });
+}"
+`;
+
+exports[`extractor should process \`css\` calls with complex interpolation inside components 2`] = `
+
+CSS:
+
+.cell_c1xha7dm {
+      opacity: 0;
+    }
+.className_c1rsdnkv {
+    &:hover .cell_c1xha7dm {
+      opacity: 0.2;
+    }
+  }
+
+Dependencies: NA
+
+`;
+
 exports[`extractor should work with String and Number object 1`] = `
 "import { css } from 'linaria';
 export const style = \\"style_s1xha7dm\\";"
@@ -1754,6 +1810,62 @@ CSS:
 }
 
 Dependencies: ../__fixtures__/complex-component
+
+`;
+
+exports[`shaker should process \`css\` calls inside components 1`] = `
+"import React from 'react';
+import { css } from 'linaria';
+export function Component() {
+  const opacity = 0.2;
+  const className = \\"className_c1xha7dm\\";
+  return React.createElement(\\"div\\", {
+    className
+  });
+}"
+`;
+
+exports[`shaker should process \`css\` calls inside components 2`] = `
+
+CSS:
+
+.className_c1xha7dm {
+    opacity: 0.2;
+  }
+
+Dependencies: NA
+
+`;
+
+exports[`shaker should process \`css\` calls with complex interpolation inside components 1`] = `
+"import React from 'react';
+import { css } from 'linaria';
+export function Component() {
+  const classes = {
+    value: 0.2,
+    cell: \\"cell_c1xha7dm\\"
+  };
+  const className = \\"className_c1rsdnkv\\";
+  return React.createElement(\\"div\\", {
+    className
+  });
+}"
+`;
+
+exports[`shaker should process \`css\` calls with complex interpolation inside components 2`] = `
+
+CSS:
+
+.cell_c1xha7dm {
+      opacity: 0;
+    }
+.className_c1rsdnkv {
+    &:hover .cell_c1xha7dm {
+      opacity: 0.2;
+    }
+  }
+
+Dependencies: NA
 
 `;
 

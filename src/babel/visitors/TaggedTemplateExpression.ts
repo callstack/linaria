@@ -17,6 +17,7 @@ import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
 import slugify from '../../slugify';
 import getLinariaComment from '../utils/getLinariaComment';
 import { debug } from '../utils/logger';
+import fastEval from '../evaluators/fastEval';
 
 export default function TaggedTemplateExpression(
   path: NodePath<t.TaggedTemplateExpression>,
@@ -83,7 +84,7 @@ export default function TaggedTemplateExpression(
 
   const expressionValues: ExpressionValue[] = expressions.map(
     (ex: NodePath<t.Expression>) => {
-      const result = ex.evaluate();
+      const result = fastEval(ex);
       if (result.confident) {
         throwIfInvalid(result.value, ex);
         return { kind: ValueType.VALUE, value: result.value };

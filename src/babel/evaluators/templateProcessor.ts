@@ -11,6 +11,7 @@ import generator from '@babel/generator';
 import { units } from '../units';
 import { State, StrictOptions, TemplateExpression, ValueCache } from '../types';
 import { StyledMeta } from '../../types';
+import fastEval from './fastEval';
 
 import isSerializable from '../utils/isSerializable';
 import { debug } from '../utils/logger';
@@ -107,7 +108,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
 
       if (ex) {
         const { end } = ex.node.loc!;
-        const result = ex.evaluate();
+        const result = fastEval(ex);
         const beforeLength = cssText.length;
 
         // The location will be end of the current string to start of next string
