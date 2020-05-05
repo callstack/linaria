@@ -25,9 +25,10 @@ import {
   ValueType,
   ValueCache,
 } from './types';
-import TaggedTemplateExpression from './visitors/TaggedTemplateExpression';
+import CollectDependencies from './visitors/CollectDependencies';
 import ImportDeclaration from './visitors/ImportDeclaration';
 import { debug } from './utils/logger';
+import GenerateClassNames from './visitors/GenerateClassNames';
 
 function isLazyValue(v: ExpressionValue): v is LazyValue {
   return v.kind === ValueType.LAZY;
@@ -113,8 +114,10 @@ export default function extract(_babel: any, options: StrictOptions) {
           // So we traverse here instead of a in a visitor
           path.traverse({
             ImportDeclaration: p => ImportDeclaration(p, state),
-            TaggedTemplateExpression: p =>
-              TaggedTemplateExpression(p, state, options),
+            TaggedTemplateExpression: p => {
+              GenerateClassNames(p, state, options);
+              CollectDependencies(p, state, options);
+            },
           });
 
           const lazyDeps = state.queue.reduce(

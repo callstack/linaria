@@ -11,7 +11,6 @@ import generator from '@babel/generator';
 import { units } from '../units';
 import { State, StrictOptions, TemplateExpression, ValueCache } from '../types';
 import { StyledMeta } from '../../types';
-import fastEval from './fastEval';
 
 import isSerializable from '../utils/isSerializable';
 import { debug } from '../utils/logger';
@@ -34,12 +33,21 @@ function hasMeta(value: any): value is StyledMeta {
   return value && typeof value === 'object' && (value as any).__linaria;
 }
 
+const cache = new WeakSet();
+
 export default function getTemplateProcessor(options: StrictOptions) {
   return function process(
     { styled, path }: TemplateExpression,
     state: State,
     valueCache: ValueCache
   ) {
+    if (cache.has(path)) {
+      // Do not process one node twice
+      return;
+    }
+
+    cache.add(path);
+
     const { quasi } = path.node;
 
     const interpolations: Interpolation[] = [];
@@ -108,7 +116,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
 
       if (ex) {
         const { end } = ex.node.loc!;
-        const result = fastEval(ex);
+        const result = ex.evaluate();
         const beforeLength = cssText.length;
 
         // The location will be end of the current string to start of next string

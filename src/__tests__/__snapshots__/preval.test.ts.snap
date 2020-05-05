@@ -814,11 +814,17 @@ Dependencies: NA
 exports[`extractor should process \`css\` calls with complex interpolation inside components 1`] = `
 "import React from 'react';
 import { css } from 'linaria';
+const globalObj = {
+  opacity: 0.5
+};
+var _ref = {
+  value: 0.2,
+  cell: \\"cell_c1xha7dm\\"
+};
+var _ref2 = _ref;
 export function Component() {
-  const classes = {
-    value: 0.2,
-    cell: \\"cell_c1xha7dm\\"
-  };
+  const classes = _ref;
+  const classes2 = _ref2;
   const className = \\"className_c1rsdnkv\\";
   return React.createElement(\\"div\\", {
     className
@@ -834,6 +840,8 @@ CSS:
       opacity: 0;
     }
 .className_c1rsdnkv {
+    opacity: 0.5;
+
     &:hover .cell_c1xha7dm {
       opacity: 0.2;
     }
@@ -1840,11 +1848,17 @@ Dependencies: NA
 exports[`shaker should process \`css\` calls with complex interpolation inside components 1`] = `
 "import React from 'react';
 import { css } from 'linaria';
+const globalObj = {
+  opacity: 0.5
+};
+var _ref = {
+  value: 0.2,
+  cell: \\"cell_c1xha7dm\\"
+};
+var _ref2 = _ref;
 export function Component() {
-  const classes = {
-    value: 0.2,
-    cell: \\"cell_c1xha7dm\\"
-  };
+  const classes = _ref;
+  const classes2 = _ref2;
   const className = \\"className_c1rsdnkv\\";
   return React.createElement(\\"div\\", {
     className
@@ -1860,6 +1874,8 @@ CSS:
       opacity: 0;
     }
 .className_c1rsdnkv {
+    opacity: 0.5;
+
     &:hover .cell_c1xha7dm {
       opacity: 0.2;
     }

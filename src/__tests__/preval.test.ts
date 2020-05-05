@@ -834,6 +834,10 @@ function run(
       import React from 'react'
       import {css} from 'linaria'
 
+      const globalObj = {
+        opacity: 0.5,
+      };
+
       export function Component() {
         const classes = {
           value: 0.2,
@@ -842,8 +846,12 @@ function run(
           \`,
         };
 
+        const classes2 = classes;
+
         const className = css\`
-          &:hover .${'${classes.cell}'} {
+          opacity: ${'${globalObj.opacity}'};
+
+          &:hover .${'${classes2.cell}'} {
             opacity: ${'${classes.value}'};
           }
         \`;
