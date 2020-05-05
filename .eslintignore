@@ -6,3 +6,4 @@ dist/
 build/
 node_modules/
 vendor/
+examples/
