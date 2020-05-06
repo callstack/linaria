@@ -4,12 +4,13 @@ import peek from '../../utils/peek';
 import { IdentifierHandlerType, NodeType } from './types';
 import { identifierHandlers as core } from './langs/core';
 import ScopeManager from './scope';
+import { VisitorKeys, BabelTypes$Fixme } from '../../types';
 
 type HandlerFn = <TParent extends t.Node = t.Node>(
   builder: GraphBuilderState,
   node: t.Identifier,
   parent: TParent,
-  parentKey: t.VisitorKeys[TParent['type']],
+  parentKey: VisitorKeys[TParent['type']],
   listIdx: number | null
 ) => void;
 
@@ -20,7 +21,7 @@ const handlers: {
 } = {};
 
 function isAlias(type: NodeType): type is keyof t.Aliases {
-  return type in t.FLIPPED_ALIAS_KEYS;
+  return type in ((t as unknown) as BabelTypes$Fixme).FLIPPED_ALIAS_KEYS;
 }
 
 export function defineHandler(
@@ -29,7 +30,7 @@ export function defineHandler(
   handler: Handler
 ) {
   const types = isAlias(typeOrAlias)
-    ? t.FLIPPED_ALIAS_KEYS[typeOrAlias]
+    ? ((t as unknown) as BabelTypes$Fixme).FLIPPED_ALIAS_KEYS[typeOrAlias]
     : [typeOrAlias];
   types.forEach((type: string) => {
     handlers[`${type}:${field}`] = handler;

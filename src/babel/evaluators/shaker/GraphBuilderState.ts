@@ -1,6 +1,7 @@
 import { types as t } from '@babel/core';
 import ScopeManager from './scope';
 import DepsGraph from './DepsGraph';
+import { VisitorKeys } from '../../types';
 
 export type OnVisitCallback = (n: t.Node) => void;
 
@@ -39,7 +40,7 @@ export default abstract class GraphBuilderState {
   abstract visit<TNode extends t.Node, TParent extends t.Node>(
     node: TNode,
     parent: TParent | null,
-    parentKey: t.VisitorKeys[TParent['type']] | null,
+    parentKey: VisitorKeys[TParent['type']] | null,
     listIdx?: number | null
   ): void;
 }

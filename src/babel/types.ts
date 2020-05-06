@@ -114,33 +114,36 @@ export type Location = {
 
 type AllNodes = { [T in t.Node['type']]: Extract<t.Node, { type: T }> };
 
-declare module '@babel/core' {
-  namespace types {
-    type VisitorKeys = {
-      [T in keyof AllNodes]: Extract<
-        keyof AllNodes[T],
-        {
-          [Key in keyof AllNodes[T]]: AllNodes[T][Key] extends
-            | t.Node
-            | t.Node[]
-            | null
-            ? Key
-            : never;
-        }[keyof AllNodes[T]]
-      >;
-    };
+export type VisitorKeys = {
+  [T in keyof AllNodes]: Extract<
+    keyof AllNodes[T],
+    {
+      [Key in keyof AllNodes[T]]: AllNodes[T][Key] extends
+        | t.Node
+        | t.Node[]
+        | null
+        ? Key
+        : never;
+    }[keyof AllNodes[T]]
+  >;
+};
 
-    const VISITOR_KEYS: { [T in keyof VisitorKeys]: VisitorKeys[T][] };
-    const ALIAS_KEYS: {
-      [T in t.Node['type']]: {
-        [K in keyof t.Aliases]: AllNodes[T] extends t.Aliases[K] ? K : never;
-      }[keyof t.Aliases][];
-    };
+/*
+ * The official @babel/types TypeScript declaration file does not include all exports. These
+ * named exports exists, and are used by linaria. Where we access them, we cast the official
+ * types as this, like so:
+ *
+ *     ((t as unknown) as BabelTypes$Fixme).ALIAS_KEYS[…]
+ */
+export type BabelTypes$Fixme = {
+  VISITOR_KEYS: { [T in keyof VisitorKeys]: VisitorKeys[T][] };
+  ALIAS_KEYS: {
+    [T in t.Node['type']]: {
+      [K in keyof t.Aliases]: AllNodes[T] extends t.Aliases[K] ? K : never;
+    }[keyof t.Aliases][];
+  };
 
-    const FLIPPED_ALIAS_KEYS: {
-      [T in keyof t.Aliases]: t.Aliases[T]['type'][];
-    };
-
-    function shallowEqual(actual: object, expected: object): boolean;
-  }
-}
+  FLIPPED_ALIAS_KEYS: {
+    [T in keyof t.Aliases]: t.Aliases[T]['type'][];
+  };
+};

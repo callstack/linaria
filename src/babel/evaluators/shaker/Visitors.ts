@@ -6,13 +6,14 @@ import { Visitor, Visitors } from './types';
 
 import { visitors as core } from './langs/core';
 import { warn } from '../../utils/logger';
+import { VisitorKeys, BabelTypes$Fixme } from '../../types';
 
 const visitors: Visitors = {
   Identifier<TParent extends t.Node>(
     this: GraphBuilderState,
     node: t.Identifier,
     parent: TParent | null,
-    parentKey: t.VisitorKeys[TParent['type']] | null,
+    parentKey: VisitorKeys[TParent['type']] | null,
     listIdx: number | null = null
   ) {
     if (!parent || !parentKey) {
@@ -73,7 +74,8 @@ const visitors: Visitors = {
 export function getVisitors<TNode extends t.Node>(
   node: TNode
 ): Visitor<TNode>[] {
-  const aliases: Array<keyof t.Aliases> = t.ALIAS_KEYS[node.type] || [];
+  const aliases: Array<keyof t.Aliases> =
+    ((t as unknown) as BabelTypes$Fixme).ALIAS_KEYS[node.type] || [];
   const aliasVisitors = aliases
     .map(type => visitors[type])
     .filter(i => i) as Visitor<TNode>[];

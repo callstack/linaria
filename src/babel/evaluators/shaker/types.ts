@@ -1,4 +1,5 @@
 import { types as t } from '@babel/core';
+import { VisitorKeys } from '../../types';
 
 export type NodeOfType<T> = Extract<t.Node, { type: T }>;
 
@@ -9,7 +10,7 @@ export type VisitorAction = 'ignore' | void;
 export type Visitor<TNode extends t.Node> = <TParent extends t.Node>(
   node: TNode,
   parent: TParent | null,
-  parentKey: t.VisitorKeys[TParent['type']] | null,
+  parentKey: VisitorKeys[TParent['type']] | null,
   listIdx: number | null
 ) => VisitorAction;
 

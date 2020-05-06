@@ -6,6 +6,7 @@ import GraphBuilderState from './GraphBuilderState';
 import { getVisitors } from './Visitors';
 import { VisitorAction } from './types';
 import ScopeManager from './scope';
+import { VisitorKeys } from '../../types';
 
 const isVoid = (node: t.Node): boolean =>
   t.isUnaryExpression(node) && node.operator === 'void';
@@ -104,7 +105,7 @@ class GraphBuilder extends GraphBuilderState {
   visit<TNode extends t.Node, TParent extends t.Node>(
     node: TNode,
     parent: TParent | null,
-    parentKey: t.VisitorKeys[TParent['type']] | null,
+    parentKey: VisitorKeys[TParent['type']] | null,
     listIdx: number | null = null
   ): VisitorAction {
     if (

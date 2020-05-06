@@ -1,4 +1,5 @@
 import { types } from '@babel/core';
+import { BabelTypes$Fixme } from '../../types';
 
 type Hooks = {
   [key: string]: (node: any) => string | number;
@@ -37,7 +38,9 @@ export default function dumpNode<T extends types.Node>(
   }
 
   result += '\n';
-  const keys = types.VISITOR_KEYS[type] as Array<keyof T>;
+  const keys = ((types as unknown) as BabelTypes$Fixme).VISITOR_KEYS[
+    type
+  ] as Array<keyof T>;
   for (const key of keys) {
     const subNode = node[key];
 
