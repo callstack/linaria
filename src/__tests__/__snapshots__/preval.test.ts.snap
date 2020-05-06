@@ -851,6 +851,61 @@ Dependencies: NA
 
 `;
 
+exports[`extractor should process \`styled\` calls inside components 1`] = `
+"import React from 'react';
+import { css } from 'linaria';
+export function Component() {
+  const opacity = 0.2;
+  const MyComponent = styled.h1\`
+    opacity: \${opacity};
+  \`;
+  return React.createElement(MyComponent);
+}"
+`;
+
+exports[`extractor should process \`styled\` calls inside components 2`] = `Object {}`;
+
+exports[`extractor should process \`styled\` calls with complex interpolation inside components 1`] = `
+"import React from 'react';
+import { css } from 'linaria';
+const globalObj = {
+  opacity: 0.5
+};
+const Styled1 = styled.p\`
+  opacity: \${globalObj.opacity}
+\`;
+export function Component() {
+  const classes = {
+    value: 0.2,
+    cell: \\"cell_c1xha7dm\\"
+  };
+  const classes2 = classes;
+  const MyComponent = styled\`
+    opacity: \${globalObj.opacity};
+
+    &:hover .\${classes2.cell} {
+      opacity: \${classes.value};
+    }
+    \${Styled1} {
+      font-size: 1;
+    }
+  \`;
+  return React.createElement(MyComponent);
+}"
+`;
+
+exports[`extractor should process \`styled\` calls with complex interpolation inside components 2`] = `
+
+CSS:
+
+.cell_c1xha7dm {
+      opacity: 0;
+    }
+
+Dependencies: NA
+
+`;
+
 exports[`extractor should work with String and Number object 1`] = `
 "import { css } from 'linaria';
 export const style = \\"style_s1xha7dm\\";"
@@ -1880,6 +1935,61 @@ CSS:
       opacity: 0.2;
     }
   }
+
+Dependencies: NA
+
+`;
+
+exports[`shaker should process \`styled\` calls inside components 1`] = `
+"import React from 'react';
+import { css } from 'linaria';
+export function Component() {
+  const opacity = 0.2;
+  const MyComponent = styled.h1\`
+    opacity: \${opacity};
+  \`;
+  return React.createElement(MyComponent);
+}"
+`;
+
+exports[`shaker should process \`styled\` calls inside components 2`] = `Object {}`;
+
+exports[`shaker should process \`styled\` calls with complex interpolation inside components 1`] = `
+"import React from 'react';
+import { css } from 'linaria';
+const globalObj = {
+  opacity: 0.5
+};
+const Styled1 = styled.p\`
+  opacity: \${globalObj.opacity}
+\`;
+export function Component() {
+  const classes = {
+    value: 0.2,
+    cell: \\"cell_c1xha7dm\\"
+  };
+  const classes2 = classes;
+  const MyComponent = styled\`
+    opacity: \${globalObj.opacity};
+
+    &:hover .\${classes2.cell} {
+      opacity: \${classes.value};
+    }
+    \${Styled1} {
+      font-size: 1;
+    }
+  \`;
+  return React.createElement(MyComponent);
+}"
+`;
+
+exports[`shaker should process \`styled\` calls with complex interpolation inside components 2`] = `
+
+CSS:
+
+.cell_c1xha7dm {
+      opacity: 0;
+    }
 
 Dependencies: NA
 

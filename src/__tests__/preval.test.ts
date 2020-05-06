@@ -828,6 +828,27 @@ function run(
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should process `styled` calls inside components', async () => {
+    const { code, metadata } = await transpile(
+      dedent`
+      import React from 'react'
+      import {css} from 'linaria'
+
+      export function Component() {
+        const opacity = 0.2;
+        const MyComponent = styled.h1\`
+          opacity: ${'${opacity}'};
+        \`;
+
+        return React.createElement(MyComponent);
+      }
+      `
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('should process `css` calls with complex interpolation inside components', async () => {
     const { code, metadata } = await transpile(
       dedent`
@@ -859,6 +880,50 @@ function run(
         return React.createElement("div", { className });
       }
       `
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should process `styled` calls with complex interpolation inside components', async () => {
+    const { code, metadata } = await transpile(
+      dedent`
+        import React from 'react'
+        import {css} from 'linaria'
+  
+        const globalObj = {
+          opacity: 0.5,
+        };
+        
+        const Styled1 = styled.p\`
+          opacity: ${'${globalObj.opacity}'}
+        \`
+
+        export function Component() {
+          const classes = {
+            value: 0.2,
+            cell: css\`
+              opacity: 0;
+            \`,
+          };
+  
+          const classes2 = classes;
+  
+          const MyComponent = styled\`
+            opacity: ${'${globalObj.opacity}'};
+  
+            &:hover .${'${classes2.cell}'} {
+              opacity: ${'${classes.value}'};
+            }
+            ${'${Styled1}'} {
+              font-size: 1;
+            }
+          \`;
+  
+          return React.createElement(MyComponent);
+        }
+        `
     );
 
     expect(code).toMatchSnapshot();
