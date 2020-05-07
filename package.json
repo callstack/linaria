@@ -8,6 +8,8 @@
   "files": [
     "bin/",
     "lib/",
+    "esm/",
+    "react/",
     "*.d.ts",
     "react.js",
     "rollup.js",
