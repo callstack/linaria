@@ -953,6 +953,24 @@ function run(
     expect(metadata).toMatchSnapshot();
   });
 
+  it('it should not throw location error for hoisted identifier', async () => {
+    const { code, metadata } = await transpile(
+      dedent`
+        import React from 'react'
+        import {css} from 'linaria'
+        
+        const size = () => 5
+        export default function Component() {
+          const color = size()
+          return css\`opacity:${'${color}'};\`
+        }
+        `
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   strategyDependentTests(transpile);
 }
 

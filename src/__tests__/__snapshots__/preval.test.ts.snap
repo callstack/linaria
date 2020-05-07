@@ -769,6 +769,30 @@ Dependencies: NA
 
 `;
 
+exports[`extractor it should not throw location error for hoisted identifier 1`] = `
+"import React from 'react';
+import { css } from 'linaria';
+
+const size = () => 5;
+
+var _ref = size();
+
+export default function Component() {
+  const color = _ref;
+  return \\"source0_s1xha7dm\\";
+}"
+`;
+
+exports[`extractor it should not throw location error for hoisted identifier 2`] = `
+
+CSS:
+
+.source0_s1xha7dm {opacity:5;}
+
+Dependencies: NA
+
+`;
+
 exports[`extractor non-hoistable identifiers 1`] = `
 "<<DIRNAME>>/source.js: An error occurred when evaluating the expression: 
 
@@ -1852,6 +1876,30 @@ CSS:
 .Title_t1xha7dm {
   position: absolute; top: 0; right: 0; bottom: 0; left: 0;
 }
+
+Dependencies: NA
+
+`;
+
+exports[`shaker it should not throw location error for hoisted identifier 1`] = `
+"import React from 'react';
+import { css } from 'linaria';
+
+const size = () => 5;
+
+var _ref = size();
+
+export default function Component() {
+  const color = _ref;
+  return \\"source0_s1xha7dm\\";
+}"
+`;
+
+exports[`shaker it should not throw location error for hoisted identifier 2`] = `
+
+CSS:
+
+.source0_s1xha7dm {opacity:5;}
 
 Dependencies: NA
 
