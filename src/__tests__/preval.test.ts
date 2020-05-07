@@ -854,7 +854,7 @@ function run(
       dedent`
       import React from 'react'
       import {css} from 'linaria'
-
+      import externalDep from '../__fixtures__/sample-script';
       const globalObj = {
         opacity: 0.5,
       };
@@ -868,9 +868,12 @@ function run(
         };
 
         const classes2 = classes;
+        const referencedExternalDep = externalDep
 
         const className = css\`
           opacity: ${'${globalObj.opacity}'};
+          font-size: ${'${externalDep}'}
+          font-size: ${'${referencedExternalDep}'}
 
           &:hover .${'${classes2.cell}'} {
             opacity: ${'${classes.value}'};
@@ -922,6 +925,26 @@ function run(
           \`;
   
           return React.createElement(MyComponent);
+        }
+        `
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should handle shadowed identifier inside components', async () => {
+    const { code, metadata } = await transpile(
+      dedent`
+        import React from 'react'
+        import {css} from 'linaria'
+        
+        const color = 'red';
+
+        export default function Component() {
+          const color = 'blue'
+          const val = { color };
+          return React.createElement('div', {className: css\`background-color:${'${val.color}'};\`});
         }
         `
     );

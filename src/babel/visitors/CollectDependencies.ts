@@ -15,7 +15,9 @@ import isStyledOrCss from '../utils/isStyledOrCss';
  */
 function hoist(ex: NodePath<t.Expression | null>) {
   const Identifier = (idPath: NodePath<t.Identifier>) => {
-    if (!idPath.isReferencedIdentifier()) return;
+    if (!idPath.isReferencedIdentifier()) {
+      return;
+    }
     const binding = idPath.scope.getBinding(idPath.node.name);
     if (!binding) return;
     const { scope, path: bindingPath, referencePaths } = binding;
@@ -29,9 +31,10 @@ function hoist(ex: NodePath<t.Expression | null>) {
       hoist(initPath);
       initPath.hoist(scope);
       if (initPath.isIdentifier()) {
-        referencePaths.forEach(referencePath =>
-          referencePath.replaceWith(t.identifier(initPath.node.name))
-        );
+        referencePaths.forEach(referencePath => {
+          referencePath.replaceWith(t.identifier(initPath.node.name));
+          // referencePath.node.name = initPath.node.name;
+        });
       }
     }
   };
@@ -54,7 +57,6 @@ export default function CollectDependencies(
   if (!styledOrCss) {
     return;
   }
-
   const expressions = path.get('quasi').get('expressions');
 
   debug('template-parse:identify-expressions', expressions.length);
@@ -66,13 +68,22 @@ export default function CollectDependencies(
         throwIfInvalid(result.value, ex);
         return { kind: ValueType.VALUE, value: result.value };
       }
-
       if (
         options.evaluate &&
         !(t.isFunctionExpression(ex) || t.isArrowFunctionExpression(ex))
       ) {
+        // save original expression that may be changed during hoisting
+        const originalExNode = t.cloneNode(ex.node);
+
         hoist(ex);
-        return { kind: ValueType.LAZY, ex };
+
+        // save hoisted expression to be used to evaluation
+        const hoistedExNode = t.cloneNode(ex.node);
+
+        // get back original expression to the tree
+        ex.replaceWith(originalExNode);
+
+        return { kind: ValueType.LAZY, ex: hoistedExNode, originalEx: ex };
       }
 
       return { kind: ValueType.FUNCTION, ex };
@@ -93,6 +104,7 @@ export default function CollectDependencies(
       // kind: ValueType.COMPONENT,
       kind: ValueType.LAZY,
       ex: styledOrCss.component.node.name,
+      originalEx: styledOrCss.component.node.name,
     });
   }
 
