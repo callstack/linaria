@@ -1,17 +1,26 @@
 import generator from '@babel/generator';
 import isSerializable from './isSerializable';
 import { Serializable } from '../types';
+import { StyledMeta, isStyledMeta } from '../../core/types';
 
 // Throw if we can't handle the interpolated value
 function throwIfInvalid(
-  value: Error | Function | string | number | Serializable | undefined,
+  value:
+    | Error
+    | Function
+    | string
+    | number
+    | StyledMeta
+    | Serializable
+    | undefined,
   ex: any
 ): void {
   if (
     typeof value === 'function' ||
     typeof value === 'string' ||
     (typeof value === 'number' && Number.isFinite(value)) ||
-    isSerializable(value)
+    isSerializable(value) ||
+    isStyledMeta(value)
   ) {
     return;
   }

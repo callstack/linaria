@@ -1,4 +1,4 @@
-import { StyledMeta } from '../types';
+import { StyledMeta } from './types';
 
 type CSSProperties = {
   [key: string]: string | number | CSSProperties;

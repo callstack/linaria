@@ -10,7 +10,7 @@ import generator from '@babel/generator';
 
 import { units } from '../units';
 import { State, StrictOptions, TemplateExpression, ValueCache } from '../types';
-import { StyledMeta } from '../../types';
+import { isStyledMeta } from '../../core/types';
 
 import isSerializable from '../utils/isSerializable';
 import { debug } from '../utils/logger';
@@ -28,10 +28,6 @@ type Interpolation = {
   source: string;
   unit: string;
 };
-
-function hasMeta(value: any): value is StyledMeta {
-  return value && typeof value === 'object' && (value as any).__linaria;
-}
 
 const processedPaths = new WeakSet();
 
@@ -165,7 +161,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
               // Only insert text for non functions
               // We don't touch functions because they'll be interpolated at runtime
 
-              if (hasMeta(value)) {
+              if (isStyledMeta(value)) {
                 // If it's an React component wrapped in styled, get the class name
                 // Useful for interpolating components
                 cssText += `.${value.__linaria.className}`;
@@ -214,7 +210,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
       // it'll ensure that styles are overridden properly
       if (options.evaluate && types.isIdentifier(styled.component.node)) {
         let value = valueCache.get(styled.component.node.name);
-        while (hasMeta(value)) {
+        while (isStyledMeta(value)) {
           selector += `.${value.__linaria.className}`;
           value = value.__linaria.extends;
         }
