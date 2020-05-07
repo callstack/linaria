@@ -11,7 +11,6 @@
     "esm/",
     "react/",
     "*.d.ts",
-    "react.js",
     "rollup.js",
     "server.js",
     "babel.js",
