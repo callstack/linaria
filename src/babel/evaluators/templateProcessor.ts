@@ -33,7 +33,7 @@ function hasMeta(value: any): value is StyledMeta {
   return value && typeof value === 'object' && (value as any).__linaria;
 }
 
-const cache = new WeakSet();
+const processedPaths = new WeakSet();
 
 export default function getTemplateProcessor(options: StrictOptions) {
   return function process(
@@ -41,12 +41,13 @@ export default function getTemplateProcessor(options: StrictOptions) {
     state: State,
     valueCache: ValueCache
   ) {
-    if (cache.has(path)) {
-      // Do not process one node twice
+    if (processedPaths.has(path)) {
+      // Do not process an expression
+      // if it is referenced in one template more than once
       return;
     }
 
-    cache.add(path);
+    processedPaths.add(path);
 
     const { quasi } = path.node;
 
