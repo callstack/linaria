@@ -153,10 +153,10 @@ exports[`shakes sequence expression 1`] = `
   var _ = require(\\"\\\\u2026\\");
 
   {
-    let local = '';
-    {
-      const color1 = () => 'blue';
+    const color1 = () => 'blue';
 
+    {
+      let local = '';
       {
         const color2 = () => local;
 
@@ -171,11 +171,11 @@ exports[`shakes sequence expression 1`] = `
 
 exports[`should keep member expression key 1`] = `
 "{
-  const obj = {
-    blue: '#00F'
-  };
+  const key = 'blue';
   {
-    const key = 'blue';
+    const obj = {
+      blue: '#00F'
+    };
     {
       const blue = obj[key];
       {
