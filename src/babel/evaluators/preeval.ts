@@ -1,10 +1,10 @@
 /**
- * This file is a babel prest used to transform files inside evaluators.
+ * This file is a babel preset used to transform files inside evaluators.
  * It works the same as main `babel/extract` preset, but do not evaluate lazy dependencies.
  */
 import { NodePath } from '@babel/traverse';
 import { types } from '@babel/core';
-import TaggedTemplateExpression from '../visitors/TaggedTemplateExpression';
+import GenerateClassNames from '../visitors/GenerateClassNames';
 import JSXElement from '../visitors/JSXElement';
 import CallExpression from '../visitors/CallExpression';
 import { State, StrictOptions } from '../types';
@@ -28,7 +28,7 @@ function preeval(_babel: any, options: StrictOptions) {
           path.traverse({
             ImportDeclaration: p => ImportDeclaration(p, state),
             TaggedTemplateExpression: p =>
-              TaggedTemplateExpression(p, state, options),
+              GenerateClassNames(p, state, options),
 
             JSXElement,
           });

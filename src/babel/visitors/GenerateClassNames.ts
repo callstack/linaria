@@ -1,111 +1,33 @@
 /**
  * This file is a visitor that checks TaggedTemplateExpressions and look for Linaria css or styled templates.
- * For each template it makes a list of dependencies, try to evaluate expressions, and if it is not possible, mark them as lazy dependencies.
- * It also generates a slug that will be used as a CSS class for particular Template Expression,
+ * For each template it generates a slug that will be used as a CSS class for particular Template Expression,
  * and generates a display name for class or styled components.
  * It saves that meta data as comment above the template, to be later used in templateProcessor.
  */
-/* eslint-disable no-param-reassign */
 
 import { basename, dirname, relative } from 'path';
 import { types as t } from '@babel/core';
 import { NodePath } from '@babel/traverse';
-import throwIfInvalid from '../utils/throwIfInvalid';
-import hasImport from '../utils/hasImport';
-import { State, StrictOptions, ValueType, ExpressionValue } from '../types';
+import { State, StrictOptions } from '../types';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
 import slugify from '../../slugify';
 import getLinariaComment from '../utils/getLinariaComment';
 import { debug } from '../utils/logger';
+import isStyledOrCss from '../utils/isStyledOrCss';
 
-export default function TaggedTemplateExpression(
+export default function GenerateClassNames(
   path: NodePath<t.TaggedTemplateExpression>,
   state: State,
   options: StrictOptions
 ) {
-  const { tag } = path.node;
-
-  const localName = state.file.metadata.localName || 'styled';
-
-  let styled: {
-    component: {
-      node: t.Expression | NodePath<t.Expression>;
-    };
-  } | null = null;
-  let css: boolean = false;
-
-  if (
-    t.isCallExpression(tag) &&
-    t.isIdentifier(tag.callee) &&
-    tag.arguments.length === 1 &&
-    tag.callee.name === localName &&
-    hasImport(
-      t,
-      path.scope,
-      state.file.opts.filename,
-      localName,
-      'linaria/react'
-    )
-  ) {
-    const tagPath = path.get('tag') as NodePath<t.CallExpression>;
-    styled = {
-      component: tagPath.get('arguments')[0] as NodePath<t.Expression>,
-    };
-  } else if (
-    t.isMemberExpression(tag) &&
-    t.isIdentifier(tag.object) &&
-    t.isIdentifier(tag.property) &&
-    tag.object.name === localName &&
-    hasImport(
-      t,
-      path.scope,
-      state.file.opts.filename,
-      localName,
-      'linaria/react'
-    )
-  ) {
-    styled = {
-      component: { node: t.stringLiteral(tag.property.name) },
-    };
-  } else if (
-    hasImport(t, path.scope, state.file.opts.filename, 'css', 'linaria')
-  ) {
-    css = t.isIdentifier(tag) && tag.name === 'css';
-  }
-
-  if (!styled && !css) {
+  const styledOrCss = isStyledOrCss(path, state);
+  if (!styledOrCss) {
     return;
   }
 
   const expressions = path.get('quasi').get('expressions');
 
   debug('template-parse:identify-expressions', expressions.length);
-
-  const expressionValues: ExpressionValue[] = expressions.map(
-    (ex: NodePath<t.Expression>) => {
-      const result = ex.evaluate();
-      if (result.confident) {
-        throwIfInvalid(result.value, ex);
-        return { kind: ValueType.VALUE, value: result.value };
-      }
-
-      if (
-        options.evaluate &&
-        !(t.isFunctionExpression(ex) || t.isArrowFunctionExpression(ex))
-      ) {
-        return { kind: ValueType.LAZY, ex };
-      }
-
-      return { kind: ValueType.FUNCTION, ex };
-    }
-  );
-
-  debug(
-    'template-parse:evaluate-expressions',
-    expressionValues.map(expressionValue =>
-      expressionValue.kind === ValueType.VALUE ? expressionValue.value : 'lazy'
-    )
-  );
 
   // Increment the index of the style we're processing
   // This is used for slug generation to prevent collision
@@ -213,6 +135,7 @@ export default function TaggedTemplateExpression(
 
     className = toValidCSSIdentifier(cnSlug);
   }
+
   debug(
     'template-parse:generated-meta',
     `slug: ${slug}, displayName: ${displayName}, className: ${className}`
@@ -220,20 +143,4 @@ export default function TaggedTemplateExpression(
 
   // Save evaluated slug and displayName for future usage in templateProcessor
   path.addComment('leading', `linaria ${slug} ${displayName} ${className}`);
-
-  if (styled && 'name' in styled.component.node) {
-    // It's not a real dependency.
-    // It can be simplified because we need just a className.
-    expressionValues.push({
-      // kind: ValueType.COMPONENT,
-      kind: ValueType.LAZY,
-      ex: styled.component.node.name,
-    });
-  }
-
-  state.queue.push({
-    styled: styled || undefined,
-    path,
-    expressionValues,
-  });
 }
