@@ -14,7 +14,7 @@ const waitForProcess = async process => {
 
 it('Ensures that package do not include core-js dependency after build', async () => {
   const packageJSON = require('../../package.json');
-  const buildScript = packageJSON.scripts.build;
+  const buildScript = packageJSON.scripts['build:lib'];
 
   const proc = cp.exec(buildScript, {
     stdio: 'ignore',
