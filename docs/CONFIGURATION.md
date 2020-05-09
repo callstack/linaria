@@ -47,6 +47,32 @@ module.exports = {
   - `hash`: The hash of the content.
   - `title`: The name of the class.
 
+- `rules: EvalRule[]`
+
+  The set of rules that defines how each matched file will be transformed during evaluation.
+  `EvalRule` is an object with two fields:
+  - `test` is a regular expression or a function `(path: string) => boolean`);
+  - `action` is an `Evaluator` function, `"ignore"` or a name of module that defines exports `Evaluator` as a default.
+  
+  If `test` is omitted the rule is applicable for all files.
+  
+  The last matched rule is used for transformation. If the last matched action for a file is `"ignore"` the file will be evaluated as is, so that file must not contain any js code that cannot be executed in nodejs environment (it's usually true for any lib in `node_modules`).  
+
+  Information about `Evaluator`, its default and custom implementations can be founded it [evaluators section of How it works docs](../HOW_IT_WORKS.md#evaluators)
+
+  The default set is:
+  ```js
+  [
+    {
+      action: require('linaria/evaluators').shaker,
+    },
+    {
+      test: /\/node_modules\//,
+      action: 'ignore',
+    },
+  ]
+  ```
+
 - `ignore: RegExp` (default: `/node_modules/`):
 
   If you specify a regex here, files matching the regex won't be processed, i.e. the matching files won't be transformed with Babel during evaluation. If you need to compile certain modules under `/node_modules/`, it's recommended to do it on a module by module basis for faster transforms, e.g. `ignore: /node_modules[\/\\](?!some-module|other-module)/`.
