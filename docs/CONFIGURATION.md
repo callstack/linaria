@@ -73,10 +73,6 @@ module.exports = {
   ]
   ```
 
-- `ignore: RegExp` (default: `/node_modules/`):
-
-  If you specify a regex here, files matching the regex won't be processed, i.e. the matching files won't be transformed with Babel during evaluation. If you need to compile certain modules under `/node_modules/`, it's recommended to do it on a module by module basis for faster transforms, e.g. `ignore: /node_modules[\/\\](?!some-module|other-module)/`.
-
 - `babelOptions: Object`
 
   If you need to specify custom babel configuration, you can pass them here. These babel options will be used by Linaria when parsing and evaluating modules.
