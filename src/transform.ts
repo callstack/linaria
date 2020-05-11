@@ -55,11 +55,12 @@ export default function transform(code: string, options: Options): Result {
   );
 
   const pluginOptions = loadOptions(options.pluginOptions);
+  const babelOptions = pluginOptions?.babelOptions ?? null;
 
   // Parse the code first so babel uses user's babel config for parsing
   // We don't want to use user's config when transforming the code
   const ast = babel.parseSync(code, {
-    ...(pluginOptions?.babelOptions ?? null),
+    ...babelOptions,
     filename: options.filename,
     caller: { name: 'linaria' },
   });
@@ -68,6 +69,7 @@ export default function transform(code: string, options: Options): Result {
     ast!,
     code,
     {
+      ...(babelOptions?.rootMode ? { rootMode: babelOptions.rootMode } : null),
       filename: options.filename,
       presets: [[babelPreset, pluginOptions]],
       babelrc: false,
