@@ -50,6 +50,7 @@ export default class RequirementsResolver {
    */
   private resolveBinding(binding: Binding) {
     let result: t.Statement;
+    const startPosition = binding.path.node.start;
 
     switch (binding.kind) {
       case 'module':
@@ -69,7 +70,6 @@ export default class RequirementsResolver {
       case 'let':
       case 'var': {
         let decl = (binding.path as NodePath<t.VariableDeclarator>).node;
-
         if (
           binding.path.isVariableDeclarator() &&
           t.isSequenceExpression(binding.path.node.init)
@@ -90,6 +90,9 @@ export default class RequirementsResolver {
         result = binding.path.node as t.Statement;
         break;
     }
+    // result may be newly created node that not have start/end/loc info
+    // which is needed to sort statements
+    result.start = startPosition;
 
     const req: Requirement = {
       result,
@@ -191,6 +194,15 @@ export default class RequirementsResolver {
       });
     }
 
-    return statements.reverse();
+    // preserve original statements order, but reversed
+    statements.sort((a, b) => {
+      if (a.start && b.start) {
+        return b.start - a.start;
+      } else {
+        return 0;
+      }
+    });
+
+    return statements;
   }
 }

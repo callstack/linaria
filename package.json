@@ -1,6 +1,6 @@
 {
   "name": "linaria",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-alpha.4",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "main": "lib/index.js",
   "module": "esm/index.js",
@@ -11,10 +11,11 @@
     "esm/",
     "react/",
     "*.d.ts",
+    "babel.js",
+    "evaluators.js",
+    "loader.js",
     "rollup.js",
     "server.js",
-    "babel.js",
-    "loader.js",
     "stylelint-config.js"
   ],
   "license": "MIT",

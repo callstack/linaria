@@ -62,7 +62,6 @@ const extractor: Evaluator = (filename, options, text, only = null) => {
   // reuses `NodePath` with a wrong scope.
   // There is probably a better solution, but I haven't found it yet.
   const ast = parseSync(code!, { filename: filename + '.preval' });
-
   // First of all, let's find a __linariaPreval export
   traverse(ast!, {
     // We know that export has been added to the program body,

@@ -119,7 +119,7 @@ const absoluteFill = {
   right: 0,
   bottom: 0,
   left: 0,
-}
+};
 
 const Container = styled.h1`
   background-color: papayawhip;
@@ -159,6 +159,29 @@ const Box = styled.h1`
 ```
 
 But keep in mind that if you're doing SSR for your app, this won't work with SSR. In this particular case, better option will be to use the `calc` function along with the `vh` unit for the viewport height (e.g. `calc(100vh * 2)`).
+
+### Evaluators
+
+Linaria can use different strategies for evaluating the interpolated values.
+Currently, we have two built-in strategies:
+
+- `extractor` was the default strategy in `1.x` version. It takes an interpolated expression, finds all the referenced identifiers, gets all its declarations, repeats cycle for all identifiers in found declarations, and then constructs a new tree of statements from all found declarations. It's a pretty simple strategy, but it significantly changes an evaluated code and doesn't work for non-primitive js-constructions.
+- `shaker` was introduced as an option in `1.4` and became the default in `2.0` version. In contrast to `extractor`, `shaker` tries to find all irrelevant code and cuts it out of the file. As a result, interpolated values can be defined without any restrictions.
+
+If an interpolated value or one of its dependencies is imported from another module, that module will be also processed with an evaluator (the implementation of evaluator will be chosen by matching `rules` from [the Linaria config](../CONFIGURATION.md#options)).
+
+Sometimes it can be useful to implement your own strategy (it can be just a mocked version of some heavy or browser-only library). You can do it by implementing `Evaluator` function:
+
+```typescript
+type Evaluator = (
+  filename: string, // the name of processed file
+  options: StrictOptions, // Linaria config
+  text: string, // source code
+  only: string[] | null // list of exported values or `null` for everything
+) => [string, Map<string, string[]> | null];
+```
+
+The function should return an array with two elements: source code prepared for evaluation and `Map` with imported files in keys and list of the identifiers in values.
 
 ## Bundler integration
 

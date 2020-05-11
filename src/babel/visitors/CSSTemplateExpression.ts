@@ -1,16 +1,16 @@
 import { NodePath } from '@babel/traverse';
-import { types } from '@babel/core';
+import { types as t } from '@babel/core';
 import getLinariaComment from '../utils/getLinariaComment';
 
 export default function CSSTemplateExpression(
-  path: NodePath<types.TaggedTemplateExpression>
+  path: NodePath<t.TaggedTemplateExpression>
 ) {
-  if (types.isIdentifier(path.node.tag) && path.node.tag.name === 'css') {
+  if (t.isIdentifier(path.node.tag) && path.node.tag.name === 'css') {
     const [, , className] = getLinariaComment(path);
     if (!className) {
       return;
     }
 
-    path.replaceWith(types.stringLiteral(className));
+    path.replaceWith(t.stringLiteral(className));
   }
 }

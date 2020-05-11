@@ -3,7 +3,10 @@ import { NodePath } from '@babel/traverse';
 
 const pattern = /^linaria (.+)$/;
 
-export default function getLinariaComment(path: NodePath<types.Node>) {
+export default function getLinariaComment(
+  path: NodePath<types.Node>,
+  remove: boolean = true
+) {
   const comments = path.node.leadingComments;
   if (!comments) {
     return [null, null, null];
@@ -19,7 +22,9 @@ export default function getLinariaComment(path: NodePath<types.Node>) {
     return [null, null, null];
   }
 
-  path.node.leadingComments = comments.filter((_, i) => i !== idx);
+  if (remove) {
+    path.node.leadingComments = comments.filter((_, i) => i !== idx);
+  }
 
   return matched[1].split(' ').map(i => (i ? i : null));
 }

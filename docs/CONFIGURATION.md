@@ -13,7 +13,7 @@ Example `linaria.config.js`:
 module.exports = {
   evaluate: true,
   displayName: false,
-}
+};
 ```
 
 ## Options
@@ -47,9 +47,35 @@ module.exports = {
   - `hash`: The hash of the content.
   - `title`: The name of the class.
 
-- `ignore: RegExp` (default: `/node_modules/`):
+- `rules: EvalRule[]`
 
-  If you specify a regex here, files matching the regex won't be processed, i.e. the matching files won't be transformed with Babel during evaluation. If you need to compile certain modules under `/node_modules/`, it's recommended to do it on a module by module basis for faster transforms, e.g. `ignore: /node_modules[\/\\](?!some-module|other-module)/`.
+  The set of rules that defines how the matched files will be transformed during the evaluation.
+  `EvalRule` is an object with two fields:
+
+  - `test` is a regular expression or a function `(path: string) => boolean`;
+  - `action` is an `Evaluator` function, `"ignore"` or a name of the module that exports `Evaluator` function as a default export.
+
+  If `test` is omitted, the rule is applicable for all the files.
+
+  The last matched rule is used for transformation. If the last matched action for a file is `"ignore"` the file will be evaluated as is, so that file must not contain any js code that cannot be executed in nodejs environment (it's usually true for any lib in `node_modules`).
+
+  If you need to compile certain modules under `/node_modules/` (which can be the case in monorepo projects), it's recommended to do it on a module by module basis for faster transforms, e.g. `ignore: /node_modules[\/\\](?!some-module|other-module)/`. Example is using Regular Expressions negative lookahead.
+
+  The Information about `Evaluator`, its default setting and custom implementations can be founded it [evaluators section of How it works docs](../HOW_IT_WORKS.md#evaluators)
+
+  The default setup is:
+
+  ```js
+  [
+    {
+      action: require('linaria/evaluators').shaker,
+    },
+    {
+      test: /\/node_modules\//,
+      action: 'ignore',
+    },
+  ];
+  ```
 
 - `babelOptions: Object`
 
@@ -74,3 +100,157 @@ To use this preset, add `linaria/babel` to your Babel configuration at the end o
 ```
 
 The babel preset can accept the same options supported by the configuration file, however it's recommended to use the configuration file directly.
+
+## Preact
+
+If you wish you use Preact, we recommend you to use the `preact-cli` and start from there. The following configuration assumes you are using the default template provided by preact-cli. Start by creating your project using;
+
+```
+npx preact-cli create default my-project
+```
+
+On top of the default template, you will need to install `@babel/preset-react`. This is because Linaria works with JSX syntax. Otherwise, preact will throw an error saying that `linaria/loader` can't parse JSX. Don't forget to install `linaria`!.
+
+After that, your `package.json` should look like the following:
+
+```diff
+"devDependencies": {
++   "@babel/preset-react": "^7.8.3",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-preact-pure": "^2.0.0",
+    "eslint": "^6.0.1",
+    "eslint-config-preact": "^1.1.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^24.9.0",
+    "jest-preset-preact": "^1.0.0",
+    "per-env": "^1.0.2",
+    "preact-cli": "^3.0.0-rc.6",
+    "preact-render-spy": "^1.2.1",
+    "sirv-cli": "^0.4.5"
+  },
+  "dependencies": {
++   "linaria": "^1.3.3",
+    "preact": "^10.3.2",
+    "preact-render-to-string": "^5.1.4",
+    "preact-router": "^3.2.1"
+  },
+```
+
+> If you wish to work with TypeScript, you will also need to install `@babel/preset-typescript`
+
+For some reason, Preact does not like when you push presets/plugins using their `preact.config.js` to the babel loader. And for Linaria to work, we need to install `linaria/babel` preset and the `linaria/loader` loader. Therefore, we extract all the plugins from preact's babel configuration (you can do this by console logging `config.module.rules[0]` and looking for the plugins object in your `preact.config.js`).
+
+```js
+const babelLoaderRule = config.module.rules[0];
+babelLoaderRule.options.presets.push('@babel/preset-react');
+babelLoaderRule.options.presets.push('linaria/loader');
+```
+
+Because of that, we need to create a `.babelrc` file with the following:
+
+```
+{
+  "presets": ["@babel/preset-env", "@babel/preset-react", "linaria/babel"],
+  "plugins": [
+    "./node_modules/@babel/plugin-syntax-dynamic-import/lib/index.js",
+    "./node_modules/@babel/plugin-transform-object-assign/lib/index.js",
+    [
+      "./node_modules/@babel/plugin-proposal-decorators/lib/index.js",
+      {
+        "legacy": true
+      }
+    ],
+    [
+      "./node_modules/@babel/plugin-proposal-class-properties/lib/index.js",
+      {
+        "loose": true
+      }
+    ],
+    "./node_modules/@babel/plugin-proposal-object-rest-spread/lib/index.js",
+    "./node_modules/babel-plugin-transform-react-remove-prop-types/lib/index.js",
+    [
+      "./node_modules/@babel/plugin-transform-react-jsx/lib/index.js",
+      {
+        "pragma": "h",
+        "pragmaFrag": "Fragment"
+      }
+    ],
+    [
+      "./node_modules/fast-async/plugin.js",
+      {
+        "spec": true
+      }
+    ],
+    "./node_modules/babel-plugin-macros/dist/index.js"
+  ]
+}
+```
+
+> The plugins listed here are based on preact's default template/cli. If you wish to change your starting template, a similar process could be done. We removed `@babel/preset-typescript`, but if you wish to use TS, add the preset in between `preset-env` and `preset-react`.
+
+Finally, in your `preact.config.js`, we will modify the babel loader to avoid having conflicting plugins and presets. Add the following:
+
+```js
+export default config => {
+  const newBabelLoader = {
+    test: /\.jsx?$/, //If you are using TS, use -> /\.m?[jt]sx?$/
+    exclude: /node_modules/,
+    enforce: 'pre', //Don't delete this
+    resolve: { mainFields: ['module', 'jsnext:main', 'browser', 'main'] }, //Don't delete this
+    use: [
+      {
+        loader: 'babel-loader',
+        options: {
+          plugins: [],
+        },
+      },
+      { loader: 'linaria/loader' },
+    ],
+  };
+
+  config.module.rules[0] = newBabelLoader; //override your babel-loader rule
+};
+```
+
+After all of that, you should be able to run `npm build`, and it should have no errors.
+
+To test that everthing is working, go to a file, for example `components/Header/index.js`, and create a class name.
+
+```js
+import { h } from 'preact';
+import { Link } from 'preact-router/match';
+import style from './style.css';
+
+import { css } from 'linaria';
+
+const className = css`
+  color: red;
+  font-weight: 800;
+`;
+
+const Header = () => (
+  <header class={style.header}>
+    <h1>Preact App</h1>
+    <nav>
+      <Link activeClassName={style.active} href="/">
+        Home
+      </Link>
+      <Link activeClassName={style.active} href="/profile">
+        Me
+      </Link>
+      <Link activeClassName={style.active} href="/profile/john">
+        John
+      </Link>
+    </nav>
+    <button class={className}>Hello</button> //here I use it
+  </header>
+);
+
+export default Header;
+```
+
+> You can also use the `styled` variant, importing from `linaria/react`.
+
+If you run `npm run dev`, you should be able to see a button next to the nav title, with red bold text.
+
+You can take a look at this example [here](../examples/Preact)

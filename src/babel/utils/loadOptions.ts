@@ -22,7 +22,7 @@ export default function loadOptions(
     evaluate: true,
     rules: [
       {
-        action: require('../evaluators/extractor').default,
+        action: require('../evaluators/shaker').default,
       },
       {
         // The old `ignore` option is used as a default value for `ignore` rule.

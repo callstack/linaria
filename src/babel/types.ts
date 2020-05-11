@@ -31,6 +31,7 @@ export type ComponentValue = {
 export type LazyValue = {
   kind: ValueType.LAZY;
   ex: NodePath<t.Expression> | t.Expression | string;
+  originalEx: NodePath<t.Expression> | t.Expression | string;
 };
 
 export type FunctionValue = {
