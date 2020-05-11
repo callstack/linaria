@@ -69,7 +69,7 @@ export default function transform(code: string, options: Options): Result {
     ast!,
     code,
     {
-      ...babelOptions,
+      ...(babelOptions?.rootMode ? { rootMode: babelOptions.rootMode } : null),
       filename: options.filename,
       presets: [[babelPreset, pluginOptions]],
       babelrc: false,
