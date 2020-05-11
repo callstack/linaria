@@ -47,7 +47,7 @@ module.exports = {
           '@babel/preset-env',
           {
             targets: {
-              node: 'current',
+              node: '10',
             },
           },
         ],
@@ -71,29 +71,11 @@ module.exports = {
                   browsers: legacy.targets.browsers,
                 },
                 loose: true,
-              },
-            ],
-          ],
-        },
-        test: {
-          /*
-           * This configuration is basically the same as for the "legacy" env,
-           * except that we enable certain options so we can track whether
-           * core-js polyfills have been inserted or not.
-           */
-          presets: [
-            [
-              '@babel/preset-env',
-              {
-                targets: {
-                  browsers: legacy.targets.browsers,
-                },
-                loose: true,
                 // our styled component should not need to use any polyfill. We do not include core-js in dependencies. However, we leave this to detect if future changes would not introduce any need for polyfill
                 useBuiltIns: 'usage',
                 corejs: 3,
                 // this is used to test if we do not introduced core-js polyfill
-                debug: process.env.NODE_ENV === 'debug',
+                debug: process.env.DEBUG_CORE_JS === 'true',
               },
             ],
           ],
