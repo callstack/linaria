@@ -13,7 +13,7 @@ Example `linaria.config.js`:
 module.exports = {
   evaluate: true,
   displayName: false,
-}
+};
 ```
 
 ## Options
@@ -49,18 +49,22 @@ module.exports = {
 
 - `rules: EvalRule[]`
 
-  The set of rules that defines how each matched file will be transformed during evaluation.
+  The set of rules that defines how the matched files will be transformed during the evaluation.
   `EvalRule` is an object with two fields:
-  - `test` is a regular expression or a function `(path: string) => boolean`);
-  - `action` is an `Evaluator` function, `"ignore"` or a name of module that defines exports `Evaluator` as a default.
-  
-  If `test` is omitted the rule is applicable for all files.
-  
-  The last matched rule is used for transformation. If the last matched action for a file is `"ignore"` the file will be evaluated as is, so that file must not contain any js code that cannot be executed in nodejs environment (it's usually true for any lib in `node_modules`).  
 
-  Information about `Evaluator`, its default and custom implementations can be founded it [evaluators section of How it works docs](../HOW_IT_WORKS.md#evaluators)
+  - `test` is a regular expression or a function `(path: string) => boolean`;
+  - `action` is an `Evaluator` function, `"ignore"` or a name of the module that exports `Evaluator` function as a default export.
 
-  The default set is:
+  If `test` is omitted, the rule is applicable for all the files.
+
+  The last matched rule is used for transformation. If the last matched action for a file is `"ignore"` the file will be evaluated as is, so that file must not contain any js code that cannot be executed in nodejs environment (it's usually true for any lib in `node_modules`).
+
+  If you need to compile certain modules under `/node_modules/` (which can be the case in monorepo projects), it's recommended to do it on a module by module basis for faster transforms, e.g. `ignore: /node_modules[\/\\](?!some-module|other-module)/`. Example is using Regular Expressions negative lookahead.
+
+  The Information about `Evaluator`, its default setting and custom implementations can be founded it [evaluators section of How it works docs](../HOW_IT_WORKS.md#evaluators)
+
+  The default setup is:
+
   ```js
   [
     {
@@ -70,7 +74,7 @@ module.exports = {
       test: /\/node_modules\//,
       action: 'ignore',
     },
-  ]
+  ];
   ```
 
 - `babelOptions: Object`
@@ -134,8 +138,7 @@ After that, your `package.json` should look like the following:
 
 > If you wish to work with TypeScript, you will also need to install `@babel/preset-typescript`
 
-For some reason, Preact does not like when you push presets/plugins using their `preact.config.js` to the babel loader. And for Linaria to work, we need to install `linaria/babel` preset and the `linaria/loader` loader. Therefore, we extract all the plugins from preact's babel configuration (you can do this by console logging `config.module.rules[0]` and looking for the plugins object in your `preact.config.js`). 
-
+For some reason, Preact does not like when you push presets/plugins using their `preact.config.js` to the babel loader. And for Linaria to work, we need to install `linaria/babel` preset and the `linaria/loader` loader. Therefore, we extract all the plugins from preact's babel configuration (you can do this by console logging `config.module.rules[0]` and looking for the plugins object in your `preact.config.js`).
 
 ```js
 const babelLoaderRule = config.module.rules[0];
@@ -192,33 +195,33 @@ export default config => {
   const newBabelLoader = {
     test: /\.jsx?$/, //If you are using TS, use -> /\.m?[jt]sx?$/
     exclude: /node_modules/,
-    enforce: "pre", //Don't delete this
-    resolve: { mainFields: ["module", "jsnext:main", "browser", "main"] }, //Don't delete this
+    enforce: 'pre', //Don't delete this
+    resolve: { mainFields: ['module', 'jsnext:main', 'browser', 'main'] }, //Don't delete this
     use: [
       {
-        loader: "babel-loader",
+        loader: 'babel-loader',
         options: {
-          plugins: [] 
-        }
+          plugins: [],
+        },
       },
-      { loader: "linaria/loader" }
-    ]
+      { loader: 'linaria/loader' },
+    ],
   };
 
   config.module.rules[0] = newBabelLoader; //override your babel-loader rule
 };
 ```
 
-After all of that, you should be able to run `npm build`, and it should have no errors. 
+After all of that, you should be able to run `npm build`, and it should have no errors.
 
 To test that everthing is working, go to a file, for example `components/Header/index.js`, and create a class name.
 
 ```js
-import { h } from "preact";
-import { Link } from "preact-router/match";
-import style from "./style.css";
+import { h } from 'preact';
+import { Link } from 'preact-router/match';
+import style from './style.css';
 
-import { css } from "linaria";
+import { css } from 'linaria';
 
 const className = css`
   color: red;
