@@ -12,17 +12,16 @@
 /*
  * Configuration for the legacy build
  */
-const legacy = {
-  targets: {
-    node: '10',
-    browsers: [
-      'last 2 versions',
-      'not ie 11',
-      'not ie_mob 11',
-      'not op_mini all',
-      'not dead',
-    ],
-  },
+
+const commonJSTargets = {
+  browsers: [
+    'last 2 versions',
+    'not ie 11',
+    'not ie_mob 11',
+    'not op_mini all',
+    'not dead',
+  ],
+  node: '10',
 };
 
 module.exports = {
@@ -35,7 +34,7 @@ module.exports = {
           '@babel/preset-env',
           {
             targets: {
-              node: legacy.targets.node,
+              node: commonJSTargets.node,
             },
           },
         ],
@@ -68,7 +67,7 @@ module.exports = {
               '@babel/preset-env',
               {
                 targets: {
-                  browsers: legacy.targets.browsers,
+                  browsers: commonJSTargets.browsers,
                 },
                 loose: true,
                 // our styled component should not need to use any polyfill. We do not include core-js in dependencies. However, we leave this to detect if future changes would not introduce any need for polyfill
@@ -84,20 +83,10 @@ module.exports = {
     },
     {
       /**
-       * we use the same config for src/__tests__ and src/__fixtures__ to not break existing tests
+       * we have to transpile JSX in tests
        */
       test: /src\/((__tests__)|(__fixtures__))\//,
-      presets: [
-        '@babel/preset-react',
-        [
-          '@babel/preset-env',
-          {
-            targets: {
-              browsers: legacy.targets.browsers,
-            },
-          },
-        ],
-      ],
+      presets: ['@babel/preset-react'],
     },
   ],
 };

@@ -51,6 +51,18 @@ const extractor: Evaluator = (filename, options, text, only = null) => {
     { useESModules: false },
   ]);
 
+  // We made a mistake somewhen, and linaria preval was dependent on `plugin-transform-template-literals`
+  // Usually it was loaded into preval, because user was using `@babel/preset-env` which included that plugin. Internally we used this preset for tests (and previously for everything)
+  // The ordering is very important here, that's why it is added as a preset, not just as a plugin. It makes this plugin run *AFTER* linaria preset
+  // In preval we have 2 visitors, one for Call Expressions and second for TaggedTemplateLiterals. Babel process TaggedTemapltes first, and we grab css`` statements.
+  // Then it process TaggedTemplate with mentioned plugin, which transforms it to CallExpression.
+  // Then Linaria can identify all `styled` as call expressions.
+  // Presets ordering is from last to first, so we add it at the beginning of the list.
+  // note that in shaker, preset-env is used explicitly
+
+  transformOptions.presets!.unshift({
+    plugins: ['@babel/plugin-transform-template-literals'],
+  });
   // Expressions will be extracted only for __linariaPreval.
   // In all other cases a code will be returned as is.
   let { code } = transformSync(text, transformOptions)!;

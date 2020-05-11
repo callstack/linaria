@@ -26,9 +26,9 @@ import {
   ValueCache,
 } from './types';
 import CollectDependencies from './visitors/CollectDependencies';
-import ImportDeclaration from './visitors/ImportDeclaration';
-import { debug } from './utils/logger';
+import DetectStyledImportName from './visitors/DetectStyledImportName';
 import GenerateClassNames from './visitors/GenerateClassNames';
+import { debug } from './utils/logger';
 
 function isLazyValue(v: ExpressionValue): v is LazyValue {
   return v.kind === ValueType.LAZY;
@@ -113,7 +113,7 @@ export default function extract(_babel: any, options: StrictOptions) {
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
-            ImportDeclaration: p => ImportDeclaration(p, state),
+            ImportDeclaration: p => DetectStyledImportName(p, state),
             TaggedTemplateExpression: p => {
               GenerateClassNames(p, state, options);
               CollectDependencies(p, state, options);
@@ -186,13 +186,11 @@ export default function extract(_babel: any, options: StrictOptions) {
         },
         exit(_: any, state: State) {
           if (Object.keys(state.rules).length) {
-            // Store the result as the file metadata
-            state.file.metadata = {
-              linaria: {
-                rules: state.rules,
-                replacements: state.replacements,
-                dependencies: state.dependencies,
-              },
+            // Store the result as the file metadata under linaria key
+            state.file.metadata.linaria = {
+              rules: state.rules,
+              replacements: state.replacements,
+              dependencies: state.dependencies,
             };
           }
 

@@ -100,6 +100,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/plugin-transform-modules-commonjs": "^7.9.0",
     "@babel/plugin-transform-runtime": "^7.9.0",
+    "@babel/plugin-transform-template-literals": "^7.8.3",
     "@babel/register": "^7.9.0",
     "@babel/template": "^7.8.6",
     "@babel/traverse": "^7.9.0",
