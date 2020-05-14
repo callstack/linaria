@@ -807,6 +807,48 @@ function run(
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should compose with css', async () => {
+    const { code, metadata } = await transpile(
+      dedent`
+      import { css } from "linaria";
+
+      export const fragment = css\`
+        color: blue;
+      \`;
+
+      export const square = css\`
+        color: red;
+        composes: ${'${fragment}'};
+      \`;
+    `
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should compose with styled', async () => {
+    const { code, metadata } = await transpile(
+      dedent`
+      import { css } from "linaria";
+      import { styled } from "linaria/react";
+
+
+      export const fragment = css\`
+        color: blue;
+      \`;
+
+      export const Component = styled.h1\`
+        composes:${'${fragment}'};
+        color: red;
+      \`;
+    `
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('should process `css` calls inside components', async () => {
     const { code, metadata } = await transpile(
       dedent`

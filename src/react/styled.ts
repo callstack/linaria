@@ -7,7 +7,7 @@
 import * as React from 'react'; // eslint-disable-line import/no-extraneous-dependencies
 import validAttr from '@emotion/is-prop-valid';
 import { cx } from '../index';
-import { StyledMeta } from '../types';
+import { DefinitionMeta } from '../types';
 
 type Options = {
   name: string;
@@ -142,12 +142,12 @@ type CSSProperties = {
   [key: string]: string | number | CSSProperties;
 };
 
-type StyledComponent<T> = StyledMeta &
+type StyledComponent<T> = DefinitionMeta &
   (T extends React.FunctionComponent<any>
     ? T
     : React.FunctionComponent<T & { as?: React.ElementType }>);
 
-type StaticPlaceholder = string | number | CSSProperties | StyledMeta;
+type StaticPlaceholder = string | number | CSSProperties | DefinitionMeta;
 
 type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
   TAdditionalProps = {}
@@ -172,7 +172,7 @@ type ComponentStyledTag<T> = <
     ? Array<StaticPlaceholder | ((props: Props) => string | number)>
     : StaticPlaceholder[]
 ) => T extends React.FunctionComponent<any>
-  ? StyledMeta & T
+  ? DefinitionMeta & T
   : StyledComponent<Props>;
 
 type StyledJSXIntrinsics = {

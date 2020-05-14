@@ -1,8 +1,14 @@
 import { types as t, TransformOptions } from '@babel/core';
 import { NodePath } from '@babel/traverse';
-import { StyledMeta } from '../types';
+import { DefinitionMeta } from '../types';
 
-export type JSONValue = string | number | boolean | JSONObject | JSONArray;
+export type JSONValue =
+  | string
+  | number
+  | boolean
+  | JSONObject
+  | JSONArray
+  | null;
 
 export interface JSONObject {
   [x: string]: JSONValue;
@@ -19,7 +25,7 @@ export enum ValueType {
   VALUE,
 }
 
-export type Value = Function | StyledMeta | string | number;
+export type Value = Function | DefinitionMeta | string | number;
 
 export type ValueCache = Map<t.Expression | string, Value>;
 

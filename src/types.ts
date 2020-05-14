@@ -43,12 +43,28 @@ export type Options = {
   pluginOptions?: Partial<PluginOptions>;
 };
 
-export type StyledMeta = {
+export type CSSMeta = {
+  displayName: string | null;
   __linaria: {
+    type: 'css';
     className: string;
-    extends: StyledMeta;
+    composes: {
+      styles: string;
+      replacements: { [key: string]: Function | Object };
+    };
   };
 };
 
+export type StyledMeta = {
+  displayName: string | null;
+  __linaria: {
+    type: 'styled';
+    className: string;
+    composes: CSSMeta | Array<CSSMeta> | null;
+    extends: StyledMeta | null;
+  };
+};
+
+export type DefinitionMeta = CSSMeta | StyledMeta;
 export type PreprocessorFn = (selector: string, cssText: string) => string;
 export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;

@@ -3,14 +3,14 @@
 exports[`handles locally named import 1`] = `
 "import { styled as custom } from 'linaria/react';
 const Component =
-/*linaria ca1zxek Component Component_ca1zxek*/
+/*linaria ca1zxek Component*/
 custom.div\`\`;"
 `;
 
 exports[`preserves classNames 1`] = `
 "import { styled } from 'linaria/react';
 const Component =
-/*linaria ca1zxek Component Component_ca1zxek*/
+/*linaria ca1zxek Component*/
 styled.div\`\`;"
 `;
 

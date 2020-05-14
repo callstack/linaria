@@ -11,7 +11,7 @@ import { NodePath } from '@babel/traverse';
 import { State, StrictOptions } from '../types';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
 import slugify from '../../slugify';
-import getLinariaComment from '../utils/getLinariaComment';
+import { getLinariaComment, addLinariaComment } from '../utils/linariaComment';
 import { debug } from '../utils/logger';
 import isStyledOrCss from '../utils/isStyledOrCss';
 
@@ -142,5 +142,5 @@ export default function GenerateClassNames(
   );
 
   // Save evaluated slug and displayName for future usage in templateProcessor
-  path.addComment('leading', `linaria ${slug} ${displayName} ${className}`);
+  addLinariaComment(path, slug, displayName, className);
 }

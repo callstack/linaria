@@ -42,7 +42,11 @@ exports[`evaluates and inlines expressions in scope 1`] = `
 const color = 'blue';
 export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th6xni0\\"
+  class: \\"th6xni0\\",
+  vars: {
+    \\"th6xni0-0\\": [color],
+    \\"th6xni0-1\\": [100 / 3, \\"%\\"]
+  }
 });"
 `;
 
@@ -51,8 +55,8 @@ exports[`evaluates and inlines expressions in scope 2`] = `
 CSS:
 
 .th6xni0 {
-  color: blue;
-  width: 33.333333333333336%;
+  color: var(--th6xni0-0);
+  width: var(--th6xni0-1);
 }
 
 Dependencies: NA
@@ -228,7 +232,10 @@ const styles = [{
 }];
 export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th6xni0\\"
+  class: \\"th6xni0\\",
+  vars: {
+    \\"th6xni0-0\\": [styles]
+  }
 });"
 `;
 
@@ -237,7 +244,7 @@ exports[`inlines array styles as CSS string 2`] = `
 CSS:
 
 .th6xni0 {
-  flex: 1; display: block; height: 24px;
+  var(--th6xni0-0)
 }
 
 Dependencies: NA
@@ -274,7 +281,10 @@ const cover = {
 };
 export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
-  class: \\"th6xni0\\"
+  class: \\"th6xni0\\",
+  vars: {
+    \\"th6xni0-0\\": [cover]
+  }
 });"
 `;
 
@@ -283,7 +293,7 @@ exports[`inlines object styles as CSS string 2`] = `
 CSS:
 
 .th6xni0 {
-  position: absolute; top: 0; right: 0; bottom: 0; left: 0; opacity: 1; min-height: 420px; &.shouldNotBeChanged { border-color: #fff; } @media (min-width: 200px) { -webkit-opacity: 0.8; -moz-opacity: 0.8; -ms-opacity: 0.8; -o-opacity: 0.8; -webkit-border-radius: 2px; -moz-border-radius: 2px; -ms-border-radius: 2px; -o-border-radius: 2px; -webkit-transition: 400ms; -moz-transition: 400ms; -o-transition: 400ms; -ms-transition: 400ms; }
+  var(--th6xni0-0)
 }
 
 Dependencies: NA

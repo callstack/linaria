@@ -9,7 +9,6 @@ import throwIfInvalid from '../utils/throwIfInvalid';
 import { State, StrictOptions, ValueType, ExpressionValue } from '../types';
 import { debug } from '../utils/logger';
 import isStyledOrCss from '../utils/isStyledOrCss';
-
 /**
  * Hoist the node and its dependencies to the highest scope possible
  */
@@ -64,7 +63,8 @@ export default function CollectDependencies(
   const expressionValues: ExpressionValue[] = expressions.map(
     (ex: NodePath<t.Expression>) => {
       const result = ex.evaluate();
-      if (result.confident) {
+      // eslint-disable-next-line
+      if (false && result.confident) {
         throwIfInvalid(result.value, ex);
         return { kind: ValueType.VALUE, value: result.value };
       }

@@ -1,21 +1,30 @@
 import generator from '@babel/generator';
 import isSerializable from './isSerializable';
 import { Serializable } from '../types';
-
+import { DefinitionMeta } from '../../types';
+import { hasDefinitionMeta } from '../evaluators/templateProcessor';
 // Throw if we can't handle the interpolated value
 function throwIfInvalid(
-  value: Error | Function | string | number | Serializable | undefined,
+  value:
+    | Error
+    | Function
+    | string
+    | number
+    | Serializable
+    | undefined
+    | DefinitionMeta,
   ex: any
 ): void {
   if (
     typeof value === 'function' ||
     typeof value === 'string' ||
     (typeof value === 'number' && Number.isFinite(value)) ||
-    isSerializable(value)
+    isSerializable(value) ||
+    hasDefinitionMeta(value as DefinitionMeta)
   ) {
     return;
   }
-
+  value = value as Exclude<typeof value, DefinitionMeta>;
   // We can't use instanceof here so let's use duck typing
   if (value && typeof value !== 'number' && value.stack && value.message) {
     throw ex.buildCodeFrameError(

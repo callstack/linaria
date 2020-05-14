@@ -100,7 +100,6 @@ export default function loader(
 
   if (result.cssText) {
     let { cssText } = result;
-
     if (sourceMap) {
       cssText += `/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
         result.cssSourceMapText || ''

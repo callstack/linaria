@@ -816,6 +816,82 @@ exports[`extractor non-hoistable identifiers 1`] = `
   11 | \`;"
 `;
 
+exports[`extractor should compose class name 1`] = `
+"import { css } from \\"linaria\\";
+export const text = \\"text_t1xha7dm\\";
+export const fragment = \\"fragment_f1rsdnkv\\";
+export const square = \\"square_sdu5vkq\\";"
+`;
+
+exports[`extractor should compose class name 2`] = `
+
+CSS:
+
+.text_t1xha7dm {}
+.fragment_f1rsdnkv {
+  color: bluish;
+}
+.square_sdu5vkq {
+  .text_t1xha7dm {
+    color: red;
+  }
+  
+  color: bluish;
+
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor should compose with css 1`] = `
+"import { css } from \\"linaria\\";
+export const fragment = \\"fragment_f1xha7dm\\";
+export const square = \\"square_s1rsdnkv fragment_f1xha7dm\\";"
+`;
+
+exports[`extractor should compose with css 2`] = `
+
+CSS:
+
+.fragment_f1xha7dm {
+  color: blue;
+}
+.square_s1rsdnkv {
+  color: red;
+  composes: ;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor should compose with styled 1`] = `
+"import { css } from \\"linaria\\";
+import { styled } from \\"linaria/react\\";
+export const fragment = \\"fragment_f1xha7dm\\";
+export const Component = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Component\\",
+  class: \\"Component_c1rsdnkv fragment_f1xha7dm\\"
+});"
+`;
+
+exports[`extractor should compose with styled 2`] = `
+
+CSS:
+
+.fragment_f1xha7dm {
+  color: blue;
+}
+.Component_c1rsdnkv {
+  composes:;
+  color: red;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`extractor should handle shadowed identifier inside components 1`] = `
 "import React from 'react';
 import { css } from 'linaria';
@@ -846,8 +922,9 @@ Dependencies: NA
 exports[`extractor should process \`css\` calls inside components 1`] = `
 "import React from 'react';
 import { css } from 'linaria';
+var _ref = 0.2;
 export function Component() {
-  const opacity = 0.2;
+  const opacity = _ref;
   const className = \\"className_c1xha7dm\\";
   return React.createElement(\\"div\\", {
     className
@@ -1928,6 +2005,82 @@ exports[`shaker non-hoistable identifiers 1`] = `
   11 | \`;"
 `;
 
+exports[`shaker should compose class name 1`] = `
+"import { css } from \\"linaria\\";
+export const text = \\"text_t1xha7dm\\";
+export const fragment = \\"fragment_f1rsdnkv\\";
+export const square = \\"square_sdu5vkq\\";"
+`;
+
+exports[`shaker should compose class name 2`] = `
+
+CSS:
+
+.text_t1xha7dm {}
+.fragment_f1rsdnkv {
+  color: bluish;
+}
+.square_sdu5vkq {
+  .text_t1xha7dm {
+    color: red;
+  }
+  
+  color: bluish;
+
+}
+
+Dependencies: NA
+
+`;
+
+exports[`shaker should compose with css 1`] = `
+"import { css } from \\"linaria\\";
+export const fragment = \\"fragment_f1xha7dm\\";
+export const square = \\"square_s1rsdnkv fragment_f1xha7dm\\";"
+`;
+
+exports[`shaker should compose with css 2`] = `
+
+CSS:
+
+.fragment_f1xha7dm {
+  color: blue;
+}
+.square_s1rsdnkv {
+  color: red;
+  composes: ;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`shaker should compose with styled 1`] = `
+"import { css } from \\"linaria\\";
+import { styled } from \\"linaria/react\\";
+export const fragment = \\"fragment_f1xha7dm\\";
+export const Component = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Component\\",
+  class: \\"Component_c1rsdnkv fragment_f1xha7dm\\"
+});"
+`;
+
+exports[`shaker should compose with styled 2`] = `
+
+CSS:
+
+.fragment_f1xha7dm {
+  color: blue;
+}
+.Component_c1rsdnkv {
+  composes:;
+  color: red;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`shaker should handle shadowed identifier inside components 1`] = `
 "import React from 'react';
 import { css } from 'linaria';
@@ -1996,8 +2149,9 @@ Dependencies: ../__fixtures__/complex-component
 exports[`shaker should process \`css\` calls inside components 1`] = `
 "import React from 'react';
 import { css } from 'linaria';
+var _ref = 0.2;
 export function Component() {
-  const opacity = 0.2;
+  const opacity = _ref;
   const className = \\"className_c1xha7dm\\";
   return React.createElement(\\"div\\", {
     className

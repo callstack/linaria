@@ -2,14 +2,19 @@
  * This file is a babel preset used to transform files inside evaluators.
  * It works the same as main `babel/extract` preset, but do not evaluate lazy dependencies.
  */
+
 import { NodePath } from '@babel/traverse';
 import { types } from '@babel/core';
+import {} from '@babel/template';
+
 import GenerateClassNames from '../visitors/GenerateClassNames';
 import DetectStyledImportName from '../visitors/DetectStyledImportName';
 import JSXElement from './visitors/JSXElement';
 import ProcessStyled from './visitors/ProcessStyled';
 import ProcessCSS from './visitors/ProcessCSS';
 import { State, StrictOptions } from '../types';
+
+import collectCompose from './collectCompose';
 
 function preeval(_babel: any, options: StrictOptions) {
   return {
@@ -22,6 +27,9 @@ function preeval(_babel: any, options: StrictOptions) {
           state.index = -1;
           state.dependencies = [];
           state.replacements = [];
+
+          // maybe would be easier to add it to vm context - we will avoid storing it as string
+          path.node.body.unshift(..._babel.parse(collectCompose).program.body);
 
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor

@@ -1,10 +1,10 @@
-import { types } from '@babel/core';
+import { types as t } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 
 const pattern = /^linaria (.+)$/;
 
-export default function getLinariaComment(
-  path: NodePath<types.Node>,
+export function getLinariaComment(
+  path: NodePath<t.Node>,
   remove: boolean = true
 ) {
   const comments = path.node.leadingComments;
@@ -27,4 +27,13 @@ export default function getLinariaComment(
   }
 
   return matched[1].split(' ').map(i => (i ? i : null));
+}
+
+export function addLinariaComment(
+  path: NodePath<t.TaggedTemplateExpression>,
+  slug: string,
+  displayName: string,
+  className: string
+) {
+  path.addComment('leading', `linaria ${slug} ${displayName} ${className}`);
 }

@@ -7,17 +7,25 @@
 
 import { types } from '@babel/core';
 import generator from '@babel/generator';
+import { parseSync } from '@babel/core';
 
 import { units } from '../units';
-import { State, StrictOptions, TemplateExpression, ValueCache } from '../types';
-import { StyledMeta } from '../../types';
+import {
+  State,
+  StrictOptions,
+  TemplateExpression,
+  ValueCache,
+  Value,
+  JSONValue,
+} from '../types';
+import { DefinitionMeta, StyledMeta, CSSMeta } from '../../types';
 
 import isSerializable from '../utils/isSerializable';
 import { debug } from '../utils/logger';
 import throwIfInvalid from '../utils/throwIfInvalid';
 import stripLines from '../utils/stripLines';
 import toCSS from '../utils/toCSS';
-import getLinariaComment from '../utils/getLinariaComment';
+import { getLinariaComment } from '../utils/linariaComment';
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
@@ -29,8 +37,18 @@ type Interpolation = {
   unit: string;
 };
 
-function hasMeta(value: any): value is StyledMeta {
-  return value && typeof value === 'object' && (value as any).__linaria;
+export function hasDefinitionMeta(value: Value | undefined | null) {
+  return value && typeof value === 'object' && value?.__linaria;
+}
+
+function hasCSSMeta(value: Value | undefined | null) {
+  return value && typeof value === 'object' && value?.__linaria?.type === 'css';
+}
+
+function hasStyledMeta(value: Value | undefined | null) {
+  return (
+    value && typeof value === 'object' && value?.__linaria?.type === 'styled'
+  );
 }
 
 const processedPaths = new WeakSet();
@@ -58,6 +76,15 @@ export default function getTemplateProcessor(options: StrictOptions) {
     let isReferenced = true;
 
     const [slug, displayName, className] = getLinariaComment(path);
+    let refereedClassName = className;
+
+    if (slug === null) {
+      throw new Error('Slug was not generated');
+    }
+
+    if (displayName === null) {
+      throw new Error('displayName was not generated');
+    }
 
     const parent = path.findParent(
       p =>
@@ -117,7 +144,6 @@ export default function getTemplateProcessor(options: StrictOptions) {
 
       if (ex) {
         const { end } = ex.node.loc!;
-        const result = ex.evaluate();
         const beforeLength = cssText.length;
 
         // The location will be end of the current string to start of next string
@@ -130,64 +156,117 @@ export default function getTemplateProcessor(options: StrictOptions) {
             : { line: end.line, column: end.column + 1 },
         };
 
-        if (result.confident) {
-          throwIfInvalid(result.value, ex);
+        // Try to preval the value
+        if (
+          options.evaluate &&
+          !(
+            types.isFunctionExpression(ex) ||
+            types.isArrowFunctionExpression(ex)
+          )
+        ) {
+          let value = valueCache.get(ex.node);
+          throwIfInvalid(value, ex);
 
-          if (isSerializable(result.value)) {
-            // If it's a plain object or an array, convert it to a CSS string
-            cssText += stripLines(loc, toCSS(result.value));
-          } else {
-            cssText += stripLines(loc, result.value);
+          // Skip the blank string instead of throwing an error
+          if (value === '') {
+            return;
           }
+          if (value && typeof value !== 'function') {
+            // Only insert text for non functions
+            // We don't touch functions because they'll be interpolated at runtime
 
-          state.replacements.push({
-            original: loc,
-            length: cssText.length - beforeLength,
-          });
-        } else {
-          // Try to preval the value
-          if (
-            options.evaluate &&
-            !(
-              types.isFunctionExpression(ex) ||
-              types.isArrowFunctionExpression(ex)
-            )
-          ) {
-            const value = valueCache.get(ex.node);
-            throwIfInvalid(value, ex);
+            if (hasDefinitionMeta(value)) {
+              value = value as DefinitionMeta;
 
-            // Skip the blank string instead of throwing an error
-            if (value === '') {
-              return;
-            }
+              // For class composition, resolve composed class name
+              if (
+                hasCSSMeta(value) &&
+                cssText.charAt(cssText.length - 1) !== '.'
+              ) {
+                value = value as CSSMeta;
 
-            if (value && typeof value !== 'function') {
-              // Only insert text for non functions
-              // We don't touch functions because they'll be interpolated at runtime
+                let { styles } = value.__linaria.composes;
+                const { replacements } = value.__linaria.composes;
+                const placeholders = styles.match(/%%(.)+%%/g);
 
-              if (hasMeta(value)) {
-                // If it's an React component wrapped in styled, get the class name
-                // Useful for interpolating components
-                cssText += `.${value.__linaria.className}`;
-              } else if (isSerializable(value)) {
-                cssText += stripLines(loc, toCSS(value));
+                placeholders?.forEach((placeholder, placeholderIndex) => {
+                  const placeholderKey = placeholder.replace(/%/g, '');
+                  const replacement = replacements[placeholderKey];
+                  if (typeof replacement === 'function') {
+                    const placeholderEndPos =
+                      styles.indexOf(placeholder) + placeholder.length;
+                    // search for the unit just after placeholder end position
+                    // longes unit is 4 characters long, we need also a separator which is max two chars, so 6 chars should be good
+                    const unitMatch = styles
+                      .substr(placeholderEndPos, 6)
+                      .match(unitRegex);
+                    const [unitString, unit, separator] =
+                      unitMatch !== null ? unitMatch : ['', '', ''];
+                    const subId = `${slug}-${i}-${placeholderIndex}`;
+                    interpolations.push({
+                      id: subId,
+                      node: ((parseSync(
+                        '(' + replacement.toString() + ')'
+                        //@ts-ignore
+                      ) as types.File)?.program?.body[0]).expression,
+                      source: replacement.toString(),
+                      unit: unit,
+                    });
+                    if (unit !== null) {
+                      //remove unit string from styles as it will be added to interpolation
+                      styles = styles.replace(
+                        placeholder + unitString,
+                        placeholder
+                      );
+                    }
+                    styles = styles.replace(
+                      placeholder,
+                      `var(--${subId})${separator}`
+                    );
+                  } else {
+                    // it is object
+                    if (replacement === undefined) {
+                      styles = styles.replace(placeholder, '');
+                    } else {
+                      styles = styles.replace(
+                        placeholder,
+                        toCSS(replacement as JSONValue)
+                      );
+                    }
+                  }
+                });
+                cssText += styles;
               } else {
-                // For anything else, assume it'll be stringified
-                cssText += stripLines(loc, value);
+                // if it is not a composition, generate class name of refereed item
+                const classNameRef = value.__linaria.className;
+                // For styled, prepend it's class name with a dot
+                if (hasStyledMeta(value)) {
+                  cssText += '.';
+                }
+                // if user wants to refer a `css` instead of `styles`, he has to add dot by himself
+                // regardless it is `styled` or `css`, append the generated class name
+                cssText += classNameRef;
               }
-
-              state.replacements.push({
-                original: loc,
-                length: cssText.length - beforeLength,
-              });
-
-              return;
+            } else if (isSerializable(value)) {
+              cssText += stripLines(loc, toCSS(value));
+            } else {
+              // For anything else, assume it'll be stringified
+              cssText += stripLines(loc, value as string | number);
             }
+
+            state.replacements.push({
+              original: loc,
+              length: cssText.length - beforeLength,
+            });
           }
+        }
 
-          if (styled) {
+        if (styled) {
+          if (
+            types.isFunctionExpression(ex) ||
+            types.isArrowFunctionExpression(ex)
+          ) {
             const id = `${slug}-${i}`;
-
             interpolations.push({
               id,
               node: ex.node,
@@ -196,12 +275,9 @@ export default function getTemplateProcessor(options: StrictOptions) {
             });
 
             cssText += `var(--${id})`;
-          } else {
-            // CSS custom properties can't be used outside components
-            throw ex.buildCodeFrameError(
-              `The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.`
-            );
           }
+        } else {
+          // would be good to somehow handle situation when interpolation is used in css, but css is not used as a fragment
         }
       }
     });
@@ -213,8 +289,11 @@ export default function getTemplateProcessor(options: StrictOptions) {
       // get its class name to create a more specific selector
       // it'll ensure that styles are overridden properly
       if (options.evaluate && types.isIdentifier(styled.component.node)) {
-        let value = valueCache.get(styled.component.node.name);
-        while (hasMeta(value)) {
+        let value: StyledMeta | undefined | null = valueCache.get(
+          styled.component.node.name
+        ) as StyledMeta | undefined | null;
+        while (hasStyledMeta(value)) {
+          value = value as StyledMeta;
           selector += `.${value.__linaria.className}`;
           value = value.__linaria.extends;
         }
@@ -232,7 +311,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
       props.push(
         types.objectProperty(
           types.identifier('class'),
-          types.stringLiteral(className!)
+          types.stringLiteral(refereedClassName!)
         )
       );
 
@@ -277,7 +356,6 @@ export default function getTemplateProcessor(options: StrictOptions) {
           )
         );
       }
-
       path.replaceWith(
         types.callExpression(
           types.callExpression(
@@ -290,7 +368,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
 
       path.addComment('leading', '#__PURE__');
     } else {
-      path.replaceWith(types.stringLiteral(className!));
+      path.replaceWith(types.stringLiteral(refereedClassName!));
     }
 
     if (!isReferenced && !cssText.includes(':global')) {

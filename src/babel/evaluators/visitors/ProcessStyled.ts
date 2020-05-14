@@ -9,13 +9,14 @@
 
 import { NodePath } from '@babel/traverse';
 import { types } from '@babel/core';
-import getLinariaComment from '../../utils/getLinariaComment';
+import { getLinariaComment } from '../../utils/linariaComment';
 import { expression } from '@babel/template';
 
 const linariaComponentTpl = expression(
   `{
     displayName: %%displayName%%,
     __linaria: {
+      type: 'styled',
       className: %%className%%,
       extends: %%extends%%
     }
@@ -30,7 +31,7 @@ export default function ProcessStyled(path: NodePath<types.CallExpression>) {
 
   path.replaceWith(
     linariaComponentTpl({
-      className: types.stringLiteral(className),
+      className: className ? types.stringLiteral(className) : null,
       displayName: displayName ? types.stringLiteral(displayName) : null,
       extends: types.isCallExpression(path.node.callee)
         ? path.node.callee.arguments[0]
