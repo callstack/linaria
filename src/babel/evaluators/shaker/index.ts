@@ -15,7 +15,11 @@ function prepareForShake(
   transformOptions.ast = true;
   transformOptions.presets!.unshift([
     '@babel/preset-env',
-    { targets: 'ie 11' },
+    {
+      targets: 'ie 11',
+      // we need this plugin so we list it explicitly, explanation in `evaluators/extractor/index`
+      include: ['@babel/plugin-transform-template-literals'],
+    },
   ]);
   transformOptions.presets!.unshift([require.resolve('../preeval'), options]);
   transformOptions.plugins!.unshift('transform-react-remove-prop-types');
