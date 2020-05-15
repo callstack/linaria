@@ -1,5 +1,5 @@
 /**
- * This file handles preparing babel config for Linaria babel plugin.
+ * This file handles preparing babel config for Linaria preevaluation.
  */
 
 import { PluginItem, TransformOptions } from '@babel/core';
