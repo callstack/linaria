@@ -14,17 +14,19 @@ const waitForProcess = async process => {
 
 it('Ensures that package do not include core-js dependency after build', async () => {
   const packageJSON = require('../../package.json');
-  const buildScript = packageJSON.scripts.build;
+  const buildScript = packageJSON.scripts['build:lib'];
 
   const proc = cp.exec(buildScript, {
     stdio: 'ignore',
     env: {
       ...process.env,
-      NODE_ENV: 'debug',
+      DEBUG_CORE_JS: 'true',
     },
   });
   const result = await waitForProcess(proc);
-  // run `NODE_ENV=debug yarn build` to debug issues with introduced core-js dependency
+  // run `DEBUG_CORE_JS=true yarn build:lib` to debug issues with introduced core-js dependency
   expect(result).not.toContain('Added following core-js polyfill');
-  expect(result).toContain('Successfully compiled');
+  expect(result).toContain(
+    'Based on your code and targets, core-js polyfills were not added'
+  );
 });
