@@ -56,32 +56,45 @@ export type TemplateExpression = {
   expressionValues: ExpressionValue[];
 };
 
+type Rules = {
+  [selector: string]: {
+    className: string;
+    displayName: string;
+    cssText: string;
+    start: Location | null | undefined;
+  };
+};
+
+type Replacements = Array<{
+  original: {
+    start: Location;
+    end: Location;
+  };
+  length: number;
+}>;
+
+type Dependencies = string[];
+
 export type State = {
   queue: TemplateExpression[];
-  rules: {
-    [selector: string]: {
-      className: string;
-      displayName: string;
-      cssText: string;
-      start: Location | null | undefined;
-    };
-  };
-  replacements: Array<{
-    original: {
-      start: Location;
-      end: Location;
-    };
-    length: number;
-  }>;
+  rules: Rules;
+  replacements: Replacements;
   index: number;
-  dependencies: string[];
+  dependencies: Dependencies;
   file: {
     opts: {
       cwd: string;
       root: string;
       filename: string;
     };
-    metadata: any;
+    metadata: {
+      localName?: string;
+      linaria?: {
+        rules: Rules;
+        replacements: Replacements;
+        dependencies: Dependencies;
+      };
+    };
   };
 };
 
