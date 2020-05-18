@@ -2,7 +2,12 @@
  * This file handles preparing babel config for Linaria preevaluation.
  */
 
-import { PluginItem, TransformOptions } from '@babel/core';
+import {
+  PluginItem,
+  TransformOptions,
+  PluginTarget,
+  PluginOptions,
+} from '@babel/core';
 import { StrictOptions } from '../types';
 
 type DefaultOptions = Partial<TransformOptions> & {
@@ -10,6 +15,125 @@ type DefaultOptions = Partial<TransformOptions> & {
   presets: PluginItem[];
   caller: { evaluate: boolean };
 };
+
+function getPluginTarget(item: PluginItem) {
+  const target = Array.isArray(item) ? item[0] : item;
+  try {
+    if (typeof target === 'string') {
+      return require.resolve(target);
+    }
+    return target;
+  } catch {
+    return target;
+  }
+}
+
+function getPluginInstanceName(item: PluginItem) {
+  return Array.isArray(item) ? item[2] : undefined;
+}
+
+function shouldMergePlugins(left: PluginItem, right: PluginItem) {
+  const leftTarget = getPluginTarget(left);
+  const rightTarget = getPluginTarget(right);
+  const leftName = getPluginInstanceName(left);
+  const rightName = getPluginInstanceName(right);
+  const result = leftTarget === rightTarget && leftName === rightName;
+  return result;
+}
+
+function isMergablePlugin(
+  item: PluginItem
+): item is
+  | PluginTarget
+  | [PluginTarget, PluginOptions]
+  | [PluginTarget, PluginOptions, string | undefined] {
+  return typeof item === 'string' || Array.isArray(item);
+}
+
+function getPluginOptions(item: PluginItem): object {
+  if (typeof item === 'string') {
+    return {};
+  }
+
+  if (Array.isArray(item)) {
+    return {
+      ...item[1],
+    };
+  }
+
+  if (typeof item === 'object' && 'options' in item) {
+    return {
+      ...item.options,
+    };
+  }
+
+  return {};
+}
+
+// Merge two plugin declarations. Options from the right override options
+// on the left
+function mergePluginItems(left: PluginItem, right: PluginItem) {
+  if (isMergablePlugin(left) && isMergablePlugin(right)) {
+    const pluginTarget = Array.isArray(left) ? left[0] : left;
+    const leftOptions = getPluginOptions(left);
+    const rightOptions = getPluginOptions(right);
+    return [pluginTarget, { ...leftOptions, ...rightOptions }];
+  }
+
+  return right;
+}
+
+/**
+ * Add `newItem` to the beginning of `plugins`. If a plugin with the same
+ * target (and ID) already exists, it will be dropeed, and its options
+ * merged into those of the newly added item.
+ */
+export function mergeOrPrependPlugin(
+  plugins: PluginItem[],
+  newItem: PluginItem
+) {
+  const mergeItemIndex = plugins.findIndex(existingItem =>
+    shouldMergePlugins(existingItem, newItem)
+  );
+  if (mergeItemIndex === -1) {
+    return [newItem, ...plugins];
+  }
+
+  const mergedItem = mergePluginItems(plugins[mergeItemIndex], newItem);
+  return [
+    mergedItem,
+    ...plugins.slice(0, mergeItemIndex),
+    ...plugins.slice(mergeItemIndex + 1),
+  ];
+}
+
+/**
+ * Add `newItem` to the end of `plugins`. If an item with the same target (and
+ * ID) already exists, instead update its options from `newItem`.
+ */
+export function mergeOrAppendPlugin(
+  plugins: PluginItem[],
+  newItem: PluginItem
+) {
+  const mergeItemIndex = plugins.findIndex(existingItem =>
+    shouldMergePlugins(existingItem, newItem)
+  );
+  if (mergeItemIndex === -1) {
+    return [...plugins, newItem];
+  }
+
+  const mergedItem = mergePluginItems(plugins[mergeItemIndex], newItem);
+  return [
+    ...plugins.slice(0, mergeItemIndex),
+    ...plugins.slice(mergeItemIndex + 1),
+    mergedItem,
+  ];
+}
+
+function isLinariaBabelPreset(item: PluginItem) {
+  const name = getPluginTarget(item);
+  return name === 'linaria/babel' || name === require.resolve('../../babel');
+}
 
 export default function buildOptions(
   filename: string,
@@ -47,56 +171,33 @@ export default function buildOptions(
   // If we programmatically pass babel options while there is a .babelrc, babel might throw
   // We need to filter out duplicate presets and plugins so that this doesn't happen
   // This workaround isn't full proof, but it's still better than nothing
-  const keys: Array<keyof TransformOptions & ('presets' | 'plugins')> = [
-    'presets',
-    'plugins',
-  ];
-  keys.forEach(field => {
-    babelOptions[field] = babelOptions[field]
-      ? babelOptions[field]!.filter((item: PluginItem) => {
-          // If item is an array it's a preset/plugin with options ([preset, options])
-          // Get the first item to get the preset.plugin name
-          // Otherwise it's a plugin name (can be a function too)
-          const name = Array.isArray(item) ? item[0] : item;
+  //
+  // In our case, a preset might also be referring to linaria/babel
+  // We require the file from internal path which is not the same one that we export
+  // This case won't get caught and the preset won't filtered, even if they are same
+  // So we add an extra check for top level linaria/babel
+  let configuredPresets = (babelOptions.presets || []).filter(
+    item => !isLinariaBabelPreset(item)
+  );
+  for (const requiredPreset of defaults.presets) {
+    // Preset order is last to first, so add our required presets to the end
+    // This makes sure that our preset is always run first
+    configuredPresets = mergeOrAppendPlugin(configuredPresets, requiredPreset);
+  }
 
-          if (
-            // In our case, a preset might also be referring to linaria/babel
-            // We require the file from internal path which is not the same one that we export
-            // This case won't get caught and the preset won't filtered, even if they are same
-            // So we add an extra check for top level linaria/babel
-            name === 'linaria/babel' ||
-            name === require.resolve('../../babel') ||
-            // Also add a check for the plugin names we include for bundler support
-            plugins.includes(name)
-          ) {
-            return false;
-          }
-
-          // Loop through the default presets/plugins to see if it already exists
-          return !defaults[field].some(it =>
-            // The default presets/plugins can also have nested arrays,
-            Array.isArray(it) ? it[0] === name : it === name
-          );
-        })
-      : [];
-  });
+  let configuedPlugins = babelOptions.plugins || [];
+  for (const requiredPlugin of defaults.plugins.slice().reverse()) {
+    // Plugin order is first to last, so add our required plugins to the start
+    // This makes sure that the plugins we specify always run first
+    configuedPlugins = mergeOrPrependPlugin(plugins, requiredPlugin);
+  }
 
   return {
     // Passed options shouldn't be able to override the options we pass
     // Linaria's plugins rely on these (such as filename to generate consistent hash)
     ...babelOptions,
     ...defaults,
-    presets: [
-      // Preset order is last to first, so add the extra presets to start
-      // This makes sure that our preset is always run first
-      ...babelOptions.presets!,
-      ...defaults.presets,
-    ],
-    plugins: [
-      ...defaults.plugins,
-      // Plugin order is first to last, so add the extra presets to end
-      // This makes sure that the plugins we specify always run first
-      ...babelOptions.plugins!,
-    ],
+    presets: configuredPresets,
+    plugins: configuedPlugins,
   };
 }
