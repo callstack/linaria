@@ -9,7 +9,7 @@ import traverse, { NodePath } from '@babel/traverse';
 import generator from '@babel/generator';
 
 import { Evaluator } from '../../types';
-import buildOptions from '../buildOptions';
+import buildOptions, { mergeOrPrependPlugin } from '../buildOptions';
 import RequirementsResolver from './RequirementsResolver';
 
 // Checks that passed node is `exports.__linariaPreval = /* something */`
@@ -45,8 +45,11 @@ function isLinariaPrevalExport(
 
 const extractor: Evaluator = (filename, options, text, only = null) => {
   const transformOptions = buildOptions(filename, options);
-  transformOptions.presets!.unshift([require.resolve('../preeval'), options]);
-  transformOptions.plugins!.unshift([
+  transformOptions.presets = mergeOrPrependPlugin(transformOptions.presets!, [
+    require.resolve('../preeval'),
+    options,
+  ]);
+  transformOptions.plugins = mergeOrPrependPlugin(transformOptions.plugins!, [
     '@babel/plugin-transform-runtime',
     { useESModules: false },
   ]);
@@ -59,8 +62,7 @@ const extractor: Evaluator = (filename, options, text, only = null) => {
   // Then Linaria can identify all `styled` as call expressions, including `styled.h1`, `styled.p` and others.
 
   // Presets ordering is from last to first, so we add the plugin at the beginning of the list, which persist the order that was established with formerly used `@babel/preset-env`.
-
-  transformOptions.presets!.unshift({
+  transformOptions.presets = mergeOrPrependPlugin(transformOptions.presets!, {
     plugins: ['@babel/plugin-transform-template-literals'],
   });
   // Expressions will be extracted only for __linariaPreval.
