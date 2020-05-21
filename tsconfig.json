@@ -1,13 +1,10 @@
 {
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": [
     "node_modules",
     "__ts-tests__",
     "**/__tests__/**",
-    "**/__fixtures__/**",
+    "**/__fixtures__/**"
   ],
   "compilerOptions": {
     "jsx": "react",
