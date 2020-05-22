@@ -209,7 +209,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
       // get its class name to create a more specific selector
       // it'll ensure that styles are overridden properly
       if (options.evaluate && types.isIdentifier(styled.component.node)) {
-        let value = valueCache.get(styled.component.node.name);
+        let value: unknown = valueCache.get(styled.component.node.name);
         while (isStyledMeta(value)) {
           selector += `.${value.__linaria.className}`;
           value = value.__linaria.extends;

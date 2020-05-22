@@ -12,7 +12,7 @@
 export interface StyledMeta {
   __linaria: {
     className: string;
-    extends: StyledMeta;
+    extends: null | StyledMeta;
   };
 }
 
