@@ -1,6 +1,7 @@
 const React = require('react');
 const renderer = require('react-test-renderer');
 const styled = require('../react/styled').default;
+const { isStyledMeta } = require('../core/types');
 
 it('renders tag with display name and class name', () => {
   const Test = styled('h1')({
@@ -253,4 +254,9 @@ it('throws when using as tag for template literal', () => {
         color: blue;
       `
   ).toThrow('Using the "styled" tag in runtime is not supported');
+});
+
+it('returns an object that is StyledMeta', () => {
+  const Test = styled('div')({});
+  expect(isStyledMeta(Test)).toBe(true);
 });
