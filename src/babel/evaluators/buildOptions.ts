@@ -189,7 +189,7 @@ export default function buildOptions(
   for (const requiredPlugin of defaults.plugins.slice().reverse()) {
     // Plugin order is first to last, so add our required plugins to the start
     // This makes sure that the plugins we specify always run first
-    configuedPlugins = mergeOrPrependPlugin(plugins, requiredPlugin);
+    configuedPlugins = mergeOrPrependPlugin(configuedPlugins, requiredPlugin);
   }
 
   return {
