@@ -43,7 +43,7 @@
     "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start",
     "build": "yarn build:lib && yarn build:esm",
     "build:declarations": "tsc --emitDeclarationOnly --outDir lib",
-    "watch": "yarn build --watch",
+    "watch": "yarn build:lib --watch",
     "prepare": "yarn build && yarn build:declarations",
     "release": "release-it",
     "website": "yarn --cwd website",
@@ -144,3 +144,4 @@
     ]
   }
 }
+
