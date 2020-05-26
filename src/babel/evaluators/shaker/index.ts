@@ -3,7 +3,7 @@ import { debug } from '../../utils/logger';
 import generator from '@babel/generator';
 import { Evaluator, StrictOptions } from '../../types';
 import { transformSync, types } from '@babel/core';
-import buildOptions from '../buildOptions';
+import buildOptions, { mergeOrPrependPlugin } from '../buildOptions';
 
 function prepareForShake(
   filename: string,
@@ -13,7 +13,8 @@ function prepareForShake(
   const transformOptions = buildOptions(filename, options);
 
   transformOptions.ast = true;
-  transformOptions.presets!.unshift([
+
+  transformOptions.presets = mergeOrPrependPlugin(transformOptions.presets!, [
     '@babel/preset-env',
     {
       targets: 'ie 11',
@@ -21,9 +22,16 @@ function prepareForShake(
       include: ['@babel/plugin-transform-template-literals'],
     },
   ]);
-  transformOptions.presets!.unshift([require.resolve('../preeval'), options]);
-  transformOptions.plugins!.unshift('transform-react-remove-prop-types');
-  transformOptions.plugins!.unshift([
+  transformOptions.presets = mergeOrPrependPlugin(transformOptions.presets!, [
+    require.resolve('../preeval'),
+    options,
+  ]);
+
+  transformOptions.plugins = mergeOrPrependPlugin(
+    transformOptions.plugins!,
+    'transform-react-remove-prop-types'
+  );
+  transformOptions.plugins = mergeOrPrependPlugin(transformOptions.plugins!, [
     '@babel/plugin-transform-runtime',
     { useESModules: false },
   ]);
