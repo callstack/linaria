@@ -61,7 +61,7 @@ module.exports = {
 
   If you need to compile certain modules under `/node_modules/` (which can be the case in monorepo projects), it's recommended to do it on a module by module basis for faster transforms, e.g. `ignore: /node_modules[\/\\](?!some-module|other-module)/`. Example is using Regular Expressions negative lookahead.
 
-  The Information about `Evaluator`, its default setting and custom implementations can be founded it [evaluators section of How it works docs](../HOW_IT_WORKS.md#evaluators)
+  The Information about `Evaluator`, its default setting and custom implementations can be founded it [evaluators section of How it works docs](./HOW_IT_WORKS.md#evaluators)
 
   The default setup is:
 
