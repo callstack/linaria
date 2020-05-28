@@ -212,3 +212,24 @@ it("doesn't throw due to duplicate preset", async () => {
     )
   ).not.toThrow('Duplicate plugin/preset detected');
 });
+
+it('testowy', async () => {
+  const { code } = await transform(
+    dedent`
+    import { css } from 'linaria';
+
+    const title = css\`
+      color: red;
+    \`;
+    `,
+    {
+      filename: './test.js',
+      outputFilename,
+      pluginOptions: {
+        rules,
+      },
+    }
+  );
+
+  expect(code).not.toContain('css`');
+});
