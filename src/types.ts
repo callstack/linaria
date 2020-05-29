@@ -43,12 +43,5 @@ export type Options = {
   pluginOptions?: Partial<PluginOptions>;
 };
 
-export type StyledMeta = {
-  __linaria: {
-    className: string;
-    extends: StyledMeta;
-  };
-};
-
 export type PreprocessorFn = (selector: string, cssText: string) => string;
 export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
