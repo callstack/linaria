@@ -86,8 +86,13 @@ export default function transform(code: string, options: Options): Result {
       .linaria
   ) {
     return {
-      code,
-      sourceMap: options.inputSourceMap,
+      code: transformedCode || '', // if there was only unused code we want to return transformed code which will be later removed by the bundler
+      sourceMap: map
+        ? {
+            ...map,
+            version: map.version.toString(),
+          }
+        : null,
     };
   }
 
