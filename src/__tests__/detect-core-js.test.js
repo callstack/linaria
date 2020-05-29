@@ -29,4 +29,4 @@ it('Ensures that package do not include core-js dependency after build', async (
   expect(result).toContain(
     'Based on your code and targets, core-js polyfills were not added'
   );
-});
+}, 15000);
