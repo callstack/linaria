@@ -87,7 +87,12 @@ export default function transform(code: string, options: Options): Result {
   ) {
     return {
       code: transformedCode || '', // if there was only unused code we want to return transformed code which will be later removed by the bundler
-      sourceMap: map,
+      sourceMap: map
+        ? {
+            ...map,
+            version: map.version.toString(),
+          }
+        : null,
     };
   }
 
