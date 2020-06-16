@@ -254,6 +254,29 @@ export default {
 };
 ```
 
+
+If you are using [@rollup/plugin-babel](https://github.com/rollup/plugins/tree/master/packages/babel) as well, ensure the linaria plugin is declared earlier in the `plugins` array than your babel plugin. 
+
+```js
+import linaria from 'linaria/rollup';
+import css from 'rollup-plugin-css-only';
+import babel from "@rollup/plugin-babel";
+
+export default {
+   /* rest of your config */
+  plugins: [
+    linaria({
+      sourceMap: process.env.NODE_ENV !== 'production',
+    }),
+    css({
+      output: 'styles.css',
+    }),
+    babel({/**/}),
+     /* rest of your plugins */
+  ],
+};
+```
+
 ### Svelte
 
 #### Contents
@@ -337,3 +360,4 @@ module.exports = {
   },
 };
 ```
+
