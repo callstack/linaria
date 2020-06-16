@@ -140,7 +140,10 @@ function styled(tag: any): any {
       ? React.forwardRef(render)
       : // React.forwardRef won't available on older React versions and in Preact
         // Fallback to a innerRef prop in that case
-        ({ innerRef, ...rest }: any) => render(rest, innerRef);
+        (props: any) => {
+          const rest = restOp(props, ['innerRef']);
+          return render(rest, props.innerRef);
+        };
 
     (Result as any).displayName = options.name;
 
