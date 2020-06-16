@@ -254,3 +254,77 @@ export default Header;
 If you run `npm run dev`, you should be able to see a button next to the nav title, with red bold text.
 
 You can take a look at this example [here](../examples/Preact)
+
+## Gatsby
+
+If you wish you use Gatsby, we recommend you to use the `gatsby-cli` and start from there. The following configuration assumes you are using the default template provided by gatsby-cli. Start by creating your project using:
+
+```
+npx gatsby new my-project
+```
+
+Now, you have two options. You can use `gatsby-plugin-linaria` or create a custom config.
+
+### gatsby-plugin-linaria
+
+This is an easier and more straightforward way of integrating Linaria with Gatsby. Check [plugin docs](https://github.com/silvenon/gatsby-plugin-linaria) for instructions.
+
+You can also take a look at the example [here](../examples/gatsby/plugin)
+
+### Custom config
+
+This is a bit more advanced way of integrating Linaria into your Gatsby project.
+
+First, you will need to install `linaria` and `babel-preset-gatsby`. Then, create `babel.config.js` in the root of your project with the following contents:
+
+```js
+module.exports = {
+  presets: [
+    'babel-preset-gatsby',
+    [
+      'linaria/babel',
+      {
+        evaluate: true,
+        displayName: process.env.NODE_ENV !== 'production',
+      },
+    ],
+  ],
+};
+```
+
+You can read more about configuring Babel in Gatsby projects in [their docs](https://www.gatsbyjs.org/docs/babel/).
+
+Besides that, you will need to alter Gatsby's Webpack config to modify the Babel loader. This can be done in `gatsby-node.js` file. Consider the following snippet:
+
+```js
+exports.onCreateWebpackConfig = ({ actions, loaders, getConfig, stage }) => {
+  const config = getConfig();
+
+  config.module.rules = [
+    ...config.module.rules.filter(
+      rule => String(rule.test) !== String(/\.js?$/)
+    ),
+
+    {
+      ...loaders.js(),
+
+      test: /\.js?$/,
+      loader: 'linaria/loader',
+      options: {
+        sourceMap: stage.includes('develop'),
+        displayName: stage.includes('develop'),
+        babelOptions: {
+          presets: ['babel-preset-gatsby'],
+        },
+      },
+      exclude: /node_modules/,
+    },
+  ];
+
+  actions.replaceWebpackConfig(config);
+};
+```
+
+If you want to know more about extending Webpack config in Gatsby projects, check out [relevant Gatsby docs](https://www.gatsbyjs.org/docs/add-custom-webpack-config/).
+
+With that done, you should be all set! You can take a look at the minimal example using the above configuration [here](../examples/gatsby/custom-config).
