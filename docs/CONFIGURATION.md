@@ -138,79 +138,32 @@ After that, your `package.json` should look like the following:
 
 > If you wish to work with TypeScript, you will also need to install `@babel/preset-typescript`
 
-For some reason, Preact does not like when you push presets/plugins using their `preact.config.js` to the babel loader. And for Linaria to work, we need to install `linaria/babel` preset and the `linaria/loader` loader. Therefore, we extract all the plugins from preact's babel configuration (you can do this by console logging `config.module.rules[0]` and looking for the plugins object in your `preact.config.js`).
-
-```js
-const babelLoaderRule = config.module.rules[0];
-babelLoaderRule.options.presets.push('@babel/preset-react');
-babelLoaderRule.options.presets.push('linaria/loader');
-```
-
-Because of that, we need to create a `.babelrc` file with the following:
-
-```
-{
-  "presets": ["@babel/preset-env", "@babel/preset-react", "linaria/babel"],
-  "plugins": [
-    "./node_modules/@babel/plugin-syntax-dynamic-import/lib/index.js",
-    "./node_modules/@babel/plugin-transform-object-assign/lib/index.js",
-    [
-      "./node_modules/@babel/plugin-proposal-decorators/lib/index.js",
-      {
-        "legacy": true
-      }
-    ],
-    [
-      "./node_modules/@babel/plugin-proposal-class-properties/lib/index.js",
-      {
-        "loose": true
-      }
-    ],
-    "./node_modules/@babel/plugin-proposal-object-rest-spread/lib/index.js",
-    "./node_modules/babel-plugin-transform-react-remove-prop-types/lib/index.js",
-    [
-      "./node_modules/@babel/plugin-transform-react-jsx/lib/index.js",
-      {
-        "pragma": "h",
-        "pragmaFrag": "Fragment"
-      }
-    ],
-    [
-      "./node_modules/fast-async/plugin.js",
-      {
-        "spec": true
-      }
-    ],
-    "./node_modules/babel-plugin-macros/dist/index.js"
-  ]
-}
-```
-
-> The plugins listed here are based on preact's default template/cli. If you wish to change your starting template, a similar process could be done. We removed `@babel/preset-typescript`, but if you wish to use TS, add the preset in between `preset-env` and `preset-react`.
-
-Finally, in your `preact.config.js`, we will modify the babel loader to avoid having conflicting plugins and presets. Add the following:
+Now in your `preact.config.js`, we will modify the babel rule to use the necessary loaders and presets. Add the following:
 
 ```js
 export default config => {
-  const newBabelLoader = {
-    test: /\.jsx?$/, //If you are using TS, use -> /\.m?[jt]sx?$/
-    exclude: /node_modules/,
-    enforce: 'pre', //Don't delete this
-    resolve: { mainFields: ['module', 'jsnext:main', 'browser', 'main'] }, //Don't delete this
+  const { options, ...babelLoaderRule } = config.module.rules[0]; // Get the babel rule and options
+  options.presets.push('@babel/preset-react', 'linaria/babel'); // Push the necessary presets
+  config.module.rules[0] = {
+    ...babelLoaderRule,
+    loader: undefined, // Disable the predefined babel-loader on the rule
     use: [
       {
         loader: 'babel-loader',
-        options: {
-          plugins: [],
-        },
+        options
       },
-      { loader: 'linaria/loader' },
-    ],
+      {
+        loader: 'linaria/loader',
+        options: {
+          babelOptions: options // Pass the current babel options to linaria's babel instance
+        }
+      }
+    ]
   };
-
-  config.module.rules[0] = newBabelLoader; //override your babel-loader rule
 };
 ```
+
+> If you wish to work with TypeScript, add the `@babel/preset-typescript` preset before `@babel/preset-react`.
 
 After all of that, you should be able to run `npm build`, and it should have no errors.
 
