@@ -280,8 +280,8 @@ export default {
 ### Svelte
 
 #### Contents
-- [Svelte with Rollup](#Rollup)
-- [Svelte with Webpack](#Webpack)
+- [Svelte with Rollup](#Rollup-1)
+- [Svelte with Webpack](#Webpack-1)
 
 #### Rollup
 
