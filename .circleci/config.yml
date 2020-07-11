@@ -42,6 +42,7 @@ commands:
       - run: |
           yarn lint
           yarn typecheck
+          yarn test:dts
   unit-tests:
     steps:
       - attach_workspace:
