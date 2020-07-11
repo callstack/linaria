@@ -84,16 +84,38 @@ styled.a`
   }
 `({ href: 'about:blank' });
 
-// Issue #536
-const Title = styled.div<{ background: string }>`
-  background: ${props => props.background};
-`;
+((/* Issue #536 */) => {
+  const Title = styled.div<{ background: string }>`
+    background: ${props => props.background};
+  `;
 
-// $ExpectType "extends"
-isExtends<typeof Title, React.FC<{ background: string }>>();
+  // $ExpectType "extends"
+  isExtends<typeof Title, React.FC<{ background: string }>>();
 
-css`
-  ${Title} {
-    color: green;
-  }
-`;
+  css`
+    ${Title} {
+      color: green;
+    }
+  `;
+})();
+
+((/* Issue #622 */) => {
+  const Wrapper = styled.div<{ prop1: boolean }>`
+    width: 1em;
+    background-color: ${props => (props.prop1 ? 'transparent' : 'green')};
+  `;
+
+  const styledTag = styled(Wrapper);
+
+  const NewWrapper = styledTag<{ prop2: string }>`
+    width: 2em;
+    background-color: ${props => (props.prop1 ? 'transparent' : 'red')};
+    color: ${props => props.prop2};
+  `;
+
+  // $ExpectType Validator<boolean> | undefined
+  NewWrapper.propTypes!.prop1;
+
+  // $ExpectType Validator<string> | undefined
+  NewWrapper.propTypes!.prop2;
+})();

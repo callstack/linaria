@@ -7,13 +7,7 @@
 import * as React from 'react'; // eslint-disable-line import/no-extraneous-dependencies
 import validAttr from '@emotion/is-prop-valid';
 import { cx } from '../index';
-
-export type StyledMeta = {
-  __linaria: {
-    className: string;
-    extends: StyledMeta;
-  };
-};
+import { StyledMeta } from '../StyledMeta';
 
 type Options = {
   name: string;
@@ -170,16 +164,21 @@ type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
 ) => StyledComponent<JSX.IntrinsicElements[TName] & TAdditionalProps>;
 
 type ComponentStyledTag<T> = <
-  Props = T extends React.FunctionComponent<infer TProps> ? TProps : T
+  OwnProps = {},
+  TrgProps = T extends React.FunctionComponent<infer TProps> ? TProps : T
 >(
   strings: TemplateStringsArray,
   // Expressions can contain functions only if wrapped component has style property
-  ...exprs: Props extends { style?: React.CSSProperties }
-    ? Array<StaticPlaceholder | ((props: Props) => string | number)>
+  ...exprs: TrgProps extends { style?: React.CSSProperties }
+    ? Array<
+        StaticPlaceholder | ((props: OwnProps & TrgProps) => string | number)
+      >
     : StaticPlaceholder[]
-) => T extends React.FunctionComponent<any>
-  ? StyledMeta & T
-  : StyledComponent<Props>;
+) => keyof OwnProps extends never
+  ? T extends React.FunctionComponent<any>
+    ? StyledMeta & T
+    : StyledComponent<TrgProps>
+  : StyledComponent<OwnProps & TrgProps>;
 
 type StyledJSXIntrinsics = {
   readonly [P in keyof JSX.IntrinsicElements]: HtmlStyledTag<P>;
