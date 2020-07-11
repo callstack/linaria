@@ -1,6 +1,6 @@
 import { types as t, TransformOptions } from '@babel/core';
 import { NodePath } from '@babel/traverse';
-import { StyledMeta } from '../react/styled';
+import { StyledMeta } from '../StyledMeta';
 
 export type JSONValue = string | number | boolean | JSONObject | JSONArray;
 
