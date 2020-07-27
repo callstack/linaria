@@ -20,6 +20,15 @@ type Options = {
   };
 };
 
+// Workaround for rest operator
+const restOp = (
+  obj: { [key: string]: any },
+  keysToExclude: string[]
+): { [key: string]: any } =>
+  Object.keys(obj)
+    .filter(prop => !keysToExclude.includes(prop))
+    .reduce((acc, curr) => Object.assign(acc, { [curr]: obj[curr] }), {}); // rest operator workaround
+
 const warnIfInvalid = (value: any, componentName: string) => {
   if (process.env.NODE_ENV !== 'production') {
     if (
@@ -66,7 +75,8 @@ function styled(tag: any): any {
     }
 
     const render = (props: any, ref: any) => {
-      const { as: component = tag, class: className, ...rest } = props;
+      const { as: component = tag, class: className } = props;
+      const rest = restOp(props, ['as', 'class']);
       let filteredProps;
 
       // Check if it's an HTML tag and not a custom element
@@ -124,7 +134,10 @@ function styled(tag: any): any {
       ? React.forwardRef(render)
       : // React.forwardRef won't available on older React versions and in Preact
         // Fallback to a innerRef prop in that case
-        ({ innerRef, ...rest }: any) => render(rest, innerRef);
+        (props: any) => {
+          const rest = restOp(props, ['innerRef']);
+          return render(rest, props.innerRef);
+        };
 
     (Result as any).displayName = options.name;
 
