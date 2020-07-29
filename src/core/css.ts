@@ -1,8 +1,18 @@
+// 'csstype' cannot be resolved since 'main' field in its package.json is empty and no script files are exported
+// eslint-disable-next-line import/no-unresolved
+import * as csstype from 'csstype';
 import { StyledMeta } from '../StyledMeta';
 
-type CSSProperties = {
-  [key: string]: string | number | CSSProperties;
-};
+// exported so that users can extend the interface by declaration merging
+export interface Properties
+  extends csstype.Properties,
+    csstype.PropertiesHyphen {}
+
+export type CSSProperties =
+  | Properties
+  | {
+      [key: string]: Properties;
+    };
 
 export default function css(
   _strings: TemplateStringsArray,
