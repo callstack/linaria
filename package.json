@@ -108,6 +108,7 @@
     "@emotion/is-prop-valid": "^0.7.3",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "cosmiconfig": "^5.1.0",
+    "csstype": "^2.6.11",
     "debug": "^4.1.1",
     "dedent": "^0.7.0",
     "enhanced-resolve": "^4.1.0",
