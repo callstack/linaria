@@ -92,7 +92,8 @@
     "react": "^16.8.3",
     "react-test-renderer": "^16.8.3",
     "release-it": "^12.4.3",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "webpack": "^4.0.0"
   },
   "dependencies": {
     "@babel/core": "^7.9.0",
@@ -122,8 +123,10 @@
     "source-map": "^0.6.1",
     "strip-ansi": "^5.2.0",
     "stylis": "^3.5.4",
-    "webpack": "^4.0.0",
     "yargs": "^13.2.1"
+  },
+  "peerDependencies": {
+    "webpack": "^4.0.0"
   },
   "resolutions": {
     "git-raw-commits": "^2.0.3"
