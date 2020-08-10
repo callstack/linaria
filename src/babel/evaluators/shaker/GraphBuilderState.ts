@@ -1,4 +1,4 @@
-import { Node, VisitorKeys } from '@babel/types';
+import type { Node, VisitorKeys } from '@babel/types';
 import ScopeManager from './scope';
 import DepsGraph from './DepsGraph';
 

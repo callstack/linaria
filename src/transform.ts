@@ -10,10 +10,11 @@
 import path from 'path';
 import { parseSync, transformFromAstSync } from '@babel/core';
 import stylis from 'stylis';
-import { SourceMapGenerator, Mapping } from 'source-map';
+import type { Mapping } from 'source-map';
+import { SourceMapGenerator } from 'source-map';
 import loadOptions from './babel/utils/loadOptions';
 import { debug } from './babel/utils/logger';
-import { LinariaMetadata, Options, PreprocessorFn, Result } from './types';
+import type { LinariaMetadata, Options, PreprocessorFn, Result } from './types';
 
 const STYLIS_DECLARATION = 1;
 const posixSep = path.posix.sep;

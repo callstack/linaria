@@ -1,6 +1,6 @@
 import { types as t } from '@babel/core';
-import { NodePath } from '@babel/traverse';
-import { Function, JSXElement as JSXElementNode } from '@babel/types';
+import type { NodePath } from '@babel/traverse';
+import type { Function, JSXElement as JSXElementNode } from '@babel/types';
 
 function getFunctionName(path: NodePath<Function>): string | null {
   if (path.isClassMethod() && t.isIdentifier(path.node.key)) {

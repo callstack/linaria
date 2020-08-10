@@ -1,5 +1,5 @@
 import { types as t } from '@babel/core';
-import { Identifier, Node } from '@babel/types';
+import type { Identifier, Node } from '@babel/types';
 
 type Scope = Map<string, Set<Identifier>>;
 

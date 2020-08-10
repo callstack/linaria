@@ -4,14 +4,15 @@
  */
 
 import { types as t } from '@babel/core';
-import {
+import type {
   Expression,
   Identifier as IdentifierNode,
   TaggedTemplateExpression,
 } from '@babel/types';
-import { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/traverse';
 import throwIfInvalid from '../utils/throwIfInvalid';
-import { State, StrictOptions, ValueType, ExpressionValue } from '../types';
+import type { State, StrictOptions, ExpressionValue } from '../types';
+import { ValueType } from '../types';
 import { debug } from '../utils/logger';
 import isStyledOrCss from '../utils/isStyledOrCss';
 

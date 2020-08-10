@@ -1,14 +1,8 @@
 import { types as t } from '@babel/core';
-import {
-  Aliases,
-  FLIPPED_ALIAS_KEYS,
-  Identifier,
-  Node,
-  VisitorKeys,
-} from '@babel/types';
+import type { Aliases, Identifier, Node, VisitorKeys } from '@babel/types';
 import peek from '../../utils/peek';
 import GraphBuilderState from './GraphBuilderState';
-import { IdentifierHandlerType, NodeType } from './types';
+import type { IdentifierHandlerType, NodeType } from './types';
 import { identifierHandlers as core } from './langs/core';
 import ScopeManager from './scope';
 
@@ -27,7 +21,7 @@ const handlers: {
 } = {};
 
 function isAlias(type: NodeType): type is keyof Aliases {
-  return type in FLIPPED_ALIAS_KEYS;
+  return type in t.FLIPPED_ALIAS_KEYS;
 }
 
 export function defineHandler(
@@ -36,7 +30,7 @@ export function defineHandler(
   handler: Handler
 ) {
   const types = isAlias(typeOrAlias)
-    ? FLIPPED_ALIAS_KEYS[typeOrAlias]
+    ? t.FLIPPED_ALIAS_KEYS[typeOrAlias]
     : [typeOrAlias];
   types.forEach((type: string) => {
     handlers[`${type}:${field}`] = handler;

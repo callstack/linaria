@@ -11,7 +11,7 @@ import normalize from 'normalize-path';
 import loaderUtils from 'loader-utils';
 import enhancedResolve from 'enhanced-resolve';
 import findYarnWorkspaceRoot from 'find-yarn-workspace-root';
-import { RawSourceMap } from 'source-map';
+import type { RawSourceMap } from 'source-map';
 import cosmiconfig from 'cosmiconfig';
 import * as EvalCache from './babel/eval-cache';
 import Module from './babel/module';

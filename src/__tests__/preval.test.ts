@@ -5,7 +5,7 @@ import stripAnsi from 'strip-ansi';
 
 import Module from '../babel/module';
 import serializer from '../__utils__/linaria-snapshot-serializer';
-import { Evaluator, StrictOptions } from '../babel/types';
+import type { Evaluator, StrictOptions } from '../babel/types';
 
 expect.addSnapshotSerializer(serializer);
 async function transformAsync(

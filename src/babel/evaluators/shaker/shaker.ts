@@ -1,4 +1,4 @@
-import { Node, Program } from '@babel/types';
+import type { Node, Program } from '@babel/types';
 import generator from '@babel/generator';
 import isNode from '../../utils/isNode';
 import getVisitorKeys from '../../utils/getVisitorKeys';

@@ -11,21 +11,21 @@
  */
 
 import { types as t } from '@babel/core';
-import { Node, Program, Expression } from '@babel/types';
-import { NodePath, Scope } from '@babel/traverse';
+import type { Node, Program, Expression } from '@babel/types';
+import type { NodePath, Scope } from '@babel/traverse';
 import { expression, statement } from '@babel/template';
 import generator from '@babel/generator';
 import evaluate from './evaluators';
 import getTemplateProcessor from './evaluators/templateProcessor';
 import Module from './module';
-import {
+import type {
   State,
   StrictOptions,
   LazyValue,
   ExpressionValue,
-  ValueType,
   ValueCache,
 } from './types';
+import { ValueType } from './types';
 import CollectDependencies from './visitors/CollectDependencies';
 import DetectStyledImportName from './visitors/DetectStyledImportName';
 import GenerateClassNames from './visitors/GenerateClassNames';

@@ -1,4 +1,4 @@
-import { LinariaMetadata } from '../types';
+import type { LinariaMetadata } from '../types';
 
 type Serializer<T> = {
   test: (value: any) => value is T;

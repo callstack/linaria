@@ -4,9 +4,9 @@
  */
 
 import { types as t } from '@babel/core';
-import { ImportDeclaration } from '@babel/types';
-import { NodePath } from '@babel/traverse';
-import { State } from '../types';
+import type { ImportDeclaration } from '@babel/types';
+import type { NodePath } from '@babel/traverse';
+import type { State } from '../types';
 
 export default function DetectStyledImportName(
   path: NodePath<ImportDeclaration>,

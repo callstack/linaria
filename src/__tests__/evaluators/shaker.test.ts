@@ -1,6 +1,6 @@
 import path from 'path';
 import dedent from 'dedent';
-import { TransformOptions } from '@babel/core';
+import type { TransformOptions } from '@babel/core';
 import shake from '../../babel/evaluators/shaker';
 
 function getFileName() {

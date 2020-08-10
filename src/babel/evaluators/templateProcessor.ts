@@ -4,12 +4,17 @@
  */
 
 import { types as t } from '@babel/core';
-import { Expression } from '@babel/types';
+import type { Expression } from '@babel/types';
 import generator from '@babel/generator';
 
 import { units } from '../units';
-import { State, StrictOptions, TemplateExpression, ValueCache } from '../types';
-import { StyledMeta } from '../../StyledMeta';
+import type {
+  State,
+  StrictOptions,
+  TemplateExpression,
+  ValueCache,
+} from '../types';
+import type { StyledMeta } from '../../StyledMeta';
 
 import isSerializable from '../utils/isSerializable';
 import { debug } from '../utils/logger';

@@ -8,8 +8,8 @@
  */
 
 import { types as t } from '@babel/core';
-import { NodePath } from '@babel/traverse';
-import { CallExpression } from '@babel/types';
+import type { NodePath } from '@babel/traverse';
+import type { CallExpression } from '@babel/types';
 import { expression } from '@babel/template';
 import getLinariaComment from '../../utils/getLinariaComment';
 

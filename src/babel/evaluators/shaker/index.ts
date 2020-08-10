@@ -1,7 +1,7 @@
 import generator from '@babel/generator';
 import { transformSync } from '@babel/core';
-import { Program } from '@babel/types';
-import { Evaluator, StrictOptions } from '../../types';
+import type { Program } from '@babel/types';
+import type { Evaluator, StrictOptions } from '../../types';
 import { debug } from '../../utils/logger';
 import buildOptions from '../buildOptions';
 import shake from './shaker';

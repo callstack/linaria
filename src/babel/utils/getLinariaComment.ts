@@ -1,4 +1,4 @@
-import { Node } from '@babel/types';
+import type { Node } from '@babel/types';
 
 const pattern = /^linaria (.+)$/;
 

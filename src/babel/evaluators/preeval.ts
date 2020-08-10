@@ -2,11 +2,11 @@
  * This file is a babel preset used to transform files inside evaluators.
  * It works the same as main `babel/extract` preset, but do not evaluate lazy dependencies.
  */
-import { NodePath } from '@babel/traverse';
-import { Program } from '@babel/types';
+import type { NodePath } from '@babel/traverse';
+import type { Program } from '@babel/types';
 import GenerateClassNames from '../visitors/GenerateClassNames';
 import DetectStyledImportName from '../visitors/DetectStyledImportName';
-import { State, StrictOptions } from '../types';
+import type { State, StrictOptions } from '../types';
 import JSXElement from './visitors/JSXElement';
 import ProcessStyled from './visitors/ProcessStyled';
 import ProcessCSS from './visitors/ProcessCSS';

@@ -1,11 +1,11 @@
 import { types as t } from '@babel/core';
-import { AssignmentExpression, Node, VisitorKeys } from '@babel/types';
+import type { AssignmentExpression, Node, VisitorKeys } from '@babel/types';
 import isNode from '../../utils/isNode';
 import getVisitorKeys from '../../utils/getVisitorKeys';
 import DepsGraph from './DepsGraph';
 import GraphBuilderState from './GraphBuilderState';
 import { getVisitors } from './Visitors';
-import { VisitorAction } from './types';
+import type { VisitorAction } from './types';
 import ScopeManager from './scope';
 
 const isVoid = (node: Node): boolean =>

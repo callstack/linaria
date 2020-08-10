@@ -4,8 +4,8 @@
  */
 
 import { types as t } from '@babel/core';
-import { NodePath } from '@babel/traverse';
-import { TaggedTemplateExpression } from '@babel/types';
+import type { NodePath } from '@babel/traverse';
+import type { TaggedTemplateExpression } from '@babel/types';
 import getLinariaComment from '../../utils/getLinariaComment';
 
 export default function ProcessCSS(path: NodePath<TaggedTemplateExpression>) {

@@ -1,4 +1,5 @@
-import genericDebug, { Debugger } from 'debug';
+import genericDebug from 'debug';
+import type { Debugger } from 'debug';
 
 type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 

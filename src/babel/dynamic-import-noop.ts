@@ -1,6 +1,6 @@
 import { types as t } from '@babel/core';
-import { Import } from '@babel/types';
-import { NodePath } from '@babel/traverse';
+import type { Import } from '@babel/types';
+import type { NodePath } from '@babel/traverse';
 import syntax from '@babel/plugin-syntax-dynamic-import';
 
 export default function dynamic() {

@@ -4,18 +4,18 @@
  * invoke RequirementsResolver to get parts of code that needs to be executed in order to evaluate the dependency.
  */
 
-import { types as t } from '@babel/core';
-import {
+import { traverse, types as t } from '@babel/core';
+import type {
   ExpressionStatement,
   MemberExpression,
   Program,
   SequenceExpression,
 } from '@babel/types';
 import { parseSync, transformSync } from '@babel/core';
-import traverse, { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/traverse';
 import generator from '@babel/generator';
 
-import { Evaluator } from '../../types';
+import type { Evaluator } from '../../types';
 import buildOptions from '../buildOptions';
 import RequirementsResolver from './RequirementsResolver';
 

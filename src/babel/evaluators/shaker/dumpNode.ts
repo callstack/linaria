@@ -1,10 +1,10 @@
-import {
+import { types as t } from '@babel/core';
+import type {
   BinaryExpression,
   Identifier,
   Node,
   NumericLiteral,
   StringLiteral,
-  VISITOR_KEYS,
 } from '@babel/types';
 
 type Hooks = {
@@ -44,7 +44,7 @@ export default function dumpNode<T extends Node>(
   }
 
   result += '\n';
-  const keys = VISITOR_KEYS[type] as Array<keyof T>;
+  const keys = t.VISITOR_KEYS[type] as Array<keyof T>;
   for (const key of keys) {
     const subNode = node[key];
 

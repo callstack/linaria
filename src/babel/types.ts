@@ -1,12 +1,13 @@
-import {
+import type {
   Aliases,
   Node,
   Expression,
   TaggedTemplateExpression,
 } from '@babel/types';
-import { TransformOptions } from '@babel/core';
-import { NodePath } from '@babel/traverse';
-import { StyledMeta } from '../StyledMeta';
+import type { TransformOptions } from '@babel/core';
+import type { NodePath } from '@babel/traverse';
+import type { VisitorKeys } from '@babel/types';
+import type { StyledMeta } from '../StyledMeta';
 
 export type JSONValue = string | number | boolean | JSONObject | JSONArray;
 
@@ -148,17 +149,21 @@ declare module '@babel/types' {
       }[keyof AllNodes[T]]
     >;
   };
+}
 
-  const VISITOR_KEYS: { [T in keyof VisitorKeys]: VisitorKeys[T][] };
-  const ALIAS_KEYS: {
-    [T in Node['type']]: {
-      [K in keyof Aliases]: AllNodes[T] extends Aliases[K] ? K : never;
-    }[keyof Aliases][];
-  };
+declare module '@babel/core' {
+  namespace types {
+    const VISITOR_KEYS: { [T in keyof VisitorKeys]: VisitorKeys[T][] };
+    const ALIAS_KEYS: {
+      [T in Node['type']]: {
+        [K in keyof Aliases]: AllNodes[T] extends Aliases[K] ? K : never;
+      }[keyof Aliases][];
+    };
 
-  const FLIPPED_ALIAS_KEYS: {
-    [T in keyof Aliases]: Aliases[T]['type'][];
-  };
+    const FLIPPED_ALIAS_KEYS: {
+      [T in keyof Aliases]: Aliases[T]['type'][];
+    };
 
-  function shallowEqual(actual: object, expected: object): boolean;
+    function shallowEqual(actual: object, expected: object): boolean;
+  }
 }

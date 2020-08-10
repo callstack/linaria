@@ -5,8 +5,13 @@
  */
 
 import { types as t } from '@babel/core';
-import { Identifier, Node, Statement, VariableDeclarator } from '@babel/types';
-import { Binding, NodePath } from '@babel/traverse';
+import type {
+  Identifier,
+  Node,
+  Statement,
+  VariableDeclarator,
+} from '@babel/types';
+import type { Binding, NodePath } from '@babel/traverse';
 
 type Requirement = {
   result: Statement;

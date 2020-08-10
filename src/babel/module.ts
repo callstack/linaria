@@ -17,11 +17,11 @@ import NativeModule from 'module';
 import vm from 'vm';
 import fs from 'fs';
 import path from 'path';
-import { BabelFileResult } from '@babel/core';
+import type { BabelFileResult } from '@babel/core';
 import * as EvalCache from './eval-cache';
 import * as process from './process';
 import { debug } from './utils/logger';
-import { StrictOptions } from './types';
+import type { StrictOptions } from './types';
 
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty

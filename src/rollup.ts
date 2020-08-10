@@ -7,8 +7,8 @@
 import { createFilter } from 'rollup-pluginutils';
 import transform from './transform';
 import slugify from './slugify';
-import { Preprocessor } from './types';
-import { PluginOptions } from './babel/utils/loadOptions';
+import type { Preprocessor } from './types';
+import type { PluginOptions } from './babel/utils/loadOptions';
 
 type RollupPluginOptions = {
   include?: string | string[];

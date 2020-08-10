@@ -1,4 +1,4 @@
-import { Node } from '@babel/types';
+import type { Node } from '@babel/types';
 
 const isNode = (obj: any): obj is Node => obj?.type !== undefined;
 

@@ -4,7 +4,7 @@
  */
 
 import Module from '../module';
-import { StrictOptions } from '../types';
+import type { StrictOptions } from '../types';
 
 export default function evaluate(
   code: string,

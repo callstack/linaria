@@ -1,5 +1,5 @@
 import { types as t } from '@babel/core';
-import {
+import type {
   AssignmentExpression,
   Block,
   CallExpression,
@@ -23,7 +23,7 @@ import {
   WhileStatement,
 } from '@babel/types';
 
-import { IdentifierHandlers, Visitors } from '../types';
+import type { IdentifierHandlers, Visitors } from '../types';
 import GraphBuilderState from '../GraphBuilderState';
 import peek from '../../../utils/peek';
 import ScopeManager from '../scope';

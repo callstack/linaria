@@ -7,9 +7,9 @@
 
 import { basename, dirname, relative } from 'path';
 import { types as t } from '@babel/core';
-import { TaggedTemplateExpression } from '@babel/types';
-import { NodePath } from '@babel/traverse';
-import { State, StrictOptions } from '../types';
+import type { TaggedTemplateExpression } from '@babel/types';
+import type { NodePath } from '@babel/traverse';
+import type { State, StrictOptions } from '../types';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
 import slugify from '../../slugify';
 import getLinariaComment from '../utils/getLinariaComment';

@@ -1,4 +1,4 @@
-import { Aliases, Node, VisitorKeys } from '@babel/types';
+import type { Aliases, Node, VisitorKeys } from '@babel/types';
 
 export type NodeOfType<T> = Extract<Node, { type: T }>;
 
