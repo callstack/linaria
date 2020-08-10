@@ -1,15 +1,22 @@
 import { types as t } from '@babel/core';
-import peek from '../../utils/peek';
+import {
+  Aliases,
+  FLIPPED_ALIAS_KEYS,
+  Identifier,
+  Node,
+  VisitorKeys,
+} from '@babel/types';
 import GraphBuilderState from './GraphBuilderState';
+import peek from '../../utils/peek';
 import { IdentifierHandlerType, NodeType } from './types';
 import { identifierHandlers as core } from './langs/core';
 import ScopeManager from './scope';
 
-type HandlerFn = <TParent extends t.Node = t.Node>(
+type HandlerFn = <TParent extends Node = Node>(
   builder: GraphBuilderState,
-  node: t.Identifier,
+  node: Identifier,
   parent: TParent,
-  parentKey: t.VisitorKeys[TParent['type']],
+  parentKey: VisitorKeys[TParent['type']],
   listIdx: number | null
 ) => void;
 
@@ -19,8 +26,8 @@ const handlers: {
   [key: string]: Handler;
 } = {};
 
-function isAlias(type: NodeType): type is keyof t.Aliases {
-  return type in t.FLIPPED_ALIAS_KEYS;
+function isAlias(type: NodeType): type is keyof Aliases {
+  return type in FLIPPED_ALIAS_KEYS;
 }
 
 export function defineHandler(
@@ -29,7 +36,7 @@ export function defineHandler(
   handler: Handler
 ) {
   const types = isAlias(typeOrAlias)
-    ? t.FLIPPED_ALIAS_KEYS[typeOrAlias]
+    ? FLIPPED_ALIAS_KEYS[typeOrAlias]
     : [typeOrAlias];
   types.forEach((type: string) => {
     handlers[`${type}:${field}`] = handler;
@@ -58,7 +65,7 @@ batchDefineHandlers([...core.refer], 'refer');
 defineHandler(
   'FunctionDeclaration',
   'id',
-  (builder: GraphBuilderState, node: t.Identifier) => {
+  (builder: GraphBuilderState, node: Identifier) => {
     builder.scope.declare(node, false, null, 1);
   }
 );
@@ -68,7 +75,7 @@ defineHandler(
  */
 const memberExpressionObjectHandler = (
   builder: GraphBuilderState,
-  node: t.Identifier
+  node: Identifier
 ) => {
   const context = peek(builder.context);
   const declaration = builder.scope.addReference(node);
@@ -100,8 +107,8 @@ defineHandler(
  */
 const memberExpressionPropertyHandler = (
   builder: GraphBuilderState,
-  node: t.Identifier,
-  parent: t.Node
+  node: Identifier,
+  parent: Node
 ) => {
   if (t.isMemberExpression(parent) && parent.computed) {
     const declaration = builder.scope.addReference(node);

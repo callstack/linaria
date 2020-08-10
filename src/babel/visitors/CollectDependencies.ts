@@ -4,6 +4,11 @@
  */
 
 import { types as t } from '@babel/core';
+import {
+  Expression,
+  Identifier as IdentifierNode,
+  TaggedTemplateExpression,
+} from '@babel/types';
 import { NodePath } from '@babel/traverse';
 import throwIfInvalid from '../utils/throwIfInvalid';
 import { State, StrictOptions, ValueType, ExpressionValue } from '../types';
@@ -13,27 +18,27 @@ import isStyledOrCss from '../utils/isStyledOrCss';
 /**
  * Hoist the node and its dependencies to the highest scope possible
  */
-function hoist(ex: NodePath<t.Expression | null>) {
-  const Identifier = (idPath: NodePath<t.Identifier>) => {
+function hoist(ex: NodePath<Expression | null>) {
+  const Identifier = (idPath: NodePath<IdentifierNode>) => {
     if (!idPath.isReferencedIdentifier()) {
       return;
     }
     const binding = idPath.scope.getBinding(idPath.node.name);
     if (!binding) return;
     const { scope, path: bindingPath, referencePaths } = binding;
-    if (scope.parent === null) {
+    // parent here can be null or undefined in different versions of babel
+    if (!scope.parent) {
       // It's a variable from global scope
       return;
     }
 
     if (bindingPath.isVariableDeclarator()) {
-      const initPath = bindingPath.get('init');
+      const initPath = bindingPath.get('init') as NodePath<Expression | null>;
       hoist(initPath);
       initPath.hoist(scope);
       if (initPath.isIdentifier()) {
         referencePaths.forEach((referencePath) => {
           referencePath.replaceWith(t.identifier(initPath.node.name));
-          // referencePath.node.name = initPath.node.name;
         });
       }
     }
@@ -49,7 +54,7 @@ function hoist(ex: NodePath<t.Expression | null>) {
 }
 
 export default function CollectDependencies(
-  path: NodePath<t.TaggedTemplateExpression>,
+  path: NodePath<TaggedTemplateExpression>,
   state: State,
   options: StrictOptions
 ) {
@@ -62,7 +67,7 @@ export default function CollectDependencies(
   debug('template-parse:identify-expressions', expressions.length);
 
   const expressionValues: ExpressionValue[] = expressions.map(
-    (ex: NodePath<t.Expression>) => {
+    (ex: NodePath<Expression>) => {
       const result = ex.evaluate();
       if (result.confident) {
         throwIfInvalid(result.value, ex);
@@ -75,7 +80,7 @@ export default function CollectDependencies(
         // save original expression that may be changed during hoisting
         const originalExNode = t.cloneNode(ex.node);
 
-        hoist(ex);
+        hoist(ex as NodePath<Expression | null>);
 
         // save hoisted expression to be used to evaluation
         const hoistedExNode = t.cloneNode(ex.node);

@@ -1,4 +1,10 @@
-import { types as t } from '@babel/core';
+import {
+  ALIAS_KEYS,
+  Aliases,
+  Identifier,
+  Node,
+  VisitorKeys,
+} from '@babel/types';
 import peek from '../../utils/peek';
 import { warn } from '../../utils/logger';
 import GraphBuilderState from './GraphBuilderState';
@@ -8,11 +14,11 @@ import { Visitor, Visitors } from './types';
 import { visitors as core } from './langs/core';
 
 const visitors: Visitors = {
-  Identifier<TParent extends t.Node>(
+  Identifier<TParent extends Node>(
     this: GraphBuilderState,
-    node: t.Identifier,
+    node: Identifier,
     parent: TParent | null,
-    parentKey: t.VisitorKeys[TParent['type']] | null,
+    parentKey: VisitorKeys[TParent['type']] | null,
     listIdx: number | null = null
   ) {
     if (!parent || !parentKey) {
@@ -70,10 +76,8 @@ const visitors: Visitors = {
   ...core,
 };
 
-export function getVisitors<TNode extends t.Node>(
-  node: TNode
-): Visitor<TNode>[] {
-  const aliases: Array<keyof t.Aliases> = t.ALIAS_KEYS[node.type] || [];
+export function getVisitors<TNode extends Node>(node: TNode): Visitor<TNode>[] {
+  const aliases: Array<keyof Aliases> = ALIAS_KEYS[node.type] || [];
   const aliasVisitors = aliases
     .map((type) => visitors[type])
     .filter((i) => i) as Visitor<TNode>[];

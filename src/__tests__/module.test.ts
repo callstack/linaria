@@ -1,13 +1,13 @@
 import path from 'path';
 import dedent from 'dedent';
-import * as babel from '@babel/core';
+import { transformSync } from '@babel/core';
 import Module from '../babel/module';
 import { Evaluator, StrictOptions } from '../babel/types';
 
 beforeEach(() => Module.invalidate());
 
 const evaluator: Evaluator = (filename, options, text) => {
-  const { code } = babel.transformSync(text, {
+  const { code } = transformSync(text, {
     filename: filename,
   })!;
   return [code!, null];

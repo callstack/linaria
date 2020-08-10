@@ -1,12 +1,13 @@
-import { types } from '@babel/core';
+import { types as t } from '@babel/core';
+import { Import } from '@babel/types';
 import { NodePath } from '@babel/traverse';
 import syntax from '@babel/plugin-syntax-dynamic-import';
 
-export default function dynamic({ types: t }: { types: typeof types }) {
+export default function dynamic() {
   return {
     inherits: syntax,
     visitor: {
-      Import(path: NodePath<types.Import>) {
+      Import(path: NodePath<Import>) {
         const noop = t.arrowFunctionExpression([], t.identifier('undefined'));
 
         path.parentPath.replaceWith(

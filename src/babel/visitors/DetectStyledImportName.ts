@@ -4,11 +4,12 @@
  */
 
 import { types as t } from '@babel/core';
+import { ImportDeclaration } from '@babel/types';
 import { NodePath } from '@babel/traverse';
 import { State } from '../types';
 
 export default function DetectStyledImportName(
-  path: NodePath<t.ImportDeclaration>,
+  path: NodePath<ImportDeclaration>,
   state: State
 ) {
   if (!t.isLiteral(path.node.source, { value: 'linaria/react' })) {

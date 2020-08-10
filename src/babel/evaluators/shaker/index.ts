@@ -1,15 +1,16 @@
 import generator from '@babel/generator';
-import { transformSync, types } from '@babel/core';
-import { debug } from '../../utils/logger';
 import { Evaluator, StrictOptions } from '../../types';
+import { transformSync } from '@babel/core';
+import { Program } from '@babel/types';
 import buildOptions from '../buildOptions';
+import { debug } from '../../utils/logger';
 import shake from './shaker';
 
 function prepareForShake(
   filename: string,
   options: StrictOptions,
   code: string
-): types.Program {
+): Program {
   const transformOptions = buildOptions(filename, options);
 
   transformOptions.ast = true;

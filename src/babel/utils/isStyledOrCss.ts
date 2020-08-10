@@ -1,14 +1,19 @@
 import { types as t } from '@babel/core';
+import {
+  CallExpression,
+  Expression,
+  TaggedTemplateExpression,
+} from '@babel/types';
 import { NodePath } from '@babel/traverse';
 import { State, TemplateExpression } from '../types';
 import hasImport from './hasImport';
 
 type Result = NonNullable<TemplateExpression['styled']> | 'css' | null;
 
-const cache = new WeakMap<NodePath<t.TaggedTemplateExpression>, Result>();
+const cache = new WeakMap<NodePath<TaggedTemplateExpression>, Result>();
 
 export default function isStyledOrCss(
-  path: NodePath<t.TaggedTemplateExpression>,
+  path: NodePath<TaggedTemplateExpression>,
   state: State
 ): Result {
   if (!cache.has(path)) {
@@ -29,9 +34,9 @@ export default function isStyledOrCss(
         'linaria/react'
       )
     ) {
-      const tagPath = path.get('tag') as NodePath<t.CallExpression>;
+      const tagPath = path.get('tag') as NodePath<CallExpression>;
       cache.set(path, {
-        component: tagPath.get('arguments')[0] as NodePath<t.Expression>,
+        component: tagPath.get('arguments')[0] as NodePath<Expression>,
       });
     } else if (
       t.isMemberExpression(tag) &&

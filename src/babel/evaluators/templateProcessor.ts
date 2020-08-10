@@ -3,9 +3,8 @@
  * It uses CSS code from template literals and evaluated values of lazy dependencies stored in ValueCache.
  */
 
-/* eslint-disable no-param-reassign */
-
-import { types } from '@babel/core';
+import { types as t } from '@babel/core';
+import { Expression } from '@babel/types';
 import generator from '@babel/generator';
 
 import { units } from '../units';
@@ -24,7 +23,7 @@ const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
 
 type Interpolation = {
   id: string;
-  node: types.Expression;
+  node: Expression;
   source: string;
   unit: string;
 };
@@ -61,17 +60,14 @@ export default function getTemplateProcessor(options: StrictOptions) {
 
     const parent = path.findParent(
       (p) =>
-        types.isObjectProperty(p) ||
-        types.isJSXOpeningElement(p) ||
-        types.isVariableDeclarator(p)
+        t.isObjectProperty(p) ||
+        t.isJSXOpeningElement(p) ||
+        t.isVariableDeclarator(p)
     );
 
     if (parent) {
       const parentNode = parent.node;
-      if (
-        types.isVariableDeclarator(parentNode) &&
-        types.isIdentifier(parentNode.id)
-      ) {
+      if (t.isVariableDeclarator(parentNode) && t.isIdentifier(parentNode.id)) {
         const { referencePaths } = path.scope.getBinding(
           parentNode.id.name
         ) || { referencePaths: [] };
@@ -148,10 +144,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
           // Try to preval the value
           if (
             options.evaluate &&
-            !(
-              types.isFunctionExpression(ex) ||
-              types.isArrowFunctionExpression(ex)
-            )
+            !(t.isFunctionExpression(ex) || t.isArrowFunctionExpression(ex))
           ) {
             const value = valueCache.get(ex.node);
             throwIfInvalid(value, ex);
@@ -212,7 +205,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
       // If `styled` wraps another component and not a primitive,
       // get its class name to create a more specific selector
       // it'll ensure that styles are overridden properly
-      if (options.evaluate && types.isIdentifier(styled.component.node)) {
+      if (options.evaluate && t.isIdentifier(styled.component.node)) {
         let value = valueCache.get(styled.component.node.name);
         while (hasMeta(value)) {
           selector += `.${value.__linaria.className}`;
@@ -223,17 +216,11 @@ export default function getTemplateProcessor(options: StrictOptions) {
       const props = [];
 
       props.push(
-        types.objectProperty(
-          types.identifier('name'),
-          types.stringLiteral(displayName!)
-        )
+        t.objectProperty(t.identifier('name'), t.stringLiteral(displayName!))
       );
 
       props.push(
-        types.objectProperty(
-          types.identifier('class'),
-          types.stringLiteral(className!)
-        )
+        t.objectProperty(t.identifier('class'), t.stringLiteral(className!))
       );
 
       // If we found any interpolations, also pass them so they can be applied
@@ -257,20 +244,20 @@ export default function getTemplateProcessor(options: StrictOptions) {
         });
 
         props.push(
-          types.objectProperty(
-            types.identifier('vars'),
-            types.objectExpression(
+          t.objectProperty(
+            t.identifier('vars'),
+            t.objectExpression(
               Object.keys(result).map((key) => {
                 const { id, node, unit } = result[key];
                 const items = [node];
 
                 if (unit) {
-                  items.push(types.stringLiteral(unit));
+                  items.push(t.stringLiteral(unit));
                 }
 
-                return types.objectProperty(
-                  types.stringLiteral(id),
-                  types.arrayExpression(items)
+                return t.objectProperty(
+                  t.stringLiteral(id),
+                  t.arrayExpression(items)
                 );
               })
             )
@@ -279,18 +266,18 @@ export default function getTemplateProcessor(options: StrictOptions) {
       }
 
       path.replaceWith(
-        types.callExpression(
-          types.callExpression(
-            types.identifier(state.file.metadata.localName || 'styled'),
+        t.callExpression(
+          t.callExpression(
+            t.identifier(state.file.metadata.localName || 'styled'),
             [styled.component.node]
           ),
-          [types.objectExpression(props)]
+          [t.objectExpression(props)]
         )
       );
 
       path.addComment('leading', '#__PURE__');
     } else {
-      path.replaceWith(types.stringLiteral(className!));
+      path.replaceWith(t.stringLiteral(className!));
     }
 
     if (!isReferenced && !cssText.includes(':global')) {

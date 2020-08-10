@@ -3,11 +3,12 @@
  *
  */
 
-import { NodePath } from '@babel/traverse';
 import { types as t } from '@babel/core';
+import { NodePath } from '@babel/traverse';
+import { TaggedTemplateExpression } from '@babel/types';
 import getLinariaComment from '../../utils/getLinariaComment';
 
-export default function ProcessCSS(path: NodePath<t.TaggedTemplateExpression>) {
+export default function ProcessCSS(path: NodePath<TaggedTemplateExpression>) {
   if (t.isIdentifier(path.node.tag) && path.node.tag.name === 'css') {
     const [, , className] = getLinariaComment(path);
     if (!className) {

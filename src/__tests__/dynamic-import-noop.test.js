@@ -1,9 +1,7 @@
-/* @flow */
-
-const babel = require('@babel/core');
+import { transformAsync } from '@babel/core';
 
 it('replaces dynamic imports with a noop', async () => {
-  const { code } = await babel.transformAsync(
+  const { code } = await transformAsync(
     `import('./foo').then(foo => foo.init())`,
     {
       plugins: [require.resolve('../babel/dynamic-import-noop')],

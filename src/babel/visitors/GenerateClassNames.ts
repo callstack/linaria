@@ -7,6 +7,7 @@
 
 import { basename, dirname, relative } from 'path';
 import { types as t } from '@babel/core';
+import { TaggedTemplateExpression } from '@babel/types';
 import { NodePath } from '@babel/traverse';
 import { State, StrictOptions } from '../types';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
@@ -16,7 +17,7 @@ import { debug } from '../utils/logger';
 import isStyledOrCss from '../utils/isStyledOrCss';
 
 export default function GenerateClassNames(
-  path: NodePath<t.TaggedTemplateExpression>,
+  path: NodePath<TaggedTemplateExpression>,
   state: State,
   options: StrictOptions
 ) {
@@ -46,7 +47,15 @@ export default function GenerateClassNames(
   if (!displayName && parent) {
     const parentNode = parent.node;
     if (t.isObjectProperty(parentNode)) {
-      displayName = parentNode.key.name || parentNode.key.value;
+      if ('name' in parentNode.key) {
+        displayName = parentNode.key.name;
+      } else if ('value' in parentNode.key) {
+        displayName = parentNode.key.value.toString();
+      } else {
+        throw new Error(
+          `Unexpected object property key ${parentNode.key.type}`
+        );
+      }
     } else if (
       t.isJSXOpeningElement(parentNode) &&
       t.isJSXIdentifier(parentNode.name)

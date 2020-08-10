@@ -1,13 +1,13 @@
 /* eslint-disable no-template-curly-in-string */
 
 import dedent from 'dedent';
-import * as babel from '@babel/core';
+import { parseSync } from '@babel/core';
 import buildDepsGraph from '../babel/evaluators/shaker/graphBuilder';
 
 function _build(literal: TemplateStringsArray, ...placeholders: string[]) {
   const code = dedent(literal, ...placeholders);
   return {
-    ast: babel.parseSync(code, { filename: 'source.js' })!,
+    ast: parseSync(code, { filename: 'source.js' })!,
     code,
   };
 }

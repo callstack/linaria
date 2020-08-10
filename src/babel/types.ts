@@ -1,4 +1,10 @@
-import { types as t, TransformOptions } from '@babel/core';
+import {
+  Aliases,
+  Node,
+  Expression,
+  TaggedTemplateExpression,
+} from '@babel/types';
+import { TransformOptions } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import { StyledMeta } from '../StyledMeta';
 
@@ -21,17 +27,17 @@ export enum ValueType {
 
 export type Value = Function | StyledMeta | string | number;
 
-export type ValueCache = Map<t.Expression | string, Value>;
+export type ValueCache = Map<Expression | string, Value>;
 
 export type ComponentValue = {
   kind: ValueType.COMPONENT;
-  ex: NodePath<t.Expression> | t.Expression | string;
+  ex: NodePath<Expression> | Expression | string;
 };
 
 export type LazyValue = {
   kind: ValueType.LAZY;
-  ex: NodePath<t.Expression> | t.Expression | string;
-  originalEx: NodePath<t.Expression> | t.Expression | string;
+  ex: NodePath<Expression> | Expression | string;
+  originalEx: NodePath<Expression> | Expression | string;
 };
 
 export type FunctionValue = {
@@ -52,7 +58,7 @@ export type ExpressionValue =
 
 export type TemplateExpression = {
   styled?: { component: any };
-  path: NodePath<t.TaggedTemplateExpression>;
+  path: NodePath<TaggedTemplateExpression>;
   expressionValues: ExpressionValue[];
 };
 
@@ -126,35 +132,33 @@ export type Location = {
   column: number;
 };
 
-type AllNodes = { [T in t.Node['type']]: Extract<t.Node, { type: T }> };
+type AllNodes = { [T in Node['type']]: Extract<Node, { type: T }> };
 
-declare module '@babel/core' {
-  namespace types {
-    type VisitorKeys = {
-      [T in keyof AllNodes]: Extract<
-        keyof AllNodes[T],
-        {
-          [Key in keyof AllNodes[T]]: AllNodes[T][Key] extends
-            | t.Node
-            | t.Node[]
-            | null
-            ? Key
-            : never;
-        }[keyof AllNodes[T]]
-      >;
-    };
+declare module '@babel/types' {
+  type VisitorKeys = {
+    [T in keyof AllNodes]: Extract<
+      keyof AllNodes[T],
+      {
+        [Key in keyof AllNodes[T]]: AllNodes[T][Key] extends
+          | Node
+          | Node[]
+          | null
+          ? Key
+          : never;
+      }[keyof AllNodes[T]]
+    >;
+  };
 
-    const VISITOR_KEYS: { [T in keyof VisitorKeys]: VisitorKeys[T][] };
-    const ALIAS_KEYS: {
-      [T in t.Node['type']]: {
-        [K in keyof t.Aliases]: AllNodes[T] extends t.Aliases[K] ? K : never;
-      }[keyof t.Aliases][];
-    };
+  const VISITOR_KEYS: { [T in keyof VisitorKeys]: VisitorKeys[T][] };
+  const ALIAS_KEYS: {
+    [T in Node['type']]: {
+      [K in keyof Aliases]: AllNodes[T] extends Aliases[K] ? K : never;
+    }[keyof Aliases][];
+  };
 
-    const FLIPPED_ALIAS_KEYS: {
-      [T in keyof t.Aliases]: t.Aliases[T]['type'][];
-    };
+  const FLIPPED_ALIAS_KEYS: {
+    [T in keyof Aliases]: Aliases[T]['type'][];
+  };
 
-    function shallowEqual(actual: object, expected: object): boolean;
-  }
+  function shallowEqual(actual: object, expected: object): boolean;
 }

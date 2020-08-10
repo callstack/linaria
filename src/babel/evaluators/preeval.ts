@@ -3,7 +3,7 @@
  * It works the same as main `babel/extract` preset, but do not evaluate lazy dependencies.
  */
 import { NodePath } from '@babel/traverse';
-import { types } from '@babel/core';
+import { Program } from '@babel/types';
 import GenerateClassNames from '../visitors/GenerateClassNames';
 import DetectStyledImportName from '../visitors/DetectStyledImportName';
 import { State, StrictOptions } from '../types';
@@ -15,7 +15,7 @@ function preeval(_babel: any, options: StrictOptions) {
   return {
     visitor: {
       Program: {
-        enter(path: NodePath<types.Program>, state: State) {
+        enter(path: NodePath<Program>, state: State) {
           // Collect all the style rules from the styles we encounter
           state.queue = [];
           state.rules = {};

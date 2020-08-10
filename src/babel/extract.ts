@@ -10,7 +10,8 @@
  *  - store result of extraction in babel's file metadata
  */
 
-import { types } from '@babel/core';
+import { types as t } from '@babel/core';
+import { Node, Program, Expression } from '@babel/types';
 import { NodePath, Scope } from '@babel/traverse';
 import { expression, statement } from '@babel/template';
 import generator from '@babel/generator';
@@ -34,8 +35,8 @@ function isLazyValue(v: ExpressionValue): v is LazyValue {
   return v.kind === ValueType.LAZY;
 }
 
-function isNodePath(obj: any): obj is NodePath {
-  return obj?.node !== undefined;
+function isNodePath<T extends Node>(obj: NodePath<T> | T): obj is NodePath<T> {
+  return 'node' in obj && obj?.node !== undefined;
 }
 
 function findFreeName(scope: Scope, name: string): string {
@@ -50,6 +51,16 @@ function findFreeName(scope: Scope, name: string): string {
   }
 
   return nextName;
+}
+
+function unwrapNode<T extends Node>(
+  item: NodePath<T> | T | string
+): T | string {
+  if (typeof item === 'string') {
+    return item;
+  }
+
+  return isNodePath(item) ? item.node : item;
 }
 
 // All exported values will be wrapped with this function
@@ -69,22 +80,22 @@ const exportsLinariaPrevalTpl = statement(
 );
 
 function addLinariaPreval(
-  path: NodePath<types.Program>,
-  lazyDeps: Array<types.Expression | string>
-): types.Program {
+  path: NodePath<Program>,
+  lazyDeps: Array<Expression | string>
+): Program {
   // Constant __linariaPreval with all dependencies
   const wrapName = findFreeName(path.scope, '_wrap');
   const statements = [
     expressionWrapperTpl({ wrapName }),
     exportsLinariaPrevalTpl({
-      expressions: types.arrayExpression(
+      expressions: t.arrayExpression(
         lazyDeps.map((expression) => expressionTpl({ expression, wrapName }))
       ),
     }),
   ];
 
   const programNode = path.node;
-  return types.program(
+  return t.program(
     [...programNode.body, ...statements],
     programNode.directives,
     programNode.sourceType,
@@ -98,7 +109,7 @@ export default function extract(_babel: any, options: StrictOptions) {
   return {
     visitor: {
       Program: {
-        enter(path: NodePath<types.Program>, state: State) {
+        enter(path: NodePath<Program>, state: State) {
           // Collect all the style rules from the styles we encounter
           state.queue = [];
           state.rules = {};
@@ -128,11 +139,9 @@ export default function extract(_babel: any, options: StrictOptions) {
             [] as LazyValue[]
           );
 
-          const expressionsToEvaluate = lazyDeps.map((v) =>
-            isNodePath(v.ex) ? v.ex.node : v.ex
-          );
+          const expressionsToEvaluate = lazyDeps.map((v) => unwrapNode(v.ex));
           const originalLazyExpressions = lazyDeps.map((v) =>
-            isNodePath(v.originalEx) ? v.originalEx.node : v.originalEx
+            unwrapNode(v.originalEx)
           );
 
           debug('lazy-deps:count', lazyDeps.length);
@@ -159,7 +168,7 @@ export default function extract(_babel: any, options: StrictOptions) {
             try {
               const evaluation = evaluate(
                 code,
-                types,
+                t,
                 state.file.opts.filename,
                 options
               );
