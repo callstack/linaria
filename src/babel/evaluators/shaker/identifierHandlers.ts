@@ -6,8 +6,8 @@ import {
   Node,
   VisitorKeys,
 } from '@babel/types';
-import GraphBuilderState from './GraphBuilderState';
 import peek from '../../utils/peek';
+import GraphBuilderState from './GraphBuilderState';
 import { IdentifierHandlerType, NodeType } from './types';
 import { identifierHandlers as core } from './langs/core';
 import ScopeManager from './scope';

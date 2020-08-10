@@ -1,5 +1,5 @@
-import { transformAsync } from '@babel/core';
 import { join } from 'path';
+import { transformAsync } from '@babel/core';
 import dedent from 'dedent';
 import stripAnsi from 'strip-ansi';
 import serializer from '../__utils__/linaria-snapshot-serializer';

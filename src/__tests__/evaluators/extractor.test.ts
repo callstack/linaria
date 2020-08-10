@@ -1,6 +1,6 @@
 import path from 'path';
 import dedent from 'dedent';
-import type { TransformOptions } from '@babel/core';
+import { TransformOptions } from '@babel/core';
 import exctract from '../../babel/evaluators/extractor';
 
 function getFileName() {

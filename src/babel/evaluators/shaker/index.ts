@@ -1,9 +1,9 @@
 import generator from '@babel/generator';
-import { Evaluator, StrictOptions } from '../../types';
 import { transformSync } from '@babel/core';
 import { Program } from '@babel/types';
-import buildOptions from '../buildOptions';
+import { Evaluator, StrictOptions } from '../../types';
 import { debug } from '../../utils/logger';
+import buildOptions from '../buildOptions';
 import shake from './shaker';
 
 function prepareForShake(
