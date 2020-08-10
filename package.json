@@ -122,7 +122,6 @@
     "source-map": "^0.6.1",
     "strip-ansi": "^5.2.0",
     "stylis": "^3.5.4",
-    "webpack": "^4.0.0",
     "yargs": "^13.2.1"
   },
   "resolutions": {
