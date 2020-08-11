@@ -174,6 +174,7 @@ Sometimes it can be useful to implement your own strategy (it can be just a mock
 
 ```typescript
 type Evaluator = (
+  babel: BabelCore,
   filename: string, // the name of processed file
   options: StrictOptions, // Linaria config
   text: string, // source code

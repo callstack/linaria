@@ -2,16 +2,21 @@
  * This file is a babel preset used to transform files inside evaluators.
  * It works the same as main `babel/extract` preset, but do not evaluate lazy dependencies.
  */
-import type { NodePath } from '@babel/traverse';
+import type { NodePath, Visitor } from '@babel/traverse';
 import type { Program } from '@babel/types';
+import type { CallExpression, TaggedTemplateExpression } from '@babel/types';
 import GenerateClassNames from '../visitors/GenerateClassNames';
 import DetectStyledImportName from '../visitors/DetectStyledImportName';
 import type { State, StrictOptions } from '../types';
+import { Core } from '../babel';
 import JSXElement from './visitors/JSXElement';
 import ProcessStyled from './visitors/ProcessStyled';
 import ProcessCSS from './visitors/ProcessCSS';
 
-function preeval(_babel: any, options: StrictOptions) {
+function preeval(
+  babel: Core,
+  options: StrictOptions
+): { visitor: Visitor<State> } {
   return {
     visitor: {
       Program: {
@@ -26,15 +31,16 @@ function preeval(_babel: any, options: StrictOptions) {
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
-            ImportDeclaration: (p) => DetectStyledImportName(p, state),
+            ImportDeclaration: (p) => DetectStyledImportName(babel, p, state),
             TaggedTemplateExpression: (p) =>
-              GenerateClassNames(p, state, options),
-            JSXElement,
+              GenerateClassNames(babel, p, state, options),
+            JSXElement: (p) => JSXElement(babel, p),
           });
         },
       },
-      CallExpression: ProcessStyled,
-      TaggedTemplateExpression: ProcessCSS, // TaggedTemplateExpression is processed before CallExpression
+      CallExpression: (p: NodePath<CallExpression>) => ProcessStyled(babel, p),
+      TaggedTemplateExpression: (p: NodePath<TaggedTemplateExpression>) =>
+        ProcessCSS(babel, p), // TaggedTemplateExpression is processed before CallExpression
     },
   };
 }

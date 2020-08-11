@@ -4,7 +4,6 @@
  * it recursively extracts paths that contains identifiers that are needed to evaluate the dependency.
  */
 
-import { types as t } from '@babel/core';
 import type {
   Identifier,
   Node,
@@ -12,6 +11,7 @@ import type {
   VariableDeclarator,
 } from '@babel/types';
 import type { Binding, NodePath } from '@babel/traverse';
+import { Core } from '../../babel';
 
 type Requirement = {
   result: Statement;
@@ -20,10 +20,15 @@ type Requirement = {
 };
 
 export default class RequirementsResolver {
-  public static resolve(path: NodePath<Node> | NodePath<Node>[]): Statement[] {
-    const resolver = new RequirementsResolver();
+  private constructor(private babel: Core) {}
+
+  public static resolve(
+    babel: Core,
+    path: NodePath<Node> | NodePath<Node>[]
+  ): Statement[] {
+    const resolver = new RequirementsResolver(babel);
     if (Array.isArray(path)) {
-      path.forEach((p) => this.resolve(p));
+      path.forEach((p) => this.resolve(babel, p));
     } else {
       resolver.resolve(path);
     }
@@ -53,6 +58,7 @@ export default class RequirementsResolver {
    * and adds all of it to the list of requirements.
    */
   private resolveBinding(binding: Binding) {
+    const { types: t } = this.babel;
     let result: Statement;
     const startPosition = binding.path.node.start;
 

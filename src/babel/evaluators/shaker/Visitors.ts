@@ -1,7 +1,7 @@
-import { types as t } from '@babel/core';
 import type { Aliases, Identifier, Node, VisitorKeys } from '@babel/types';
 import peek from '../../utils/peek';
 import { warn } from '../../utils/logger';
+import { Core } from '../../babel';
 import GraphBuilderState from './GraphBuilderState';
 import identifierHandlers from './identifierHandlers';
 import type { Visitor, Visitors } from './types';
@@ -11,6 +11,7 @@ import { visitors as core } from './langs/core';
 const visitors: Visitors = {
   Identifier<TParent extends Node>(
     this: GraphBuilderState,
+    babel: Core,
     node: Identifier,
     parent: TParent | null,
     parentKey: VisitorKeys[TParent['type']] | null,
@@ -23,7 +24,7 @@ const visitors: Visitors = {
     const handler = identifierHandlers[`${parent.type}:${parentKey}`];
 
     if (typeof handler === 'function') {
-      handler(this, node, parent, parentKey, listIdx);
+      handler(babel, this, node, parent, parentKey, listIdx);
       return;
     }
 
@@ -71,7 +72,10 @@ const visitors: Visitors = {
   ...core,
 };
 
-export function getVisitors<TNode extends Node>(node: TNode): Visitor<TNode>[] {
+export function getVisitors<TNode extends Node>(
+  { types: t }: Core,
+  node: TNode
+): Visitor<TNode>[] {
   const aliases: Array<keyof Aliases> = t.ALIAS_KEYS[node.type] || [];
   const aliasVisitors = aliases
     .map((type) => visitors[type])

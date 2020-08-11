@@ -1,13 +1,13 @@
 import path from 'path';
 import dedent from 'dedent';
-import { transformSync } from '@babel/core';
+import * as babel from '@babel/core';
 import Module from '../babel/module';
 import type { Evaluator, StrictOptions } from '../babel/types';
 
 beforeEach(() => Module.invalidate());
 
-const evaluator: Evaluator = (filename, options, text) => {
-  const { code } = transformSync(text, {
+const evaluator: Evaluator = (core, filename, options, text) => {
+  const { code } = babel.transformSync(text, {
     filename: filename,
   })!;
   return [code!, null];
@@ -36,7 +36,7 @@ beforeEach(() => Module.invalidateEvalCache());
 
 it('creates module for JS files', () => {
   const filename = '/foo/bar/test.js';
-  const mod = new Module(filename, options);
+  const mod = new Module(babel, filename, options);
 
   mod.evaluate('module.exports = () => 42');
 
@@ -46,7 +46,7 @@ it('creates module for JS files', () => {
 });
 
 it('requires JS files', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   mod.evaluate(dedent`
     const answer = require('./sample-script');
@@ -58,7 +58,7 @@ it('requires JS files', () => {
 });
 
 it('requires JSON files', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   mod.evaluate(dedent`
     const data = require('./sample-data.json');
@@ -70,7 +70,7 @@ it('requires JSON files', () => {
 });
 
 it('imports JS files', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   mod.evaluate(dedent`
     import answer from './sample-script';
@@ -83,6 +83,7 @@ it('imports JS files', () => {
 
 it('imports TypeScript files', () => {
   const mod = new Module(
+    babel,
     path.resolve(__dirname, '../__fixtures__/test.ts'),
     options
   );
@@ -97,7 +98,7 @@ it('imports TypeScript files', () => {
 });
 
 it('imports JSON files', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   mod.evaluate(dedent`
     import data from './sample-data.json';
@@ -114,14 +115,14 @@ it('returns module from the cache', () => {
   /* eslint-disable no-self-compare */
 
   const filename = getFileName();
-  const mod = new Module(filename, options);
+  const mod = new Module(babel, filename, options);
   const id = './sample-data.json';
 
   expect(mod.require(id) === mod.require(id)).toBe(true);
 
   expect(
-    new Module(filename, options).require(id) ===
-      new Module(filename, options).require(id)
+    new Module(babel, filename, options).require(id) ===
+      new Module(babel, filename, options).require(id)
   ).toBe(true);
 });
 
@@ -129,35 +130,39 @@ it('clears modules from the cache', () => {
   const filename = getFileName();
   const id = './sample-data.json';
 
-  const result = new Module(filename, options).require(id);
+  const result = new Module(babel, filename, options).require(id);
 
-  expect(result === new Module(filename, options).require(id)).toBe(true);
+  expect(result === new Module(babel, filename, options).require(id)).toBe(
+    true
+  );
 
   Module.invalidate();
 
-  expect(result === new Module(filename, options).require(id)).toBe(false);
+  expect(result === new Module(babel, filename, options).require(id)).toBe(
+    false
+  );
 });
 
 it('exports the path for non JS/JSON files', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   expect(mod.require('./sample-asset.png')).toBe('./sample-asset.png');
 });
 
 it('returns module when requiring mocked builtin node modules', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   expect(mod.require('path')).toBe(require('path'));
 });
 
 it('returns null when requiring empty builtin node modules', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   expect(mod.require('fs')).toBe(null);
 });
 
 it('throws when requiring unmocked builtin node modules', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   expect(() => mod.require('perf_hooks')).toThrow(
     'Unable to import "perf_hooks". Importing Node builtins is not supported in the sandbox.'
@@ -165,7 +170,7 @@ it('throws when requiring unmocked builtin node modules', () => {
 });
 
 it('has access to the global object', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -175,7 +180,7 @@ it('has access to the global object', () => {
 });
 
 it("doesn't have access to the process object", () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -185,7 +190,7 @@ it("doesn't have access to the process object", () => {
 });
 
 it('has access to NODE_ENV', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   mod.evaluate(dedent`
   module.exports = process.env.NODE_ENV;
@@ -195,7 +200,7 @@ it('has access to NODE_ENV', () => {
 });
 
 it('has require.resolve available', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   mod.evaluate(dedent`
   module.exports = require.resolve('./sample-script');
@@ -207,7 +212,7 @@ it('has require.resolve available', () => {
 });
 
 it('has require.ensure available', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -217,7 +222,7 @@ it('has require.ensure available', () => {
 });
 
 it('has __filename available', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   mod.evaluate(dedent`
   module.exports = __filename;
@@ -227,7 +232,7 @@ it('has __filename available', () => {
 });
 
 it('has __dirname available', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   mod.evaluate(dedent`
   module.exports = __dirname;
@@ -237,7 +242,7 @@ it('has __dirname available', () => {
 });
 
 it('has setTimeout, clearTimeout available', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -251,7 +256,7 @@ it('has setTimeout, clearTimeout available', () => {
 });
 
 it('has setInterval, clearInterval available', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -265,7 +270,7 @@ it('has setInterval, clearInterval available', () => {
 });
 
 it('has setImmediate, clearImmediate available', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -279,7 +284,7 @@ it('has setImmediate, clearImmediate available', () => {
 });
 
 it('has global objects available without referencing global', () => {
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -293,7 +298,7 @@ it('changes resolve behaviour on overriding _resolveFilename', () => {
 
   Module._resolveFilename = (id) => (id === 'foo' ? 'bar' : id);
 
-  const mod = new Module(getFileName(), options);
+  const mod = new Module(babel, getFileName(), options);
 
   mod.evaluate(dedent`
   module.exports = [
@@ -310,7 +315,7 @@ it('changes resolve behaviour on overriding _resolveFilename', () => {
 
 it('correctly processes export declarations in strict mode', () => {
   const filename = '/foo/bar/test.js';
-  const mod = new Module(filename, options);
+  const mod = new Module(babel, filename, options);
 
   mod.evaluate('"use strict"; exports = module.exports = () => 42');
 

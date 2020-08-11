@@ -3,7 +3,6 @@
  * It uses CSS code from template literals and evaluated values of lazy dependencies stored in ValueCache.
  */
 
-import { types as t } from '@babel/core';
 import type { Expression } from '@babel/types';
 import generator from '@babel/generator';
 
@@ -22,6 +21,7 @@ import throwIfInvalid from '../utils/throwIfInvalid';
 import stripLines from '../utils/stripLines';
 import toCSS from '../utils/toCSS';
 import getLinariaComment from '../utils/getLinariaComment';
+import { Core } from '../babel';
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
@@ -39,7 +39,10 @@ function hasMeta(value: any): value is StyledMeta {
 
 const processedPaths = new WeakSet();
 
-export default function getTemplateProcessor(options: StrictOptions) {
+export default function getTemplateProcessor(
+  { types: t }: Core,
+  options: StrictOptions
+) {
   return function process(
     { styled, path }: TemplateExpression,
     state: State,

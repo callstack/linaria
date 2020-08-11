@@ -1,12 +1,13 @@
 import generator from '@babel/generator';
-import { transformSync } from '@babel/core';
 import type { Program } from '@babel/types';
 import type { Evaluator, StrictOptions } from '../../types';
 import { debug } from '../../utils/logger';
 import buildOptions from '../buildOptions';
+import { Core } from '../../babel';
 import shake from './shaker';
 
 function prepareForShake(
+  babel: Core,
   filename: string,
   options: StrictOptions,
   code: string
@@ -37,7 +38,7 @@ function prepareForShake(
       2
     )}`
   );
-  const transformed = transformSync(code, transformOptions);
+  const transformed = babel.transformSync(code, transformOptions);
 
   if (transformed === null || !transformed.ast) {
     throw new Error(`${filename} cannot be transformed`);
@@ -46,9 +47,10 @@ function prepareForShake(
   return transformed.ast.program;
 }
 
-const shaker: Evaluator = (filename, options, text, only = null) => {
+const shaker: Evaluator = (babel, filename, options, text, only = null) => {
   const [shaken, imports] = shake(
-    prepareForShake(filename, options, text),
+    babel,
+    prepareForShake(babel, filename, options, text),
     only
   );
 

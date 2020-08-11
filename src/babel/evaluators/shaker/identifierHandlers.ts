@@ -1,12 +1,12 @@
-import { types as t } from '@babel/core';
 import type { Aliases, Identifier, Node, VisitorKeys } from '@babel/types';
 import peek from '../../utils/peek';
+import { Core } from '../../babel';
 import GraphBuilderState from './GraphBuilderState';
 import type { IdentifierHandlerType, NodeType } from './types';
 import { identifierHandlers as core } from './langs/core';
-import ScopeManager from './scope';
 
 type HandlerFn = <TParent extends Node = Node>(
+  babel: Core,
   builder: GraphBuilderState,
   node: Identifier,
   parent: TParent,
@@ -20,111 +20,127 @@ const handlers: {
   [key: string]: Handler;
 } = {};
 
-function isAlias(type: NodeType): type is keyof Aliases {
+function isAlias({ types: t }: Core, type: NodeType): type is keyof Aliases {
   return type in t.FLIPPED_ALIAS_KEYS;
 }
 
-export function defineHandler(
+function defineHandler(
+  babel: Core,
   typeOrAlias: NodeType,
   field: string,
   handler: Handler
 ) {
-  const types = isAlias(typeOrAlias)
-    ? t.FLIPPED_ALIAS_KEYS[typeOrAlias]
+  const types = isAlias(babel, typeOrAlias)
+    ? babel.types.FLIPPED_ALIAS_KEYS[typeOrAlias]
     : [typeOrAlias];
   types.forEach((type: string) => {
     handlers[`${type}:${field}`] = handler;
   });
 }
 
-export function batchDefineHandlers(
+function batchDefineHandlers(
+  babel: Core,
   typesAndFields: [NodeType, ...string[]][],
   handler: IdentifierHandlerType
 ) {
   typesAndFields.forEach(([type, ...fields]) =>
-    fields.forEach((field) => defineHandler(type, field, handler))
+    fields.forEach((field) => defineHandler(babel, type, field, handler))
   );
 }
 
-batchDefineHandlers([...core.declare], 'declare');
+export function initialize(babel: Core) {
+  if (Object.keys(handlers).length > 0) return;
 
-batchDefineHandlers([...core.keep], 'keep');
+  batchDefineHandlers(babel, [...core.declare], 'declare');
 
-batchDefineHandlers([...core.refer], 'refer');
+  batchDefineHandlers(babel, [...core.keep], 'keep');
 
-/*
- * Special case for FunctionDeclaration
- * Function id should be defined in the parent scope
- */
-defineHandler(
-  'FunctionDeclaration',
-  'id',
-  (builder: GraphBuilderState, node: Identifier) => {
+  batchDefineHandlers(babel, [...core.refer], 'refer');
+
+  /*
+   * Special case for FunctionDeclaration
+   * Function id should be defined in the parent scope
+   */
+  defineHandler(babel, 'FunctionDeclaration', 'id', (babel, builder, node) => {
     builder.scope.declare(node, false, null, 1);
-  }
-);
+  });
 
-/*
- * Special handler for [obj.member = 42] = [1] in different contexts
- */
-const memberExpressionObjectHandler = (
-  builder: GraphBuilderState,
-  node: Identifier
-) => {
-  const context = peek(builder.context);
-  const declaration = builder.scope.addReference(node);
-  if (declaration) {
-    builder.graph.addEdge(node, declaration);
-
-    if (context === 'lval') {
-      // One exception here: we shake exports,
-      // so `exports` does not depend on its members' assignments.
-      if (
-        declaration !== ScopeManager.globalExportsIdentifier &&
-        declaration !== ScopeManager.globalModuleIdentifier
-      ) {
-        builder.graph.addEdge(declaration, node);
-      }
-    }
-  }
-};
-
-defineHandler('MemberExpression', 'object', memberExpressionObjectHandler);
-defineHandler(
-  'OptionalMemberExpression',
-  'object',
-  memberExpressionObjectHandler
-);
-
-/*
- * Special handler for obj.member and obj[member]
- */
-const memberExpressionPropertyHandler = (
-  builder: GraphBuilderState,
-  node: Identifier,
-  parent: Node
-) => {
-  if (t.isMemberExpression(parent) && parent.computed) {
+  /*
+   * Special handler for [obj.member = 42] = [1] in different contexts
+   */
+  const memberExpressionObjectHandler = (
+    babel: Core,
+    builder: GraphBuilderState,
+    node: Identifier
+  ) => {
+    const context = peek(builder.context);
     const declaration = builder.scope.addReference(node);
-    // Let's check that it's not a global variable
     if (declaration) {
-      // usage of a variable depends on its declaration
       builder.graph.addEdge(node, declaration);
 
-      const context = peek(builder.context);
       if (context === 'lval') {
-        // This is an identifier in the left side of an assignment expression and a variable value depends on that.
-        builder.graph.addEdge(declaration, node);
+        // One exception here: we shake exports,
+        // so `exports` does not depend on its members' assignments.
+        if (
+          declaration !== builder.scope.globalExportsIdentifier &&
+          declaration !== builder.scope.globalModuleIdentifier
+        ) {
+          builder.graph.addEdge(declaration, node);
+        }
       }
     }
-  }
-};
+  };
 
-defineHandler('MemberExpression', 'property', memberExpressionPropertyHandler);
-defineHandler(
-  'OptionalMemberExpression',
-  'property',
-  memberExpressionPropertyHandler
-);
+  defineHandler(
+    babel,
+    'MemberExpression',
+    'object',
+    memberExpressionObjectHandler
+  );
+  defineHandler(
+    babel,
+    'OptionalMemberExpression',
+    'object',
+    memberExpressionObjectHandler
+  );
+
+  /*
+   * Special handler for obj.member and obj[member]
+   */
+  const memberExpressionPropertyHandler = (
+    { types: t }: Core,
+    builder: GraphBuilderState,
+    node: Identifier,
+    parent: Node
+  ) => {
+    if (t.isMemberExpression(parent) && parent.computed) {
+      const declaration = builder.scope.addReference(node);
+      // Let's check that it's not a global variable
+      if (declaration) {
+        // usage of a variable depends on its declaration
+        builder.graph.addEdge(node, declaration);
+
+        const context = peek(builder.context);
+        if (context === 'lval') {
+          // This is an identifier in the left side of an assignment expression and a variable value depends on that.
+          builder.graph.addEdge(declaration, node);
+        }
+      }
+    }
+  };
+
+  defineHandler(
+    babel,
+    'MemberExpression',
+    'property',
+    memberExpressionPropertyHandler
+  );
+  defineHandler(
+    babel,
+    'OptionalMemberExpression',
+    'property',
+    memberExpressionPropertyHandler
+  );
+}
 
 export default handlers;

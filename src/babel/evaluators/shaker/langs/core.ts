@@ -1,4 +1,3 @@
-import { types as t } from '@babel/core';
 import type {
   AssignmentExpression,
   Block,
@@ -26,9 +25,10 @@ import type {
 import type { IdentifierHandlers, Visitors } from '../types';
 import GraphBuilderState from '../GraphBuilderState';
 import peek from '../../../utils/peek';
-import ScopeManager from '../scope';
+import { Core } from '../../../babel';
 
 function isIdentifier(
+  { types: t }: Core,
   node: Node,
   name?: string | string[]
 ): node is Identifier {
@@ -47,7 +47,7 @@ type SideEffect = [
   (node: CallExpression, state: GraphBuilderState) => void
 ];
 
-const sideEffects: SideEffect[] = [
+const getSideEffects: (babel: Core) => SideEffect[] = ({ types: t }) => [
   [
     // if the first argument of forEach is required, mark forEach as required
     {
@@ -60,7 +60,7 @@ const sideEffects: SideEffect[] = [
   ],
 ];
 
-function getCallee(node: CallExpression): Node {
+function getCallee({ types: t }: Core, node: CallExpression): Node {
   if (
     t.isSequenceExpression(node.callee) &&
     node.callee.expressions.length === 2
@@ -77,14 +77,19 @@ function getCallee(node: CallExpression): Node {
 /*
  * Returns nodes which are implicitly affected by specified node
  */
-function getAffectedNodes(node: Node, state: GraphBuilderState): Node[] {
+function getAffectedNodes(
+  babel: Core,
+  node: Node,
+  state: GraphBuilderState
+): Node[] {
+  const { types: t } = babel;
   // FIXME: this method should be generalized
-  const callee = t.isCallExpression(node) ? getCallee(node) : null;
+  const callee = t.isCallExpression(node) ? getCallee(babel, node) : null;
   if (
     t.isCallExpression(node) &&
     t.isMemberExpression(callee) &&
-    isIdentifier(callee.object, 'Object') &&
-    isIdentifier(callee.property, [
+    isIdentifier(babel, callee.object, 'Object') &&
+    isIdentifier(babel, callee.property, [
       'assign',
       'defineProperty',
       'defineProperties',
@@ -98,7 +103,7 @@ function getAffectedNodes(node: Node, state: GraphBuilderState): Node[] {
     }
 
     if (
-      state.scope.getDeclaration(obj) !== ScopeManager.globalExportsIdentifier
+      state.scope.getDeclaration(obj) !== state.scope.globalExportsIdentifier
     ) {
       return [node.arguments[0]];
     }
@@ -131,7 +136,11 @@ export const visitors: Visitors = {
    * that's why we need to mark the statement as a dependency of the expression.
    * If we don't mark it, it will be cut as a useless statement.
    */
-  ExpressionStatement(this: GraphBuilderState, node: ExpressionStatement) {
+  ExpressionStatement(
+    this: GraphBuilderState,
+    babel,
+    node: ExpressionStatement
+  ) {
     this.baseVisit(node);
 
     this.graph.addEdge(node.expression, node);
@@ -145,7 +154,8 @@ export const visitors: Visitors = {
    * In general, a body depends on parameters of a function.
    * In real life, some of the parameters can be omitted, but it's not trivial to implement that type of tree shaking.
    */
-  Function(this: GraphBuilderState, node: Function) {
+  Function(this: GraphBuilderState, babel, node: Function) {
+    const { types: t } = babel;
     const unsubscribe = this.onVisit((descendant) =>
       this.graph.addEdge(node, descendant)
     );
@@ -183,7 +193,8 @@ export const visitors: Visitors = {
    * If we want to evaluate the value of `c`, we need to evaluate lines 1, 3, 5 and 6,
    * but we don't need line 4, even though it's a child of the block.
    */
-  Block(this: GraphBuilderState, node: Block) {
+  Block(this: GraphBuilderState, babel, node: Block) {
+    const { types: t } = babel;
     this.baseVisit(node);
 
     if (t.isProgram(node)) {
@@ -199,7 +210,7 @@ export const visitors: Visitors = {
     });
   },
 
-  Directive(this: GraphBuilderState, node: Directive) {
+  Directive(this: GraphBuilderState, babel, node: Directive) {
     this.baseVisit(node);
     this.graph.addEdge(node, node.value);
   },
@@ -210,7 +221,7 @@ export const visitors: Visitors = {
    * `handler` and `finalizer` do not make sense without `block`
    * `block` depends on the whole node.
    */
-  TryStatement(this: GraphBuilderState, node: TryStatement) {
+  TryStatement(this: GraphBuilderState, babel, node: TryStatement) {
     this.baseVisit(node);
     [node.handler, node.finalizer].forEach((statement) => {
       if (statement) {
@@ -222,7 +233,7 @@ export const visitors: Visitors = {
     this.graph.addEdge(node.block, node);
   },
 
-  IfStatement(this: GraphBuilderState, node: IfStatement) {
+  IfStatement(this: GraphBuilderState, babel, node: IfStatement) {
     this.baseVisit(node);
     [node.consequent, node.alternate].forEach((statement) => {
       if (statement) {
@@ -240,13 +251,13 @@ export const visitors: Visitors = {
    * • if body is required, the statement is required
    * • if the statement is required, the condition is also required.
    */
-  WhileStatement(this: GraphBuilderState, node: WhileStatement) {
+  WhileStatement(this: GraphBuilderState, babel, node: WhileStatement) {
     this.baseVisit(node);
     this.graph.addEdge(node.body, node);
     this.graph.addEdge(node, node.test);
   },
 
-  SwitchCase(this: GraphBuilderState, node: SwitchCase) {
+  SwitchCase(this: GraphBuilderState, babel, node: SwitchCase) {
     this.baseVisit(node);
     node.consequent.forEach((statement) => this.graph.addEdge(statement, node));
     if (node.test) {
@@ -254,13 +265,13 @@ export const visitors: Visitors = {
     }
   },
 
-  SwitchStatement(this: GraphBuilderState, node: SwitchStatement) {
+  SwitchStatement(this: GraphBuilderState, babel, node: SwitchStatement) {
     this.baseVisit(node);
     node.cases.forEach((c) => this.graph.addEdge(c, node));
     this.graph.addEdge(node, node.discriminant);
   },
 
-  ForStatement(this: GraphBuilderState, node: ForStatement) {
+  ForStatement(this: GraphBuilderState, babel, node: ForStatement) {
     this.baseVisit(node);
 
     if (node.body) {
@@ -278,7 +289,7 @@ export const visitors: Visitors = {
    * ForInStatement
    * for (const k in o) { body }
    */
-  ForInStatement(this: GraphBuilderState, node: ForInStatement) {
+  ForInStatement(this: GraphBuilderState, babel, node: ForInStatement) {
     this.baseVisit(node);
 
     if (node.body) {
@@ -295,7 +306,8 @@ export const visitors: Visitors = {
    * All these nodes are required to evaluate the value of a function in which they are defined.
    * Also, the value of these nodes depends on the argument if it is presented.
    */
-  Terminatorless(this: GraphBuilderState, node: Terminatorless) {
+  Terminatorless(this: GraphBuilderState, babel, node: Terminatorless) {
+    const { types: t } = babel;
     this.baseVisit(node);
 
     if (
@@ -319,7 +331,8 @@ export const visitors: Visitors = {
    *   ...rest, // SpreadElement
    * }
    */
-  ObjectExpression(this: GraphBuilderState, node: ObjectExpression) {
+  ObjectExpression(this: GraphBuilderState, babel, node: ObjectExpression) {
+    const { types: t } = babel;
     this.context.push('expression');
     this.baseVisit(node);
     node.properties.forEach((prop) => {
@@ -351,7 +364,8 @@ export const visitors: Visitors = {
    * If we try to evaluate `obj` without backward dependency,
    * `obj.b = 2` will be cut and we will get just `{ a: 1 }`.
    */
-  MemberExpression(this: GraphBuilderState, node: MemberExpression) {
+  MemberExpression(this: GraphBuilderState, babel, node: MemberExpression) {
+    const { types: t } = babel;
     this.baseVisit(node);
     this.graph.addEdge(node.object, node);
 
@@ -375,7 +389,11 @@ export const visitors: Visitors = {
    * We switch the context to `lval` and continue traversing through the left branch.
    * If we then meet some identifier, we mark it as a dependency of its declaration.
    */
-  AssignmentExpression(this: GraphBuilderState, node: AssignmentExpression) {
+  AssignmentExpression(
+    this: GraphBuilderState,
+    babel,
+    node: AssignmentExpression
+  ) {
     this.context.push('lval');
     this.visit<AssignmentExpression['left'], AssignmentExpression>(
       node.left,
@@ -401,7 +419,7 @@ export const visitors: Visitors = {
    * VariableDeclarator
    * It would be pretty simple if it weren't used to declare variables from other modules.
    */
-  VariableDeclarator(this: GraphBuilderState, node: VariableDeclarator) {
+  VariableDeclarator(this: GraphBuilderState, babel, node: VariableDeclarator) {
     /*
      * declared is used for detecting external dependencies in cases like
      * const { a, b, c } = require('module');
@@ -435,7 +453,11 @@ export const visitors: Visitors = {
    * It's just a wrapper for group of VariableDeclarator.
    * If one of the declarators is required, the wrapper itself is also required.
    */
-  VariableDeclaration(this: GraphBuilderState, node: VariableDeclaration) {
+  VariableDeclaration(
+    this: GraphBuilderState,
+    babel,
+    node: VariableDeclaration
+  ) {
     this.meta.set('kind-of-declaration', node.kind);
     this.baseVisit(node);
     node.declarations.forEach((declaration) =>
@@ -453,9 +475,11 @@ export const visitors: Visitors = {
    */
   CallExpression(
     this: GraphBuilderState,
+    babel: Core,
     node: CallExpression,
     parent: Node | null
   ) {
+    const { types: t } = babel;
     this.baseVisit(node);
 
     if (t.isIdentifier(node.callee) && node.callee.name === 'require') {
@@ -524,7 +548,7 @@ export const visitors: Visitors = {
       return;
     }
 
-    sideEffects.forEach(([conditions, callback]) => {
+    getSideEffects(babel).forEach(([conditions, callback]) => {
       if (
         (conditions.callee && !conditions.callee(node.callee)) ||
         (conditions.arguments && !conditions.arguments(node.arguments))
@@ -535,7 +559,7 @@ export const visitors: Visitors = {
       return callback(node, this);
     });
 
-    getAffectedNodes(node, this).forEach((affectedNode) => {
+    getAffectedNodes(babel, node, this).forEach((affectedNode) => {
       this.graph.addEdge(affectedNode, node);
       if (t.isIdentifier(affectedNode)) {
         this.graph.addEdge(
@@ -555,7 +579,7 @@ export const visitors: Visitors = {
    * Example:
    * const a = (1, 2, b = 3, 4, b + 2); // `a` will be equal 5
    */
-  SequenceExpression(this: GraphBuilderState, node: SequenceExpression) {
+  SequenceExpression(this: GraphBuilderState, babel, node: SequenceExpression) {
     // Sequence value depends on only last expression in the list
     this.baseVisit(node, true);
     if (node.expressions.length > 0) {

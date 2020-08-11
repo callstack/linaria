@@ -10,9 +10,8 @@
  *  - store result of extraction in babel's file metadata
  */
 
-import { types as t } from '@babel/core';
 import type { Node, Program, Expression } from '@babel/types';
-import type { NodePath, Scope } from '@babel/traverse';
+import type { NodePath, Scope, Visitor } from '@babel/traverse';
 import { expression, statement } from '@babel/template';
 import generator from '@babel/generator';
 import evaluate from './evaluators';
@@ -30,6 +29,7 @@ import CollectDependencies from './visitors/CollectDependencies';
 import DetectStyledImportName from './visitors/DetectStyledImportName';
 import GenerateClassNames from './visitors/GenerateClassNames';
 import { debug } from './utils/logger';
+import type { Core } from './babel';
 
 function isLazyValue(v: ExpressionValue): v is LazyValue {
   return v.kind === ValueType.LAZY;
@@ -80,6 +80,7 @@ const exportsLinariaPrevalTpl = statement(
 );
 
 function addLinariaPreval(
+  { types: t }: Core,
   path: NodePath<Program>,
   lazyDeps: Array<Expression | string>
 ): Program {
@@ -103,8 +104,11 @@ function addLinariaPreval(
   );
 }
 
-export default function extract(_babel: any, options: StrictOptions) {
-  const process = getTemplateProcessor(options);
+export default function extract(
+  babel: Core,
+  options: StrictOptions
+): { visitor: Visitor<State> } {
+  const process = getTemplateProcessor(babel, options);
 
   return {
     visitor: {
@@ -124,10 +128,10 @@ export default function extract(_babel: any, options: StrictOptions) {
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
-            ImportDeclaration: (p) => DetectStyledImportName(p, state),
+            ImportDeclaration: (p) => DetectStyledImportName(babel, p, state),
             TaggedTemplateExpression: (p) => {
-              GenerateClassNames(p, state, options);
-              CollectDependencies(p, state, options);
+              GenerateClassNames(babel, p, state, options);
+              CollectDependencies(babel, p, state, options);
             },
           });
 
@@ -162,13 +166,17 @@ export default function extract(_babel: any, options: StrictOptions) {
               )
             );
 
-            const program = addLinariaPreval(path, expressionsToEvaluate);
+            const program = addLinariaPreval(
+              babel,
+              path,
+              expressionsToEvaluate
+            );
             const { code } = generator(program);
             debug('lazy-deps:evaluate', '');
             try {
               const evaluation = evaluate(
                 code,
-                t,
+                babel,
                 state.file.opts.filename,
                 options
               );

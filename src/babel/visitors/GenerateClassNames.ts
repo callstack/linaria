@@ -6,7 +6,6 @@
  */
 
 import { basename, dirname, relative } from 'path';
-import { types as t } from '@babel/core';
 import type { TaggedTemplateExpression } from '@babel/types';
 import type { NodePath } from '@babel/traverse';
 import type { State, StrictOptions } from '../types';
@@ -15,13 +14,16 @@ import slugify from '../../slugify';
 import getLinariaComment from '../utils/getLinariaComment';
 import { debug } from '../utils/logger';
 import isStyledOrCss from '../utils/isStyledOrCss';
+import { Core } from '../babel';
 
 export default function GenerateClassNames(
+  babel: Core,
   path: NodePath<TaggedTemplateExpression>,
   state: State,
   options: StrictOptions
 ) {
-  const styledOrCss = isStyledOrCss(path, state);
+  const { types: t } = babel;
+  const styledOrCss = isStyledOrCss(babel, path, state);
   if (!styledOrCss) {
     return;
   }
@@ -132,7 +134,7 @@ export default function GenerateClassNames(
     };
 
     // Variables that were used in the config for `classNameSlug`
-    const optionVariables = classNameSlug.match(/\[.*?\]/g) || [];
+    const optionVariables = classNameSlug.match(/\[.*?]/g) || [];
     let cnSlug = classNameSlug;
 
     for (let i = 0, l = optionVariables.length; i < l; i++) {

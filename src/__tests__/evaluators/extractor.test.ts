@@ -1,5 +1,6 @@
 import path from 'path';
 import dedent from 'dedent';
+import * as babel from '@babel/core';
 import type { TransformOptions } from '@babel/core';
 import exctract from '../../babel/evaluators/extractor';
 
@@ -14,6 +15,7 @@ function _shake(opts?: TransformOptions, only: string[] = ['__linariaPreval']) {
   ): [string, Map<string, string[]>] => {
     const code = dedent(literal, ...placeholders);
     const [shaken, deps] = exctract(
+      babel,
       getFileName(),
       {
         babelOptions: opts || {},

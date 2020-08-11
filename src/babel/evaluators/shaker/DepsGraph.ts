@@ -1,5 +1,5 @@
-import { types as t } from '@babel/core';
 import type { Identifier, Node } from '@babel/types';
+import { Core } from '../../babel';
 import ScopeManager, { PromisedNode, resolveNode } from './scope';
 
 type Action = (this: DepsGraph, a: Node, b: Node) => void;
@@ -55,6 +55,7 @@ export default class DepsGraph {
   }
 
   private getAllReferences(id: string): Identifier[] {
+    const { types: t } = this.babel;
     const [, name] = id.split(':');
     const declaration = this.scope.getDeclaration(id)!;
     const allReferences = [
@@ -65,7 +66,7 @@ export default class DepsGraph {
     return allReferences;
   }
 
-  constructor(protected scope: ScopeManager) {}
+  constructor(private babel: Core, protected scope: ScopeManager) {}
 
   addEdge(dependent: Node | PromisedNode, dependency: Node | PromisedNode) {
     this.actionQueue.push([addEdge, dependent, dependency]);
@@ -76,6 +77,7 @@ export default class DepsGraph {
   }
 
   getDependenciesByBinding(id: string) {
+    const { types: t } = this.babel;
     this.processQueue();
     const allReferences = this.getAllReferences(id);
     const dependencies = [];
@@ -89,6 +91,7 @@ export default class DepsGraph {
   }
 
   getDependentsByBinding(id: string) {
+    const { types: t } = this.babel;
     this.processQueue();
     const allReferences = this.getAllReferences(id);
     const dependents = [];
@@ -102,6 +105,7 @@ export default class DepsGraph {
   }
 
   findDependencies(like: Object) {
+    const { types: t } = this.babel;
     this.processQueue();
     return this.edges
       .filter(([a]) => t.shallowEqual(a, like))
@@ -109,6 +113,7 @@ export default class DepsGraph {
   }
 
   findDependents(like: object) {
+    const { types: t } = this.babel;
     this.processQueue();
     return this.edges
       .filter(([, b]) => t.shallowEqual(b, like))

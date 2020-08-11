@@ -7,11 +7,11 @@
  * It is used explicitly in extractor, and loaded as a part of `prest-env` in shaker
  */
 
-import { types as t } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import type { CallExpression } from '@babel/types';
 import { expression } from '@babel/template';
 import getLinariaComment from '../../utils/getLinariaComment';
+import { Core } from '../../babel';
 
 const linariaComponentTpl = expression(
   `{
@@ -23,7 +23,10 @@ const linariaComponentTpl = expression(
   }`
 );
 
-export default function ProcessStyled(path: NodePath<CallExpression>) {
+export default function ProcessStyled(
+  { types: t }: Core,
+  path: NodePath<CallExpression>
+) {
   const [, displayName, className] = getLinariaComment(path);
   if (!className) {
     return;

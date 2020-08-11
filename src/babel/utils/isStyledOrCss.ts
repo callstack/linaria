@@ -1,4 +1,3 @@
-import { types as t } from '@babel/core';
 import type {
   CallExpression,
   Expression,
@@ -6,6 +5,7 @@ import type {
 } from '@babel/types';
 import type { NodePath } from '@babel/traverse';
 import type { State, TemplateExpression } from '../types';
+import { Core } from '../babel';
 import hasImport from './hasImport';
 
 type Result = NonNullable<TemplateExpression['styled']> | 'css' | null;
@@ -13,6 +13,7 @@ type Result = NonNullable<TemplateExpression['styled']> | 'css' | null;
 const cache = new WeakMap<NodePath<TaggedTemplateExpression>, Result>();
 
 export default function isStyledOrCss(
+  { types: t }: Core,
   path: NodePath<TaggedTemplateExpression>,
   state: State
 ): Result {

@@ -1,4 +1,5 @@
 import type { Aliases, Node, VisitorKeys } from '@babel/types';
+import { Core } from '../../babel';
 
 export type NodeOfType<T> = Extract<Node, { type: T }>;
 
@@ -7,6 +8,7 @@ export type NodeType = Node['type'] | keyof Aliases;
 export type VisitorAction = 'ignore' | void;
 
 export type Visitor<TNode extends Node> = <TParent extends Node>(
+  babel: Core,
   node: TNode,
   parent: TParent | null,
   parentKey: VisitorKeys[TParent['type']] | null,

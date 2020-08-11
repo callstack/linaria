@@ -21,7 +21,8 @@ import type { BabelFileResult } from '@babel/core';
 import * as EvalCache from './eval-cache';
 import * as process from './process';
 import { debug } from './utils/logger';
-import type { StrictOptions } from './types';
+import type { Evaluator, StrictOptions } from './types';
+import { Core } from './babel';
 
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty
@@ -96,6 +97,7 @@ class Module {
   debuggerDepth: number;
 
   constructor(
+    private babel: Core,
     filename: string,
     options: StrictOptions,
     debuggerDepth: number = 0
@@ -212,7 +214,12 @@ class Module {
       if (!m) {
         this.debug('cached:not-exist', id);
         // Create the module if cached module is not available
-        m = new Module(filename, this.options, this.debuggerDepth + 1);
+        m = new Module(
+          this.babel,
+          filename,
+          this.options,
+          this.debuggerDepth + 1
+        );
         m.transform = this.transform;
 
         // Store it in cache at this point with, otherwise
@@ -285,7 +292,7 @@ class Module {
       code = text;
     } else {
       // Action can be a function or a module name
-      const evaluator =
+      const evaluator: Evaluator =
         typeof action === 'function' ? action : require(action).default;
 
       // For JavaScript files, we need to transpile it and to get the exports of the module
@@ -293,7 +300,13 @@ class Module {
 
       this.debug('prepare-evaluation', this.filename, 'using', evaluator.name);
 
-      [code, imports] = evaluator(this.filename, this.options, text, only);
+      [code, imports] = evaluator(
+        this.babel,
+        this.filename,
+        this.options,
+        text,
+        only
+      );
       this.imports = imports;
 
       this.debug(

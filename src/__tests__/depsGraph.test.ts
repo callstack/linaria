@@ -1,20 +1,20 @@
 /* eslint-disable no-template-curly-in-string */
 
 import dedent from 'dedent';
-import { parseSync } from '@babel/core';
+import * as babel from '@babel/core';
 import buildDepsGraph from '../babel/evaluators/shaker/graphBuilder';
 
 function _build(literal: TemplateStringsArray, ...placeholders: string[]) {
   const code = dedent(literal, ...placeholders);
   return {
-    ast: parseSync(code, { filename: 'source.js' })!,
+    ast: babel.parseSync(code, { filename: 'source.js' })!,
     code,
   };
 }
 
 function _buildGraph(literal: TemplateStringsArray, ...placeholders: string[]) {
   const { ast } = _build(literal, ...placeholders);
-  return buildDepsGraph(ast);
+  return buildDepsGraph(babel, ast);
 }
 
 describe('VariableDeclaration', () => {

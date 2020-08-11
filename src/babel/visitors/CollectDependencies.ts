@@ -3,7 +3,6 @@
  * For each template it makes a list of dependencies, try to evaluate expressions, and if it is not possible, mark them as lazy dependencies.
  */
 
-import { types as t } from '@babel/core';
 import type {
   Expression,
   Identifier as IdentifierNode,
@@ -15,11 +14,12 @@ import type { State, StrictOptions, ExpressionValue } from '../types';
 import { ValueType } from '../types';
 import { debug } from '../utils/logger';
 import isStyledOrCss from '../utils/isStyledOrCss';
+import { Core } from '../babel';
 
 /**
  * Hoist the node and its dependencies to the highest scope possible
  */
-function hoist(ex: NodePath<Expression | null>) {
+function hoist(babel: Core, ex: NodePath<Expression | null>) {
   const Identifier = (idPath: NodePath<IdentifierNode>) => {
     if (!idPath.isReferencedIdentifier()) {
       return;
@@ -35,11 +35,11 @@ function hoist(ex: NodePath<Expression | null>) {
 
     if (bindingPath.isVariableDeclarator()) {
       const initPath = bindingPath.get('init') as NodePath<Expression | null>;
-      hoist(initPath);
+      hoist(babel, initPath);
       initPath.hoist(scope);
       if (initPath.isIdentifier()) {
         referencePaths.forEach((referencePath) => {
-          referencePath.replaceWith(t.identifier(initPath.node.name));
+          referencePath.replaceWith(babel.types.identifier(initPath.node.name));
         });
       }
     }
@@ -55,11 +55,13 @@ function hoist(ex: NodePath<Expression | null>) {
 }
 
 export default function CollectDependencies(
+  babel: Core,
   path: NodePath<TaggedTemplateExpression>,
   state: State,
   options: StrictOptions
 ) {
-  const styledOrCss = isStyledOrCss(path, state);
+  const { types: t } = babel;
+  const styledOrCss = isStyledOrCss(babel, path, state);
   if (!styledOrCss) {
     return;
   }
@@ -81,7 +83,7 @@ export default function CollectDependencies(
         // save original expression that may be changed during hoisting
         const originalExNode = t.cloneNode(ex.node);
 
-        hoist(ex as NodePath<Expression | null>);
+        hoist(babel, ex as NodePath<Expression | null>);
 
         // save hoisted expression to be used to evaluation
         const hoistedExNode = t.cloneNode(ex.node);
