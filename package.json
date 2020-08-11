@@ -95,7 +95,6 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "@babel/core": ">=7",
     "@babel/generator": ">=7",
     "@babel/plugin-proposal-export-namespace-from": ">=7",
     "@babel/plugin-syntax-dynamic-import": ">=7",
@@ -120,6 +119,9 @@
     "strip-ansi": "^5.2.0",
     "stylis": "^3.5.4",
     "yargs": "^13.2.1"
+  },
+  "peerDependencies": {
+    "@babel/core": ">=7"
   },
   "resolutions": {
     "git-raw-commits": "^2.0.3"
