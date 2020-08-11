@@ -1,9 +1,9 @@
-import shake from './shaker';
-import { debug } from '../../utils/logger';
 import generator from '@babel/generator';
-import { Evaluator, StrictOptions } from '../../types';
 import { transformSync, types } from '@babel/core';
+import { debug } from '../../utils/logger';
+import { Evaluator, StrictOptions } from '../../types';
 import buildOptions from '../buildOptions';
+import shake from './shaker';
 
 function prepareForShake(
   filename: string,

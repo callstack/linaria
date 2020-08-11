@@ -291,7 +291,7 @@ it('has global objects available without referencing global', () => {
 it('changes resolve behaviour on overriding _resolveFilename', () => {
   const originalResolveFilename = Module._resolveFilename;
 
-  Module._resolveFilename = id => (id === 'foo' ? 'bar' : id);
+  Module._resolveFilename = (id) => (id === 'foo' ? 'bar' : id);
 
   const mod = new Module(getFileName(), options);
 

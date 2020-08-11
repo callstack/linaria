@@ -1,6 +1,6 @@
+import path from 'path';
 import dedent from 'dedent';
 import * as babel from '@babel/core';
-import path from 'path';
 import exctract from '../../babel/evaluators/extractor';
 
 function getFileName() {

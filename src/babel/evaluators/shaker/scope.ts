@@ -85,7 +85,7 @@ export default class ScopeManager {
     const idName = identifier.name;
     const scope = this.stack
       .slice(stack)
-      .find(s => !isHoistable || functionScopes.has(s))!;
+      .find((s) => !isHoistable || functionScopes.has(s))!;
     if (this.global.has(idName)) {
       // It's probably a declaration of a previous referenced identifier
       // Let's use naïve implementation of hoisting
@@ -104,12 +104,12 @@ export default class ScopeManager {
 
     this.declarations.set(getId(scope, identifier), identifier);
     const handlers = this.handlers.get(scopeIds.get(scope)!)!;
-    handlers.forEach(handler => handler(identifier, from));
+    handlers.forEach((handler) => handler(identifier, from));
   }
 
   addReference(identifier: Identifier): Identifier | PromisedNode {
     const name = identifier.name;
-    const scope = this.stack.find(s => s.has(name)) || this.global;
+    const scope = this.stack.find((s) => s.has(name)) || this.global;
     const id = getId(scope, identifier);
     if (scope === this.global && !scope.has(name)) {
       scope.set(name, new Set());
@@ -123,7 +123,7 @@ export default class ScopeManager {
   whereIsDeclared(identifier: Identifier): ScopeId | undefined {
     const name = identifier.name;
     const scope = this.stack.find(
-      s => s.has(name) && s.get(name)!.has(identifier)
+      (s) => s.has(name) && s.get(name)!.has(identifier)
     );
     if (scope) {
       return scopeIds.get(scope);
@@ -158,7 +158,7 @@ export default class ScopeManager {
     const scopeId = scopeIds.get(this.stack[0])!;
     this.handlers.get(scopeId)!.push(handler);
     return () => {
-      const handlers = this.handlers.get(scopeId)!.filter(h => h !== handler);
+      const handlers = this.handlers.get(scopeId)!.filter((h) => h !== handler);
       this.handlers.set(scopeId, handlers);
     };
   }

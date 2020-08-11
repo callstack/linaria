@@ -1,11 +1,11 @@
 import { types as t } from '@babel/core';
 import peek from '../../utils/peek';
+import { warn } from '../../utils/logger';
 import GraphBuilderState from './GraphBuilderState';
 import identifierHandlers from './identifierHandlers';
 import { Visitor, Visitors } from './types';
 
 import { visitors as core } from './langs/core';
-import { warn } from '../../utils/logger';
 
 const visitors: Visitors = {
   Identifier<TParent extends t.Node>(
@@ -75,10 +75,10 @@ export function getVisitors<TNode extends t.Node>(
 ): Visitor<TNode>[] {
   const aliases: Array<keyof t.Aliases> = t.ALIAS_KEYS[node.type] || [];
   const aliasVisitors = aliases
-    .map(type => visitors[type])
-    .filter(i => i) as Visitor<TNode>[];
+    .map((type) => visitors[type])
+    .filter((i) => i) as Visitor<TNode>[];
   return [...aliasVisitors, visitors[node.type] as Visitor<TNode>].filter(
-    v => v
+    (v) => v
   );
 }
 

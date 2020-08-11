@@ -9,8 +9,8 @@
 
 import { NodePath } from '@babel/traverse';
 import { types } from '@babel/core';
-import getLinariaComment from '../../utils/getLinariaComment';
 import { expression } from '@babel/template';
+import getLinariaComment from '../../utils/getLinariaComment';
 
 const linariaComponentTpl = expression(
   `{

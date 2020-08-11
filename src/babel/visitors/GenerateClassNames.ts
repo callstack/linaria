@@ -37,7 +37,7 @@ export default function GenerateClassNames(
   let [slug, displayName, predefinedClassName] = getLinariaComment(path);
 
   const parent = path.findParent(
-    p =>
+    (p) =>
       t.isObjectProperty(p) ||
       t.isJSXOpeningElement(p) ||
       t.isVariableDeclarator(p)

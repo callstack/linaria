@@ -1,9 +1,9 @@
 import { types as t } from '@babel/core';
 import generator from '@babel/generator';
-import build from './graphBuilder';
 import isNode from '../../utils/isNode';
 import getVisitorKeys from '../../utils/getVisitorKeys';
 import { debug } from '../../utils/logger';
+import build from './graphBuilder';
 import dumpNode from './dumpNode';
 
 /*
@@ -74,13 +74,13 @@ export default function shake(
 
   const depsGraph = build(rootPath);
   const alive = new Set<t.Node>();
-  let deps: t.Node[] = depsGraph.getLeafs(exports).map(i => i) as t.Node[];
+  let deps: t.Node[] = depsGraph.getLeafs(exports).map((i) => i) as t.Node[];
   while (deps.length > 0) {
     // Mark all dependencies as alive
-    deps.forEach(d => alive.add(d));
+    deps.forEach((d) => alive.add(d));
 
     // Collect new dependencies of dependencies
-    deps = depsGraph.getDependencies(deps).filter(d => !alive.has(d));
+    deps = depsGraph.getDependencies(deps).filter((d) => !alive.has(d));
   }
 
   const shaken = shakeNode(rootPath, alive) as t.Program;
@@ -95,7 +95,7 @@ export default function shake(
     const defaultMembers =
       depsGraph.importTypes.get(source) === 'wildcard' ? ['*'] : [];
     const aliveMembers = new Set(
-      members.filter(i => alive.has(i)).map(i => i.name)
+      members.filter((i) => alive.has(i)).map((i) => i.name)
     );
 
     imports.set(

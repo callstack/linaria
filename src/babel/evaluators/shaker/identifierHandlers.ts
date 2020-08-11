@@ -1,6 +1,6 @@
 import { types as t } from '@babel/core';
-import GraphBuilderState from './GraphBuilderState';
 import peek from '../../utils/peek';
+import GraphBuilderState from './GraphBuilderState';
 import { IdentifierHandlerType, NodeType } from './types';
 import { identifierHandlers as core } from './langs/core';
 import ScopeManager from './scope';
@@ -41,7 +41,7 @@ export function batchDefineHandlers(
   handler: IdentifierHandlerType
 ) {
   typesAndFields.forEach(([type, ...fields]) =>
-    fields.forEach(field => defineHandler(type, field, handler))
+    fields.forEach((field) => defineHandler(type, field, handler))
   );
 }
 

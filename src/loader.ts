@@ -13,11 +13,11 @@ import enhancedResolve from 'enhanced-resolve';
 import findYarnWorkspaceRoot from 'find-yarn-workspace-root';
 import { loader as webpackLoader } from 'webpack';
 import { RawSourceMap } from 'source-map';
+import cosmiconfig from 'cosmiconfig';
 import * as EvalCache from './babel/eval-cache';
 import Module from './babel/module';
 import { debug } from './babel/utils/logger';
 import transform from './transform';
-import cosmiconfig from 'cosmiconfig';
 
 const workspaceRoot = findYarnWorkspaceRoot();
 const lernaConfig = cosmiconfig('lerna', {
@@ -68,7 +68,7 @@ export default function loader(
     // There is this.resolve, but it's asynchronous
     // Another option is to read the webpack.config.js, but it won't work for programmatic usage
     // This API is used by many loaders/plugins, so hope we're safe for a while
-    this._compilation && this._compilation.options.resolve
+    this._compilation?.options.resolve
       ? {
           ...resolveOptions,
           alias: this._compilation.options.resolve.alias,
@@ -107,8 +107,8 @@ export default function loader(
       ).toString('base64')}*/`;
     }
 
-    if (result.dependencies && result.dependencies.length) {
-      result.dependencies.forEach(dep => {
+    if (result.dependencies?.length) {
+      result.dependencies.forEach((dep) => {
         try {
           const f = resolveSync(path.dirname(this.resourcePath), dep);
 

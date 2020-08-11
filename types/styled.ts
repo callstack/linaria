@@ -10,7 +10,8 @@ function isExtends<C, T>(arg1?: C, arg2?: T): C extends T ? 'extends' : never {
 }
 
 // tslint:disable-next-line no-unnecessary-generics
-const Fabric = <T>(): React.FC<T> => props => React.createElement('div', props);
+const Fabric = <T>(): React.FC<T> => (props) =>
+  React.createElement('div', props);
 
 const Header = (p: { children: string }) => React.createElement('h1', p);
 
@@ -62,12 +63,12 @@ styled(Fabric<{ className: string; style: {} }>())`
 styled(Fabric<{ className: string; style: {} }>())`
   // color should be defined in props
   // $ExpectError
-  color: ${props => props.color};
+  color: ${(props) => props.color};
 `;
 
 styled(Fabric<{ className: string; style: {}; color: 'red' | 'blue' }>())`
   & > ${SimplestComponent} {
-    color: ${props => props.color};
+    color: ${(props) => props.color};
   }
 `;
 
@@ -86,7 +87,7 @@ styled.a`
 
 ((/* Issue #536 */) => {
   const Title = styled.div<{ background: string }>`
-    background: ${props => props.background};
+    background: ${(props) => props.background};
   `;
 
   // $ExpectType "extends"
@@ -102,15 +103,15 @@ styled.a`
 ((/* Issue #622 */) => {
   const Wrapper = styled.div<{ prop1: boolean }>`
     width: 1em;
-    background-color: ${props => (props.prop1 ? 'transparent' : 'green')};
+    background-color: ${(props) => (props.prop1 ? 'transparent' : 'green')};
   `;
 
   const styledTag = styled(Wrapper);
 
   const NewWrapper = styledTag<{ prop2: string }>`
     width: 2em;
-    background-color: ${props => (props.prop1 ? 'transparent' : 'red')};
-    color: ${props => props.prop2};
+    background-color: ${(props) => (props.prop1 ? 'transparent' : 'red')};
+    color: ${(props) => props.prop2};
   `;
 
   // $ExpectType Validator<boolean> | undefined

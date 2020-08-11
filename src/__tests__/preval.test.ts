@@ -1,6 +1,6 @@
+import { join, resolve } from 'path';
 import * as babel from '@babel/core';
 import dedent from 'dedent';
-import { join, resolve } from 'path';
 import stripAnsi from 'strip-ansi';
 
 import Module from '../babel/module';
@@ -70,7 +70,7 @@ function run(
 
   const transpile: TranspileFn = async (
     input: string,
-    conf: (original: typeof babelrc) => typeof babelrc = i => i
+    conf: (original: typeof babelrc) => typeof babelrc = (i) => i
   ) => {
     const { code, metadata } = await transformAsync(input, {
       ...conf(babelrc),
@@ -186,7 +186,7 @@ function run(
         color: ${'${Colors.BLUE}'};
       \`;
       `,
-      config => ({
+      (config) => ({
         ...config,
         plugins: [
           '@babel/plugin-transform-typescript',
@@ -557,7 +557,7 @@ function run(
         color: blue;
       \`;
       `,
-      config => ({
+      (config) => ({
         ...config,
         plugins: ['@babel/plugin-syntax-jsx', ...(config.plugins || [])],
       })
@@ -975,7 +975,7 @@ function run(
 }
 
 describe('shaker', () => {
-  run(require('../babel/evaluators/shaker').default, transpile => {
+  run(require('../babel/evaluators/shaker').default, (transpile) => {
     it('should work with wildcard imports', async () => {
       const { code, metadata } = await transpile(
         dedent`
