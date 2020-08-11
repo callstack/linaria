@@ -26,7 +26,7 @@ const restOp = (
   keysToExclude: string[]
 ): { [key: string]: any } =>
   Object.keys(obj)
-    .filter(prop => !keysToExclude.includes(prop))
+    .filter((prop) => !keysToExclude.includes(prop))
     .reduce((acc, curr) => Object.assign(acc, { [curr]: obj[curr] }), {}); // rest operator workaround
 
 const warnIfInvalid = (value: any, componentName: string) => {

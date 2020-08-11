@@ -15,7 +15,7 @@ export default function DetectStyledImportName(
     return;
   }
 
-  path.node.specifiers.forEach(specifier => {
+  path.node.specifiers.forEach((specifier) => {
     if (!t.isImportSpecifier(specifier)) {
       return;
     }

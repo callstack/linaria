@@ -1,7 +1,7 @@
+import path from 'path';
 import dedent from 'dedent';
 import * as babel from '@babel/core';
 import shake from '../../babel/evaluators/shaker';
-import path from 'path';
 
 function getFileName() {
   return path.resolve(__dirname, `../__fixtures__/test.js`);

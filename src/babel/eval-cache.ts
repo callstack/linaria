@@ -6,15 +6,12 @@ const fileHashes = new Map<string, string>();
 const evalCache = new Map<string, any>();
 const fileKeys = new Map<string, string[]>();
 
-const hash = (text: string) =>
-  createHash('sha1')
-    .update(text)
-    .digest('base64');
+const hash = (text: string) => createHash('sha1').update(text).digest('base64');
 
 let lastText: string = '';
 let lastHash: string = hash(lastText);
 
-const memoizedHash: typeof hash = text => {
+const memoizedHash: typeof hash = (text) => {
   if (lastText !== text) {
     lastHash = hash(text);
     lastText = text;

@@ -171,7 +171,7 @@ export default function transform(code: string, options: Options): Result {
           file: options.filename.replace(/\.js$/, '.css'),
         });
 
-        mappings.forEach(mapping =>
+        mappings.forEach((mapping) =>
           generator.addMapping(
             Object.assign({}, mapping, { source: options.filename })
           )

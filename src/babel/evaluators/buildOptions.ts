@@ -33,7 +33,7 @@ export default function buildOptions(
       ],
     ],
     plugins: [
-      ...plugins.map(name => require.resolve(name as string)),
+      ...plugins.map((name) => require.resolve(name as string)),
       // We don't support dynamic imports when evaluating, but don't wanna syntax error
       // This will replace dynamic imports with an object that does nothing
       require.resolve('../dynamic-import-noop'),
@@ -51,7 +51,7 @@ export default function buildOptions(
     'presets',
     'plugins',
   ];
-  keys.forEach(field => {
+  keys.forEach((field) => {
     babelOptions[field] = babelOptions[field]
       ? babelOptions[field]!.filter((item: PluginItem) => {
           // If item is an array it's a preset/plugin with options ([preset, options])
@@ -73,7 +73,7 @@ export default function buildOptions(
           }
 
           // Loop through the default presets/plugins to see if it already exists
-          return !defaults[field].some(it =>
+          return !defaults[field].some((it) =>
             // The default presets/plugins can also have nested arrays,
             Array.isArray(it) ? it[0] === name : it === name
           );

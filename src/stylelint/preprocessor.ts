@@ -68,7 +68,7 @@ function preprocessor() {
       // Construct a CSS-ish file from the unprocessed style rules
       let cssText = '';
 
-      Object.keys(rules).forEach(selector => {
+      Object.keys(rules).forEach((selector) => {
         const rule = rules[selector];
 
         // Append new lines until we get to the start line number
@@ -116,17 +116,12 @@ function preprocessor() {
 
         if (!loc) {
           // If the error doesn't have location info, try to find it from the code frame
-          const line = message.split('\n').find(l => l.startsWith('>'));
-          const column = message.split('\n').find(l => l.includes('^'));
+          const line = message.split('\n').find((l) => l.startsWith('>'));
+          const column = message.split('\n').find((l) => l.includes('^'));
 
           if (line && column) {
             loc = {
-              line: Number(
-                line
-                  .replace(/^> /, '')
-                  .split('|')[0]
-                  .trim()
-              ),
+              line: Number(line.replace(/^> /, '').split('|')[0].trim()),
               column: column.replace(/[^|]+\|\s/, '').length,
             };
           }
@@ -153,7 +148,7 @@ function preprocessor() {
         replacements.forEach(({ original, length }) => {
           // If the warnings contain stuff that's been replaced,
           // Correct the line and column numbers to what's replaced
-          result.warnings.forEach(w => {
+          result.warnings.forEach((w) => {
             /* eslint-disable no-param-reassign */
 
             if (w.line === original.start.line) {

@@ -27,7 +27,7 @@ export default function JSXElement(path: NodePath<types.JSXElement>) {
 
     // Is it not just a function, but a method `render`?
     if (getFunctionName(scopePath) === 'render') {
-      const decl = scopePath.findParent(p => p.isClassDeclaration());
+      const decl = scopePath.findParent((p) => p.isClassDeclaration());
 
       // Replace the whole component
       if (decl?.isClassDeclaration()) {

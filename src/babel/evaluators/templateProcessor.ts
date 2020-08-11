@@ -60,7 +60,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
     const [slug, displayName, className] = getLinariaComment(path);
 
     const parent = path.findParent(
-      p =>
+      (p) =>
         types.isObjectProperty(p) ||
         types.isJSXOpeningElement(p) ||
         types.isVariableDeclarator(p)
@@ -243,7 +243,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
         // we don't need to use 2 custom properties for them, we can use a single one
         const result: { [key: string]: Interpolation } = {};
 
-        interpolations.forEach(it => {
+        interpolations.forEach((it) => {
           const key = it.source + it.unit;
 
           if (key in result) {
@@ -260,7 +260,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
           types.objectProperty(
             types.identifier('vars'),
             types.objectExpression(
-              Object.keys(result).map(key => {
+              Object.keys(result).map((key) => {
                 const { id, node, unit } = result[key];
                 const items = [node];
 
@@ -306,7 +306,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
       cssText,
       className: className!,
       displayName: displayName!,
-      start: path.parent && path.parent.loc ? path.parent.loc.start : null,
+      start: path.parent?.loc?.start ?? null,
     };
   };
 }

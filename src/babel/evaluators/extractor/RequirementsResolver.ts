@@ -19,7 +19,7 @@ export default class RequirementsResolver {
   ): t.Statement[] {
     const resolver = new RequirementsResolver();
     if (Array.isArray(path)) {
-      path.forEach(p => this.resolve(p));
+      path.forEach((p) => this.resolve(p));
     } else {
       resolver.resolve(path);
     }
@@ -33,7 +33,7 @@ export default class RequirementsResolver {
    * Checks that specified node or one of its ancestors is already added
    */
   private isAdded(path: NodePath<t.Node>): boolean {
-    if (this.requirements.some(req => req.path === path)) {
+    if (this.requirements.some((req) => req.path === path)) {
       return true;
     }
 
@@ -143,7 +143,7 @@ export default class RequirementsResolver {
     }
 
     path.traverse({
-      Identifier: p => {
+      Identifier: (p) => {
         const binding = this.resolveIdentifier(p);
         if (binding !== null) {
           set.add(binding.path);
@@ -182,11 +182,11 @@ export default class RequirementsResolver {
         throw new Error('Circular dependency');
       }
 
-      statements.push(...zeroDeps.map(req => req.result));
+      statements.push(...zeroDeps.map((req) => req.result));
       // Let's remove already added statements from the requirements of the rest of the list.
-      requirements = rest.map(req => {
+      requirements = rest.map((req) => {
         const reqs = new Set(req.requirements);
-        zeroDeps.forEach(r => reqs.delete(r.path));
+        zeroDeps.forEach((r) => reqs.delete(r.path));
         return {
           ...req,
           requirements: reqs,

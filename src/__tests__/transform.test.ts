@@ -1,7 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
 
-import dedent from 'dedent';
 import path from 'path';
+import dedent from 'dedent';
 import transform, { transformUrl } from '../transform';
 import evaluator from '../babel/evaluators/extractor';
 

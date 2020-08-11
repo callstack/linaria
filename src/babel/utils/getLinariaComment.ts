@@ -12,7 +12,7 @@ export default function getLinariaComment(
     return [null, null, null];
   }
 
-  const idx = comments.findIndex(comment => pattern.test(comment.value));
+  const idx = comments.findIndex((comment) => pattern.test(comment.value));
   if (idx === -1) {
     return [null, null, null];
   }
@@ -26,5 +26,5 @@ export default function getLinariaComment(
     path.node.leadingComments = comments.filter((_, i) => i !== idx);
   }
 
-  return matched[1].split(' ').map(i => (i ? i : null));
+  return matched[1].split(' ').map((i) => (i ? i : null));
 }
