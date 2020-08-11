@@ -95,10 +95,10 @@ class GraphBuilder extends GraphBuilderState {
     }
 
     if (isExpression && !ignoreDeps) {
-      dependencies.forEach(dep => this.graph.addEdge(node, dep));
+      dependencies.forEach((dep) => this.graph.addEdge(node, dep));
     }
 
-    this.callbacks.forEach(callback => callback(node));
+    this.callbacks.forEach((callback) => callback(node));
   }
 
   visit<TNode extends t.Node, TParent extends t.Node>(
@@ -126,7 +126,7 @@ class GraphBuilder extends GraphBuilderState {
             // Each property of the assigned object is independent named export.
             // We also need to specify all dependencies and call `visit` for every value.
             this.visit(node.left, node, 'left');
-            node.right.properties.forEach(prop => {
+            node.right.properties.forEach((prop) => {
               if (t.isObjectProperty(prop) && t.isIdentifier(prop.key)) {
                 this.visit(prop.value, prop, 'value');
                 this.graph.addExport(prop.key.name, prop);

@@ -27,7 +27,7 @@ export default abstract class GraphBuilderState {
   public onVisit(callback: OnVisitCallback) {
     this.callbacks.push(callback);
     return () => {
-      this.callbacks = this.callbacks.filter(c => c !== callback);
+      this.callbacks = this.callbacks.filter((c) => c !== callback);
     };
   }
 

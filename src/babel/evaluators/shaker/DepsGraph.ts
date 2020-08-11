@@ -59,7 +59,7 @@ export default class DepsGraph {
     const allReferences = [
       ...Array.from(this.dependencies.get(declaration) || []),
       ...Array.from(this.dependents.get(declaration) || []),
-    ].filter(i => t.isIdentifier(i) && i.name === name) as t.Identifier[];
+    ].filter((i) => t.isIdentifier(i) && i.name === name) as t.Identifier[];
     allReferences.push(declaration);
     return allReferences;
   }
@@ -125,7 +125,7 @@ export default class DepsGraph {
   getLeafs(only: string[] | null): Array<t.Node | undefined> {
     this.processQueue();
     return only
-      ? only.map(name => this.exports.get(name))
+      ? only.map((name) => this.exports.get(name))
       : Array.from(this.exports.values());
   }
 }

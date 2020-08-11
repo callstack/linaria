@@ -1,6 +1,6 @@
 import generator from '@babel/generator';
-import isSerializable from './isSerializable';
 import { Serializable } from '../types';
+import isSerializable from './isSerializable';
 
 // Throw if we can't handle the interpolated value
 function throwIfInvalid(

@@ -1,8 +1,8 @@
 // TypeScript Version: 3.2
 
-import isSerializable from './isSerializable';
 import { unitless } from '../units';
 import { JSONValue } from '../types';
+import isSerializable from './isSerializable';
 import isBoxedPrimitive from './isBoxedPrimitive';
 
 const hyphenate = (s: string) =>

@@ -1,7 +1,7 @@
 import { types as t } from '@babel/core';
 import { NodePath } from '@babel/traverse';
-import hasImport from './hasImport';
 import { State, TemplateExpression } from '../types';
+import hasImport from './hasImport';
 
 type Result = NonNullable<TemplateExpression['styled']> | 'css' | null;
 

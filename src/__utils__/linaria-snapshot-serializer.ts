@@ -16,7 +16,7 @@ export default {
 CSS:
 
 ${Object.keys(linaria.rules)
-  .map(selector => `${selector} {${linaria.rules[selector].cssText}}`)
+  .map((selector) => `${selector} {${linaria.rules[selector].cssText}}`)
   .join('\n')}
 
 Dependencies: ${

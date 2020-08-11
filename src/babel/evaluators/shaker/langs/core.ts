@@ -28,7 +28,7 @@ const sideEffects: SideEffect[] = [
   [
     // if the first argument of forEach is required, mark forEach as required
     {
-      callee: node =>
+      callee: (node) =>
         t.isMemberExpression(node) &&
         t.isIdentifier(node.property) &&
         node.property.name === 'forEach',
@@ -123,7 +123,7 @@ export const visitors: Visitors = {
    * In real life, some of the parameters can be omitted, but it's not trivial to implement that type of tree shaking.
    */
   Function(this: GraphBuilderState, node: t.Function) {
-    const unsubscribe = this.onVisit(descendant =>
+    const unsubscribe = this.onVisit((descendant) =>
       this.graph.addEdge(node, descendant)
     );
     this.baseVisit(node, true); // ignoreDeps=true prevents default dependency resolving
@@ -132,7 +132,7 @@ export const visitors: Visitors = {
     this.graph.addEdge(node, node.body);
     this.graph.addEdge(node.body, node);
 
-    node.params.forEach(param => this.graph.addEdge(node.body, param));
+    node.params.forEach((param) => this.graph.addEdge(node.body, param));
     if (t.isFunctionDeclaration(node) && node.id !== null) {
       // `id` is an identifier which depends on the function declaration
       this.graph.addEdge(node.id, node);
@@ -166,10 +166,12 @@ export const visitors: Visitors = {
     if (t.isProgram(node)) {
       const exportsDeclaration = this.scope.getDeclaration('global:exports')!;
       this.graph.addEdge(node, exportsDeclaration);
-      node.directives.forEach(directive => this.graph.addEdge(node, directive));
+      node.directives.forEach((directive) =>
+        this.graph.addEdge(node, directive)
+      );
     }
 
-    node.body.forEach(exp => {
+    node.body.forEach((exp) => {
       this.graph.addEdge(exp, node);
     });
   },
@@ -187,7 +189,7 @@ export const visitors: Visitors = {
    */
   TryStatement(this: GraphBuilderState, node: t.TryStatement) {
     this.baseVisit(node);
-    [node.handler, node.finalizer].forEach(statement => {
+    [node.handler, node.finalizer].forEach((statement) => {
       if (statement) {
         this.graph.addEdge(node.block, statement);
         this.graph.addEdge(statement, node.block);
@@ -199,7 +201,7 @@ export const visitors: Visitors = {
 
   IfStatement(this: GraphBuilderState, node: t.IfStatement) {
     this.baseVisit(node);
-    [node.consequent, node.alternate].forEach(statement => {
+    [node.consequent, node.alternate].forEach((statement) => {
       if (statement) {
         this.graph.addEdge(statement, node);
       }
@@ -223,7 +225,7 @@ export const visitors: Visitors = {
 
   SwitchCase(this: GraphBuilderState, node: t.SwitchCase) {
     this.baseVisit(node);
-    node.consequent.forEach(statement => this.graph.addEdge(statement, node));
+    node.consequent.forEach((statement) => this.graph.addEdge(statement, node));
     if (node.test) {
       this.graph.addEdge(node, node.test);
     }
@@ -231,7 +233,7 @@ export const visitors: Visitors = {
 
   SwitchStatement(this: GraphBuilderState, node: t.SwitchStatement) {
     this.baseVisit(node);
-    node.cases.forEach(c => this.graph.addEdge(c, node));
+    node.cases.forEach((c) => this.graph.addEdge(c, node));
     this.graph.addEdge(node, node.discriminant);
   },
 
@@ -242,7 +244,7 @@ export const visitors: Visitors = {
       this.graph.addEdge(node.body, node);
     }
 
-    [node.init, node.test, node.update, node.body].forEach(child => {
+    [node.init, node.test, node.update, node.body].forEach((child) => {
       if (child) {
         this.graph.addEdge(node, child);
       }
@@ -297,7 +299,7 @@ export const visitors: Visitors = {
   ObjectExpression(this: GraphBuilderState, node: t.ObjectExpression) {
     this.context.push('expression');
     this.baseVisit(node);
-    node.properties.forEach(prop => {
+    node.properties.forEach((prop) => {
       this.graph.addEdge(node, prop);
       if (t.isObjectMethod(prop)) {
         this.graph.addEdge(prop, prop.key);
@@ -413,7 +415,7 @@ export const visitors: Visitors = {
   VariableDeclaration(this: GraphBuilderState, node: t.VariableDeclaration) {
     this.meta.set('kind-of-declaration', node.kind);
     this.baseVisit(node);
-    node.declarations.forEach(declaration =>
+    node.declarations.forEach((declaration) =>
       this.graph.addEdge(declaration, node)
     );
     this.meta.delete('kind-of-declaration');
@@ -510,7 +512,7 @@ export const visitors: Visitors = {
       return callback(node, this);
     });
 
-    getAffectedNodes(node, this).forEach(affectedNode => {
+    getAffectedNodes(node, this).forEach((affectedNode) => {
       this.graph.addEdge(affectedNode, node);
       if (t.isIdentifier(affectedNode)) {
         this.graph.addEdge(

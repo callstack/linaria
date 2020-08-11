@@ -31,7 +31,7 @@ function hoist(ex: NodePath<t.Expression | null>) {
       hoist(initPath);
       initPath.hoist(scope);
       if (initPath.isIdentifier()) {
-        referencePaths.forEach(referencePath => {
+        referencePaths.forEach((referencePath) => {
           referencePath.replaceWith(t.identifier(initPath.node.name));
           // referencePath.node.name = initPath.node.name;
         });
@@ -92,7 +92,7 @@ export default function CollectDependencies(
 
   debug(
     'template-parse:evaluate-expressions',
-    expressionValues.map(expressionValue =>
+    expressionValues.map((expressionValue) =>
       expressionValue.kind === ValueType.VALUE ? expressionValue.value : 'lazy'
     )
   );

@@ -78,7 +78,7 @@ function addLinariaPreval(
     expressionWrapperTpl({ wrapName }),
     exportsLinariaPrevalTpl({
       expressions: types.arrayExpression(
-        lazyDeps.map(expression => expressionTpl({ expression, wrapName }))
+        lazyDeps.map((expression) => expressionTpl({ expression, wrapName }))
       ),
     }),
   ];
@@ -113,8 +113,8 @@ export default function extract(_babel: any, options: StrictOptions) {
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
-            ImportDeclaration: p => DetectStyledImportName(p, state),
-            TaggedTemplateExpression: p => {
+            ImportDeclaration: (p) => DetectStyledImportName(p, state),
+            TaggedTemplateExpression: (p) => {
               GenerateClassNames(p, state, options);
               CollectDependencies(p, state, options);
             },
@@ -128,10 +128,10 @@ export default function extract(_babel: any, options: StrictOptions) {
             [] as LazyValue[]
           );
 
-          const expressionsToEvaluate = lazyDeps.map(v =>
+          const expressionsToEvaluate = lazyDeps.map((v) =>
             isNodePath(v.ex) ? v.ex.node : v.ex
           );
-          const originalLazyExpressions = lazyDeps.map(v =>
+          const originalLazyExpressions = lazyDeps.map((v) =>
             isNodePath(v.originalEx) ? v.originalEx.node : v.originalEx
           );
 
@@ -142,13 +142,13 @@ export default function extract(_babel: any, options: StrictOptions) {
           if (expressionsToEvaluate.length > 0) {
             debug(
               'lazy-deps:original-expressions-list',
-              originalLazyExpressions.map(node =>
+              originalLazyExpressions.map((node) =>
                 typeof node !== 'string' ? generator(node).code : node
               )
             );
             debug(
               'lazy-deps:expressions-to-eval-list',
-              expressionsToEvaluate.map(node =>
+              expressionsToEvaluate.map((node) =>
                 typeof node !== 'string' ? generator(node).code : node
               )
             );
@@ -182,7 +182,7 @@ export default function extract(_babel: any, options: StrictOptions) {
           originalLazyExpressions.forEach((key, idx) =>
             valueCache.set(key, lazyValues[idx])
           );
-          state.queue.forEach(item => process(item, state, valueCache));
+          state.queue.forEach((item) => process(item, state, valueCache));
         },
         exit(_: any, state: State) {
           if (Object.keys(state.rules).length) {

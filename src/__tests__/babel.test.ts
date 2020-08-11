@@ -1,6 +1,6 @@
+import { join } from 'path';
 import * as babel from '@babel/core';
 import dedent from 'dedent';
-import { join } from 'path';
 import stripAnsi from 'strip-ansi';
 import serializer from '../__utils__/linaria-snapshot-serializer';
 import { StrictOptions } from '../babel/types';

@@ -2,19 +2,19 @@
 
 import 'ignore-styles';
 
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import { collect } from 'linaria/server'; // eslint-disable-line import/no-unresolved
 import Koa from 'koa';
 import Router from 'koa-router';
 import compress from 'koa-compress';
 import send from 'koa-send';
-import fs from 'fs';
-import path from 'path';
-import crypto from 'crypto';
 import dedent from 'dedent';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { collect } from 'linaria/server'; // eslint-disable-line import/no-unresolved
-import App from './components/App';
 import config from '../serve.config';
+import App from './components/App';
 
 const cache = {};
 const css = fs.readFileSync(path.join(__dirname, '../dist/styles.css'), 'utf8');
@@ -23,14 +23,11 @@ const router = new Router();
 
 app.use(compress());
 
-router.get('/', async ctx => {
+router.get('/', async (ctx) => {
   const html = ReactDOMServer.renderToStaticMarkup(<App />);
 
   const { critical, other } = collect(html, css);
-  const slug = crypto
-    .createHash('md5')
-    .update(other)
-    .digest('hex');
+  const slug = crypto.createHash('md5').update(other).digest('hex');
 
   cache[slug] = other;
 
@@ -59,11 +56,11 @@ router.get('/', async ctx => {
   `;
 });
 
-router.get('/dist/:path+', async ctx => {
+router.get('/dist/:path+', async (ctx) => {
   await send(ctx, path.join('dist', ctx.params.path));
 });
 
-router.get('/styles/:slug', async ctx => {
+router.get('/styles/:slug', async (ctx) => {
   ctx.type = 'text/css';
   ctx.body = cache[ctx.params.slug];
 });
