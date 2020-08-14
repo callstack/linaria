@@ -1,5 +1,5 @@
+import { types as t } from '@babel/core';
 import type { Identifier, Node } from '@babel/types';
-import { Core } from '../../babel';
 
 type Scope = Map<string, Set<Identifier>>;
 
@@ -32,28 +32,9 @@ const scopeIds = new WeakMap<Scope, number | 'global'>();
 const getId = (scope: Scope, identifier: Identifier): string =>
   `${scopeIds.get(scope)}:${identifier.name}`;
 
-// FIXME
-const globalIdentifier = (
-  fn: (babel: Core) => Identifier
-): ((babel: Core) => Identifier) => {
-  let identifier: Identifier;
-  return (babel) => {
-    if (!identifier) {
-      identifier = fn(babel);
-    }
-
-    return identifier;
-  };
-};
-
-const getGlobalExportsIdentifier = globalIdentifier(({ types: t }: Core) => {
-  return t.identifier('exports');
-});
-const getGlobalModuleIdentifier = globalIdentifier(({ types: t }: Core) => {
-  return t.identifier('module');
-});
-
 export default class ScopeManager {
+  public static globalExportsIdentifier = t.identifier('exports');
+  public static globalModuleIdentifier = t.identifier('module');
   private nextId = 0;
   private readonly stack: Array<Scope> = [];
   private readonly map: Map<ScopeId, Scope> = new Map();
@@ -67,18 +48,10 @@ export default class ScopeManager {
     return this.map.get('global')!;
   }
 
-  public get globalExportsIdentifier() {
-    return getGlobalExportsIdentifier(this.babel);
-  }
-
-  public get globalModuleIdentifier() {
-    return getGlobalModuleIdentifier(this.babel);
-  }
-
-  constructor(private babel: Core) {
+  constructor() {
     this.new(true, 'global');
-    this.declare(this.globalExportsIdentifier, false);
-    this.declare(this.globalModuleIdentifier, false);
+    this.declare(ScopeManager.globalExportsIdentifier, false);
+    this.declare(ScopeManager.globalModuleIdentifier, false);
   }
 
   new(isFunction: boolean, scopeId: ScopeId = this.nextId++): Scope {

@@ -14,7 +14,7 @@ function _build(literal: TemplateStringsArray, ...placeholders: string[]) {
 
 function _buildGraph(literal: TemplateStringsArray, ...placeholders: string[]) {
   const { ast } = _build(literal, ...placeholders);
-  return buildDepsGraph(babel, ast);
+  return buildDepsGraph(ast);
 }
 
 describe('VariableDeclaration', () => {

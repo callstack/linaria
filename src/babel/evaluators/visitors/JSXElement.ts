@@ -1,11 +1,8 @@
+import { types as t } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import type { Function, JSXElement as JSXElementNode } from '@babel/types';
-import { Core } from '../../babel';
 
-function getFunctionName(
-  { types: t }: Core,
-  path: NodePath<Function>
-): string | null {
+function getFunctionName(path: NodePath<Function>): string | null {
   if (path.isClassMethod() && t.isIdentifier(path.node.key)) {
     return path.node.key.name;
   }
@@ -13,11 +10,7 @@ function getFunctionName(
   return null;
 }
 
-export default function JSXElement(
-  babel: Core,
-  path: NodePath<JSXElementNode>
-) {
-  const { types: t } = babel;
+export default function JSXElement(path: NodePath<JSXElementNode>) {
   // JSX can be safely replaced on an empty fragment because it is unnecessary for styles
   const emptyFragment = t.jsxFragment(
     t.jsxOpeningFragment(),
@@ -32,7 +25,7 @@ export default function JSXElement(
     const emptyBody = t.blockStatement([t.returnStatement(emptyFragment)]);
 
     // Is it not just a function, but a method `render`?
-    if (getFunctionName(babel, scopePath) === 'render') {
+    if (getFunctionName(scopePath) === 'render') {
       const decl = scopePath.findParent((p) => p.isClassDeclaration());
 
       // Replace the whole component

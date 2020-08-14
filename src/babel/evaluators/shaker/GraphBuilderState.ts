@@ -1,20 +1,15 @@
 import type { Node, VisitorKeys } from '@babel/types';
-import { Core } from '../../babel';
 import ScopeManager from './scope';
 import DepsGraph from './DepsGraph';
 
 export type OnVisitCallback = (n: Node) => void;
 
 export default abstract class GraphBuilderState {
+  public readonly scope = new ScopeManager();
+  public readonly graph = new DepsGraph(this.scope);
   public readonly meta = new Map<string, any>();
 
   protected callbacks: OnVisitCallback[] = [];
-
-  protected constructor(
-    protected babel: Core,
-    public readonly scope = new ScopeManager(babel),
-    public readonly graph = new DepsGraph(babel, scope)
-  ) {}
 
   /*
    * For expressions like `{ foo: bar }` we need to now context

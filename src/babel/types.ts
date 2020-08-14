@@ -8,7 +8,6 @@ import type { TransformOptions } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import type { VisitorKeys } from '@babel/types';
 import type { StyledMeta } from '../StyledMeta';
-import { Core } from './babel';
 
 export type JSONValue = string | number | boolean | JSONObject | JSONArray;
 
@@ -107,7 +106,6 @@ export type State = {
 };
 
 export type Evaluator = (
-  babel: Core,
   filename: string,
   options: StrictOptions,
   text: string,

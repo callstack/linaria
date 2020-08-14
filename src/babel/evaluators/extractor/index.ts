@@ -4,18 +4,19 @@
  * invoke RequirementsResolver to get parts of code that needs to be executed in order to evaluate the dependency.
  */
 
+import { traverse, types as t } from '@babel/core';
 import type {
   ExpressionStatement,
   MemberExpression,
   Program,
   SequenceExpression,
 } from '@babel/types';
+import { parseSync, transformSync } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import generator from '@babel/generator';
 
 import type { Evaluator } from '../../types';
 import buildOptions from '../buildOptions';
-import { Core } from '../../babel';
 import RequirementsResolver from './RequirementsResolver';
 
 function isMemberExpression(
@@ -59,14 +60,7 @@ function isLinariaPrevalExport(
   return object.isIdentifier() && object.node.name === 'exports';
 }
 
-const extractor: Evaluator = (
-  babel: Core,
-  filename,
-  options,
-  text,
-  only = null
-) => {
-  const { types: t, traverse } = babel;
+const extractor: Evaluator = (filename, options, text, only = null) => {
   const transformOptions = buildOptions(filename, options);
   transformOptions.presets!.unshift([require.resolve('../preeval'), options]);
   transformOptions.plugins!.unshift([
@@ -88,7 +82,7 @@ const extractor: Evaluator = (
   });
   // Expressions will be extracted only for __linariaPreval.
   // In all other cases a code will be returned as is.
-  let { code } = babel.transformSync(text, transformOptions)!;
+  let { code } = transformSync(text, transformOptions)!;
   if (!only || only.length !== 1 || only[0] !== '__linariaPreval') {
     return [code!, null];
   }
@@ -96,7 +90,7 @@ const extractor: Evaluator = (
   // because there is some kind of cache inside `traverse` which
   // reuses `NodePath` with a wrong scope.
   // There is probably a better solution, but I haven't found it yet.
-  const ast = babel.parseSync(code!, { filename: filename + '.preval' });
+  const ast = parseSync(code!, { filename: filename + '.preval' });
   // First of all, let's find a __linariaPreval export
   traverse(ast!, {
     // We know that export has been added to the program body,
@@ -108,7 +102,6 @@ const extractor: Evaluator = (
         if (isLinariaPrevalExport(body[idx])) {
           // Here we are!
           const statements = RequirementsResolver.resolve(
-            babel,
             body[idx].get('expression.right')
           );
 

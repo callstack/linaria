@@ -1,3 +1,4 @@
+import { types as t } from '@babel/core';
 import type {
   BinaryExpression,
   Identifier,
@@ -5,7 +6,6 @@ import type {
   NumericLiteral,
   StringLiteral,
 } from '@babel/types';
-import { Core } from '../../babel';
 
 type Hooks = {
   [key: string]: (node: any) => string | number;
@@ -23,13 +23,11 @@ function isNode(obj: any): obj is Node {
 }
 
 export default function dumpNode<T extends Node>(
-  babel: Core,
   node: T,
   alive: Set<Node> | null = null,
   level = 0,
   idx: number | null = null
 ) {
-  const { types: t } = babel;
   let result = level === 0 ? '\n' : '';
   const prefix =
     level === 0
@@ -54,10 +52,10 @@ export default function dumpNode<T extends Node>(
     if (Array.isArray(subNode)) {
       for (let i = 0; i < subNode.length; i++) {
         const child = subNode[i];
-        if (child) result += dumpNode(babel, child, alive, level + 2, i);
+        if (child) result += dumpNode(child, alive, level + 2, i);
       }
     } else if (isNode(subNode)) {
-      result += dumpNode(babel, subNode, alive, level + 2);
+      result += dumpNode(subNode, alive, level + 2);
     }
   }
 

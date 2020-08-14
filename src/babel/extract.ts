@@ -176,7 +176,6 @@ export default function extract(
             try {
               const evaluation = evaluate(
                 code,
-                babel,
                 state.file.opts.filename,
                 options
               );

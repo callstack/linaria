@@ -1,33 +1,31 @@
+import { types as t } from '@babel/core';
 import type { AssignmentExpression, Node, VisitorKeys } from '@babel/types';
 import isNode from '../../utils/isNode';
 import getVisitorKeys from '../../utils/getVisitorKeys';
-import { Core } from '../../babel';
 import DepsGraph from './DepsGraph';
 import GraphBuilderState from './GraphBuilderState';
 import { getVisitors } from './Visitors';
 import type { VisitorAction } from './types';
-import { initialize } from './identifierHandlers';
+import ScopeManager from './scope';
 
-const isVoid = ({ types: t }: Core, node: Node): boolean =>
+const isVoid = (node: Node): boolean =>
   t.isUnaryExpression(node) && node.operator === 'void';
 
 class GraphBuilder extends GraphBuilderState {
-  static build(babel: Core, root: Node): DepsGraph {
-    initialize(babel);
-    return new GraphBuilder(babel, root).graph;
+  static build(root: Node): DepsGraph {
+    return new GraphBuilder(root).graph;
   }
 
-  constructor(babel: Core, rootNode: Node) {
-    super(babel);
+  constructor(rootNode: Node) {
+    super();
 
     this.visit(rootNode, null, null, null);
   }
 
   private isExportsIdentifier(node: Node) {
-    const { types: t } = this.babel;
     if (
       t.isIdentifier(node) &&
-      this.scope.getDeclaration(node) === this.scope.globalExportsIdentifier
+      this.scope.getDeclaration(node) === ScopeManager.globalExportsIdentifier
     ) {
       return true;
     }
@@ -38,12 +36,11 @@ class GraphBuilder extends GraphBuilderState {
       node.property.name === 'exports' &&
       t.isIdentifier(node.object) &&
       this.scope.getDeclaration(node.object) ===
-        this.scope.globalModuleIdentifier
+        ScopeManager.globalModuleIdentifier
     );
   }
 
   private isExportsAssigment(node: Node): node is AssignmentExpression {
-    const { types: t } = this.babel;
     if (
       node &&
       t.isAssignmentExpression(node) &&
@@ -72,10 +69,9 @@ class GraphBuilder extends GraphBuilderState {
    * both of them are required for evaluating the value of the expression
    */
   baseVisit<TNode extends Node>(node: TNode, ignoreDeps = false) {
-    const { types: t } = this.babel;
     const dependencies = [];
     const isExpression = t.isExpression(node);
-    const keys = getVisitorKeys(this.babel, node);
+    const keys = getVisitorKeys(node);
     for (const key of keys) {
       // Ignore all types
       if (key === 'typeArguments' || key === 'typeParameters') {
@@ -112,11 +108,10 @@ class GraphBuilder extends GraphBuilderState {
     parentKey: VisitorKeys[TParent['type']] | null,
     listIdx: number | null = null
   ): VisitorAction {
-    const { types: t } = this.babel;
     if (
       this.isExportsAssigment(node) &&
       !this.isExportsAssigment(node.right) &&
-      !isVoid(this.babel, node.right)
+      !isVoid(node.right)
     ) {
       if (
         t.isMemberExpression(node.left) &&
@@ -162,19 +157,12 @@ class GraphBuilder extends GraphBuilderState {
     if (isScopable) this.scope.new(t.isProgram(node) || t.isFunction(node));
     if (isFunction) this.fnStack.push(node);
 
-    const visitors = getVisitors(this.babel, node);
+    const visitors = getVisitors(node);
     let action: VisitorAction;
     if (visitors.length > 0) {
       let visitor;
       while (!action && (visitor = visitors.shift())) {
-        action = visitor.call(
-          this,
-          this.babel,
-          node,
-          parent,
-          parentKey,
-          listIdx
-        );
+        action = visitor.call(this, node, parent, parentKey, listIdx);
       }
     } else {
       this.baseVisit(node);
