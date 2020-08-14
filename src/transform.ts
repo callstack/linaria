@@ -8,12 +8,13 @@
  */
 
 import path from 'path';
-import * as babel from '@babel/core';
+import { parseSync, transformFromAstSync } from '@babel/core';
 import stylis from 'stylis';
-import { SourceMapGenerator, Mapping } from 'source-map';
+import type { Mapping } from 'source-map';
+import { SourceMapGenerator } from 'source-map';
 import loadOptions from './babel/utils/loadOptions';
 import { debug } from './babel/utils/logger';
-import { LinariaMetadata, Options, PreprocessorFn, Result } from './types';
+import type { LinariaMetadata, Options, PreprocessorFn, Result } from './types';
 
 const STYLIS_DECLARATION = 1;
 const posixSep = path.posix.sep;
@@ -59,13 +60,13 @@ export default function transform(code: string, options: Options): Result {
 
   // Parse the code first so babel uses user's babel config for parsing
   // We don't want to use user's config when transforming the code
-  const ast = babel.parseSync(code, {
+  const ast = parseSync(code, {
     ...babelOptions,
     filename: options.filename,
     caller: { name: 'linaria' },
   });
 
-  const { metadata, code: transformedCode, map } = babel.transformFromAstSync(
+  const { metadata, code: transformedCode, map } = transformFromAstSync(
     ast!,
     code,
     {

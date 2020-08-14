@@ -1,5 +1,5 @@
 import generator from '@babel/generator';
-import { Serializable } from '../types';
+import type { Serializable } from '../types';
 import isSerializable from './isSerializable';
 
 // Throw if we can't handle the interpolated value

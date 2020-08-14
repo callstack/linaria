@@ -6,21 +6,24 @@
  */
 
 import { basename, dirname, relative } from 'path';
-import { types as t } from '@babel/core';
-import { NodePath } from '@babel/traverse';
-import { State, StrictOptions } from '../types';
+import type { TaggedTemplateExpression } from '@babel/types';
+import type { NodePath } from '@babel/traverse';
+import type { State, StrictOptions } from '../types';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
 import slugify from '../../slugify';
 import getLinariaComment from '../utils/getLinariaComment';
 import { debug } from '../utils/logger';
 import isStyledOrCss from '../utils/isStyledOrCss';
+import { Core } from '../babel';
 
 export default function GenerateClassNames(
-  path: NodePath<t.TaggedTemplateExpression>,
+  babel: Core,
+  path: NodePath<TaggedTemplateExpression>,
   state: State,
   options: StrictOptions
 ) {
-  const styledOrCss = isStyledOrCss(path, state);
+  const { types: t } = babel;
+  const styledOrCss = isStyledOrCss(babel, path, state);
   if (!styledOrCss) {
     return;
   }
@@ -46,7 +49,15 @@ export default function GenerateClassNames(
   if (!displayName && parent) {
     const parentNode = parent.node;
     if (t.isObjectProperty(parentNode)) {
-      displayName = parentNode.key.name || parentNode.key.value;
+      if ('name' in parentNode.key) {
+        displayName = parentNode.key.name;
+      } else if ('value' in parentNode.key) {
+        displayName = parentNode.key.value.toString();
+      } else {
+        throw new Error(
+          `Unexpected object property key ${parentNode.key.type}`
+        );
+      }
     } else if (
       t.isJSXOpeningElement(parentNode) &&
       t.isJSXIdentifier(parentNode.name)
@@ -123,7 +134,7 @@ export default function GenerateClassNames(
     };
 
     // Variables that were used in the config for `classNameSlug`
-    const optionVariables = classNameSlug.match(/\[.*?\]/g) || [];
+    const optionVariables = classNameSlug.match(/\[.*?]/g) || [];
     let cnSlug = classNameSlug;
 
     for (let i = 0, l = optionVariables.length; i < l; i++) {

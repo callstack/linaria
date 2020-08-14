@@ -1,23 +1,30 @@
-import { types } from '@babel/core';
+import { types as t } from '@babel/core';
+import type {
+  BinaryExpression,
+  Identifier,
+  Node,
+  NumericLiteral,
+  StringLiteral,
+} from '@babel/types';
 
 type Hooks = {
   [key: string]: (node: any) => string | number;
 };
 
 const hooks: Hooks = {
-  Identifier: (node: types.Identifier) => node.name,
-  BinaryExpression: (node: types.BinaryExpression) => node.operator,
-  NumericLiteral: (node: types.NumericLiteral) => node.value,
-  StringLiteral: (node: types.StringLiteral) => node.value,
+  Identifier: (node: Identifier) => node.name,
+  BinaryExpression: (node: BinaryExpression) => node.operator,
+  NumericLiteral: (node: NumericLiteral) => node.value,
+  StringLiteral: (node: StringLiteral) => node.value,
 };
 
-function isNode(obj: any): obj is types.Node {
+function isNode(obj: any): obj is Node {
   return !!obj;
 }
 
-export default function dumpNode<T extends types.Node>(
+export default function dumpNode<T extends Node>(
   node: T,
-  alive: Set<types.Node> | null = null,
+  alive: Set<Node> | null = null,
   level = 0,
   idx: number | null = null
 ) {
@@ -37,7 +44,7 @@ export default function dumpNode<T extends types.Node>(
   }
 
   result += '\n';
-  const keys = types.VISITOR_KEYS[type] as Array<keyof T>;
+  const keys = t.VISITOR_KEYS[type] as Array<keyof T>;
   for (const key of keys) {
     const subNode = node[key];
 

@@ -1,9 +1,9 @@
 import { join } from 'path';
-import * as babel from '@babel/core';
+import { transformAsync } from '@babel/core';
 import dedent from 'dedent';
 import stripAnsi from 'strip-ansi';
 import serializer from '../__utils__/linaria-snapshot-serializer';
-import { StrictOptions } from '../babel/types';
+import type { StrictOptions } from '../babel/types';
 
 expect.addSnapshotSerializer(serializer);
 
@@ -11,7 +11,7 @@ const transpile = async (
   input: string,
   opts: Partial<StrictOptions> = { evaluate: false }
 ) =>
-  (await babel.transformAsync(input, {
+  (await transformAsync(input, {
     babelrc: false,
     presets: [[require.resolve('../babel'), opts]],
     plugins: ['@babel/plugin-syntax-jsx'],

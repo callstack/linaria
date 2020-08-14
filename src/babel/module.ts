@@ -17,11 +17,11 @@ import NativeModule from 'module';
 import vm from 'vm';
 import fs from 'fs';
 import path from 'path';
-import { BabelFileResult } from '@babel/core';
+import type { BabelFileResult } from '@babel/core';
 import * as EvalCache from './eval-cache';
 import * as process from './process';
 import { debug } from './utils/logger';
-import { StrictOptions } from './types';
+import type { Evaluator, StrictOptions } from './types';
 
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty
@@ -285,7 +285,7 @@ class Module {
       code = text;
     } else {
       // Action can be a function or a module name
-      const evaluator =
+      const evaluator: Evaluator =
         typeof action === 'function' ? action : require(action).default;
 
       // For JavaScript files, we need to transpile it and to get the exports of the module

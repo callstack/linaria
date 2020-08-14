@@ -7,8 +7,9 @@
  * It is used explicitly in extractor, and loaded as a part of `prest-env` in shaker
  */
 
-import { NodePath } from '@babel/traverse';
-import { types } from '@babel/core';
+import { types as t } from '@babel/core';
+import type { NodePath } from '@babel/traverse';
+import type { CallExpression } from '@babel/types';
 import { expression } from '@babel/template';
 import getLinariaComment from '../../utils/getLinariaComment';
 
@@ -22,7 +23,7 @@ const linariaComponentTpl = expression(
   }`
 );
 
-export default function ProcessStyled(path: NodePath<types.CallExpression>) {
+export default function ProcessStyled(path: NodePath<CallExpression>) {
   const [, displayName, className] = getLinariaComment(path);
   if (!className) {
     return;
@@ -30,11 +31,11 @@ export default function ProcessStyled(path: NodePath<types.CallExpression>) {
 
   path.replaceWith(
     linariaComponentTpl({
-      className: types.stringLiteral(className),
-      displayName: displayName ? types.stringLiteral(displayName) : null,
-      extends: types.isCallExpression(path.node.callee)
+      className: t.stringLiteral(className),
+      displayName: displayName ? t.stringLiteral(displayName) : null,
+      extends: t.isCallExpression(path.node.callee)
         ? path.node.callee.arguments[0]
-        : types.nullLiteral(),
+        : t.nullLiteral(),
     })
   );
 }

@@ -5,7 +5,7 @@ import stripAnsi from 'strip-ansi';
 
 import Module from '../babel/module';
 import serializer from '../__utils__/linaria-snapshot-serializer';
-import { Evaluator, StrictOptions } from '../babel/types';
+import type { Evaluator, StrictOptions } from '../babel/types';
 
 expect.addSnapshotSerializer(serializer);
 async function transformAsync(
@@ -894,11 +894,11 @@ function run(
       dedent`
         import React from 'react'
         import {css} from 'linaria'
-  
+
         const globalObj = {
           opacity: 0.5,
         };
-        
+
         const Styled1 = styled.p\`
           opacity: ${'${globalObj.opacity}'}
         \`
@@ -910,12 +910,12 @@ function run(
               opacity: 0;
             \`,
           };
-  
+
           const classes2 = classes;
-  
+
           const MyComponent = styled\`
             opacity: ${'${globalObj.opacity}'};
-  
+
             &:hover .${'${classes2.cell}'} {
               opacity: ${'${classes.value}'};
             }
@@ -923,7 +923,7 @@ function run(
               font-size: 1;
             }
           \`;
-  
+
           return React.createElement(MyComponent);
         }
         `
@@ -938,7 +938,7 @@ function run(
       dedent`
         import React from 'react'
         import {css} from 'linaria'
-        
+
         const color = 'red';
 
         export default function Component() {
@@ -958,7 +958,7 @@ function run(
       dedent`
         import React from 'react'
         import {css} from 'linaria'
-        
+
         const size = () => 5
         export default function Component() {
           const color = size()

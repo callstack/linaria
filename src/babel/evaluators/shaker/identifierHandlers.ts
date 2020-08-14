@@ -1,15 +1,16 @@
 import { types as t } from '@babel/core';
+import type { Aliases, Identifier, Node, VisitorKeys } from '@babel/types';
 import peek from '../../utils/peek';
 import GraphBuilderState from './GraphBuilderState';
-import { IdentifierHandlerType, NodeType } from './types';
+import type { IdentifierHandlerType, NodeType } from './types';
 import { identifierHandlers as core } from './langs/core';
 import ScopeManager from './scope';
 
-type HandlerFn = <TParent extends t.Node = t.Node>(
+type HandlerFn = <TParent extends Node = Node>(
   builder: GraphBuilderState,
-  node: t.Identifier,
+  node: Identifier,
   parent: TParent,
-  parentKey: t.VisitorKeys[TParent['type']],
+  parentKey: VisitorKeys[TParent['type']],
   listIdx: number | null
 ) => void;
 
@@ -19,7 +20,7 @@ const handlers: {
   [key: string]: Handler;
 } = {};
 
-function isAlias(type: NodeType): type is keyof t.Aliases {
+function isAlias(type: NodeType): type is keyof Aliases {
   return type in t.FLIPPED_ALIAS_KEYS;
 }
 
@@ -58,7 +59,7 @@ batchDefineHandlers([...core.refer], 'refer');
 defineHandler(
   'FunctionDeclaration',
   'id',
-  (builder: GraphBuilderState, node: t.Identifier) => {
+  (builder: GraphBuilderState, node: Identifier) => {
     builder.scope.declare(node, false, null, 1);
   }
 );
@@ -68,7 +69,7 @@ defineHandler(
  */
 const memberExpressionObjectHandler = (
   builder: GraphBuilderState,
-  node: t.Identifier
+  node: Identifier
 ) => {
   const context = peek(builder.context);
   const declaration = builder.scope.addReference(node);
@@ -100,8 +101,8 @@ defineHandler(
  */
 const memberExpressionPropertyHandler = (
   builder: GraphBuilderState,
-  node: t.Identifier,
-  parent: t.Node
+  node: Identifier,
+  parent: Node
 ) => {
   if (t.isMemberExpression(parent) && parent.computed) {
     const declaration = builder.scope.addReference(node);

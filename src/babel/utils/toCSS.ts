@@ -1,7 +1,7 @@
 // TypeScript Version: 3.2
 
 import { unitless } from '../units';
-import { JSONValue } from '../types';
+import type { JSONValue } from '../types';
 import isSerializable from './isSerializable';
 import isBoxedPrimitive from './isBoxedPrimitive';
 

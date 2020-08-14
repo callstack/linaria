@@ -1,4 +1,4 @@
-import { types as t } from '@babel/core';
+import type { Node, Program } from '@babel/types';
 import generator from '@babel/generator';
 import isNode from '../../utils/isNode';
 import getVisitorKeys from '../../utils/getVisitorKeys';
@@ -9,13 +9,10 @@ import dumpNode from './dumpNode';
 /*
  * Returns new tree without dead nodes
  */
-function shakeNode<TNode extends t.Node>(
-  node: TNode,
-  alive: Set<t.Node>
-): t.Node {
+function shakeNode<TNode extends Node>(node: TNode, alive: Set<Node>): Node {
   const keys = getVisitorKeys(node) as Array<keyof TNode>;
   const changes: Partial<TNode> = {};
-  const isNodeAlive = (n: t.Node) => alive.has(n);
+  const isNodeAlive = (n: Node) => alive.has(n);
 
   for (const key of keys) {
     const subNode = node[key];
@@ -61,9 +58,9 @@ function shakeNode<TNode extends t.Node>(
  * Returns new AST and an array of external dependencies.
  */
 export default function shake(
-  rootPath: t.Program,
+  rootPath: Program,
   exports: string[] | null
-): [t.Program, Map<string, string[]>] {
+): [Program, Map<string, string[]>] {
   debug(
     'evaluator:shaker:shake',
     () =>
@@ -73,8 +70,8 @@ export default function shake(
   );
 
   const depsGraph = build(rootPath);
-  const alive = new Set<t.Node>();
-  let deps: t.Node[] = depsGraph.getLeafs(exports).map((i) => i) as t.Node[];
+  const alive = new Set<Node>();
+  let deps: Node[] = depsGraph.getLeafs(exports).map((i) => i) as Node[];
   while (deps.length > 0) {
     // Mark all dependencies as alive
     deps.forEach((d) => alive.add(d));
@@ -83,7 +80,7 @@ export default function shake(
     deps = depsGraph.getDependencies(deps).filter((d) => !alive.has(d));
   }
 
-  const shaken = shakeNode(rootPath, alive) as t.Program;
+  const shaken = shakeNode(rootPath, alive) as Program;
   /*
    * If we want to know what is really happen with our code tree,
    * we can print formatted tree here by setting env variable LINARIA_LOG=debug
