@@ -1,27 +1,28 @@
 import { types as t } from '@babel/core';
+import type { AssignmentExpression, Node, VisitorKeys } from '@babel/types';
 import isNode from '../../utils/isNode';
 import getVisitorKeys from '../../utils/getVisitorKeys';
 import DepsGraph from './DepsGraph';
 import GraphBuilderState from './GraphBuilderState';
 import { getVisitors } from './Visitors';
-import { VisitorAction } from './types';
+import type { VisitorAction } from './types';
 import ScopeManager from './scope';
 
-const isVoid = (node: t.Node): boolean =>
+const isVoid = (node: Node): boolean =>
   t.isUnaryExpression(node) && node.operator === 'void';
 
 class GraphBuilder extends GraphBuilderState {
-  static build(root: t.Node): DepsGraph {
+  static build(root: Node): DepsGraph {
     return new GraphBuilder(root).graph;
   }
 
-  constructor(rootNode: t.Node) {
+  constructor(rootNode: Node) {
     super();
 
     this.visit(rootNode, null, null, null);
   }
 
-  private isExportsIdentifier(node: t.Node) {
+  private isExportsIdentifier(node: Node) {
     if (
       t.isIdentifier(node) &&
       this.scope.getDeclaration(node) === ScopeManager.globalExportsIdentifier
@@ -39,7 +40,7 @@ class GraphBuilder extends GraphBuilderState {
     );
   }
 
-  private isExportsAssigment(node: t.Node): node is t.AssignmentExpression {
+  private isExportsAssigment(node: Node): node is AssignmentExpression {
     if (
       node &&
       t.isAssignmentExpression(node) &&
@@ -67,7 +68,7 @@ class GraphBuilder extends GraphBuilderState {
    * eg. BinaryExpression has children `left` and `right`,
    * both of them are required for evaluating the value of the expression
    */
-  baseVisit<TNode extends t.Node>(node: TNode, ignoreDeps = false) {
+  baseVisit<TNode extends Node>(node: TNode, ignoreDeps = false) {
     const dependencies = [];
     const isExpression = t.isExpression(node);
     const keys = getVisitorKeys(node);
@@ -101,10 +102,10 @@ class GraphBuilder extends GraphBuilderState {
     this.callbacks.forEach((callback) => callback(node));
   }
 
-  visit<TNode extends t.Node, TParent extends t.Node>(
+  visit<TNode extends Node, TParent extends Node>(
     node: TNode,
     parent: TParent | null,
-    parentKey: t.VisitorKeys[TParent['type']] | null,
+    parentKey: VisitorKeys[TParent['type']] | null,
     listIdx: number | null = null
   ): VisitorAction {
     if (

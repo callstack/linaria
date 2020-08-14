@@ -2,7 +2,7 @@ import path from 'path';
 import dedent from 'dedent';
 import * as babel from '@babel/core';
 import Module from '../babel/module';
-import { Evaluator, StrictOptions } from '../babel/types';
+import type { Evaluator, StrictOptions } from '../babel/types';
 
 beforeEach(() => Module.invalidate());
 

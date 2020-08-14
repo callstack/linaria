@@ -2,8 +2,8 @@
  * This file handles preparing babel config for Linaria preevaluation.
  */
 
-import { PluginItem, TransformOptions } from '@babel/core';
-import { StrictOptions } from '../types';
+import type { PluginItem, TransformOptions } from '@babel/core';
+import type { StrictOptions } from '../types';
 
 type DefaultOptions = Partial<TransformOptions> & {
   plugins: PluginItem[];

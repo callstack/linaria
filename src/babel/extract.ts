@@ -10,32 +10,33 @@
  *  - store result of extraction in babel's file metadata
  */
 
-import { types } from '@babel/core';
-import { NodePath, Scope } from '@babel/traverse';
+import type { Node, Program, Expression } from '@babel/types';
+import type { NodePath, Scope, Visitor } from '@babel/traverse';
 import { expression, statement } from '@babel/template';
 import generator from '@babel/generator';
 import evaluate from './evaluators';
 import getTemplateProcessor from './evaluators/templateProcessor';
 import Module from './module';
-import {
+import type {
   State,
   StrictOptions,
   LazyValue,
   ExpressionValue,
-  ValueType,
   ValueCache,
 } from './types';
+import { ValueType } from './types';
 import CollectDependencies from './visitors/CollectDependencies';
 import DetectStyledImportName from './visitors/DetectStyledImportName';
 import GenerateClassNames from './visitors/GenerateClassNames';
 import { debug } from './utils/logger';
+import type { Core } from './babel';
 
 function isLazyValue(v: ExpressionValue): v is LazyValue {
   return v.kind === ValueType.LAZY;
 }
 
-function isNodePath(obj: any): obj is NodePath {
-  return obj?.node !== undefined;
+function isNodePath<T extends Node>(obj: NodePath<T> | T): obj is NodePath<T> {
+  return 'node' in obj && obj?.node !== undefined;
 }
 
 function findFreeName(scope: Scope, name: string): string {
@@ -50,6 +51,16 @@ function findFreeName(scope: Scope, name: string): string {
   }
 
   return nextName;
+}
+
+function unwrapNode<T extends Node>(
+  item: NodePath<T> | T | string
+): T | string {
+  if (typeof item === 'string') {
+    return item;
+  }
+
+  return isNodePath(item) ? item.node : item;
 }
 
 // All exported values will be wrapped with this function
@@ -69,22 +80,23 @@ const exportsLinariaPrevalTpl = statement(
 );
 
 function addLinariaPreval(
-  path: NodePath<types.Program>,
-  lazyDeps: Array<types.Expression | string>
-): types.Program {
+  { types: t }: Core,
+  path: NodePath<Program>,
+  lazyDeps: Array<Expression | string>
+): Program {
   // Constant __linariaPreval with all dependencies
   const wrapName = findFreeName(path.scope, '_wrap');
   const statements = [
     expressionWrapperTpl({ wrapName }),
     exportsLinariaPrevalTpl({
-      expressions: types.arrayExpression(
+      expressions: t.arrayExpression(
         lazyDeps.map((expression) => expressionTpl({ expression, wrapName }))
       ),
     }),
   ];
 
   const programNode = path.node;
-  return types.program(
+  return t.program(
     [...programNode.body, ...statements],
     programNode.directives,
     programNode.sourceType,
@@ -92,13 +104,16 @@ function addLinariaPreval(
   );
 }
 
-export default function extract(_babel: any, options: StrictOptions) {
-  const process = getTemplateProcessor(options);
+export default function extract(
+  babel: Core,
+  options: StrictOptions
+): { visitor: Visitor<State> } {
+  const process = getTemplateProcessor(babel, options);
 
   return {
     visitor: {
       Program: {
-        enter(path: NodePath<types.Program>, state: State) {
+        enter(path: NodePath<Program>, state: State) {
           // Collect all the style rules from the styles we encounter
           state.queue = [];
           state.rules = {};
@@ -113,10 +128,10 @@ export default function extract(_babel: any, options: StrictOptions) {
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
-            ImportDeclaration: (p) => DetectStyledImportName(p, state),
+            ImportDeclaration: (p) => DetectStyledImportName(babel, p, state),
             TaggedTemplateExpression: (p) => {
-              GenerateClassNames(p, state, options);
-              CollectDependencies(p, state, options);
+              GenerateClassNames(babel, p, state, options);
+              CollectDependencies(babel, p, state, options);
             },
           });
 
@@ -128,11 +143,9 @@ export default function extract(_babel: any, options: StrictOptions) {
             [] as LazyValue[]
           );
 
-          const expressionsToEvaluate = lazyDeps.map((v) =>
-            isNodePath(v.ex) ? v.ex.node : v.ex
-          );
+          const expressionsToEvaluate = lazyDeps.map((v) => unwrapNode(v.ex));
           const originalLazyExpressions = lazyDeps.map((v) =>
-            isNodePath(v.originalEx) ? v.originalEx.node : v.originalEx
+            unwrapNode(v.originalEx)
           );
 
           debug('lazy-deps:count', lazyDeps.length);
@@ -153,13 +166,16 @@ export default function extract(_babel: any, options: StrictOptions) {
               )
             );
 
-            const program = addLinariaPreval(path, expressionsToEvaluate);
+            const program = addLinariaPreval(
+              babel,
+              path,
+              expressionsToEvaluate
+            );
             const { code } = generator(program);
             debug('lazy-deps:evaluate', '');
             try {
               const evaluation = evaluate(
                 code,
-                types,
                 state.file.opts.filename,
                 options
               );

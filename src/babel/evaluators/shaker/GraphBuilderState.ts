@@ -1,8 +1,8 @@
-import { types as t } from '@babel/core';
+import type { Node, VisitorKeys } from '@babel/types';
 import ScopeManager from './scope';
 import DepsGraph from './DepsGraph';
 
-export type OnVisitCallback = (n: t.Node) => void;
+export type OnVisitCallback = (n: Node) => void;
 
 export default abstract class GraphBuilderState {
   public readonly scope = new ScopeManager();
@@ -22,7 +22,7 @@ export default abstract class GraphBuilderState {
    */
   public readonly context: Array<'expression' | 'lval'> = [];
 
-  public readonly fnStack: t.Node[] = [];
+  public readonly fnStack: Node[] = [];
 
   public onVisit(callback: OnVisitCallback) {
     this.callbacks.push(callback);
@@ -31,15 +31,15 @@ export default abstract class GraphBuilderState {
     };
   }
 
-  abstract baseVisit<TNode extends t.Node>(
+  abstract baseVisit<TNode extends Node>(
     node: TNode,
     ignoreDeps?: boolean
   ): void;
 
-  abstract visit<TNode extends t.Node, TParent extends t.Node>(
+  abstract visit<TNode extends Node, TParent extends Node>(
     node: TNode,
     parent: TParent | null,
-    parentKey: t.VisitorKeys[TParent['type']] | null,
+    parentKey: VisitorKeys[TParent['type']] | null,
     listIdx?: number | null
   ): void;
 }

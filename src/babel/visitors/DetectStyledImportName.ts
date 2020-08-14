@@ -3,12 +3,14 @@
  * This Visitor checks if import of `linaria/react` was renamed and stores that information in state
  */
 
-import { types as t } from '@babel/core';
-import { NodePath } from '@babel/traverse';
-import { State } from '../types';
+import type { ImportDeclaration } from '@babel/types';
+import type { NodePath } from '@babel/traverse';
+import type { State } from '../types';
+import { Core } from '../babel';
 
 export default function DetectStyledImportName(
-  path: NodePath<t.ImportDeclaration>,
+  { types: t }: Core,
+  path: NodePath<ImportDeclaration>,
   state: State
 ) {
   if (!t.isLiteral(path.node.source, { value: 'linaria/react' })) {

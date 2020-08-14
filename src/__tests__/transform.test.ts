@@ -147,7 +147,9 @@ it('respects passed babel options', async () => {
         },
       }
     )
-  ).toThrow('Unexpected token');
+  ).toThrow(
+    /Support for the experimental syntax 'jsx' isn't currently enabled/
+  );
 
   expect(() =>
     transform(

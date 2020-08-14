@@ -1,19 +1,20 @@
-import { NodePath } from '@babel/traverse';
-import { types } from '@babel/core';
+import { types as t } from '@babel/core';
+import type { NodePath } from '@babel/traverse';
+import type { Function, JSXElement as JSXElementNode } from '@babel/types';
 
-function getFunctionName(path: NodePath<types.Function>): string | null {
-  if (path.isClassMethod() && types.isIdentifier(path.node.key)) {
+function getFunctionName(path: NodePath<Function>): string | null {
+  if (path.isClassMethod() && t.isIdentifier(path.node.key)) {
     return path.node.key.name;
   }
 
   return null;
 }
 
-export default function JSXElement(path: NodePath<types.JSXElement>) {
+export default function JSXElement(path: NodePath<JSXElementNode>) {
   // JSX can be safely replaced on an empty fragment because it is unnecessary for styles
-  const emptyFragment = types.jsxFragment(
-    types.jsxOpeningFragment(),
-    types.jsxClosingFragment(),
+  const emptyFragment = t.jsxFragment(
+    t.jsxOpeningFragment(),
+    t.jsxClosingFragment(),
     []
   );
 
@@ -21,9 +22,7 @@ export default function JSXElement(path: NodePath<types.JSXElement>) {
   // If that JSX is a result of a function, we can replace the function body.
   const scopePath = path.scope.path;
   if (scopePath.isFunction()) {
-    const emptyBody = types.blockStatement([
-      types.returnStatement(emptyFragment),
-    ]);
+    const emptyBody = t.blockStatement([t.returnStatement(emptyFragment)]);
 
     // Is it not just a function, but a method `render`?
     if (getFunctionName(scopePath) === 'render') {
@@ -31,15 +30,20 @@ export default function JSXElement(path: NodePath<types.JSXElement>) {
 
       // Replace the whole component
       if (decl?.isClassDeclaration()) {
-        decl.replaceWith(
-          types.functionDeclaration(decl.node.id, [], emptyBody)
-        );
+        decl.replaceWith(t.functionDeclaration(decl.node.id, [], emptyBody));
 
         return;
       }
     }
 
-    scopePath.get('body').replaceWith(emptyBody);
+    const body = scopePath.get('body');
+    if (Array.isArray(body)) {
+      throw new Error(
+        `A body of a function is expected to be a single element but an array was returned. It's possible if JS syntax has been changed since that code was written.`
+      );
+    }
+
+    body.replaceWith(emptyBody);
   } else {
     path.replaceWith(emptyFragment);
   }

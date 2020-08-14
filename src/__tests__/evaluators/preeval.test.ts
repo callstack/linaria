@@ -1,8 +1,8 @@
 import { join } from 'path';
-import * as babel from '@babel/core';
+import { transformAsync } from '@babel/core';
 import dedent from 'dedent';
 import serializer from '../../__utils__/linaria-snapshot-serializer';
-import { StrictOptions } from '../../babel/types';
+import type { StrictOptions } from '../../babel/types';
 
 expect.addSnapshotSerializer(serializer);
 
@@ -12,7 +12,7 @@ const options: Partial<StrictOptions> = {
 };
 
 const transpile = async (input: string) =>
-  (await babel.transformAsync(input, {
+  (await transformAsync(input, {
     babelrc: false,
     presets: [[require.resolve('../../babel/evaluators/preeval'), options]],
     plugins: [
@@ -26,7 +26,7 @@ it('preserves classNames', async () => {
   const { code } = await transpile(
     dedent`
       import { styled } from 'linaria/react';
-      
+
       const Component = styled.div\`\`;
       `
   );
@@ -38,7 +38,7 @@ it('handles locally named import', async () => {
   const { code } = await transpile(
     dedent`
       import { styled as custom } from 'linaria/react';
-      
+
       const Component = custom.div\`\`;
       `
   );
@@ -51,7 +51,7 @@ it('replaces functional component', async () => {
   const { code } = await transpile(
     dedent`
       import React from 'react';
-      
+
       const Component = (props) => ${div};
       `
   );
@@ -64,7 +64,7 @@ it('replaces class component', async () => {
   const { code } = await transpile(
     dedent`
       import React from 'react';
-      
+
       class Component extends React.PureComponent {
         render() {
           return ${div};
@@ -81,9 +81,9 @@ it('replaces constant', async () => {
   const { code } = await transpile(
     dedent`
       import React from 'react';
-      
+
       const tag = ${div};
-      
+
       const Component = (props) => tag;
       `
   );

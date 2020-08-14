@@ -1,10 +1,9 @@
-import { types } from '@babel/core';
-import { NodePath } from '@babel/traverse';
+import type { Node } from '@babel/types';
 
 const pattern = /^linaria (.+)$/;
 
 export default function getLinariaComment(
-  path: NodePath<types.Node>,
+  path: { node: Node },
   remove: boolean = true
 ) {
   const comments = path.node.leadingComments;

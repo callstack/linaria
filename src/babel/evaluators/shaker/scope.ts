@@ -1,6 +1,6 @@
-import { types } from '@babel/core';
+import { types as t } from '@babel/core';
+import type { Identifier, Node } from '@babel/types';
 
-type Identifier = types.Identifier;
 type Scope = Map<string, Set<Identifier>>;
 
 export type ScopeId = number | 'global';
@@ -12,7 +12,7 @@ export type DeclareHandler = (
 const ResolvedNode = Symbol('ResolvedNode');
 const functionScopes = new WeakSet<Scope>();
 
-export class PromisedNode<T = types.Node> {
+export class PromisedNode<T = Node> {
   static is<TNode>(obj: any): obj is PromisedNode<TNode> {
     return obj && ResolvedNode in obj;
   }
@@ -24,7 +24,7 @@ export class PromisedNode<T = types.Node> {
   }
 }
 
-export const resolveNode = <T = types.Node>(
+export const resolveNode = <T = Node>(
   obj: T | PromisedNode<T> | undefined
 ): T | undefined => (PromisedNode.is<T>(obj) ? obj.identifier : obj);
 
@@ -33,8 +33,8 @@ const getId = (scope: Scope, identifier: Identifier): string =>
   `${scopeIds.get(scope)}:${identifier.name}`;
 
 export default class ScopeManager {
-  public static globalExportsIdentifier = types.identifier('exports');
-  public static globalModuleIdentifier = types.identifier('module');
+  public static globalExportsIdentifier = t.identifier('exports');
+  public static globalModuleIdentifier = t.identifier('module');
   private nextId = 0;
   private readonly stack: Array<Scope> = [];
   private readonly map: Map<ScopeId, Scope> = new Map();

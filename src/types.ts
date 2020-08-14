@@ -1,5 +1,5 @@
-import { RawSourceMap } from 'source-map';
-import { PluginOptions } from './babel/utils/loadOptions';
+import type { RawSourceMap } from 'source-map';
+import type { PluginOptions } from './babel/utils/loadOptions';
 
 export type Replacement = {
   original: { start: Location; end: Location };

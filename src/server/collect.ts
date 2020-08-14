@@ -2,7 +2,8 @@
  * This utility extracts critical CSS from given HTML and CSS file to be used in SSR environments
  */
 
-import postcss, { AtRule, ChildNode } from 'postcss';
+import type { AtRule, ChildNode } from 'postcss';
+import postcss from 'postcss';
 
 type CollectResult = {
   critical: string;
