@@ -63,5 +63,6 @@ jspm_packages/
 lib/
 dist/
 build/
+esm/
 
 .linaria-cache
