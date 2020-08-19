@@ -5,18 +5,20 @@
   "description": "Linaria website",
   "scripts": {
     "prestart": "yarn --cwd .. prepare",
-    "start": "webpack-serve",
     "server": "node build/server",
     "clean:client": "del dist",
     "clean:server": "del build",
     "clean": "yarn clean:client && yarn clean:server",
     "build:client": "cross-env NODE_ENV=production webpack -p --env.NODE_ENV production",
     "build:server": "cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build",
-    "build": "yarn build:client && yarn build:server",
     "prebuild": "yarn clean",
-    "lint:css": "stylelint src/**/*.js"
+    "lint:css": "stylelint src/**/*.js",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   },
   "dependencies": {
+    "@zeit/next-css": "^1.0.1",
     "babel-plugin-file-loader": "^1.1.1",
     "dedent": "^0.7.0",
     "escape-html": "^1.0.3",
@@ -25,6 +27,8 @@
     "koa-compress": "^3.0.0",
     "koa-router": "^7.4.0",
     "koa-send": "^5.0.0",
+    "next": "^9.5.2",
+    "next-optimized-images": "^2.6.2",
     "react": "^16.8.3",
     "react-dom": "^16.8.3"
   },

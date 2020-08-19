@@ -64,5 +64,6 @@ lib/
 esm/
 dist/
 build/
+.next/
 
 .linaria-cache
