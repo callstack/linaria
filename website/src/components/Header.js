@@ -1,5 +1,3 @@
-/* @flow */
-
 import { styled } from 'linaria/react';
 import React from 'react';
 import constants from '../styles/constants';
@@ -10,7 +8,7 @@ export default function Header() {
   return (
     <NavBar>
       <LogoImage
-        src={require('../../assets/linaria-logo.svg')}
+        src={require('../assets/linaria-logo.svg')}
         alt="Linaria Logo"
       />
       <Links>

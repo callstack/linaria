@@ -1,5 +1,3 @@
-/* @flow */
-
 export default {
   fontFamily:
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", Helvetica, sans-serif',

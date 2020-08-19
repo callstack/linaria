@@ -1,13 +1,10 @@
-/* @flow */
-
 import { css } from 'linaria';
 import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './components/App';
-import constants from './styles/constants';
+import constants from '../styles/constants';
 
-/* $FlowFixMe */
-ReactDOM.render(<App />, document.getElementById('root'));
+export default function App({ Component, pageProps }) {
+  return <Component {...pageProps} />;
+}
 
 export const globals = css`
   :global() {

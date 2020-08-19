@@ -1,5 +1,3 @@
-/* @flow */
-
 import { styled } from 'linaria/react';
 import React from 'react';
 import { media } from '../styles/utils';
@@ -28,7 +26,7 @@ export default function Hero() {
           <RightColumn>
             <CodeSample
               alt="Linaria code sample"
-              src={require('../../assets/code-sample.png')}
+              src={require('../assets/code-sample.png')}
             />
           </RightColumn>
         </Row>
@@ -42,7 +40,7 @@ const HeroContainer = styled.main`
 
   ${media.large} {
     padding: 64px 0;
-    background-image: url(${require('../../assets/linaria-logomark.svg')});
+    background-image: url(${require('../assets/linaria-logomark.svg')});
     background-repeat: no-repeat;
     background-position: bottom right;
   }

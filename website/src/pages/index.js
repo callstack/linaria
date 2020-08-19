@@ -1,13 +1,15 @@
-/* @flow */
-
 import { styled } from 'linaria/react';
 import React from 'react';
-import Header from './Header';
-import Hero from './Hero';
+import Head from 'next/head';
+import Header from '../components/Header';
+import Hero from '../components/Hero';
 
 export default function Index() {
   return (
     <Page>
+      <Head>
+        <title>Linaria – zero-runtime CSS in JS library</title>
+      </Head>
       <Header />
       <Hero />
     </Page>
