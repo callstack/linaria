@@ -6,9 +6,9 @@
   "scripts": {
     "prestart": "yarn --cwd .. prepare",
     "lint:css": "stylelint src/**/*.js",
-    "serve": "next start",
+    "dev": "next dev",
     "build": "next build",
-    "start": "next dev"
+    "start": "next start"
   },
   "dependencies": {
     "@zeit/next-css": "^1.0.1",
