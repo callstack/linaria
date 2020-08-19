@@ -15,7 +15,7 @@ export type Rules = {
   [className: string]: {
     cssText: string;
     displayName: string;
-    start: Location | null;
+    start: Location | null | undefined;
   };
 };
 

@@ -8,6 +8,7 @@ import type { TransformOptions } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import type { VisitorKeys } from '@babel/types';
 import type { StyledMeta } from '../StyledMeta';
+import { Preprocessor } from '../types';
 
 export type JSONValue = string | number | boolean | JSONObject | JSONArray;
 
@@ -121,6 +122,7 @@ type ClassNameFn = (hash: string, title: string) => string;
 
 export type StrictOptions = {
   classNameSlug?: string | ClassNameFn;
+  injectStyleTags: { preprocessor: Preprocessor } | true | false;
   displayName: boolean;
   evaluate: boolean;
   ignore?: RegExp;

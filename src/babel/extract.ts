@@ -14,6 +14,7 @@ import type { Node, Program, Expression } from '@babel/types';
 import type { NodePath, Scope, Visitor } from '@babel/traverse';
 import { expression, statement } from '@babel/template';
 import generator from '@babel/generator';
+import preprocess from '../preprocess';
 import evaluate from './evaluators';
 import getTemplateProcessor from './evaluators/templateProcessor';
 import Module from './module';
@@ -101,6 +102,48 @@ function addLinariaPreval(
     programNode.directives,
     programNode.sourceType,
     programNode.interpreter
+  );
+}
+
+function injectStyleAst({ types: t }: Core, css: string) {
+  const createStyleElement = t.variableDeclaration('const', [
+    t.variableDeclarator(
+      t.identifier('style'),
+      t.callExpression(
+        t.memberExpression(
+          t.identifier('document'),
+          t.identifier('createElement')
+        ),
+        [t.stringLiteral('style')]
+      )
+    ),
+  ]);
+
+  const assignInnerHTML = t.expressionStatement(
+    t.assignmentExpression(
+      '=',
+      t.memberExpression(t.identifier('style'), t.identifier('innerHTML')),
+      t.stringLiteral(css)
+    )
+  );
+
+  const appendToDOM = t.expressionStatement(
+    t.callExpression(
+      t.memberExpression(
+        t.memberExpression(t.identifier('document'), t.identifier('head')),
+        t.identifier('appendChild')
+      ),
+      [t.identifier('style')]
+    )
+  );
+
+  return t.ifStatement(
+    t.binaryExpression(
+      '!==',
+      t.unaryExpression('typeof', t.identifier('document')),
+      t.stringLiteral('undefined')
+    ),
+    t.blockStatement([createStyleElement, assignInnerHTML, appendToDOM])
   );
 }
 
@@ -200,7 +243,7 @@ export default function extract(
           );
           state.queue.forEach((item) => process(item, state, valueCache));
         },
-        exit(_: any, state: State) {
+        exit(path: NodePath<Program>, state: State) {
           if (Object.keys(state.rules).length) {
             // Store the result as the file metadata under linaria key
             state.file.metadata.linaria = {
@@ -208,6 +251,17 @@ export default function extract(
               replacements: state.replacements,
               dependencies: state.dependencies,
             };
+
+            if (options.injectStyleTags) {
+              const { cssText } = preprocess(state.rules, {
+                filename: state.file.opts.filename,
+                preprocessor:
+                  options.injectStyleTags === true
+                    ? undefined
+                    : options.injectStyleTags.preprocessor,
+              });
+              path.pushContainer('body', injectStyleAst(babel, cssText));
+            }
           }
 
           // Invalidate cache for module evaluation when we're done
