@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@zeit/next-css": "^1.0.1",
+    "linaria": "^1.3.3",
     "next": "^9.5.2",
     "next-optimized-images": "^2.6.2",
     "react": "^16.13.1",
@@ -25,6 +26,7 @@
     "babel-loader": "^8.0.5",
     "babel-plugin-module-resolver": "^3.2.0",
     "stylelint": "^9.10.1",
-    "stylelint-config-recommended": "^2.1.0"
+    "stylelint-config-recommended": "^2.1.0",
+    "vercel": "^20.0.0"
   }
 }

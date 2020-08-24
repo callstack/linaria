@@ -11,7 +11,7 @@ module.exports = withImages(
         use: [
           { loader: 'babel-loader' },
           {
-            loader: require.resolve('../lib/loader'),
+            loader: 'linaria/loader',
             options: {
               sourceMap: process.env.NODE_ENV !== 'production',
             },
