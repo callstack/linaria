@@ -7,6 +7,7 @@
 import * as React from 'react'; // eslint-disable-line import/no-extraneous-dependencies
 import validAttr from '@emotion/is-prop-valid';
 import { cx } from '../index';
+import type { CSSProperties } from '../CSSProperties';
 import type { StyledMeta } from '../StyledMeta';
 
 type Options = {
@@ -150,10 +151,6 @@ function styled(tag: any): any {
     return Result;
   };
 }
-
-type CSSProperties = {
-  [key: string]: string | number | CSSProperties;
-};
 
 type StyledComponent<T> = StyledMeta &
   (T extends React.FunctionComponent<any>
