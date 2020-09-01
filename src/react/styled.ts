@@ -10,6 +10,8 @@ import { cx } from '../index';
 import type { CSSProperties } from '../CSSProperties';
 import type { StyledMeta } from '../StyledMeta';
 
+export type NoInfer<A extends any> = [A][A extends any ? 0 : never];
+
 type Options = {
   name: string;
   class: string;
@@ -181,7 +183,8 @@ type ComponentStyledTag<T> = <
   // Expressions can contain functions only if wrapped component has style property
   ...exprs: TrgProps extends { style?: React.CSSProperties }
     ? Array<
-        StaticPlaceholder | ((props: OwnProps & TrgProps) => string | number)
+        | StaticPlaceholder
+        | ((props: NoInfer<OwnProps & TrgProps>) => string | number)
       >
     : StaticPlaceholder[]
 ) => keyof OwnProps extends never
