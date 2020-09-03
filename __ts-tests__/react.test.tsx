@@ -26,7 +26,7 @@ const Button = styled.button`
 `;
 
 const ColoredButton = styled.button<{ background: string; children: string }>`
-  background-color: ${props => props.background};
+  background-color: ${(props) => props.background};
 `;
 
 const CustomButton = styled(Button)`

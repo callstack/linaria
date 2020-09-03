@@ -4,29 +4,46 @@
  * invoke RequirementsResolver to get parts of code that needs to be executed in order to evaluate the dependency.
  */
 
-import { parseSync, transformSync, types as t } from '@babel/core';
-import traverse, { NodePath } from '@babel/traverse';
+import { traverse, types as t } from '@babel/core';
+import type {
+  ExpressionStatement,
+  MemberExpression,
+  Program,
+  SequenceExpression,
+} from '@babel/types';
+import { parseSync, transformSync } from '@babel/core';
+import type { NodePath } from '@babel/traverse';
 import generator from '@babel/generator';
 
-import { Evaluator } from '../../types';
+import type { Evaluator } from '../../types';
 import buildOptions from '../buildOptions';
 import RequirementsResolver from './RequirementsResolver';
 
+function isMemberExpression(
+  path: NodePath<any> | NodePath<any>[]
+): path is NodePath<MemberExpression> {
+  return !Array.isArray(path) && path.isMemberExpression();
+}
+
 // Checks that passed node is `exports.__linariaPreval = /* something */`
 function isLinariaPrevalExport(
-  path: NodePath<t.Node>
-): path is NodePath<t.ExpressionStatement> {
+  path: NodePath<any>
+): path is NodePath<ExpressionStatement> {
   if (!path.isExpressionStatement()) {
     return false;
   }
 
-  if (!path.get('expression').isAssignmentExpression()) {
+  if (
+    !(path as NodePath<ExpressionStatement>)
+      .get('expression')
+      .isAssignmentExpression()
+  ) {
     return false;
   }
 
   const left = path.get('expression.left');
 
-  if (Array.isArray(left) || !left.isMemberExpression()) {
+  if (!isMemberExpression(left)) {
     return false;
   }
 
@@ -78,7 +95,7 @@ const extractor: Evaluator = (filename, options, text, only = null) => {
   traverse(ast!, {
     // We know that export has been added to the program body,
     // so we don't need to traverse through the whole tree
-    Program(path: NodePath<t.Program>) {
+    Program(path: NodePath<Program>) {
       const body = path.get('body');
       // Highly likely it has been added in the end
       for (let idx = body.length - 1; idx >= 0; idx--) {
@@ -90,7 +107,7 @@ const extractor: Evaluator = (filename, options, text, only = null) => {
 
           // We only need to evaluate the last item in a sequence expression, e.g. (a, b, c)
           body[idx].traverse({
-            SequenceExpression(sequence: NodePath<t.SequenceExpression>) {
+            SequenceExpression(sequence: NodePath<SequenceExpression>) {
               sequence.replaceWith(
                 sequence.get('expressions')[
                   sequence.node.expressions.length - 1

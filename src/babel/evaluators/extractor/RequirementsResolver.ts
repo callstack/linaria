@@ -5,21 +5,25 @@
  */
 
 import { types as t } from '@babel/core';
-import { Binding, NodePath } from '@babel/traverse';
+import type {
+  Identifier,
+  Node,
+  Statement,
+  VariableDeclarator,
+} from '@babel/types';
+import type { Binding, NodePath } from '@babel/traverse';
 
 type Requirement = {
-  result: t.Statement;
-  path: NodePath<t.Node>;
+  result: Statement;
+  path: NodePath<Node>;
   requirements: Set<NodePath>;
 };
 
 export default class RequirementsResolver {
-  public static resolve(
-    path: NodePath<t.Node> | NodePath<t.Node>[]
-  ): t.Statement[] {
+  public static resolve(path: NodePath<Node> | NodePath<Node>[]): Statement[] {
     const resolver = new RequirementsResolver();
     if (Array.isArray(path)) {
-      path.forEach(p => this.resolve(p));
+      path.forEach((p) => this.resolve(p));
     } else {
       resolver.resolve(path);
     }
@@ -32,8 +36,8 @@ export default class RequirementsResolver {
   /**
    * Checks that specified node or one of its ancestors is already added
    */
-  private isAdded(path: NodePath<t.Node>): boolean {
-    if (this.requirements.some(req => req.path === path)) {
+  private isAdded(path: NodePath<Node>): boolean {
+    if (this.requirements.some((req) => req.path === path)) {
       return true;
     }
 
@@ -49,7 +53,7 @@ export default class RequirementsResolver {
    * and adds all of it to the list of requirements.
    */
   private resolveBinding(binding: Binding) {
-    let result: t.Statement;
+    let result: Statement;
     const startPosition = binding.path.node.start;
 
     switch (binding.kind) {
@@ -63,13 +67,13 @@ export default class RequirementsResolver {
             binding.path.parentPath.node.source
           );
         } else {
-          result = binding.path.parentPath.node as t.Statement;
+          result = binding.path.parentPath.node as Statement;
         }
         break;
       case 'const':
       case 'let':
       case 'var': {
-        let decl = (binding.path as NodePath<t.VariableDeclarator>).node;
+        let decl = (binding.path as NodePath<VariableDeclarator>).node;
         if (
           binding.path.isVariableDeclarator() &&
           t.isSequenceExpression(binding.path.node.init)
@@ -87,7 +91,7 @@ export default class RequirementsResolver {
         break;
       }
       default:
-        result = binding.path.node as t.Statement;
+        result = binding.path.node as Statement;
         break;
     }
     // result may be newly created node that not have start/end/loc info
@@ -109,7 +113,7 @@ export default class RequirementsResolver {
    * Checks that a specified identifier has a binding and tries to resolve it
    * @return `Binding` or null if there is no binding, or it is already added, or it has useless type
    */
-  private resolveIdentifier(path: NodePath<t.Identifier>): Binding | null {
+  private resolveIdentifier(path: NodePath<Identifier>): Binding | null {
     const binding = path.scope.getBinding(path.node.name);
 
     if (
@@ -131,7 +135,7 @@ export default class RequirementsResolver {
    * and recursively calls `resolve` for each of them.
    * @return `Set` with related bindings
    */
-  private resolve(path: NodePath<t.Node>): Set<NodePath> {
+  private resolve(path: NodePath<Node>): Set<NodePath> {
     const set = new Set<NodePath>();
     if (path.isIdentifier()) {
       const binding = this.resolveIdentifier(path);
@@ -143,7 +147,7 @@ export default class RequirementsResolver {
     }
 
     path.traverse({
-      Identifier: p => {
+      Identifier: (p) => {
         const binding = this.resolveIdentifier(p);
         if (binding !== null) {
           set.add(binding.path);
@@ -157,8 +161,8 @@ export default class RequirementsResolver {
   /**
    * Returns sorted list of required statements
    */
-  private get statements(): t.Statement[] {
-    const statements: t.Statement[] = [];
+  private get statements(): Statement[] {
+    const statements: Statement[] = [];
     let requirements = this.requirements;
     while (requirements.length > 0) {
       // On each step, we add to the result list only that statements
@@ -182,11 +186,11 @@ export default class RequirementsResolver {
         throw new Error('Circular dependency');
       }
 
-      statements.push(...zeroDeps.map(req => req.result));
+      statements.push(...zeroDeps.map((req) => req.result));
       // Let's remove already added statements from the requirements of the rest of the list.
-      requirements = rest.map(req => {
+      requirements = rest.map((req) => {
         const reqs = new Set(req.requirements);
-        zeroDeps.forEach(r => reqs.delete(r.path));
+        zeroDeps.forEach((r) => reqs.delete(r.path));
         return {
           ...req,
           requirements: reqs,

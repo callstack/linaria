@@ -11,6 +11,8 @@ If you use Babel in your project, make sure to have a [config file for Babel](ht
 
 ## Bundlers
 
+Please note, that `@babel/core` is a peer dependency of all loaders. Do not forget to add it to `devDependencies` list in your project. 
+
 ### webpack
 
 To use Linaria with webpack, in your webpack config, add `linaria/loader` under `module.rules`:
@@ -280,8 +282,8 @@ export default {
 ### Svelte
 
 #### Contents
-- [Svelte with Rollup](#Rollup)
-- [Svelte with Webpack](#Webpack)
+- [Svelte with Rollup](#Rollup-1)
+- [Svelte with Webpack](#Webpack-1)
 
 #### Rollup
 

@@ -1,16 +1,13 @@
-import dedent from 'dedent';
-import * as babel from '@babel/core';
-import shake from '../../babel/evaluators/shaker';
 import path from 'path';
+import dedent from 'dedent';
+import type { TransformOptions } from '@babel/core';
+import shake from '../../babel/evaluators/shaker';
 
 function getFileName() {
   return path.resolve(__dirname, `../__fixtures__/test.js`);
 }
 
-function _shake(
-  opts?: babel.TransformOptions,
-  only: string[] = ['__linariaPreval']
-) {
+function _shake(opts?: TransformOptions, only: string[] = ['__linariaPreval']) {
   return (
     literal: TemplateStringsArray,
     ...placeholders: string[]

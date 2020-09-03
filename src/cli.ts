@@ -3,8 +3,8 @@
  */
 
 import path from 'path';
-import normalize from 'normalize-path';
 import fs from 'fs';
+import normalize from 'normalize-path';
 import mkdirp from 'mkdirp';
 import glob from 'glob';
 import yargs from 'yargs';
@@ -84,7 +84,7 @@ function processFiles(files: string[], options: Options) {
     [] as string[]
   );
 
-  resolvedFiles.forEach(filename => {
+  resolvedFiles.forEach((filename) => {
     const outputFilename = resolveOutputFilename(filename, options.outDir);
 
     const { cssText, sourceMap, cssSourceMapText } = transform(

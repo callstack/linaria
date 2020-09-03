@@ -2,7 +2,7 @@ import path from 'path';
 import dedent from 'dedent';
 import * as babel from '@babel/core';
 import Module from '../babel/module';
-import { Evaluator, StrictOptions } from '../babel/types';
+import type { Evaluator, StrictOptions } from '../babel/types';
 
 beforeEach(() => Module.invalidate());
 
@@ -291,7 +291,7 @@ it('has global objects available without referencing global', () => {
 it('changes resolve behaviour on overriding _resolveFilename', () => {
   const originalResolveFilename = Module._resolveFilename;
 
-  Module._resolveFilename = id => (id === 'foo' ? 'bar' : id);
+  Module._resolveFilename = (id) => (id === 'foo' ? 'bar' : id);
 
   const mod = new Module(getFileName(), options);
 

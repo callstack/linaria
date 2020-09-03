@@ -1,5 +1,5 @@
-const webpack = require('webpack'); // eslint-disable-line import/no-extraneous-dependencies
 const path = require('path');
+const webpack = require('webpack'); // eslint-disable-line import/no-extraneous-dependencies
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // eslint-disable-line import/no-extraneous-dependencies
 
 const dev = process.env.NODE_ENV !== 'production';

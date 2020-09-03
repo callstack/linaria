@@ -2,7 +2,8 @@
  * This utility extracts critical CSS from given HTML and CSS file to be used in SSR environments
  */
 
-import postcss, { AtRule, ChildNode } from 'postcss';
+import type { AtRule, ChildNode } from 'postcss';
+import postcss from 'postcss';
 
 type CollectResult = {
   critical: string;
@@ -28,7 +29,7 @@ export default function collect(html: string, css: string): CollectResult {
   const handleAtRule = (rule: AtRule) => {
     let addedToCritical = false;
 
-    rule.each(childRule => {
+    rule.each((childRule) => {
       if (isCritical(childRule) && !addedToCritical) {
         critical.append(rule.clone());
         addedToCritical = true;
@@ -46,7 +47,7 @@ export default function collect(html: string, css: string): CollectResult {
     }
   };
 
-  stylesheet.walkAtRules('font-face', rule => {
+  stylesheet.walkAtRules('font-face', (rule) => {
     /**
      * @font-face rules may be defined also in CSS conditional groups (eg. @media)
      * we want only handle those from top-level, rest will be handled in stylesheet.walkRules
@@ -58,7 +59,7 @@ export default function collect(html: string, css: string): CollectResult {
 
   const walkedAtRules = new Set();
 
-  stylesheet.walkRules(rule => {
+  stylesheet.walkRules((rule) => {
     if ('name' in rule.parent && rule.parent.name === 'keyframes') {
       return;
     }
@@ -78,11 +79,11 @@ export default function collect(html: string, css: string): CollectResult {
     }
   });
 
-  critical.walkDecls(/animation/, decl => {
+  critical.walkDecls(/animation/, (decl) => {
     animations.add(decl.value.split(' ')[0]);
   });
 
-  stylesheet.walkAtRules('keyframes', rule => {
+  stylesheet.walkAtRules('keyframes', (rule) => {
     if (animations.has(rule.params)) {
       critical.append(rule);
     }

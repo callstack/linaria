@@ -1,19 +1,20 @@
 export default config => {
-  const newBabelLoader = {
-    test: /\.jsx?$/,
-    exclude: /node_modules/,
-    enforce: "pre", //Don't delete this
-    resolve: { mainFields: ["module", "jsnext:main", "browser", "main"] }, //Don't delete this
+  const { options, ...babelLoaderRule } = config.module.rules[0];
+  options.presets.push('@babel/preset-react', 'linaria/babel');
+  config.module.rules[0] = {
+    ...babelLoaderRule,
+    loader: undefined,
     use: [
       {
-        loader: "babel-loader",
-        options: {
-          plugins: [] 
-        }
+        loader: 'babel-loader',
+        options,
       },
-      { loader: "linaria/loader" }
-    ]
+      {
+        loader: 'linaria/loader',
+        options: {
+          babelOptions: options,
+        },
+      },
+    ],
   };
-
-  config.module.rules[0] = newBabelLoader; //override your babel-loader rule
 };

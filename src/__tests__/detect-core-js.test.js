@@ -1,9 +1,9 @@
 import cp from 'child_process';
 
-const waitForProcess = async process => {
-  return new Promise(resolve => {
+const waitForProcess = async (process) => {
+  return new Promise((resolve) => {
     let output = '';
-    process.stdout.on('data', chunk => {
+    process.stdout.on('data', (chunk) => {
       output += chunk.toString();
     });
     process.on('close', () => {

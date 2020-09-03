@@ -1,5 +1,5 @@
+import type { Serializable } from '../types';
 import isBoxedPrimitive from './isBoxedPrimitive';
-import { Serializable } from '../types';
 
 export default function isSerializable(o: any): o is Serializable {
   return (

@@ -17,11 +17,11 @@ import NativeModule from 'module';
 import vm from 'vm';
 import fs from 'fs';
 import path from 'path';
-import { BabelFileResult } from '@babel/core';
+import type { BabelFileResult } from '@babel/core';
 import * as EvalCache from './eval-cache';
 import * as process from './process';
 import { debug } from './utils/logger';
-import { StrictOptions } from './types';
+import type { Evaluator, StrictOptions } from './types';
 
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty
@@ -144,7 +144,7 @@ class Module {
 
     try {
       // Check for supported extensions
-      this.extensions.forEach(ext => {
+      this.extensions.forEach((ext) => {
         if (ext in extensions) {
           return;
         }
@@ -159,7 +159,7 @@ class Module {
       return Module._resolveFilename(id, this);
     } finally {
       // Cleanup the extensions we added to restore previous behaviour
-      added.forEach(ext => delete extensions[ext]);
+      added.forEach((ext) => delete extensions[ext]);
     }
   };
 
@@ -191,11 +191,11 @@ class Module {
         );
       }
 
-      this.dependencies && this.dependencies.push(id);
+      this.dependencies?.push(id);
 
       let cacheKey = filename;
       let only: string[] = [];
-      if (this.imports && this.imports.has(id)) {
+      if (this.imports?.has(id)) {
         // We know what exactly we need from this module. Let's shake it!
         only = this.imports.get(id)!.sort();
         if (only.length === 0) {
@@ -285,7 +285,7 @@ class Module {
       code = text;
     } else {
       // Action can be a function or a module name
-      const evaluator =
+      const evaluator: Evaluator =
         typeof action === 'function' ? action : require(action).default;
 
       // For JavaScript files, we need to transpile it and to get the exports of the module

@@ -1,4 +1,4 @@
-import { LinariaMetadata } from '../types';
+import type { LinariaMetadata } from '../types';
 
 type Serializer<T> = {
   test: (value: any) => value is T;
@@ -16,7 +16,7 @@ export default {
 CSS:
 
 ${Object.keys(linaria.rules)
-  .map(selector => `${selector} {${linaria.rules[selector].cssText}}`)
+  .map((selector) => `${selector} {${linaria.rules[selector].cssText}}`)
   .join('\n')}
 
 Dependencies: ${

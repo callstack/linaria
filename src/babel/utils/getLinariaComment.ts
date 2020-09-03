@@ -1,10 +1,9 @@
-import { types } from '@babel/core';
-import { NodePath } from '@babel/traverse';
+import type { Node } from '@babel/types';
 
 const pattern = /^linaria (.+)$/;
 
 export default function getLinariaComment(
-  path: NodePath<types.Node>,
+  path: { node: Node },
   remove: boolean = true
 ) {
   const comments = path.node.leadingComments;
@@ -12,7 +11,7 @@ export default function getLinariaComment(
     return [null, null, null];
   }
 
-  const idx = comments.findIndex(comment => pattern.test(comment.value));
+  const idx = comments.findIndex((comment) => pattern.test(comment.value));
   if (idx === -1) {
     return [null, null, null];
   }
@@ -26,5 +25,5 @@ export default function getLinariaComment(
     path.node.leadingComments = comments.filter((_, i) => i !== idx);
   }
 
-  return matched[1].split(' ').map(i => (i ? i : null));
+  return matched[1].split(' ').map((i) => (i ? i : null));
 }

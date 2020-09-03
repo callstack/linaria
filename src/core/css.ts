@@ -1,8 +1,5 @@
-import { StyledMeta } from '../StyledMeta';
-
-type CSSProperties = {
-  [key: string]: string | number | CSSProperties;
-};
+import type { CSSProperties } from '../CSSProperties';
+import type { StyledMeta } from '../StyledMeta';
 
 export default function css(
   _strings: TemplateStringsArray,

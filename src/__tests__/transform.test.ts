@@ -1,7 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
 
-import dedent from 'dedent';
 import path from 'path';
+import dedent from 'dedent';
 import transform, { transformUrl } from '../transform';
 import evaluator from '../babel/evaluators/extractor';
 
@@ -147,7 +147,9 @@ it('respects passed babel options', async () => {
         },
       }
     )
-  ).toThrow('Unexpected token');
+  ).toThrow(
+    /Support for the experimental syntax 'jsx' isn't currently enabled/
+  );
 
   expect(() =>
     transform(
