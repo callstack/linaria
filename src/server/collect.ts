@@ -101,7 +101,7 @@ const extractClassesFromHtml = (html: string): RegExp => {
   let match = regex.exec(html);
 
   while (match !== null) {
-    match[1].split(' ').forEach(className => {
+    match[1].split(' ').forEach((className) => {
       className = className.replace(
         /\\|\^|\$|\{|\}|\[|\]|\(|\)|\.|\*|\+|\?|\|/g,
         '\\$&'
