@@ -101,7 +101,13 @@ const extractClassesFromHtml = (html: string): RegExp => {
   let match = regex.exec(html);
 
   while (match !== null) {
-    match[1].split(' ').forEach((className) => htmlClasses.push(className));
+    match[1].split(' ').forEach((className) => {
+      className = className.replace(
+        /\\|\^|\$|\{|\}|\[|\]|\(|\)|\.|\*|\+|\?|\|/g,
+        '\\$&'
+      );
+      htmlClasses.push(className);
+    });
     match = regex.exec(html);
   }
 
