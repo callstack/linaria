@@ -106,6 +106,18 @@ styled.a`
     background-color: ${(props) => (props.prop1 ? 'transparent' : 'green')};
   `;
 
+  const Custom: React.FC<{ className?: string; id: number }> = () => null;
+
+  const tag = styled(Custom);
+  const Card = tag`
+    ${Wrapper} {
+      color: green;
+    }
+  `;
+
+  // $ExpectType Validator<number> | undefined
+  Card.propTypes!.id;
+
   const styledTag = styled(Wrapper);
 
   const NewWrapper = styledTag<{ prop2: string }>`
