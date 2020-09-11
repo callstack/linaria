@@ -28,6 +28,4 @@ export const memoryUsage = noop;
 export const uvCounters = noop;
 export const features = {};
 
-export const env = {
-  NODE_ENV: process.env.NODE_ENV,
-};
+export const env = process.env;
