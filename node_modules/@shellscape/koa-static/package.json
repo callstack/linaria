@@ -1,0 +1,53 @@
+{
+  "name": "@shellscape/koa-static",
+  "description": "Static file serving middleware for koa",
+  "repository": "shellscape/koa-static",
+  "version": "4.0.5",
+  "keywords": [
+    "koa",
+    "middleware",
+    "file",
+    "static",
+    "sendfile"
+  ],
+  "files": [
+    "index.js",
+    "legacy/index.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0-beta.39",
+    "@babel/core": "^7.0.0-beta.39",
+    "@babel/polyfill": "^7.0.0-beta.39",
+    "@babel/preset-env": "^7.0.0-beta.39",
+    "@babel/register": "^7.0.0-beta.39",
+    "babel-plugin-module-resolver": "^3.0.0",
+    "eslint": "^4.1.1",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.6.1",
+    "eslint-plugin-node": "^5.1.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "istanbul": "^0.4.5",
+    "koa": "^2.3.0",
+    "mocha": "^3.4.2",
+    "supertest": "^3.0.0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "debug": "^2.6.8",
+    "@shellscape/koa-send": "^4.1.0"
+  },
+  "scripts": {
+    "lint": "eslint --fix .",
+    "prepublishOnly": "babel index.js --out-file legacy/index.js",
+    "test": "npm run prepublishOnly && mocha --harmony --reporter spec",
+    "test-cov": "node --harmony ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
+    "test-travis": "node --harmony ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly"
+  },
+  "engines": {
+    "node": ">= 6"
+  }
+}

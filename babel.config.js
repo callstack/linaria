@@ -1,92 +1,30 @@
-/*
- * The following environments are supported:
- *
- * (unspecified): Produces ES module output, no language features
- *   (except non-standard ones) are transpiled.
- * "legacy": Produces CommonJS output, uses @babel/preset-env to target
- *   Node.js 10 and specific browsers.
- * "test": Used by Jest, produces CommonJS output, targetting
- *   the current Node.js version.
- */
-
-/*
- * Configuration for the legacy build
- */
-
-const commonJSTargets = {
-  browsers: [
-    'last 2 versions',
-    'not ie 11',
-    'not ie_mob 11',
-    'not op_mini all',
-    'not dead',
-  ],
-  node: '10',
-};
-
 module.exports = {
-  presets: ['@babel/preset-typescript'],
-  plugins: ['@babel/plugin-proposal-class-properties'],
+  presets: ['@babel/preset-env', '@babel/preset-flow', '@babel/preset-react'],
+  plugins: [
+    [
+      'module-resolver',
+      {
+        alias: {
+          linaria: '../lib',
+        },
+      },
+    ],
+  ],
   env: {
-    legacy: {
+    server: {
       presets: [
-        [
-          '@babel/preset-env',
-          {
-            targets: {
-              node: commonJSTargets.node,
-            },
-          },
-        ],
+        ['@babel/preset-env', { targets: { node: 8 } }],
+        require.resolve('../lib/babel'),
       ],
-    },
-    test: {
-      presets: [
+      plugins: [
         [
-          '@babel/preset-env',
+          'file-loader',
           {
-            targets: {
-              node: '10',
-            },
+            publicPath: '/dist',
+            outputPath: '/dist',
           },
         ],
       ],
     },
   },
-  overrides: [
-    {
-      /**
-       * only src/react and src/core are targeted to be run in the browser
-       */
-      test: /src\/((react)|(core))\//,
-      presets: ['@babel/preset-react'],
-      env: {
-        legacy: {
-          presets: [
-            [
-              '@babel/preset-env',
-              {
-                targets: {
-                  browsers: commonJSTargets.browsers,
-                },
-                loose: true,
-                // our styled component should not need to use any polyfill. We do not include core-js in dependencies. However, we leave this to detect if future changes would not introduce any need for polyfill
-                useBuiltIns: 'usage',
-                corejs: 3,
-                // this is used to test if we do not introduced core-js polyfill
-                debug: process.env.DEBUG_CORE_JS === 'true',
-              },
-            ],
-          ],
-        },
-      },
-    },
-    {
-      /**
-       * we have to transpile JSX in tests
-       */
-      test: /src\/((__tests__)|(__fixtures__))\//,
-      presets: ['@babel/preset-react'],
-    },
-  ],
 };

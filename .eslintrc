@@ -1,25 +1,5 @@
 {
-  "extends": "@callstack",
-  "rules": {
-    "jest/no-try-expect": "off",
-    "global-require": "off",
-    "react-native/no-raw-text": "off",
-    "react-native/no-inline-styles": "off",
-    "import/no-extraneous-dependencies": [
-      "error",
-      {
-        "devDependencies": [
-          "**/*.test.{js,ts,jsx,tsx}",
-          "src/{babel,server}/**/*.{js,ts,jsx,tsx}"
-        ]
-      }
-    ]
-  },
   "settings": {
-    "import/resolver": {
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
-      }
-    }
+    "import/core-modules": ["linaria","linaria/react"]
   }
 }

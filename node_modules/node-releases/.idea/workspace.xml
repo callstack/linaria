@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="2adb9df7-dc6f-46a2-94c4-b7e31697fc3d" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1QuzFWFRAbemMQ0fqkm8OO5TzKe" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2adb9df7-dc6f-46a2-94c4-b7e31697fc3d" name="Default Changelist" comment="" />
+      <created>1541196784996</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1541196784996</updated>
+      <workItem from="1541196786949" duration="636000" />
+      <workItem from="1541200851694" duration="598000" />
+      <workItem from="1541321954118" duration="43000" />
+      <workItem from="1541329259404" duration="199000" />
+      <workItem from="1542562588391" duration="109000" />
+      <workItem from="1545165877505" duration="634000" />
+      <workItem from="1568635167152" duration="1369000" />
+      <workItem from="1568808864771" duration="2005000" />
+      <workItem from="1569315408847" duration="577000" />
+      <workItem from="1569322725908" duration="349000" />
+      <workItem from="1569781022246" duration="569000" />
+      <workItem from="1574765059873" duration="482000" />
+      <workItem from="1574772117340" duration="559000" />
+      <workItem from="1574798879704" duration="6000" />
+    </task>
+    <task id="LOCAL-00001" summary="upd">
+      <created>1541196833083</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1541196833083</updated>
+    </task>
+    <task id="LOCAL-00002" summary="upd">
+      <created>1545165894333</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1545165894333</updated>
+    </task>
+    <task id="LOCAL-00003" summary="merge master">
+      <created>1568635276140</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1568635276140</updated>
+    </task>
+    <task id="LOCAL-00004" summary="merge master">
+      <created>1568635494361</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1568635494361</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="upd" />
+    <MESSAGE value="merge master" />
+    <option name="LAST_COMMIT_MESSAGE" value="merge master" />
+  </component>
+</project>

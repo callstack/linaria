@@ -1,0 +1,100 @@
+{
+  "name": "@webpack-contrib/config-loader",
+  "version": "1.2.1",
+  "description": "A webpack configuration loader",
+  "license": "MIT",
+  "repository": "webpack-contrib/config-loader",
+  "author": "Andrew Powell <andrew@shellscape.org>",
+  "homepage": "https://github.com/webpack-contrib/config-loader",
+  "bugs": "https://github.com/webpack-contrib/config-loader/issues",
+  "main": "lib/index.js",
+  "engines": {
+    "node": ">= 6.9.0 <7.0.0 || >= 8.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "commitlint": "commitlint",
+    "commitmsg": "commitlint -e $GIT_PARAMS",
+    "lint": "eslint --cache lib test",
+    "ci:lint:commits": "commitlint --from=${CIRCLE_BRANCH} --to=${CIRCLE_SHA1}",
+    "lint-staged": "lint-staged",
+    "release": "standard-version",
+    "release:ci": "conventional-github-releaser -p angular",
+    "release:validate": "commitlint --from=$(git describe --tags --abbrev=0) --to=$(git rev-parse HEAD)",
+    "security": "nsp check",
+    "test": "mocha test/test.js --exit --mode=superman",
+    "test:coverage": "mkdir -p coverage && nyc --silent npm test && npm run test:coverage:report",
+    "test:coverage:report": "nyc report --reporter=lcov --reporter=text-lcov --reporter=json --reporter=clover > coverage/lcov.info",
+    "ci:lint": "npm run lint && npm run security",
+    "ci:test": "npm run test -- --runInBand",
+    "ci:coverage": "npm run test:coverage -- --runInBand",
+    "defaults": "webpack-defaults"
+  },
+  "files": [
+    "lib/",
+    "index.js"
+  ],
+  "peerDependencies": {
+    "webpack": "^4.3.0"
+  },
+  "dependencies": {
+    "@webpack-contrib/schema-utils": "^1.0.0-beta.0",
+    "chalk": "^2.1.0",
+    "cosmiconfig": "^5.0.2",
+    "is-plain-obj": "^1.1.0",
+    "loud-rejection": "^1.6.0",
+    "merge-options": "^1.0.1",
+    "minimist": "^1.2.0",
+    "resolve": "^1.6.0",
+    "webpack-log": "^1.1.2"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^7.0.0",
+    "@commitlint/config-conventional": "^7.0.1",
+    "@webpack-contrib/eslint-config-webpack": "^2.0.4",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
+    "conventional-github-releaser": "^3.1.2",
+    "cross-env": "^5.1.4",
+    "del": "^3.0.0",
+    "del-cli": "^1.1.0",
+    "eslint": "^4.19.1",
+    "eslint-plugin-import": "^2.10.0",
+    "eslint-plugin-prettier": "^2.6.0",
+    "esm": "^3.0.15",
+    "execa": "^0.10.0",
+    "expect": "^23.2.0",
+    "flow-remove-types": "^1.2.3",
+    "husky": "^0.14.3",
+    "jest-serializer-path": "^0.1.15",
+    "jest-snapshot": "^23.2.0",
+    "lint-staged": "^7.2.0",
+    "memory-fs": "^0.4.1",
+    "mocha": "^5.0.5",
+    "nsp": "^3.2.1",
+    "nyc": "^12.0.2",
+    "pre-commit": "^1.2.2",
+    "prettier": "^1.11.1",
+    "standard-version": "^4.3.0",
+    "ts-node": "^5.0.1",
+    "typescript": "^2.8.1",
+    "webpack": "^4.4.1",
+    "webpack-defaults": "^2.3.0"
+  },
+  "keywords": [
+    "webpack"
+  ],
+  "pre-commit": "lint-staged",
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
+}

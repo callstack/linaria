@@ -1,0 +1,31 @@
+{
+  "name": "nanoassert",
+  "version": "1.1.0",
+  "description": "Nanoscale assertion module",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "tape": "^4.6.3"
+  },
+  "scripts": {
+    "test": "tape test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emilbayes/nanoassert.git"
+  },
+  "keywords": [
+    "assert",
+    "unassert",
+    "power-assert",
+    "tiny",
+    "nano",
+    "pico"
+  ],
+  "author": "Emil Bay <github@tixz.dk>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emilbayes/nanoassert/issues"
+  },
+  "homepage": "https://github.com/emilbayes/nanoassert#readme"
+}

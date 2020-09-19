@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "exit": {
+      "type": "boolean"
+    },
+    "log": {
+      "type": "boolean"
+    },
+    "name": {
+      "type": "string"
+    },
+    "schema": {
+      "type": ["string", "object"]
+    },
+    "target": {
+      "type": "object"
+    },
+    "throw": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["name", "schema", "target"]
+}
