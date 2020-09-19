@@ -14,16 +14,15 @@ jobs:
 
       - name: Install and Build 🔧
         run: |
-          yarn install
+          yarn install --frozen-lockfile
           yarn build
-          cd website
-          yarn install
-          yarn build
+          yarn website install --frozen-lockfile
+          yarn website build
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.6.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: master
+          BRANCH: gh-pages
           FOLDER: website
           CLEAN: true
