@@ -1,5 +1,45 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Transpiles injecting the style tags into the document head if injectStyleTags is true 1`] = `
+"import { css } from 'linaria';
+import { styled } from 'linaria/react';
+export const a = \\"ah6xni0\\";
+export const B = /*#__PURE__*/styled(\\"div\\")({
+  name: \\"B\\",
+  class: \\"b1u0rrat\\"
+});
+export const C = /*#__PURE__*/styled(\\"div\\")({
+  name: \\"C\\",
+  class: \\"c1n8pbpy\\"
+});
+
+if (typeof document !== \\"undefined\\") {
+  const style = document.createElement(\\"style\\");
+  style.innerHTML = \\".ah6xni0{font-size:14px;}\\\\n.b1u0rrat{font-weight:bold;}\\\\n.c1n8pbpy .b1u0rrat{font-weight:normal;}\\\\n\\";
+  document.head.appendChild(style);
+}"
+`;
+
+exports[`Transpiles injecting the style tags into the document head if injectStyleTags is true 2`] = `
+
+CSS:
+
+.ah6xni0 {
+  font-size: 14px;
+}
+.b1u0rrat {
+  font-weight: bold;
+}
+.c1n8pbpy {
+  .b1u0rrat {
+    font-weight: normal;
+  }
+}
+
+Dependencies: NA
+
+`;
+
 exports[`does not include styles if not referenced anywhere 1`] = `
 "import { css } from 'linaria';
 import { styled } from 'linaria/react';

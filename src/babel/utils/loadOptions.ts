@@ -30,6 +30,7 @@ export default function loadOptions(
         action: 'ignore',
       },
     ],
+    injectStyleTags: false,
     ...(result ? result.config : null),
     ...rest,
   };

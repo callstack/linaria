@@ -42,6 +42,24 @@ module.exports = {
 
   **note** invalid characters will be replaced with an underscore (`_`).
 
+  - `injectStyleTags: { preprocessor: Preprocessor } | true | false` (default: `false`)
+
+    Using this option will transform your file to your file to create a CSS style tag when your module is imported.
+
+    e.x.
+
+    ```javascript
+    if (typeof document !== 'undefined') {
+      const style = document.createElement('style');
+      style.innerHTML = '.absdjfsdf__42__header {text-transform:uppercase;}';
+      document.head.appendChild(style);
+    }
+    ```
+
+    You may want to use this option if your package does not have a bundler set up to handle CSS files.
+
+    `true` will use the default preprocessor, and you can set a custom preprocessor by passing an object with the value `preprocessor` set to your preprocessor.
+
   ### Variables
 
   - `hash`: The hash of the content.
@@ -141,7 +159,7 @@ After that, your `package.json` should look like the following:
 Now in your `preact.config.js`, we will modify the babel rule to use the necessary loaders and presets. Add the following:
 
 ```js
-export default config => {
+export default (config) => {
   const { options, ...babelLoaderRule } = config.module.rules[0]; // Get the babel rule and options
   options.presets.push('@babel/preset-react', 'linaria/babel'); // Push the necessary presets
   config.module.rules[0] = {
@@ -150,15 +168,15 @@ export default config => {
     use: [
       {
         loader: 'babel-loader',
-        options
+        options,
       },
       {
         loader: 'linaria/loader',
         options: {
-          babelOptions: options // Pass the current babel options to linaria's babel instance
-        }
-      }
-    ]
+          babelOptions: options, // Pass the current babel options to linaria's babel instance
+        },
+      },
+    ],
   };
 };
 ```
@@ -255,7 +273,7 @@ exports.onCreateWebpackConfig = ({ actions, loaders, getConfig, stage }) => {
 
   config.module.rules = [
     ...config.module.rules.filter(
-      rule => String(rule.test) !== String(/\.js?$/)
+      (rule) => String(rule.test) !== String(/\.js?$/)
     ),
 
     {

@@ -488,3 +488,30 @@ it('includes unreferenced styles for :global', async () => {
   expect(code).toMatchSnapshot();
   expect(metadata).toMatchSnapshot();
 });
+
+it('Transpiles injecting the style tags into the document head if injectStyleTags is true', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { css } from 'linaria';
+      import { styled } from 'linaria/react';
+
+      export const a = css\`
+        font-size: 14px;
+      \`;
+
+      export const B = styled.div\`
+        font-weight: bold;
+      \`;
+
+      export const C = styled.div\`
+        ${'${B}'} {
+          font-weight: normal;
+        }
+      \`;
+      `,
+    { injectStyleTags: true }
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
