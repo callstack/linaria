@@ -187,6 +187,25 @@ Dependencies: NA
 
 `;
 
+exports[`handles objects with numeric keys 1`] = `
+"import { css } from 'linaria';
+export const object = {
+  stringKey: \\"sh6xni0\\",
+  42: \\"_1u0rrat\\"
+};"
+`;
+
+exports[`handles objects with numeric keys 2`] = `
+
+CSS:
+
+.sh6xni0 {}
+._1u0rrat {}
+
+Dependencies: NA
+
+`;
+
 exports[`includes unreferenced styles for :global 1`] = `
 "import { css } from 'linaria';
 import { styled } from 'linaria/react';

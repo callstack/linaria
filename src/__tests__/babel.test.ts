@@ -488,3 +488,19 @@ it('includes unreferenced styles for :global', async () => {
   expect(code).toMatchSnapshot();
   expect(metadata).toMatchSnapshot();
 });
+
+it('handles objects with numeric keys', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { css } from 'linaria';
+
+      export const object = {
+        stringKey: css\`\`,
+        42: css\`\`,
+      }
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
