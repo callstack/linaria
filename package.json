@@ -37,6 +37,7 @@
   "scripts": {
     "prepare": "yarn lerna run prepare",
     "test": "yarn lerna run test",
+    "test:coverage": "yarn lerna run test -- -- --coverage",
     "test:dts": "yarn lerna run test:dts",
     "typecheck": "yarn lerna run typecheck",
     "lint": "eslint --ext .js,.ts,.tsx .",

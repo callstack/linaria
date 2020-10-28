@@ -4,5 +4,6 @@ module.exports = {
   transform: {
     '^.+\\.(js|ts|tsx)$': 'babel-jest',
   },
+  collectCoverageFrom: ['src/*.ts'],
   transformIgnorePatterns: ['node_modules/(?!@linaria)'],
 };

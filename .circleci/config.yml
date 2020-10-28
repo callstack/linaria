@@ -54,8 +54,8 @@ commands:
       - attach_workspace:
           at: ~/linaria
       - run: |
-          yarn test --coverage
-          cat ./coverage/lcov.info | ./node_modules/.bin/codecov
+          test:coverage
+          cat ./packages/*/coverage/lcov.info | ./node_modules/.bin/codecov
           bash .circleci/comment-artifacts.sh
       - store_artifacts:
           path: coverage
