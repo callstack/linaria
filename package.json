@@ -99,6 +99,7 @@
     }
   },
   "workspaces": [
-    "./packages/*"
+    "./packages/*",
+    "./website"
   ]
 }
