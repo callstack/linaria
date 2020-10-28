@@ -25,7 +25,6 @@ commands:
             - dependencies-website-
       - run: |
           yarn install --frozen-lockfile
-          yarn install --frozen-lockfile --cwd website
       - save_cache:
           key: dependencies-{{ checksum "package.json" }}
           paths: node_modules
