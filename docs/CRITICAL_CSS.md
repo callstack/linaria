@@ -7,7 +7,7 @@ If you're not code splitting, or the initial CSS chunk is not representative of 
 The `collect` method takes some HTML and CSS and gives you the critical CSS:
 
 ```js
-import { collect } from 'linaria/server';
+import { collect } from '@linaria/server';
 
 const { critical, other }  = collect(html, css);
 ```
@@ -20,7 +20,7 @@ import express from 'express';
 import crypto from 'crypto';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { collect } from 'linaria/server';
+import { collect } from '@linaria/server';
 import App from './App';
 
 const cache = {};

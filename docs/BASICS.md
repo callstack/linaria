@@ -30,7 +30,7 @@ These tags let you write styles in CSS syntax inside the template literals.
 The `css` tag allows you to create simple class names:
 
 ```js
-import { css } from 'linaria';
+import { css } from '@linaria/core';
 
 // Create a class name
 const title = css`
@@ -70,7 +70,7 @@ The `styled` tag allows you to create a React component with some styles already
 You write `styled` followed by the name of the HTML tag you want to use, e.g. `styled.div`, `styled.a`, `styled.button`, `styled.h3` etc.
 
 ```js
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 
 // Create a styled component
 const Title = styled.h1`

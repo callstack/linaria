@@ -15,7 +15,7 @@ Please note, that `@babel/core` is a peer dependency of all loaders. Do not forg
 
 ### webpack
 
-To use Linaria with webpack, in your webpack config, add `linaria/loader` under `module.rules`:
+To use Linaria with webpack, in your webpack config, add `@linaria/webpack-loader` under `module.rules`:
 
 ```js
 {
@@ -23,7 +23,7 @@ To use Linaria with webpack, in your webpack config, add `linaria/loader` under 
   use: [
     { loader: 'babel-loader' },
     {
-      loader: 'linaria/loader',
+      loader: '@linaria/webpack-loader',
       options: {
         sourceMap: process.env.NODE_ENV !== 'production',
       },
@@ -32,7 +32,7 @@ To use Linaria with webpack, in your webpack config, add `linaria/loader` under 
 }
 ```
 
-Make sure that `linaria/loader` is included after `babel-loader`.
+Make sure that `@linaria/webpack-loader` is included after `babel-loader`.
 
 In order to have your styles extracted, you'll also need to use **css-loader** and **MiniCssExtractPlugin**. First, install them:
 
@@ -131,7 +131,7 @@ module.exports = {
         use: [
           { loader: 'babel-loader' },
           {
-            loader: 'linaria/loader',
+            loader: '@linaria/webpack-loader',
             options: { sourceMap: dev },
           },
         ],
@@ -169,7 +169,7 @@ You can copy this file to your project if you are starting from scratch.
 To install the dependencies used in the example config, run:
 
 ```sh
-yarn add --dev webpack webpack-cli webpack-dev-server mini-css-extract-plugin css-loader file-loader babel-loader
+yarn add --dev webpack webpack-cli webpack-dev-server mini-css-extract-plugin css-loader file-loader babel-loader @linaria/webpack-loader
 ```
 
 You can now run the dev server by running `webpack-dev-server` and build the files by running `webpack`.
@@ -220,7 +220,7 @@ You can pass options to the loader like so:
 
 ```js
 {
-  loader: 'linaria/loader',
+  loader: '@linaria/webpack-loader',
   options: {
     sourceMap: false,
     cacheDirectory: '.linaria-cache',
@@ -233,13 +233,13 @@ You can pass options to the loader like so:
 To use Linaria with Rollup, you need to use it together with a plugin which handles CSS files, such as `rollup-plugin-css-only`:
 
 ```sh
-yarn add --dev rollup-plugin-css-only
+yarn add --dev rollup-plugin-css-only @linaria/rollup
 ```
 
 Then add them to your `rollup.config.js`:
 
 ```js
-import linaria from 'linaria/rollup';
+import linaria from '@linaria/rollup';
 import css from 'rollup-plugin-css-only';
 
 export default {
@@ -260,7 +260,7 @@ export default {
 If you are using [@rollup/plugin-babel](https://github.com/rollup/plugins/tree/master/packages/babel) as well, ensure the linaria plugin is declared earlier in the `plugins` array than your babel plugin. 
 
 ```js
-import linaria from 'linaria/rollup';
+import linaria from '@linaria/rollup';
 import css from 'rollup-plugin-css-only';
 import babel from "@rollup/plugin-babel";
 
@@ -294,7 +294,7 @@ Install `rollup-plugin-css-only` and update `rollup.config.js`
 ```js
 import svelte from 'rollup-plugin-svelte';
 import css from 'rollup-plugin-css-only'; // for CSS bundling
-import linaria from 'linaria/rollup';
+import linaria from '@linaria/rollup';
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -328,7 +328,7 @@ Update `webpack.config.js` with the following:
 const prod = process.env.NODE_ENV === 'production';
 
 const linariaLoader = {
-  loader: 'linaria/loader',
+  loader: '@linaria/webpack-loader',
   options: {
     sourceMap: !prod,
   },

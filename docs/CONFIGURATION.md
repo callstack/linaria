@@ -68,7 +68,7 @@ module.exports = {
   ```js
   [
     {
-      action: require('linaria/evaluators').shaker,
+      action: require('@linaria/shaker').default,
     },
     {
       test: /\/node_modules\//,
@@ -81,11 +81,11 @@ module.exports = {
 
   If you need to specify custom babel configuration, you can pass them here. These babel options will be used by Linaria when parsing and evaluating modules.
 
-## `linaria/babel` preset
+## `@linaria/babel` preset
 
 The preset pre-processes and evaluates the CSS. The bundler plugins use this preset under the hood. You also might want to use this preset if you import the components outside of the files handled by your bundler, such as on your server or in unit tests.
 
-To use this preset, add `linaria/babel` to your Babel configuration at the end of the presets list:
+To use this preset, add `@linaria/babel` to your Babel configuration at the end of the presets list:
 
 `.babelrc`:
 
@@ -94,7 +94,7 @@ To use this preset, add `linaria/babel` to your Babel configuration at the end o
   "presets": [
     "@babel/preset-env",
     "@babel/preset-react",
-+   "linaria/babel"
++   "@linaria/babel"
   ]
 }
 ```
@@ -109,7 +109,7 @@ If you wish you use Preact, we recommend you to use the `preact-cli` and start f
 npx preact-cli create default my-project
 ```
 
-On top of the default template, you will need to install `@babel/preset-react`. This is because Linaria works with JSX syntax. Otherwise, preact will throw an error saying that `linaria/loader` can't parse JSX. Don't forget to install `linaria`!.
+On top of the default template, you will need to install `@babel/preset-react`. This is because Linaria works with JSX syntax. Otherwise, preact will throw an error saying that `@linaria/webpack-loader` can't parse JSX. Don't forget to install all required `@linaria`-packages!.
 
 After that, your `package.json` should look like the following:
 
@@ -129,7 +129,10 @@ After that, your `package.json` should look like the following:
     "sirv-cli": "^0.4.5"
   },
   "dependencies": {
-+   "linaria": "^1.3.3",
++   "@linaria/babel": "^3.0.0",
++   "@linaria/core": "^3.0.0",
++   "@linaria/react": "^3.0.0",
++   "@linaria/webpack-loader": "^3.0.0",
     "preact": "^10.3.2",
     "preact-render-to-string": "^5.1.4",
     "preact-router": "^3.2.1"
@@ -143,7 +146,7 @@ Now in your `preact.config.js`, we will modify the babel rule to use the necessa
 ```js
 export default config => {
   const { options, ...babelLoaderRule } = config.module.rules[0]; // Get the babel rule and options
-  options.presets.push('@babel/preset-react', 'linaria/babel'); // Push the necessary presets
+  options.presets.push('@babel/preset-react', '@linaria/babel'); // Push the necessary presets
   config.module.rules[0] = {
     ...babelLoaderRule,
     loader: undefined, // Disable the predefined babel-loader on the rule
@@ -153,7 +156,7 @@ export default config => {
         options
       },
       {
-        loader: 'linaria/loader',
+        loader: '@linaria/webpack-loader',
         options: {
           babelOptions: options // Pass the current babel options to linaria's babel instance
         }
@@ -174,7 +177,7 @@ import { h } from 'preact';
 import { Link } from 'preact-router/match';
 import style from './style.css';
 
-import { css } from 'linaria';
+import { css } from '@linaria/core';
 
 const className = css`
   color: red;
@@ -202,7 +205,7 @@ const Header = () => (
 export default Header;
 ```
 
-> You can also use the `styled` variant, importing from `linaria/react`.
+> You can also use the `styled` variant, importing from `@linaria/react`.
 
 If you run `npm run dev`, you should be able to see a button next to the nav title, with red bold text.
 
@@ -228,14 +231,14 @@ You can also take a look at the example [here](../examples/gatsby/plugin)
 
 This is a bit more advanced way of integrating Linaria into your Gatsby project.
 
-First, you will need to install `linaria` and `babel-preset-gatsby`. Then, create `babel.config.js` in the root of your project with the following contents:
+First, you will need to install `@linaria/babel` and `babel-preset-gatsby`. Then, create `babel.config.js` in the root of your project with the following contents:
 
 ```js
 module.exports = {
   presets: [
     'babel-preset-gatsby',
     [
-      'linaria/babel',
+      '@linaria/babel',
       {
         evaluate: true,
         displayName: process.env.NODE_ENV !== 'production',
@@ -262,7 +265,7 @@ exports.onCreateWebpackConfig = ({ actions, loaders, getConfig, stage }) => {
       ...loaders.js(),
 
       test: /\.js?$/,
-      loader: 'linaria/loader',
+      loader: '@linaria/webpack-loader',
       options: {
         sourceMap: stage.includes('develop'),
         displayName: stage.includes('develop'),

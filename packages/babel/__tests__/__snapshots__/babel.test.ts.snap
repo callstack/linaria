@@ -1,0 +1,596 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`does not include styles if not referenced anywhere 1`] = `
+"import { css } from '@linaria/core';
+import { styled } from '@linaria/react';
+const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"t17gu1mi\\"
+});
+const title = \\"tccybe9\\";"
+`;
+
+exports[`does not include styles if not referenced anywhere 2`] = `Object {}`;
+
+exports[`does not output CSS if none present 1`] = `
+"const number = 42;
+const title = String.raw\`This is something\`;"
+`;
+
+exports[`does not output CSS if none present 2`] = `Object {}`;
+
+exports[`does not output CSS property when value is a blank string 1`] = `
+"import { css } from '@linaria/core';
+export const title = \\"t17gu1mi\\";"
+`;
+
+exports[`does not output CSS property when value is a blank string 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  font-size: ;
+  margin: 6px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`evaluates and inlines expressions in scope 1`] = `
+"import { styled } from '@linaria/react';
+const color = 'blue';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"t17gu1mi\\"
+});"
+`;
+
+exports[`evaluates and inlines expressions in scope 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  color: blue;
+  width: 33.333333333333336%;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`handles css template literal in JSX element 1`] = `
+"import { css } from '@linaria/core';
+<Title class={\\"t17gu1mi\\"} />;"
+`;
+
+exports[`handles css template literal in JSX element 2`] = `
+
+CSS:
+
+.t17gu1mi { font-size: 14px; }
+
+Dependencies: NA
+
+`;
+
+exports[`handles css template literal in object property 1`] = `
+"import { css } from '@linaria/core';
+const components = {
+  title: \\"t17gu1mi\\"
+};"
+`;
+
+exports[`handles css template literal in object property 2`] = `
+
+CSS:
+
+.t17gu1mi {
+    font-size: 14px;
+  }
+
+Dependencies: NA
+
+`;
+
+exports[`handles fn passed in as classNameSlug 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"t17gu1mi_42_Title\\"
+});"
+`;
+
+exports[`handles fn passed in as classNameSlug 2`] = `
+
+CSS:
+
+.t17gu1mi_42_Title {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`handles interpolation followed by unit 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"t17gu1mi\\",
+  vars: {
+    \\"t17gu1mi-0\\": [size, \\"em\\"],
+    \\"t17gu1mi-1\\": [shadow, \\"px\\"],
+    \\"t17gu1mi-2\\": [size, \\"px\\"],
+    \\"t17gu1mi-3\\": [props => props.width, \\"vw\\"],
+    \\"t17gu1mi-4\\": [props => {
+      if (true) {
+        return props.height;
+      } else {
+        return 200;
+      }
+    }, \\"px\\"],
+    \\"t17gu1mi-5\\": [unit, \\"fr\\"],
+    \\"t17gu1mi-7\\": [function (props) {
+      return 200;
+    }, \\"px\\"]
+  }
+});"
+`;
+
+exports[`handles interpolation followed by unit 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  font-size: var(--t17gu1mi-0);
+  text-shadow: black 1px var(--t17gu1mi-1), white -2px -2px;
+  margin: var(--t17gu1mi-2);
+  width: calc(2 * var(--t17gu1mi-3));
+  height: var(--t17gu1mi-4);
+  grid-template-columns: var(--t17gu1mi-5) 1fr 1fr var(--t17gu1mi-5);
+  border-radius: var(--t17gu1mi-7)
+}
+
+Dependencies: NA
+
+`;
+
+exports[`handles nested blocks 1`] = `
+"import { styled } from '@linaria/react';
+export const Button = /*#__PURE__*/styled(\\"button\\")({
+  name: \\"Button\\",
+  class: \\"b17gu1mi\\",
+  vars: {
+    \\"b17gu1mi-0\\": [regular]
+  }
+});"
+`;
+
+exports[`handles nested blocks 2`] = `
+
+CSS:
+
+.b17gu1mi {
+  font-family: var(--b17gu1mi-0);
+
+  &:hover {
+    border-color: blue;
+  }
+
+  @media (max-width: 200px) {
+    width: 100%;
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`handles objects with numeric keys 1`] = `
+"import { css } from '@linaria/core';
+export const object = {
+  stringKey: \\"s17gu1mi\\",
+  42: \\"_ccybe9\\"
+};"
+`;
+
+exports[`handles objects with numeric keys 2`] = `
+
+CSS:
+
+.s17gu1mi {}
+._ccybe9 {}
+
+Dependencies: NA
+
+`;
+
+exports[`includes unreferenced styles for :global 1`] = `
+"import { css } from '@linaria/core';
+import { styled } from '@linaria/react';
+const a = \\"a17gu1mi\\";
+const B = /*#__PURE__*/styled(\\"div\\")({
+  name: \\"B\\",
+  class: \\"bccybe9\\"
+});"
+`;
+
+exports[`includes unreferenced styles for :global 2`] = `
+
+CSS:
+
+.a17gu1mi {
+  :global() {
+    .title {
+      font-size: 14px;
+    }
+  }
+}
+.bccybe9 {
+  :global(.title) {
+    font-size: 14px;
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`inlines array styles as CSS string 1`] = `
+"import { styled } from '@linaria/react';
+const styles = [{
+  flex: 1
+}, {
+  display: 'block',
+  height: 24
+}];
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"t17gu1mi\\"
+});"
+`;
+
+exports[`inlines array styles as CSS string 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  flex: 1; display: block; height: 24px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`inlines object styles as CSS string 1`] = `
+"import { styled } from '@linaria/react';
+const cover = {
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+  opacity: 1,
+  minHeight: 420,
+  '&.shouldNotBeChanged': {
+    borderColor: '#fff'
+  },
+  '@media (min-width: 200px)': {
+    WebkitOpacity: .8,
+    MozOpacity: .8,
+    msOpacity: .8,
+    OOpacity: .8,
+    WebkitBorderRadius: 2,
+    MozBorderRadius: 2,
+    msBorderRadius: 2,
+    OBorderRadius: 2,
+    WebkitTransition: '400ms',
+    MozTransition: '400ms',
+    OTransition: '400ms',
+    msTransition: '400ms'
+  }
+};
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"t17gu1mi\\"
+});"
+`;
+
+exports[`inlines object styles as CSS string 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0; opacity: 1; min-height: 420px; &.shouldNotBeChanged { border-color: #fff; } @media (min-width: 200px) { -webkit-opacity: 0.8; -moz-opacity: 0.8; -ms-opacity: 0.8; -o-opacity: 0.8; -webkit-border-radius: 2px; -moz-border-radius: 2px; -ms-border-radius: 2px; -o-border-radius: 2px; -webkit-transition: 400ms; -moz-transition: 400ms; -o-transition: 400ms; -ms-transition: 400ms; }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`outputs valid CSS classname 1`] = `
+"import { styled } from '@linaria/react';
+export const ΩPage$Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"\\\\u03A9Page$Title\\",
+  class: \\"\\\\u03C917gu1mi\\"
+});"
+`;
+
+exports[`outputs valid CSS classname 2`] = `
+
+CSS:
+
+.ω17gu1mi {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`prevents class name collision 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"t17gu1mi\\",
+  vars: {
+    \\"t17gu1mi-0\\": [size, \\"px\\"],
+    \\"t17gu1mi-1\\": [props => props.color]
+  }
+});
+
+function Something() {
+  const Title = /*#__PURE__*/styled(\\"h1\\")({
+    name: \\"Title\\",
+    class: \\"tccybe9\\",
+    vars: {
+      \\"tccybe9-0\\": [regular]
+    }
+  });
+  return <Title />;
+}"
+`;
+
+exports[`prevents class name collision 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  font-size: var(--t17gu1mi-0);
+  color: var(--t17gu1mi-1)
+}
+.tccybe9 {
+    font-family: var(--tccybe9-0);
+  }
+
+Dependencies: NA
+
+`;
+
+exports[`replaces unknown expressions with CSS custom properties 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"t17gu1mi\\",
+  vars: {
+    \\"t17gu1mi-0\\": [size, \\"px\\"],
+    \\"t17gu1mi-1\\": [props => props.color]
+  }
+});"
+`;
+
+exports[`replaces unknown expressions with CSS custom properties 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  font-size: var(--t17gu1mi-0);
+  color: var(--t17gu1mi-1);
+}
+
+Dependencies: NA
+
+`;
+
+exports[`supports both css and styled tags 1`] = `
+"import { css } from '@linaria/core';
+import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"t17gu1mi\\"
+});
+export const title = \\"tccybe9\\";"
+`;
+
+exports[`supports both css and styled tags 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  font-size: 14px;
+}
+.tccybe9 {
+  color: blue;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`throws when contains dynamic expression without evaluate: true in css tag 1`] = `
+"<<DIRNAME>>/app/index.js: The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.
+  2 | 
+  3 | const title = css\`
+> 4 |   font-size: \${size}px;
+    |                ^^^^
+  5 | \`;"
+`;
+
+exports[`transpiles css template literal 1`] = `
+"import { css } from '@linaria/core';
+export const title = \\"t17gu1mi\\";"
+`;
+
+exports[`transpiles css template literal 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`transpiles renamed styled import 1`] = `
+"import { styled as custom } from '@linaria/react';
+export const Title = /*#__PURE__*/custom('h1')({
+  name: \\"Title\\",
+  class: \\"t17gu1mi\\"
+});"
+`;
+
+exports[`transpiles renamed styled import 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`transpiles styled template literal with function and component 1`] = `
+"import { styled } from '@linaria/react';
+
+const Heading = () => null;
+
+export const Title = /*#__PURE__*/styled(Heading)({
+  name: \\"Title\\",
+  class: \\"t17gu1mi\\"
+});"
+`;
+
+exports[`transpiles styled template literal with function and component 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`transpiles styled template literal with function and tag 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"t17gu1mi\\"
+});"
+`;
+
+exports[`transpiles styled template literal with function and tag 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`transpiles styled template literal with object 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"t17gu1mi\\"
+});"
+`;
+
+exports[`transpiles styled template literal with object 2`] = `
+
+CSS:
+
+.t17gu1mi {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`uses string passed in as classNameSlug 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"testSlug\\"
+});"
+`;
+
+exports[`uses string passed in as classNameSlug 2`] = `
+
+CSS:
+
+.testSlug {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`uses the same custom property for the same expression 1`] = `
+"import { styled } from '@linaria/react';
+export const Box = /*#__PURE__*/styled(\\"div\\")({
+  name: \\"Box\\",
+  class: \\"b17gu1mi\\",
+  vars: {
+    \\"b17gu1mi-0\\": [props => props.size, \\"px\\"]
+  }
+});"
+`;
+
+exports[`uses the same custom property for the same expression 2`] = `
+
+CSS:
+
+.b17gu1mi {
+  height: var(--b17gu1mi-0);
+  width: var(--b17gu1mi-0);
+}
+
+Dependencies: NA
+
+`;
+
+exports[`uses the same custom property for the same identifier 1`] = `
+"import { styled } from '@linaria/react';
+export const Box = /*#__PURE__*/styled(\\"div\\")({
+  name: \\"Box\\",
+  class: \\"b17gu1mi\\",
+  vars: {
+    \\"b17gu1mi-0\\": [size, \\"px\\"]
+  }
+});"
+`;
+
+exports[`uses the same custom property for the same identifier 2`] = `
+
+CSS:
+
+.b17gu1mi {
+  height: var(--b17gu1mi-0);
+  width: var(--b17gu1mi-0);
+}
+
+Dependencies: NA
+
+`;

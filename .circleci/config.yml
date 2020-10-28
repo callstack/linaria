@@ -40,9 +40,9 @@ commands:
       - attach_workspace:
           at: ~/linaria
       - run: |
-          yarn lint
-          yarn typecheck
           yarn test:dts
+          yarn typecheck
+          yarn lint
   unit-tests:
     steps:
       - attach_workspace:

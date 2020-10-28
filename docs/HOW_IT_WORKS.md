@@ -18,7 +18,7 @@ The interpolations used for the CSS custom properties are left in the file, and 
 For example, the plugin will transpile this:
 
 ```js
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 import { families, sizes } from './fonts';
 
 const background = 'yellow';
@@ -43,7 +43,7 @@ const Container = styled.div`
 To this:
 
 ```js
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 import { families, sizes } from './fonts';
 
 const background = 'yellow';

@@ -56,9 +56,9 @@ module.exports = {
   overrides: [
     {
       /**
-       * only src/react and src/core are targeted to be run in the browser
+       * only react and core packages are targeted to be run in the browser
        */
-      test: /src\/((react)|(core))\//,
+      test: /\/packages\/((react)|(core))\//,
       presets: ['@babel/preset-react'],
       env: {
         legacy: {
@@ -85,7 +85,7 @@ module.exports = {
       /**
        * we have to transpile JSX in tests
        */
-      test: /src\/((__tests__)|(__fixtures__))\//,
+      test: /\/((__tests__)|(__fixtures__))\//,
       presets: ['@babel/preset-react'],
     },
   ],
