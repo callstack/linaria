@@ -1,39 +1,11 @@
 {
   "private": true,
-  "name": "linaria",
-  "version": "2.0.0",
-  "description": "Blazing fast zero-runtime CSS in JS library",
-  "main": "lib/index.js",
-  "module": "esm/index.js",
-  "bin": "bin/linaria.js",
-  "files": [
-    "packages/cli/bin/",
-    "lib/",
-    "esm/",
-    "react/",
-    "*.d.ts",
-    "babel.js",
-    "evaluators.js",
-    "loader.js",
-    "rollup.js",
-    "server.js",
-    "stylelint-config.js"
-  ],
   "license": "MIT",
   "repository": "git@github.com:callstack/linaria.git",
   "bugs": {
     "url": "https://github.com/callstack/linaria/issues"
   },
   "homepage": "https://github.com/callstack/linaria#readme",
-  "keywords": [
-    "react",
-    "css",
-    "css-in-js",
-    "styled-components",
-    "babel-plugin",
-    "babel",
-    "webpack"
-  ],
   "scripts": {
     "prepare": "yarn lerna run prepare",
     "test": "yarn lerna run test",
@@ -47,9 +19,6 @@
     "release": "release-it",
     "website": "yarn --cwd website",
     "bootstrap": "yarn && yarn website install"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
     "@babel/cli": ">=7",

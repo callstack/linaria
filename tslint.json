@@ -6,6 +6,6 @@
     "strict-export-declare-modifiers": false
   },
   "linterOptions": {
-    "exclude": ["node_modules/**"]
+    "exclude": ["node_modules/**", "packages/*/types"]
   }
 }

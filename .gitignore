@@ -62,6 +62,7 @@ jspm_packages/
 # generated files
 lib/
 esm/
+types/
 dist/
 build/
 
