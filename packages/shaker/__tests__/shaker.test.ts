@@ -1,4 +1,4 @@
-import { run } from '@linaria/babel/__tests__/strategy-tester';
+import { run } from '@linaria/babel/__utils__/strategy-tester';
 import dedent from 'dedent';
 
 describe('shaker', () => {

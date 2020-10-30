@@ -1,3 +1,4 @@
+/* eslint-env jest */
 /* eslint-disable import/no-extraneous-dependencies */
 import { join, resolve } from 'path';
 import * as babel from '@babel/core';
@@ -5,8 +6,8 @@ import dedent from 'dedent';
 import stripAnsi from 'strip-ansi';
 
 import { Module } from '../src';
-import serializer from '../__utils__/linaria-snapshot-serializer';
 import type { Evaluator, StrictOptions } from '../src';
+import serializer from './linaria-snapshot-serializer';
 
 expect.addSnapshotSerializer(serializer);
 async function transformAsync(
