@@ -196,6 +196,11 @@ Take a look on [Contributing](CONTRIBUTING.md) docs to check how you can run Lin
 
 - Syntax Highlighting & Autocompletion - [webstorm-styled-components](https://github.com/styled-components/webstorm-styled-components)
 
+### Sublime Text
+
+- Syntax Highlighting & Autocompletion - [Naomi](https://packagecontrol.io/packages/Naomi), [JSCustom](https://packagecontrol.io/packages/JSCustom) (refer to document on how to turn on Styled Component syntax)
+- Linting - [SublimeLinter-stylelint](https://packagecontrol.io/packages/SublimeLinter-stylelint), [LSP Stylelint](https://packagecontrol.io/packages/LSP-stylelint)
+
 ## Recommended Libraries
 
 - [gatsby-plugin-linaria](https://github.com/silvenon/gatsby-plugin-linaria) – Gatsby plugin that sets up Babel and webpack configuration for Linaria.
