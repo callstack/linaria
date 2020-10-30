@@ -33,6 +33,9 @@
     "test": "jest --config ../../jest.config.js --rootDir .",
     "typecheck": "tsc --noEmit"
   },
+  "devDependencies": {
+    "@types/dedent": "^0.7.0"
+  },
   "dependencies": {
     "@babel/generator": ">=7",
     "@babel/plugin-transform-runtime": ">=7",
