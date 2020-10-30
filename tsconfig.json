@@ -9,6 +9,7 @@
   ],
   "compilerOptions": {
     "baseUrl": ".",
+    "composite": true,
     "paths": {
       "@linaria/*": ["./packages/*/src"]
     },

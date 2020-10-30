@@ -1,6 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "paths": {}
-  }
+    "paths": {},
+    "rootDir": "src/"
+  },
+  "references": [
+    { "path": "../babel" },
+    { "path": "../logger" },
+    { "path": "../preeval" }
+  ]
 }

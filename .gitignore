@@ -65,5 +65,6 @@ esm/
 types/
 dist/
 build/
+tsconfig.tsbuildinfo
 
 .linaria-cache
