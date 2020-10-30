@@ -7,19 +7,19 @@
   },
   "homepage": "https://github.com/callstack/linaria#readme",
   "scripts": {
+    "add-contributor": "all-contributors add",
+    "bootstrap": "yarn && yarn website install",
+    "check:all": "yarn test:dts && yarn typecheck && yarn test && yarn lint",
     "clean": "del 'packages/*/{coverage,esm,lib,types}'",
+    "lint": "eslint --ext .js,.ts,.tsx .",
     "prepare": "yarn lerna run prepare",
+    "release": "release-it",
     "test": "yarn lerna run test",
     "test:coverage": "yarn lerna run test -- -- --coverage",
     "test:dts": "yarn lerna run test:dts",
     "typecheck": "yarn lerna run typecheck",
-    "lint": "eslint --ext .js,.ts,.tsx .",
-    "check:all": "yarn test:dts && yarn typecheck && yarn test && yarn lint",
-    "add-contributor": "all-contributors add",
-    "watch": "yarn build --watch",
-    "release": "release-it",
-    "website": "yarn --cwd website",
-    "bootstrap": "yarn && yarn website install"
+    "watch": "lerna run --parallel watch",
+    "website": "yarn --cwd website"
   },
   "devDependencies": {
     "@babel/cli": ">=7",

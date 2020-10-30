@@ -31,7 +31,8 @@
     "build:declarations": "del types && tsc --emitDeclarationOnly --outDir types",
     "prepare": "yarn build && yarn build:declarations",
     "test": "jest --config ../../jest.config.js --rootDir .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "watch": "yarn build --watch"
   },
   "dependencies": {
     "@babel/generator": ">=7",
