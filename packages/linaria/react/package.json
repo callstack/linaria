@@ -1,0 +1,5 @@
+{
+  "main": "../lib/react.js",
+  "module": "../esm/react.js",
+  "types": "../lib/react.d.ts"
+}

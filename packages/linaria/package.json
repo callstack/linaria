@@ -1,12 +1,18 @@
 {
-  "name": "@linaria/cli",
+  "name": "linaria",
   "version": "3.0.0-beta.0",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "main": "lib/cli.js",
-  "module": "esm/cli.js",
-  "bin": "bin/linaria.js",
+  "main": "lib/core.js",
+  "module": "esm/core.js",
+  "types": "types/core.d.ts",
   "files": [
-    "bin/",
+    "babel",
+    "evaluators",
+    "loader",
+    "react",
+    "rollup",
+    "server",
+    "stylelint-config",
     "types/",
     "lib/",
     "esm/"
@@ -35,16 +41,16 @@
     "typecheck": "tsc --noEmit --composite false",
     "watch": "yarn build --watch"
   },
-  "devDependencies": {
-    "@types/mkdirp": "^0.5.2",
-    "@types/normalize-path": "^3.0.0"
-  },
   "dependencies": {
     "@linaria/babel": "3.0.0-beta.0",
-    "glob": "^7.1.3",
-    "mkdirp": "^0.5.1",
-    "normalize-path": "^3.0.0",
-    "yargs": "^13.2.1"
+    "@linaria/core": "3.0.0-beta.0",
+    "@linaria/extractor": "3.0.0-beta.0",
+    "@linaria/react": "3.0.0-beta.0",
+    "@linaria/rollup": "3.0.0-beta.0",
+    "@linaria/shaker": "3.0.0-beta.0",
+    "@linaria/server": "3.0.0-beta.0",
+    "@linaria/stylelint": "3.0.0-beta.0",
+    "@linaria/webpack4-loader": "3.0.0-beta.0"
   },
   "peerDependencies": {
     "@babel/core": ">=7"

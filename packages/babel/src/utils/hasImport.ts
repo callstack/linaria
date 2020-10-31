@@ -1,13 +1,20 @@
 import { dirname } from 'path';
 import Module from '../module';
 
+const linariaLibs = new Set([
+  '@linaria/core',
+  '@linaria/react',
+  'linaria',
+  'linaria/react',
+]);
+
 // Verify if the binding is imported from the specified source
 export default function hasImport(
   t: any,
   scope: any,
   filename: string,
   identifier: string,
-  source: string
+  sources: string[]
 ): boolean {
   const binding = scope.getAllBindings()[identifier];
 
@@ -30,16 +37,16 @@ export default function hasImport(
   };
 
   const isImportingModule = (value: string) =>
-    // If the value is an exact match, assume it imports the module
-    value === source ||
-    // Otherwise try to resolve both and check if they are the same file
-    resolveFromFile(value) ===
-      // eslint-disable-next-line no-nested-ternary
-      (source === '@linaria/core'
-        ? require.resolve('@linaria/core')
-        : source === '@linaria/react'
-        ? require.resolve('@linaria/react')
-        : resolveFromFile(source));
+    sources.some(
+      (source) =>
+        // If the value is an exact match, assume it imports the module
+        value === source ||
+        // Otherwise try to resolve both and check if they are the same file
+        resolveFromFile(value) ===
+          (linariaLibs.has(source)
+            ? require.resolve(source)
+            : resolveFromFile(source))
+    );
 
   if (t.isImportSpecifier(p) && t.isImportDeclaration(p.parentPath)) {
     return isImportingModule(p.parentPath.node.source.value);
