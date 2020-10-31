@@ -47,7 +47,7 @@
     "prepare": "yarn build && yarn build:declarations",
     "release": "release-it",
     "website": "yarn --cwd website",
-    "docs": "component-docs serve \"docs/*.{md,mdx}\"",
+    "docs": "component-docs serve",
     "bootstrap": "yarn && yarn website install"
   },
   "publishConfig": {
@@ -82,7 +82,7 @@
     "babel-jest": "^24.5.0",
     "codecov": "^3.2.0",
     "commitlint": "^8.3.5",
-    "component-docs": "^0.19.4",
+    "component-docs": "^0.23.0",
     "dedent": "^0.7.0",
     "del-cli": "^1.1.0",
     "dtslint": "^0.9.8",
