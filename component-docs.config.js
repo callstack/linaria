@@ -2,6 +2,8 @@ const path = require('path');
 
 module.exports = {
   port: 3031,
+  assets: [path.resolve(__dirname, 'website/assets')],
+  logo: '/assets/linaria-logo-colored.svg',
   /* prettier-ignore */
   pages: [
     { type: 'mdx', file: path.resolve(__dirname, 'docs/00.HOME.mdx') },
