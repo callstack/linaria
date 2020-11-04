@@ -8,3 +8,4 @@ build/
 node_modules/
 vendor/
 examples/
+docs-public/

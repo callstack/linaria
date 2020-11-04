@@ -1,3 +1,7 @@
+---
+title: Theming
+---
+
 # Theming
 
 There are several approaches you can use for theming. Depending on the browser support and requirements, you can pick the approach that suits you the best.
