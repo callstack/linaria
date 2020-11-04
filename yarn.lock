@@ -4221,7 +4221,7 @@ compare-func@^2.0.0:
     array-ify "^1.0.0"
     dot-prop "^5.1.0"
 
-component-docs@^0.23.0:
+component-docs@0.23.0:
   version "0.23.0"
   resolved "https://registry.yarnpkg.com/component-docs/-/component-docs-0.23.0.tgz#f16c3017b5dbd8c46ec0362e6d891e04947d5eb5"
   integrity sha512-iNjN0d8GCLCi19wwhlmJOchWJPhKWeiFGt/ItxTWJFoe4c0aPPUzFj5IUI7aN0yC9f4IEVuWH8UsxGXPd7Eddw==
