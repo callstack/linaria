@@ -1,30 +1,25 @@
 {
-  "name": "react-dom",
-  "version": "16.13.1",
-  "description": "React package for working with the DOM.",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/facebook/react.git",
-    "directory": "packages/react-dom"
+  "browser": {
+    "./server.js": "./server.browser.js",
+    "./unstable-fizz.js": "./unstable-fizz.browser.js"
   },
-  "keywords": [
-    "react"
-  ],
-  "license": "MIT",
+  "browserify": {
+    "transform": [
+      "loose-envify"
+    ]
+  },
   "bugs": {
     "url": "https://github.com/facebook/react/issues"
   },
-  "homepage": "https://reactjs.org/",
+  "bundleDependencies": false,
   "dependencies": {
     "loose-envify": "^1.1.0",
     "object-assign": "^4.1.1",
     "prop-types": "^15.6.2",
     "scheduler": "^0.19.1"
   },
-  "peerDependencies": {
-    "react": "^16.13.1"
-  },
+  "deprecated": false,
+  "description": "React package for working with the DOM.",
   "files": [
     "LICENSE",
     "README.md",
@@ -43,13 +38,23 @@
     "cjs/",
     "umd/"
   ],
-  "browser": {
-    "./server.js": "./server.browser.js",
-    "./unstable-fizz.js": "./unstable-fizz.browser.js"
+  "homepage": "https://reactjs.org/",
+  "keywords": [
+    "react"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "react-dom",
+  "peerDependencies": {
+    "react": "^16.14.0"
   },
-  "browserify": {
-    "transform": [
-      "loose-envify"
-    ]
-  }
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/facebook/react.git",
+    "directory": "packages/react-dom"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "version": "16.14.0"
 }

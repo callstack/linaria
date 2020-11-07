@@ -32,7 +32,7 @@ module.exports = {
         use: [
           { loader: 'babel-loader' },
           {
-            loader: require.resolve('../lib/loader'),
+            loader: require.resolve('@linaria/webpack4-loader'),
             options: { sourceMap: dev },
           },
         ],

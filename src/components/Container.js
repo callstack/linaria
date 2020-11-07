@@ -1,6 +1,6 @@
 /* @flow */
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 
 const Container = styled.div`
   max-width: 1140px;
