@@ -1,0 +1,1119 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`extractor derives display name from filename 1`] = `
+"import { styled } from '@linaria/react';
+export default /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"FancyName0\\",
+  class: \\"FancyName0_f1tjvuuv\\"
+});"
+`;
+
+exports[`extractor derives display name from filename 2`] = `
+
+CSS:
+
+.FancyName0_f1tjvuuv {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor derives display name from parent folder name 1`] = `
+"import { styled } from '@linaria/react';
+export default /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"FancyName0\\",
+  class: \\"FancyName0_fud4l0y\\"
+});"
+`;
+
+exports[`extractor derives display name from parent folder name 2`] = `
+
+CSS:
+
+.FancyName0_fud4l0y {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor does not strip instanbul coverage sequences 1`] = `
+"var cov_2dr9r1nt95 = function () {
+  var path = \\"/home/user/project/file.js\\";
+  var hash = \\"23f56bbaeb2ebcd213f41374d3b2af1bce287bd3\\";
+  var global = new Function(\\"return this\\")();
+  var gcv = \\"__coverage__\\";
+  var coverageData = {
+    path: \\"/home/user/project/file.js\\",
+    statementMap: {
+      \\"0\\": {
+        start: {
+          line: 3,
+          column: 10
+        },
+        end: {
+          line: 3,
+          column: 12
+        }
+      },
+      \\"1\\": {
+        start: {
+          line: 5,
+          column: 21
+        },
+        end: {
+          line: 7,
+          column: 1
+        }
+      }
+    },
+    fnMap: {},
+    branchMap: {},
+    s: {
+      \\"0\\": 0,
+      \\"1\\": 0
+    },
+    f: {},
+    b: {},
+    _coverageSchema: \\"43e27e138ebf9cfc5966b082cf9a028302ed4184\\",
+    hash: \\"23f56bbaeb2ebcd213f41374d3b2af1bce287bd3\\"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+
+  if (coverage[path] && coverage[path].hash === hash) {
+    return coverage[path];
+  }
+
+  return coverage[path] = coverageData;
+}();
+
+import { styled } from '@linaria/react';
+const a = (cov_2dr9r1nt95.s[0]++, 42);
+export const Title = (cov_2dr9r1nt95.s[1]++, /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_tow9xsn\\"
+}));"
+`;
+
+exports[`extractor does not strip instanbul coverage sequences 2`] = `
+
+CSS:
+
+.Title_tow9xsn {
+  height: 42px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor evaluates babel helpers 1`] = `
+"import { styled } from '@linaria/react';
+
+function copyAndExtend(a, b) {
+  return { ...a,
+    ...b
+  };
+}
+
+const obj = copyAndExtend({
+  a: 1
+}, {
+  a: 2
+});
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});"
+`;
+
+exports[`extractor evaluates babel helpers 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  &:before {
+    content: "2"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor evaluates complex styles with functions and nested selectors 1`] = `
+"import { css } from '@linaria/core';
+export const bareIconClass = \\"bareIconClass_b1t92lw9\\";
+
+const getSizeStyles = fs => ({
+  [\`&.\${bareIconClass}\`]: {
+    fontSize: fs * 1.5
+  }
+});
+
+export const SIZES = {
+  XS: \\"XS_x1xjmq2i\\"
+};"
+`;
+
+exports[`extractor evaluates complex styles with functions and nested selectors 2`] = `
+
+CSS:
+
+.bareIconClass_b1t92lw9 {}
+.XS_x1xjmq2i {&.bareIconClass_b1t92lw9 { font-size: 16.5px; }}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor evaluates component interpolations 1`] = `
+"const {
+  styled
+} = require('@linaria/react');
+
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});
+export const Paragraph = /*#__PURE__*/styled(\\"p\\")({
+  name: \\"Paragraph\\",
+  class: \\"Paragraph_p1xjmq2i\\"
+});"
+`;
+
+exports[`extractor evaluates component interpolations 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  color: red;
+}
+.Paragraph_p1xjmq2i {
+  .Title_t1t92lw9 {
+    color: blue;
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor evaluates dependencies with sequence expression 1`] = `
+"import { styled } from '@linaria/react';
+const color = (external, () => 'blue');
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\",
+  vars: {
+    \\"t1t92lw9-0\\": [color]
+  }
+});"
+`;
+
+exports[`extractor evaluates dependencies with sequence expression 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  color: var(--t1t92lw9-0);
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor evaluates expressions with dependencies 1`] = `
+"import { styled } from '@linaria/react';
+import slugify from '@linaria/babel/__fixtures__/slugify';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});"
+`;
+
+exports[`extractor evaluates expressions with dependencies 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  &:before {
+    content: "6og6jy"
+  }
+}
+
+Dependencies: @babel/runtime/helpers/interopRequireDefault, @linaria/babel/__fixtures__/slugify
+
+`;
+
+exports[`extractor evaluates expressions with expressions depending on shared dependency 1`] = `
+"import { styled } from '@linaria/react';
+
+const slugify = require('@linaria/babel/__fixtures__/slugify').default;
+
+const boo = t => slugify(t) + 'boo';
+
+const bar = t => slugify(t) + 'bar';
+
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});"
+`;
+
+exports[`extractor evaluates expressions with expressions depending on shared dependency 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  &:before {
+    content: "6og6jyboo6og6jybar"
+  }
+}
+
+Dependencies: @linaria/babel/__fixtures__/slugify
+
+`;
+
+exports[`extractor evaluates functions with nested identifiers 1`] = `
+"import { styled } from '@linaria/react';
+const objects = {
+  key: {
+    fontSize: 12
+  }
+};
+
+const foo = k => {
+  const obj = objects[k];
+  return obj;
+};
+
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});"
+`;
+
+exports[`extractor evaluates functions with nested identifiers 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  font-size: 12px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor evaluates identifier in scope 1`] = `
+"import { styled } from '@linaria/react';
+const answer = 42;
+
+const foo = () => answer;
+
+const days = foo() + ' days';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});"
+`;
+
+exports[`extractor evaluates identifier in scope 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  &:before {
+    content: "42 days"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor evaluates interpolations with sequence expression 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\",
+  vars: {
+    \\"t1t92lw9-0\\": [(external, () => \\"blue\\")]
+  }
+});"
+`;
+
+exports[`extractor evaluates interpolations with sequence expression 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  color: var(--t1t92lw9-0);
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor evaluates local expressions 1`] = `
+"import { styled } from '@linaria/react';
+const answer = 42;
+
+const foo = () => answer;
+
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});"
+`;
+
+exports[`extractor evaluates local expressions 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  &:before {
+    content: "42 days"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor evaluates multiple expressions with shared dependency 1`] = `
+"import { styled } from '@linaria/react';
+
+const slugify = require('@linaria/babel/__fixtures__/slugify').default;
+
+const boo = t => slugify(t) + 'boo';
+
+const bar = t => slugify(t) + 'bar';
+
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});"
+`;
+
+exports[`extractor evaluates multiple expressions with shared dependency 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  &:before {
+    content: "6og6jyboo"
+    content: "6og6jybar"
+  }
+}
+
+Dependencies: @linaria/babel/__fixtures__/slugify
+
+`;
+
+exports[`extractor evaluates typescript enums 1`] = `
+"var Colors;
+
+(function (Colors) {
+  Colors[\\"BLUE\\"] = \\"#27509A\\";
+})(Colors || (Colors = {}));
+
+const Title = styled.h1\`
+  color: \${Colors.BLUE};
+\`;"
+`;
+
+exports[`extractor evaluates typescript enums 2`] = `Object {}`;
+
+exports[`extractor generates stable class names 1`] = `
+"import { styled } from '@linaria/react';
+export const T1 = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"T1\\",
+  class: \\"T1_t16d1w5s\\"
+});
+export const T2 = /*#__PURE__*/styled(\\"h2\\")({
+  name: \\"T2\\",
+  class: \\"T2_t18j681n\\"
+});
+export const T3 = /*#__PURE__*/styled(\\"h3\\")({
+  name: \\"T3\\",
+  class: \\"T3_t16ajafo\\"
+});
+export default /*#__PURE__*/styled(\\"p\\")({
+  name: \\"components-library3\\",
+  class: \\"components-library3_c16bmp8w\\"
+});"
+`;
+
+exports[`extractor generates stable class names 2`] = `
+
+CSS:
+
+.T1_t16d1w5s {
+  background: #111;
+}
+.T2_t18j681n {
+  background: #222;
+}
+.T3_t16ajafo {
+  .T2_t18j681n {
+    background: #333;
+  }
+}
+.components-library3_c16bmp8w {
+  background: #333;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor handles complex component 1`] = `
+"// Dead code in this file should be ignored
+import deadDep from 'unknown-dependency';
+import { styled } from '@linaria/react';
+export const deadValue = deadDep();
+const objects = {
+  font: {
+    fontSize: 12
+  },
+  box: {
+    border: '1px solid red'
+  }
+};
+
+const foo = k => {
+  const {
+    [k]: obj
+  } = objects;
+  return obj;
+};
+
+objects.font.fontWeight = 'bold';
+export const whiteColor = '#fff';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t16vg7lb\\"
+});"
+`;
+
+exports[`extractor handles complex component 2`] = `
+
+CSS:
+
+.Title_t16vg7lb {
+  font-size: 12px;
+  border: 1px solid red;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor handles escapes properly 1`] = `
+"import { styled } from '@linaria/react';
+const selectors = ['a', 'b'];
+export const Block = /*#__PURE__*/styled(\\"div\\")({
+  name: \\"Block\\",
+  class: \\"Block_b11ngyv0\\"
+});"
+`;
+
+exports[`extractor handles escapes properly 2`] = `
+
+CSS:
+
+.Block_b11ngyv0 {
+  a { content: "\\u000A"; } b { content: "\\u000A"; };
+}
+
+Dependencies: @babel/runtime/helpers/interopRequireDefault, @babel/runtime/helpers/taggedTemplateLiteral
+
+`;
+
+exports[`extractor handles indirect wrapping another styled component 1`] = `
+"const {
+  styled
+} = require('@linaria/react');
+
+const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});
+
+const hoc = Cmp => Cmp;
+
+export const CustomTitle = /*#__PURE__*/styled(hoc(Title))({
+  name: \\"CustomTitle\\",
+  class: \\"CustomTitle_c1xjmq2i\\"
+});"
+`;
+
+exports[`extractor handles indirect wrapping another styled component 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  color: red;
+}
+.CustomTitle_c1xjmq2i {
+  font-size: 24px;
+  color: blue;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor handles wrapping another styled component 1`] = `
+"const {
+  css
+} = require('..');
+
+const {
+  styled
+} = require('@linaria/react');
+
+const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});
+export const BlueTitle = /*#__PURE__*/styled(Title)({
+  name: \\"BlueTitle\\",
+  class: \\"BlueTitle_b1xjmq2i\\"
+});
+export const GreenTitle = /*#__PURE__*/styled(BlueTitle)({
+  name: \\"GreenTitle\\",
+  class: \\"GreenTitle_g2qjq78\\"
+});"
+`;
+
+exports[`extractor handles wrapping another styled component 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  color: red;
+}
+.BlueTitle_b1xjmq2i.Title_t1t92lw9 {
+  font-size: 24px;
+  color: blue;
+}
+.GreenTitle_g2qjq78.BlueTitle_b1xjmq2i.Title_t1t92lw9 {
+  color: green;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor hoistable identifiers 1`] = `
+"import { styled } from '@linaria/react';
+{
+  var days = 42;
+}
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});"
+`;
+
+exports[`extractor hoistable identifiers 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  &:before {
+    content: "42"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor ignores external expressions 1`] = `
+"import { styled } from '@linaria/react';
+
+const generate = props => props.content;
+
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\",
+  vars: {
+    \\"t1t92lw9-0\\": [generate]
+  }
+});"
+`;
+
+exports[`extractor ignores external expressions 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  &:before {
+    content: "var(--t1t92lw9-0)"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor ignores inline arrow function expressions 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\",
+  vars: {
+    \\"t1t92lw9-0\\": [props => props.content]
+  }
+});"
+`;
+
+exports[`extractor ignores inline arrow function expressions 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  &:before {
+    content: "var(--t1t92lw9-0)"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor ignores inline vanilla function expressions 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\",
+  vars: {
+    \\"t1t92lw9-0\\": [function (props) {
+      return props.content;
+    }]
+  }
+});"
+`;
+
+exports[`extractor ignores inline vanilla function expressions 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  &:before {
+    content: "var(--t1t92lw9-0)"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor inlines array styles as CSS string 1`] = `
+"import { styled } from '@linaria/react';
+
+const fill = (top = 0, left = 0, right = 0, bottom = 0) => [{
+  position: 'absolute'
+}, {
+  top,
+  right,
+  bottom,
+  left
+}];
+
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});"
+`;
+
+exports[`extractor inlines array styles as CSS string 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor inlines object styles as CSS string 1`] = `
+"import { styled } from '@linaria/react';
+
+const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
+  position: 'absolute',
+  top,
+  right,
+  bottom,
+  left
+});
+
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_t1t92lw9\\"
+});"
+`;
+
+exports[`extractor inlines object styles as CSS string 2`] = `
+
+CSS:
+
+.Title_t1t92lw9 {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor it should not throw location error for hoisted identifier 1`] = `
+"import React from 'react';
+import { css } from '@linaria/core';
+
+const size = () => 5;
+
+var _ref = size();
+
+export default function Component() {
+  const color = _ref;
+  return \\"source0_s1t92lw9\\";
+}"
+`;
+
+exports[`extractor it should not throw location error for hoisted identifier 2`] = `
+
+CSS:
+
+.source0_s1t92lw9 {opacity:5;}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor non-hoistable identifiers 1`] = `
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: 
+
+  > days is not defined. 
+
+  Make sure you are not using a browser or Node specific API and all the variables are available in static context.
+  Linaria have to extract pieces of your code to resolve the interpolated values.
+  Defining styled component or class will not work inside:
+    - function,
+    - class,
+    - method,
+    - loop,
+  because it cannot be statically determined in which context you use them.
+  That's why some variables may be not defined during evaluation.
+      
+   7 | export const Title = styled.h1\`
+   8 |   &:before {
+>  9 |     content: \\"\${days}\\"
+     |                 ^^^^
+  10 |   }
+  11 | \`;"
+`;
+
+exports[`extractor should handle shadowed identifier inside components 1`] = `
+"import React from 'react';
+import { css } from '@linaria/core';
+const color = 'red';
+var _ref = 'blue';
+var _ref2 = {
+  color: _ref
+};
+export default function Component() {
+  const color = _ref;
+  const val = _ref2;
+  return React.createElement('div', {
+    className: \\"className_c1t92lw9\\"
+  });
+}"
+`;
+
+exports[`extractor should handle shadowed identifier inside components 2`] = `
+
+CSS:
+
+.className_c1t92lw9 {background-color:blue;}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor should process \`css\` calls inside components 1`] = `
+"import React from 'react';
+import { css } from '@linaria/core';
+export function Component() {
+  const opacity = 0.2;
+  const className = \\"className_c1t92lw9\\";
+  return React.createElement(\\"div\\", {
+    className
+  });
+}"
+`;
+
+exports[`extractor should process \`css\` calls inside components 2`] = `
+
+CSS:
+
+.className_c1t92lw9 {
+    opacity: 0.2;
+  }
+
+Dependencies: NA
+
+`;
+
+exports[`extractor should process \`css\` calls with complex interpolation inside components 1`] = `
+"import React from 'react';
+import { css } from '@linaria/core';
+import externalDep from '@linaria/babel/__fixtures__/sample-script';
+const globalObj = {
+  opacity: 0.5
+};
+var _ref = externalDep;
+var _ref2 = {
+  value: 0.2,
+  cell: \\"cell_c1t92lw9\\"
+};
+var _ref3 = _ref2;
+export function Component() {
+  const classes = _ref2;
+  const classes2 = _ref3;
+  const referencedExternalDep = _ref;
+  const className = \\"className_c1xjmq2i\\";
+  return React.createElement(\\"div\\", {
+    className
+  });
+}"
+`;
+
+exports[`extractor should process \`css\` calls with complex interpolation inside components 2`] = `
+
+CSS:
+
+.cell_c1t92lw9 {
+      opacity: 0;
+    }
+.className_c1xjmq2i {
+    opacity: 0.5;
+    font-size: 42
+    font-size: 42
+
+    &:hover .cell_c1t92lw9 {
+      opacity: 0.2;
+    }
+  }
+
+Dependencies: @babel/runtime/helpers/interopRequireDefault, @linaria/babel/__fixtures__/sample-script
+
+`;
+
+exports[`extractor should process \`styled\` calls inside components 1`] = `
+"import React from 'react';
+import { css } from '@linaria/core';
+export function Component() {
+  const opacity = 0.2;
+  const MyComponent = styled.h1\`
+    opacity: \${opacity};
+  \`;
+  return React.createElement(MyComponent);
+}"
+`;
+
+exports[`extractor should process \`styled\` calls inside components 2`] = `Object {}`;
+
+exports[`extractor should process \`styled\` calls with complex interpolation inside components 1`] = `
+"import React from 'react';
+import { css } from '@linaria/core';
+const globalObj = {
+  opacity: 0.5
+};
+const Styled1 = styled.p\`
+  opacity: \${globalObj.opacity}
+\`;
+export function Component() {
+  const classes = {
+    value: 0.2,
+    cell: \\"cell_c1t92lw9\\"
+  };
+  const classes2 = classes;
+  const MyComponent = styled\`
+    opacity: \${globalObj.opacity};
+
+    &:hover .\${classes2.cell} {
+      opacity: \${classes.value};
+    }
+    \${Styled1} {
+      font-size: 1;
+    }
+  \`;
+  return React.createElement(MyComponent);
+}"
+`;
+
+exports[`extractor should process \`styled\` calls with complex interpolation inside components 2`] = `
+
+CSS:
+
+.cell_c1t92lw9 {
+      opacity: 0;
+    }
+
+Dependencies: NA
+
+`;
+
+exports[`extractor should work with String and Number object 1`] = `
+"import { css } from '@linaria/core';
+export const style = \\"style_s1t92lw9\\";"
+`;
+
+exports[`extractor should work with String and Number object 2`] = `
+
+CSS:
+
+.style_s1t92lw9 {
+  width: 100%;
+  opacity: 0.75;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor should work with generated classnames as selectors 1`] = `
+"import { css } from \\"@linaria/core\\";
+export const text = \\"text_t1t92lw9\\";
+export const square = \\"square_s1xjmq2i\\";"
+`;
+
+exports[`extractor should work with generated classnames as selectors 2`] = `
+
+CSS:
+
+.text_t1t92lw9 {}
+.square_s1xjmq2i {
+  .text_t1t92lw9 {
+    color: red;
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`extractor simplifies react components 1`] = `
+"import React from 'react';
+import { styled } from '@linaria/react';
+import constant from './broken-dependency';
+
+const FuncComponent = props => <div>{props.children + constant}</div>;
+
+class ClassComponent extends React.PureComponent {
+  method() {
+    return constant;
+  }
+
+  render() {
+    return <div>{props.children + constant}</div>;
+  }
+
+}
+
+export const StyledFunc = /*#__PURE__*/styled(FuncComponent)({
+  name: \\"StyledFunc\\",
+  class: \\"StyledFunc_s1t92lw9\\"
+});
+export const StyledClass = /*#__PURE__*/styled(ClassComponent)({
+  name: \\"StyledClass\\",
+  class: \\"StyledClass_s1xjmq2i\\"
+});"
+`;
+
+exports[`extractor simplifies react components 2`] = `
+
+CSS:
+
+.StyledFunc_s1t92lw9 {
+  color: red;
+}
+.StyledClass_s1xjmq2i {
+  color: blue;
+}
+
+Dependencies: @babel/runtime/helpers/interopRequireDefault, react
+
+`;
+
+exports[`extractor throws codeframe error when evaluation fails 1`] = `
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: 
+
+  > This will fail. 
+
+  Make sure you are not using a browser or Node specific API and all the variables are available in static context.
+  Linaria have to extract pieces of your code to resolve the interpolated values.
+  Defining styled component or class will not work inside:
+    - function,
+    - class,
+    - method,
+    - loop,
+  because it cannot be statically determined in which context you use them.
+  That's why some variables may be not defined during evaluation.
+      
+  4 | 
+  5 | export const Title = styled.h1\`
+> 6 |   font-size: \${foo()}px;
+    |                ^^^^^
+  7 | \`;"
+`;
+
+exports[`extractor throws if couldn't determine a display name 1`] = `
+"<<DIRNAME>>/.js: Couldn't determine a name for the component. Ensure that it's either:
+- Assigned to a variable
+- Is an object property
+- Is a prop in a JSX element
+
+  1 | import { styled } from '@linaria/react';
+  2 | 
+> 3 | export default styled.h1\`
+    |                ^
+  4 |   font-size: 14px;
+  5 | \`;"
+`;
+
+exports[`extractor throws when interpolation evaluates to NaN 1`] = `
+"<<DIRNAME>>/source.js: The expression evaluated to 'NaN', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(height)'.
+  4 | 
+  5 | export const Title = styled.h1\`
+> 6 |   height: \${height}px;
+    |             ^^^^^^
+  7 | \`;"
+`;
+
+exports[`extractor throws when interpolation evaluates to null 1`] = `
+"<<DIRNAME>>/source.js: The expression evaluated to 'null', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(color)'.
+  4 | 
+  5 | export const Title = styled.h1\`
+> 6 |   color: \${color};
+    |            ^^^^^
+  7 | \`;"
+`;
+
+exports[`extractor throws when interpolation evaluates to undefined 1`] = `
+"<<DIRNAME>>/source.js: The expression evaluated to 'undefined', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(fontSize)'.
+  4 | 
+  5 | export const Title = styled.h1\`
+> 6 |   font-size: \${fontSize};
+    |                ^^^^^^^^
+  7 | \`;"
+`;

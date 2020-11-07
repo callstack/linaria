@@ -1,0 +1,5 @@
+{
+  "main": "../lib/evaluators.js",
+  "module": "../esm/evaluators.js",
+  "types": "../lib/evaluators.d.ts"
+}

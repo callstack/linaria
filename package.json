@@ -1,127 +1,56 @@
 {
-  "name": "linaria",
-  "version": "2.0.0",
-  "description": "Blazing fast zero-runtime CSS in JS library",
-  "main": "lib/index.js",
-  "module": "esm/index.js",
-  "bin": "bin/linaria.js",
-  "files": [
-    "bin/",
-    "lib/",
-    "esm/",
-    "react/",
-    "*.d.ts",
-    "babel.js",
-    "evaluators.js",
-    "loader.js",
-    "rollup.js",
-    "server.js",
-    "stylelint-config.js"
-  ],
+  "private": true,
   "license": "MIT",
   "repository": "git@github.com:callstack/linaria.git",
   "bugs": {
     "url": "https://github.com/callstack/linaria/issues"
   },
   "homepage": "https://github.com/callstack/linaria#readme",
-  "keywords": [
-    "react",
-    "css",
-    "css-in-js",
-    "styled-components",
-    "babel-plugin",
-    "babel",
-    "webpack"
-  ],
   "scripts": {
-    "lint": "eslint --ext .js,.ts,.tsx .",
-    "typecheck": "tsc --noEmit",
-    "test": "jest",
-    "test:dts": "dtslint --localTs node_modules/typescript/lib types",
     "add-contributor": "all-contributors add",
-    "build:lib": "NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start",
-    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --ignore '**/__tests__/**,**/__integration-tests__/**,**/__fixtures__/**' --source-maps --delete-dir-on-start",
-    "build": "yarn build:lib && yarn build:esm",
-    "build:declarations": "tsc --project tsconfig.prod.json --emitDeclarationOnly --outDir lib",
-    "watch": "yarn build --watch",
-    "prepare": "yarn build && yarn build:declarations",
+    "bootstrap": "yarn && yarn website install",
+    "check:all": "yarn test:dts && yarn typecheck && yarn test && yarn lint",
+    "clean": "del 'packages/*/{coverage,esm,lib,types,tsconfig.tsbuildinfo}'",
+    "lint": "eslint --ext .js,.ts,.tsx .",
+    "prepare": "lerna-to-typescript-project-references --update && yarn lerna run prepare",
     "release": "release-it",
-    "website": "yarn --cwd website",
-    "bootstrap": "yarn && yarn website install"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "test": "yarn lerna run test",
+    "test:coverage": "yarn lerna run test -- -- --coverage",
+    "test:dts": "yarn lerna run test:dts",
+    "typecheck": "yarn lerna run typecheck",
+    "watch": "lerna run --parallel watch",
+    "website": "yarn --cwd website"
   },
   "devDependencies": {
     "@babel/cli": ">=7",
+    "@babel/core": ">=7",
     "@babel/plugin-proposal-class-properties": ">=7",
     "@babel/plugin-syntax-jsx": ">=7",
     "@babel/preset-env": ">=7",
     "@babel/preset-react": ">=7",
     "@babel/preset-typescript": ">=7",
-    "@callstack/eslint-config": "^10.0.1",
+    "@callstack/eslint-config": "^10.1.0",
     "@commitlint/config-conventional": "^8.3.4",
     "@release-it/conventional-changelog": "^1.1.0",
-    "@types/cosmiconfig": "^5.0.3",
-    "@types/debug": "^4.1.5",
-    "@types/dedent": "^0.7.0",
-    "@types/enhanced-resolve": "^3.0.6",
-    "@types/glob": "^7.1.1",
-    "@types/jest": "^24.0.11",
-    "@types/loader-utils": "^1.1.3",
-    "@types/mkdirp": "^0.5.2",
-    "@types/normalize-path": "^3.0.0",
-    "@types/prettier": "^2.0.2",
-    "@types/react": "^16.9.25",
-    "@types/react-is": "^16.7.1",
-    "@types/strip-ansi": "^5.2.1",
+    "@types/jest": "^24.9.1",
     "@typescript-eslint/eslint-plugin": "^3.9.0",
     "@typescript-eslint/parser": "^3.9.0",
     "all-contributors-cli": "^6.1.1",
     "babel-jest": "^24.5.0",
     "codecov": "^3.2.0",
     "commitlint": "^8.3.5",
-    "dedent": "^0.7.0",
     "del-cli": "^1.1.0",
-    "dtslint": "^0.9.8",
+    "dtslint": "^4.0.4",
     "eslint": "^7.6.0",
     "eslint-plugin-prettier": "^3.1.4",
     "husky": "^1.3.1",
-    "jest": "^24.7.1",
+    "jest": "^24.9.0",
+    "lerna": "^3.22.1",
+    "lerna-to-typescript-project-references": "^0.0.6",
     "prettier": "^2.0.5",
-    "react": "^16.8.3",
-    "react-test-renderer": "^16.8.3",
+    "react": ">=16",
     "release-it": "^12.4.3",
     "typescript": "^3.9.7"
-  },
-  "dependencies": {
-    "@babel/generator": ">=7",
-    "@babel/plugin-proposal-export-namespace-from": ">=7",
-    "@babel/plugin-syntax-dynamic-import": ">=7",
-    "@babel/plugin-transform-modules-commonjs": ">=7",
-    "@babel/plugin-transform-runtime": ">=7",
-    "@babel/plugin-transform-template-literals": ">=7",
-    "@babel/template": ">=7",
-    "@emotion/is-prop-valid": "^0.8.8",
-    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "cosmiconfig": "^5.1.0",
-    "debug": "^4.1.1",
-    "enhanced-resolve": "^4.1.0",
-    "find-yarn-workspace-root": "^1.2.1",
-    "glob": "^7.1.3",
-    "loader-utils": "^1.2.3",
-    "mkdirp": "^0.5.1",
-    "normalize-path": "^3.0.0",
-    "postcss": "^7.0.14",
-    "react-is": "^16.8.3",
-    "rollup-pluginutils": "^2.4.1",
-    "source-map": "^0.6.1",
-    "strip-ansi": "^5.2.0",
-    "stylis": "^3.5.4",
-    "yargs": "^13.2.1"
-  },
-  "peerDependencies": {
-    "@babel/core": ">=7"
   },
   "resolutions": {
     "git-raw-commits": "^2.0.3"
@@ -129,17 +58,11 @@
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "yarn lint && yarn typecheck && yarn test && yarn test:dts"
+      "pre-commit": "yarn check:all"
     }
   },
-  "jest": {
-    "testEnvironment": "node",
-    "testRegex": "/__tests__/.*\\.(test|spec)\\.(js|tsx?)$",
-    "transform": {
-      "^.+\\.(js|ts|tsx)$": "babel-jest"
-    },
-    "setupFiles": [
-      "<rootDir>/jest/resolveTypescript.js"
-    ]
-  }
+  "workspaces": [
+    "./packages/*",
+    "./website"
+  ]
 }

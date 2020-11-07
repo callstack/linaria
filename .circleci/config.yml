@@ -25,7 +25,6 @@ commands:
             - dependencies-website-
       - run: |
           yarn install --frozen-lockfile
-          yarn install --frozen-lockfile --cwd website
       - save_cache:
           key: dependencies-{{ checksum "package.json" }}
           paths: node_modules
@@ -40,9 +39,9 @@ commands:
       - attach_workspace:
           at: ~/linaria
       - run: |
-          yarn lint
-          yarn typecheck
           yarn test:dts
+          yarn typecheck
+          yarn lint
   unit-tests:
     steps:
       - attach_workspace:
@@ -54,8 +53,8 @@ commands:
       - attach_workspace:
           at: ~/linaria
       - run: |
-          yarn test --coverage
-          cat ./coverage/lcov.info | ./node_modules/.bin/codecov
+          yarn test:coverage
+          cat ./packages/*/coverage/lcov.info | ./node_modules/.bin/codecov
           bash .circleci/comment-artifacts.sh
       - store_artifacts:
           path: coverage

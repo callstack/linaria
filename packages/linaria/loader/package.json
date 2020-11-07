@@ -1,0 +1,5 @@
+{
+  "main": "../lib/webpack4-loader.js",
+  "module": "../esm/webpack4-loader.js",
+  "types": "../lib/webpack4-loader.d.ts"
+}

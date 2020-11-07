@@ -5,7 +5,7 @@ import 'ignore-styles';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { collect } from 'linaria/server'; // eslint-disable-line import/no-unresolved
+import { collect } from '@linaria/server';
 import Koa from 'koa';
 import Router from 'koa-router';
 import compress from 'koa-compress';

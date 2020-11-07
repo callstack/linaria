@@ -1,6 +1,6 @@
 /* @flow */
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 import React from 'react';
 import constants from '../styles/constants';
 import { media } from '../styles/utils';

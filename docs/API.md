@@ -1,6 +1,6 @@
 # API
 
-Linaria exposes a core `css` method alongside with small, but just enough amount of helpers. Inside `linaria` module you can find following methods:
+Linaria exposes a core `css` method alongside with small, but just enough amount of helpers. Inside `@linaria/core` module you can find following methods:
 
 ## Client APIs
 
@@ -9,7 +9,7 @@ Linaria exposes a core `css` method alongside with small, but just enough amount
 String tag for tagged template literals consisting CSS code. The tagged template literal is evaluated to a unique class name by the Babel plugin:
 
 ```js
-import { css } from 'linaria';
+import { css } from '@linaria/core';
 
 const flower = css`
   display: inline;
@@ -22,7 +22,7 @@ const flower = css`
 All rules inside the template literal are scoped to the class name, including media queries and animations. For example, we can declare CSS animation like so:
 
 ```js
-import { css } from 'linaria';
+import { css } from '@linaria/core';
 
 const box = css`
   animation: rotate 1s linear infinite;
@@ -39,7 +39,7 @@ const box = css`
 Takes a list of class names and returns a concatenated string with the class names. Falsy values are ignored.
 
 ```js
-import { css, cx } from 'linaria';
+import { css, cx } from '@linaria/core';
 
 const cat = css`
   font-weight: bold;
@@ -67,7 +67,7 @@ Helper to build React components. It allows you to write your components in a si
 The syntax is similar to the `css` tag. Additionally, you can use function interpolations that receive the component's props:
 
 ```js
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 import colors from './colors.json';
 
 const Container = styled.div`
@@ -130,14 +130,14 @@ const FancyButton = styled(Button)`
 `;
 ```
 
-## Server APIs (`linaria/server`)
+## Server APIs (`@linaria/server`)
 
 ### `collect(html: string, css: string) => string`
 
 Takes HTML and CSS strings and returns the critical CSS used in the page by analyzing the class names. It can be used to determine critical CSS for server side rendering.
 
 ```js
-import { collect } from 'linaria/server';
+import { collect } from '@linaria/server';
 
 const css = fs.readFileSync('./dist/styles.css', 'utf8');
 const html = ReactDOMServer.renderToString(<App />);

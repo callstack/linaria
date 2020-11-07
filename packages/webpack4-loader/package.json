@@ -1,0 +1,57 @@
+{
+  "name": "@linaria/webpack4-loader",
+  "version": "3.0.0-beta.0",
+  "description": "Blazing fast zero-runtime CSS in JS library",
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "types": "types",
+  "files": [
+    "types/",
+    "lib/",
+    "esm/"
+  ],
+  "license": "MIT",
+  "repository": "git@github.com:callstack/linaria.git",
+  "bugs": {
+    "url": "https://github.com/callstack/linaria/issues"
+  },
+  "homepage": "https://github.com/callstack/linaria#readme",
+  "keywords": [
+    "react",
+    "linaria",
+    "css",
+    "css-in-js",
+    "styled-components",
+    "babel-plugin",
+    "babel"
+  ],
+  "scripts": {
+    "build:lib": "NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build": "yarn build:lib && yarn build:esm",
+    "build:declarations": "tsc --emitDeclarationOnly --outDir types",
+    "prepare": "yarn build && yarn build:declarations",
+    "typecheck": "tsc --noEmit --composite false",
+    "watch": "yarn build --watch"
+  },
+  "devDependencies": {
+    "@types/cosmiconfig": "^5.0.3",
+    "@types/enhanced-resolve": "^3.0.6",
+    "@types/loader-utils": "^1.1.3",
+    "@types/mkdirp": "^0.5.2",
+    "@types/normalize-path": "^3.0.0"
+  },
+  "dependencies": {
+    "@linaria/babel": "3.0.0-beta.0",
+    "@linaria/logger": "3.0.0-beta.0",
+    "cosmiconfig": "^5.1.0",
+    "enhanced-resolve": "^4.1.0",
+    "find-yarn-workspace-root": "^1.2.1",
+    "loader-utils": "^1.2.3",
+    "mkdirp": "^0.5.1",
+    "normalize-path": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@babel/core": ">=7"
+  }
+}

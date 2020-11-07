@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": { "paths": {}, "rootDir": "src/" },
+  "references": [
+    { "path": "../babel" },
+    { "path": "../core" },
+    { "path": "../extractor" },
+    { "path": "../react" },
+    { "path": "../rollup" },
+    { "path": "../server" },
+    { "path": "../shaker" },
+    { "path": "../stylelint" },
+    { "path": "../webpack4-loader" }
+  ]
+}

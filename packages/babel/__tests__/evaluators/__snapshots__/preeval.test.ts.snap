@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`handles locally named import 1`] = `
+"import { styled as custom } from '@linaria/react';
+const Component =
+/*linaria ci72cjv Component Component_ci72cjv*/
+custom.div\`\`;"
+`;
+
+exports[`preserves classNames 1`] = `
+"import { styled } from '@linaria/react';
+const Component =
+/*linaria ci72cjv Component Component_ci72cjv*/
+styled.div\`\`;"
+`;
+
+exports[`replaces class component 1`] = `
+"import React from 'react';
+
+function Component() {
+  return <></>;
+}"
+`;
+
+exports[`replaces constant 1`] = `
+"import React from 'react';
+const tag = <></>;
+
+const Component = props => tag;"
+`;
+
+exports[`replaces functional component 1`] = `
+"import React from 'react';
+
+const Component = props => {
+  return <></>;
+};"
+`;

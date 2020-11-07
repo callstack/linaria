@@ -1,6 +1,6 @@
 /* @flow */
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 import React from 'react';
 import Header from './Header';
 import Hero from './Hero';

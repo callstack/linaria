@@ -1,12 +1,18 @@
 {
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": [
     "node_modules",
-    "__ts-tests__",
-    "**/__tests__/**",
-    "**/__fixtures__/**"
+    "packages/*/__dtslint__/**",
+    "packages/*/__tests__/**",
+    "packages/*/__fixtures__/**",
+    "packages/*/__utils__/**",
+    "packages/*/types/**"
   ],
   "compilerOptions": {
+    "baseUrl": ".",
+    "composite": true,
+    "paths": {
+      "@linaria/*": ["./packages/*/src"]
+    },
     "jsx": "react",
     "lib": ["es6", "dom"],
     "module": "es6",

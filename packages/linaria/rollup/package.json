@@ -1,0 +1,5 @@
+{
+  "main": "../lib/rollup.js",
+  "module": "../esm/rollup.js",
+  "types": "../lib/rollup.d.ts"
+}

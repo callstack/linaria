@@ -37,13 +37,13 @@ Zero-runtime CSS in JS library.
 ## Installation
 
 ```sh
-npm install linaria
+npm install @linaria/core @linaria/react @linaria/babel
 ```
 
 or
 
 ```sh
-yarn add linaria
+yarn add @linaria/core @linaria/react @linaria/babel
 ```
 
 ## Setup
@@ -66,7 +66,7 @@ Optionally, add the `linaria/babel` preset to your Babel configuration at the en
   "presets": [
     "@babel/preset-env",
     "@babel/preset-react",
-    "linaria/babel"
+    "@linaria/babel"
   ]
 }
 ```
@@ -78,7 +78,7 @@ See [Configuration](/docs/CONFIGURATION.md) to customize how Linaria processes y
 Linaria can be used with any framework, with additional helpers for React. The basic syntax looks like this:
 
 ```js
-import { css } from 'linaria';
+import { css } from '@linaria/core';
 import { modularScale, hiDPI } from 'polished';
 import fonts from './fonts';
 
@@ -102,7 +102,7 @@ You can use imported variables and functions for logic inside the CSS code. They
 If you're using [React](https://reactjs.org/), you can use the `styled` helper, which makes it easy to write React components with dynamic styles with a styled-component like syntax:
 
 ```js
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 import { families, sizes } from './fonts';
 
 // Write your styles in `styled` tag
@@ -170,7 +170,7 @@ Take a look on [Contributing](CONTRIBUTING.md) docs to check how you can run Lin
   For example:
 
   ```js
-  import { css } from 'linaria';
+  import { css } from '@linaria/core';
   import colors from './colors';
 
   const title = css`
