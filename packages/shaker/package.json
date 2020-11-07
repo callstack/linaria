@@ -1,6 +1,6 @@
 {
   "name": "@linaria/shaker",
-  "version": "2.0.1",
+  "version": "3.0.0-beta.0",
   "publishConfig": {
     "access": "public"
   },
@@ -44,9 +44,9 @@
   "dependencies": {
     "@babel/generator": ">=7",
     "@babel/plugin-transform-runtime": ">=7",
-    "@linaria/babel": "^2.0.1",
-    "@linaria/logger": "^2.0.1",
-    "@linaria/preeval": "^2.0.1",
+    "@linaria/babel": "^3.0.0-beta.0",
+    "@linaria/logger": "^3.0.0-beta.0",
+    "@linaria/preeval": "^3.0.0-beta.0",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "dedent": "^0.7.0"
   },

@@ -1,6 +1,6 @@
 {
   "name": "@linaria/webpack4-loader",
-  "version": "2.0.1",
+  "version": "3.0.0-beta.0",
   "publishConfig": {
     "access": "public"
   },
@@ -45,8 +45,8 @@
     "@types/normalize-path": "^3.0.0"
   },
   "dependencies": {
-    "@linaria/babel": "^2.0.1",
-    "@linaria/logger": "^2.0.1",
+    "@linaria/babel": "^3.0.0-beta.0",
+    "@linaria/logger": "^3.0.0-beta.0",
     "cosmiconfig": "^5.1.0",
     "enhanced-resolve": "^4.1.0",
     "find-yarn-workspace-root": "^1.2.1",
