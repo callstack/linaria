@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": { "paths": {}, "rootDir": "src/" },
+  "references": [
+    { "path": "../webpack4-loader" },
+    { "path": "../webpack5-loader" }
+  ]
+}

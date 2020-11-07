@@ -1,5 +1,5 @@
 {
-  "name": "@linaria/webpack4-loader",
+  "name": "@linaria/webpack5-loader",
   "version": "3.0.0-beta.0",
   "publishConfig": {
     "access": "public"
@@ -43,19 +43,21 @@
     "@types/loader-utils": "^1.1.3",
     "@types/mkdirp": "^0.5.2",
     "@types/normalize-path": "^3.0.0",
-    "source-map": "^0.6.1"
+    "source-map": "^0.6.1",
+    "webpack": "^5.6.0"
   },
   "dependencies": {
-    "@linaria/babel": "^3.0.0-beta.0",
-    "@linaria/logger": "^3.0.0-beta.0",
+    "@linaria/babel": "3.0.0-beta.0",
+    "@linaria/logger": "3.0.0-beta.0",
     "cosmiconfig": "^5.1.0",
-    "enhanced-resolve": "^4.1.0",
+    "enhanced-resolve": "^5.3.1",
     "find-yarn-workspace-root": "^1.2.1",
-    "loader-utils": "^1.2.3",
+    "loader-utils": "^2.0.0",
     "mkdirp": "^0.5.1",
     "normalize-path": "^3.0.0"
   },
   "peerDependencies": {
-    "@babel/core": ">=7"
+    "@babel/core": ">=7",
+    "webpack": ">=5"
   }
 }
