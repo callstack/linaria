@@ -1,6 +1,9 @@
 {
   "name": "@linaria/server",
-  "version": "3.0.0-beta.0",
+  "version": "2.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Blazing fast zero-runtime CSS in JS library",
   "main": "lib/index.js",
   "module": "esm/index.js",
