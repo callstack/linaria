@@ -186,7 +186,7 @@ export default function extract(
               debug('lazy-deps:values', evaluation.value.__linariaPreval);
             } catch (e) {
               throw new Error(
-                'An unexpected runtime error ocurred during dependencies evaluation: \n' +
+                'An unexpected runtime error occurred during dependencies evaluation: \n' +
                   e.stack +
                   '\n\nIt may happen when your code or third party module is invalid or uses identifiers not available in Node environment, eg. window. \n' +
                   'Note that line numbers in above stack trace will most likely not match, because Linaria needed to transform your code a bit.\n'
