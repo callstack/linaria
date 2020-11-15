@@ -22,6 +22,7 @@ export default function buildOptions(
   ];
 
   const defaults: DefaultOptions = {
+    rootMode: 'upward-optional',
     caller: { name: 'linaria', evaluate: true },
     filename: filename,
     presets: [
