@@ -37,13 +37,13 @@ Zero-runtime CSS in JS library.
 ## Installation
 
 ```sh
-npm install @linaria/core @linaria/react @linaria/babel
+npm install @linaria/core @linaria/react @linaria/babel @linaria/shaker
 ```
 
 or
 
 ```sh
-yarn add @linaria/core @linaria/react @linaria/babel
+yarn add @linaria/core @linaria/react @linaria/babel @linaria/shaker
 ```
 
 ## Setup
@@ -66,7 +66,7 @@ Optionally, add the `linaria/babel` preset to your Babel configuration at the en
   "presets": [
     "@babel/preset-env",
     "@babel/preset-react",
-    "@linaria/babel"
+    "module:@linaria/babel"
   ]
 }
 ```
