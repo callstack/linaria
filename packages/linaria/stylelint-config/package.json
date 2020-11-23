@@ -1,5 +1,5 @@
 {
   "main": "../lib/stylelint.js",
   "module": "../esm/stylelint.js",
-  "types": "../lib/stylelint.d.ts"
+  "types": "../types/stylelint.d.ts"
 }

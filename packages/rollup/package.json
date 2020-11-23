@@ -1,6 +1,9 @@
 {
   "name": "@linaria/rollup",
   "version": "3.0.0-beta.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Blazing fast zero-runtime CSS in JS library",
   "main": "lib/index.js",
   "module": "esm/index.js",
@@ -40,7 +43,7 @@
     "rollup": "1.20.0||^2.0.0"
   },
   "dependencies": {
-    "@linaria/babel": "3.0.0-beta.0",
+    "@linaria/babel": "^3.0.0-beta.0",
     "@rollup/pluginutils": "^4.1.0"
   },
   "peerDependencies": {

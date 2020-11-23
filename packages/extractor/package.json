@@ -1,6 +1,9 @@
 {
   "name": "@linaria/extractor",
   "version": "3.0.0-beta.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Blazing fast zero-runtime CSS in JS library",
   "main": "lib/index.js",
   "module": "esm/index.js",
@@ -38,8 +41,8 @@
   "dependencies": {
     "@babel/generator": ">=7",
     "@babel/plugin-transform-runtime": ">=7",
-    "@linaria/babel": "3.0.0-beta.0",
-    "@linaria/preeval": "3.0.0-beta.0"
+    "@linaria/babel": "^3.0.0-beta.0",
+    "@linaria/preeval": "^3.0.0-beta.0"
   },
   "peerDependencies": {
     "@babel/core": ">=7"
