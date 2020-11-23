@@ -299,7 +299,7 @@ const Title = styled.h1`
   min-height: 360px;
 
   '@media (min-width: 200px)': {
-    minheight: 480px;
+    min-height: 480px;
   }
 `;
 ```
