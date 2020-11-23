@@ -6,9 +6,9 @@
 
 import fs from 'fs';
 import path from 'path';
+import loaderUtils from 'loader-utils';
 import mkdirp from 'mkdirp';
 import normalize from 'normalize-path';
-import loaderUtils from 'loader-utils';
 import enhancedResolve from 'enhanced-resolve';
 import findYarnWorkspaceRoot from 'find-yarn-workspace-root';
 import type { RawSourceMap } from 'source-map';
@@ -23,10 +23,8 @@ const lernaConfig = cosmiconfig('lerna', {
 const lernaRoot =
   lernaConfig !== null ? path.dirname(lernaConfig.filepath) : null;
 
-type LoaderContext = Parameters<typeof loaderUtils.getOptions>[0];
-
-export default function webpack4Loader(
-  this: LoaderContext,
+export default function webpack5Loader(
+  this: any,
   content: string,
   inputSourceMap: RawSourceMap | null
 ) {
@@ -40,7 +38,7 @@ export default function webpack4Loader(
     preprocessor = undefined,
     extension = '.linaria.css',
     ...rest
-  } = loaderUtils.getOptions(this) || {};
+  } = this.getOptions() || {};
 
   const root = workspaceRoot || lernaRoot || process.cwd();
 
@@ -82,8 +80,15 @@ export default function webpack4Loader(
 
   try {
     // Use webpack's resolution when evaluating modules
-    Module._resolveFilename = (id, { filename }) =>
-      resolveSync(path.dirname(filename), id);
+    Module._resolveFilename = (id, { filename }) => {
+      const result = resolveSync(path.dirname(filename), id);
+      if (!result) {
+        // enhanced-resolve v4 throws a error when dependency is missed
+        throw new Error('No result');
+      }
+
+      return result;
+    };
 
     result = transform(content, {
       filename: path.relative(process.cwd(), this.resourcePath),
@@ -148,3 +153,5 @@ export default function webpack4Loader(
 
   this.callback(null, result.code, result.sourceMap ?? undefined);
 }
+
+export type Webpack5Loader = typeof webpack5Loader;
