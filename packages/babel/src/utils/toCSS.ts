@@ -3,12 +3,19 @@ import type { JSONValue } from '../types';
 import isSerializable from './isSerializable';
 import isBoxedPrimitive from './isBoxedPrimitive';
 
-const hyphenate = (s: string) =>
-  s
-    // Hyphenate CSS property names from camelCase version from JS string
-    .replace(/([A-Z])/g, (match, p1) => `-${p1.toLowerCase()}`)
-    // Special case for `-ms` because in JS it starts with `ms` unlike `Webkit`
-    .replace(/^ms-/, '-ms-');
+const hyphenate = (s: string) => {
+  if (s.startsWith('--')) {
+    // It's a custom property which is already well formatted.
+    return s;
+  }
+  return (
+    s
+      // Hyphenate CSS property names from camelCase version from JS string
+      .replace(/([A-Z])/g, (match, p1) => `-${p1.toLowerCase()}`)
+      // Special case for `-ms` because in JS it starts with `ms` unlike `Webkit`
+      .replace(/^ms-/, '-ms-')
+  );
+};
 
 // Some tools such as polished.js output JS objects
 // To support them transparently, we convert JS objects to CSS strings

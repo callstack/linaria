@@ -155,6 +155,7 @@ it('inlines object styles as CSS string', async () => {
     import { styled } from '@linaria/react';
 
     const cover = {
+      '--color-primaryText': '#222',
       position: 'absolute',
       top: 0,
       right: 0,
