@@ -6,7 +6,7 @@
  */
 
 import { basename, dirname, relative } from 'path';
-import type { TaggedTemplateExpression } from '@babel/types';
+import type { ObjectProperty, TaggedTemplateExpression } from '@babel/types';
 import type { NodePath } from '@babel/traverse';
 import { debug } from '@linaria/logger';
 import type { State, StrictOptions } from '../types';
@@ -54,9 +54,8 @@ export default function GenerateClassNames(
       } else if ('value' in parentNode.key) {
         displayName = parentNode.key.value.toString();
       } else {
-        throw new Error(
-          `Unexpected object property key ${parentNode.key.type}`
-        );
+        const keyPath = (parent as NodePath<ObjectProperty>).get('key');
+        displayName = keyPath.getSource();
       }
     } else if (
       t.isJSXOpeningElement(parentNode) &&

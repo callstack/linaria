@@ -504,3 +504,20 @@ it('handles objects with numeric keys', async () => {
   expect(code).toMatchSnapshot();
   expect(metadata).toMatchSnapshot();
 });
+
+it('handles objects with enums as keys', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { css } from '@linaria/core';
+      import { TestEnum } from './ts-data.ts';
+
+      export const object = {
+        [TestEnum.FirstValue]: css\`\`,
+        [TestEnum.SecondValue]: css\`\`,
+      }
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
