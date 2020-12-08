@@ -187,6 +187,26 @@ Dependencies: NA
 
 `;
 
+exports[`handles objects with enums as keys 1`] = `
+"import { css } from '@linaria/core';
+import { TestEnum } from './ts-data.ts';
+export const object = {
+  [TestEnum.FirstValue]: \\"t17gu1mi\\",
+  [TestEnum.SecondValue]: \\"tccybe9\\"
+};"
+`;
+
+exports[`handles objects with enums as keys 2`] = `
+
+CSS:
+
+.t17gu1mi {}
+.tccybe9 {}
+
+Dependencies: NA
+
+`;
+
 exports[`handles objects with numeric keys 1`] = `
 "import { css } from '@linaria/core';
 export const object = {
