@@ -8,7 +8,7 @@ import normalize from 'normalize-path';
 import mkdirp from 'mkdirp';
 import glob from 'glob';
 import yargs from 'yargs';
-import { transform } from '@linaria/babel';
+import { transform } from '@linaria/babel-preset';
 
 const { argv } = yargs
   .usage('Usage: $0 [options] <files ...>')

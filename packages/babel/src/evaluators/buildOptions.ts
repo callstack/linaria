@@ -65,7 +65,8 @@ export default function buildOptions(
             // This case won't get caught and the preset won't filtered, even if they are same
             // So we add an extra check for top level linaria/babel
             name === 'linaria/babel' ||
-            name === '@linaria/babel' ||
+            name === '@linaria' ||
+            name === '@linaria/babel-preset' ||
             name === require.resolve('../index') ||
             // Also add a check for the plugin names we include for bundler support
             plugins.includes(name)

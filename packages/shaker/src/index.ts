@@ -2,8 +2,8 @@ import generator from '@babel/generator';
 import { transformSync } from '@babel/core';
 import type { Program } from '@babel/types';
 import { debug } from '@linaria/logger';
-import type { Evaluator, StrictOptions } from '@linaria/babel';
-import { buildOptions } from '@linaria/babel';
+import type { Evaluator, StrictOptions } from '@linaria/babel-preset';
+import { buildOptions } from '@linaria/babel-preset';
 import shake from './shaker';
 
 function prepareForShake(

@@ -1,4 +1,4 @@
-import babel from '@linaria/babel';
+import babel from '@linaria/babel-preset';
 
 export default babel;
-export * from '@linaria/babel';
+export * from '@linaria/babel-preset';

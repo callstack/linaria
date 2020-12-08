@@ -1,4 +1,4 @@
-import { run } from '@linaria/babel/__utils__/strategy-tester';
+import { run } from '@linaria/babel-preset/__utils__/strategy-tester';
 import dedent from 'dedent';
 
 describe('shaker', () => {
@@ -7,7 +7,7 @@ describe('shaker', () => {
       const { code, metadata } = await transpile(
         dedent`
       import { css } from "@linaria/core";
-      import * as mod from "@linaria/babel/__fixtures__/complex-component";
+      import * as mod from "@linaria/babel-preset/__fixtures__/complex-component";
 
       export const square = css\`
         ${'${mod.Title}'} {
@@ -25,7 +25,7 @@ describe('shaker', () => {
       const { code, metadata } = await transpile(
         dedent`
       import { css } from "@linaria/core";
-      import { Title } from "@linaria/babel/__fixtures__/complex-component";
+      import { Title } from "@linaria/babel-preset/__fixtures__/complex-component";
 
       export const square = css\`
         ${'${Title}'} {
@@ -43,7 +43,7 @@ describe('shaker', () => {
       const { code, metadata } = await transpile(
         dedent`
       import { css } from "@linaria/core";
-      import { whiteColor } from "@linaria/babel/__fixtures__/complex-component";
+      import { whiteColor } from "@linaria/babel-preset/__fixtures__/complex-component";
 
       export const square = css\`
         color: ${'${whiteColor}'}

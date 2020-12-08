@@ -15,8 +15,8 @@ import { parseSync, transformSync } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import generator from '@babel/generator';
 
-import type { Evaluator } from '@linaria/babel';
-import { buildOptions } from '@linaria/babel';
+import type { Evaluator } from '@linaria/babel-preset';
+import { buildOptions } from '@linaria/babel-preset';
 import RequirementsResolver from './RequirementsResolver';
 
 function isMemberExpression(

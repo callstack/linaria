@@ -228,7 +228,7 @@ Dependencies: NA
 
 exports[`shaker evaluates expressions with dependencies 1`] = `
 "import { styled } from '@linaria/react';
-import slugify from '@linaria/babel/__fixtures__/slugify';
+import slugify from '@linaria/babel-preset/__fixtures__/slugify';
 export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
@@ -245,14 +245,14 @@ CSS:
   }
 }
 
-Dependencies: @babel/runtime/helpers/interopRequireDefault, @linaria/babel/__fixtures__/slugify
+Dependencies: @babel/runtime/helpers/interopRequireDefault, @linaria/babel-preset/__fixtures__/slugify
 
 `;
 
 exports[`shaker evaluates expressions with expressions depending on shared dependency 1`] = `
 "import { styled } from '@linaria/react';
 
-const slugify = require('@linaria/babel/__fixtures__/slugify').default;
+const slugify = require('@linaria/babel-preset/__fixtures__/slugify').default;
 
 const boo = t => slugify(t) + 'boo';
 
@@ -274,7 +274,7 @@ CSS:
   }
 }
 
-Dependencies: @linaria/babel/__fixtures__/slugify
+Dependencies: @linaria/babel-preset/__fixtures__/slugify
 
 `;
 
@@ -388,7 +388,7 @@ Dependencies: NA
 exports[`shaker evaluates multiple expressions with shared dependency 1`] = `
 "import { styled } from '@linaria/react';
 
-const slugify = require('@linaria/babel/__fixtures__/slugify').default;
+const slugify = require('@linaria/babel-preset/__fixtures__/slugify').default;
 
 const boo = t => slugify(t) + 'boo';
 
@@ -411,7 +411,7 @@ CSS:
   }
 }
 
-Dependencies: @linaria/babel/__fixtures__/slugify
+Dependencies: @linaria/babel-preset/__fixtures__/slugify
 
 `;
 
@@ -851,7 +851,7 @@ Dependencies: NA
 
 exports[`shaker should interpolate imported components 1`] = `
 "import { css } from \\"@linaria/core\\";
-import { Title } from \\"@linaria/babel/__fixtures__/complex-component\\";
+import { Title } from \\"@linaria/babel-preset/__fixtures__/complex-component\\";
 export const square = \\"square_s1t92lw9\\";"
 `;
 
@@ -865,13 +865,13 @@ CSS:
   }
 }
 
-Dependencies: @linaria/babel/__fixtures__/complex-component
+Dependencies: @linaria/babel-preset/__fixtures__/complex-component
 
 `;
 
 exports[`shaker should interpolate imported variables 1`] = `
 "import { css } from \\"@linaria/core\\";
-import { whiteColor } from \\"@linaria/babel/__fixtures__/complex-component\\";
+import { whiteColor } from \\"@linaria/babel-preset/__fixtures__/complex-component\\";
 export const square = \\"square_s1t92lw9\\";"
 `;
 
@@ -883,7 +883,7 @@ CSS:
   color: #fff
 }
 
-Dependencies: @linaria/babel/__fixtures__/complex-component
+Dependencies: @linaria/babel-preset/__fixtures__/complex-component
 
 `;
 
@@ -914,7 +914,7 @@ Dependencies: NA
 exports[`shaker should process \`css\` calls with complex interpolation inside components 1`] = `
 "import React from 'react';
 import { css } from '@linaria/core';
-import externalDep from '@linaria/babel/__fixtures__/sample-script';
+import externalDep from '@linaria/babel-preset/__fixtures__/sample-script';
 const globalObj = {
   opacity: 0.5
 };
@@ -952,7 +952,7 @@ CSS:
     }
   }
 
-Dependencies: @babel/runtime/helpers/interopRequireDefault, @linaria/babel/__fixtures__/sample-script
+Dependencies: @babel/runtime/helpers/interopRequireDefault, @linaria/babel-preset/__fixtures__/sample-script
 
 `;
 
@@ -1052,7 +1052,7 @@ Dependencies: NA
 
 exports[`shaker should work with wildcard imports 1`] = `
 "import { css } from \\"@linaria/core\\";
-import * as mod from \\"@linaria/babel/__fixtures__/complex-component\\";
+import * as mod from \\"@linaria/babel-preset/__fixtures__/complex-component\\";
 export const square = \\"square_s1t92lw9\\";"
 `;
 
@@ -1066,7 +1066,7 @@ CSS:
   }
 }
 
-Dependencies: @babel/runtime/helpers/interopRequireWildcard, @linaria/babel/__fixtures__/complex-component
+Dependencies: @babel/runtime/helpers/interopRequireWildcard, @linaria/babel-preset/__fixtures__/complex-component
 
 `;
 
