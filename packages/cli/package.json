@@ -1,6 +1,6 @@
 {
   "name": "@linaria/cli",
-  "version": "3.0.0-beta.0",
+  "version": "3.0.0-beta.1",
   "publishConfig": {
     "access": "public"
   },
@@ -43,7 +43,7 @@
     "@types/normalize-path": "^3.0.0"
   },
   "dependencies": {
-    "@linaria/babel-preset": "^3.0.0-beta.0",
+    "@linaria/babel-preset": "^3.0.0-beta.1",
     "glob": "^7.1.3",
     "mkdirp": "^0.5.1",
     "normalize-path": "^3.0.0",
