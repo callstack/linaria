@@ -1,7 +1,7 @@
 import { types as t } from '@babel/core';
 import type { Aliases, Identifier, Node, VisitorKeys } from '@babel/types';
 import { warn } from '@linaria/logger';
-import { peek } from '@linaria/babel';
+import { peek } from '@linaria/babel-preset';
 import GraphBuilderState from './GraphBuilderState';
 import identifierHandlers from './identifierHandlers';
 import type { Visitor, Visitors } from './types';

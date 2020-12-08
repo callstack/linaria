@@ -46,7 +46,7 @@
     "source-map": "^0.6.1"
   },
   "dependencies": {
-    "@linaria/babel": "^3.0.0-beta.0",
+    "@linaria/babel-preset": "^3.0.0-beta.0",
     "@linaria/logger": "^3.0.0-beta.0",
     "cosmiconfig": "^5.1.0",
     "enhanced-resolve": "^4.1.0",

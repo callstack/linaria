@@ -35,6 +35,7 @@
     "@babel/cli": "^7.12.1",
     "@babel/core": "^7.12.3",
     "@babel/preset-flow": "^7.0.0",
+    "@linaria/babel-preset": "^3.0.0-beta.0",
     "@linaria/stylelint": "^3.0.0-beta.0",
     "@linaria/webpack4-loader": "^3.0.0-beta.0",
     "babel-loader": "^8.0.5",

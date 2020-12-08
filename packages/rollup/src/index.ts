@@ -5,8 +5,8 @@
  */
 
 import { createFilter } from '@rollup/pluginutils';
-import { transform, slugify } from '@linaria/babel';
-import type { PluginOptions, Preprocessor } from '@linaria/babel';
+import { transform, slugify } from '@linaria/babel-preset';
+import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
 
 type RollupPluginOptions = {
   include?: string | string[];

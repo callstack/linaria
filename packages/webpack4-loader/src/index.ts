@@ -13,7 +13,7 @@ import enhancedResolve from 'enhanced-resolve';
 import findYarnWorkspaceRoot from 'find-yarn-workspace-root';
 import type { RawSourceMap } from 'source-map';
 import cosmiconfig from 'cosmiconfig';
-import { EvalCache, Module, transform } from '@linaria/babel';
+import { EvalCache, Module, transform } from '@linaria/babel-preset';
 import { debug } from '@linaria/logger';
 
 const workspaceRoot = findYarnWorkspaceRoot();

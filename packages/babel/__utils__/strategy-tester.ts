@@ -248,7 +248,7 @@ export function run(
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from '@linaria/react';
-      import slugify from '@linaria/babel/__fixtures__/slugify';
+      import slugify from '@linaria/babel-preset/__fixtures__/slugify';
 
       export const Title = styled.h1\`
         &:before {
@@ -266,7 +266,7 @@ export function run(
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from '@linaria/react';
-      const slugify = require('@linaria/babel/__fixtures__/slugify').default;
+      const slugify = require('@linaria/babel-preset/__fixtures__/slugify').default;
 
       const boo = t => slugify(t) + 'boo';
       const bar = t => slugify(t) + 'bar';
@@ -287,7 +287,7 @@ export function run(
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from '@linaria/react';
-      const slugify = require('@linaria/babel/__fixtures__/slugify').default;
+      const slugify = require('@linaria/babel-preset/__fixtures__/slugify').default;
 
       const boo = t => slugify(t) + 'boo';
       const bar = t => slugify(t) + 'bar';
@@ -858,7 +858,7 @@ export function run(
       dedent`
       import React from 'react'
       import {css} from '@linaria/core'
-      import externalDep from '@linaria/babel/__fixtures__/sample-script';
+      import externalDep from '@linaria/babel-preset/__fixtures__/sample-script';
       const globalObj = {
         opacity: 0.5,
       };

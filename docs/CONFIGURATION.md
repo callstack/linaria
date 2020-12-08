@@ -81,11 +81,11 @@ module.exports = {
 
   If you need to specify custom babel configuration, you can pass them here. These babel options will be used by Linaria when parsing and evaluating modules.
 
-## `@linaria/babel` preset
+## `@linaria/babel-preset`
 
 The preset pre-processes and evaluates the CSS. The bundler plugins use this preset under the hood. You also might want to use this preset if you import the components outside of the files handled by your bundler, such as on your server or in unit tests.
 
-To use this preset, add `@linaria/babel` to your Babel configuration at the end of the presets list:
+To use this preset, add `@linaria/babel-preset` to your Babel configuration at the end of the presets list:
 
 `.babelrc`:
 
@@ -94,7 +94,7 @@ To use this preset, add `@linaria/babel` to your Babel configuration at the end 
   "presets": [
     "@babel/preset-env",
     "@babel/preset-react",
-+   "@linaria/babel"
++   "@linaria"
   ]
 }
 ```
@@ -129,7 +129,7 @@ After that, your `package.json` should look like the following:
     "sirv-cli": "^0.4.5"
   },
   "dependencies": {
-+   "@linaria/babel": "^3.0.0",
++   "@linaria/babel-preset": "^3.0.0",
 +   "@linaria/core": "^3.0.0",
 +   "@linaria/react": "^3.0.0",
 +   "@linaria/webpack-loader": "^3.0.0",
@@ -146,7 +146,7 @@ Now in your `preact.config.js`, we will modify the babel rule to use the necessa
 ```js
 export default config => {
   const { options, ...babelLoaderRule } = config.module.rules[0]; // Get the babel rule and options
-  options.presets.push('@babel/preset-react', '@linaria/babel'); // Push the necessary presets
+  options.presets.push('@babel/preset-react', '@linaria'); // Push the necessary presets
   config.module.rules[0] = {
     ...babelLoaderRule,
     loader: undefined, // Disable the predefined babel-loader on the rule
@@ -231,14 +231,14 @@ You can also take a look at the example [here](../examples/gatsby/plugin)
 
 This is a bit more advanced way of integrating Linaria into your Gatsby project.
 
-First, you will need to install `@linaria/babel` and `babel-preset-gatsby`. Then, create `babel.config.js` in the root of your project with the following contents:
+First, you will need to install `@linaria/babel-preset` and `babel-preset-gatsby`. Then, create `babel.config.js` in the root of your project with the following contents:
 
 ```js
 module.exports = {
   presets: [
     'babel-preset-gatsby',
     [
-      '@linaria/babel',
+      '@linaria',
       {
         evaluate: true,
         displayName: process.env.NODE_ENV !== 'production',

@@ -42,7 +42,7 @@
     "watch": "yarn build --watch"
   },
   "dependencies": {
-    "@linaria/babel": "^3.0.0-beta.0",
+    "@linaria/babel-preset": "^3.0.0-beta.0",
     "@linaria/core": "^3.0.0-beta.0",
     "@linaria/extractor": "^3.0.0-beta.0",
     "@linaria/react": "^3.0.0-beta.0",
