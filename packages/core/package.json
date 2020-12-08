@@ -5,6 +5,7 @@
     "access": "public"
   },
   "description": "Blazing fast zero-runtime CSS in JS library",
+  "sideEffects": false,
   "main": "lib/index.js",
   "module": "esm/index.js",
   "types": "types",

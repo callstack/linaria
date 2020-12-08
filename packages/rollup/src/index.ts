@@ -35,7 +35,8 @@ export default function linaria({
       if (importee in cssLookup) return importee;
     },
     transform(code: string, id: string) {
-      if (!filter(id)) return;
+      // Do not transform ignored and generated files
+      if (!filter(id) || id in cssLookup) return;
 
       const result = transform(code, {
         filename: id,

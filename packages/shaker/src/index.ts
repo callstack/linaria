@@ -15,10 +15,10 @@ function prepareForShake(
 
   transformOptions.ast = true;
   transformOptions.presets!.unshift([
-    '@babel/preset-env',
+    require.resolve('@babel/preset-env'),
     {
       targets: 'ie 11',
-      // we need this plugin so we list it explicitly, explanation in `evaluators/extractor/index`
+      // we need this plugin so we list it explicitly, explanation in `packages/extractor/src/index`
       include: ['@babel/plugin-transform-template-literals'],
     },
   ]);
@@ -26,9 +26,11 @@ function prepareForShake(
     require.resolve('@linaria/preeval'),
     options,
   ]);
-  transformOptions.plugins!.unshift('transform-react-remove-prop-types');
+  transformOptions.plugins!.unshift(
+    require.resolve('babel-plugin-transform-react-remove-prop-types')
+  );
   transformOptions.plugins!.unshift([
-    '@babel/plugin-transform-runtime',
+    require.resolve('@babel/plugin-transform-runtime'),
     { useESModules: false },
   ]);
 

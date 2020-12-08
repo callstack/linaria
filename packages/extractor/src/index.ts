@@ -67,7 +67,7 @@ const extractor: Evaluator = (filename, options, text, only = null) => {
     options,
   ]);
   transformOptions.plugins!.unshift([
-    '@babel/plugin-transform-runtime',
+    require.resolve('@babel/plugin-transform-runtime'),
     { useESModules: false },
   ]);
 
@@ -81,7 +81,7 @@ const extractor: Evaluator = (filename, options, text, only = null) => {
   // Presets ordering is from last to first, so we add the plugin at the beginning of the list, which persist the order that was established with formerly used `@babel/preset-env`.
 
   transformOptions.presets!.unshift({
-    plugins: ['@babel/plugin-transform-template-literals'],
+    plugins: [require.resolve('@babel/plugin-transform-template-literals')],
   });
   // Expressions will be extracted only for __linariaPreval.
   // In all other cases a code will be returned as is.

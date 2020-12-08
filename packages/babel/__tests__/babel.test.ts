@@ -155,6 +155,7 @@ it('inlines object styles as CSS string', async () => {
     import { styled } from '@linaria/react';
 
     const cover = {
+      '--color-primaryText': '#222',
       position: 'absolute',
       top: 0,
       right: 0,
@@ -497,6 +498,23 @@ it('handles objects with numeric keys', async () => {
       export const object = {
         stringKey: css\`\`,
         42: css\`\`,
+      }
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('handles objects with enums as keys', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+      import { css } from '@linaria/core';
+      import { TestEnum } from './ts-data.ts';
+
+      export const object = {
+        [TestEnum.FirstValue]: css\`\`,
+        [TestEnum.SecondValue]: css\`\`,
       }
       `
   );
