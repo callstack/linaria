@@ -12,18 +12,19 @@
 /*
  * Configuration for the legacy build
  * Browsers compatibility based on https://caniuse.com/css-variables
+ * Versions adjusted specifically to not include any core-js polyfills
  */
 
 const commonJSTargets = {
   browsers: [
-    'Chrome >= 49',
-    'ChromeAndroid >= 49',
-    'Edge >= 16',
-    'Firefox >= 31',
-    'iOS >= 9.3',
-    'Opera >= 36',
-    'Safari >= 9.1',
-    'Samsung >= 5',
+    'Chrome > 52',
+    'ChromeAndroid > 52',
+    'Edge > 18',
+    'Firefox > 49',
+    'iOS > 10.3',
+    'Opera > 39',
+    'Safari > 10.1',
+    'Samsung > 5',
     'last 2 versions',
     'not ie 11',
     'not ie_mob 11',
