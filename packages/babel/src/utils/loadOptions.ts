@@ -28,7 +28,7 @@ export default function loadOptions(
       },
       {
         // The old `ignore` option is used as a default value for `ignore` rule.
-        test: ignore ?? /\/node_modules\//,
+        test: ignore ?? /[\\/]node_modules[\\/]/,
         action: 'ignore',
       },
     ],
