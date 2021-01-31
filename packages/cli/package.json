@@ -7,7 +7,9 @@
   "description": "Blazing fast zero-runtime CSS in JS library",
   "main": "lib/cli.js",
   "module": "esm/cli.js",
-  "bin": "bin/linaria.js",
+  "bin": {
+    "linaria": "bin/linaria.js"
+  },
   "files": [
     "bin/",
     "types/",
