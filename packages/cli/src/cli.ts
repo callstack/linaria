@@ -35,6 +35,7 @@ const { argv } = yargs
     alias: 'r',
     type: 'string',
     description: 'Directory containing the source JS files',
+    demandOption: true,
     requiresArg: true,
   })
   .option('insert-css-requires', {
@@ -67,7 +68,7 @@ processFiles(argv._, {
 type Options = {
   outDir: string;
   sourceMaps?: boolean;
-  sourceRoot?: string;
+  sourceRoot: string;
   insertCssRequires?: string;
   configFile?: string;
   ignore?: string;
@@ -85,7 +86,11 @@ function processFiles(files: string[], options: Options) {
   );
 
   resolvedFiles.forEach((filename) => {
-    const outputFilename = resolveOutputFilename(filename, options.outDir);
+    const outputFilename = resolveOutputFilename(
+      filename,
+      options.outDir,
+      options.sourceRoot
+    );
 
     const { cssText, sourceMap, cssSourceMapText } = transform(
       fs.readFileSync(filename).toString(),
@@ -156,11 +161,15 @@ function resolveRequireInsertionFilename(filename: string) {
   return filename.replace(/\.tsx?/, '.js');
 }
 
-function resolveOutputFilename(filename: string, outDir: string) {
-  const folderStructure = path.relative(process.cwd(), path.dirname(filename));
+function resolveOutputFilename(
+  filename: string,
+  outDir: string,
+  sourceRoot: string
+) {
+  const outputFolder = path.relative(sourceRoot, path.dirname(filename));
   const outputBasename = path
     .basename(filename)
     .replace(path.extname(filename), '.css');
 
-  return path.join(outDir, folderStructure, outputBasename);
+  return path.join(outDir, outputFolder, outputBasename);
 }
