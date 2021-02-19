@@ -19,7 +19,7 @@ A tagged template literal is a tag attached to a template literal:
 const message = someTag`This is a tagged template literal`;
 ```
 
-Tags are normal JavaScript function that receive the template literal and it's interpolations, and can perform operations before returning a value.
+Tags are normal JavaScript function that receive the template literal and its interpolations, and can perform operations before returning a value.
 
 Linaria exposes 2 tags for styling, `css` and `styled`. They both support the same set of features, except prop based styles, which is only supported by the `styled` tag.
 
