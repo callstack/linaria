@@ -40,46 +40,16 @@ export function transformUrl(
   return relative.split(platformPath.sep).join(posixSep);
 }
 
-export default function transform(code: string, options: Options): Result {
-  // Check if the file contains `css` or `styled` words first
-  // Otherwise we should skip transforming
-  if (!/\b(styled|css)/.test(code)) {
-    return {
-      code,
-      sourceMap: options.inputSourceMap,
-    };
-  }
+export function shouldTransformCode(code: string): boolean {
+  return /\b(styled|css)/.test(code);
+}
 
-  debug(
-    'transform',
-    `${options.filename} to ${options.outputFilename}\n${code}`
-  );
-
-  const pluginOptions = loadOptions(options.pluginOptions);
-  const babelOptions = pluginOptions?.babelOptions ?? null;
-
-  // Parse the code first so babel uses user's babel config for parsing
-  // We don't want to use user's config when transforming the code
-  const ast = parseSync(code, {
-    ...babelOptions,
-    filename: options.filename,
-    caller: { name: 'linaria' },
-  });
-
-  const { metadata, code: transformedCode, map } = transformFromAstSync(
-    ast!,
-    code,
-    {
-      ...(babelOptions?.rootMode ? { rootMode: babelOptions.rootMode } : null),
-      filename: options.filename,
-      presets: [[babelPreset, pluginOptions]],
-      babelrc: false,
-      configFile: false,
-      sourceMaps: true,
-      sourceFileName: options.filename,
-      inputSourceMap: options.inputSourceMap,
-    }
-  )!;
+export function extractCssFromAst(
+  babelFileResult: babel.BabelFileResult,
+  code: string,
+  options: Options
+) {
+  const { metadata, code: transformedCode, map } = babelFileResult;
 
   if (
     !metadata ||
@@ -186,4 +156,44 @@ export default function transform(code: string, options: Options): Result {
       return '';
     },
   };
+}
+
+export default function transform(code: string, options: Options): Result {
+  // Check if the file contains `css` or `styled` words first
+  // Otherwise we should skip transforming
+  if (!shouldTransformCode(code)) {
+    return {
+      code,
+      sourceMap: options.inputSourceMap,
+    };
+  }
+
+  debug(
+    'transform',
+    `${options.filename} to ${options.outputFilename}\n${code}`
+  );
+
+  const pluginOptions = loadOptions(options.pluginOptions);
+  const babelOptions = pluginOptions?.babelOptions ?? null;
+
+  // Parse the code first so babel uses user's babel config for parsing
+  // We don't want to use user's config when transforming the code
+  const ast = parseSync(code, {
+    ...babelOptions,
+    filename: options.filename,
+    caller: { name: 'linaria' },
+  });
+
+  const babelFileResult = transformFromAstSync(ast!, code, {
+    ...(babelOptions?.rootMode ? { rootMode: babelOptions.rootMode } : null),
+    filename: options.filename,
+    presets: [[babelPreset, pluginOptions]],
+    babelrc: false,
+    configFile: false,
+    sourceMaps: true,
+    sourceFileName: options.filename,
+    inputSourceMap: options.inputSourceMap,
+  })!;
+
+  return extractCssFromAst(babelFileResult, code, options);
 }
