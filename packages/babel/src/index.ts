@@ -15,7 +15,11 @@ export { default as JSXElement } from './evaluators/visitors/JSXElement';
 export { default as ProcessCSS } from './evaluators/visitors/ProcessCSS';
 export { default as ProcessStyled } from './evaluators/visitors/ProcessStyled';
 export { default as Module } from './module';
-export { default as transform } from './transform';
+export {
+  default as transform,
+  extractCssFromAst,
+  shouldTransformCode,
+} from './transform';
 export * from './types';
 export type { PluginOptions } from './utils/loadOptions';
 export { default as isNode } from './utils/isNode';
