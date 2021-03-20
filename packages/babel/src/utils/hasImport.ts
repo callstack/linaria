@@ -8,13 +8,13 @@ const linariaLibs = new Set([
   'linaria/react',
 ]);
 
-const safeResolve = (name) => {
+const safeResolve = (name: string) => {
   try {
     return require.resolve(name);
   } catch (err) {
     return null;
   }
-}
+};
 
 // Verify if the binding is imported from the specified source
 export default function hasImport(
