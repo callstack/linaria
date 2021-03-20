@@ -8,6 +8,14 @@ const linariaLibs = new Set([
   'linaria/react',
 ]);
 
+const safeResolve = (name: string) => {
+  try {
+    return require.resolve(name);
+  } catch (err) {
+    return null;
+  }
+};
+
 // Verify if the binding is imported from the specified source
 export default function hasImport(
   t: any,
@@ -44,7 +52,7 @@ export default function hasImport(
         // Otherwise try to resolve both and check if they are the same file
         resolveFromFile(value) ===
           (linariaLibs.has(source)
-            ? require.resolve(source)
+            ? safeResolve(source)
             : resolveFromFile(source))
     );
 
