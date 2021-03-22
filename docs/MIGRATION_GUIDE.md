@@ -1,4 +1,6 @@
-# `2.0` Migration Guide
+# Migration Guide
+
+# 2.x from 1.x
 
 ## Breaking changes
 
