@@ -1,4 +1,31 @@
-# `2.0` Migration Guide
+# Migration Guide
+
+# 3.x from 2.x
+
+This release was mostly a refactor to [split into more packages](https://github.com/callstack/linaria/pull/687/).
+
+## Breaking changes
+
+All these package imports in code need to be updated:
+
+| Old | New
+| --- | ---
+|linaria | @linaria/core
+|linaria/loader | @linaria/webpack-loader
+|linaria/react | @linaria/react
+|linaria/rollup | @linaria/rollup
+|linaria/server | @linaria/server
+|linaria/stylelint-config | @linaria/stylelint
+
+
+The `shaker` evaluator has moved from `linaria/evaluators` into its own package. You'll need to add `@linaria/shaker` to your package.json even if you never import it.
+
+The Babel preset moved from `linaria/babel` to `@linaria/babel-preset` but has to be referenced as `@linaria` in a Babel config. See https://github.com/callstack/linaria/issues/704
+
+
+In package.json import all the new packages you use.
+
+# 2.x from 1.x
 
 ## Breaking changes
 
