@@ -1,5 +1,9 @@
 export type ClassName = string | false | void | null | 0;
 
-export default function cx(...classNames: ClassName[]): string {
-  return classNames.filter(Boolean).join(' ');
-}
+type CX = (...classNames: ClassName[]) => string;
+
+const cx: CX = function cx() {
+  return Array.prototype.slice.call(arguments).filter(Boolean).join(' ');
+};
+
+export default cx;
