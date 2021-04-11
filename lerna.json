@@ -5,5 +5,19 @@
     "packages/*",
     "website"
   ],
-  "version": "3.0.0-beta.1"
+  "version": "3.0.0-beta.1",
+  "command": {
+    "publish": {
+      "allowBranch": "master",
+      "conventionalCommits": true,
+      "createRelease": "github",
+      "message": "chore: publish",
+      "ignoreChanges": [
+        "**/__fixtures__/**",
+        "**/__tests__/**",
+        "**/*.md",
+        "**/website/**"
+      ]
+    }
+  }
 }
