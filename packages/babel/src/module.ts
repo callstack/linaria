@@ -72,6 +72,16 @@ const createCustomDebug = (depth: number) => (
   debug(`${modulePrefix}:${namespaces}`, arg1, ...args);
 };
 
+const cookModuleId = (rawId: string) => {
+  // It's a dirty hack for avoiding conflicts with babel-preset-react-app
+  // https://github.com/callstack/linaria/issues/745
+  // FIXME @Anber: I'll try to figure out a better solution. Probably, using Terser as a shaker's core can solve problems with interfered plugins.
+  return rawId.replace(
+    '/@babel/runtime/helpers/esm/',
+    '/@babel/runtime/helpers/'
+  );
+};
+
 class Module {
   static invalidate: () => void;
   static invalidateEvalCache: () => void;
@@ -134,7 +144,8 @@ class Module {
     this.debug('prepare', filename);
   }
 
-  resolve = (id: string) => {
+  resolve = (rawId: string) => {
+    const id = cookModuleId(rawId);
     const extensions = ((NativeModule as unknown) as {
       _extensions: { [key: string]: Function };
     })._extensions;
@@ -167,7 +178,8 @@ class Module {
     ensure: () => void;
     cache: typeof cache;
   } = Object.assign(
-    (id: string) => {
+    (rawId: string) => {
+      const id = cookModuleId(rawId);
       this.debug('require', id);
       if (id in builtins) {
         // The module is in the allowed list of builtin node modules

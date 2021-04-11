@@ -43,7 +43,13 @@ export default function JSXElement(path: NodePath<JSXElementNode>) {
       );
     }
 
-    body.replaceWith(emptyBody);
+    const node: typeof scopePath.node = {
+      ...scopePath.node,
+      body: emptyBody,
+      params: [],
+    };
+
+    scopePath.replaceWith(node);
   } else {
     path.replaceWith(emptyFragment);
   }

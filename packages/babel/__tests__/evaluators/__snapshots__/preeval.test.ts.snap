@@ -32,7 +32,7 @@ const Component = props => tag;"
 exports[`replaces functional component 1`] = `
 "import React from 'react';
 
-const Component = props => {
+const Component = () => {
   return <></>;
 };"
 `;
