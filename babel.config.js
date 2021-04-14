@@ -14,13 +14,7 @@
  */
 
 const commonJSTargets = {
-  browsers: [
-    'last 2 versions',
-    'not ie 11',
-    'not ie_mob 11',
-    'not op_mini all',
-    'not dead',
-  ],
+  browsers: ['last 2 versions', 'not op_mini all', 'not dead'],
   node: '10',
 };
 
@@ -72,6 +66,13 @@ module.exports = {
                 loose: true,
                 // our styled component should not need to use any polyfill. We do not include core-js in dependencies. However, we leave this to detect if future changes would not introduce any need for polyfill
                 useBuiltIns: 'usage',
+                // Even core-js doesn't remember IE11
+                exclude: [
+                  /es\.array\.(?:filter|for-each|index-of|join|reduce|slice)/,
+                  'es.function.name',
+                  'es.object.keys',
+                  'web.dom-collections.for-each',
+                ],
                 corejs: 3,
                 // this is used to test if we do not introduced core-js polyfill
                 debug: process.env.DEBUG_CORE_JS === 'true',
