@@ -24,12 +24,15 @@ type Options = {
 
 // Workaround for rest operator
 const restOp = (
-  obj: { [key: string]: any },
+  obj: Record<string, unknown>,
   keysToExclude: string[]
-): { [key: string]: any } =>
+): Record<string, unknown> =>
   Object.keys(obj)
-    .filter((prop) => !keysToExclude.includes(prop))
-    .reduce((acc, curr) => Object.assign(acc, { [curr]: obj[curr] }), {}); // rest operator workaround
+    .filter((prop) => keysToExclude.indexOf(prop) === -1)
+    .reduce((acc, curr) => {
+      acc[curr] = obj[curr];
+      return acc;
+    }, {} as Record<string, unknown>); // rest operator workaround
 
 const warnIfInvalid = (value: any, componentName: string) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -50,6 +53,12 @@ const warnIfInvalid = (value: any, componentName: string) => {
     );
   }
 };
+
+interface IProps {
+  className?: string;
+  style?: Record<string, string>;
+  [props: string]: unknown;
+}
 
 // If styled wraps custom component, that component should have className property
 function styled<TConstructor extends React.FunctionComponent<any>>(
@@ -79,7 +88,7 @@ function styled(tag: any): any {
     const render = (props: any, ref: any) => {
       const { as: component = tag, class: className } = props;
       const rest = restOp(props, ['as', 'class']);
-      let filteredProps;
+      let filteredProps: IProps;
 
       // Check if it's an HTML tag and not a custom element
       if (typeof component === 'string' && component.indexOf('-') === -1) {
@@ -119,7 +128,15 @@ function styled(tag: any): any {
           style[`--${name}`] = `${value}${unit}`;
         }
 
-        filteredProps.style = Object.assign(style, filteredProps.style);
+        const ownStyle = filteredProps.style || {};
+        const keys = Object.keys(ownStyle);
+        if (keys.length > 0) {
+          keys.forEach((key) => {
+            style[key] = ownStyle[key];
+          });
+        }
+
+        filteredProps.style = style;
       }
 
       if ((tag as any).__linaria && tag !== component) {
