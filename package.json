@@ -39,6 +39,7 @@
     "babel-jest": "^24.5.0",
     "codecov": "^3.2.0",
     "commitlint": "^8.3.5",
+    "cross-env": "^7.0.3",
     "del-cli": "^1.1.0",
     "dtslint": "^4.0.4",
     "eslint": "^7.6.0",
