@@ -33,7 +33,7 @@
     "babel"
   ],
   "scripts": {
-    "build:lib": "NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "build": "yarn build:lib && yarn build:esm",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
