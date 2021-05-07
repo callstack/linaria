@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Linaria" src="../../website/assets/linaria-logo@2x.png" width="496">
+  <img alt="Linaria" src="https://raw.githubusercontent.com/callstack/linaria/HEAD/website/assets/linaria-logo@2x.png" width="496">
 </p>
 
 <p align="center">
