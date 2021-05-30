@@ -54,5 +54,29 @@ describe('shaker', () => {
       expect(code).toMatchSnapshot();
       expect(metadata).toMatchSnapshot();
     });
+
+    it('evaluates typescript enums', async () => {
+      const { code, metadata } = await transpile(
+        dedent`
+      import { styled } from '@linaria/react';
+
+      enum Colors {
+        BLUE = '#27509A'
+      }
+
+      export const Title = styled.h1\`
+        color: ${'${Colors.BLUE}'};
+      \`;
+      `,
+        (config) => ({
+          ...config,
+          presets: ['@babel/preset-typescript', ...(config.presets ?? [])],
+          filename: 'source.ts',
+        })
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
   });
 });

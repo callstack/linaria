@@ -4,7 +4,6 @@ import type {
   Block,
   CallExpression,
   Directive,
-  ExpressionStatement,
   ForInStatement,
   ForStatement,
   Function,
@@ -117,27 +116,6 @@ function getAffectedNodes(node: Node, state: GraphBuilderState): Node[] {
 
 export const visitors: Visitors = {
   /*
-   * ExpressionStatement
-   * This is one of the rare cases when a child defines a dependency on a parent.
-   * Suppose we have a code like this:
-   * const fn = () => {
-   *   let a = 2;
-   *   a *= 2;
-   *   return a;
-   * };
-   *
-   * `a *= 2` here is an ExpressionStatement node which contains an expression AssignmentExpression `a *= 2`.
-   * The result of AssignmentExpression here depends on the fact of ExpressionStatement execution,
-   * that's why we need to mark the statement as a dependency of the expression.
-   * If we don't mark it, it will be cut as a useless statement.
-   */
-  ExpressionStatement(this: GraphBuilderState, node: ExpressionStatement) {
-    this.baseVisit(node);
-
-    this.graph.addEdge(node.expression, node);
-  },
-
-  /*
    * FunctionDeclaration | FunctionExpression | ObjectMethod | ArrowFunctionExpression | ClassMethod | ClassPrivateMethod;
    * Functions can be either a statement or an expression.
    * That's why we need to disable default dependency resolving strategy for expressions by passing `ignoreDeps` flag.
@@ -153,14 +131,8 @@ export const visitors: Visitors = {
     unsubscribe();
 
     this.graph.addEdge(node, node.body);
-    this.graph.addEdge(node.body, node);
 
     node.params.forEach((param) => this.graph.addEdge(node.body, param));
-    if (t.isFunctionDeclaration(node) && node.id !== null) {
-      // `id` is an identifier which depends on the function declaration
-      this.graph.addEdge(node.id, node);
-    }
-
     if (t.isFunctionExpression(node) && node.id !== null) {
       // keep function name in expressions like `const a = function a();`
       this.graph.addEdge(node, node.id);
@@ -193,10 +165,6 @@ export const visitors: Visitors = {
         this.graph.addEdge(node, directive)
       );
     }
-
-    node.body.forEach((exp) => {
-      this.graph.addEdge(exp, node);
-    });
   },
 
   Directive(this: GraphBuilderState, node: Directive) {
@@ -218,18 +186,10 @@ export const visitors: Visitors = {
         this.graph.addEdge(statement, node.block);
       }
     });
-
-    this.graph.addEdge(node.block, node);
   },
 
   IfStatement(this: GraphBuilderState, node: IfStatement) {
     this.baseVisit(node);
-    [node.consequent, node.alternate].forEach((statement) => {
-      if (statement) {
-        this.graph.addEdge(statement, node);
-      }
-    });
-
     this.graph.addEdge(node, node.consequent);
     this.graph.addEdge(node, node.test);
   },
@@ -242,7 +202,6 @@ export const visitors: Visitors = {
    */
   WhileStatement(this: GraphBuilderState, node: WhileStatement) {
     this.baseVisit(node);
-    this.graph.addEdge(node.body, node);
     this.graph.addEdge(node, node.test);
   },
 
@@ -263,10 +222,6 @@ export const visitors: Visitors = {
   ForStatement(this: GraphBuilderState, node: ForStatement) {
     this.baseVisit(node);
 
-    if (node.body) {
-      this.graph.addEdge(node.body, node);
-    }
-
     [node.init, node.test, node.update, node.body].forEach((child) => {
       if (child) {
         this.graph.addEdge(node, child);
@@ -282,7 +237,6 @@ export const visitors: Visitors = {
     this.baseVisit(node);
 
     if (node.body) {
-      this.graph.addEdge(node.body, node);
       this.graph.addEdge(node, node.body);
       this.graph.addEdge(node.body, node.left);
     }
@@ -353,7 +307,6 @@ export const visitors: Visitors = {
    */
   MemberExpression(this: GraphBuilderState, node: MemberExpression) {
     this.baseVisit(node);
-    this.graph.addEdge(node.object, node);
 
     if (t.isIdentifier(node.object) && t.isIdentifier(node.property)) {
       // It's simple `foo.bar` expression. Is it a usage of a required library?
@@ -386,15 +339,11 @@ export const visitors: Visitors = {
 
     this.visit(node.right, node, 'right');
 
-    // THe value of an expression depends on the left part.
+    // The value of an expression depends on the left part.
     this.graph.addEdge(node, node.left);
-    // this.graph.addEdge(node, node.right);
 
     // The left part of an assignment depends on the right part.
     this.graph.addEdge(node.left, node.right);
-
-    // At the same time, the left part doesn't make any sense without the whole expression.
-    this.graph.addEdge(node.left, node);
   },
 
   /*
@@ -421,10 +370,6 @@ export const visitors: Visitors = {
       // If there is an initialization part, the identifier depends on it.
       this.graph.addEdge(node.id, node.init);
     }
-
-    // If we want to evaluate the value of a declared identifier,
-    // we need to evaluate the whole expression.
-    this.graph.addEdge(node.id, node);
 
     // If a statement is required itself, an id is also required
     this.graph.addEdge(node, node.id);

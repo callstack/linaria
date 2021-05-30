@@ -336,6 +336,27 @@ Dependencies: NA
 
 `;
 
+exports[`shaker evaluates imported typescript enums 1`] = `
+"import { styled } from '@linaria/react';
+import { Colors } from '@linaria/babel-preset/__fixtures__/enums';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_taxxqrn\\"
+});"
+`;
+
+exports[`shaker evaluates imported typescript enums 2`] = `
+
+CSS:
+
+.Title_taxxqrn {
+  color: #27509A;
+}
+
+Dependencies: @linaria/babel-preset/__fixtures__/enums
+
+`;
+
 exports[`shaker evaluates interpolations with sequence expression 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled(\\"h1\\")({
@@ -416,18 +437,30 @@ Dependencies: @linaria/babel-preset/__fixtures__/slugify
 `;
 
 exports[`shaker evaluates typescript enums 1`] = `
-"var Colors;
+"import { styled } from '@linaria/react';
+var Colors;
 
 (function (Colors) {
   Colors[\\"BLUE\\"] = \\"#27509A\\";
 })(Colors || (Colors = {}));
 
-const Title = styled.h1\`
-  color: \${Colors.BLUE};
-\`;"
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_taxxqrn\\"
+});"
 `;
 
-exports[`shaker evaluates typescript enums 2`] = `Object {}`;
+exports[`shaker evaluates typescript enums 2`] = `
+
+CSS:
+
+.Title_taxxqrn {
+  color: #27509A;
+}
+
+Dependencies: NA
+
+`;
 
 exports[`shaker generates stable class names 1`] = `
 "import { styled } from '@linaria/react';

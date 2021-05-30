@@ -77,8 +77,8 @@ export function run(
     conf: (original: typeof babelrc) => typeof babelrc = (i) => i
   ) => {
     const { code, metadata } = await transformAsync(input, {
-      ...conf(babelrc),
       filename: join(dirname, 'source.js'),
+      ...conf(babelrc),
     });
     // The slug will be machine specific, so replace it with a consistent one
     return {
@@ -179,23 +179,20 @@ export function run(
     expect(metadata).toMatchSnapshot();
   });
 
-  it('evaluates typescript enums', async () => {
+  it('evaluates imported typescript enums', async () => {
     const { code, metadata } = await transpile(
       dedent`
-      enum Colors {
-        BLUE = '#27509A'
-      }
+      import { styled } from '@linaria/react';
+      import { Colors } from '@linaria/babel-preset/__fixtures__/enums';
 
-      const Title = styled.h1\`
+      export const Title = styled.h1\`
         color: ${'${Colors.BLUE}'};
       \`;
       `,
       (config) => ({
         ...config,
-        plugins: [
-          '@babel/plugin-transform-typescript',
-          ...(config.plugins || []),
-        ],
+        presets: ['@babel/preset-typescript', ...(config.presets ?? [])],
+        filename: 'source.ts',
       })
     );
 

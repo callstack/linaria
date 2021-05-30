@@ -167,8 +167,8 @@ class GraphBuilder extends GraphBuilderState {
       this.baseVisit(node);
     }
 
-    if (parent && action !== 'ignore' && t.isDeclaration(node)) {
-      // Declaration always depends on its scope
+    if (parent && action !== 'ignore') {
+      // Node always depends on its parent
       this.graph.addEdge(node, parent);
     }
 
