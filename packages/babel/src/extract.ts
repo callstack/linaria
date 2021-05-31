@@ -14,7 +14,7 @@ import type { Node, Program, Expression } from '@babel/types';
 import type { NodePath, Scope, Visitor } from '@babel/traverse';
 import { expression, statement } from '@babel/template';
 import generator from '@babel/generator';
-import { debug } from '@linaria/logger';
+import { debug, error } from '@linaria/logger';
 import evaluate from './evaluators';
 import getTemplateProcessor from './evaluators/templateProcessor';
 import Module from './module';
@@ -185,6 +185,7 @@ export default function extract(
               lazyValues = evaluation.value.__linariaPreval || [];
               debug('lazy-deps:values', evaluation.value.__linariaPreval);
             } catch (e) {
+              error('lazy-deps:evaluate', code);
               throw new Error(
                 'An unexpected runtime error occurred during dependencies evaluation: \n' +
                   e.stack +

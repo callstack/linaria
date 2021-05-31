@@ -336,6 +336,27 @@ Dependencies: NA
 
 `;
 
+exports[`extractor evaluates imported typescript enums 1`] = `
+"import { styled } from '@linaria/react';
+import { Colors } from '@linaria/babel-preset/__fixtures__/enums';
+export const Title = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"Title\\",
+  class: \\"Title_taxxqrn\\"
+});"
+`;
+
+exports[`extractor evaluates imported typescript enums 2`] = `
+
+CSS:
+
+.Title_taxxqrn {
+  color: #27509A;
+}
+
+Dependencies: @linaria/babel-preset/__fixtures__/enums
+
+`;
+
 exports[`extractor evaluates interpolations with sequence expression 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled(\\"h1\\")({
@@ -414,20 +435,6 @@ CSS:
 Dependencies: @linaria/babel-preset/__fixtures__/slugify
 
 `;
-
-exports[`extractor evaluates typescript enums 1`] = `
-"var Colors;
-
-(function (Colors) {
-  Colors[\\"BLUE\\"] = \\"#27509A\\";
-})(Colors || (Colors = {}));
-
-const Title = styled.h1\`
-  color: \${Colors.BLUE};
-\`;"
-`;
-
-exports[`extractor evaluates typescript enums 2`] = `Object {}`;
 
 exports[`extractor generates stable class names 1`] = `
 "import { styled } from '@linaria/react';

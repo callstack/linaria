@@ -26,11 +26,11 @@ describe('VariableDeclaration', () => {
     const deps = graph.getDependenciesByBinding('0:a');
     expect(deps).toMatchObject([
       {
-        type: 'NumericLiteral',
-        value: 42,
+        type: 'VariableDeclarator',
       },
       {
-        type: 'VariableDeclarator',
+        type: 'NumericLiteral',
+        value: 42,
       },
     ]);
 
@@ -52,11 +52,11 @@ describe('scopes', () => {
     const deps0 = graph.getDependenciesByBinding('0:a');
     expect(deps0).toMatchObject([
       {
-        type: 'NumericLiteral',
-        value: 42,
+        type: 'VariableDeclarator',
       },
       {
-        type: 'VariableDeclarator',
+        type: 'NumericLiteral',
+        value: 42,
       },
       {
         type: 'Identifier',
@@ -67,22 +67,22 @@ describe('scopes', () => {
         start: 35,
       },
       {
-        type: 'NumericLiteral',
-        value: 21,
+        type: 'AssignmentExpression',
       },
       {
-        type: 'AssignmentExpression',
+        type: 'NumericLiteral',
+        value: 21,
       },
     ]);
 
     const deps1 = graph.getDependenciesByBinding('1:a');
     expect(deps1).toMatchObject([
       {
-        type: 'StringLiteral',
-        value: '21',
+        type: 'VariableDeclarator',
       },
       {
-        type: 'VariableDeclarator',
+        type: 'StringLiteral',
+        value: '21',
       },
     ]);
 
@@ -97,14 +97,14 @@ describe('scopes', () => {
     const aDeps = graph.getDependenciesByBinding('0:a');
     expect(aDeps).toMatchObject([
       {
-        type: 'ArrowFunctionExpression',
+        type: 'VariableDeclarator',
       },
       {
-        type: 'VariableDeclarator',
+        type: 'ArrowFunctionExpression',
       },
     ]);
 
-    expect(graph.getDependenciesByBinding('1:arg1')).toHaveLength(1);
+    expect(graph.getDependenciesByBinding('1:arg1')).toHaveLength(3);
     expect(graph.getDependentsByBinding('1:arg1')).toMatchObject([
       {
         // arg1 in the binary expression
@@ -130,17 +130,31 @@ describe('scopes', () => {
 
     expect(graph.getDependenciesByBinding('1:arg2')).toMatchObject([
       {
+        type: 'ArrowFunctionExpression',
+      },
+      {
         type: 'Identifier',
         name: 'arg2',
         start: 17,
+      },
+      {
+        type: 'BinaryExpression',
+        start: 32,
       },
     ]);
 
     expect(graph.getDependenciesByBinding('1:arg3')).toMatchObject([
       {
+        type: 'ArrowFunctionExpression',
+      },
+      {
         type: 'Identifier',
         name: 'arg3',
         start: 23,
+      },
+      {
+        type: 'BinaryExpression',
+        start: 32,
       },
     ]);
   });
@@ -156,11 +170,11 @@ describe('AssignmentExpression', () => {
     const deps = graph.getDependenciesByBinding('0:a');
     expect(deps).toMatchObject([
       {
-        type: 'NumericLiteral',
-        value: 42,
+        type: 'VariableDeclarator',
       },
       {
-        type: 'VariableDeclarator',
+        type: 'NumericLiteral',
+        value: 42,
       },
       {
         type: 'Identifier',
@@ -173,11 +187,11 @@ describe('AssignmentExpression', () => {
         start: 12,
       },
       {
-        type: 'NumericLiteral',
-        value: 24,
+        type: 'AssignmentExpression',
       },
       {
-        type: 'AssignmentExpression',
+        type: 'NumericLiteral',
+        value: 24,
       },
     ]);
 
@@ -193,11 +207,11 @@ describe('AssignmentExpression', () => {
 
     expect(graph.getDependenciesByBinding('0:a')).toMatchObject([
       {
-        type: 'ObjectExpression',
-        properties: [],
+        type: 'VariableDeclarator',
       },
       {
-        type: 'VariableDeclarator',
+        type: 'ObjectExpression',
+        properties: [],
       },
       {
         type: 'Identifier',
@@ -242,6 +256,12 @@ it('SequenceExpression', () => {
     {
       type: 'ArrowFunctionExpression',
     },
+    {
+      id: {
+        name: 'color2',
+      },
+      type: 'VariableDeclarator',
+    },
   ]);
 
   const fnDeps = graph.findDependencies({
@@ -260,16 +280,19 @@ it('SequenceExpression', () => {
       name: 'local',
       type: 'Identifier',
     },
+    {
+      type: 'SequenceExpression',
+    },
   ]);
 
   const localDeps = graph.getDependenciesByBinding('0:local');
   expect(localDeps).toMatchObject([
     {
-      type: 'StringLiteral',
-      value: '',
+      type: 'VariableDeclarator',
     },
     {
-      type: 'VariableDeclarator',
+      type: 'StringLiteral',
+      value: '',
     },
     {
       type: 'Identifier',
@@ -282,11 +305,11 @@ it('SequenceExpression', () => {
       start: 61,
     },
     {
-      type: 'Identifier',
-      name: 'color1',
+      type: 'AssignmentExpression',
     },
     {
-      type: 'AssignmentExpression',
+      type: 'Identifier',
+      name: 'color1',
     },
     {
       type: 'Identifier',
@@ -300,7 +323,7 @@ it('SequenceExpression', () => {
 
   const bool = { type: 'BooleanLiteral' };
   expect(graph.findDependents(bool)).toHaveLength(0);
-  expect(graph.findDependencies(bool)).toHaveLength(0);
+  expect(graph.findDependencies(bool)).toHaveLength(1);
 });
 
 it('MemberExpression', () => {
@@ -322,6 +345,12 @@ it('MemberExpression', () => {
     {
       type: 'Identifier',
       name: 'key',
+    },
+    {
+      type: 'VariableDeclarator',
+      id: {
+        name: 'blue',
+      },
     },
   ]);
 });
