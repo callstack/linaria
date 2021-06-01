@@ -8,13 +8,15 @@ import path from 'path';
 import fs from 'fs';
 import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
 import { slugify, transform } from '@linaria/babel-preset';
-import esbuild, { Plugin, TransformOptions } from 'esbuild';
+import esbuild, { Plugin, TransformOptions, Loader } from 'esbuild';
 
 type EsbuildPluginOptions = {
   sourceMap?: boolean;
   preprocessor?: Preprocessor;
   esbuildOptions?: TransformOptions;
 } & Partial<PluginOptions>;
+
+const nodeModulesRegex = /^(?:.*[\\/])?node_modules(?:[\\/].*)?$/;
 
 export default function linaria({
   sourceMap,
@@ -44,9 +46,18 @@ export default function linaria({
       build.onLoad({ filter: /\.(js|jsx|ts|tsx)$/ }, (args) => {
         const rawCode = fs.readFileSync(args.path, 'utf8');
         const { ext, name: filename } = path.parse(args.path);
+        const loader = ext.replace(/^\./, '') as Loader;
+
+        if (nodeModulesRegex.test(args.path)) {
+          return {
+            loader,
+            contents: rawCode,
+          };
+        }
+
         const { code } = esbuild.transformSync(rawCode, {
           ...esbuildOptions,
-          loader: ext.replace(/^\./, '') as 'js' | 'jsx' | 'ts' | 'tsx',
+          loader,
         });
         const result = transform(code, {
           filename: args.path,
@@ -54,11 +65,11 @@ export default function linaria({
           pluginOptions: rest,
         });
 
-        if (!result.cssText)
+        if (!result.cssText) {
           return {
-            loader: 'tsx',
             contents: code,
           };
+        }
 
         let { cssText } = result;
 
@@ -74,9 +85,9 @@ export default function linaria({
 
         return {
           contents: `
-        import ${JSON.stringify(cssFilename)};
-        ${result.code}`,
-          loader: 'tsx',
+          import ${JSON.stringify(cssFilename)};
+          ${result.code}
+          `,
         };
       });
     },
