@@ -1,6 +1,9 @@
 {
   "name": "@linaria/babel-plugin-interop",
   "version": "3.0.0-beta.6",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "index.js",
   "repository": "https://github.com/callstack/linaria/tree/master/packages/interop",
   "homepage": "https://github.com/callstack/linaria/tree/master/packages/interop#readme",
