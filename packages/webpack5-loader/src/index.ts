@@ -87,6 +87,7 @@ export default function webpack5Loader(
         throw new Error('No result');
       }
 
+      this.addDependency(result);
       return result;
     };
 
