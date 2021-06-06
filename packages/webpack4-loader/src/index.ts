@@ -82,8 +82,11 @@ export default function webpack4Loader(
 
   try {
     // Use webpack's resolution when evaluating modules
-    Module._resolveFilename = (id, { filename }) =>
-      resolveSync(path.dirname(filename), id);
+    Module._resolveFilename = (id, { filename }) => {
+      const result = resolveSync(path.dirname(filename), id);
+      this.addDependency(result);
+      return result;
+    };
 
     result = transform(content, {
       filename: path.relative(process.cwd(), this.resourcePath),
