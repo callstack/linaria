@@ -8,7 +8,7 @@ Zero-runtime CSS in JS library.
 
 ---
 
-# `@linaria/interop`
+# `@linaria/babel-plugin-interop`
 
 This plugin allows to interpolate Linaria components inside styled-components and Emotion:
 ```javascript
@@ -30,7 +30,7 @@ export default styled(Article)`
 Install the plugin first:
 
 ```
-npm install --save-dev @linaria/interop
+npm install --save-dev @linaria/babel-plugin-interop
 ```
 
 Then add `@linaria/interop` to your babel configuration *before* `styled-components`:
