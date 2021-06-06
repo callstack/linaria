@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`styled-components css 1`] = `
+"import { css } from \\"styled-components\\";
+import Title from \\"./Title\\";
+export default css\`
+  & > \${(i => i && i.__linaria ? '.' + i.__linaria.className : i)(Title)} {
+    color: red;
+  }
+\`;"
+`;
+
+exports[`styled-components keeps linaria 1`] = `
+"import styled from \\"linaria/react\\";
+import Title from \\"./Title\\";
+export default styled.h1\`
+  & > \${Title} {
+    color: red;
+  }
+\`;"
+`;
+
+exports[`styled-components member expression as selector 1`] = `
+"import styled from \\"styled-components\\";
+import Title from \\"./Title\\";
+export default styled.h1\`
+  & > \${(i => i && i.__linaria ? '.' + i.__linaria.className : i)(Title.Small)} {
+    color: red;
+  }
+\`;"
+`;
+
+exports[`styled-components styled(Cmp) 1`] = `
+"import styled from \\"styled-components\\";
+import Cmp from \\"./Cmp\\";
+import Title from \\"./Title\\";
+export default styled(Cmp)\`
+  & > \${(i => i && i.__linaria ? '.' + i.__linaria.className : i)(Title)} {
+    color: red;
+  }
+\`;"
+`;
+
+exports[`styled-components styled(Cmp).attrs({}) 1`] = `
+"import styled from \\"styled-components\\";
+import Cmp from \\"./Cmp\\";
+import Title from \\"./Title\\";
+export default styled(Cmp).attrs(() => ({}))\`
+  & > \${(i => i && i.__linaria ? '.' + i.__linaria.className : i)(Title)} {
+    color: red;
+  }
+\`;"
+`;
+
+exports[`styled-components styled.h1 1`] = `
+"import styled from \\"styled-components\\";
+import Title from \\"./Title\\";
+export default styled.h1\`
+  & > \${(i => i && i.__linaria ? '.' + i.__linaria.className : i)(Title)} {
+    color: red;
+  }
+\`;"
+`;
+
+exports[`styled-components styled.h1.attrs({}) 1`] = `
+"import styled from \\"styled-components\\";
+import Title from \\"./Title\\";
+export default styled.h1.attrs(() => ({}))\`
+  & > \${(i => i && i.__linaria ? '.' + i.__linaria.className : i)(Title)} {
+    color: red;
+  }
+\`;"
+`;
