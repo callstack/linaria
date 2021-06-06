@@ -180,6 +180,10 @@ Take a look on [Contributing](CONTRIBUTING.md) docs to check how you can run Lin
 
   Here, there should be no side-effects in the `colors.js` file, or any file it imports. We recommend to move helpers and shared configuration to files without any side-effects.
 
+## Interoperability with other CSS-in-JS libraries
+
+Linaria can work together with other CSS-in-JS libraries out-of-the-box. However, if you want to use styled components from Linaria as selectors in `styled-components`/`emotion`, you need to use [@linaria/interop](/packages/interop/README.md)    
+
 ## Editor Plugins
 
 ### VSCode
