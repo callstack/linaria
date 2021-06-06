@@ -1,0 +1,19 @@
+{
+  "name": "@linaria/babel-plugin-interop",
+  "version": "3.0.0-beta.5",
+  "main": "index.js",
+  "repository": "https://github.com/callstack/linaria/tree/master/packages/interop",
+  "homepage": "https://github.com/callstack/linaria/tree/master/packages/interop#readme",
+  "author": {
+    "name": "Anton Evzhakov",
+    "email": "anton@evz.name"
+  },
+  "scripts": {
+    "test": "jest --config ../../jest.config.js --rootDir ."
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": ">=7",
+    "dedent": "^0.7.0"
+  }
+}
