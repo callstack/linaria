@@ -76,7 +76,7 @@ new MiniCssExtractPlugin({
 });
 ```
 
-This will extract the CSS from all files into a single `styles.css`. Then you can to link to this file in your HTML file manually or use something like [`HTMLWebpackPlugin`](https://github.com/jantimon/html-webpack-plugin).
+This will extract the CSS from all files into a single `styles.css`. Then you can link to this file in your HTML file manually or use something like [`HTMLWebpackPlugin`](https://github.com/jantimon/html-webpack-plugin).
 
 It will also hot reload your styles when in a development environment.
 
