@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.6](https://github.com/callstack/linaria/compare/v3.0.0-beta.5...v3.0.0-beta.6) (2021-06-06)
+
+
+### Bug Fixes
+
+* **rollup:** compliant vite ([#763](https://github.com/callstack/linaria/issues/763)) ([3966dcf](https://github.com/callstack/linaria/commit/3966dcf03919430a7054ee7d6cf54aeaa715413c))
+* **webpack:** hot reload fails after compile error (fixes [#762](https://github.com/callstack/linaria/issues/762)) ([#775](https://github.com/callstack/linaria/issues/775)) ([67fcd81](https://github.com/callstack/linaria/commit/67fcd8108f283f8ade23c68ad3fece8aee335bf1))
+
+
+### Features
+
+* **interop:** interop between Linaria and traditional CSS-in-JS libraries ([#776](https://github.com/callstack/linaria/issues/776)) ([0a5f5b4](https://github.com/callstack/linaria/commit/0a5f5b440506bfa24724d4a91e519c48d6f6c69b))
+* add esbuild integration ([#765](https://github.com/callstack/linaria/issues/765)) ([511a717](https://github.com/callstack/linaria/commit/511a7178fd9c77fb971d392067b0f7ea8fcd30a4))
+
+
+
+
+
 # [3.0.0-beta.5](https://github.com/callstack/linaria/compare/v3.0.0-beta.4...v3.0.0-beta.5) (2021-05-31)
 
 
