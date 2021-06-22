@@ -8,7 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
 import { slugify, transform } from '@linaria/babel-preset';
-import esbuild, { Plugin, TransformOptions, Loader } from 'esbuild';
+import { transformSync, Plugin, TransformOptions, Loader } from 'esbuild';
 
 type EsbuildPluginOptions = {
   sourceMap?: boolean;
@@ -55,7 +55,7 @@ export default function linaria({
           };
         }
 
-        const { code } = esbuild.transformSync(rawCode, {
+        const { code } = transformSync(rawCode, {
           ...esbuildOptions,
           loader,
         });
