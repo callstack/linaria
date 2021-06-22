@@ -55,6 +55,16 @@ export default function linaria({
           };
         }
 
+        if (typeof esbuildOptions === 'undefined') {
+          esbuildOptions = {};
+          if ('jsxFactory' in build.initialOptions) {
+            esbuildOptions.jsxFactory = build.initialOptions.jsxFactory;
+          }
+          if ('jsxFragment' in build.initialOptions) {
+            esbuildOptions.jsxFragment = build.initialOptions.jsxFragment;
+          }
+        }
+
         const { code } = transformSync(rawCode, {
           ...esbuildOptions,
           loader,
