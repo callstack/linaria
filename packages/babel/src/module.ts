@@ -64,13 +64,13 @@ let cache: { [id: string]: Module } = {};
 
 const NOOP = () => {};
 
-const createCustomDebug = (depth: number) => (
-  ..._args: Parameters<typeof debug>
-) => {
-  const [namespaces, arg1, ...args] = _args;
-  const modulePrefix = depth === 0 ? 'module' : `sub-module-${depth}`;
-  debug(`${modulePrefix}:${namespaces}`, arg1, ...args);
-};
+const createCustomDebug =
+  (depth: number) =>
+  (..._args: Parameters<typeof debug>) => {
+    const [namespaces, arg1, ...args] = _args;
+    const modulePrefix = depth === 0 ? 'module' : `sub-module-${depth}`;
+    debug(`${modulePrefix}:${namespaces}`, arg1, ...args);
+  };
 
 const cookModuleId = (rawId: string) => {
   // It's a dirty hack for avoiding conflicts with babel-preset-react-app
@@ -129,9 +129,11 @@ class Module {
       },
       paths: {
         value: Object.freeze(
-          ((NativeModule as unknown) as {
-            _nodeModulePaths(filename: string): string[];
-          })._nodeModulePaths(path.dirname(filename))
+          (
+            NativeModule as unknown as {
+              _nodeModulePaths(filename: string): string[];
+            }
+          )._nodeModulePaths(path.dirname(filename))
         ),
         writable: false,
       },
@@ -146,9 +148,11 @@ class Module {
 
   resolve = (rawId: string) => {
     const id = cookModuleId(rawId);
-    const extensions = ((NativeModule as unknown) as {
-      _extensions: { [key: string]: Function };
-    })._extensions;
+    const extensions = (
+      NativeModule as unknown as {
+        _extensions: { [key: string]: Function };
+      }
+    )._extensions;
     const added: string[] = [];
 
     try {
@@ -353,13 +357,17 @@ Module.invalidateEvalCache = () => {
 // This static property can be overriden by the webpack loader
 // This allows us to use webpack's module resolution algorithm
 Module._resolveFilename = (id, options) =>
-  ((NativeModule as unknown) as {
-    _resolveFilename: (id: string, options: any) => string;
-  })._resolveFilename(id, options);
+  (
+    NativeModule as unknown as {
+      _resolveFilename: (id: string, options: any) => string;
+    }
+  )._resolveFilename(id, options);
 
 Module._nodeModulePaths = (filename: string) =>
-  ((NativeModule as unknown) as {
-    _nodeModulePaths: (filename: string) => string[];
-  })._nodeModulePaths(filename);
+  (
+    NativeModule as unknown as {
+      _nodeModulePaths: (filename: string) => string[];
+    }
+  )._nodeModulePaths(filename);
 
 export default Module;

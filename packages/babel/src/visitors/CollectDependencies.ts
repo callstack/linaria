@@ -7,9 +7,11 @@ import type {
   Expression,
   Identifier as IdentifierNode,
   TaggedTemplateExpression,
+  TSType,
 } from '@babel/types';
 import type { NodePath } from '@babel/traverse';
 import { debug } from '@linaria/logger';
+import generator from '@babel/generator';
 import throwIfInvalid from '../utils/throwIfInvalid';
 import type { State, StrictOptions, ExpressionValue } from '../types';
 import { ValueType } from '../types';
@@ -70,7 +72,13 @@ export default function CollectDependencies(
   debug('template-parse:identify-expressions', expressions.length);
 
   const expressionValues: ExpressionValue[] = expressions.map(
-    (ex: NodePath<Expression>) => {
+    (ex: NodePath<Expression | TSType>) => {
+      if (!ex.isExpression()) {
+        throw ex.buildCodeFrameError(
+          `The expression '${generator(ex.node).code}' is not supported.`
+        );
+      }
+
       const result = ex.evaluate();
       if (result.confident) {
         throwIfInvalid(result.value, ex);

@@ -38,7 +38,7 @@
     "watch": "yarn build --watch"
   },
   "devDependencies": {
-    "source-map": "^0.6.1"
+    "source-map": "^0.7.3"
   },
   "dependencies": {
     "@linaria/webpack4-loader": "^3.0.0-beta.6",

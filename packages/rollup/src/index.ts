@@ -5,7 +5,7 @@
  */
 
 import { createFilter } from '@rollup/pluginutils';
-import { transform, slugify } from '@linaria/babel-preset';
+import { transform, slugify, Result } from '@linaria/babel-preset';
 import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
 
 type RollupPluginOptions = {
@@ -34,7 +34,10 @@ export default function linaria({
     resolveId(importee: string) {
       if (importee in cssLookup) return importee;
     },
-    transform(code: string, id: string) {
+    transform(
+      code: string,
+      id: string
+    ): { code: string; map: Result['sourceMap'] } | undefined {
       // Do not transform ignored and generated files
       if (!filter(id) || id in cssLookup) return;
 

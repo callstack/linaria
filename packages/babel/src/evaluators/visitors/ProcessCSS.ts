@@ -10,7 +10,7 @@ import getLinariaComment from '../../utils/getLinariaComment';
 
 export default function ProcessCSS(path: NodePath<TaggedTemplateExpression>) {
   if (t.isIdentifier(path.node.tag) && path.node.tag.name === 'css') {
-    const [, , className] = getLinariaComment(path);
+    const [, , , className] = getLinariaComment(path);
     if (!className) {
       return;
     }

@@ -133,7 +133,11 @@ export const visitors: Visitors = {
     this.graph.addEdge(node, node.body);
 
     node.params.forEach((param) => this.graph.addEdge(node.body, param));
-    if (t.isFunctionExpression(node) && node.id !== null) {
+    if (
+      t.isFunctionExpression(node) &&
+      node.id !== null &&
+      node.id !== undefined
+    ) {
       // keep function name in expressions like `const a = function a();`
       this.graph.addEdge(node, node.id);
     }

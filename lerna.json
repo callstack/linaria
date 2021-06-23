@@ -2,8 +2,8 @@
   "npmClient": "yarn",
   "useWorkspaces": true,
   "packages": [
-    "packages/*",
-    "website"
+    "./packages/*",
+    "./website"
   ],
   "version": "3.0.0-beta.6",
   "command": {

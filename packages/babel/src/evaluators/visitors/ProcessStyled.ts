@@ -24,8 +24,13 @@ const linariaComponentTpl = expression(
 );
 
 export default function ProcessStyled(path: NodePath<CallExpression>) {
-  const [, displayName, className] = getLinariaComment(path);
+  const [type, , displayName, className] = getLinariaComment(path);
   if (!className) {
+    return;
+  }
+
+  if (type === 'css') {
+    path.replaceWith(t.stringLiteral(className));
     return;
   }
 
