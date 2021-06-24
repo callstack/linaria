@@ -123,12 +123,14 @@ it('shakes exports', () => {
 });
 
 it('shakes es5 exports', () => {
-  const [shaken] = _shake(undefined, ['redColor', 'greenColor'])`
+  const [shaken] = _shake(undefined, ['redColor', 'greenColor', 'yellowColor'])`
     "use strict";
     Object.defineProperty(exports, "__esModule", {
       value: true
     });
     exports.redColor = 'red';
+    exports['yellowColor'] = 'yellow';
+    exports['pinkColor'] = 'pink';
     Object.defineProperty(exports, "blueColor", {
       enumerable: true,
       get: function get() {

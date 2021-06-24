@@ -114,7 +114,8 @@ class GraphBuilder extends GraphBuilderState {
     ) {
       if (
         t.isMemberExpression(node.left) &&
-        t.isIdentifier(node.left.property)
+        (t.isIdentifier(node.left.property) ||
+          t.isStringLiteral(node.left.property))
       ) {
         if (
           t.isIdentifier(node.left.object) &&
@@ -145,7 +146,12 @@ class GraphBuilder extends GraphBuilderState {
             this.graph.addExport('default', node);
           }
         } else {
-          this.graph.addExport(node.left.property.name, node);
+          // it can be either `exports.name` or `exports["name"]`
+          const nameNode = node.left.property;
+          this.graph.addExport(
+            t.isStringLiteral(nameNode) ? nameNode.value : nameNode.name,
+            node
+          );
         }
       }
     }
