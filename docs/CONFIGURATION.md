@@ -86,8 +86,7 @@ module.exports = {
   By default, the loader will resolve modules using the `alias` and `modules`
   settings from your Webpack configuration. If you need additional custom
   configuration for resolving modules, use this property to add or customize the
-  [enhanced-resolve
-  options](https://www.npmjs.com/package/enhanced-resolve#user-content-resolver-options).
+  [enhanced-resolve options](https://www.npmjs.com/package/enhanced-resolve#user-content-resolver-options).
 
 ## `@linaria/babel-preset`
 
