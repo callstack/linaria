@@ -109,6 +109,7 @@ Object.defineProperty(exports, \\"__esModule\\", {
   value: true
 });
 exports.redColor = 'red';
+exports['yellowColor'] = 'yellow';
 Object.defineProperty(exports, \\"greenColor\\", {
   enumerable: true,
   get: function get() {
