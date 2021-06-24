@@ -80,6 +80,13 @@ module.exports = {
 - `babelOptions: Object`
 
   If you need to specify custom babel configuration, you can pass them here. These babel options will be used by Linaria when parsing and evaluating modules.
+  
+- `resolveOptions: Object`
+
+  By default, the loader will resolve modules using the `alias` and `modules`
+  settings from your Webpack configuration. If you need additional custom
+  configuration for resolving modules, use this property to add or customize the
+  [enhanced-resolve options](https://www.npmjs.com/package/enhanced-resolve#user-content-resolver-options).
 
 ## `@linaria/babel-preset`
 
