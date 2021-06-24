@@ -21,7 +21,12 @@ export default function DetectStyledImportName(
     if (!t.isImportSpecifier(specifier)) {
       return;
     }
-    if (specifier.local.name !== specifier.imported.name) {
+
+    const importedName = t.isStringLiteral(specifier.imported)
+      ? specifier.imported.value
+      : specifier.imported.name;
+
+    if (specifier.local.name !== importedName) {
       state.file.metadata.localName = specifier.local.name;
     }
   });

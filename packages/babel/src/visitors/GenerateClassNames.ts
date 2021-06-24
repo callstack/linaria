@@ -37,7 +37,7 @@ export default function GenerateClassNames(
   // Also used for display name if it couldn't be determined
   state.index++;
 
-  let [slug, displayName, predefinedClassName] = getLinariaComment(path);
+  let [, slug, displayName, predefinedClassName] = getLinariaComment(path);
 
   const parent = path.findParent(
     (p) =>
@@ -146,11 +146,16 @@ export default function GenerateClassNames(
     className = toValidCSSIdentifier(cnSlug);
   }
 
+  const type = styledOrCss === 'css' ? 'css' : 'styled';
+
   debug(
-    'template-parse:generated-meta',
+    `template-parse:generated-meta:${type}`,
     `slug: ${slug}, displayName: ${displayName}, className: ${className}`
   );
 
   // Save evaluated slug and displayName for future usage in templateProcessor
-  path.addComment('leading', `linaria ${slug} ${displayName} ${className}`);
+  path.addComment(
+    'leading',
+    `linaria ${type} ${slug} ${displayName} ${className}`
+  );
 }

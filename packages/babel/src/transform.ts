@@ -8,6 +8,7 @@
  */
 
 import path from 'path';
+import type { BabelFileMetadata, BabelFileResult } from '@babel/core';
 import { parseSync, transformFromAstSync } from '@babel/core';
 import stylis from 'stylis';
 import type { Mapping } from 'source-map';
@@ -45,35 +46,27 @@ export function shouldTransformCode(code: string): boolean {
 }
 
 export function extractCssFromAst(
-  babelFileResult: babel.BabelFileResult,
+  babelFileResult: BabelFileResult,
   code: string,
   options: Options
-) {
+): Result {
   const { metadata, code: transformedCode, map } = babelFileResult;
 
   if (
     !metadata ||
-    !(metadata as babel.BabelFileMetadata & { linaria: LinariaMetadata })
-      .linaria
+    !(metadata as BabelFileMetadata & { linaria: LinariaMetadata }).linaria
   ) {
     return {
       code: transformedCode || '', // if there was only unused code we want to return transformed code which will be later removed by the bundler
-      sourceMap: map
-        ? {
-            ...map,
-            version: map.version.toString(),
-          }
-        : null,
+      sourceMap: map,
     };
   }
 
-  const {
-    rules,
-    replacements,
-    dependencies,
-  } = (metadata as babel.BabelFileMetadata & {
-    linaria: LinariaMetadata;
-  }).linaria;
+  const { rules, replacements, dependencies } = (
+    metadata as BabelFileMetadata & {
+      linaria: LinariaMetadata;
+    }
+  ).linaria;
   const mappings: Mapping[] = [];
 
   let cssText = '';
@@ -129,12 +122,7 @@ export function extractCssFromAst(
     rules,
     replacements,
     dependencies,
-    sourceMap: map
-      ? {
-          ...map,
-          version: map.version.toString(),
-        }
-      : null,
+    sourceMap: map,
 
     get cssSourceMapText() {
       if (mappings?.length) {

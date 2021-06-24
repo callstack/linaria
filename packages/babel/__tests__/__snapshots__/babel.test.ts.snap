@@ -441,7 +441,7 @@ Dependencies: NA
 
 exports[`throws when contains dynamic expression without evaluate: true in css tag 1`] = `
 "<<DIRNAME>>/app/index.js: The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.
-  2 | 
+  2 |
   3 | const title = css\`
 > 4 |   font-size: \${size}px;
     |                ^^^^

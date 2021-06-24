@@ -1,5 +1,5 @@
 import { types as t } from '@babel/core';
-import type { Aliases, Identifier, Node, VisitorKeys } from '@babel/types';
+import type { Identifier, Node, VisitorKeys } from '@babel/types';
 import { warn } from '@linaria/logger';
 import { peek } from '@linaria/babel-preset';
 import GraphBuilderState from './GraphBuilderState';
@@ -71,10 +71,13 @@ const visitors: Visitors = {
   ...core,
 };
 
+const isKeyOfVisitors = (type: string): type is keyof Visitors =>
+  type in visitors;
+
 export function getVisitors<TNode extends Node>(node: TNode): Visitor<TNode>[] {
-  const aliases: Array<keyof Aliases> = t.ALIAS_KEYS[node.type] || [];
+  const aliases = t.ALIAS_KEYS[node.type] || [];
   const aliasVisitors = aliases
-    .map((type) => visitors[type])
+    .map((type) => (isKeyOfVisitors(type) ? visitors[type] : null))
     .filter((i) => i) as Visitor<TNode>[];
   return [...aliasVisitors, visitors[node.type] as Visitor<TNode>].filter(
     (v) => v

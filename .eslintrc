@@ -1,6 +1,7 @@
 {
   "extends": "@callstack",
   "rules": {
+    "no-redeclare": "off",
     "jest/no-try-expect": "off",
     "global-require": "off",
     "react-native/no-raw-text": "off",
@@ -14,6 +15,9 @@
         ]
       }
     ]
+  },
+  "globals": {
+    "JSX": "readonly"
   },
   "settings": {
     "import/resolver": {

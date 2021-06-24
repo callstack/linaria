@@ -127,9 +127,8 @@ function processFiles(files: string[], options: Options) {
           path.relative(options.sourceRoot, filename)
         );
 
-        const normalizedInputFilename = resolveRequireInsertionFilename(
-          inputFilename
-        );
+        const normalizedInputFilename =
+          resolveRequireInsertionFilename(inputFilename);
 
         const relativePath = normalize(
           path.relative(path.dirname(inputFilename), outputFilename)

@@ -1,3 +1,4 @@
+/* tslint:disable:no-unnecessary-generics */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as React from 'react';
 import { css } from '@linaria/core';
@@ -9,13 +10,13 @@ function isExtends<C, T>(arg1?: C, arg2?: T): C extends T ? 'extends' : never {
   return null as any;
 }
 
-// tslint:disable-next-line no-unnecessary-generics
-const Fabric = <T>(): React.FC<T> => (props) =>
-  React.createElement('div', props);
+const Fabric =
+  <T>(): React.FC<T> =>
+  (props) =>
+    React.createElement('div', props);
 
 const Header = (p: { children: string }) => React.createElement('h1', p);
 
-// tslint:disable-next-line no-unnecessary-generics
 const Generic = <T>(p: T & { className?: string }) =>
   React.createElement('h1', p);
 

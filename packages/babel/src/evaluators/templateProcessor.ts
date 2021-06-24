@@ -64,7 +64,7 @@ export default function getTemplateProcessor(
     // Only works when it's assigned to a variable
     let isReferenced = true;
 
-    const [slug, displayName, className] = getLinariaComment(path);
+    const [, slug, displayName, className] = getLinariaComment(path);
 
     const parent = path.findParent(
       (p) =>
@@ -119,6 +119,12 @@ export default function getTemplateProcessor(
 
       const ex = expressions[i];
 
+      if (ex && !ex.isExpression()) {
+        throw ex.buildCodeFrameError(
+          `The expression '${generator(ex.node).code}' is not supported.`
+        );
+      }
+
       if (ex) {
         const { end } = ex.node.loc!;
         const result = ex.evaluate();
@@ -157,7 +163,7 @@ export default function getTemplateProcessor(
             const value = valueCache.get(ex.node);
             throwIfInvalid(value, ex);
 
-            // Skip the blank string instead of throwing an error
+            // Skip the blank string instead of throw ing an error
             if (value === '') {
               return;
             }

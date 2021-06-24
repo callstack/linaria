@@ -25,6 +25,16 @@ const lernaRoot =
 
 type LoaderContext = Parameters<typeof loaderUtils.getOptions>[0];
 
+const castSourceMap = <T extends { version: number } | { version: string }>(
+  sourceMap: T | null | undefined
+) =>
+  sourceMap
+    ? {
+        ...sourceMap,
+        version: sourceMap.version.toString(),
+      }
+    : undefined;
+
 export default function webpack4Loader(
   this: LoaderContext,
   content: string,
@@ -148,10 +158,10 @@ export default function webpack4Loader(
         this,
         outputFilename
       )});`,
-      result.sourceMap ?? undefined
+      castSourceMap(result.sourceMap)
     );
     return;
   }
 
-  this.callback(null, result.code, result.sourceMap ?? undefined);
+  this.callback(null, result.code, castSourceMap(result.sourceMap));
 }

@@ -1,12 +1,6 @@
-import type {
-  Aliases,
-  Node,
-  Expression,
-  TaggedTemplateExpression,
-} from '@babel/types';
+import type { Node, Expression, TaggedTemplateExpression } from '@babel/types';
 import type { TransformOptions } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
-import type { VisitorKeys } from '@babel/types';
 import type { StyledMeta } from '@linaria/core';
 import type { RawSourceMap } from 'source-map';
 import type { PluginOptions } from './utils/loadOptions';
@@ -183,21 +177,4 @@ declare module '@babel/types' {
       }[keyof AllNodes[T]]
     >;
   };
-}
-
-declare module '@babel/core' {
-  namespace types {
-    const VISITOR_KEYS: { [T in keyof VisitorKeys]: VisitorKeys[T][] };
-    const ALIAS_KEYS: {
-      [T in Node['type']]: {
-        [K in keyof Aliases]: AllNodes[T] extends Aliases[K] ? K : never;
-      }[keyof Aliases][];
-    };
-
-    const FLIPPED_ALIAS_KEYS: {
-      [T in keyof Aliases]: Aliases[T]['type'][];
-    };
-
-    function shallowEqual(actual: object, expected: object): boolean;
-  }
 }

@@ -1,9 +1,9 @@
 version: 2.1
 
 executors:
-  node-v12:
+  node-v14:
     docker:
-      - image: circleci/node:12
+      - image: circleci/node:14
     working_directory: ~/linaria
   node-v10:
     docker:
@@ -68,7 +68,7 @@ commands:
           yarn --cwd website lint:css
 jobs:
   install-dependencies:
-    executor: node-v12
+    executor: node-v14
     steps:
       - install-dependencies
   install-dependencies-v10:
@@ -76,15 +76,15 @@ jobs:
     steps:
       - install-dependencies
   lint-and-typecheck:
-    executor: node-v12
+    executor: node-v14
     steps:
       - lint-and-typecheck
   lint-website:
-    executor: node-v12
+    executor: node-v14
     steps:
       - lint-website
   unit-tests-and-coverage:
-    executor: node-v12
+    executor: node-v14
     steps:
       - unit-tests-and-coverage
   unit-tests-node-v10:
