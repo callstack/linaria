@@ -230,7 +230,7 @@ You can pass options to the loader like so:
 
 ### esbuild
 
-To use Linaria with Rollup, you don't need to install any external package since esbuild handles CSS by itself:
+To use Linaria with esbuild, you don't need to install any external package since esbuild handles CSS by itself:
 
 ```sh
 yarn add --dev @linaria/esbuild
