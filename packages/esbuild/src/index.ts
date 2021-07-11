@@ -40,6 +40,7 @@ export default function linaria({
         return {
           contents: cssLookup.get(args.path),
           loader: 'css',
+          resolveDir: path.basename(args.path),
         };
       });
 
