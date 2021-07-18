@@ -7,6 +7,28 @@ const Component =
 custom.div\`\`;"
 `;
 
+exports[`hoists exports 1`] = `
+"\\"use strict\\";
+
+var _foo = require(\\"./foo\\");
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+Object.defineProperty(exports, \\"foo\\", {
+  enumerable: true,
+  get: function get() {
+    return _foo.foo;
+  }
+});
+Object.defineProperty(exports, \\"bar\\", {
+  enumerable: true,
+  get: function get() {
+    return _foo.bar;
+  }
+});"
+`;
+
 exports[`preserves classNames 1`] = `
 "import { styled } from '@linaria/react';
 const Component =

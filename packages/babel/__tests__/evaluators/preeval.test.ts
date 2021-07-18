@@ -91,3 +91,31 @@ it('replaces constant', async () => {
 
   expect(code).toMatchSnapshot();
 });
+
+it('hoists exports', async () => {
+  const { code } = await transpile(
+    dedent`
+      "use strict";
+
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      Object.defineProperty(exports, "foo", {
+        enumerable: true,
+        get: function get() {
+          return _foo.foo;
+        }
+      });
+      Object.defineProperty(exports, "bar", {
+        enumerable: true,
+        get: function get() {
+          return _foo.bar;
+        }
+      });
+
+      var _foo = require("./foo");
+    `
+  );
+
+  expect(code).toMatchSnapshot();
+});

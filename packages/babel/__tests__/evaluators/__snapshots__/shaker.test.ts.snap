@@ -121,12 +121,11 @@ Object.defineProperty(exports, \\"greenColor\\", {
 exports[`shakes exports 1`] = `
 "\\"use strict\\";
 
+var _ = require(\\"\\\\u2026\\");
+
 Object.defineProperty(exports, \\"__esModule\\", {
   value: true
 });
-
-var _ = require(\\"\\\\u2026\\");
-
 var a = _.whiteColor;
 exports.__linariaPreval = [a];"
 `;
