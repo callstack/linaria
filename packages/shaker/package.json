@@ -1,6 +1,6 @@
 {
   "name": "@linaria/shaker",
-  "version": "3.0.0-beta.7",
+  "version": "3.0.0-beta.8",
   "publishConfig": {
     "access": "public"
   },
@@ -49,7 +49,7 @@
     "@babel/preset-env": ">=7",
     "@linaria/babel-preset": "^3.0.0-beta.7",
     "@linaria/logger": "^3.0.0-beta.3",
-    "@linaria/preeval": "^3.0.0-beta.7",
+    "@linaria/preeval": "^3.0.0-beta.8",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24"
   },
   "peerDependencies": {
