@@ -9,7 +9,7 @@ Linaria consists of 2 parts:
 
 The Babel plugin will look for `css` and `styled` tags in your code, extract the CSS out and return it in the file's metadata. It will also generate unique class names based on the hash of the filename.
 
-> To get a deep dive into Linaria babel plugin internals, check [debugging section of Contributing docs](./CONTRIBUTING.md#debugging-and-deep-dive-into-babel-plugin)
+> To get a deep dive into Linaria babel plugin internals, check [debugging section of Contributing docs](../CONTRIBUTING.md#debugging-and-deep-dive-into-babel-plugin)
 
 When using the `styled` tag, dynamic interpolations will be replaced with CSS custom properties. References to constants in the scope will also be inlined. If the same expression is used multiple times, the plugin will create a single CSS custom property for those.
 
