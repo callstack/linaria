@@ -1,10 +1,9 @@
 import { types as t } from '@babel/core';
-import type { Identifier, Node } from '@babel/types';
 import ScopeManager, { PromisedNode, resolveNode } from './scope';
 
-type Action = (this: DepsGraph, a: Node, b: Node) => void;
+type Action = (this: DepsGraph, a: t.Node, b: t.Node) => void;
 
-function addEdge(this: DepsGraph, a: Node, b: Node) {
+function addEdge(this: DepsGraph, a: t.Node, b: t.Node) {
   if (this.dependencies.has(a) && this.dependencies.get(a)!.has(b)) {
     // edge has been already added∂ƒ
     return;
@@ -25,17 +24,17 @@ function addEdge(this: DepsGraph, a: Node, b: Node) {
 }
 
 export default class DepsGraph {
-  public readonly imports: Map<string, Identifier[]> = new Map();
-  public readonly importAliases: Map<Identifier, string> = new Map();
+  public readonly imports: Map<string, t.Identifier[]> = new Map();
+  public readonly importAliases: Map<t.Identifier, string> = new Map();
   public readonly importTypes: Map<string, 'wildcard' | 'default'> = new Map();
 
-  protected readonly edges: Array<[Node, Node]> = [];
-  protected readonly exports: Map<string, Node> = new Map();
-  protected readonly dependencies: Map<Node, Set<Node>> = new Map();
-  protected readonly dependents: Map<Node, Set<Node>> = new Map();
+  protected readonly edges: Array<[t.Node, t.Node]> = [];
+  protected readonly exports: Map<string, t.Node> = new Map();
+  protected readonly dependencies: Map<t.Node, Set<t.Node>> = new Map();
+  protected readonly dependents: Map<t.Node, Set<t.Node>> = new Map();
 
   private actionQueue: Array<
-    [Action, Node | PromisedNode, Node | PromisedNode]
+    [Action, t.Node | PromisedNode, t.Node | PromisedNode]
   > = [];
 
   private processQueue() {
@@ -54,24 +53,24 @@ export default class DepsGraph {
     this.actionQueue = [];
   }
 
-  private getAllReferences(id: string): Identifier[] {
+  private getAllReferences(id: string): (t.Identifier | t.MemberExpression)[] {
     const [, name] = id.split(':');
     const declaration = this.scope.getDeclaration(id)!;
-    const allReferences = [
+    const allReferences: (t.Identifier | t.MemberExpression)[] = [
       ...Array.from(this.dependencies.get(declaration) || []),
       ...Array.from(this.dependents.get(declaration) || []),
-    ].filter((i) => t.isIdentifier(i) && i.name === name) as Identifier[];
+    ].filter((i) => t.isIdentifier(i) && i.name === name) as t.Identifier[];
     allReferences.push(declaration);
     return allReferences;
   }
 
   constructor(protected scope: ScopeManager) {}
 
-  addEdge(dependent: Node | PromisedNode, dependency: Node | PromisedNode) {
+  addEdge(dependent: t.Node | PromisedNode, dependency: t.Node | PromisedNode) {
     this.actionQueue.push([addEdge, dependent, dependency]);
   }
 
-  addExport(name: string, node: Node) {
+  addExport(name: string, node: t.Node) {
     this.exports.set(name, node);
   }
 
@@ -115,15 +114,15 @@ export default class DepsGraph {
       .map(([a]) => a);
   }
 
-  getDependencies(nodes: Node[]) {
+  getDependencies(nodes: t.Node[]) {
     this.processQueue();
     return nodes.reduce(
       (acc, node) => acc.concat(Array.from(this.dependencies.get(node) || [])),
-      [] as Node[]
+      [] as t.Node[]
     );
   }
 
-  getLeafs(only: string[] | null): Array<Node | undefined> {
+  getLeafs(only: string[] | null): Array<t.Node | undefined> {
     this.processQueue();
     return only
       ? only.map((name) => this.exports.get(name))

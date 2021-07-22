@@ -1,18 +1,18 @@
 import { types as t } from '@babel/core';
-import type { Identifier, Node } from '@babel/types';
+import invariant from 'ts-invariant';
 
-type Scope = Map<string, Set<Identifier>>;
+type Scope = Map<string, Set<t.Identifier | t.MemberExpression>>;
 
-export type ScopeId = number | 'global';
+export type ScopeId = number | 'global' | 'exports';
 export type DeclareHandler = (
-  identifier: Identifier,
-  from: Identifier | null
+  identifier: t.Identifier,
+  from: t.Identifier | null
 ) => void;
 
 const ResolvedNode = Symbol('ResolvedNode');
 const functionScopes = new WeakSet<Scope>();
 
-export class PromisedNode<T = Node> {
+export class PromisedNode<T = t.Node> {
   static is<TNode>(obj: any): obj is PromisedNode<TNode> {
     return obj && ResolvedNode in obj;
   }
@@ -24,13 +24,37 @@ export class PromisedNode<T = Node> {
   }
 }
 
-export const resolveNode = <T = Node>(
+export const resolveNode = <T = t.Node>(
   obj: T | PromisedNode<T> | undefined
 ): T | undefined => (PromisedNode.is<T>(obj) ? obj.identifier : obj);
 
-const scopeIds = new WeakMap<Scope, number | 'global'>();
-const getId = (scope: Scope, identifier: Identifier): string =>
-  `${scopeIds.get(scope)}:${identifier.name}`;
+const getExportName = (node: t.Node): string => {
+  invariant(
+    t.isMemberExpression(node),
+    `getExportName expects MemberExpression but received ${node.type}`
+  );
+
+  const { object, property } = node;
+  invariant(
+    t.isIdentifier(object) && object.name === 'exports',
+    `getExportName expects a member expression with 'exports'`
+  );
+  invariant(
+    t.isIdentifier(property) || t.isStringLiteral(property),
+    `getExportName supports only identifiers and literals as names of exported values`
+  );
+
+  const name = t.isIdentifier(property) ? property.name : property.value;
+  return `exports.${name}`;
+};
+
+const scopeIds = new WeakMap<Scope, ScopeId>();
+const getId = (scope: Scope, identifier: t.Identifier | string): string => {
+  const scopeId = scopeIds.get(scope);
+  return `${scopeId}:${
+    typeof identifier === 'string' ? identifier : identifier.name
+  }`;
+};
 
 export default class ScopeManager {
   public static globalExportsIdentifier = t.identifier('exports');
@@ -41,7 +65,7 @@ export default class ScopeManager {
   private readonly handlers: Map<ScopeId, Array<DeclareHandler>> = new Map();
   private readonly declarations: Map<
     string,
-    Identifier | PromisedNode<Identifier>
+    t.Identifier | t.MemberExpression | PromisedNode<t.Identifier>
   > = new Map();
 
   private get global(): Scope {
@@ -77,11 +101,25 @@ export default class ScopeManager {
   }
 
   declare(
-    identifier: Identifier,
+    identifierOrMemberExpression: t.Identifier | t.MemberExpression,
     isHoistable: boolean,
-    from: Identifier | null = null,
+    from: t.Identifier | null = null,
     stack = 0
   ): void {
+    if (t.isMemberExpression(identifierOrMemberExpression)) {
+      // declare receives MemberExpression only if it's `exports.something` expression
+      const memberExp = identifierOrMemberExpression;
+      const name = getExportName(memberExp);
+      if (!this.global.has(name)) {
+        this.global.set(name, new Set());
+        this.declarations.set(getId(this.global, name), memberExp);
+      }
+
+      this.global.get(name)!.add(memberExp);
+      return;
+    }
+
+    const identifier = identifierOrMemberExpression;
     const idName = identifier.name;
     const scope = this.stack
       .slice(stack)
@@ -91,7 +129,7 @@ export default class ScopeManager {
       // Let's use naïve implementation of hoisting
       const promise = this.declarations.get(
         getId(this.global, identifier)
-      )! as PromisedNode<Identifier>;
+      )! as PromisedNode<t.Identifier>;
       promise[ResolvedNode] = identifier;
       scope.set(
         idName,
@@ -107,20 +145,24 @@ export default class ScopeManager {
     handlers.forEach((handler) => handler(identifier, from));
   }
 
-  addReference(identifier: Identifier): Identifier | PromisedNode {
-    const name = identifier.name;
-    const scope = this.stack.find((s) => s.has(name)) || this.global;
-    const id = getId(scope, identifier);
+  addReference(
+    identifierOrMemberExpression: t.Identifier | t.MemberExpression
+  ): t.Identifier | t.MemberExpression | PromisedNode {
+    const name = t.isIdentifier(identifierOrMemberExpression)
+      ? identifierOrMemberExpression.name
+      : getExportName(identifierOrMemberExpression);
+    const scope = this.stack.find((s) => s.has(name)) ?? this.global;
+    const id = getId(scope, name);
     if (scope === this.global && !scope.has(name)) {
       scope.set(name, new Set());
-      this.declarations.set(getId(scope, identifier), new PromisedNode());
+      this.declarations.set(id, new PromisedNode());
     }
 
-    scope.get(name)!.add(identifier);
+    scope.get(name)!.add(identifierOrMemberExpression);
     return this.declarations.get(id)!;
   }
 
-  whereIsDeclared(identifier: Identifier): ScopeId | undefined {
+  whereIsDeclared(identifier: t.Identifier): ScopeId | undefined {
     const name = identifier.name;
     const scope = this.stack.find(
       (s) => s.has(name) && s.get(name)!.has(identifier)
@@ -137,18 +179,20 @@ export default class ScopeManager {
   }
 
   getDeclaration(
-    identifierOrName: Identifier | string
-  ): Identifier | undefined {
+    identifierOrMemberExpOrName: t.Identifier | t.MemberExpression | string
+  ): t.Identifier | t.MemberExpression | undefined {
     let name: string;
-    if (typeof identifierOrName === 'string') {
-      name = identifierOrName;
+    if (typeof identifierOrMemberExpOrName === 'string') {
+      name = identifierOrMemberExpOrName;
+    } else if (t.isMemberExpression(identifierOrMemberExpOrName)) {
+      name = getId(this.global, getExportName(identifierOrMemberExpOrName));
     } else {
-      const scopeId = this.whereIsDeclared(identifierOrName);
+      const scopeId = this.whereIsDeclared(identifierOrMemberExpOrName);
       if (scopeId === undefined) {
         return undefined;
       }
 
-      name = getId(this.map.get(scopeId)!, identifierOrName);
+      name = getId(this.map.get(scopeId)!, identifierOrMemberExpOrName);
     }
 
     return resolveNode(this.declarations.get(name));

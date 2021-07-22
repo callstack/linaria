@@ -227,3 +227,17 @@ it('shakes for-in statements', () => {
 
   expect(shaken).toMatchSnapshot();
 });
+
+it('keeps reused exports', () => {
+  const [shaken] = _shake()`
+    const bar = function() {
+      return 'hello world';
+    };
+    exports.bar = bar;
+
+    const foo = exports.bar();
+    exports.__linariaPreval = [foo];
+  `;
+
+  expect(shaken).toMatchSnapshot();
+});
