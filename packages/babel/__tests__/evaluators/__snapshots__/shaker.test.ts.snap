@@ -65,6 +65,18 @@ color.green = '#0f0';
 exports.__linariaPreval = [color];"
 `;
 
+exports[`keeps reused exports 1`] = `
+"\\"use strict\\";
+
+var bar = function bar() {
+  return 'hello world';
+};
+
+exports.bar = bar;
+var foo = exports.bar();
+exports.__linariaPreval = [foo];"
+`;
+
 exports[`removes all 1`] = `
 "\\"use strict\\";
 

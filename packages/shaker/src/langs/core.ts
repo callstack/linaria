@@ -312,10 +312,33 @@ export const visitors: Visitors = {
   MemberExpression(this: GraphBuilderState, node: MemberExpression) {
     this.baseVisit(node);
 
+    if (
+      isIdentifier(node.object, 'exports') &&
+      this.scope.getDeclaration(node.object) ===
+        ScopeManager.globalExportsIdentifier
+    ) {
+      // We treat `exports.something` and `exports['something']` as identifiers in the global scope
+      this.graph.addEdge(node, node.object);
+      this.graph.addEdge(node, node.property);
+
+      const isLVal = peek(this.context) === 'lval';
+      if (isLVal) {
+        this.scope.declare(node, false);
+      } else {
+        const declaration = this.scope.addReference(node);
+        this.graph.addEdge(node, declaration);
+      }
+
+      return;
+    }
+
     if (t.isIdentifier(node.object) && t.isIdentifier(node.property)) {
       // It's simple `foo.bar` expression. Is it a usage of a required library?
       const declaration = this.scope.getDeclaration(node.object);
-      if (declaration && this.graph.importAliases.has(declaration)) {
+      if (
+        t.isIdentifier(declaration) &&
+        this.graph.importAliases.has(declaration)
+      ) {
         // It is. We can remember what exactly we use from it.
         const source = this.graph.importAliases.get(declaration)!;
         this.graph.imports.get(source)!.push(node.property);
