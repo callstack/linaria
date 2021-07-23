@@ -107,6 +107,10 @@ class GraphBuilder extends GraphBuilderState {
     parentKey: VisitorKeys[TParent['type']] | null,
     listIdx: number | null = null
   ): VisitorAction {
+    if (parent) {
+      this.graph.addParent(node, parent);
+    }
+
     if (
       this.isExportsAssigment(node) &&
       !this.isExportsAssigment(node.right) &&

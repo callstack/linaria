@@ -21,6 +21,22 @@ describe('shaker', () => {
       expect(metadata).toMatchSnapshot();
     });
 
+    it('should work with wildcard reexports', async () => {
+      const { code, metadata } = await transpile(
+        dedent`
+      import { css } from "@linaria/core";
+      import { foo1 } from "../__fixtures__/reexports";
+
+      export const square = css\`
+        color: ${'${foo1}'};
+      \`;
+    `
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+
     it('should interpolate imported components', async () => {
       const { code, metadata } = await transpile(
         dedent`

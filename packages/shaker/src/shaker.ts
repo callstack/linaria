@@ -70,7 +70,24 @@ export default function shake(
 
   const depsGraph = build(rootPath);
   const alive = new Set<Node>();
-  let deps: Node[] = depsGraph.getLeafs(exports).map((i) => i) as Node[];
+  const reexports: string[] = [];
+  let deps = (exports ?? [])
+    .map((token) => {
+      const node = depsGraph.getLeaf(token);
+      if (node) return [node];
+      // We have some unknown token. Do we have `export * from …` in that file?
+      if (depsGraph.reexports.length === 0) {
+        return [];
+      }
+
+      // If so, mark all re-exported files as required
+      reexports.push(token);
+      return [...depsGraph.reexports];
+    })
+    .reduce<Node[]>((acc, el) => {
+      acc.push(...el);
+      return acc;
+    }, []);
   while (deps.length > 0) {
     // Mark all dependencies as alive
     deps.forEach((d) => alive.add(d));
@@ -88,11 +105,15 @@ export default function shake(
 
   const imports = new Map<string, string[]>();
   for (let [source, members] of depsGraph.imports.entries()) {
-    const defaultMembers =
-      depsGraph.importTypes.get(source) === 'wildcard' ? ['*'] : [];
+    const importType = depsGraph.importTypes.get(source);
+    const defaultMembers = importType === 'wildcard' ? ['*'] : [];
     const aliveMembers = new Set(
       members.filter((i) => alive.has(i)).map((i) => i.name)
     );
+
+    if (importType === 'reexport') {
+      reexports.forEach((token) => aliveMembers.add(token));
+    }
 
     imports.set(
       source,
