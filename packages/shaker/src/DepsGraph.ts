@@ -26,8 +26,13 @@ function addEdge(this: DepsGraph, a: t.Node, b: t.Node) {
 export default class DepsGraph {
   public readonly imports: Map<string, t.Identifier[]> = new Map();
   public readonly importAliases: Map<t.Identifier, string> = new Map();
-  public readonly importTypes: Map<string, 'wildcard' | 'default'> = new Map();
+  public readonly importTypes: Map<
+    string,
+    'wildcard' | 'default' | 'reexport'
+  > = new Map();
+  public readonly reexports: Array<t.Identifier> = [];
 
+  protected readonly parents: WeakMap<t.Node, t.Node> = new WeakMap();
   protected readonly edges: Array<[t.Node, t.Node]> = [];
   protected readonly exports: Map<string, t.Node> = new Map();
   protected readonly dependencies: Map<t.Node, Set<t.Node>> = new Map();
@@ -72,6 +77,14 @@ export default class DepsGraph {
 
   addExport(name: string, node: t.Node) {
     this.exports.set(name, node);
+  }
+
+  addParent(node: t.Node, parent: t.Node) {
+    this.parents.set(node, parent);
+  }
+
+  getParent(node: t.Node): t.Node | undefined {
+    return this.parents.get(node);
   }
 
   getDependenciesByBinding(id: string) {
@@ -122,10 +135,14 @@ export default class DepsGraph {
     );
   }
 
-  getLeafs(only: string[] | null): Array<t.Node | undefined> {
+  getLeaf(name: string): t.Node | undefined {
+    return this.exports.get(name);
+  }
+
+  getLeaves(only: string[] | null): Array<t.Node | undefined> {
     this.processQueue();
     return only
-      ? only.map((name) => this.exports.get(name))
+      ? only.map((name) => this.getLeaf(name))
       : Array.from(this.exports.values());
   }
 }

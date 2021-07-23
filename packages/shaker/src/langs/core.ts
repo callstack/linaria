@@ -4,6 +4,7 @@ import type {
   Block,
   CallExpression,
   Directive,
+  ExpressionStatement,
   ForInStatement,
   ForStatement,
   Function,
@@ -26,6 +27,7 @@ import { peek } from '@linaria/babel-preset';
 import type { IdentifierHandlers, Visitors } from '../types';
 import GraphBuilderState from '../GraphBuilderState';
 import ScopeManager from '../scope';
+import DepsGraph from '../DepsGraph';
 
 function isIdentifier(
   node: Node,
@@ -71,6 +73,60 @@ function getCallee(node: CallExpression): Node {
   }
 
   return node.callee;
+}
+
+function findWildcardReexportStatement(
+  node: t.CallExpression,
+  identifierName: string,
+  graph: DepsGraph
+): t.Statement | null {
+  if (!t.isIdentifier(node.callee) || node.callee.name !== 'require')
+    return null;
+
+  const declarator = graph.getParent(node);
+  if (!t.isVariableDeclarator(declarator)) return null;
+
+  const declaration = graph.getParent(declarator);
+  if (!t.isVariableDeclaration(declaration)) return null;
+
+  const program = graph.getParent(declaration);
+  if (!t.isProgram(program)) return null;
+
+  // Our node is a correct export
+  // Let's check that we have something that looks like transpiled re-export
+  return (
+    program.body.find((statement) => {
+      /*
+       * We are looking for `Object.keys(_bar).forEach(…)`
+       */
+
+      if (!t.isExpressionStatement(statement)) return false;
+
+      const expression = statement.expression;
+      if (!t.isCallExpression(expression)) return false;
+
+      const callee = expression.callee;
+      if (!t.isMemberExpression(callee)) return false;
+
+      const { object, property } = callee;
+
+      if (!isIdentifier(property, 'forEach')) return false;
+
+      if (!t.isCallExpression(object)) return false;
+
+      // `object` should be `Object.keys`
+      if (
+        !t.isMemberExpression(object.callee) ||
+        !isIdentifier(object.callee.object, 'Object') ||
+        !isIdentifier(object.callee.property, 'keys')
+      )
+        return false;
+
+      //
+      const [argument] = object.arguments;
+      return isIdentifier(argument, identifierName);
+    }) ?? null
+  );
 }
 
 /*
@@ -141,6 +197,16 @@ export const visitors: Visitors = {
       // keep function name in expressions like `const a = function a();`
       this.graph.addEdge(node, node.id);
     }
+  },
+
+  /*
+   * ExpressionStatement
+   */
+  ExpressionStatement(this: GraphBuilderState, node: ExpressionStatement) {
+    this.baseVisit(node);
+
+    this.graph.addEdge(node, node.expression);
+    this.graph.addEdge(node.expression, node);
   },
 
   /*
@@ -337,7 +403,8 @@ export const visitors: Visitors = {
       const declaration = this.scope.getDeclaration(node.object);
       if (
         t.isIdentifier(declaration) &&
-        this.graph.importAliases.has(declaration)
+        this.graph.importAliases.has(declaration) &&
+        !node.computed
       ) {
         // It is. We can remember what exactly we use from it.
         const source = this.graph.importAliases.get(declaration)!;
@@ -483,6 +550,21 @@ export const visitors: Visitors = {
                 this.graph.importTypes.set(source, 'wildcard');
               } else {
                 // What I've missed?
+              }
+            }
+
+            // Do we know the type of import?
+            if (!this.graph.importTypes.has(source)) {
+              // Is it a wildcard reexport? Let's check.
+              const statement = findWildcardReexportStatement(
+                node,
+                local.name,
+                this.graph
+              );
+              if (statement) {
+                this.graph.addEdge(local, statement);
+                this.graph.reexports.push(local);
+                this.graph.importTypes.set(source, 'reexport');
               }
             }
 

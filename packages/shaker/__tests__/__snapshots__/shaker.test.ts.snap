@@ -1103,6 +1103,24 @@ Dependencies: @babel/runtime/helpers/typeof, @linaria/babel-preset/__fixtures__/
 
 `;
 
+exports[`shaker should work with wildcard reexports 1`] = `
+"import { css } from \\"@linaria/core\\";
+import { foo1 } from \\"../__fixtures__/reexports\\";
+export const square = \\"square_s1t92lw9\\";"
+`;
+
+exports[`shaker should work with wildcard reexports 2`] = `
+
+CSS:
+
+.square_s1t92lw9 {
+  color: foo1;
+}
+
+Dependencies: ../__fixtures__/reexports
+
+`;
+
 exports[`shaker simplifies react components 1`] = `
 "import React from 'react';
 import { styled } from '@linaria/react';
