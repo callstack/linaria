@@ -112,9 +112,10 @@ export default class ScopeManager {
       const name = getExportName(memberExp);
       if (!this.global.has(name)) {
         this.global.set(name, new Set());
-        this.declarations.set(getId(this.global, name), memberExp);
       }
 
+      // There can be a few `export.foo = …` statements, but we need only the last one
+      this.declarations.set(getId(this.global, name), memberExp);
       this.global.get(name)!.add(memberExp);
       return;
     }

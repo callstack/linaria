@@ -241,3 +241,19 @@ it('keeps reused exports', () => {
 
   expect(shaken).toMatchSnapshot();
 });
+
+it('keeps only the last assignment of each exported variable', () => {
+  const [shaken] = _shake()`
+    const bar = function() {
+      return 'hello world';
+    };
+
+    exports.bar = "bar";
+    exports.bar = bar;
+
+    const foo = exports.bar();
+    exports.__linariaPreval = [foo];
+  `;
+
+  expect(shaken).toMatchSnapshot();
+});
