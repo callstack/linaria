@@ -1,6 +1,6 @@
 {
   "name": "linaria",
-  "version": "3.0.0-beta.9",
+  "version": "3.0.0-beta.10",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "main": "lib/core.js",
   "module": "esm/core.js",
@@ -48,7 +48,7 @@
     "@linaria/react": "^3.0.0-beta.7",
     "@linaria/rollup": "^3.0.0-beta.7",
     "@linaria/server": "^3.0.0-beta.3",
-    "@linaria/shaker": "^3.0.0-beta.9",
+    "@linaria/shaker": "^3.0.0-beta.10",
     "@linaria/stylelint": "^3.0.0-beta.7",
     "@linaria/webpack4-loader": "^3.0.0-beta.7"
   },
