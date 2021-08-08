@@ -398,13 +398,16 @@ export const visitors: Visitors = {
       return;
     }
 
-    if (t.isIdentifier(node.object) && t.isIdentifier(node.property)) {
-      // It's simple `foo.bar` expression. Is it a usage of a required library?
+    if (
+      t.isIdentifier(node.object) &&
+      ((t.isIdentifier(node.property) && !node.computed) ||
+        t.isStringLiteral(node.property))
+    ) {
+      // It's simple `foo.bar` or `foo["bar"]` expression. Is it a usage of a required library?
       const declaration = this.scope.getDeclaration(node.object);
       if (
         t.isIdentifier(declaration) &&
-        this.graph.importAliases.has(declaration) &&
-        !node.computed
+        this.graph.importAliases.has(declaration)
       ) {
         // It is. We can remember what exactly we use from it.
         const source = this.graph.importAliases.get(declaration)!;
