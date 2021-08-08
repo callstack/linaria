@@ -1,6 +1,6 @@
 {
   "name": "linaria-website",
-  "version": "3.0.0-beta.7",
+  "version": "3.0.0-beta.11",
   "private": true,
   "description": "Linaria website",
   "scripts": {
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@linaria/core": "^3.0.0-beta.4",
-    "@linaria/react": "^3.0.0-beta.7",
+    "@linaria/react": "^3.0.0-beta.11",
     "@linaria/server": "^3.0.0-beta.3",
     "babel-plugin-file-loader": "^1.1.1",
     "dedent": "^0.7.0",
