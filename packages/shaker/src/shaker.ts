@@ -108,7 +108,9 @@ export default function shake(
     const importType = depsGraph.importTypes.get(source);
     const defaultMembers = importType === 'wildcard' ? ['*'] : [];
     const aliveMembers = new Set(
-      members.filter((i) => alive.has(i)).map((i) => i.name)
+      members
+        .filter((i) => alive.has(i))
+        .map((i) => (i.type === 'Identifier' ? i.name : i.value))
     );
 
     if (importType === 'reexport') {

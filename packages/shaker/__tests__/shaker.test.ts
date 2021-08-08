@@ -9,9 +9,11 @@ describe('shaker', () => {
       import { css } from "@linaria/core";
       import * as mod from "@linaria/babel-preset/__fixtures__/complex-component";
 
+      const color = mod["whiteColor"];
+
       export const square = css\`
         ${'${mod.Title}'} {
-          color: red;
+          color: ${'${color}'};
         }
       \`;
     `
