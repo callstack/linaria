@@ -4,7 +4,7 @@
  * - injects classNames for the returned component
  * - injects CSS variables used to define dynamic styles based on props
  */
-import * as React from 'react';
+import React from 'react';
 import validAttr from '@emotion/is-prop-valid';
 import { cx } from '@linaria/core';
 import type { CSSProperties, StyledMeta } from '@linaria/core';

@@ -26,7 +26,9 @@ it('Ensures that package do not include core-js dependency after build', async (
   });
   const result = await waitForProcess(proc);
   // run `DEBUG_CORE_JS=true yarn build:lib` to debug issues with introduced core-js dependency
-  expect(result).not.toContain('Added following core-js polyfill');
+  expect(result).not.toContain(
+    'The corejs3 polyfill added the following polyfills'
+  );
   expect(result).toContain(
     'Based on your code and targets, the corejs3 polyfill did not add any polyfill'
   );
