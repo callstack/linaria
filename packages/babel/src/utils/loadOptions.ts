@@ -10,7 +10,7 @@ const explorer = cosmiconfig('linaria');
 export default function loadOptions(
   overrides: Partial<PluginOptions> = {}
 ): Partial<StrictOptions> {
-  const { configFile, ignore, ...rest } = overrides;
+  const { configFile, ignore, rules, ...rest } = overrides;
 
   const result =
     configFile !== undefined
@@ -20,7 +20,7 @@ export default function loadOptions(
   return {
     displayName: false,
     evaluate: true,
-    rules: [
+    rules: rules ?? [
       {
         // FIXME: if `rule` is not specified in a config, `@linaria/shaker` should be added as a dependency
         // eslint-disable-next-line import/no-extraneous-dependencies
