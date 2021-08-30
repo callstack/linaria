@@ -97,7 +97,7 @@ exports[`handles fn passed in as classNameSlug 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"t17gu1mi_42_Title\\"
+  class: \\"t17gu1mi_Title_t17gu1mi_Title__tests___app_index_js_index__js_app\\"
 });"
 `;
 
@@ -105,7 +105,7 @@ exports[`handles fn passed in as classNameSlug 2`] = `
 
 CSS:
 
-.t17gu1mi_42_Title {
+.t17gu1mi_Title_t17gu1mi_Title__tests___app_index_js_index__js_app {
   font-size: 14px;
 }
 
@@ -389,6 +389,26 @@ Dependencies: NA
 
 `;
 
+exports[`removes fake replacement patterns in string classNameSlug 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"__\\"
+});"
+`;
+
+exports[`removes fake replacement patterns in string classNameSlug 2`] = `
+
+CSS:
+
+.__ {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`replaces unknown expressions with CSS custom properties 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled(\\"h1\\")({
@@ -552,7 +572,7 @@ exports[`uses string passed in as classNameSlug 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"testSlug\\"
+  class: \\"t17gu1mi_Title__tests___app_index_js_index__js_app\\"
 });"
 `;
 
@@ -560,7 +580,7 @@ exports[`uses string passed in as classNameSlug 2`] = `
 
 CSS:
 
-.testSlug {
+.t17gu1mi_Title__tests___app_index_js_index__js_app {
   font-size: 14px;
 }
 

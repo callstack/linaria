@@ -5,16 +5,17 @@
  * It saves that meta data as comment above the template, to be later used in templateProcessor.
  */
 
-import { basename, dirname, relative } from 'path';
+import { basename, dirname, relative, extname, sep } from 'path';
 import type { ObjectProperty, TaggedTemplateExpression } from '@babel/types';
 import type { NodePath } from '@babel/traverse';
 import { debug } from '@linaria/logger';
-import type { State, StrictOptions } from '../types';
+import type { ClassNameSlugVars, State, StrictOptions } from '../types';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
 import slugify from '../utils/slugify';
 import getLinariaComment from '../utils/getLinariaComment';
 import isStyledOrCss from '../utils/isStyledOrCss';
 import { Core } from '../babel';
+import isSlugVar from '../utils/isSlugVar';
 
 export default function GenerateClassNames(
   babel: Core,
@@ -106,6 +107,19 @@ export default function GenerateClassNames(
       )}`
     );
 
+  // Collect some useful replacement patterns from the filename
+  // Available variables for the square brackets used in `classNameSlug` options
+  const file = relative(process.cwd(), state.file.opts.filename).slice(1);
+  const ext = extname(file);
+  const slugVars: ClassNameSlugVars = {
+    hash: slug,
+    title: displayName,
+    file,
+    ext,
+    name: basename(file, ext),
+    dir: dirname(file).split(sep).pop() as string,
+  };
+
   let className = predefinedClassName
     ? predefinedClassName
     : options.displayName
@@ -116,7 +130,7 @@ export default function GenerateClassNames(
   if (typeof options.classNameSlug === 'function') {
     try {
       className = toValidCSSIdentifier(
-        options.classNameSlug(slug, displayName)
+        options.classNameSlug(slug, displayName, slugVars)
       );
     } catch {
       throw new Error(`classNameSlug option must return a string`);
@@ -126,12 +140,6 @@ export default function GenerateClassNames(
   if (typeof options.classNameSlug === 'string') {
     const { classNameSlug } = options;
 
-    // Available variables for the square brackets used in `classNameSlug` options
-    const classNameSlugVars: Record<string, string | null> = {
-      hash: slug,
-      title: displayName,
-    };
-
     // Variables that were used in the config for `classNameSlug`
     const optionVariables = classNameSlug.match(/\[.*?]/g) || [];
     let cnSlug = classNameSlug;
@@ -140,7 +148,10 @@ export default function GenerateClassNames(
       const v = optionVariables[i].slice(1, -1); // Remove the brackets around the variable name
 
       // Replace the var if it key and value exist otherwise place an empty string
-      cnSlug = cnSlug.replace(`[${v}]`, classNameSlugVars[v] || '');
+      cnSlug = cnSlug.replace(
+        `[${v}]`,
+        isSlugVar(v, slugVars) ? slugVars[v] : ''
+      );
     }
 
     className = toValidCSSIdentifier(cnSlug);
