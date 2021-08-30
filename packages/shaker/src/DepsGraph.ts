@@ -130,10 +130,11 @@ export default class DepsGraph {
 
   getDependencies(nodes: t.Node[]) {
     this.processQueue();
-    return nodes.reduce(
-      (acc, node) => acc.concat(Array.from(this.dependencies.get(node) || [])),
-      [] as t.Node[]
+    const reduced: t.Node[] = [];
+    nodes.forEach((n) =>
+      reduced.push(...Array.from(this.dependencies.get(n) || []))
     );
+    return reduced;
   }
 
   getLeaf(name: string): t.Node | undefined {
