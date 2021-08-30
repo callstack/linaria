@@ -43,7 +43,29 @@ it('uses string passed in as classNameSlug', async () => {
       font-size: 14px;
     \`;
 `,
-    { classNameSlug: 'testSlug' }
+    {
+      classNameSlug: ['hash', 'title', 'file', 'name', 'ext', 'dir']
+        .map((s) => `[${s}]`)
+        .join('_'),
+    }
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('removes fake replacement patterns in string classNameSlug', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from '@linaria/react';
+
+    export const Title = styled('h1')\`
+      font-size: 14px;
+    \`;
+`,
+    {
+      classNameSlug: `[not]_[actual]_[replacements]`,
+    }
   );
 
   expect(code).toMatchSnapshot();
@@ -60,8 +82,17 @@ it('handles fn passed in as classNameSlug', async () => {
     \`;
 `,
     {
-      classNameSlug: (hash, title) => {
-        return `${hash}_${7 * 6}_${title}`;
+      classNameSlug: (hash, title, vars) => {
+        return [
+          hash,
+          title,
+          vars.hash,
+          vars.title,
+          vars.file,
+          vars.name,
+          vars.ext,
+          vars.dir,
+        ].join('_');
       },
     }
   );
