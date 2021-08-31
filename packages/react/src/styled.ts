@@ -63,13 +63,15 @@ interface IProps {
 // If styled wraps custom component, that component should have className property
 function styled<TConstructor extends React.FunctionComponent<any>>(
   tag: TConstructor extends React.FunctionComponent<infer T>
-    ? T extends { className?: string }
+    ? T extends { className?: string | undefined }
       ? TConstructor
       : never
     : never
 ): ComponentStyledTag<TConstructor>;
 function styled<T>(
-  tag: T extends { className?: string } ? React.ComponentType<T> : never
+  tag: T extends { className?: string | undefined }
+    ? React.ComponentType<T>
+    : never
 ): ComponentStyledTag<T>;
 function styled<TName extends keyof JSX.IntrinsicElements>(
   tag: TName
@@ -197,7 +199,7 @@ type ComponentStyledTag<T> = <
 >(
   strings: TemplateStringsArray,
   // Expressions can contain functions only if wrapped component has style property
-  ...exprs: TrgProps extends { style?: React.CSSProperties }
+  ...exprs: TrgProps extends { style?: React.CSSProperties | undefined }
     ? Array<
         | StaticPlaceholder
         | ((props: NoInfer<OwnProps & TrgProps>) => string | number)
