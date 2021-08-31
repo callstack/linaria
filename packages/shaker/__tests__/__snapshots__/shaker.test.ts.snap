@@ -144,6 +144,28 @@ Dependencies: @babel/runtime/helpers/interopRequireDefault, @babel/runtime/helpe
 
 `;
 
+exports[`shaker evaluates chain of reexports 1`] = `
+"import { styled } from '@linaria/react';
+import { fooStyles } from \\"@linaria/babel-preset/__fixtures__/reexports\\";
+const value = fooStyles.foo;
+export const H1 = /*#__PURE__*/styled(\\"h1\\")({
+  name: \\"H1\\",
+  class: \\"H1_h1t92lw9\\"
+});"
+`;
+
+exports[`shaker evaluates chain of reexports 2`] = `
+
+CSS:
+
+.H1_h1t92lw9 {
+  color: foo;
+}
+
+Dependencies: @linaria/babel-preset/__fixtures__/reexports
+
+`;
+
 exports[`shaker evaluates complex styles with functions and nested selectors 1`] = `
 "import { css } from '@linaria/core';
 export const bareIconClass = \\"bareIconClass_b1t92lw9\\";

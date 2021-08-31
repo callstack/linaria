@@ -242,7 +242,7 @@ class Module {
           } else {
             // For JS/TS files, evaluate the module
             // The module will be transpiled using provided transform
-            m.evaluate(code, only.includes('*') ? null : only);
+            m.evaluate(code, only.includes('*') ? ['*'] : only);
           }
         } else {
           // For non JS/JSON requires, just export the id

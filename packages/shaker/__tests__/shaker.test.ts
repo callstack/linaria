@@ -96,5 +96,23 @@ describe('shaker', () => {
       expect(code).toMatchSnapshot();
       expect(metadata).toMatchSnapshot();
     });
+
+    it('evaluates chain of reexports', async () => {
+      const { code, metadata } = await transpile(
+        dedent`
+      import { styled } from '@linaria/react';
+      import { fooStyles } from "@linaria/babel-preset/__fixtures__/reexports";
+
+      const value = fooStyles.foo;
+
+      export const H1 = styled.h1\`
+        color: ${'${value}'};
+      \`
+      `
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
   });
 });
