@@ -50,6 +50,8 @@ function shakeNode<TNode extends Node>(node: TNode, alive: Set<Node>): Node {
   return Object.keys(changes).length ? { ...node, ...changes } : node;
 }
 
+const isDefined = <T>(i: T | undefined): i is T => i !== undefined;
+
 /*
  * Gets AST and a list of nodes for evaluation
  * Removes unrelated “dead” code.
@@ -73,6 +75,10 @@ export default function shake(
   const reexports: string[] = [];
   let deps = (exports ?? [])
     .map((token) => {
+      if (token === '*') {
+        return depsGraph.getLeaves(null).filter(isDefined);
+      }
+
       const node = depsGraph.getLeaf(token);
       if (node) return [node];
       // We have some unknown token. Do we have `export * from …` in that file?
