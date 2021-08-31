@@ -1,6 +1,6 @@
 {
   "name": "@linaria/webpack5-loader",
-  "version": "3.0.0-beta.7",
+  "version": "3.0.0-beta.12",
   "publishConfig": {
     "access": "public"
   },
@@ -47,7 +47,7 @@
     "webpack": "^5.6.0"
   },
   "dependencies": {
-    "@linaria/babel-preset": "^3.0.0-beta.7",
+    "@linaria/babel-preset": "^3.0.0-beta.12",
     "@linaria/logger": "^3.0.0-beta.3",
     "cosmiconfig": "^5.1.0",
     "enhanced-resolve": "^5.3.1",
