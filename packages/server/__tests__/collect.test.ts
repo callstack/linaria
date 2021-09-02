@@ -233,3 +233,20 @@ describe('include atrule once', () => {
   test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
   test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
 });
+
+describe('ignore empty class attribute', () => {
+  const html = dedent`
+    <div class=""></div>
+    <div class="a"></div>
+    <div class=""></div>
+    <div class="b"></div>
+    <div class=""></div>
+  `;
+
+  const css = dedent`
+    .not-exist {}
+  `;
+
+  const { critical } = collect(html, css);
+  test('critical should be empty', () => expect(critical).toEqual(''));
+});
