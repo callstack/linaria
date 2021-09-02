@@ -77,6 +77,7 @@ export default function webpack4Loader(
     {
       ...(this._compilation?.options.resolve ?? {}),
       ...resolveOptions,
+      mainFields: ['main'],
     }
   );
 

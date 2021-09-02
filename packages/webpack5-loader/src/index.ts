@@ -65,6 +65,7 @@ export default function webpack5Loader(
     {
       ...(this._compilation?.options.resolve ?? {}),
       ...resolveOptions,
+      mainFields: ['main'],
     }
   );
 
