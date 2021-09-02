@@ -32,11 +32,6 @@ export default function webpack5Loader(
 
   EvalCache.clearForFile(this.resourcePath);
 
-  const resolveOptionsDefaults = {
-    conditionNames: ['require'],
-    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
-  };
-
   const {
     sourceMap = undefined,
     cacheDirectory = '.linaria-cache',
@@ -68,13 +63,9 @@ export default function webpack5Loader(
     // Another option is to read the webpack.config.js, but it won't work for programmatic usage
     // This API is used by many loaders/plugins, so hope we're safe for a while
     {
-      ...resolveOptionsDefaults,
-      ...((this._compilation?.options.resolve && {
-        alias: this._compilation.options.resolve.alias,
-        modules: this._compilation.options.resolve.modules,
-      }) ||
-        {}),
+      ...(this._compilation?.options.resolve ?? {}),
       ...resolveOptions,
+      mainFields: ['main'],
     }
   );
 
