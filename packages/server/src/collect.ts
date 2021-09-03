@@ -97,7 +97,7 @@ export default function collect(html: string, css: string): CollectResult {
 
 const extractClassesFromHtml = (html: string): RegExp => {
   const htmlClasses: string[] = [];
-  const regex = /\s+class="([^"]*)"/gm;
+  const regex = /\s+class="([^"]+)"/gm;
   let match = regex.exec(html);
 
   while (match !== null) {
