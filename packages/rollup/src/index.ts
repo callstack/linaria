@@ -4,6 +4,7 @@
  * returns transformed code without template literals and attaches generated source maps
  */
 
+import path from 'path';
 import { createFilter } from '@rollup/pluginutils';
 import { transform, slugify, Result } from '@linaria/babel-preset';
 import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
@@ -15,6 +16,11 @@ type RollupPluginOptions = {
   preprocessor?: Preprocessor;
 } & Partial<PluginOptions>;
 
+type ViteConfig = {
+  root: string;
+  command: 'serve' | 'build';
+};
+
 export default function linaria({
   include,
   exclude,
@@ -24,9 +30,13 @@ export default function linaria({
 }: RollupPluginOptions = {}) {
   const filter = createFilter(include, exclude);
   const cssLookup: { [key: string]: string } = {};
+  let config: ViteConfig;
 
   return {
     name: 'linaria',
+    configResolved(resolvedConfig: ViteConfig) {
+      config = resolvedConfig;
+    },
     load(id: string) {
       return cssLookup[id];
     },
@@ -52,7 +62,7 @@ export default function linaria({
       let { cssText } = result;
 
       const slug = slugify(cssText);
-      const filename = `@linaria:${id.replace(/\.js$/, '')}_${slug}.css`;
+      const filename = `${id.replace(/\.[jt]sx?$/, '')}_${slug}.css`;
 
       if (sourceMap && result.cssSourceMapText) {
         const map = Buffer.from(result.cssSourceMapText).toString('base64');
@@ -60,6 +70,9 @@ export default function linaria({
       }
 
       cssLookup[filename] = cssText;
+      if (config?.command === 'serve' && config?.root) {
+        cssLookup['/' + path.posix.relative(config.root, filename)] = cssText;
+      }
 
       result.code += `\nimport ${JSON.stringify(filename)};\n`;
 
