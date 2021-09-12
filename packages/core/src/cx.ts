@@ -1,9 +1,18 @@
-export type ClassName = string | false | void | null | 0;
+import { LinariaClassName } from './css';
 
-type CX = (...classNames: ClassName[]) => string;
+export type ClassName<T = string> = T | false | void | null | 0 | '';
 
-const cx: CX = function cx() {
-  return Array.prototype.slice.call(arguments).filter(Boolean).join(' ');
+interface ICX {
+  (...classNames: ClassName<LinariaClassName>[]): LinariaClassName;
+  (...classNames: ClassName[]): string;
+}
+
+const cx: ICX = function cx() {
+  const result = Array.prototype.slice
+    .call(arguments)
+    .filter(Boolean)
+    .join(' ');
+  return result as LinariaClassName;
 };
 
 export default cx;
