@@ -1,10 +1,12 @@
 import type { CSSProperties } from './CSSProperties';
 import type { StyledMeta } from './StyledMeta';
 
+export type LinariaClassName = string & { __linariaClassName: true };
+
 type CSS = (
   strings: TemplateStringsArray,
   ...exprs: Array<string | number | CSSProperties | StyledMeta>
-) => string;
+) => LinariaClassName;
 
 const css: CSS = () => {
   throw new Error(
