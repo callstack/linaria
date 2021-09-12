@@ -22,21 +22,23 @@ class GraphBuilder extends GraphBuilderState {
   }
 
   private isExportsIdentifier(node: Node) {
-    if (
-      t.isIdentifier(node) &&
-      this.scope.getDeclaration(node) === ScopeManager.globalExportsIdentifier
-    ) {
-      return true;
+    if (t.isIdentifier(node)) {
+      return (
+        this.scope.getDeclaration(node) === ScopeManager.globalExportsIdentifier
+      );
     }
 
-    return (
-      t.isMemberExpression(node) &&
-      t.isIdentifier(node.property) &&
-      node.property.name === 'exports' &&
-      t.isIdentifier(node.object) &&
-      this.scope.getDeclaration(node.object) ===
-        ScopeManager.globalModuleIdentifier
-    );
+    if (t.isMemberExpression(node)) {
+      return (
+        t.isIdentifier(node.property) &&
+        node.property.name === 'exports' &&
+        t.isIdentifier(node.object) &&
+        this.scope.getDeclaration(node.object) ===
+          ScopeManager.globalModuleIdentifier
+      );
+    }
+
+    return false;
   }
 
   private isExportsAssigment(node: Node): node is AssignmentExpression {
@@ -57,6 +59,17 @@ class GraphBuilder extends GraphBuilderState {
     }
 
     return false;
+  }
+
+  private isTSExporterCall(
+    node: Node
+  ): node is t.CallExpression & { arguments: [t.StringLiteral, t.Identifier] } {
+    if (!t.isCallExpression(node) || node.arguments.length !== 2) {
+      return false;
+    }
+
+    // FIXME: more precisely check
+    return !(!t.isIdentifier(node.callee) || node.callee.name !== 'exporter');
   }
 
   /*
@@ -158,6 +171,10 @@ class GraphBuilder extends GraphBuilderState {
           );
         }
       }
+    } else if (this.isTSExporterCall(node)) {
+      const [name, identifier] = node.arguments;
+      this.graph.addExport(name.value, node);
+      this.graph.addEdge(node, identifier);
     }
 
     const isScopable = t.isScopable(node);

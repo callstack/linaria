@@ -77,6 +77,12 @@ export default class DepsGraph {
   }
 
   addExport(name: string, node: t.Node) {
+    const existed = this.exports.get(name);
+    if (existed) {
+      // Sometimes export can be defined more than once and in that case we have to keep all export statements
+      this.addEdge(node, existed);
+    }
+
     this.exports.set(name, node);
   }
 
