@@ -65,18 +65,6 @@ color.green = '#0f0';
 exports.__linariaPreval = [color];"
 `;
 
-exports[`keeps only the last assignment of each exported variable 1`] = `
-"\\"use strict\\";
-
-var bar = function bar() {
-  return 'hello world';
-};
-
-exports.bar = bar;
-var foo = exports.bar();
-exports.__linariaPreval = [foo];"
-`;
-
 exports[`keeps reused exports 1`] = `
 "\\"use strict\\";
 

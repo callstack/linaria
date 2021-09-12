@@ -3,6 +3,7 @@ import type {
   AssignmentExpression,
   Block,
   CallExpression,
+  CatchClause,
   Directive,
   ExpressionStatement,
   ForInStatement,
@@ -73,6 +74,48 @@ function getCallee(node: CallExpression): Node {
   }
 
   return node.callee;
+}
+
+function isTSLib(node: t.Node, scope: ScopeManager) {
+  if (!t.isIdentifier(node)) {
+    return false;
+  }
+
+  const declaration = scope.getDeclaration(node);
+  return t.isIdentifier(declaration) && declaration.name === 'tslib_1';
+}
+
+function isTSReexport(
+  node: t.Node,
+  scope: ScopeManager
+): node is t.Node & { callee: { object: t.Identifier } } {
+  if (!t.isCallExpression(node)) {
+    return false;
+  }
+
+  const {
+    callee,
+    arguments: [, exportsIdentifier],
+  } = node;
+  if (
+    !t.isIdentifier(exportsIdentifier) ||
+    exportsIdentifier.name !== 'exports' ||
+    scope.getDeclaration(exportsIdentifier) !==
+      ScopeManager.globalExportsIdentifier
+  ) {
+    return false;
+  }
+
+  if (!t.isMemberExpression(callee)) {
+    return false;
+  }
+
+  const { object, property } = callee;
+  if (!t.isIdentifier(property) || property.name !== '__exportStar') {
+    return false;
+  }
+
+  return isTSLib(object, scope);
 }
 
 function findWildcardReexportStatement(
@@ -197,6 +240,10 @@ export const visitors: Visitors = {
       // keep function name in expressions like `const a = function a();`
       this.graph.addEdge(node, node.id);
     }
+
+    if (t.isFunctionDeclaration(node) && node.id) {
+      this.graph.addEdge(node, node.id);
+    }
   },
 
   /*
@@ -256,6 +303,12 @@ export const visitors: Visitors = {
         this.graph.addEdge(statement, node.block);
       }
     });
+  },
+
+  CatchClause(this: GraphBuilderState, node: CatchClause) {
+    this.baseVisit(node);
+
+    this.graph.addEdge(node, node.body);
   },
 
   IfStatement(this: GraphBuilderState, node: IfStatement) {
@@ -519,6 +572,18 @@ export const visitors: Visitors = {
         [Identifier, Identifier | null]
       >;
       if (!declared) {
+        // Is it a ts reexport?
+        // tslib_1.__exportStar(require("./Async"), exports);
+        if (parent && isTSReexport(parent, this.scope)) {
+          if (!this.graph.imports.has(source)) {
+            this.graph.imports.set(source, []);
+          }
+
+          this.graph.addEdge(parent.callee.object, parent);
+          this.graph.reexports.push(parent.callee.object);
+          this.graph.importTypes.set(source, 'reexport');
+        }
+
         // This is a standalone `require`
         return;
       }

@@ -56,6 +56,8 @@ const getId = (scope: Scope, identifier: t.Identifier | string): string => {
   }`;
 };
 
+const globalIdentifiers = new Set(['exports', 'module']);
+
 export default class ScopeManager {
   public static globalExportsIdentifier = t.identifier('exports');
   public static globalModuleIdentifier = t.identifier('module');
@@ -125,7 +127,7 @@ export default class ScopeManager {
     const scope = this.stack
       .slice(stack)
       .find((s) => !isHoistable || functionScopes.has(s))!;
-    if (this.global.has(idName)) {
+    if (this.global.has(idName) && !globalIdentifiers.has(idName)) {
       // It's probably a declaration of a previous referenced identifier
       // Let's use naïve implementation of hoisting
       const promise = this.declarations.get(
