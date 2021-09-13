@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.13](https://github.com/callstack/linaria/compare/v3.0.0-beta.12...v3.0.0-beta.13) (2021-09-13)
+
+
+### Bug Fixes
+
+* **core:** return type alias instead of string from `css` and `cx` ([#835](https://github.com/callstack/linaria/issues/835)) ([7eb9d94](https://github.com/callstack/linaria/commit/7eb9d94dc2d9d79f7be0159c43fa5d71c96d7182))
+
+
+
+
+
 # [3.0.0-beta.4](https://github.com/callstack/linaria/compare/v3.0.0-beta.3...v3.0.0-beta.4) (2021-05-07)
 
 **Note:** Version bump only for package @linaria/core

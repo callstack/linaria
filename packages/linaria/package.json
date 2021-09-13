@@ -1,6 +1,6 @@
 {
   "name": "linaria",
-  "version": "3.0.0-beta.12",
+  "version": "3.0.0-beta.13",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "main": "lib/core.js",
   "module": "esm/core.js",
@@ -42,15 +42,15 @@
     "watch": "yarn build --watch"
   },
   "dependencies": {
-    "@linaria/babel-preset": "^3.0.0-beta.12",
-    "@linaria/core": "^3.0.0-beta.4",
-    "@linaria/extractor": "^3.0.0-beta.12",
-    "@linaria/react": "^3.0.0-beta.11",
-    "@linaria/rollup": "^3.0.0-beta.12",
-    "@linaria/server": "^3.0.0-beta.3",
-    "@linaria/shaker": "^3.0.0-beta.12",
-    "@linaria/stylelint": "^3.0.0-beta.12",
-    "@linaria/webpack4-loader": "^3.0.0-beta.12"
+    "@linaria/babel-preset": "^3.0.0-beta.13",
+    "@linaria/core": "^3.0.0-beta.13",
+    "@linaria/extractor": "^3.0.0-beta.13",
+    "@linaria/react": "^3.0.0-beta.13",
+    "@linaria/rollup": "^3.0.0-beta.13",
+    "@linaria/server": "^3.0.0-beta.13",
+    "@linaria/shaker": "^3.0.0-beta.13",
+    "@linaria/stylelint": "^3.0.0-beta.13",
+    "@linaria/webpack4-loader": "^3.0.0-beta.13"
   },
   "peerDependencies": {
     "@babel/core": ">=7"

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.13](https://github.com/callstack/linaria/compare/v3.0.0-beta.12...v3.0.0-beta.13) (2021-09-13)
+
+
+### Bug Fixes
+
+* **rollup:** rollup preserveModules no js extension ([#822](https://github.com/callstack/linaria/issues/822)) ([ca5232a](https://github.com/callstack/linaria/commit/ca5232ad389ae01937cafd0c360401507ddbcda2))
+
+
+
+
+
 # [3.0.0-beta.12](https://github.com/callstack/linaria/compare/v3.0.0-beta.11...v3.0.0-beta.12) (2021-08-31)
 
 **Note:** Version bump only for package @linaria/rollup

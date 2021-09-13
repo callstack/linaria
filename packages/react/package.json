@@ -1,6 +1,6 @@
 {
   "name": "@linaria/react",
-  "version": "3.0.0-beta.11",
+  "version": "3.0.0-beta.13",
   "publishConfig": {
     "access": "public"
   },
@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^0.8.8",
-    "@linaria/core": "^3.0.0-beta.4"
+    "@linaria/core": "^3.0.0-beta.13"
   },
   "peerDependencies": {
     "react": ">=16"

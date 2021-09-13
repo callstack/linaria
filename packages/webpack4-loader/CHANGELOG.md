@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.13](https://github.com/callstack/linaria/compare/v3.0.0-beta.12...v3.0.0-beta.13) (2021-09-13)
+
+
+### Bug Fixes
+
+* **webpack:** pass all user resolve options to loader (fixes [#658](https://github.com/callstack/linaria/issues/658)) ([#830](https://github.com/callstack/linaria/issues/830)) ([a0590e5](https://github.com/callstack/linaria/commit/a0590e5183b3ad3a93fd7adce61504fd85b4bcb1))
+
+
+
+
+
 # [3.0.0-beta.12](https://github.com/callstack/linaria/compare/v3.0.0-beta.11...v3.0.0-beta.12) (2021-08-31)
 
 **Note:** Version bump only for package @linaria/webpack4-loader
