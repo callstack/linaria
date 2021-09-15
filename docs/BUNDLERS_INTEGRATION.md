@@ -1,6 +1,7 @@
 # Bundlers Integration
 
 ## Jump To
+
 - [webpack](#webpack)
 - [Rollup](#Rollup)
 - [Svelte](#Svelte)
@@ -11,7 +12,7 @@ If you use Babel in your project, make sure to have a [config file for Babel](ht
 
 ## Bundlers
 
-Please note, that `@babel/core` is a peer dependency of all loaders. Do not forget to add it to `devDependencies` list in your project. 
+Please note, that `@babel/core` is a peer dependency of all loaders. Do not forget to add it to `devDependencies` list in your project.
 
 ### webpack
 
@@ -54,9 +55,6 @@ Now add the following snippet in under `module.rules`:
   use: [
     {
       loader: MiniCssExtractPlugin.loader,
-      options: {
-        hmr: process.env.NODE_ENV !== 'production',
-      },
     },
     {
       loader: 'css-loader',
@@ -139,12 +137,7 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              hmr: process.env.NODE_ENV !== 'production',
-            },
-          },
+          MiniCssExtractPlugin.loader,
           {
             loader: 'css-loader',
             options: { sourceMap: dev },
@@ -185,7 +178,7 @@ The loader accepts the following options:
 - `cacheDirectory: string` (default: `'.linaria-cache'`):
 
   Path to the directory where the loader will output the intermediate CSS files. You can pass a relative or absolute directory path. Make sure the directory is inside the working directory for things to work properly. **You should add this directory to `.gitignore` so you don't accidentally commit them.**
-  
+
 - `extension: string` (default: `'.linaria.css'`):
 
   An extension of the intermediate CSS files.
@@ -287,16 +280,15 @@ export default {
 };
 ```
 
-
-If you are using [@rollup/plugin-babel](https://github.com/rollup/plugins/tree/master/packages/babel) as well, ensure the linaria plugin is declared earlier in the `plugins` array than your babel plugin. 
+If you are using [@rollup/plugin-babel](https://github.com/rollup/plugins/tree/master/packages/babel) as well, ensure the linaria plugin is declared earlier in the `plugins` array than your babel plugin.
 
 ```js
 import linaria from '@linaria/rollup';
 import css from 'rollup-plugin-css-only';
-import babel from "@rollup/plugin-babel";
+import babel from '@rollup/plugin-babel';
 
 export default {
-   /* rest of your config */
+  /* rest of your config */
   plugins: [
     linaria({
       sourceMap: process.env.NODE_ENV !== 'production',
@@ -304,8 +296,10 @@ export default {
     css({
       output: 'styles.css',
     }),
-    babel({/**/}),
-     /* rest of your plugins */
+    babel({
+      /**/
+    }),
+    /* rest of your plugins */
   ],
 };
 ```
@@ -313,6 +307,7 @@ export default {
 ### Svelte
 
 #### Contents
+
 - [Svelte with Rollup](#Rollup-1)
 - [Svelte with Webpack](#Webpack-1)
 
@@ -393,4 +388,3 @@ module.exports = {
   },
 };
 ```
-
