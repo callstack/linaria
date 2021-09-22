@@ -55,13 +55,13 @@ const warnIfInvalid = (value: any, componentName: string) => {
 // If styled wraps custom component, that component should have className property
 function styled<TConstructor extends React.FunctionComponent<any>>(
   tag: TConstructor extends React.FunctionComponent<infer T>
-    ? T extends { className?: string }
+    ? [T] extends [{ className?: string }]
       ? TConstructor
       : never
     : never
 ): ComponentStyledTag<TConstructor>;
 function styled<T>(
-  tag: T extends { className?: string } ? React.ComponentType<T> : never
+  tag: [T] extends [{ className?: string }] ? React.ComponentType<T> : never
 ): ComponentStyledTag<T>;
 function styled<TName extends keyof JSX.IntrinsicElements>(
   tag: TName
@@ -155,7 +155,7 @@ function styled(tag: any): any {
 }
 
 type StyledComponent<T> = StyledMeta &
-  (T extends React.FunctionComponent<any>
+  ([T] extends [React.FunctionComponent<any>]
     ? T
     : React.FunctionComponent<T & { as?: React.ElementType }>);
 
@@ -177,7 +177,7 @@ type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
 
 type ComponentStyledTag<T> = <
   OwnProps = {},
-  TrgProps = T extends React.FunctionComponent<infer TProps> ? TProps : T
+  TrgProps = [T] extends [React.FunctionComponent<infer TProps>] ? TProps : T
 >(
   strings: TemplateStringsArray,
   // Expressions can contain functions only if wrapped component has style property
@@ -188,7 +188,7 @@ type ComponentStyledTag<T> = <
       >
     : StaticPlaceholder[]
 ) => keyof OwnProps extends never
-  ? T extends React.FunctionComponent<any>
+  ? [T] extends [React.FunctionComponent<any>]
     ? StyledMeta & T
     : StyledComponent<TrgProps>
   : StyledComponent<OwnProps & TrgProps>;
