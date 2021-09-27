@@ -54,9 +54,6 @@ Now add the following snippet in under `module.rules`:
   use: [
     {
       loader: MiniCssExtractPlugin.loader,
-      options: {
-        hmr: process.env.NODE_ENV !== 'production',
-      },
     },
     {
       loader: 'css-loader',
@@ -141,9 +138,6 @@ module.exports = {
         use: [
           {
             loader: MiniCssExtractPlugin.loader,
-            options: {
-              hmr: process.env.NODE_ENV !== 'production',
-            },
           },
           {
             loader: 'css-loader',
