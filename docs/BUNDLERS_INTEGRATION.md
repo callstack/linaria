@@ -2,6 +2,7 @@
 
 ## Jump To
 - [webpack](#webpack)
+- [esbuild](#esbuild)
 - [Rollup](#Rollup)
 - [Svelte](#Svelte)
 
