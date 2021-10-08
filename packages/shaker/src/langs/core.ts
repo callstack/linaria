@@ -213,7 +213,60 @@ function getAffectedNodes(node: Node, state: GraphBuilderState): Node[] {
   return [];
 }
 
+/*
+ * In some cases (such as enums) babel uses CallExpression for object initializations
+ * (function (Colors) {
+ *   Colors["BLUE"] = "#27509A";
+ * })(Colors || (Colors = {}));
+ */
+function isLazyInit(
+  statement: ExpressionStatement
+): statement is ExpressionStatement & {
+  expression: {
+    arguments: [{ right: AssignmentExpression }];
+  };
+} {
+  const { expression } = statement;
+  if (!t.isCallExpression(expression) || expression.arguments.length !== 1) {
+    return false;
+  }
+
+  const [arg] = expression.arguments;
+  if (!t.isLogicalExpression(arg) || arg.operator !== '||') {
+    return false;
+  }
+
+  const { left, right } = arg;
+  return t.isIdentifier(left) && t.isAssignmentExpression(right);
+}
+
 export const visitors: Visitors = {
+  /*
+   * ExpressionStatement
+   * This is one of the rare cases when a child defines a dependency on a parent.
+   * Suppose we have a code like this:
+   * const fn = () => {
+   *   let a = 2;
+   *   a *= 2;
+   *   return a;
+   * };
+   *
+   * `a *= 2` here is an ExpressionStatement node which contains an expression AssignmentExpression `a *= 2`.
+   * The result of AssignmentExpression here depends on the fact of ExpressionStatement execution,
+   * that's why we need to mark the statement as a dependency of the expression.
+   * If we don't mark it, it will be cut as a useless statement.
+   */
+  ExpressionStatement(this: GraphBuilderState, node: ExpressionStatement) {
+    this.baseVisit(node);
+
+    this.graph.addEdge(node, node.expression);
+    this.graph.addEdge(node.expression, node);
+
+    if (isLazyInit(node)) {
+      this.graph.addEdge(node.expression.arguments[0].right, node);
+    }
+  },
+
   /*
    * FunctionDeclaration | FunctionExpression | ObjectMethod | ArrowFunctionExpression | ClassMethod | ClassPrivateMethod;
    * Functions can be either a statement or an expression.
@@ -232,6 +285,11 @@ export const visitors: Visitors = {
     this.graph.addEdge(node, node.body);
 
     node.params.forEach((param) => this.graph.addEdge(node.body, param));
+    if (t.isFunctionDeclaration(node) && node.id) {
+      // `id` is an identifier which depends on the function declaration
+      this.graph.addEdge(node.id, node);
+    }
+
     if (
       t.isFunctionExpression(node) &&
       node.id !== null &&
@@ -244,16 +302,6 @@ export const visitors: Visitors = {
     if (t.isFunctionDeclaration(node) && node.id) {
       this.graph.addEdge(node, node.id);
     }
-  },
-
-  /*
-   * ExpressionStatement
-   */
-  ExpressionStatement(this: GraphBuilderState, node: ExpressionStatement) {
-    this.baseVisit(node);
-
-    this.graph.addEdge(node, node.expression);
-    this.graph.addEdge(node.expression, node);
   },
 
   /*
@@ -430,6 +478,7 @@ export const visitors: Visitors = {
    */
   MemberExpression(this: GraphBuilderState, node: MemberExpression) {
     this.baseVisit(node);
+    this.graph.addEdge(node.object, node);
 
     if (
       isIdentifier(node.object, 'exports') &&
@@ -494,6 +543,9 @@ export const visitors: Visitors = {
 
     // The left part of an assignment depends on the right part.
     this.graph.addEdge(node.left, node.right);
+
+    // At the same time, the left part doesn't make any sense without the whole expression.
+    this.graph.addEdge(node.left, node);
   },
 
   /*
@@ -520,6 +572,10 @@ export const visitors: Visitors = {
       // If there is an initialization part, the identifier depends on it.
       this.graph.addEdge(node.id, node.init);
     }
+
+    // If we want to evaluate the value of a declared identifier,
+    // we need to evaluate the whole expression.
+    this.graph.addEdge(node.id, node);
 
     // If a statement is required itself, an id is also required
     this.graph.addEdge(node, node.id);
