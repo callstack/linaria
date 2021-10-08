@@ -51,6 +51,7 @@ yarn add @linaria/core @linaria/react @linaria/babel-preset @linaria/shaker
 Linaria currently supports webpack and Rollup to extract the CSS at build time. To configure your bundler, check the following guides:
 
 - [webpack](/docs/BUNDLERS_INTEGRATION.md#webpack)
+- [esbuild](/docs/BUNDLERS_INTEGRATION.md#esbuild)
 - [Rollup](/docs/BUNDLERS_INTEGRATION.md#rollup)
 - [Svelte](/docs/BUNDLERS_INTEGRATION.md#svelte)
 
