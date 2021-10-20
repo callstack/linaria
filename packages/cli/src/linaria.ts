@@ -86,6 +86,10 @@ function processFiles(files: string[], options: Options) {
   );
 
   resolvedFiles.forEach((filename) => {
+    if (fs.lstatSync(filename).isDirectory()) {
+      return;
+    }
+
     const outputFilename = resolveOutputFilename(
       filename,
       options.outDir,
