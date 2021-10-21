@@ -191,7 +191,7 @@ The loader accepts the following options:
 
   - `'none'`: This will disable pre-processing entirely and the CSS will be left as you wrote it.
 
-    You might want to do it if you want to use non-standard syntax such as Sass or custom [postcss](https://postcss.org/) syntax Features such as nesting will no longer work with this option. You need to specify a loader such as [`sass-loader`](https://github.com/webpack-contrib/sass-loader) for `.linaria.css` files which handles the syntax you wrote.
+    You might want to do it if you want to use non-standard syntax such as Sass or custom [postcss](https://postcss.org/) syntax. Features such as nesting will no longer work with this option. You need to specify a loader such as [`sass-loader`](https://github.com/webpack-contrib/sass-loader) for `.linaria.css` files which handles the syntax you wrote.
 
   - `'stylis'`: This is the default pre-processor using [stylis.js](https://github.com/thysultan/stylis.js).
 
