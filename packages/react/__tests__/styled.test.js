@@ -1,3 +1,5 @@
+import { restOp } from '../src/styled';
+
 const React = require('react');
 const renderer = require('react-test-renderer');
 const styled = require('../src').styled;
@@ -253,4 +255,25 @@ it('throws when using as tag for template literal', () => {
         color: blue;
       `
   ).toThrow('Using the "styled" tag in runtime is not supported');
+});
+
+it('can get rest keys from object', () => {
+  const obj = { one: 1, two: 2, three: 3 };
+  const rest = restOp(obj, ['two']);
+  // eslint-disable-next-line no-unused-vars
+  const { two, ...expectedRest } = obj;
+  expect(rest).toEqual(expectedRest);
+});
+it('can get rest keys from complex object', () => {
+  const obj = {
+    string: 'hello',
+    bool: false,
+    object: { hello: 'world' },
+    arr: [1, 2, 3],
+    num: 47,
+  };
+  const rest = restOp(obj, ['bool', 'object', 'arr']);
+  // eslint-disable-next-line no-unused-vars
+  const { bool, object, arr, ...expectedRest } = obj;
+  expect(rest).toEqual(expectedRest);
 });

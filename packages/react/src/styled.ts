@@ -22,17 +22,23 @@ type Options = {
   };
 };
 
+interface CustomOmit {
+  <T extends object, K extends [...(keyof T)[]]>(obj: T, keys: K): {
+    [K2 in Exclude<keyof T, K[number]>]: T[K2];
+  };
+}
+
 // Workaround for rest operator
-const restOp = (
-  obj: Record<string, unknown>,
-  keysToExclude: string[]
-): Record<string, unknown> =>
-  Object.keys(obj)
-    .filter((prop) => keysToExclude.indexOf(prop) === -1)
-    .reduce((acc, curr) => {
-      acc[curr] = obj[curr];
-      return acc;
-    }, {} as Record<string, unknown>); // rest operator workaround
+export const restOp: CustomOmit = (obj, keys) => {
+  const res = {} as { [K in keyof typeof obj]: typeof obj[K] };
+  let key: keyof typeof obj;
+  for (key in obj) {
+    if (keys.indexOf(key) === -1) {
+      res[key] = obj[key];
+    }
+  }
+  return res;
+};
 
 const warnIfInvalid = (value: any, componentName: string) => {
   if (process.env.NODE_ENV !== 'production') {
