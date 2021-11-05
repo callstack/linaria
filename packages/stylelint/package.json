@@ -1,6 +1,6 @@
 {
   "name": "@linaria/stylelint",
-  "version": "3.0.0-beta.13",
+  "version": "3.0.0-beta.14",
   "publishConfig": {
     "access": "public"
   },
@@ -36,7 +36,7 @@
     "watch": "yarn build --watch"
   },
   "dependencies": {
-    "@linaria/babel-preset": "^3.0.0-beta.13",
+    "@linaria/babel-preset": "^3.0.0-beta.14",
     "strip-ansi": "^5.2.0"
   }
 }

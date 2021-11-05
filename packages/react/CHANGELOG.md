@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.14](https://github.com/callstack/linaria/compare/v3.0.0-beta.13...v3.0.0-beta.14) (2021-11-05)
+
+
+### Bug Fixes
+
+* **react:** refactor/rest op ([#860](https://github.com/callstack/linaria/issues/860)) ([da94704](https://github.com/callstack/linaria/commit/da94704df8ca74d94fe57682e2557274cf2d4cb0))
+* **react:** unions in prop types are not resolved ([#844](https://github.com/callstack/linaria/issues/844)) ([62009e9](https://github.com/callstack/linaria/commit/62009e9184638fd8761f187c99e7ea434f364bee))
+
+
+
+
+
 # [3.0.0-beta.13](https://github.com/callstack/linaria/compare/v3.0.0-beta.12...v3.0.0-beta.13) (2021-09-13)
 
 
