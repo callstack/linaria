@@ -185,7 +185,7 @@ export default function extract(
               lazyValues = evaluation.value.__linariaPreval || [];
               debug('lazy-deps:values', evaluation.value.__linariaPreval);
             } catch (e) {
-              error('lazy-deps:evaluate', code);
+              error('lazy-deps:evaluate:error', code);
               throw new Error(
                 'An unexpected runtime error occurred during dependencies evaluation: \n' +
                   e.stack +

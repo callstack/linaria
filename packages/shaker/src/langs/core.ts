@@ -477,7 +477,16 @@ export const visitors: Visitors = {
    * `obj.b = 2` will be cut and we will get just `{ a: 1 }`.
    */
   MemberExpression(this: GraphBuilderState, node: MemberExpression) {
-    this.baseVisit(node);
+    if (this.visit(node.object, node, 'object') !== 'ignore') {
+      this.graph.addEdge(node, node.object);
+    }
+
+    this.context.push('expression');
+    if (this.visit(node.property, node, 'property') !== 'ignore') {
+      this.graph.addEdge(node, node.property);
+    }
+    this.context.pop();
+
     this.graph.addEdge(node.object, node);
 
     if (
