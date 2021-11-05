@@ -298,7 +298,7 @@ const Title = styled.h1`
   opacity: 1;
   min-height: 360px;
 
-  '@media (min-width: 200px)': {
+  @media (min-width: 200px): {
     min-height: 480px;
   }
 `;
