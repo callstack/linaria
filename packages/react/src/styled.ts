@@ -16,8 +16,8 @@ type Options = {
   class: string;
   vars?: {
     [key: string]: [
-        string | number | ((props: unknown) => string | number),
-        string | void
+      string | number | ((props: unknown) => string | number),
+      string | void
     ];
   };
 };
@@ -33,7 +33,7 @@ export const restOp: CustomOmit = (obj, keys) => {
   const res = {} as { [K in keyof typeof obj]: typeof obj[K] };
   let key: keyof typeof obj;
   for (key in obj) {
-    if (!keys.includes(key)) {
+    if (keys.indexOf(key) === -1) {
       res[key] = obj[key];
     }
   }
@@ -161,10 +161,10 @@ function styled(tag: any): any {
       ? React.forwardRef(render)
       : // React.forwardRef won't available on older React versions and in Preact
         // Fallback to a innerRef prop in that case
-      (props: any) => {
-        const rest = restOp(props, ['innerRef']);
-        return render(rest, props.innerRef);
-      };
+        (props: any) => {
+          const rest = restOp(props, ['innerRef']);
+          return render(rest, props.innerRef);
+        };
 
     (Result as any).displayName = options.name;
 
@@ -187,28 +187,28 @@ type StaticPlaceholder = string | number | CSSProperties | StyledMeta;
 
 type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
   TAdditionalProps = {}
-  >(
+>(
   strings: TemplateStringsArray,
   ...exprs: Array<
     | StaticPlaceholder
     | ((
-    // Without Omit here TS tries to infer TAdditionalProps
-    // from a component passed for interpolation
-    props: JSX.IntrinsicElements[TName] & Omit<TAdditionalProps, never>
-  ) => string | number)
-    >
+        // Without Omit here TS tries to infer TAdditionalProps
+        // from a component passed for interpolation
+        props: JSX.IntrinsicElements[TName] & Omit<TAdditionalProps, never>
+      ) => string | number)
+  >
 ) => StyledComponent<JSX.IntrinsicElements[TName] & TAdditionalProps>;
 
 type ComponentStyledTag<T> = <
   OwnProps = {},
   TrgProps = T extends React.FunctionComponent<infer TProps> ? TProps : T
-  >(
+>(
   strings: TemplateStringsArray,
   // Expressions can contain functions only if wrapped component has style property
   ...exprs: TrgProps extends { style?: React.CSSProperties | undefined }
     ? Array<
-      | StaticPlaceholder
-      | ((props: NoInfer<OwnProps & TrgProps>) => string | number)
+        | StaticPlaceholder
+        | ((props: NoInfer<OwnProps & TrgProps>) => string | number)
       >
     : StaticPlaceholder[]
 ) => keyof OwnProps extends never
@@ -225,8 +225,8 @@ export type Styled = typeof styled & StyledJSXIntrinsics;
 
 export default (process.env.NODE_ENV !== 'production'
   ? new Proxy(styled, {
-    get(o, prop: keyof JSX.IntrinsicElements) {
-      return o(prop);
-    },
-  })
+      get(o, prop: keyof JSX.IntrinsicElements) {
+        return o(prop);
+      },
+    })
   : styled) as Styled;
