@@ -65,6 +65,7 @@ type Rules = {
     displayName: string;
     cssText: string;
     start: Location | null | undefined;
+    atom?: boolean;
   };
 };
 

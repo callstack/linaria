@@ -1,5 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`compiles atomic css 1`] = `
+"/* @flow */
+import { css } from '@linaria/atomic';
+import { styled } from '@linaria/react';
+const x = {
+  \\"background\\": \\"atm_k1dxsr\\",
+  \\"height\\": \\"atm_128ffr2\\"
+};
+console.log(x);"
+`;
+
+exports[`compiles atomic css 2`] = `
+
+CSS:
+
+.atm_k1dxsr {background: red;}
+.atm_128ffr2 {height: 100px;}
+
+Dependencies: NA
+
+`;
+
 exports[`does not include styles if not referenced anywhere 1`] = `
 "import { css } from '@linaria/core';
 import { styled } from '@linaria/react';

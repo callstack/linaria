@@ -112,8 +112,12 @@ export function extractCssFromAst(
       source: '',
     });
 
-    // Run each rule through stylis to support nesting
-    cssText += `${preprocessor(selector, rules[selector].cssText)}\n`;
+    if (rules[selector].atom) {
+      cssText += `${selector} {${rules[selector].cssText}}\n`;
+    } else {
+      // Run each rule through stylis to support nesting
+      cssText += `${preprocessor(selector, rules[selector].cssText)}\n`;
+    }
   });
 
   return {

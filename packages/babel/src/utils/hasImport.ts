@@ -4,6 +4,7 @@ import Module from '../module';
 const linariaLibs = new Set([
   '@linaria/core',
   '@linaria/react',
+  '@linaria/atomic',
   'linaria',
   'linaria/react',
 ]);

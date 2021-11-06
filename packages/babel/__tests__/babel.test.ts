@@ -553,3 +553,25 @@ it('handles objects with enums as keys', async () => {
   expect(code).toMatchSnapshot();
   expect(metadata).toMatchSnapshot();
 });
+
+it('compiles atomic css', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { css } from '@linaria/atomic';
+    import { styled } from '@linaria/react';
+    
+    const x = css\`
+      background: red;
+      height: 100px;
+    \`;
+    
+    console.log(x);
+    
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});

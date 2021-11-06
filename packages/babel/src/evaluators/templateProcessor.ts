@@ -22,6 +22,7 @@ import stripLines from '../utils/stripLines';
 import toCSS from '../utils/toCSS';
 import getLinariaComment from '../utils/getLinariaComment';
 import { Core } from '../babel';
+import atomize from '../utils/atomize';
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
@@ -64,7 +65,7 @@ export default function getTemplateProcessor(
     // Only works when it's assigned to a variable
     let isReferenced = true;
 
-    const [, slug, displayName, className] = getLinariaComment(path);
+    const [type, slug, displayName, className] = getLinariaComment(path);
 
     const parent = path.findParent(
       (p) =>
@@ -290,7 +291,7 @@ export default function getTemplateProcessor(
       );
 
       path.addComment('leading', '#__PURE__');
-    } else {
+    } else if (type === 'css') {
       path.replaceWith(t.stringLiteral(className!));
     }
 
@@ -298,16 +299,45 @@ export default function getTemplateProcessor(
       return;
     }
 
-    debug(
-      'evaluator:template-processor:extracted-rule',
-      `\n${selector} {${cssText}\n}`
-    );
+    if (type === 'atomic-css') {
+      const atomicRules = atomize(cssText);
+      atomicRules.forEach((rule) => {
+        state.rules[`.${rule.className}`] = {
+          cssText: rule.cssText,
+          start: path.parent?.loc?.start ?? null,
+          className: className!,
+          displayName: displayName!,
+          atom: true,
+        };
 
-    state.rules[selector] = {
-      cssText,
-      className: className!,
-      displayName: displayName!,
-      start: path.parent?.loc?.start ?? null,
-    };
+        debug(
+          'evaluator:template-processor:extracted-atomic-rule',
+          `\n${rule.cssText}`
+        );
+      });
+
+      const atomicClassObject = t.objectExpression(
+        atomicRules.map((rule) =>
+          t.objectProperty(
+            t.stringLiteral(rule.property),
+            t.stringLiteral(rule.className)
+          )
+        )
+      );
+
+      path.replaceWith(atomicClassObject);
+    } else {
+      debug(
+        'evaluator:template-processor:extracted-rule',
+        `\n${selector} {${cssText}\n}`
+      );
+
+      state.rules[selector] = {
+        cssText,
+        className: className!,
+        displayName: displayName!,
+        start: path.parent?.loc?.start ?? null,
+      };
+    }
   };
 }
