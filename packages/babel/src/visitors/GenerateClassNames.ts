@@ -6,12 +6,12 @@
  */
 
 import { basename, dirname, relative, extname, sep } from 'path';
+import { slugify } from '@linaria/utils';
 import type { ObjectProperty, TaggedTemplateExpression } from '@babel/types';
 import type { NodePath } from '@babel/traverse';
 import { debug } from '@linaria/logger';
 import type { ClassNameSlugVars, State, StrictOptions } from '../types';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
-import slugify from '../utils/slugify';
 import getLinariaComment from '../utils/getLinariaComment';
 import getTemplateType from '../utils/getTemplateType';
 import { Core } from '../babel';

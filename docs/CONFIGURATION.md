@@ -77,10 +77,16 @@ module.exports = {
   ];
   ```
 
+- `atomize: (cssText) => { className: string, cssText: string, property: string, }[]`
+
+  A function that will be used to split css text into an array of atoms (atoms have className, cssText and the property key defined for them)
+
+  To configure for use with `@linaria/atomic`, set this option to `atomize: require('@linaria/atomic').atomize`
+
 - `babelOptions: Object`
 
   If you need to specify custom babel configuration, you can pass them here. These babel options will be used by Linaria when parsing and evaluating modules.
-  
+
 - `resolveOptions: Object`
 
   By default, the loader will resolve modules using the `alias` and `modules`
@@ -151,7 +157,7 @@ After that, your `package.json` should look like the following:
 Now in your `preact.config.js`, we will modify the babel rule to use the necessary loaders and presets. Add the following:
 
 ```js
-export default config => {
+export default (config) => {
   const { options, ...babelLoaderRule } = config.module.rules[0]; // Get the babel rule and options
   options.presets.push('@babel/preset-react', '@linaria'); // Push the necessary presets
   config.module.rules[0] = {
@@ -160,15 +166,15 @@ export default config => {
     use: [
       {
         loader: 'babel-loader',
-        options
+        options,
       },
       {
         loader: '@linaria/webpack-loader',
         options: {
-          babelOptions: options // Pass the current babel options to linaria's babel instance
-        }
-      }
-    ]
+          babelOptions: options, // Pass the current babel options to linaria's babel instance
+        },
+      },
+    ],
   };
 };
 ```
@@ -265,7 +271,7 @@ exports.onCreateWebpackConfig = ({ actions, loaders, getConfig, stage }) => {
 
   config.module.rules = [
     ...config.module.rules.filter(
-      rule => String(rule.test) !== String(/\.js?$/)
+      (rule) => String(rule.test) !== String(/\.js?$/)
     ),
 
     {

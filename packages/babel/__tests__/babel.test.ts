@@ -9,7 +9,10 @@ expect.addSnapshotSerializer(serializer);
 
 const transpile = async (
   input: string,
-  opts: Partial<StrictOptions> = { evaluate: false }
+  opts: Partial<StrictOptions> = {
+    evaluate: false,
+    atomize: require('@linaria/atomic').atomize,
+  }
 ) =>
   (await transformAsync(input, {
     babelrc: false,

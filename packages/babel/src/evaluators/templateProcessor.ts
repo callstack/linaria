@@ -22,7 +22,6 @@ import stripLines from '../utils/stripLines';
 import toCSS from '../utils/toCSS';
 import getLinariaComment from '../utils/getLinariaComment';
 import { Core } from '../babel';
-import atomize from '../utils/atomize';
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
@@ -300,6 +299,12 @@ export default function getTemplateProcessor(
     }
 
     if (type === 'atomic-css') {
+      const { atomize } = options;
+      if (!atomize) {
+        throw new Error(
+          'The atomic css API was detected, but an atomize function was not passed in the linaria configuration.'
+        );
+      }
       const atomicRules = atomize(cssText);
       atomicRules.forEach((rule) => {
         state.rules[`.${rule.className}`] = {

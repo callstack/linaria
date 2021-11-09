@@ -1,5 +1,5 @@
 import postcss from 'postcss';
-import slugify from './slugify';
+import { slugify } from '@linaria/utils';
 
 export default function atomize(cssText: string) {
   const atomicRules: {

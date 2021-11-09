@@ -1,5 +1,5 @@
 export { default as css } from './css';
-export { default as cx } from './cx';
+export { cx } from '@linaria/utils';
 export type { CSSProperties } from './CSSProperties';
 export type { StyledMeta } from './StyledMeta';
-export type { LinariaClassName } from './css';
+export type { LinariaClassName } from '@linaria/utils';
