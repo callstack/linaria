@@ -1,10 +1,11 @@
 import genericDebug from 'debug';
 import type { Debugger } from 'debug';
+import pc from 'picocolors';
 
 type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 
 const levels = ['error', 'warn', 'info', 'debug'];
-const currentLevel = levels.indexOf(process.env.LINARIA_LOG || 'error');
+const currentLevel = levels.indexOf(process.env.LINARIA_LOG || 'warn');
 
 const linariaLogger = genericDebug('linaria');
 
@@ -61,3 +62,13 @@ export const debug = log.bind(null, 'debug');
 export const info = log.bind(null, 'info');
 export const warn = log.bind(null, 'warn');
 export const error = log.bind(null, 'error');
+
+export const notify = (message: string) => {
+  console.log(
+    pc.red(
+      message.replace(/(`.*?`)/g, (s) =>
+        pc.italic(s.substring(1, s.length - 1))
+      )
+    )
+  );
+};
