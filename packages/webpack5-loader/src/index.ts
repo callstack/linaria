@@ -68,6 +68,12 @@ export default function webpack5Loader(
   // This API is used by many loaders/plugins, so hope we're safe for a while
   const webpackResolveOptions = this._compilation?.options.resolve;
 
+  // Resolved configuration contains empty list of extensions as a default value
+  // https://github.com/callstack/linaria/issues/855
+  if (webpackResolveOptions.extensions?.length === 0) {
+    delete webpackResolveOptions.extensions;
+  }
+
   // Let's try to create a resolver with the webpack config
   let resolveSync = enhancedResolve.create.sync({
     ...resolveOptionsDefaults,
