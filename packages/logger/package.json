@@ -39,6 +39,7 @@
     "@types/debug": "^4.1.5"
   },
   "dependencies": {
-    "debug": "^4.1.1"
+    "debug": "^4.1.1",
+    "picocolors": "^1.0.0"
   }
 }
