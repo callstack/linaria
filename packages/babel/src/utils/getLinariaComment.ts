@@ -1,11 +1,11 @@
 import type { Node } from '@babel/types';
 
-const pattern = /^linaria (css|styled) (.+)$/;
+const pattern = /^linaria (atomic-css|css|styled) (.+)$/;
 
 export default function getLinariaComment(
   path: { node: Node },
   remove: boolean = true
-): ['css' | 'styled' | null, ...(string | null)[]] {
+): ['css' | 'atomic-css' | 'styled' | null, ...(string | null)[]] {
   const comments = path.node.leadingComments;
   if (!comments) {
     return [null, null, null, null];
@@ -25,7 +25,11 @@ export default function getLinariaComment(
     path.node.leadingComments = comments.filter((_, i) => i !== idx);
   }
 
-  const type = matched[1] === 'css' ? 'css' : 'styled';
-
+  let type: 'css' | 'atomic-css' | 'styled' = 'styled';
+  if (matched[1] === 'css') {
+    type = 'css';
+  } else if (matched[1] === 'atomic-css') {
+    type = 'atomic-css';
+  }
   return [type, ...matched[2].split(' ').map((i) => (i ? i : null))];
 }

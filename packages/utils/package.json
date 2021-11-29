@@ -1,13 +1,14 @@
 {
-  "name": "@linaria/babel-preset",
-  "version": "3.0.0-beta.14",
+  "name": "@linaria/utils",
+  "version": "3.0.0-beta.13",
   "publishConfig": {
     "access": "public"
   },
   "description": "Blazing fast zero-runtime CSS in JS library",
+  "sideEffects": false,
   "main": "lib/index.js",
   "module": "esm/index.js",
-  "types": "types",
+  "types": "types/index.d.ts",
   "files": [
     "types/",
     "lib/",
@@ -24,9 +25,7 @@
     "linaria",
     "css",
     "css-in-js",
-    "styled-components",
-    "babel-plugin",
-    "babel"
+    "styled-components"
   ],
   "scripts": {
     "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
@@ -37,26 +36,5 @@
     "test": "jest --config ../../jest.config.js --rootDir .",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "yarn build --watch"
-  },
-  "devDependencies": {
-    "@linaria/atomic": "^3.0.0-beta.13",
-    "@types/cosmiconfig": "^5.0.3",
-    "@types/dedent": "^0.7.0",
-    "dedent": "^0.7.0",
-    "strip-ansi": "^5.2.0"
-  },
-  "dependencies": {
-    "@babel/generator": ">=7",
-    "@babel/plugin-syntax-dynamic-import": ">=7",
-    "@babel/template": ">=7",
-    "@linaria/core": "^3.0.0-beta.13",
-    "@linaria/logger": "^3.0.0-beta.3",
-    "@linaria/utils": "^3.0.0-beta.13",
-    "cosmiconfig": "^5.1.0",
-    "source-map": "^0.7.3",
-    "stylis": "^3.5.4"
-  },
-  "peerDependencies": {
-    "@babel/core": ">=7"
   }
 }

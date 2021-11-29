@@ -65,6 +65,7 @@ type Rules = {
     displayName: string;
     cssText: string;
     start: Location | null | undefined;
+    atom?: boolean;
   };
 };
 
@@ -128,11 +129,18 @@ type ClassNameFn = (
   args: ClassNameSlugVars
 ) => string;
 
+type AtomizeFn = (cssText: string) => {
+  className: string;
+  cssText: string;
+  property: string;
+}[];
+
 export type StrictOptions = {
   classNameSlug?: string | ClassNameFn;
   displayName: boolean;
   evaluate: boolean;
   ignore?: RegExp;
+  atomize?: AtomizeFn;
   babelOptions: TransformOptions;
   rules: EvalRule[];
 };

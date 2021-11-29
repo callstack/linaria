@@ -1,3 +1,3 @@
-import slugify from '../src/utils/slugify';
+import { slugify } from '@linaria/utils';
 
 export default slugify;

@@ -9,6 +9,8 @@ import { debug } from '@linaria/logger';
 import type { PluginOptions } from './utils/loadOptions';
 import loadOptions from './utils/loadOptions';
 
+export { slugify } from '@linaria/utils';
+
 export * as EvalCache from './eval-cache';
 export { default as buildOptions } from './evaluators/buildOptions';
 export { default as JSXElement } from './evaluators/visitors/JSXElement';
@@ -25,7 +27,6 @@ export type { PluginOptions } from './utils/loadOptions';
 export { default as isNode } from './utils/isNode';
 export { default as getVisitorKeys } from './utils/getVisitorKeys';
 export { default as peek } from './utils/peek';
-export { default as slugify } from './utils/slugify';
 export { default as CollectDependencies } from './visitors/CollectDependencies';
 export { default as DetectStyledImportName } from './visitors/DetectStyledImportName';
 export { default as GenerateClassNames } from './visitors/GenerateClassNames';

@@ -36,5 +36,8 @@
     "test": "jest --config ../../jest.config.js --rootDir .",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "yarn build --watch"
+  },
+  "dependencies": {
+    "@linaria/utils": "^3.0.0-beta.13"
   }
 }

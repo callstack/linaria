@@ -8,11 +8,15 @@ import type { State, TemplateExpression } from '../types';
 import { Core } from '../babel';
 import hasImport from './hasImport';
 
-type Result = NonNullable<TemplateExpression['styled']> | 'css' | null;
+type Result =
+  | NonNullable<TemplateExpression['styled']>
+  | 'css'
+  | 'atomic-css'
+  | null;
 
 const cache = new WeakMap<NodePath<TaggedTemplateExpression>, Result>();
 
-export default function isStyledOrCss(
+export default function getTemplateType(
   { types: t }: Core,
   path: NodePath<TaggedTemplateExpression>,
   state: State
@@ -58,6 +62,14 @@ export default function isStyledOrCss(
       tag.name === 'css'
     ) {
       cache.set(path, 'css');
+    } else if (
+      hasImport(t, path.scope, state.file.opts.filename, 'css', [
+        '@linaria/atomic',
+      ]) &&
+      t.isIdentifier(tag) &&
+      tag.name === 'css'
+    ) {
+      cache.set(path, 'atomic-css');
     } else {
       cache.set(path, null);
     }

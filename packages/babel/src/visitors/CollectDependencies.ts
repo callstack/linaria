@@ -15,7 +15,7 @@ import generator from '@babel/generator';
 import throwIfInvalid from '../utils/throwIfInvalid';
 import type { State, StrictOptions, ExpressionValue } from '../types';
 import { ValueType } from '../types';
-import isStyledOrCss from '../utils/isStyledOrCss';
+import getTemplateType from '../utils/getTemplateType';
 import { Core } from '../babel';
 
 /**
@@ -63,8 +63,8 @@ export default function CollectDependencies(
   options: StrictOptions
 ) {
   const { types: t } = babel;
-  const styledOrCss = isStyledOrCss(babel, path, state);
-  if (!styledOrCss) {
+  const templateType = getTemplateType(babel, path, state);
+  if (!templateType) {
     return;
   }
   const expressions = path.get('quasi').get('expressions');
@@ -113,19 +113,26 @@ export default function CollectDependencies(
     )
   );
 
-  if (styledOrCss !== 'css' && 'name' in styledOrCss.component.node) {
+  if (
+    templateType !== 'css' &&
+    templateType !== 'atomic-css' &&
+    'name' in templateType.component.node
+  ) {
     // It's not a real dependency.
     // It can be simplified because we need just a className.
     expressionValues.push({
       // kind: ValueType.COMPONENT,
       kind: ValueType.LAZY,
-      ex: styledOrCss.component.node.name,
-      originalEx: styledOrCss.component.node.name,
+      ex: templateType.component.node.name,
+      originalEx: templateType.component.node.name,
     });
   }
 
   state.queue.push({
-    styled: styledOrCss !== 'css' ? styledOrCss : undefined,
+    styled:
+      templateType !== 'css' && templateType !== 'atomic-css'
+        ? templateType
+        : undefined,
     path,
     expressionValues,
   });

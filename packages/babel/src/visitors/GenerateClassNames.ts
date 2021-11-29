@@ -6,14 +6,14 @@
  */
 
 import { basename, dirname, relative, extname, sep } from 'path';
+import { slugify } from '@linaria/utils';
 import type { ObjectProperty, TaggedTemplateExpression } from '@babel/types';
 import type { NodePath } from '@babel/traverse';
 import { debug } from '@linaria/logger';
 import type { ClassNameSlugVars, State, StrictOptions } from '../types';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
-import slugify from '../utils/slugify';
 import getLinariaComment from '../utils/getLinariaComment';
-import isStyledOrCss from '../utils/isStyledOrCss';
+import getTemplateType from '../utils/getTemplateType';
 import { Core } from '../babel';
 import isSlugVar from '../utils/isSlugVar';
 
@@ -24,8 +24,8 @@ export default function GenerateClassNames(
   options: StrictOptions
 ) {
   const { types: t } = babel;
-  const styledOrCss = isStyledOrCss(babel, path, state);
-  if (!styledOrCss) {
+  const templateType = getTemplateType(babel, path, state);
+  if (!templateType) {
     return;
   }
 
@@ -157,7 +157,10 @@ export default function GenerateClassNames(
     className = toValidCSSIdentifier(cnSlug);
   }
 
-  const type = styledOrCss === 'css' ? 'css' : 'styled';
+  const type =
+    templateType !== 'css' && templateType !== 'atomic-css'
+      ? 'styled'
+      : templateType;
 
   debug(
     `template-parse:generated-meta:${type}`,

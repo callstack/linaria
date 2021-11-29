@@ -9,7 +9,10 @@ expect.addSnapshotSerializer(serializer);
 
 const transpile = async (
   input: string,
-  opts: Partial<StrictOptions> = { evaluate: false }
+  opts: Partial<StrictOptions> = {
+    evaluate: false,
+    atomize: require('@linaria/atomic').atomize,
+  }
 ) =>
   (await transformAsync(input, {
     babelrc: false,
@@ -547,6 +550,28 @@ it('handles objects with enums as keys', async () => {
         [TestEnum.FirstValue]: css\`\`,
         [TestEnum.SecondValue]: css\`\`,
       }
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('compiles atomic css', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { css } from '@linaria/atomic';
+    import { styled } from '@linaria/react';
+    
+    const x = css\`
+      background: red;
+      height: 100px;
+    \`;
+    
+    console.log(x);
+    
       `
   );
 
