@@ -35,9 +35,21 @@ type LintResult = {
   warnings: Warning[];
 };
 
+interface IPosition {
+  line: number;
+  column: number;
+}
+
+interface ISourceOffset {
+  generated: IPosition;
+  name: string;
+  original: IPosition;
+}
+
 function preprocessor() {
   const errors: Errors = {};
   const cache: Cache = {};
+  const offsets: Record<string, ISourceOffset[] | undefined> = {};
 
   return {
     code(input: string, filename: string) {
@@ -50,8 +62,10 @@ function preprocessor() {
 
         cache[filename] = undefined;
         errors[filename] = undefined;
+        offsets[filename] = [];
       } catch (e) {
         cache[filename] = undefined;
+        offsets[filename] = undefined;
         errors[filename] = e;
 
         // Ignore parse errors here
@@ -66,41 +80,55 @@ function preprocessor() {
       }
 
       // Construct a CSS-ish file from the unprocessed style rules
-      let cssText = '';
+      let generatedLineNumber = 1;
+      let cssText = Object.values(rules)
+        .map((rule) => {
+          const ruleText = `.${rule.className} {${rule.cssText}}`;
 
-      Object.keys(rules).forEach((selector) => {
-        const rule = rules[selector];
+          if (rule.start && 'line' in rule.start) {
+            offsets[filename]?.push({
+              generated: {
+                line: generatedLineNumber,
+                column: 1,
+              },
+              original: {
+                ...rule.start,
+              },
+              name: rule.displayName,
+            });
 
-        // Append new lines until we get to the start line number
-        let line = cssText.split('\n').length;
+            generatedLineNumber += 1;
+          }
 
-        while (rule.start && line < rule.start.line) {
-          cssText += '\n';
-          line++;
-        }
-
-        cssText += `.${rule.displayName} {`;
-
-        // Append blank spaces until we get to the start column number
-        const last = cssText.split('\n').pop();
-
-        let column = last ? last.length : 0;
-
-        while (rule.start && column < rule.start.column) {
-          cssText += ' ';
-          column++;
-        }
-
-        cssText += `${rule.cssText} }`;
-      });
+          generatedLineNumber += ruleText.split('\n').length + 2;
+          return ruleText;
+        })
+        .join('\n\n');
 
       cache[filename] = replacements;
+      offsets[filename] = offsets[filename]?.reverse();
 
-      return cssText;
+      console.log(cssText);
+
+      return cssText + '\n';
     },
     result(result: LintResult, filename: string) {
       const error = errors[filename];
       const replacements = cache[filename];
+      const sourceMap = offsets[filename];
+
+      if (sourceMap) {
+        result.warnings = result.warnings.map((warning) => {
+          const offset = sourceMap.find(
+            (o) => o.generated.line <= warning.line
+          );
+          if (offset) {
+            warning.line += offset.original.line - offset.generated.line;
+          }
+
+          return warning;
+        });
+      }
 
       if (error) {
         // Babel adds this to the error message
@@ -150,7 +178,6 @@ function preprocessor() {
           // Correct the line and column numbers to what's replaced
           result.warnings.forEach((w) => {
             /* eslint-disable no-param-reassign */
-
             if (w.line === original.start.line) {
               // If the error is on the same line where an interpolation started, we need to adjust the line and column numbers
               // Because a replacement would have increased or decreased the column numbers
