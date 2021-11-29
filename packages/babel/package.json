@@ -1,6 +1,6 @@
 {
   "name": "@linaria/babel-preset",
-  "version": "3.0.0-beta.14",
+  "version": "3.0.0-beta.15",
   "publishConfig": {
     "access": "public"
   },
@@ -39,7 +39,7 @@
     "watch": "yarn build --watch"
   },
   "devDependencies": {
-    "@linaria/atomic": "^3.0.0-beta.13",
+    "@linaria/atomic": "^3.0.0-beta.15",
     "@types/cosmiconfig": "^5.0.3",
     "@types/dedent": "^0.7.0",
     "dedent": "^0.7.0",
@@ -49,9 +49,9 @@
     "@babel/generator": ">=7",
     "@babel/plugin-syntax-dynamic-import": ">=7",
     "@babel/template": ">=7",
-    "@linaria/core": "^3.0.0-beta.13",
-    "@linaria/logger": "^3.0.0-beta.3",
-    "@linaria/utils": "^3.0.0-beta.13",
+    "@linaria/core": "^3.0.0-beta.15",
+    "@linaria/logger": "^3.0.0-beta.15",
+    "@linaria/utils": "^3.0.0-beta.15",
     "cosmiconfig": "^5.1.0",
     "source-map": "^0.7.3",
     "stylis": "^3.5.4"

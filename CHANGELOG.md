@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.15](https://github.com/callstack/linaria/compare/v3.0.0-beta.14...v3.0.0-beta.15) (2021-11-29)
+
+
+### Bug Fixes
+
+* **babel:** missed reference to atomic ([079379e](https://github.com/callstack/linaria/commit/079379ec7adf713c830da345955b6e5d8c968d6b))
+* **cli:** cli trying to transform directories ([#856](https://github.com/callstack/linaria/issues/856)) ([14d9edd](https://github.com/callstack/linaria/commit/14d9edd3de5472af2fb7d7f12b22779fb59b2324))
+* **react:** fixed types for supporting class components (fixes [#730](https://github.com/callstack/linaria/issues/730)) ([#877](https://github.com/callstack/linaria/issues/877)) ([e637ecb](https://github.com/callstack/linaria/commit/e637ecb8946a8119cfbd039bfb65d42206e09c4e))
+* **stylelint:** fix indentation errors (fixes [#693](https://github.com/callstack/linaria/issues/693)) ([#876](https://github.com/callstack/linaria/issues/876)) ([7f9f24f](https://github.com/callstack/linaria/commit/7f9f24f25018e45081efd2da98e70ebed0564da6))
+* **webpack:** better merge for configs and fallback for async plugins ([#874](https://github.com/callstack/linaria/issues/874)) ([ad84d6d](https://github.com/callstack/linaria/commit/ad84d6dea9c753c873090b54f5c8583ac4086033)), closes [#855](https://github.com/callstack/linaria/issues/855)
+
+
+### Features
+
+* **atomic:** create an atomic package for the css API ([#867](https://github.com/callstack/linaria/issues/867)) ([4773bcf](https://github.com/callstack/linaria/commit/4773bcf4b14f08cdc4d2b612654b962cdfc97eaa))
+
+
+
+
+
 # [3.0.0-beta.14](https://github.com/callstack/linaria/compare/v3.0.0-beta.13...v3.0.0-beta.14) (2021-11-05)
 
 

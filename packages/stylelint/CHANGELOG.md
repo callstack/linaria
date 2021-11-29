@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.15](https://github.com/callstack/linaria/compare/v3.0.0-beta.14...v3.0.0-beta.15) (2021-11-29)
+
+
+### Bug Fixes
+
+* **stylelint:** fix indentation errors (fixes [#693](https://github.com/callstack/linaria/issues/693)) ([#876](https://github.com/callstack/linaria/issues/876)) ([7f9f24f](https://github.com/callstack/linaria/commit/7f9f24f25018e45081efd2da98e70ebed0564da6))
+
+
+
+
+
 # [3.0.0-beta.14](https://github.com/callstack/linaria/compare/v3.0.0-beta.13...v3.0.0-beta.14) (2021-11-05)
 
 **Note:** Version bump only for package @linaria/stylelint

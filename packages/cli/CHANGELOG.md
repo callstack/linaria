@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.15](https://github.com/callstack/linaria/compare/v3.0.0-beta.14...v3.0.0-beta.15) (2021-11-29)
+
+
+### Bug Fixes
+
+* **cli:** cli trying to transform directories ([#856](https://github.com/callstack/linaria/issues/856)) ([14d9edd](https://github.com/callstack/linaria/commit/14d9edd3de5472af2fb7d7f12b22779fb59b2324))
+
+
+
+
+
 # [3.0.0-beta.14](https://github.com/callstack/linaria/compare/v3.0.0-beta.13...v3.0.0-beta.14) (2021-11-05)
 
 **Note:** Version bump only for package @linaria/cli
