@@ -67,8 +67,8 @@ interface IProps {
 }
 
 // If styled wraps custom component, that component should have className property
-function styled<TConstructor extends React.FunctionComponent<any>>(
-  tag: TConstructor extends React.FunctionComponent<infer T>
+function styled<TConstructor extends React.ComponentType<any>>(
+  tag: TConstructor extends React.ComponentType<infer T>
     ? [T] extends [{ className?: string | undefined }]
       ? TConstructor
       : never
