@@ -7,6 +7,5 @@ export default {
     'value-no-vendor-prefix': true,
     'no-empty-source': null,
     'no-extra-semicolons': null,
-    'no-missing-end-of-source-newline': null,
   },
 };
