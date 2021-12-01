@@ -38,22 +38,17 @@
     "watch": "yarn build --watch"
   },
   "devDependencies": {
-    "@types/cosmiconfig": "^5.0.3",
     "@types/enhanced-resolve": "^3.0.6",
     "@types/loader-utils": "^1.1.3",
     "@types/mkdirp": "^0.5.2",
-    "@types/normalize-path": "^3.0.0",
     "source-map": "^0.7.3"
   },
   "dependencies": {
     "@linaria/babel-preset": "^3.0.0-beta.15",
     "@linaria/logger": "^3.0.0-beta.15",
-    "cosmiconfig": "^5.1.0",
     "enhanced-resolve": "^4.1.0",
-    "find-yarn-workspace-root": "^1.2.1",
     "loader-utils": "^1.2.3",
-    "mkdirp": "^0.5.1",
-    "normalize-path": "^3.0.0"
+    "mkdirp": "^0.5.1"
   },
   "peerDependencies": {
     "@babel/core": ">=7"
