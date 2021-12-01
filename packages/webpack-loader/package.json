@@ -1,6 +1,6 @@
 {
   "name": "@linaria/webpack-loader",
-  "version": "3.0.0-beta.15",
+  "version": "3.0.0-beta.16",
   "publishConfig": {
     "access": "public"
   },
@@ -41,7 +41,7 @@
     "source-map": "^0.7.3"
   },
   "dependencies": {
-    "@linaria/webpack4-loader": "^3.0.0-beta.15",
-    "@linaria/webpack5-loader": "^3.0.0-beta.15"
+    "@linaria/webpack4-loader": "^3.0.0-beta.16",
+    "@linaria/webpack5-loader": "^3.0.0-beta.16"
   }
 }

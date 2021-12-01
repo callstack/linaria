@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.16](https://github.com/callstack/linaria/compare/v3.0.0-beta.15...v3.0.0-beta.16) (2021-12-01)
+
+
+### Bug Fixes
+
+* **webpack:** replace file system cache with in-memory cache (fixes [#878](https://github.com/callstack/linaria/issues/878)) ([#879](https://github.com/callstack/linaria/issues/879)) ([5517cf7](https://github.com/callstack/linaria/commit/5517cf79c1a5dbf7c10d17be01cf4ac4470116f9))
+
+
+
+
+
 # [3.0.0-beta.15](https://github.com/callstack/linaria/compare/v3.0.0-beta.14...v3.0.0-beta.15) (2021-11-29)
 
 
