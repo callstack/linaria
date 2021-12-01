@@ -4,28 +4,19 @@
  * returns transformed code without template literals and attaches generated source maps
  */
 
-import fs from 'fs';
 import path from 'path';
-import mkdirp from 'mkdirp';
-import normalize from 'normalize-path';
 import loaderUtils from 'loader-utils';
 import enhancedResolve from 'enhanced-resolve';
-import findYarnWorkspaceRoot from 'find-yarn-workspace-root';
 import type { RawSourceMap } from 'source-map';
-import cosmiconfig from 'cosmiconfig';
 import * as EvalCache from './babel/eval-cache';
 import Module from './babel/module';
 import { debug } from './babel/utils/logger';
 import transform from './transform';
-
-const workspaceRoot = findYarnWorkspaceRoot();
-const lernaConfig = cosmiconfig('lerna', {
-  searchPlaces: ['lerna.json'],
-}).searchSync();
-const lernaRoot =
-  lernaConfig !== null ? path.dirname(lernaConfig.filepath) : null;
+import { addFile } from './outputCssLoader';
 
 type LoaderContext = Parameters<typeof loaderUtils.getOptions>[0];
+
+const outputCssLoader = require.resolve('./outputCssLoader');
 
 export default function loader(
   this: LoaderContext,
@@ -38,26 +29,12 @@ export default function loader(
 
   const {
     sourceMap = undefined,
-    cacheDirectory = '.linaria-cache',
     preprocessor = undefined,
     extension = '.linaria.css',
     ...rest
   } = loaderUtils.getOptions(this) || {};
 
-  const root = workspaceRoot || lernaRoot || process.cwd();
-
-  const baseOutputFileName = this.resourcePath.replace(/\.[^.]+$/, extension);
-
-  const outputFilename = normalize(
-    path.join(
-      path.isAbsolute(cacheDirectory)
-        ? cacheDirectory
-        : path.join(process.cwd(), cacheDirectory),
-      this.resourcePath.includes(root)
-        ? path.relative(root, baseOutputFileName)
-        : baseOutputFileName
-    )
-  );
+  const outputFilename = this.resourcePath.replace(/\.[^.]+$/, extension);
 
   const resolveOptions = {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
@@ -84,13 +61,15 @@ export default function loader(
 
   try {
     // Use webpack's resolution when evaluating modules
-    Module._resolveFilename = (id, { filename }) =>
-      resolveSync(path.dirname(filename), id);
+    Module._resolveFilename = (id, { filename }) => {
+      const result = resolveSync(path.dirname(filename), id);
+      this.addDependency(result);
+      return result;
+    };
 
     result = transform(content, {
       filename: path.relative(process.cwd(), this.resourcePath),
       inputSourceMap: inputSourceMap ?? undefined,
-      outputFilename,
       pluginOptions: rest,
       preprocessor,
     });
@@ -121,28 +100,13 @@ export default function loader(
       });
     }
 
-    // Read the file first to compare the content
-    // Write the new content only if it's changed
-    // This will prevent unnecessary WDS reloads
-    let currentCssText;
-
-    try {
-      currentCssText = fs.readFileSync(outputFilename, 'utf-8');
-    } catch (e) {
-      // Ignore error
-    }
-
-    if (currentCssText !== cssText) {
-      mkdirp.sync(path.dirname(outputFilename));
-      fs.writeFileSync(outputFilename, cssText);
-    }
+    addFile(this.resourcePath, cssText);
+    const request = `${outputFilename}!=!${outputCssLoader}!${this.resourcePath}`;
+    const stringifiedRequest = loaderUtils.stringifyRequest(this, request);
 
     this.callback(
       null,
-      `${result.code}\n\nrequire(${loaderUtils.stringifyRequest(
-        this,
-        outputFilename
-      )});`,
+      `${result.code}\n\nrequire(${stringifiedRequest});`,
       result.sourceMap ?? undefined
     );
     return;
