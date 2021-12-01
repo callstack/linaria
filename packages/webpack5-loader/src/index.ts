@@ -31,9 +31,12 @@ export default function webpack5Loader(
   const {
     sourceMap = undefined,
     preprocessor = undefined,
+    extension = '.linaria.css',
     resolveOptions = {},
     ...rest
   } = this.getOptions() || {};
+
+  const outputFileName = this.resourcePath.replace(/\.[^.]+$/, extension);
 
   // this._compilation is a deprecated API
   // However there seems to be no other way to access webpack's resolver
@@ -129,7 +132,7 @@ export default function webpack5Loader(
 
     addFile(this.resourcePath, cssText);
 
-    const request = `linaria.css!=!${outputCssLoader}!${this.resourcePath}`;
+    const request = `${outputFileName}!=!${outputCssLoader}!${this.resourcePath}`;
     const stringifiedRequest = loaderUtils.stringifyRequest(this, request);
 
     this.callback(

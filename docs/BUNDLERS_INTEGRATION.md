@@ -177,6 +177,10 @@ The loader accepts the following options:
 
   Setting this option to `true` will include source maps for the generated CSS so that you can see where source of the class name in devtools. We recommend to enable this only in development mode because the sourcemap is inlined into the CSS files.
 
+- `extension: string` (default: `'.linaria.css'`):
+
+  An extension of the intermediate CSS files.
+
 - `preprocessor: 'none' | 'stylis' | Function` (default: `'stylis'`)
 
   You can override the pre-processor if you want to override how the loader processes the CSS.
