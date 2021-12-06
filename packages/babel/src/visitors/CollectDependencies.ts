@@ -62,8 +62,9 @@ export default function CollectDependencies(
   state: State,
   options: StrictOptions
 ) {
+  const { linariaLibResolver } = options;
   const { types: t } = babel;
-  const templateType = getTemplateType(babel, path, state);
+  const templateType = getTemplateType(babel, path, state, linariaLibResolver);
   if (!templateType) {
     return;
   }
