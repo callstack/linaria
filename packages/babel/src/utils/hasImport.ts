@@ -24,7 +24,7 @@ export default function hasImport(
   filename: string,
   identifier: string,
   sources: string[],
-  linariaLibResolver = safeResolve
+  libResolver = safeResolve
 ): boolean {
   const binding = scope.getAllBindings()[identifier];
 
@@ -54,7 +54,7 @@ export default function hasImport(
         // Otherwise try to resolve both and check if they are the same file
         resolveFromFile(value) ===
           (linariaLibs.has(source)
-            ? linariaLibResolver(source)
+            ? libResolver(source)
             : resolveFromFile(source))
     );
 

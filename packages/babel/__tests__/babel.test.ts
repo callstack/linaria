@@ -578,3 +578,30 @@ it('compiles atomic css', async () => {
   expect(code).toMatchSnapshot();
   expect(metadata).toMatchSnapshot();
 });
+
+it('can re-export lib apis using a custom resolver', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { css } from './my-folder';
+    
+    const x = css\`
+      background: red;
+      height: 100px;
+    \`;
+    
+    console.log(x);
+    
+      `,
+    {
+      libResolver: () => {
+        // In testing, since ./my-folder isn't a real folder, to match the
+        // resolution we need to return null here. In a real use case, the full
+        // file path to the correct resolution would be returned
+        return null;
+      },
+    }
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});

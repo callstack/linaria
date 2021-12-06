@@ -135,7 +135,7 @@ type AtomizeFn = (cssText: string) => {
   property: string;
 }[];
 
-export type LinariaLibResolverFn = (linariaLibPath: string) => string | null;
+export type LibResolverFn = (linariaLibPath: string) => string | null;
 
 export type StrictOptions = {
   classNameSlug?: string | ClassNameFn;
@@ -145,7 +145,7 @@ export type StrictOptions = {
   atomize?: AtomizeFn;
   babelOptions: TransformOptions;
   rules: EvalRule[];
-  linariaLibResolver?: LinariaLibResolverFn;
+  libResolver?: LibResolverFn;
 };
 
 export type Location = {

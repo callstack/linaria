@@ -4,7 +4,7 @@ import type {
   TaggedTemplateExpression,
 } from '@babel/types';
 import type { NodePath } from '@babel/traverse';
-import type { State, TemplateExpression, LinariaLibResolverFn } from '../types';
+import type { State, TemplateExpression, LibResolverFn } from '../types';
 import { Core } from '../babel';
 import hasImport from './hasImport';
 
@@ -20,7 +20,7 @@ export default function getTemplateType(
   { types: t }: Core,
   path: NodePath<TaggedTemplateExpression>,
   state: State,
-  linariaLibResolver?: LinariaLibResolverFn
+  libResolver?: LibResolverFn
 ): Result {
   if (!cache.has(path)) {
     const { tag } = path.node;
@@ -38,7 +38,7 @@ export default function getTemplateType(
         state.file.opts.filename,
         localName,
         ['@linaria/react', 'linaria/react'],
-        linariaLibResolver
+        libResolver
       )
     ) {
       const tagPath = path.get('tag') as NodePath<CallExpression>;
@@ -56,7 +56,7 @@ export default function getTemplateType(
         state.file.opts.filename,
         localName,
         ['@linaria/react', 'linaria/react'],
-        linariaLibResolver
+        libResolver
       )
     ) {
       cache.set(path, {
@@ -69,7 +69,7 @@ export default function getTemplateType(
         state.file.opts.filename,
         'css',
         ['@linaria/core', 'linaria'],
-        linariaLibResolver
+        libResolver
       ) &&
       t.isIdentifier(tag) &&
       tag.name === 'css'
@@ -82,7 +82,7 @@ export default function getTemplateType(
         state.file.opts.filename,
         'css',
         ['@linaria/atomic'],
-        linariaLibResolver
+        libResolver
       ) &&
       t.isIdentifier(tag) &&
       tag.name === 'css'
