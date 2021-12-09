@@ -1,5 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`can re-export lib apis using a custom resolver 1`] = `
+"import { css } from './my-folder';
+const x = \\"x17gu1mi\\";
+console.log(x);"
+`;
+
+exports[`can re-export lib apis using a custom resolver 2`] = `
+
+CSS:
+
+.x17gu1mi {
+  background: red;
+  height: 100px;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`compiles atomic css 1`] = `
 "/* @flow */
 import { css } from '@linaria/atomic';

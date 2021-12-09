@@ -83,6 +83,45 @@ module.exports = {
 
   To configure for use with `@linaria/atomic`, set this option to `atomize: require('@linaria/atomic').atomize`
 
+- `libResolver: (source) => string`
+
+  A custom function to use when resolving linaria libraries during babel compilation.
+
+  By default, linaria APIs like `css` and `styled` **must** be imported directly from the package – this is because babel needs to be able to recognize the API's to do static style extraction. `libResolver` allows `css` and `styled` APIs to be imported from other files too.
+
+  `libResolver` takes the path for the source module (eg. `@linaria/core`), and returns the full file path to resolve this module to.
+
+  For example, we can use this to map `@linaria/core` , `@linaria/react` or `@linaria/atomic` where we re-export the module.
+
+  ```js
+  {
+    libResolver: (source) => {
+      if (source === '@linaria/core') {
+        return require.resolve('./my-local-folder/core');
+      } else if (source === '@linaria/react') {
+        return require.resolve('./my-local-folder/react');
+      }
+      return null;
+    };
+  }
+  ```
+
+  We can then re-export and use linaria API's from `./my-local-folder`:
+
+  ```js
+  // my-file.js
+  import { css } from './my-local-folder/core';
+
+  export default css`
+    border: 1px solid black;
+  `;
+  ```
+
+  ```js
+  // ./my-local-folder/core.js
+  export * from '@linaria/core';
+  ```
+
 - `babelOptions: Object`
 
   If you need to specify custom babel configuration, you can pass them here. These babel options will be used by Linaria when parsing and evaluating modules.

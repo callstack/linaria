@@ -23,8 +23,9 @@ export default function GenerateClassNames(
   state: State,
   options: StrictOptions
 ) {
+  const { libResolver } = options;
   const { types: t } = babel;
-  const templateType = getTemplateType(babel, path, state);
+  const templateType = getTemplateType(babel, path, state, libResolver);
   if (!templateType) {
     return;
   }
