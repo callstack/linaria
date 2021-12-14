@@ -63,10 +63,10 @@ function preprocessor() {
         cache[filename] = undefined;
         errors[filename] = undefined;
         offsets[filename] = [];
-      } catch (e) {
+      } catch (e: unknown) {
         cache[filename] = undefined;
         offsets[filename] = undefined;
-        errors[filename] = e;
+        errors[filename] = e as Error;
 
         // Ignore parse errors here
         // We handle it separately

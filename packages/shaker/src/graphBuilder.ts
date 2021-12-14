@@ -1,11 +1,13 @@
 import { types as t } from '@babel/core';
-import type { AssignmentExpression, Node, VisitorKeys } from '@babel/types';
+import type { AssignmentExpression, Node } from '@babel/types';
 import { isNode, getVisitorKeys } from '@linaria/babel-preset';
+import type { VisitorKeys } from '@linaria/babel-preset';
 import DepsGraph from './DepsGraph';
 import GraphBuilderState from './GraphBuilderState';
 import { getVisitors } from './Visitors';
 import type { VisitorAction } from './types';
 import ScopeManager from './scope';
+import { Visitor } from './types';
 
 const isVoid = (node: Node): boolean =>
   t.isUnaryExpression(node) && node.operator === 'void';
@@ -117,7 +119,7 @@ class GraphBuilder extends GraphBuilderState {
   visit<TNode extends Node, TParent extends Node>(
     node: TNode,
     parent: TParent | null,
-    parentKey: VisitorKeys[TParent['type']] | null,
+    parentKey: VisitorKeys<TParent> | null,
     listIdx: number | null = null
   ): VisitorAction {
     if (parent) {
@@ -143,7 +145,11 @@ class GraphBuilder extends GraphBuilderState {
             // Batch export is a very particular case.
             // Each property of the assigned object is independent named export.
             // We also need to specify all dependencies and call `visit` for every value.
-            this.visit(node.left, node, 'left');
+            this.visit(
+              node.left,
+              node,
+              'left' as VisitorKeys<TNode & AssignmentExpression>
+            );
             node.right.properties.forEach((prop) => {
               if (t.isObjectProperty(prop) && t.isIdentifier(prop.key)) {
                 this.visit(prop.value, prop, 'value');
@@ -186,9 +192,10 @@ class GraphBuilder extends GraphBuilderState {
     const visitors = getVisitors(node);
     let action: VisitorAction;
     if (visitors.length > 0) {
-      let visitor;
+      let visitor: Visitor<TNode> | undefined;
       while (!action && (visitor = visitors.shift())) {
-        action = visitor.call(this, node, parent, parentKey, listIdx);
+        const method: Visitor<TNode> = visitor.bind(this);
+        action = method(node, parent, parentKey, listIdx);
       }
     } else {
       this.baseVisit(node);
