@@ -59,7 +59,7 @@ export default function webpack4Loader(
 
   // Resolved configuration contains empty list of extensions as a default value
   // https://github.com/callstack/linaria/issues/855
-  if (webpackResolveOptions.extensions?.length === 0) {
+  if (webpackResolveOptions?.extensions?.length === 0) {
     delete webpackResolveOptions.extensions;
   }
 
