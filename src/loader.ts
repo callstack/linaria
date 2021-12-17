@@ -12,7 +12,8 @@ import * as EvalCache from './babel/eval-cache';
 import Module from './babel/module';
 import { debug } from './babel/utils/logger';
 import transform from './transform';
-import { addFile } from './outputCssLoader';
+import { getCacheInstance } from './cache';
+import type { Result } from './types';
 
 type LoaderContext = Parameters<typeof loaderUtils.getOptions>[0];
 
@@ -23,6 +24,9 @@ export default function loader(
   content: string,
   inputSourceMap: RawSourceMap | null
 ) {
+  // tell Webpack this loader is async
+  this.async();
+
   debug('loader', this.resourcePath);
 
   EvalCache.clearForFile(this.resourcePath);
@@ -31,6 +35,7 @@ export default function loader(
     sourceMap = undefined,
     preprocessor = undefined,
     extension = '.linaria.css',
+    cacheProvider,
     ...rest
   } = loaderUtils.getOptions(this) || {};
 
@@ -55,7 +60,7 @@ export default function loader(
       : resolveOptions
   );
 
-  let result;
+  let result: Result;
 
   const originalResolveFilename = Module._resolveFilename;
 
@@ -100,15 +105,21 @@ export default function loader(
       });
     }
 
-    addFile(this.resourcePath, cssText);
-    const request = `${outputFilename}!=!${outputCssLoader}!${this.resourcePath}`;
-    const stringifiedRequest = loaderUtils.stringifyRequest(this, request);
+    getCacheInstance(cacheProvider)
+      .then((cacheInstance) => cacheInstance.set(this.resourcePath, cssText))
+      .then(() => {
+        const request = `${outputFilename}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
+          cacheProvider
+        )}!${this.resourcePath}`;
+        const stringifiedRequest = loaderUtils.stringifyRequest(this, request);
 
-    this.callback(
-      null,
-      `${result.code}\n\nrequire(${stringifiedRequest});`,
-      result.sourceMap ?? undefined
-    );
+        return this.callback(
+          null,
+          `${result.code}\n\nrequire(${stringifiedRequest});`,
+          result.sourceMap ?? undefined
+        );
+      })
+      .catch((err: Error) => this.callback(err));
     return;
   }
 
