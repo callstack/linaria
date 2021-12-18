@@ -8,9 +8,9 @@ import path from 'path';
 import loaderUtils from 'loader-utils';
 import enhancedResolve from 'enhanced-resolve';
 import type { RawSourceMap } from 'source-map';
-import { EvalCache, Module, transform } from '@linaria/babel-preset';
+import { EvalCache, Module, Result, transform } from '@linaria/babel-preset';
 import { debug, notify } from '@linaria/logger';
-import { addFile } from './outputCssLoader';
+import { getCacheInstance } from './cache';
 
 type LoaderContext = Parameters<typeof loaderUtils.getOptions>[0];
 
@@ -31,6 +31,9 @@ export default function webpack4Loader(
   content: string,
   inputSourceMap: RawSourceMap | null
 ) {
+  // tell Webpack this loader is async
+  this.async();
+
   debug('loader', this.resourcePath);
 
   EvalCache.clearForFile(this.resourcePath);
@@ -44,6 +47,7 @@ export default function webpack4Loader(
     sourceMap = undefined,
     preprocessor = undefined,
     extension = '.linaria.css',
+    cacheProvider,
     resolveOptions = {},
     ...rest
   } = loaderUtils.getOptions(this) || {};
@@ -92,7 +96,7 @@ export default function webpack4Loader(
     });
   }
 
-  let result;
+  let result: Result;
 
   const originalResolveFilename = Module._resolveFilename;
 
@@ -137,16 +141,21 @@ export default function webpack4Loader(
       });
     }
 
-    addFile(this.resourcePath, cssText);
+    getCacheInstance(cacheProvider)
+      .then((cacheInstance) => cacheInstance.set(this.resourcePath, cssText))
+      .then(() => {
+        const request = `${outputFileName}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
+          cacheProvider ?? ''
+        )}!${this.resourcePath}`;
+        const stringifiedRequest = loaderUtils.stringifyRequest(this, request);
 
-    const request = `${outputFileName}!=!${outputCssLoader}!${this.resourcePath}`;
-    const stringifiedRequest = loaderUtils.stringifyRequest(this, request);
-
-    this.callback(
-      null,
-      `${result.code}\n\nrequire(${stringifiedRequest});`,
-      castSourceMap(result.sourceMap)
-    );
+        return this.callback(
+          null,
+          `${result.code}\n\nrequire(${stringifiedRequest});`,
+          castSourceMap(result.sourceMap)
+        );
+      })
+      .catch((err: Error) => this.callback(err));
     return;
   }
 

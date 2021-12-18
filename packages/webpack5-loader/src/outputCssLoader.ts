@@ -1,9 +1,13 @@
-const cssLookup = new Map<string, string>();
+import webpack from 'webpack';
+import { getCacheInstance, ICache } from './cache';
 
-export const addFile = (id: string, content: string) => {
-  cssLookup.set(id, content);
-};
-
-export default function outputCssLoader(this: { resourcePath: string }) {
-  return cssLookup.get(this.resourcePath) ?? '';
+export default function outputCssLoader(
+  this: webpack.LoaderContext<{ cacheProvider: string | ICache | undefined }>
+) {
+  this.async();
+  const { cacheProvider } = this.getOptions();
+  getCacheInstance(cacheProvider)
+    .then((cacheInstance) => cacheInstance.get(this.resourcePath))
+    .then((result) => this.callback(null, result))
+    .catch((err: Error) => this.callback(err));
 }
