@@ -1,4 +1,5 @@
-import type { Node, VisitorKeys } from '@babel/types';
+import type { Node } from '@babel/types';
+import type { VisitorKeys } from '@linaria/babel-preset';
 import ScopeManager from './scope';
 import DepsGraph from './DepsGraph';
 import { VisitorAction } from './types';
@@ -40,7 +41,7 @@ export default abstract class GraphBuilderState {
   abstract visit<TNode extends Node, TParent extends Node>(
     node: TNode,
     parent: TParent | null,
-    parentKey: VisitorKeys[TParent['type']] | null,
+    parentKey: VisitorKeys<TParent> | null,
     listIdx?: number | null
   ): VisitorAction;
 }

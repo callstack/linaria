@@ -1,4 +1,4 @@
-import type { Node, Expression, TaggedTemplateExpression } from '@babel/types';
+import type { Expression, TaggedTemplateExpression } from '@babel/types';
 import type { TransformOptions } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import type { StyledMeta } from '@linaria/core';
@@ -184,21 +184,3 @@ export type Options = {
 
 export type PreprocessorFn = (selector: string, cssText: string) => string;
 export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
-
-type AllNodes = { [T in Node['type']]: Extract<Node, { type: T }> };
-
-declare module '@babel/types' {
-  type VisitorKeys = {
-    [T in keyof AllNodes]: Extract<
-      keyof AllNodes[T],
-      {
-        [Key in keyof AllNodes[T]]: AllNodes[T][Key] extends
-          | Node
-          | Node[]
-          | null
-          ? Key
-          : never;
-      }[keyof AllNodes[T]]
-    >;
-  };
-}

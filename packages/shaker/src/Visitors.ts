@@ -1,7 +1,8 @@
 import { types as t } from '@babel/core';
-import type { Identifier, Node, VisitorKeys } from '@babel/types';
+import type { Identifier, Node } from '@babel/types';
 import { warn } from '@linaria/logger';
 import { peek } from '@linaria/babel-preset';
+import type { VisitorKeys } from '@linaria/babel-preset';
 import GraphBuilderState from './GraphBuilderState';
 import identifierHandlers from './identifierHandlers';
 import type { Visitor, Visitors } from './types';
@@ -13,7 +14,7 @@ const visitors: Visitors = {
     this: GraphBuilderState,
     node: Identifier,
     parent: TParent | null,
-    parentKey: VisitorKeys[TParent['type']] | null,
+    parentKey: VisitorKeys<TParent> | null,
     listIdx: number | null = null
   ) {
     if (!parent || !parentKey) {

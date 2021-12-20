@@ -133,3 +133,40 @@ styled.a`
   // $ExpectType Validator<string> | undefined
   NewWrapper.propTypes!.prop2;
 })();
+
+((/* Issue #844 */) => {
+  type GridProps = { container?: false } | { container: true; spacing: number };
+
+  const Grid: React.FC<GridProps & { className?: string }> = () => null;
+
+  // Type 'false' is not assignable to type 'true'
+  // $ExpectError
+  React.createElement(Grid, { container: false, spacing: 8 });
+
+  React.createElement(Grid, { container: true, spacing: 8 });
+
+  styled(Grid)``;
+})();
+
+((/* Issue #872 */) => {
+  interface BaseProps {
+    className?: string;
+    style?: React.CSSProperties;
+  }
+
+  interface ComponentProps extends BaseProps {
+    title: string;
+  }
+
+  const Flow = <TProps extends BaseProps>(Cmp: React.FC<TProps>) =>
+    styled(Cmp)`
+      display: flow;
+    `;
+
+  const Component: React.FC<ComponentProps> = (props) =>
+    React.createElement('div', props);
+
+  const Implementation = Flow(Component);
+
+  (() => React.createElement(Implementation, { title: 'Title' }))();
+})();

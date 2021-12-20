@@ -184,14 +184,18 @@ export default function extract(
               state.dependencies.push(...evaluation.dependencies);
               lazyValues = evaluation.value.__linariaPreval || [];
               debug('lazy-deps:values', evaluation.value.__linariaPreval);
-            } catch (e) {
+            } catch (e: unknown) {
               error('lazy-deps:evaluate:error', code);
-              throw new Error(
-                'An unexpected runtime error occurred during dependencies evaluation: \n' +
-                  e.stack +
-                  '\n\nIt may happen when your code or third party module is invalid or uses identifiers not available in Node environment, eg. window. \n' +
-                  'Note that line numbers in above stack trace will most likely not match, because Linaria needed to transform your code a bit.\n'
-              );
+              if (e instanceof Error) {
+                throw new Error(
+                  'An unexpected runtime error occurred during dependencies evaluation: \n' +
+                    e.stack +
+                    '\n\nIt may happen when your code or third party module is invalid or uses identifiers not available in Node environment, eg. window. \n' +
+                    'Note that line numbers in above stack trace will most likely not match, because Linaria needed to transform your code a bit.\n'
+                );
+              } else {
+                throw e;
+              }
             }
           }
 

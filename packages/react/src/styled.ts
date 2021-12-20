@@ -11,6 +11,12 @@ import type { CSSProperties, StyledMeta } from '@linaria/core';
 
 export type NoInfer<A extends any> = [A][A extends any ? 0 : never];
 
+type Component<TProps> =
+  | ((props: TProps) => unknown)
+  | { new (props: TProps): unknown };
+
+type Has<T, TObj> = [T] extends [TObj] ? T : T & TObj;
+
 type Options = {
   name: string;
   class: string;
@@ -22,15 +28,12 @@ type Options = {
   };
 };
 
-interface CustomOmit {
-  <T extends object, K extends [...(keyof T)[]]>(obj: T, keys: K): {
-    [K2 in Exclude<keyof T, K[number]>]: T[K2];
-  };
-}
-
 // Workaround for rest operator
-export const restOp: CustomOmit = (obj, keys) => {
-  const res = {} as { [K in keyof typeof obj]: typeof obj[K] };
+export const restOp = <T extends object, TKeys extends [...(keyof T)[]]>(
+  obj: T,
+  keys: TKeys
+) => {
+  const res = {} as { [K in keyof T]: T[K] };
   let key: keyof typeof obj;
   for (key in obj) {
     if (keys.indexOf(key) === -1) {
@@ -66,22 +69,28 @@ interface IProps {
   [props: string]: unknown;
 }
 
+// Property-based interpolation is allowed only if `style` property exists
+function styled<
+  TProps extends Has<TMustHave, { style?: React.CSSProperties }>,
+  TMustHave extends { style?: React.CSSProperties },
+  TConstructor extends Component<TProps>
+>(
+  componentWithStyle: TConstructor & Component<TProps>
+): ComponentStyledTagWithInterpolation<TProps, TConstructor>;
 // If styled wraps custom component, that component should have className property
-function styled<TConstructor extends React.ComponentType<any>>(
-  tag: TConstructor extends React.ComponentType<infer T>
-    ? [T] extends [{ className?: string | undefined }]
-      ? TConstructor
-      : never
-    : never
-): ComponentStyledTag<TConstructor>;
-function styled<T>(
-  tag: [T] extends [{ className?: string | undefined }]
-    ? React.ComponentType<T>
-    : never
-): ComponentStyledTag<T>;
+function styled<
+  TProps extends Has<TMustHave, { className?: string }>,
+  TMustHave extends { className?: string },
+  TConstructor extends Component<TProps>
+>(
+  componentWithoutStyle: TConstructor & Component<TProps>
+): ComponentStyledTagWithoutInterpolation<TConstructor>;
 function styled<TName extends keyof JSX.IntrinsicElements>(
   tag: TName
 ): HtmlStyledTag<TName>;
+function styled(
+  component: 'The target component should have a className prop'
+): never;
 function styled(tag: any): any {
   return (options: Options) => {
     if (process.env.NODE_ENV !== 'production') {
@@ -199,23 +208,23 @@ type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
   >
 ) => StyledComponent<JSX.IntrinsicElements[TName] & TAdditionalProps>;
 
-type ComponentStyledTag<T> = <
-  OwnProps = {},
-  TrgProps = [T] extends [React.FunctionComponent<infer TProps>] ? TProps : T
->(
+type ComponentStyledTagWithoutInterpolation<TOrigCmp> = (
   strings: TemplateStringsArray,
-  // Expressions can contain functions only if wrapped component has style property
-  ...exprs: TrgProps extends { style?: React.CSSProperties | undefined }
-    ? Array<
-        | StaticPlaceholder
-        | ((props: NoInfer<OwnProps & TrgProps>) => string | number)
-      >
-    : StaticPlaceholder[]
+  ...exprs: Array<
+    | StaticPlaceholder
+    | ((props: 'The target component should have a style prop') => never)
+  >
+) => StyledMeta & TOrigCmp;
+
+type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
+  strings: TemplateStringsArray,
+  ...exprs: Array<
+    | StaticPlaceholder
+    | ((props: NoInfer<OwnProps & TTrgProps>) => string | number)
+  >
 ) => keyof OwnProps extends never
-  ? [T] extends [React.FunctionComponent<any>]
-    ? StyledMeta & T
-    : StyledComponent<TrgProps>
-  : StyledComponent<OwnProps & TrgProps>;
+  ? StyledMeta & TOrigCmp
+  : StyledComponent<OwnProps & TTrgProps>;
 
 type StyledJSXIntrinsics = {
   readonly [P in keyof JSX.IntrinsicElements]: HtmlStyledTag<P>;
