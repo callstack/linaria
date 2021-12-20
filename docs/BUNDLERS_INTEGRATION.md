@@ -1,6 +1,7 @@
 # Bundlers Integration
 
 ## Jump To
+
 - [webpack](#webpack)
 - [esbuild](#esbuild)
 - [Rollup](#Rollup)
@@ -12,7 +13,7 @@ If you use Babel in your project, make sure to have a [config file for Babel](ht
 
 ## Bundlers
 
-Please note, that `@babel/core` is a peer dependency of all loaders. Do not forget to add it to `devDependencies` list in your project. 
+Please note, that `@babel/core` is a peer dependency of all loaders. Do not forget to add it to `devDependencies` list in your project.
 
 ### webpack
 
@@ -177,6 +178,16 @@ The loader accepts the following options:
 
   Setting this option to `true` will include source maps for the generated CSS so that you can see where source of the class name in devtools. We recommend to enable this only in development mode because the sourcemap is inlined into the CSS files.
 
+- `cacheProvider: undefined | string | ICache` (default: `undefined`):
+  By default Linaria use a memory cache to store temporary CSS files. But if you are using this loader with [thread-loader](https://www.npmjs.com/package/thread-loader) you should use some consistent cache to prevent [some unexpected issues](https://github.com/callstack/linaria/issues/881). This options support a `ICache` instance or a path to NodeJS module which export a `ICache` instance as `module.exports`
+
+  > ```
+  > interface ICache {
+  >   get: (key: string) => Promise<string>;
+  >   set: (key: string, value: string) => Promise<void>
+  > }
+  > ```
+
 - `extension: string` (default: `'.linaria.css'`):
 
   An extension of the intermediate CSS files.
@@ -264,9 +275,7 @@ import linaria from '@linaria/rollup';
 import css from 'rollup-plugin-css-only';
 
 export default {
-  /* rest of your config */
   plugins: [
-    /* rest of your plugins */
     linaria({
       sourceMap: process.env.NODE_ENV !== 'production',
     }),
@@ -277,16 +286,14 @@ export default {
 };
 ```
 
-
-If you are using [@rollup/plugin-babel](https://github.com/rollup/plugins/tree/master/packages/babel) as well, ensure the linaria plugin is declared earlier in the `plugins` array than your babel plugin. 
+If you are using [@rollup/plugin-babel](https://github.com/rollup/plugins/tree/master/packages/babel) as well, ensure the linaria plugin is declared earlier in the `plugins` array than your babel plugin.
 
 ```js
 import linaria from '@linaria/rollup';
 import css from 'rollup-plugin-css-only';
-import babel from "@rollup/plugin-babel";
+import babel from '@rollup/plugin-babel';
 
 export default {
-   /* rest of your config */
   plugins: [
     linaria({
       sourceMap: process.env.NODE_ENV !== 'production',
@@ -294,8 +301,8 @@ export default {
     css({
       output: 'styles.css',
     }),
-    babel({/**/}),
-     /* rest of your plugins */
+    babel({}),
+    /* rest of your plugins */
   ],
 };
 ```
@@ -303,6 +310,7 @@ export default {
 ### Svelte
 
 #### Contents
+
 - [Svelte with Rollup](#Rollup-1)
 - [Svelte with Webpack](#Webpack-1)
 
@@ -383,4 +391,3 @@ module.exports = {
   },
 };
 ```
-
