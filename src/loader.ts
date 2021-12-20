@@ -109,7 +109,7 @@ export default function loader(
       .then((cacheInstance) => cacheInstance.set(this.resourcePath, cssText))
       .then(() => {
         const request = `${outputFilename}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
-          cacheProvider
+          cacheProvider ?? ''
         )}!${this.resourcePath}`;
         const stringifiedRequest = loaderUtils.stringifyRequest(this, request);
 
