@@ -1,6 +1,6 @@
 {
   "name": "@linaria/rollup",
-  "version": "3.0.0-beta.15",
+  "version": "3.0.0-beta.17",
   "publishConfig": {
     "access": "public"
   },
@@ -43,7 +43,7 @@
     "rollup": "1.20.0||^2.0.0"
   },
   "dependencies": {
-    "@linaria/babel-preset": "^3.0.0-beta.15",
+    "@linaria/babel-preset": "^3.0.0-beta.17",
     "@rollup/pluginutils": "^4.1.0"
   },
   "peerDependencies": {
