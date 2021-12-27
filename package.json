@@ -1,6 +1,6 @@
 {
   "name": "linaria-website",
-  "version": "3.0.0-beta.16",
+  "version": "3.0.0-beta.17",
   "private": true,
   "description": "Linaria website",
   "scripts": {
@@ -19,7 +19,7 @@
   "dependencies": {
     "@linaria/atomic": "^3.0.0-beta.15",
     "@linaria/core": "^3.0.0-beta.15",
-    "@linaria/react": "^3.0.0-beta.15",
+    "@linaria/react": "^3.0.0-beta.17",
     "@linaria/server": "^3.0.0-beta.13",
     "babel-plugin-file-loader": "^1.1.1",
     "dedent": "^0.7.0",
@@ -36,9 +36,9 @@
     "@babel/cli": "^7.12.1",
     "@babel/core": "^7.12.3",
     "@babel/preset-flow": "^7.0.0",
-    "@linaria/babel-preset": "^3.0.0-beta.15",
-    "@linaria/stylelint": "^3.0.0-beta.15",
-    "@linaria/webpack4-loader": "^3.0.0-beta.16",
+    "@linaria/babel-preset": "^3.0.0-beta.17",
+    "@linaria/stylelint": "^3.0.0-beta.17",
+    "@linaria/webpack4-loader": "^3.0.0-beta.17",
     "babel-loader": "^8.0.5",
     "babel-plugin-module-resolver": "^3.2.0",
     "cross-env": "^5.2.0",
