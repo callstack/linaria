@@ -1,0 +1,46 @@
+{
+  "name": "ts-invariant",
+  "version": "0.9.4",
+  "author": "Ben Newman <ben@apollographql.com>",
+  "description": "TypeScript implementation of invariant(condition, message)",
+  "license": "MIT",
+  "main": "lib/invariant.js",
+  "module": "lib/invariant.esm.js",
+  "types": "lib/invariant.d.ts",
+  "keywords": [
+    "invariant",
+    "assertion",
+    "precondition",
+    "TypeScript"
+  ],
+  "homepage": "https://github.com/apollographql/invariant-packages",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apollographql/invariant-packages.git"
+  },
+  "bugs": {
+    "url": "https://github.com/apollographql/invariant-packages/issues"
+  },
+  "scripts": {
+    "build": "npm run tsc && npm run rollup",
+    "tsc": "../../node_modules/.bin/tsc",
+    "rollup": "../../node_modules/.bin/rollup -c",
+    "mocha": "../../node_modules/.bin/mocha --reporter spec --full-trace lib/tests.js",
+    "prepublish": "npm run build",
+    "pretest": "npm run build",
+    "test": "npm run test:mocha && npm run test:no-node",
+    "test:mocha": "npm run mocha",
+    "test:no-node": "! grep -i node lib/invariant.d.ts"
+  },
+  "dependencies": {
+    "tslib": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/invariant": "^2.2.29",
+    "invariant": "^2.2.4"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "gitHead": "84163bbe416bae1221d58f5ce947b43d8f751cb7"
+}

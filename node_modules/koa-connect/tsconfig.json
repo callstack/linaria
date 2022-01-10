@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "commonjs",
+    "lib": ["es2015"],
+    "declaration": true,
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "exclude": [
+    "./examples",
+  ]
+}

@@ -1,0 +1,338 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _module = _interopRequireDefault(require("module"));
+
+var _vm = _interopRequireDefault(require("vm"));
+
+var _fs = _interopRequireDefault(require("fs"));
+
+var _path = _interopRequireDefault(require("path"));
+
+var _logger = require("@linaria/logger");
+
+var EvalCache = _interopRequireWildcard(require("./eval-cache"));
+
+var process = _interopRequireWildcard(require("./process"));
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+// Supported node builtins based on the modules polyfilled by webpack
+// `true` means module is polyfilled, `false` means module is empty
+const builtins = {
+  assert: true,
+  buffer: true,
+  child_process: false,
+  cluster: false,
+  console: true,
+  constants: true,
+  crypto: true,
+  dgram: false,
+  dns: false,
+  domain: true,
+  events: true,
+  fs: false,
+  http: true,
+  https: true,
+  module: false,
+  net: false,
+  os: true,
+  path: true,
+  punycode: true,
+  process: true,
+  querystring: true,
+  readline: false,
+  repl: false,
+  stream: true,
+  string_decoder: true,
+  sys: true,
+  timers: true,
+  tls: false,
+  tty: true,
+  url: true,
+  util: true,
+  vm: true,
+  zlib: true
+}; // Separate cache for evaluated modules
+
+let cache = {};
+
+const NOOP = () => {};
+
+const createCustomDebug = depth => (..._args) => {
+  const [namespaces, arg1, ...args] = _args;
+  const modulePrefix = depth === 0 ? 'module' : `sub-module-${depth}`;
+  (0, _logger.debug)(`${modulePrefix}:${namespaces}`, arg1, ...args);
+};
+
+const cookModuleId = rawId => {
+  // It's a dirty hack for avoiding conflicts with babel-preset-react-app
+  // https://github.com/callstack/linaria/issues/745
+  // FIXME @Anber: I'll try to figure out a better solution. Probably, using Terser as a shaker's core can solve problems with interfered plugins.
+  return rawId.replace('/@babel/runtime/helpers/esm/', '/@babel/runtime/helpers/');
+};
+
+class Module {
+  constructor(_filename, options, debuggerDepth = 0) {
+    _defineProperty(this, "id", void 0);
+
+    _defineProperty(this, "filename", void 0);
+
+    _defineProperty(this, "options", void 0);
+
+    _defineProperty(this, "imports", void 0);
+
+    _defineProperty(this, "paths", void 0);
+
+    _defineProperty(this, "exports", void 0);
+
+    _defineProperty(this, "extensions", void 0);
+
+    _defineProperty(this, "dependencies", void 0);
+
+    _defineProperty(this, "transform", void 0);
+
+    _defineProperty(this, "debug", void 0);
+
+    _defineProperty(this, "debuggerDepth", void 0);
+
+    _defineProperty(this, "resolve", rawId => {
+      const id = cookModuleId(rawId);
+      const extensions = _module.default._extensions;
+      const added = [];
+
+      try {
+        // Check for supported extensions
+        this.extensions.forEach(ext => {
+          if (ext in extensions) {
+            return;
+          } // When an extension is not supported, add it
+          // And keep track of it to clean it up after resolving
+          // Use noop for the transform function since we handle it
+
+
+          extensions[ext] = NOOP;
+          added.push(ext);
+        });
+        return Module._resolveFilename(id, this);
+      } finally {
+        // Cleanup the extensions we added to restore previous behaviour
+        added.forEach(ext => delete extensions[ext]);
+      }
+    });
+
+    _defineProperty(this, "require", Object.assign(rawId => {
+      var _this$dependencies, _this$imports;
+
+      const id = cookModuleId(rawId);
+      this.debug('require', id);
+
+      if (id in builtins) {
+        // The module is in the allowed list of builtin node modules
+        // Ideally we should prevent importing them, but webpack polyfills some
+        // So we check for the list of polyfills to determine which ones to support
+        if (builtins[id]) {
+          return require(id);
+        }
+
+        return null;
+      } // Resolve module id (and filename) relatively to parent module
+
+
+      const filename = this.resolve(id);
+
+      if (filename === id && !_path.default.isAbsolute(id)) {
+        // The module is a builtin node modules, but not in the allowed list
+        throw new Error(`Unable to import "${id}". Importing Node builtins is not supported in the sandbox.`);
+      }
+
+      (_this$dependencies = this.dependencies) === null || _this$dependencies === void 0 ? void 0 : _this$dependencies.push(id);
+      let cacheKey = filename;
+      let only = [];
+
+      if ((_this$imports = this.imports) !== null && _this$imports !== void 0 && _this$imports.has(id)) {
+        // We know what exactly we need from this module. Let's shake it!
+        only = this.imports.get(id).sort();
+
+        if (only.length === 0) {
+          // Probably the module is used as a value itself
+          // like `'The answer is ' + require('./module')`
+          only = ['default'];
+        }
+
+        cacheKey += `:${only.join(',')}`;
+      }
+
+      let m = cache[cacheKey];
+
+      if (!m) {
+        this.debug('cached:not-exist', id); // Create the module if cached module is not available
+
+        m = new Module(filename, this.options, this.debuggerDepth + 1);
+        m.transform = this.transform; // Store it in cache at this point with, otherwise
+        // we would end up in infinite loop with cyclic dependencies
+
+        cache[cacheKey] = m;
+
+        if (this.extensions.includes(_path.default.extname(filename))) {
+          // To evaluate the file, we need to read it first
+          const code = _fs.default.readFileSync(filename, 'utf-8');
+
+          if (/\.json$/.test(filename)) {
+            // For JSON files, parse it to a JS object similar to Node
+            m.exports = JSON.parse(code);
+          } else {
+            // For JS/TS files, evaluate the module
+            // The module will be transpiled using provided transform
+            m.evaluate(code, only.includes('*') ? ['*'] : only);
+          }
+        } else {
+          // For non JS/JSON requires, just export the id
+          // This is to support importing assets in webpack
+          // The module will be resolved by css-loader
+          m.exports = id;
+        }
+      } else {
+        this.debug('cached:exist', id);
+      }
+
+      return m.exports;
+    }, {
+      ensure: NOOP,
+      cache,
+      resolve: this.resolve
+    }));
+
+    this.id = _filename;
+    this.filename = _filename;
+    this.options = options;
+    this.imports = null;
+    this.paths = [];
+    this.dependencies = null;
+    this.transform = null;
+    this.debug = createCustomDebug(debuggerDepth);
+    this.debuggerDepth = debuggerDepth;
+    Object.defineProperties(this, {
+      id: {
+        value: _filename,
+        writable: false
+      },
+      filename: {
+        value: _filename,
+        writable: false
+      },
+      paths: {
+        value: Object.freeze(_module.default._nodeModulePaths(_path.default.dirname(_filename))),
+        writable: false
+      }
+    });
+    this.exports = {}; // We support following extensions by default
+
+    this.extensions = ['.json', '.js', '.jsx', '.ts', '.tsx'];
+    this.debug('prepare', _filename);
+  }
+
+  evaluate(text, only = null) {
+    const filename = this.filename;
+    const matchedRules = this.options.rules.filter(({
+      test
+    }) => {
+      if (!test) {
+        return true;
+      }
+
+      if (typeof test === 'function') {
+        // this is not a test
+        // eslint-disable-next-line jest/no-disabled-tests
+        return test(filename);
+      }
+
+      if (test instanceof RegExp) {
+        return test.test(filename);
+      }
+
+      return false;
+    }).reverse();
+    const cacheKey = [this.filename, ...(only !== null && only !== void 0 ? only : [])];
+
+    if (EvalCache.has(cacheKey, text)) {
+      this.exports = EvalCache.get(cacheKey, text);
+      return;
+    }
+
+    let code;
+    const action = matchedRules.length > 0 ? matchedRules[0].action : 'ignore';
+
+    if (action === 'ignore') {
+      this.debug('ignore', `${filename}`);
+      code = text;
+    } else {
+      // Action can be a function or a module name
+      const evaluator = typeof action === 'function' ? action : require(action).default; // For JavaScript files, we need to transpile it and to get the exports of the module
+
+      let imports;
+      this.debug('prepare-evaluation', this.filename, 'using', evaluator.name);
+      [code, imports] = evaluator(this.filename, this.options, text, only);
+      this.imports = imports;
+      this.debug('evaluate', `${this.filename} (only ${(only || []).join(', ')}):\n${code}`);
+    }
+
+    const script = new _vm.default.Script(`(function (exports) { ${code}\n})(exports);`, {
+      filename: this.filename
+    });
+    script.runInContext(_vm.default.createContext({
+      clearImmediate: NOOP,
+      clearInterval: NOOP,
+      clearTimeout: NOOP,
+      setImmediate: NOOP,
+      setInterval: NOOP,
+      setTimeout: NOOP,
+      global,
+      process,
+      module: this,
+      exports: this.exports,
+      require: this.require,
+      __filename: this.filename,
+      __dirname: _path.default.dirname(this.filename)
+    }));
+    EvalCache.set(cacheKey, text, this.exports);
+  }
+
+}
+
+_defineProperty(Module, "invalidate", void 0);
+
+_defineProperty(Module, "invalidateEvalCache", void 0);
+
+_defineProperty(Module, "_resolveFilename", void 0);
+
+_defineProperty(Module, "_nodeModulePaths", void 0);
+
+Module.invalidate = () => {
+  cache = {};
+};
+
+Module.invalidateEvalCache = () => {
+  EvalCache.clear();
+}; // Alias to resolve the module using node's resolve algorithm
+// This static property can be overriden by the webpack loader
+// This allows us to use webpack's module resolution algorithm
+
+
+Module._resolveFilename = (id, options) => _module.default._resolveFilename(id, options);
+
+Module._nodeModulePaths = filename => _module.default._nodeModulePaths(filename);
+
+var _default = Module;
+exports.default = _default;
+//# sourceMappingURL=module.js.map

@@ -1,0 +1,50 @@
+{
+  "name": "koa-connect",
+  "version": "2.1.0",
+  "description": "Use Connect/Express middleware in Koa",
+  "repository": "vkurchatkin/koa-connect",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "author": "Vladimir Kurchatkin <vladimir.kurchatkin@gmail.com>",
+  "contributors": [
+    "Louis DeScioli (https://descioli.design)"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "start": "tsc --watch",
+    "build": "tsc -p tsconfig-build.json",
+    "test": "mocha -r ts-node/register tests.ts",
+    "test:watch": "npm run test -- --watch --watch-extensions ts --reporter nyan"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.0",
+    "@types/koa": "^2.0.46",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^10.9.2",
+    "@types/supertest": "^2.0.9",
+    "body-parser": "^1.19.0",
+    "husky": "^4.2.5",
+    "koa": "^2.0.0",
+    "lint-staged": "^10.2.9",
+    "mocha": "^2.3.4",
+    "prettier": "^2.0.5",
+    "supertest": "^1.1.0",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.0.1"
+  },
+  "keywords": [
+    "koa",
+    "connect",
+    "express",
+    "middleware"
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "!(*.d).ts": "prettier --single-quote --write",
+    "*.md": "prettier --write"
+  }
+}
