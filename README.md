@@ -233,6 +233,15 @@ Linaria is an open source project and will always remain free to use. If you thi
 
 Like the project? ⚛️ [Join the team](https://callstack.com/careers/?utm_campaign=Senior_RN&utm_source=github&utm_medium=readme) who does amazing stuff for clients and drives React Native Open Source! 🔥
 
+## Sponsors
+
+<p>
+  <a href="https://www.callstack.com"><img alt="{callstack}" src="website/assets/callstack-logo.svg" width="250"></a>
+</p>
+<p>
+  <a href="https://www.servers.com"><img alt="Servers.com" src="website/assets/serverscom-logo-black.svg" width="250"></a>
+</p>
+
 ## Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
