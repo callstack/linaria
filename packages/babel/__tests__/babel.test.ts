@@ -578,3 +578,67 @@ it('compiles atomic css', async () => {
   expect(code).toMatchSnapshot();
   expect(metadata).toMatchSnapshot();
 });
+
+it('compiles atomic css with at-rules and pseudo classes', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { css } from '@linaria/atomic';
+    import { styled } from '@linaria/react';
+    
+    const x = css\`
+      @media (max-width: 500px) {
+        background: blue;
+      }
+      @media (min-width: 300px) {
+        &:hover {
+          background: purple;
+        }
+      }
+      &:enabled {
+        width: 100%;
+      }
+      background: red;
+      height: 100px;
+    \`;
+    
+    console.log(x);
+    
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('compiles atomic css with keyframes', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { css } from '@linaria/atomic';
+    import { styled } from '@linaria/react';
+    
+    const x = css\`
+      @keyframes fade {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      animation: fade 1s infinite;
+      background: red;
+      height: 100px;
+    \`;
+    
+    console.log(x);
+    
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});

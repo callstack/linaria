@@ -307,7 +307,7 @@ export default function getTemplateProcessor(
       }
       const atomicRules = atomize(cssText);
       atomicRules.forEach((rule) => {
-        state.rules[`.${rule.className}`] = {
+        state.rules[rule.property] = {
           cssText: rule.cssText,
           start: path.parent?.loc?.start ?? null,
           className: className!,
@@ -322,12 +322,15 @@ export default function getTemplateProcessor(
       });
 
       const atomicClassObject = t.objectExpression(
-        atomicRules.map((rule) =>
-          t.objectProperty(
-            t.stringLiteral(rule.property),
-            t.stringLiteral(rule.className)
+        atomicRules
+          // Some atomic rules produced (eg. keyframes) don't have class names, and they also don't need to appear in the object
+          .filter((rule) => !!rule.className)
+          .map((rule) =>
+            t.objectProperty(
+              t.stringLiteral(rule.property),
+              t.stringLiteral(rule.className!)
+            )
           )
-        )
       );
 
       path.replaceWith(atomicClassObject);

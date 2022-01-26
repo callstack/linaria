@@ -130,7 +130,7 @@ type ClassNameFn = (
 ) => string;
 
 type AtomizeFn = (cssText: string) => {
-  className: string;
+  className?: string;
   cssText: string;
   property: string;
 }[];
