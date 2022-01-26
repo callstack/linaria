@@ -1,4 +1,4 @@
-import type { Node, Expression, TaggedTemplateExpression } from '@babel/types';
+import type { Expression, TaggedTemplateExpression } from '@babel/types';
 import type { TransformOptions } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import type { StyledMeta } from '@linaria/core';
@@ -135,6 +135,8 @@ type AtomizeFn = (cssText: string) => {
   property: string;
 }[];
 
+export type LibResolverFn = (linariaLibPath: string) => string | null;
+
 export type StrictOptions = {
   classNameSlug?: string | ClassNameFn;
   displayName: boolean;
@@ -143,6 +145,7 @@ export type StrictOptions = {
   atomize?: AtomizeFn;
   babelOptions: TransformOptions;
   rules: EvalRule[];
+  libResolver?: LibResolverFn;
 };
 
 export type Location = {
@@ -181,21 +184,3 @@ export type Options = {
 
 export type PreprocessorFn = (selector: string, cssText: string) => string;
 export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
-
-type AllNodes = { [T in Node['type']]: Extract<Node, { type: T }> };
-
-declare module '@babel/types' {
-  type VisitorKeys = {
-    [T in keyof AllNodes]: Extract<
-      keyof AllNodes[T],
-      {
-        [Key in keyof AllNodes[T]]: AllNodes[T][Key] extends
-          | Node
-          | Node[]
-          | null
-          ? Key
-          : never;
-      }[keyof AllNodes[T]]
-    >;
-  };
-}

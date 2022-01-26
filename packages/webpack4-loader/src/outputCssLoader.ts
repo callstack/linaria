@@ -1,9 +1,13 @@
-const cssLookup = new Map<string, string>();
+import loaderUtils from 'loader-utils';
+import { getCacheInstance } from './cache';
 
-export const addFile = (id: string, content: string) => {
-  cssLookup.set(id, content);
-};
+type LoaderContext = Parameters<typeof loaderUtils.getOptions>[0];
 
-export default function outputCssLoader(this: { resourcePath: string }) {
-  return cssLookup.get(this.resourcePath) ?? '';
+export default function outputCssLoader(this: LoaderContext) {
+  this.async();
+  const { cacheProvider } = loaderUtils.getOptions(this) || {};
+  getCacheInstance(cacheProvider)
+    .then((cacheInstance) => cacheInstance.get(this.resourcePath))
+    .then((result) => this.callback(null, result))
+    .catch((err: Error) => this.callback(err));
 }

@@ -1,6 +1,6 @@
 {
   "name": "@linaria/preeval",
-  "version": "3.0.0-beta.15",
+  "version": "3.0.0-beta.17",
   "publishConfig": {
     "access": "public"
   },
@@ -38,7 +38,7 @@
     "watch": "yarn build --watch"
   },
   "dependencies": {
-    "@linaria/babel-preset": "^3.0.0-beta.15"
+    "@linaria/babel-preset": "^3.0.0-beta.17"
   },
   "peerDependencies": {
     "@babel/core": ">=7"

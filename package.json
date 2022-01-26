@@ -53,7 +53,7 @@
     "react": ">=16",
     "release-it": "^14.2.1",
     "release-it-lerna-changelog": "^3.1.0",
-    "typescript": "^3.9.7"
+    "typescript": "^4.2.3"
   },
   "resolutions": {
     "@typescript-eslint/experimental-utils": "^4.28.0",
