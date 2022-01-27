@@ -28,8 +28,12 @@ const box = css`
   animation: rotate 1s linear infinite;
 
   @keyframes rotate {
-    { from: 0deg; }
-    { to: 360deg; }
+     {
+      from: 0deg;
+    }
+     {
+      to: 360deg;
+    }
   }
 `;
 ```
@@ -72,7 +76,7 @@ import colors from './colors.json';
 
 const Container = styled.div`
   background-color: ${colors.background};
-  color: ${props => props.color};
+  color: ${(props) => props.color};
   width: ${100 / 3}%;
   border: 1px solid red;
 
@@ -129,6 +133,10 @@ const FancyButton = styled(Button)`
   background-color: black;
 `;
 ```
+
+### Atomic `css`
+
+In addition to `css` from `@linaria/core`, the `@linaria/atomic` package exports its own `css` template literal which produces _atomic_ styles. See [the atomic css documentation](./ATOMIC_CSS.md) on this for more information.
 
 ## Server APIs (`@linaria/server`)
 
