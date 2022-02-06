@@ -6,7 +6,8 @@ module.exports = function () {
       /* eslint global-require: off */
       debug = require("debug")("follow-redirects");
     }
-    catch (error) {
+    catch (error) { /* */ }
+    if (typeof debug !== "function") {
       debug = function () { /* */ };
     }
   }
