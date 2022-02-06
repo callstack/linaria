@@ -24,8 +24,8 @@ exports[`compiles atomic css 1`] = `
 import { css } from '@linaria/atomic';
 import { styled } from '@linaria/react';
 const x = {
-  \\"background\\": \\"atm_k1dxsr\\",
-  \\"height\\": \\"atm_128ffr2\\"
+  \\"height\\": \\"atm_1tgle95\\",
+  \\"background\\": \\"atm_6sb1d7\\"
 };
 console.log(x);"
 `;
@@ -34,8 +34,68 @@ exports[`compiles atomic css 2`] = `
 
 CSS:
 
-.atm_k1dxsr {background: red;}
-.atm_128ffr2 {height: 100px;}
+.atm_1tgle95{height:100px;}
+.atm_6sb1d7{background:red;}
+
+Dependencies: NA
+
+`;
+
+exports[`compiles atomic css with at-rules and pseudo classes 1`] = `
+"/* @flow */
+import { css } from '@linaria/atomic';
+import { styled } from '@linaria/react';
+const x = {
+  \\"width &:enabled\\": \\"atm_1t9s2zv\\",
+  \\"height\\": \\"atm_1tgle95\\",
+  \\"background\\": \\"atm_6sb1d7\\",
+  \\"background media (max-width: 500px)\\": \\"atm_arq8dg\\",
+  \\"background &:hover media (min-width: 300px)\\": \\"atm_k1xw5e\\"
+};
+console.log(x);"
+`;
+
+exports[`compiles atomic css with at-rules and pseudo classes 2`] = `
+
+CSS:
+
+.atm_1t9s2zv:enabled{width:100%;}
+.atm_1tgle95{height:100px;}
+.atm_6sb1d7{background:red;}
+@media (max-width:500px){.atm_arq8dg{background:blue;}}
+@media (min-width:300px){.atm_k1xw5e:hover{background:purple;}}
+
+Dependencies: NA
+
+`;
+
+exports[`compiles atomic css with keyframes 1`] = `
+"/* @flow */
+import { css } from '@linaria/atomic';
+import { styled } from '@linaria/react';
+const x = {
+  \\"height\\": \\"atm_1tgle95\\",
+  \\"background\\": \\"atm_6sb1d7\\",
+  \\"animation\\": \\"atm_ddsc8h\\"
+};
+console.log(x);"
+`;
+
+exports[`compiles atomic css with keyframes 2`] = `
+
+CSS:
+
+.atm_1tgle95{height:100px;}
+.atm_6sb1d7{background:red;}
+.atm_ddsc8h{animation:fade 1s infinite;}
+@keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 
 Dependencies: NA
 

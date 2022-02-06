@@ -113,7 +113,8 @@ export function extractCssFromAst(
     });
 
     if (rules[selector].atom) {
-      cssText += `${selector} {${rules[selector].cssText}}\n`;
+      // For atoms, we just directly insert cssText, to give the atomizer full control over the rules
+      cssText += `${rules[selector].cssText}\n`;
     } else {
       // Run each rule through stylis to support nesting
       cssText += `${preprocessor(selector, rules[selector].cssText)}\n`;
