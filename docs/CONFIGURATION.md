@@ -81,7 +81,15 @@ module.exports = {
 
   A function that will be used to split css text into an array of atoms (atoms have className, cssText and the property key defined for them)
 
+  Each atom is comprised of:
+
+  - `className`: the name of the class to be used for this atom
+  - `cssText`: the complete css text for this atomic rule
+  - `property`: the property that this atom represents. This string representation is used to deduplicate atoms in `cx`.
+
   To configure for use with `@linaria/atomic`, set this option to `atomize: require('@linaria/atomic').atomize`
+
+  For more information on atomic css, see [the atomic css](./ATOMIC_CSS.md) documentation.
 
 - `libResolver: (source) => string`
 
