@@ -58,7 +58,7 @@ function App({ isPlaying }) {
 }
 ```
 
-Unlike the [`classnames`](https://www.npmjs.com/package/classnames) library, this doesn't handle objects. If you want need the features of the `classnames` library, you can use it instead.
+Unlike the [`classnames`](https://www.npmjs.com/package/classnames) library, this doesn't handle objects. If you want or need the features of the `classnames` library, you can use it instead.
 
 ### `styled`
 
