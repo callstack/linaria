@@ -564,14 +564,14 @@ it('compiles atomic css', async () => {
 
     import { css } from '@linaria/atomic';
     import { styled } from '@linaria/react';
-    
+
     const x = css\`
       background: red;
       height: 100px;
     \`;
-    
+
     console.log(x);
-    
+
       `
   );
 
@@ -586,7 +586,7 @@ it('compiles atomic css with at-rules and pseudo classes', async () => {
 
     import { css } from '@linaria/atomic';
     import { styled } from '@linaria/react';
-    
+
     const x = css\`
       @media (max-width: 500px) {
         background: blue;
@@ -602,9 +602,9 @@ it('compiles atomic css with at-rules and pseudo classes', async () => {
       background: red;
       height: 100px;
     \`;
-    
+
     console.log(x);
-    
+
       `
   );
 
@@ -619,7 +619,7 @@ it('compiles atomic css with keyframes', async () => {
 
     import { css } from '@linaria/atomic';
     import { styled } from '@linaria/react';
-    
+
     const x = css\`
       @keyframes fade {
         from {
@@ -634,9 +634,9 @@ it('compiles atomic css with keyframes', async () => {
       background: red;
       height: 100px;
     \`;
-    
+
     console.log(x);
-    
+
       `
   );
 
@@ -648,11 +648,13 @@ it('can re-export lib apis using a custom resolver', async () => {
   const { code, metadata } = await transpile(
     dedent`
     import { css } from './my-folder';
-    
+
     const x = css\`
       background: red;
       height: 100px;
     \`
+
+    console.log(x);
     `,
     {
       libResolver: () => {

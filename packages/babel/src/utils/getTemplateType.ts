@@ -14,6 +14,62 @@ type Result =
   | 'atomic-css'
   | null;
 
+function getTemplateTypeByTag(
+  t: Core['types'],
+  path: NodePath<TaggedTemplateExpression>,
+  localName: string,
+  has: (identifier: string, sources: string[]) => boolean
+): Result {
+  const { tag } = path.node;
+
+  // styled(Cmp)``
+  if (
+    t.isCallExpression(tag) &&
+    t.isIdentifier(tag.callee) &&
+    tag.arguments.length === 1 &&
+    tag.callee.name === localName &&
+    has(localName, ['@linaria/react', 'linaria/react'])
+  ) {
+    const tagPath = path.get('tag') as NodePath<CallExpression>;
+    return {
+      component: tagPath.get('arguments')[0] as NodePath<Expression>,
+    };
+  }
+
+  // styled.div``
+  if (
+    t.isMemberExpression(tag) &&
+    t.isIdentifier(tag.object) &&
+    t.isIdentifier(tag.property) &&
+    tag.object.name === localName &&
+    has(localName, ['@linaria/react', 'linaria/react'])
+  ) {
+    return {
+      component: { node: t.stringLiteral(tag.property.name) },
+    };
+  }
+
+  // css``
+  if (
+    has('css', ['@linaria/core', 'linaria']) &&
+    t.isIdentifier(tag) &&
+    tag.name === 'css'
+  ) {
+    return 'css';
+  }
+
+  // css`` but atomic
+  if (
+    has('css', ['@linaria/atomic']) &&
+    t.isIdentifier(tag) &&
+    tag.name === 'css'
+  ) {
+    return 'atomic-css';
+  }
+
+  return null;
+}
+
 const cache = new WeakMap<NodePath<TaggedTemplateExpression>, Result>();
 
 export default function getTemplateType(
@@ -23,74 +79,18 @@ export default function getTemplateType(
   libResolver?: LibResolverFn
 ): Result {
   if (!cache.has(path)) {
-    const { tag } = path.node;
-
     const localName = state.file.metadata.localName || 'styled';
+    const has = (identifier: string, sources: string[]) =>
+      hasImport(
+        t,
+        path.scope,
+        state.file.opts.filename,
+        identifier,
+        sources,
+        libResolver
+      );
 
-    if (
-      t.isCallExpression(tag) &&
-      t.isIdentifier(tag.callee) &&
-      tag.arguments.length === 1 &&
-      tag.callee.name === localName &&
-      hasImport(
-        t,
-        path.scope,
-        state.file.opts.filename,
-        localName,
-        ['@linaria/react', 'linaria/react'],
-        libResolver
-      )
-    ) {
-      const tagPath = path.get('tag') as NodePath<CallExpression>;
-      cache.set(path, {
-        component: tagPath.get('arguments')[0] as NodePath<Expression>,
-      });
-    } else if (
-      t.isMemberExpression(tag) &&
-      t.isIdentifier(tag.object) &&
-      t.isIdentifier(tag.property) &&
-      tag.object.name === localName &&
-      hasImport(
-        t,
-        path.scope,
-        state.file.opts.filename,
-        localName,
-        ['@linaria/react', 'linaria/react'],
-        libResolver
-      )
-    ) {
-      cache.set(path, {
-        component: { node: t.stringLiteral(tag.property.name) },
-      });
-    } else if (
-      hasImport(
-        t,
-        path.scope,
-        state.file.opts.filename,
-        'css',
-        ['@linaria/core', 'linaria'],
-        libResolver
-      ) &&
-      t.isIdentifier(tag) &&
-      tag.name === 'css'
-    ) {
-      cache.set(path, 'css');
-    } else if (
-      hasImport(
-        t,
-        path.scope,
-        state.file.opts.filename,
-        'css',
-        ['@linaria/atomic'],
-        libResolver
-      ) &&
-      t.isIdentifier(tag) &&
-      tag.name === 'css'
-    ) {
-      cache.set(path, 'atomic-css');
-    } else {
-      cache.set(path, null);
-    }
+    cache.set(path, getTemplateTypeByTag(t, path, localName, has));
   }
 
   return cache.get(path) ?? null;
