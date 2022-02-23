@@ -63,27 +63,25 @@ Which at build time, is transformed into:
 import { cx } from '@linaria/core';
 import { css } from '@linaria/atomic';
 
-const atomicCss = {
-  background: 'atm_abcd',
-  width: 'atm_efgh',
-  background: 'atm_ijkl',
-  border: 'atm_mnop',
-};
+const atomicCss =
+  'atm_background_abcd atm_width_efgh atm_height_ijkl atm_border_mnop';
 
-const blueBackground = {
-  background: 'atm_qrst',
-  // Note that the class name for border is the same in both – this is because it's the same property + value pair, so it's the same atom
-  border: 'atm_mnop',
-};
+const blueBackground = 'atm_background_qrst atm_border_mnop';
 
 // In React:
-<div className={cx(atomicCss, blueBackground)} />;
+<div className={cx(atomicCss, blueBackground)} />; // <div class="atm_width_efgh atm_height_ijkl atm_border_mnop" atm_background_qrst />
 
 // In vanilla JS:
 const div = document.createElement('div');
-div.setAttribute('class', cx(atomicCss, blueBackground));
+div.setAttribute('class', cx(atomicCss, blueBackground)); // same as React example
 document.body.appendChild(div);
 ```
+
+(Note: in the example above, the slugs in the atoms are lengthened for readability)
+
+The format of these atoms is `atm_${propertySlug}_${valueSlug}` which lets us deduplicate based on the `propertySlug` part of the atom.
+
+As you can see in the above example, `atm_border_mnop` can be removed as it duplicated, and we see two atoms with the `background` property slug, and can remove one of them.
 
 ### at-rules, pseudo classes and keyframes
 

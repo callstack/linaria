@@ -321,19 +321,15 @@ export default function getTemplateProcessor(
         );
       });
 
-      const atomicClassObject = t.objectExpression(
+      const atomicString = t.stringLiteral(
         atomicRules
           // Some atomic rules produced (eg. keyframes) don't have class names, and they also don't need to appear in the object
           .filter((rule) => !!rule.className)
-          .map((rule) =>
-            t.objectProperty(
-              t.stringLiteral(rule.property),
-              t.stringLiteral(rule.className!)
-            )
-          )
+          .map((rule) => rule.className!)
+          .join(' ')
       );
 
-      path.replaceWith(atomicClassObject);
+      path.replaceWith(atomicString);
     } else {
       debug(
         'evaluator:template-processor:extracted-rule',

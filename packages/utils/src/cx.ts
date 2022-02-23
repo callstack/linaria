@@ -2,13 +2,8 @@ export type LinariaClassName = string & { __linariaClassName: true };
 
 export type ClassName<T = string> = T | false | void | null | 0 | '';
 
-interface StyleCollectionObject {
-  [key: string]: string;
-}
-
 interface ICX {
-  (...classNames: ClassName<LinariaClassName>[]): LinariaClassName;
-  (...classNames: (ClassName | ClassName<StyleCollectionObject>)[]): string;
+  (...classNames: (ClassName | ClassName<LinariaClassName>)[]): string;
 }
 /**
  * Takes a list of class names and filters for truthy ones, joining them into a single class name for convenience.
@@ -16,10 +11,10 @@ interface ICX {
  * ```js
  *  cx('red', isBig && 'big') // returns 'red big' if `isBig` is true, otherwise returns 'red'
  * ```
- * If arguments provided are objects, these objects are merged together, and the values are taken as class names:
+ * If space separated atomic styles are provided, they are deduplicated according to the first hashed valued:
  *
  * ```js
- *  cx({ color: 'class1', textDecoration: 'class2'}, { color: 'class3' }) // returns `class3 class2`
+ *  cx('atm_a_class1 atm_b_class2', 'atm_a_class3') // returns `atm_a_class3 atm_b_class2`
  * ```
  *
  * @returns the combined, space separated class names that can be applied directly to the class attribute
@@ -29,22 +24,23 @@ const cx: ICX = function cx() {
     .call(arguments)
     .filter(Boolean);
 
-  // In the basic case, `cx` is passed all strings, and we simply need to join them together with space separators
-  const classNamesResult: string[] = presentClassNames.filter(
-    (arg) => typeof arg !== 'object'
-  );
+  const atomicClasses: { [k: string]: string } = {};
+  const nonAtomicClasses = [];
+  for (const className of presentClassNames) {
+    // className could be the output of a previous cx call, so split by ' ' first
+    const individualClassNames = className.split(' ');
 
-  // There might also be objects (eg. from the atomic API) such as cx('foo', {
-  // key1: 'bar', key2: 'fizz'}, { key1: 'buzz' }) the desired behavior is to
-  // deduplicate the values based on their properties. The object's values are
-  // the class names
-  const styleCollectionResult: string[] = Object.values(
-    Object.assign(
-      {},
-      ...presentClassNames.filter((arg) => typeof arg === 'object')
-    )
-  );
-  return [...styleCollectionResult, ...classNamesResult].join(
+    for (const className of individualClassNames) {
+      if (className.startsWith('atm_')) {
+        const [, keyHash] = className.split('_');
+        atomicClasses[keyHash] = className;
+      } else {
+        nonAtomicClasses.push(className);
+      }
+    }
+  }
+
+  return [...Object.values(atomicClasses), ...nonAtomicClasses].join(
     ' '
   ) as LinariaClassName;
 };

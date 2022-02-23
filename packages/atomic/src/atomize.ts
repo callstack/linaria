@@ -1,6 +1,25 @@
 import postcss, { Document, AtRule, Container, Rule } from 'postcss';
 import { slugify } from '@linaria/utils';
 import stylis from 'stylis';
+import { all as knownProperties } from 'known-css-properties';
+
+const knownPropertiesMap = knownProperties.reduce(
+  (acc: { [property: string]: number }, property, i) => {
+    acc[property] = i;
+    return acc;
+  },
+  {}
+);
+
+function hashProperty(property: string) {
+  const index = knownPropertiesMap[property];
+  // If it's a known property, let's use the index to cut down the length of the hash.
+  // otherwise, slugify
+  if (index !== undefined) {
+    return index.toString(36); // base 36 so that we get a-z,0-9
+  }
+  return slugify(property);
+}
 
 export default function atomize(cssText: string) {
   stylis.set({
@@ -64,8 +83,9 @@ export default function atomize(cssText: string) {
     container.append(decl.clone());
 
     const css = root.toString();
-    const slug = slugify([...atomicProperty, decl.value].join(';'));
-    const className = `atm_${slug}`;
+    const propertySlug = hashProperty([...atomicProperty].join(';'));
+    const valueSlug = slugify(decl.value);
+    const className = `atm_${propertySlug}_${valueSlug}`;
 
     const processedCss = stylis(`.${className}`, css);
 

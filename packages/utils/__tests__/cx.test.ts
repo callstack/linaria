@@ -6,24 +6,14 @@ it('should filter falsy values', () => {
   );
 });
 
-it('should join objects together, de-duplicating by property and joining the values', () => {
-  expect(
-    cx({ color: 'class1', textDecoration: 'class2' }, { color: 'class3' })
-  ).toBe('class3 class2');
+it('should join atoms together, de-duplicating by property and joining the values', () => {
+  expect(cx('atm_a_class1 atm_b_class2', 'atm_a_class3')).toBe(
+    'atm_a_class3 atm_b_class2'
+  );
 });
 
-it('should join objects and strings together at the same time', () => {
+it('should join atoms and non atoms together at the same time', () => {
   expect(
-    cx(
-      { color: 'atm_a', padding: 'atm_b' },
-      { color: 'atm_c' },
-      false,
-      '2',
-      0,
-      '',
-      null,
-      undefined,
-      '3'
-    )
-  ).toBe('atm_c atm_b 2 3');
+    cx('atm_a_1', 'atm_b_2', false, '2', 0, '', null, undefined, '3', 'atm_b_3')
+  ).toBe('atm_a_1 atm_b_3 2 3');
 });
