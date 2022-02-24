@@ -87,7 +87,7 @@ document.body.appendChild(div);
 
 ### at-rules, pseudo classes and keyframes
 
-Linaria's atomic css also supports creating (nested) at-rules, psuedo classes and keyframes:
+Linaria's atomic css also supports creating (nested) at-rules, pseudo classes and keyframes:
 
 ```ts
 import { css } from '@linaria/atomic';
