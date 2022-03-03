@@ -2,6 +2,7 @@ import postcss, { Document, AtRule, Container, Rule } from 'postcss';
 import { slugify } from '@linaria/utils';
 import stylis from 'stylis';
 import { all as knownProperties } from 'known-css-properties';
+import { getPropertyPriority } from './propertyPriority';
 
 const knownPropertiesMap = knownProperties.reduce(
   (acc: { [property: string]: number }, property, i) => {
@@ -87,7 +88,8 @@ export default function atomize(cssText: string) {
     const valueSlug = slugify(decl.value);
     const className = `atm_${propertySlug}_${valueSlug}`;
 
-    const processedCss = stylis(`.${className}`, css);
+    const propertyPriority = getPropertyPriority(decl.prop);
+    const processedCss = stylis(`.${className}`.repeat(propertyPriority), css);
 
     atomicRules.push({
       property: atomicProperty.join(' '),

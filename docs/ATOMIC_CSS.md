@@ -119,6 +119,29 @@ export const mediaQuery = css`
 
 These can also be combined for further nesting.
 
+### Property priorities
+
+Using atomic CSS, longhand properties such as `padding-top` have a _higher_ priority than their shorthand equivalents like `padding-top`. For example:
+
+```ts
+import { css } from '@linaria/atomic';
+
+const noPadding = css`
+  padding: 0;
+`;
+
+const paddingTop = css`
+  padding-top: 5px:
+`;
+
+// In react:
+<div className={cx(noPadding, paddingTop)}>...</div>;
+```
+
+The result will be that the div has `padding-top: 5px;`, as that is higher priority than `padding: 0`.
+
+The way linaria achieves this is through property priorities. See [this blog post](https://weser.io/blog/the-shorthand-longhand-problem-in-atomic-css) for more details on the concept, and the problems it solves. The method used in linaria is to increase the specificity of the rules: see `@linaria/atomic`'s `propertyPriority` function for a list of longhand and shorthand properties supported by this.
+
 ## Use cases
 
 ### Reducing number of rules
