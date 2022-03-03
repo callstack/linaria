@@ -38,6 +38,27 @@ Dependencies: NA
 
 `;
 
+exports[`compiles atomic css with at-rules and property priorities 1`] = `
+"/* @flow */
+import { css } from '@linaria/atomic';
+import { styled } from '@linaria/react';
+const x = \\"atm_ci1k5c_i2wt44 atm_le_1v6z61t atm_1h9nsec_idpfg4 atm_7xgmf7_14y27yu\\";
+console.log(x);"
+`;
+
+exports[`compiles atomic css with at-rules and property priorities 2`] = `
+
+CSS:
+
+.atm_ci1k5c_i2wt44.atm_ci1k5c_i2wt44:enabled{padding-left:6px;}
+.atm_le_1v6z61t.atm_le_1v6z61t{padding-bottom:7px;}
+@media (max-width:500px){.atm_1h9nsec_idpfg4{padding:0;}}
+@media (min-width:300px){.atm_7xgmf7_14y27yu.atm_7xgmf7_14y27yu:hover{padding-top:5px;}}
+
+Dependencies: NA
+
+`;
+
 exports[`compiles atomic css with at-rules and pseudo classes 1`] = `
 "/* @flow */
 import { css } from '@linaria/atomic';
@@ -83,6 +104,26 @@ CSS:
       opacity: 1;
     }
   }
+
+Dependencies: NA
+
+`;
+
+exports[`compiles atomic css with property priorities 1`] = `
+"/* @flow */
+import { css } from '@linaria/atomic';
+import { styled } from '@linaria/react';
+const y = \\"atm_gz_14y27yu\\";
+const x = \\"atm_gi_idpfg4\\";
+console.log(x, y);"
+`;
+
+exports[`compiles atomic css with property priorities 2`] = `
+
+CSS:
+
+.atm_gz_14y27yu.atm_gz_14y27yu{margin-left:5px;}
+.atm_gi_idpfg4{margin:0;}
 
 Dependencies: NA
 
