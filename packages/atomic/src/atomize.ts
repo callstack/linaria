@@ -49,11 +49,13 @@ export default function atomize(cssText: string) {
     let thisParent: Document | Container | undefined = decl.parent;
     const parents: (Document | Container)[] = [];
     const atomicProperty = [decl.prop];
+    let hasAtRule = false;
 
     // Traverse the declarations parents, and collect them all.
     while (thisParent && thisParent !== stylesheet) {
       parents.unshift(thisParent);
       if (thisParent.type === 'atrule') {
+        hasAtRule = true;
         // @media queries, @supports etc.
         atomicProperty.push(
           (thisParent as AtRule).name,
@@ -88,7 +90,8 @@ export default function atomize(cssText: string) {
     const valueSlug = slugify(decl.value);
     const className = `atm_${propertySlug}_${valueSlug}`;
 
-    const propertyPriority = getPropertyPriority(decl.prop);
+    const propertyPriority =
+      getPropertyPriority(decl.prop) + (hasAtRule ? 1 : 0);
     const processedCss = stylis(`.${className}`.repeat(propertyPriority), css);
 
     atomicRules.push({
@@ -98,11 +101,5 @@ export default function atomize(cssText: string) {
     });
   });
 
-  // The most common reason for sorting these rules is so that @media queries appear after rules that they might override. For example,
-  // .atm_foo { background: red; }
-  // @media (max-width: 500px) { .atm_bar { background: white; } }
-  // it's very likely that the media atom should come after the other background atom.
-  // This is necessary because media queries don't add specificity to the rules.
-  // In general also, this deterministic ordering is helpful.
-  return atomicRules.sort((a, b) => (a.cssText > b.cssText ? 1 : -1));
+  return atomicRules;
 }

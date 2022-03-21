@@ -85,7 +85,7 @@ As you can see in the above example, `atm_border_mnop` can be removed as it dupl
 
 ### at-rules, pseudo classes and keyframes
 
-Linaria's atomic css also supports creating (nested) at-rules, psuedo classes and keyframes:
+Linaria's atomic css also supports creating (nested) at-rules, pseudo classes and keyframes:
 
 ```ts
 import { css } from '@linaria/atomic';
@@ -140,7 +140,10 @@ const paddingTop = css`
 
 The result will be that the div has `padding-top: 5px;`, as that is higher priority than `padding: 0`.
 
-The way linaria achieves this is through property priorities. See [this blog post](https://weser.io/blog/the-shorthand-longhand-problem-in-atomic-css) for more details on the concept, and the problems it solves. The method used in linaria is to increase the specificity of the rules: see `@linaria/atomic`'s `propertyPriority` function for a list of longhand and shorthand properties supported by this.
+The way linaria achieves this is through property priorities. See [this blog post](https://weser.io/blog/the-shorthand-longhand-problem-in-atomic-css) for more details on the concept, and the problems it solves. The method used in linaria is to increase the specificity of the rules: see `@linaria/atomic`'s `propertyPriority` function for a list of longhand and shorthand properties supported by this. The basic rules are:
+
+- Longhand properties have higher priority than shorthand properties
+- Declarations in @media rules (and any @-rule, such as @supports) have higher priority than those outside of them
 
 ## Use cases
 
