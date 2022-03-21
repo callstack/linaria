@@ -736,17 +736,19 @@ export const visitors: Visitors = {
   /*
    * SequenceExpression
    * It is a special case of expression in which the value of the whole
-   * expression depends only on the last subexpression in the list.
-   * The rest of the subexpressions can be omitted if they don't have dependent nodes.
+   * evaluates to the last subexpression in the list.
+   * In theory, some could be emitted, but we set all the subexpressions
+   * to have dependencies since there could be references in the list.
    *
    * Example:
    * const a = (1, 2, b = 3, 4, b + 2); // `a` will be equal 5
    */
   SequenceExpression(this: GraphBuilderState, node: SequenceExpression) {
-    // Sequence value depends on only last expression in the list
     this.baseVisit(node, true);
     if (node.expressions.length > 0) {
-      this.graph.addEdge(node, node.expressions[node.expressions.length - 1]);
+      for (let expression of node.expressions) {
+        this.graph.addEdge(node, expression);
+      }
     }
   },
 };

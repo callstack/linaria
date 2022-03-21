@@ -23,6 +23,78 @@ describe('shaker', () => {
       expect(metadata).toMatchSnapshot();
     });
 
+    it('assigning to exports', async () => {
+      const { code, metadata } = await transpile(
+        dedent`
+      import { css } from "@linaria/core";
+      import { Padding } from "../__fixtures__/assignToExport";
+
+      export const square = css\`
+        div {
+          padding: ${'${Padding}'}px;
+        }
+      \`;
+    `
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+
+    it('exporting objects', async () => {
+      const { code, metadata } = await transpile(
+        dedent`
+      import { css } from "@linaria/core";
+      import object from "../__fixtures__/objectExport";
+
+      export const square = css\`
+        div {
+          margin: ${'${object.margin}'}px;
+        }
+      \`;
+    `
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+
+    it('exporting objects with computed keys', async () => {
+      const { code, metadata } = await transpile(
+        dedent`
+      import { css } from "@linaria/core";
+      import { object } from "../__fixtures__/computedKeys";
+
+      export const square = css\`
+        div {
+          color: ${'${object.blue}'};
+        }
+      \`;
+    `
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+
+    it('exporting sequence expressions', async () => {
+      const { code, metadata } = await transpile(
+        dedent`
+      import { css } from "@linaria/core";
+      import number from "../__fixtures__/sequenceExport";
+
+      export const square = css\`
+        div {
+          height: ${'${number}'}px;
+        }
+      \`;
+    `
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+
     it('should work with wildcard reexports', async () => {
       const { code, metadata } = await transpile(
         dedent`

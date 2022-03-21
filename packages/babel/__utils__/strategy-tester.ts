@@ -306,7 +306,7 @@ export function run(
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from '@linaria/react';
-
+      let external = 0;
       export const Title = styled.h1\`
         color: ${'${(external, () => "blue")}'};
       \`;
@@ -321,7 +321,7 @@ export function run(
     const { code, metadata } = await transpile(
       dedent`
       import { styled } from '@linaria/react';
-
+      let external = 0;
       const color = (external, () => 'blue');
 
       export const Title = styled.h1\`
