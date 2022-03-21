@@ -85,7 +85,7 @@ As you can see in the above example, `atm_border_mnop` can be removed as it dupl
 
 ### at-rules, pseudo classes and keyframes
 
-Linaria's atomic css also supports creating (nested) at-rules, psuedo classes and keyframes:
+Linaria's atomic css also supports creating (nested) at-rules, pseudo classes and keyframes:
 
 ```ts
 import { css } from '@linaria/atomic';
