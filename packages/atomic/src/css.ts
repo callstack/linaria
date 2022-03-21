@@ -1,13 +1,10 @@
+import type { LinariaClassName } from '@linaria/utils';
 import type { CSSProperties } from './CSSProperties';
-
-export interface StyleCollectionObject {
-  [key: string]: string;
-}
 
 type CSS = (
   strings: TemplateStringsArray,
   ...exprs: Array<string | number | CSSProperties>
-) => StyleCollectionObject;
+) => LinariaClassName;
 
 export const css: CSS = () => {
   throw new Error(

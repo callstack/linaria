@@ -23,10 +23,7 @@ exports[`compiles atomic css 1`] = `
 "/* @flow */
 import { css } from '@linaria/atomic';
 import { styled } from '@linaria/react';
-const x = {
-  \\"height\\": \\"atm_1tgle95\\",
-  \\"background\\": \\"atm_6sb1d7\\"
-};
+const x = \\"atm_26_5scuol atm_e2_12xxubj\\";
 console.log(x);"
 `;
 
@@ -34,8 +31,29 @@ exports[`compiles atomic css 2`] = `
 
 CSS:
 
-.atm_1tgle95{height:100px;}
-.atm_6sb1d7{background:red;}
+.atm_26_5scuol{background:red;}
+.atm_e2_12xxubj{height:100px;}
+
+Dependencies: NA
+
+`;
+
+exports[`compiles atomic css with at-rules and property priorities 1`] = `
+"/* @flow */
+import { css } from '@linaria/atomic';
+import { styled } from '@linaria/react';
+const x = \\"atm_ci1k5c_i2wt44 atm_le_1v6z61t atm_1h9nsec_idpfg4 atm_7xgmf7_14y27yu\\";
+console.log(x);"
+`;
+
+exports[`compiles atomic css with at-rules and property priorities 2`] = `
+
+CSS:
+
+.atm_ci1k5c_i2wt44.atm_ci1k5c_i2wt44:enabled{padding-left:6px;}
+.atm_le_1v6z61t.atm_le_1v6z61t{padding-bottom:7px;}
+@media (max-width:500px){.atm_1h9nsec_idpfg4{padding:0;}}
+@media (min-width:300px){.atm_7xgmf7_14y27yu.atm_7xgmf7_14y27yu:hover{padding-top:5px;}}
 
 Dependencies: NA
 
@@ -45,13 +63,7 @@ exports[`compiles atomic css with at-rules and pseudo classes 1`] = `
 "/* @flow */
 import { css } from '@linaria/atomic';
 import { styled } from '@linaria/react';
-const x = {
-  \\"width &:enabled\\": \\"atm_1t9s2zv\\",
-  \\"height\\": \\"atm_1tgle95\\",
-  \\"background\\": \\"atm_6sb1d7\\",
-  \\"background media (max-width: 500px)\\": \\"atm_arq8dg\\",
-  \\"background &:hover media (min-width: 300px)\\": \\"atm_k1xw5e\\"
-};
+const x = \\"atm_1hwwax4_1osqo2v atm_26_5scuol atm_e2_12xxubj atm_1apu8aw_13q2bts atm_1yli2by_1cnho6b\\";
 console.log(x);"
 `;
 
@@ -59,11 +71,11 @@ exports[`compiles atomic css with at-rules and pseudo classes 2`] = `
 
 CSS:
 
-.atm_1t9s2zv:enabled{width:100%;}
-.atm_1tgle95{height:100px;}
-.atm_6sb1d7{background:red;}
-@media (max-width:500px){.atm_arq8dg{background:blue;}}
-@media (min-width:300px){.atm_k1xw5e:hover{background:purple;}}
+.atm_1hwwax4_1osqo2v:enabled{width:100%;}
+.atm_26_5scuol{background:red;}
+.atm_e2_12xxubj{height:100px;}
+@media (max-width:500px){.atm_1apu8aw_13q2bts{background:blue;}}
+@media (min-width:300px){.atm_1yli2by_1cnho6b:hover{background:purple;}}
 
 Dependencies: NA
 
@@ -73,11 +85,7 @@ exports[`compiles atomic css with keyframes 1`] = `
 "/* @flow */
 import { css } from '@linaria/atomic';
 import { styled } from '@linaria/react';
-const x = {
-  \\"height\\": \\"atm_1tgle95\\",
-  \\"background\\": \\"atm_6sb1d7\\",
-  \\"animation\\": \\"atm_ddsc8h\\"
-};
+const x = \\"atm_26_5scuol atm_e2_12xxubj atm_p_x1wbsp\\";
 console.log(x);"
 `;
 
@@ -85,9 +93,9 @@ exports[`compiles atomic css with keyframes 2`] = `
 
 CSS:
 
-.atm_1tgle95{height:100px;}
-.atm_6sb1d7{background:red;}
-.atm_ddsc8h{animation:fade 1s infinite;}
+.atm_26_5scuol{background:red;}
+.atm_e2_12xxubj{height:100px;}
+.atm_p_x1wbsp{animation:fade 1s infinite;}
 @keyframes fade {
     from {
       opacity: 0;
@@ -96,6 +104,26 @@ CSS:
       opacity: 1;
     }
   }
+
+Dependencies: NA
+
+`;
+
+exports[`compiles atomic css with property priorities 1`] = `
+"/* @flow */
+import { css } from '@linaria/atomic';
+import { styled } from '@linaria/react';
+const y = \\"atm_gz_14y27yu\\";
+const x = \\"atm_gi_idpfg4\\";
+console.log(x, y);"
+`;
+
+exports[`compiles atomic css with property priorities 2`] = `
+
+CSS:
+
+.atm_gz_14y27yu.atm_gz_14y27yu{margin-left:5px;}
+.atm_gi_idpfg4{margin:0;}
 
 Dependencies: NA
 

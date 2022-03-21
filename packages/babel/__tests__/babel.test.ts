@@ -579,6 +579,31 @@ it('compiles atomic css', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('compiles atomic css with property priorities', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { css } from '@linaria/atomic';
+    import { styled } from '@linaria/react';
+
+    const y = css\`
+      margin-left: 5px;
+    \`;
+
+    const x = css\`
+      margin: 0;
+    \`;
+
+    console.log(x, y);
+
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('compiles atomic css with at-rules and pseudo classes', async () => {
   const { code, metadata } = await transpile(
     dedent`
@@ -605,6 +630,37 @@ it('compiles atomic css with at-rules and pseudo classes', async () => {
 
     console.log(x);
 
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('compiles atomic css with at-rules and property priorities', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { css } from '@linaria/atomic';
+    import { styled } from '@linaria/react';
+
+    const x = css\`
+      @media (max-width: 500px) {
+        padding: 0;
+      }
+      @media (min-width: 300px) {
+        &:hover {
+          padding-top: 5px;
+        }
+      }
+      &:enabled {
+        padding-left: 6px;
+      }
+      padding-bottom: 7px;
+    \`;
+
+    console.log(x);
       `
   );
 

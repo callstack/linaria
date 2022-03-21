@@ -63,27 +63,25 @@ Which at build time, is transformed into:
 import { cx } from '@linaria/core';
 import { css } from '@linaria/atomic';
 
-const atomicCss = {
-  background: 'atm_abcd',
-  width: 'atm_efgh',
-  background: 'atm_ijkl',
-  border: 'atm_mnop',
-};
+const atomicCss =
+  'atm_background_abcd atm_width_efgh atm_height_ijkl atm_border_mnop';
 
-const blueBackground = {
-  background: 'atm_qrst',
-  // Note that the class name for border is the same in both – this is because it's the same property + value pair, so it's the same atom
-  border: 'atm_mnop',
-};
+const blueBackground = 'atm_background_qrst atm_border_mnop';
 
 // In React:
-<div className={cx(atomicCss, blueBackground)} />;
+<div className={cx(atomicCss, blueBackground)} />; // <div class="atm_width_efgh atm_height_ijkl atm_border_mnop" atm_background_qrst />
 
 // In vanilla JS:
 const div = document.createElement('div');
-div.setAttribute('class', cx(atomicCss, blueBackground));
+div.setAttribute('class', cx(atomicCss, blueBackground)); // same as React example
 document.body.appendChild(div);
 ```
+
+(Note: in the example above, the slugs in the atoms are lengthened for readability)
+
+The format of these atoms is `atm_${propertySlug}_${valueSlug}` which lets us deduplicate based on the `propertySlug` part of the atom.
+
+As you can see in the above example, `atm_border_mnop` can be removed as it duplicated, and we see two atoms with the `background` property slug, and can remove one of them.
 
 ### at-rules, pseudo classes and keyframes
 
@@ -120,6 +118,32 @@ export const mediaQuery = css`
 ```
 
 These can also be combined for further nesting.
+
+### Property priorities
+
+Using atomic CSS, longhand properties such as `padding-top` have a _higher_ priority than their shorthand equivalents like `padding-top`. For example:
+
+```ts
+import { css } from '@linaria/atomic';
+
+const noPadding = css`
+  padding: 0;
+`;
+
+const paddingTop = css`
+  padding-top: 5px:
+`;
+
+// In react:
+<div className={cx(noPadding, paddingTop)}>...</div>;
+```
+
+The result will be that the div has `padding-top: 5px;`, as that is higher priority than `padding: 0`.
+
+The way linaria achieves this is through property priorities. See [this blog post](https://weser.io/blog/the-shorthand-longhand-problem-in-atomic-css) for more details on the concept, and the problems it solves. The method used in linaria is to increase the specificity of the rules: see `@linaria/atomic`'s `propertyPriority` function for a list of longhand and shorthand properties supported by this. The basic rules are:
+
+- Longhand properties have higher priority than shorthand properties
+- Declarations in @media rules (and any @-rule, such as @supports) have higher priority than those outside of them
 
 ## Use cases
 
