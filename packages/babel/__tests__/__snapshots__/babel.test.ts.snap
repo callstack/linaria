@@ -42,7 +42,7 @@ exports[`compiles atomic css with at-rules and property priorities 1`] = `
 "/* @flow */
 import { css } from '@linaria/atomic';
 import { styled } from '@linaria/react';
-const x = \\"atm_ci1k5c_i2wt44 atm_le_1v6z61t atm_1h9nsec_idpfg4 atm_7xgmf7_14y27yu\\";
+const x = \\"atm_1h9nsec_idpfg4 atm_7xgmf7_14y27yu atm_ci1k5c_i2wt44 atm_le_1v6z61t\\";
 console.log(x);"
 `;
 
@@ -50,10 +50,10 @@ exports[`compiles atomic css with at-rules and property priorities 2`] = `
 
 CSS:
 
+@media (max-width:500px){.atm_1h9nsec_idpfg4.atm_1h9nsec_idpfg4{padding:0;}}
+@media (min-width:300px){.atm_7xgmf7_14y27yu.atm_7xgmf7_14y27yu.atm_7xgmf7_14y27yu:hover{padding-top:5px;}}
 .atm_ci1k5c_i2wt44.atm_ci1k5c_i2wt44:enabled{padding-left:6px;}
 .atm_le_1v6z61t.atm_le_1v6z61t{padding-bottom:7px;}
-@media (max-width:500px){.atm_1h9nsec_idpfg4{padding:0;}}
-@media (min-width:300px){.atm_7xgmf7_14y27yu.atm_7xgmf7_14y27yu:hover{padding-top:5px;}}
 
 Dependencies: NA
 
@@ -63,7 +63,7 @@ exports[`compiles atomic css with at-rules and pseudo classes 1`] = `
 "/* @flow */
 import { css } from '@linaria/atomic';
 import { styled } from '@linaria/react';
-const x = \\"atm_1hwwax4_1osqo2v atm_26_5scuol atm_e2_12xxubj atm_1apu8aw_13q2bts atm_1yli2by_1cnho6b\\";
+const x = \\"atm_1apu8aw_13q2bts atm_1yli2by_1cnho6b atm_1hwwax4_1osqo2v atm_26_5scuol atm_e2_12xxubj\\";
 console.log(x);"
 `;
 
@@ -71,11 +71,11 @@ exports[`compiles atomic css with at-rules and pseudo classes 2`] = `
 
 CSS:
 
+@media (max-width:500px){.atm_1apu8aw_13q2bts.atm_1apu8aw_13q2bts{background:blue;}}
+@media (min-width:300px){.atm_1yli2by_1cnho6b.atm_1yli2by_1cnho6b:hover{background:purple;}}
 .atm_1hwwax4_1osqo2v:enabled{width:100%;}
 .atm_26_5scuol{background:red;}
 .atm_e2_12xxubj{height:100px;}
-@media (max-width:500px){.atm_1apu8aw_13q2bts{background:blue;}}
-@media (min-width:300px){.atm_1yli2by_1cnho6b:hover{background:purple;}}
 
 Dependencies: NA
 
@@ -85,7 +85,7 @@ exports[`compiles atomic css with keyframes 1`] = `
 "/* @flow */
 import { css } from '@linaria/atomic';
 import { styled } from '@linaria/react';
-const x = \\"atm_26_5scuol atm_e2_12xxubj atm_p_x1wbsp\\";
+const x = \\"atm_p_x1wbsp atm_26_5scuol atm_e2_12xxubj\\";
 console.log(x);"
 `;
 
@@ -93,9 +93,6 @@ exports[`compiles atomic css with keyframes 2`] = `
 
 CSS:
 
-.atm_26_5scuol{background:red;}
-.atm_e2_12xxubj{height:100px;}
-.atm_p_x1wbsp{animation:fade 1s infinite;}
 @keyframes fade {
     from {
       opacity: 0;
@@ -104,6 +101,9 @@ CSS:
       opacity: 1;
     }
   }
+.atm_p_x1wbsp{animation:fade 1s infinite;}
+.atm_26_5scuol{background:red;}
+.atm_e2_12xxubj{height:100px;}
 
 Dependencies: NA
 
