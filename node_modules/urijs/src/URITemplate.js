@@ -2,7 +2,7 @@
  * URI.js - Mutating URLs
  * URI Template Support - http://tools.ietf.org/html/rfc6570
  *
- * Version: 1.19.7
+ * Version: 1.19.10
  *
  * Author: Rodney Rehm
  * Web: http://medialize.github.io/URI.js/
