@@ -1,5 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`shaker assigning to exports 1`] = `
+"import { css } from \\"@linaria/core\\";
+import { Padding } from \\"../__fixtures__/assignToExport\\";
+export const square = \\"square_s1t92lw9\\";"
+`;
+
+exports[`shaker assigning to exports 2`] = `
+
+CSS:
+
+.square_s1t92lw9 {
+  div {
+    padding: 4px;
+  }
+}
+
+Dependencies: ../__fixtures__/assignToExport
+
+`;
+
 exports[`shaker derives display name from filename 1`] = `
 "import { styled } from '@linaria/react';
 export default /*#__PURE__*/styled(\\"h1\\")({
@@ -226,6 +246,7 @@ Dependencies: NA
 
 exports[`shaker evaluates dependencies with sequence expression 1`] = `
 "import { styled } from '@linaria/react';
+let external = 0;
 const color = (external, () => 'blue');
 export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
@@ -381,6 +402,7 @@ Dependencies: @linaria/babel-preset/__fixtures__/enums
 
 exports[`shaker evaluates interpolations with sequence expression 1`] = `
 "import { styled } from '@linaria/react';
+let external = 0;
 export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\",
@@ -481,6 +503,66 @@ CSS:
 }
 
 Dependencies: NA
+
+`;
+
+exports[`shaker exporting objects 1`] = `
+"import { css } from \\"@linaria/core\\";
+import object from \\"../__fixtures__/objectExport\\";
+export const square = \\"square_s1t92lw9\\";"
+`;
+
+exports[`shaker exporting objects 2`] = `
+
+CSS:
+
+.square_s1t92lw9 {
+  div {
+    margin: 5px;
+  }
+}
+
+Dependencies: @babel/runtime/helpers/interopRequireDefault, ../__fixtures__/objectExport
+
+`;
+
+exports[`shaker exporting objects with computed keys 1`] = `
+"import { css } from \\"@linaria/core\\";
+import { object } from \\"../__fixtures__/computedKeys\\";
+export const square = \\"square_s1t92lw9\\";"
+`;
+
+exports[`shaker exporting objects with computed keys 2`] = `
+
+CSS:
+
+.square_s1t92lw9 {
+  div {
+    color: blue;
+  }
+}
+
+Dependencies: ../__fixtures__/computedKeys
+
+`;
+
+exports[`shaker exporting sequence expressions 1`] = `
+"import { css } from \\"@linaria/core\\";
+import number from \\"../__fixtures__/sequenceExport\\";
+export const square = \\"square_s1t92lw9\\";"
+`;
+
+exports[`shaker exporting sequence expressions 2`] = `
+
+CSS:
+
+.square_s1t92lw9 {
+  div {
+    height: 5px;
+  }
+}
+
+Dependencies: @babel/runtime/helpers/interopRequireDefault, ../__fixtures__/sequenceExport
 
 `;
 

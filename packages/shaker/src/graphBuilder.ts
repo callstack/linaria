@@ -43,7 +43,7 @@ class GraphBuilder extends GraphBuilderState {
     return false;
   }
 
-  private isExportsAssigment(node: Node): node is AssignmentExpression {
+  private isExportsAssignment(node: Node): node is AssignmentExpression {
     if (
       node &&
       t.isAssignmentExpression(node) &&
@@ -127,8 +127,8 @@ class GraphBuilder extends GraphBuilderState {
     }
 
     if (
-      this.isExportsAssigment(node) &&
-      !this.isExportsAssigment(node.right) &&
+      this.isExportsAssignment(node) &&
+      !this.isExportsAssignment(node.right) &&
       !isVoid(node.right)
     ) {
       if (
@@ -162,12 +162,12 @@ class GraphBuilder extends GraphBuilderState {
 
             this.graph.addEdge(node.right, node);
             this.graph.addEdge(node, node.left);
-
-            // We have done all the required work, so stop here
-            return;
           } else {
             this.graph.addExport('default', node);
+            this.graph.addEdge(node, node.left);
           }
+          // Regardless of whether the node.right is an object expression, this may also be the default export
+          this.graph.addExport('default', node);
         } else {
           // it can be either `exports.name` or `exports["name"]`
           const nameNode = node.left.property;
@@ -181,6 +181,47 @@ class GraphBuilder extends GraphBuilderState {
       const [name, identifier] = node.arguments;
       this.graph.addExport(name.value, node);
       this.graph.addEdge(node, identifier);
+    } else if (t.isVariableDeclaration(node)) {
+      // We might be assigning to the exports, eg. `var Padding = exports.Padding = ...`
+      // or it might be a sequence and look like var foo = 1, var Name = exports.name = ...
+      node.declarations.forEach((declaration) => {
+        if (
+          t.isVariableDeclarator(declaration) &&
+          t.isAssignmentExpression(declaration.init)
+        ) {
+          let currentAssignmentExpression: t.Expression = declaration.init;
+          let addedExport = false;
+          let edgesToAdd = [];
+
+          // loop through the assignments looking for possible exports
+          while (t.isAssignmentExpression(currentAssignmentExpression)) {
+            edgesToAdd.push(currentAssignmentExpression);
+            if (
+              this.isExportsAssignment(currentAssignmentExpression) &&
+              t.isMemberExpression(currentAssignmentExpression.left) &&
+              (t.isIdentifier(currentAssignmentExpression.left.property) ||
+                t.isStringLiteral(currentAssignmentExpression.left.property))
+            ) {
+              const nameNode = currentAssignmentExpression.left.property;
+              this.graph.addExport(
+                t.isStringLiteral(nameNode) ? nameNode.value : nameNode.name,
+                node
+              );
+              addedExport = true;
+              edgesToAdd.push(declaration);
+              edgesToAdd.push(currentAssignmentExpression.left);
+              edgesToAdd.push(currentAssignmentExpression.right);
+            }
+
+            currentAssignmentExpression = currentAssignmentExpression.right;
+          }
+          if (addedExport) {
+            edgesToAdd.forEach((edge) => {
+              this.graph.addEdge(node, edge);
+            });
+          }
+        }
+      });
     }
 
     const isScopable = t.isScopable(node);
