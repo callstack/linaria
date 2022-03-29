@@ -204,6 +204,7 @@ Dependencies: NA
 
 exports[`extractor evaluates dependencies with sequence expression 1`] = `
 "import { styled } from '@linaria/react';
+let external = 0;
 const color = (external, () => 'blue');
 export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
@@ -359,6 +360,7 @@ Dependencies: @linaria/babel-preset/__fixtures__/enums
 
 exports[`extractor evaluates interpolations with sequence expression 1`] = `
 "import { styled } from '@linaria/react';
+let external = 0;
 export const Title = /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\",

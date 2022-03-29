@@ -240,6 +240,12 @@ it('SequenceExpression', () => {
   });
   expect(seqDeps).toMatchObject([
     {
+      type: 'BooleanLiteral',
+    },
+    {
+      type: 'AssignmentExpression',
+    },
+    {
       type: 'ArrowFunctionExpression',
     },
   ]);
@@ -296,7 +302,7 @@ it('SequenceExpression', () => {
   ]);
 
   const bool = { type: 'BooleanLiteral' };
-  expect(graph.findDependents(bool)).toHaveLength(0);
+  expect(graph.findDependents(bool)).toHaveLength(1);
   expect(graph.findDependencies(bool)).toHaveLength(0);
 });
 

@@ -99,11 +99,11 @@ var _a$b = {
   b: 2
 };
 _a$b = _a$b === void 0 ? {} : _a$b;
-var object = (_extends2.default)({}, _a$b);
+var object = (0, _extends2.default)({}, _a$b);
 var _ref = [1, 2, 3, 4];
 _ref = _ref === void 0 ? [] : _ref;
 
-var _ref2 = (_toArray2.default)(_ref),
+var _ref2 = (0, _toArray2.default)(_ref),
     array = _ref2.slice(0);
 
 var obj = {
@@ -179,7 +179,9 @@ exports.__linariaPreval = [_.whiteColor, _.default];"
 exports[`shakes sequence expression 1`] = `
 "\\"use strict\\";
 
-var color1 = (function () {
+var _ = require(\\"\\\\u2026\\");
+
+var color1 = (_.external, function () {
   return 'blue';
 });
 var local = '';
