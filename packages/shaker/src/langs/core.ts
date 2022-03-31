@@ -172,24 +172,50 @@ function findWildcardReexportStatement(
   );
 }
 
+function isMethodWithSideEffect(
+  callee: Node | null,
+  state: GraphBuilderState
+): boolean {
+  const methods = [
+    'assign',
+    'defineProperty',
+    'defineProperties',
+    'freeze',
+    'observe',
+  ];
+  if (
+    t.isMemberExpression(callee) &&
+    isIdentifier(callee.object, 'Object') &&
+    isIdentifier(callee.property, methods)
+  ) {
+    // It's something like Object.defineProperty
+    return true;
+  }
+
+  if (
+    t.isMemberExpression(callee) &&
+    isIdentifier(callee.property, 'default') &&
+    isIdentifier(callee.object)
+  ) {
+    // It looks like a call of imported method. Maybe it's a polyfill for Object's methods?
+    const declaration = state.scope.getDeclaration(callee.object);
+    if (!declaration || !isIdentifier(declaration)) return false;
+    const source = state.graph.importAliases.get(declaration);
+    return methods.some(
+      (method) => `@babel/runtime/helpers/${method}` === source
+    );
+  }
+
+  return false;
+}
+
 /*
  * Returns nodes which are implicitly affected by specified node
  */
 function getAffectedNodes(node: Node, state: GraphBuilderState): Node[] {
   // FIXME: this method should be generalized
   const callee = t.isCallExpression(node) ? getCallee(node) : null;
-  if (
-    t.isCallExpression(node) &&
-    t.isMemberExpression(callee) &&
-    isIdentifier(callee.object, 'Object') &&
-    isIdentifier(callee.property, [
-      'assign',
-      'defineProperty',
-      'defineProperties',
-      'freeze',
-      'observe',
-    ])
-  ) {
+  if (t.isCallExpression(node) && isMethodWithSideEffect(callee, state)) {
     const [obj, property] = node.arguments;
     if (!t.isIdentifier(obj)) {
       return [];
@@ -736,19 +762,17 @@ export const visitors: Visitors = {
   /*
    * SequenceExpression
    * It is a special case of expression in which the value of the whole
-   * evaluates to the last subexpression in the list.
-   * In theory, some could be emitted, but we set all the subexpressions
-   * to have dependencies since there could be references in the list.
+   * expression depends only on the last subexpression in the list.
+   * The rest of the subexpressions can be omitted if they don't have dependent nodes.
    *
    * Example:
    * const a = (1, 2, b = 3, 4, b + 2); // `a` will be equal 5
    */
   SequenceExpression(this: GraphBuilderState, node: SequenceExpression) {
+    // Sequence value depends on only last expression in the list
     this.baseVisit(node, true);
     if (node.expressions.length > 0) {
-      for (let expression of node.expressions) {
-        this.graph.addEdge(node, expression);
-      }
+      this.graph.addEdge(node, node.expressions[node.expressions.length - 1]);
     }
   },
 };
