@@ -79,6 +79,8 @@ export default function linaria({
         if (!result.cssText) {
           return {
             contents: code,
+            loader,
+            resolveDir: path.basename(args.path),
           };
         }
 
@@ -99,6 +101,8 @@ export default function linaria({
           import ${JSON.stringify(cssFilename)};
           ${result.code}
           `,
+          loader,
+          resolveDir: path.basename(args.path),
         };
       });
     },
