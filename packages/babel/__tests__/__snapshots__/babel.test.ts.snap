@@ -129,6 +129,192 @@ Dependencies: NA
 
 `;
 
+exports[`compiles atomic styled with only dynamic interpolations as @linaria/react would 1`] = `
+"/* @flow */
+import { styled } from '@linaria/atomic';
+const Component = /*#__PURE__*/styled(\\"div\\")({
+  name: \\"Component\\",
+  class: \\"c17gu1mi\\",
+  vars: {
+    \\"c17gu1mi-0\\": [props => props.color],
+    \\"c17gu1mi-1\\": [size, \\"px\\"]
+  }
+});
+console.log(Component);"
+`;
+
+exports[`compiles atomic styled with only dynamic interpolations as @linaria/react would 2`] = `
+
+CSS:
+
+.c17gu1mi {
+  background-color: var(--c17gu1mi-0);
+  margin: var(--c17gu1mi-1);
+}
+
+Dependencies: NA
+
+`;
+
+exports[`compiles atomic styled with only static css 1`] = `
+"/* @flow */
+import { styled } from '@linaria/atomic';
+const Component = /*#__PURE__*/styled(\\"div\\")({
+  name: \\"Component\\",
+  class: \\"atm_7l_13q2bts atm_e2_12xxubj c17gu1mi\\"
+});
+console.log(Component);"
+`;
+
+exports[`compiles atomic styled with only static css 2`] = `
+
+CSS:
+
+.atm_7l_13q2bts{color:blue;}
+.atm_e2_12xxubj{height:100px;}
+.c17gu1mi {}
+
+Dependencies: NA
+
+`;
+
+exports[`compiles atomic styled with static css and dynamic interpolations 1`] = `
+"/* @flow */
+import { styled } from '@linaria/atomic';
+const Component = /*#__PURE__*/styled(\\"div\\")({
+  name: \\"Component\\",
+  class: \\"atm_7l_13q2bts atm_e2_12xxubj c17gu1mi\\",
+  vars: {
+    \\"c17gu1mi-0\\": [props => props.color]
+  }
+});
+console.log(Component);"
+`;
+
+exports[`compiles atomic styled with static css and dynamic interpolations 2`] = `
+
+CSS:
+
+.atm_7l_13q2bts{color:blue;}
+.atm_e2_12xxubj{height:100px;}
+.c17gu1mi {
+  background-color: var(--c17gu1mi-0);
+}
+
+Dependencies: NA
+
+`;
+
+exports[`compiles atomic styled with static interpolations as static css 1`] = `
+"/* @flow */
+import { styled } from '@linaria/atomic';
+const Component = /*#__PURE__*/styled(\\"div\\")({
+  name: \\"Component\\",
+  class: \\"atm_7l_13q2bts atm_e2_12xxubj atm_gi_12am3vd c17gu1mi\\"
+});
+console.log(Component);"
+`;
+
+exports[`compiles atomic styled with static interpolations as static css 2`] = `
+
+CSS:
+
+.atm_7l_13q2bts{color:blue;}
+.atm_e2_12xxubj{height:100px;}
+.atm_gi_12am3vd{margin:50px;}
+.c17gu1mi {}
+
+Dependencies: NA
+
+`;
+
+exports[`compiles atomic styled without colliding by property 1`] = `
+"/* @flow */
+import { styled } from '@linaria/atomic';
+export const Component = /*#__PURE__*/styled(\\"ul\\")({
+  name: \\"Component\\",
+  class: \\"atm_9s_1txwivl atm_l8_idpfg4 c17gu1mi\\"
+});
+export const Component2 = /*#__PURE__*/styled(\\"ul\\")({
+  name: \\"Component2\\",
+  class: \\"atm_9s_1ulexfb atm_l8_idpfg4 cccybe9\\"
+});"
+`;
+
+exports[`compiles atomic styled without colliding by property 2`] = `
+
+CSS:
+
+.atm_9s_1txwivl{display:flex;}
+.atm_l8_idpfg4{padding:0;}
+.c17gu1mi {}
+.atm_9s_1ulexfb{display:block;}
+.cccybe9 {}
+
+Dependencies: NA
+
+`;
+
+exports[`compiles atomic styled wrapping components as @linaria/react would 1`] = `
+"/* @flow */
+import { styled } from '@linaria/atomic';
+const Component = /*#__PURE__*/styled(\\"div\\")({
+  name: \\"Component\\",
+  class: \\"atm_7l_13q2bts atm_e2_12xxubj c17gu1mi\\"
+});
+const ComponentCompositing = /*#__PURE__*/styled(Component)({
+  name: \\"ComponentCompositing\\",
+  class: \\"cccybe9\\"
+});
+console.log(ComponentCompositing);"
+`;
+
+exports[`compiles atomic styled wrapping components as @linaria/react would 2`] = `
+
+CSS:
+
+.atm_7l_13q2bts{color:blue;}
+.atm_e2_12xxubj{height:100px;}
+.c17gu1mi {}
+.cccybe9 {
+  color: red;
+  height: 100px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`compiles atoms that are shared between css and styled templates 1`] = `
+"/* @flow */
+import { css } from '@linaria/atomic';
+import { styled } from '@linaria/atomic';
+const x = \\"atm_26_5scuol atm_e2_12xxubj\\";
+const Component = /*#__PURE__*/styled(\\"div\\")({
+  name: \\"Component\\",
+  class: \\"atm_26_5scuol atm_e2_12xxubj atm_gi_19bvopo cccybe9\\",
+  vars: {
+    \\"cccybe9-1\\": [props => props.color]
+  }
+});
+console.log(x, Component);"
+`;
+
+exports[`compiles atoms that are shared between css and styled templates 2`] = `
+
+CSS:
+
+.atm_26_5scuol{background:red;}
+.atm_e2_12xxubj{height:100px;}
+.atm_gi_19bvopo{margin:10px;}
+.cccybe9 {
+  color: var(--cccybe9-1);
+}
+
+Dependencies: NA
+
+`;
+
 exports[`does not include styles if not referenced anywhere 1`] = `
 "import { css } from '@linaria/core';
 import { styled } from '@linaria/react';

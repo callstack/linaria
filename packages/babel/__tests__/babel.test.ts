@@ -700,6 +700,164 @@ it('compiles atomic css with keyframes', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('compiles atomic styled with only static css', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { styled } from '@linaria/atomic';
+
+    const Component = styled.div\`
+      color: blue;
+      height: 100px;
+    \`;
+
+    console.log(Component);
+
+      `
+  );
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('compiles atomic styled with static interpolations as static css', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { styled } from '@linaria/atomic';
+
+    const Component = styled.div\`
+      color: blue;
+      height: 100px;
+      margin: ${'${100 / 2}'}px;
+    \`;
+
+    console.log(Component);
+
+      `
+  );
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('compiles atomic styled with only dynamic interpolations as @linaria/react would', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { styled } from '@linaria/atomic';
+
+    const Component = styled.div\`
+      background-color: ${'${props => props.color}'};
+      margin: ${'${size}'}px;
+    \`;
+
+    console.log(Component);
+
+      `
+  );
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('compiles atomic styled with static css and dynamic interpolations', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { styled } from '@linaria/atomic';
+
+    const Component = styled.div\`
+      color: blue;
+      height: 100px;
+      background-color: ${'${props => props.color}'};
+    \`;
+
+    console.log(Component);
+
+      `
+  );
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('compiles atoms that are shared between css and styled templates', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { css } from '@linaria/atomic';
+    import { styled } from '@linaria/atomic';
+
+    const x = css\`
+      background: red;
+      height: 100px;
+    \`
+
+    const Component = styled.div\`
+      background: red;
+      height: ${'${200 / 2}'}px;
+      margin: 10px;
+      color: ${'${props => props.color}'};
+    \`;
+
+    console.log(x, Component);
+
+      `
+  );
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('compiles atomic styled wrapping components as @linaria/react would', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { styled } from '@linaria/atomic';
+
+    const Component = styled.div\`
+      color: blue;
+      height: 100px;
+    \`;
+
+    const ComponentCompositing = styled(Component)\`
+      color: red;
+      height: 100px;
+    \`;
+
+    console.log(ComponentCompositing);
+
+      `
+  );
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('compiles atomic styled without colliding by property', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { styled } from '@linaria/atomic';
+
+    export const Component = styled.ul\`
+      display: flex;
+      padding: 0;
+    \`;
+
+    export const Component2 = styled.ul\`
+      display: block;
+      padding: 0;
+    \`;
+
+      `
+  );
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('can re-export lib apis using a custom resolver', async () => {
   const { code, metadata } = await transpile(
     dedent`

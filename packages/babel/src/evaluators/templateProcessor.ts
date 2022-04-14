@@ -14,6 +14,7 @@ import type {
   StrictOptions,
   TemplateExpression,
   ValueCache,
+  AtomizeFn,
 } from '../types';
 
 import isSerializable from '../utils/isSerializable';
@@ -38,6 +39,44 @@ function hasMeta(value: any): value is StyledMeta {
 }
 
 const processedPaths = new WeakSet();
+
+function createAtomicString(
+  atomize: AtomizeFn | undefined,
+  cssText: string,
+  displayName: string | null,
+  className: string | null,
+  state: State,
+  path: any
+) {
+  if (!atomize) {
+    throw new Error(
+      'The atomic css API was detected, but an atomize function was not passed in the linaria configuration.'
+    );
+  }
+  const atomicRules = atomize(cssText);
+  atomicRules.forEach((rule: any) => {
+    state.rules[rule.className] = {
+      cssText: rule.cssText,
+      start: path.parent?.loc?.start ?? null,
+      className: className!,
+      displayName: displayName!,
+      atom: true,
+    };
+
+    debug(
+      'evaluator:template-processor:extracted-atomic-rule',
+      `\n${rule.cssText}`
+    );
+  });
+
+  const atomicString = atomicRules
+    // Some atomic rules produced (eg. keyframes) don't have class names, and they also don't need to appear in the object
+    .filter((rule: any) => !!rule.className)
+    .map((rule: any) => rule.className!)
+    .join(' ');
+
+  return atomicString;
+}
 
 export default function getTemplateProcessor(
   { types: t }: Core,
@@ -233,9 +272,47 @@ export default function getTemplateProcessor(
         t.objectProperty(t.identifier('name'), t.stringLiteral(displayName!))
       );
 
-      props.push(
-        t.objectProperty(t.identifier('class'), t.stringLiteral(className!))
-      );
+      if (styled.type === 'atomic-styled') {
+        const { atomize } = options;
+        const cssTextArray = cssText.split(';');
+        let staticCssText: string[] = [];
+        let dynamicCssText: string[] = [];
+        // TODO: is there a better way to differentiate static declarations from non-static?
+        cssTextArray.map((line) => {
+          const lineWithoutWhitespace = line.replace(/\s/g, '');
+          if (lineWithoutWhitespace && line.indexOf('var(--') === -1) {
+            staticCssText.push(line);
+          } else if (lineWithoutWhitespace) {
+            dynamicCssText.push(line);
+          }
+        });
+        // restore the missing ; at the end
+        cssText =
+          dynamicCssText.length > 0
+            ? dynamicCssText.concat('\n').join(';')
+            : '';
+
+        const atomicString = createAtomicString(
+          atomize,
+          staticCssText.join(';'),
+          displayName,
+          className,
+          state,
+          path
+        );
+
+        const classList: string =
+          (staticCssText.length > 0 && atomicString ? `${atomicString} ` : '') +
+            className || '';
+
+        props.push(
+          t.objectProperty(t.identifier('class'), t.stringLiteral(classList!))
+        );
+      } else {
+        props.push(
+          t.objectProperty(t.identifier('class'), t.stringLiteral(className!))
+        );
+      }
 
       // If we found any interpolations, also pass them so they can be applied
       if (interpolations.length) {
@@ -300,36 +377,15 @@ export default function getTemplateProcessor(
 
     if (type === 'atomic-css') {
       const { atomize } = options;
-      if (!atomize) {
-        throw new Error(
-          'The atomic css API was detected, but an atomize function was not passed in the linaria configuration.'
-        );
-      }
-      const atomicRules = atomize(cssText);
-      atomicRules.forEach((rule) => {
-        state.rules[rule.property] = {
-          cssText: rule.cssText,
-          start: path.parent?.loc?.start ?? null,
-          className: className!,
-          displayName: displayName!,
-          atom: true,
-        };
-
-        debug(
-          'evaluator:template-processor:extracted-atomic-rule',
-          `\n${rule.cssText}`
-        );
-      });
-
-      const atomicString = t.stringLiteral(
-        atomicRules
-          // Some atomic rules produced (eg. keyframes) don't have class names, and they also don't need to appear in the object
-          .filter((rule) => !!rule.className)
-          .map((rule) => rule.className!)
-          .join(' ')
+      const atomicString = createAtomicString(
+        atomize,
+        cssText,
+        displayName,
+        className,
+        state,
+        path
       );
-
-      path.replaceWith(atomicString);
+      path.replaceWith(t.stringLiteral(atomicString));
     } else {
       debug(
         'evaluator:template-processor:extracted-rule',

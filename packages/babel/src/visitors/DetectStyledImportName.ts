@@ -13,7 +13,10 @@ export default function DetectStyledImportName(
   path: NodePath<ImportDeclaration>,
   state: State
 ) {
-  if (!t.isLiteral(path.node.source, { value: '@linaria/react' })) {
+  if (
+    !t.isLiteral(path.node.source, { value: '@linaria/react' }) &&
+    !t.isLiteral(path.node.source, { value: '@linaria/atomic' })
+  ) {
     return;
   }
 

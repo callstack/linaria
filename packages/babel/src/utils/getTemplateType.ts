@@ -28,11 +28,19 @@ function getTemplateTypeByTag(
     t.isIdentifier(tag.callee) &&
     tag.arguments.length === 1 &&
     tag.callee.name === localName &&
-    has(localName, ['@linaria/react', 'linaria/react'])
+    (has(localName, ['@linaria/react', 'linaria/react']) ||
+      has(localName, ['@linaria/atomic']))
   ) {
     const tagPath = path.get('tag') as NodePath<CallExpression>;
+    const isAtomicImport = has(localName, ['@linaria/atomic']);
     return {
       component: tagPath.get('arguments')[0] as NodePath<Expression>,
+      // TODO: is there a better way to send this information to templateProcessor.ts?
+      type:
+        // atomic-styled is only available for styled('div') primitives, not for styled(MyComponent)
+        isAtomicImport && t.isStringLiteral(tag.arguments[0])
+          ? 'atomic-styled'
+          : 'styled',
     };
   }
 
@@ -42,10 +50,13 @@ function getTemplateTypeByTag(
     t.isIdentifier(tag.object) &&
     t.isIdentifier(tag.property) &&
     tag.object.name === localName &&
-    has(localName, ['@linaria/react', 'linaria/react'])
+    (has(localName, ['@linaria/react', 'linaria/react']) ||
+      has(localName, ['@linaria/atomic']))
   ) {
+    const isAtomicImport = has(localName, ['@linaria/atomic']);
     return {
       component: { node: t.stringLiteral(tag.property.name) },
+      type: isAtomicImport ? 'atomic-styled' : 'styled',
     };
   }
 

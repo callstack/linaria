@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": { "paths": {}, "rootDir": "src/" },
-  "references": [{ "path": "../utils" }]
+  "references": [{ "path": "../react" }, { "path": "../utils" }]
 }
