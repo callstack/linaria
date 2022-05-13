@@ -108,8 +108,6 @@ function preprocessor() {
       cache[filename] = replacements;
       offsets[filename] = offsets[filename]?.reverse();
 
-      console.log(cssText);
-
       return cssText + '\n';
     },
     result(result: LintResult, filename: string) {
