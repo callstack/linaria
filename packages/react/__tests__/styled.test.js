@@ -1,4 +1,4 @@
-import { restOp } from '../src/styled';
+import { omit } from '../src/styled';
 
 const React = require('react');
 const renderer = require('react-test-renderer');
@@ -184,7 +184,7 @@ it('filters unknown html attributes for HTML tag', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
-it('does not filter attributes for custom elements', () => {
+it('does not filter attributes for kebab cased custom elements', () => {
   const Test = styled('my-element')({
     name: 'TestComponent',
     class: 'abcdefg',
@@ -193,6 +193,17 @@ it('does not filter attributes for custom elements', () => {
   const tree = renderer.create(
     <Test unknownAttribute="voila">This is a test</Test>
   );
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
+it('does not filter attributes for upper camel cased custom elements', () => {
+  const Test = styled('View')({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  const tree = renderer.create(<Test hoverClass="voila">This is a test</Test>);
 
   expect(tree.toJSON()).toMatchSnapshot();
 });
@@ -259,7 +270,7 @@ it('throws when using as tag for template literal', () => {
 
 it('can get rest keys from object', () => {
   const obj = { one: 1, two: 2, three: 3 };
-  const rest = restOp(obj, ['two']);
+  const rest = omit(obj, ['two']);
   // eslint-disable-next-line no-unused-vars
   const { two, ...expectedRest } = obj;
   expect(rest).toEqual(expectedRest);
@@ -272,7 +283,7 @@ it('can get rest keys from complex object', () => {
     arr: [1, 2, 3],
     num: 47,
   };
-  const rest = restOp(obj, ['bool', 'object', 'arr']);
+  const rest = omit(obj, ['bool', 'object', 'arr']);
   // eslint-disable-next-line no-unused-vars
   const { bool, object, arr, ...expectedRest } = obj;
   expect(rest).toEqual(expectedRest);

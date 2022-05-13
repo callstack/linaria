@@ -28,20 +28,49 @@ type Options = {
   };
 };
 
-// Workaround for rest operator
-export const restOp = <T extends object, TKeys extends [...(keyof T)[]]>(
+const isCapital = (ch: string): boolean => ch.toUpperCase() === ch;
+const filterKey =
+  <TExclude extends keyof any>(keys: TExclude[]) =>
+  <TAll extends keyof any>(key: TAll): key is Exclude<TAll, TExclude> =>
+    keys.indexOf(key as any) === -1;
+
+export const omit = <T extends Record<string, unknown>, TKeys extends keyof T>(
   obj: T,
-  keys: TKeys
-) => {
-  const res = {} as { [K in keyof T]: T[K] };
-  let key: keyof typeof obj;
-  for (key in obj) {
-    if (keys.indexOf(key) === -1) {
+  keys: TKeys[]
+): Omit<T, TKeys> => {
+  const res = {} as Omit<T, TKeys>;
+  Object.keys(obj)
+    .filter(filterKey(keys))
+    .forEach((key) => {
       res[key] = obj[key];
-    }
-  }
+    });
+
   return res;
 };
+
+function filterProps<T extends Record<string, unknown>, TKeys extends keyof T>(
+  component: string | unknown,
+  props: T,
+  omitKeys: TKeys[]
+): Partial<Omit<T, TKeys>> {
+  const filteredProps = omit(props, omitKeys) as Partial<T>;
+
+  // Check if it's an HTML tag and not a custom element
+  if (
+    typeof component === 'string' &&
+    component.indexOf('-') === -1 &&
+    !isCapital(component[0])
+  ) {
+    Object.keys(filteredProps).forEach((key) => {
+      if (!validAttr(key)) {
+        // Don't pass through invalid attributes to HTML elements
+        delete filteredProps[key];
+      }
+    });
+  }
+
+  return filteredProps;
+}
 
 const warnIfInvalid = (value: any, componentName: string) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -104,23 +133,10 @@ function styled(tag: any): any {
 
     const render = (props: any, ref: any) => {
       const { as: component = tag, class: className } = props;
-      const rest = restOp(props, ['as', 'class']);
-      let filteredProps: IProps;
-
-      // Check if it's an HTML tag and not a custom element
-      if (typeof component === 'string' && component.indexOf('-') === -1) {
-        filteredProps = {} as { [key: string]: any };
-
-        // eslint-disable-next-line guard-for-in
-        for (const key in rest) {
-          if (key === 'as' || validAttr(key)) {
-            // Don't pass through invalid attributes to HTML elements
-            filteredProps[key] = rest[key];
-          }
-        }
-      } else {
-        filteredProps = rest;
-      }
+      let filteredProps: IProps = filterProps(component, props, [
+        'as',
+        'class',
+      ]);
 
       filteredProps.ref = ref;
       filteredProps.className = cx(
@@ -171,7 +187,7 @@ function styled(tag: any): any {
       : // React.forwardRef won't available on older React versions and in Preact
         // Fallback to a innerRef prop in that case
         (props: any) => {
-          const rest = restOp(props, ['innerRef']);
+          const rest = omit(props, ['innerRef']);
           return render(rest, props.innerRef);
         };
 
