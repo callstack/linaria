@@ -890,6 +890,38 @@ export function run(
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should process `css` calls referencing other `css` calls inside components', async () => {
+    const { code, metadata } = await transpile(
+      dedent`
+      import React from 'react'
+      import {css} from '@linaria/core'
+
+      export function Component() {
+        const outer = css\`
+          color: red;
+        \`;
+
+        const inner = css\`
+          color: green;
+          .${'${outer}'}:hover & {
+            color: blue;
+          }
+        \`;
+
+        return React.createElement("div", { className: outer },
+          "outer",
+          React.createElement("div", { className: inner },
+            "inner"
+          )
+        );
+      }
+      `
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('should process `styled` calls with complex interpolation inside components', async () => {
     const { code, metadata } = await transpile(
       dedent`
