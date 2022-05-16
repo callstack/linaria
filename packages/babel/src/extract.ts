@@ -27,7 +27,7 @@ import type {
 } from './types';
 import { ValueType } from './types';
 import CollectDependencies from './visitors/CollectDependencies';
-import DetectStyledImportName from './visitors/DetectStyledImportName';
+import DetectLinariaImportName from './visitors/DetectLinariaImportName';
 import GenerateClassNames from './visitors/GenerateClassNames';
 import type { Core } from './babel';
 
@@ -128,7 +128,7 @@ export default function extract(
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
-            ImportDeclaration: (p) => DetectStyledImportName(babel, p, state),
+            ImportDeclaration: (p) => DetectLinariaImportName(babel, p, state),
             TaggedTemplateExpression: (p) => {
               GenerateClassNames(babel, p, state, options);
               CollectDependencies(babel, p, state, options);
