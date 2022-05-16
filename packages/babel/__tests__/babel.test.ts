@@ -700,6 +700,29 @@ it('compiles atomic css with keyframes', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('compiles atomic css with unique atoms based on key value pairs', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { css } from '@linaria/atomic';
+
+    const x = css\`
+      height: 100px;
+    \`;
+
+    const y = css\`
+      height: 99px
+    \`;
+
+    console.log(x, y);
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('can re-export lib apis using a custom resolver', async () => {
   const { code, metadata } = await transpile(
     dedent`

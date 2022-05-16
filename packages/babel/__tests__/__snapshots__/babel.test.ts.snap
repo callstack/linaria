@@ -129,6 +129,25 @@ Dependencies: NA
 
 `;
 
+exports[`compiles atomic css with unique atoms based on key value pairs 1`] = `
+"/* @flow */
+import { css } from '@linaria/atomic';
+const x = \\"atm_e2_12xxubj\\";
+const y = \\"atm_e2_tnzek8\\";
+console.log(x, y);"
+`;
+
+exports[`compiles atomic css with unique atoms based on key value pairs 2`] = `
+
+CSS:
+
+.atm_e2_12xxubj{height:100px;}
+.atm_e2_tnzek8{height:99px;}
+
+Dependencies: NA
+
+`;
+
 exports[`does not include styles if not referenced anywhere 1`] = `
 "import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
