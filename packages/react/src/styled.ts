@@ -124,8 +124,8 @@ function styled(tag: any): any {
 
       filteredProps.ref = ref;
       filteredProps.className = cx(
-        filteredProps.className || className,
-        options.class
+        options.class,
+        filteredProps.className || className
       );
 
       const { vars } = options;

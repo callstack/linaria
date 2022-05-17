@@ -41,7 +41,7 @@ exports[`filters unknown html attributes for HTML tag 1`] = `
 
 exports[`forwards as prop when wrapping another styled component 1`] = `
 <a
-  className="hijklmn abcdefg"
+  className="abcdefg hijklmn"
 >
   This is a test
 </a>
@@ -49,7 +49,7 @@ exports[`forwards as prop when wrapping another styled component 1`] = `
 
 exports[`handles wrapping another styled component 1`] = `
 <div
-  className="hijklmn abcdefg"
+  className="abcdefg hijklmn"
 >
   This is a test
 </div>
@@ -71,7 +71,7 @@ exports[`merges CSS variables with custom style prop 1`] = `
 
 exports[`provides linaria component className for composition as last item in props.className 1`] = `
 <div
-  className="some-another-class abcdefg abcdefg--primary abcdefg--accessibility"
+  className="abcdefg some-another-class some-another-class--primary some-another-class--accessibility"
 >
   original classname used for composition
 </div>
@@ -128,7 +128,7 @@ exports[`replaces simple component with as prop 1`] = `
 
 exports[`supports extra class prop 1`] = `
 <div
-  className="primary abcdefg"
+  className="abcdefg primary"
 >
   This is a test
 </div>
@@ -136,7 +136,7 @@ exports[`supports extra class prop 1`] = `
 
 exports[`supports extra className prop 1`] = `
 <div
-  className="primary abcdefg"
+  className="abcdefg primary"
 >
   This is a test
 </div>

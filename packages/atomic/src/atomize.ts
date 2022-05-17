@@ -22,7 +22,7 @@ function hashProperty(property: string) {
   return slugify(property);
 }
 
-export default function atomize(cssText: string) {
+export default function atomize(cssText: string, hasPriority = false) {
   stylis.set({
     prefix: false,
     keyframe: false,
@@ -91,7 +91,9 @@ export default function atomize(cssText: string) {
     const className = `atm_${propertySlug}_${valueSlug}`;
 
     const propertyPriority =
-      getPropertyPriority(decl.prop) + (hasAtRule ? 1 : 0);
+      getPropertyPriority(decl.prop) +
+      (hasAtRule ? 1 : 0) +
+      (hasPriority ? 1 : 0);
     const processedCss = stylis(`.${className}`.repeat(propertyPriority), css);
 
     atomicRules.push({

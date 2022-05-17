@@ -15,6 +15,7 @@ import type {
   TemplateExpression,
   ValueCache,
   AtomizeFn,
+  Path,
 } from '../types';
 
 import isSerializable from '../utils/isSerializable';
@@ -46,16 +47,17 @@ function createAtomicString(
   displayName: string | null,
   className: string | null,
   state: State,
-  path: any
+  path: Path,
+  hasPriority: boolean
 ) {
   if (!atomize) {
     throw new Error(
       'The atomic css API was detected, but an atomize function was not passed in the linaria configuration.'
     );
   }
-  const atomicRules = atomize(cssText);
-  atomicRules.forEach((rule: any) => {
-    state.rules[rule.className] = {
+  const atomicRules = atomize(cssText, hasPriority);
+  atomicRules.forEach((rule) => {
+    state.rules[rule.className || rule.cssText] = {
       cssText: rule.cssText,
       start: path.parent?.loc?.start ?? null,
       className: className!,
@@ -71,8 +73,8 @@ function createAtomicString(
 
   const atomicString = atomicRules
     // Some atomic rules produced (eg. keyframes) don't have class names, and they also don't need to appear in the object
-    .filter((rule: any) => !!rule.className)
-    .map((rule: any) => rule.className!)
+    .filter((rule) => !!rule.className)
+    .map((rule) => rule.className!)
     .join(' ');
 
   return atomicString;
@@ -272,43 +274,7 @@ export default function getTemplateProcessor(
         t.objectProperty(t.identifier('name'), t.stringLiteral(displayName!))
       );
 
-      if (styled.type === 'atomic-styled') {
-        const { atomize } = options;
-        const cssTextArray = cssText.split(';');
-        let staticCssText: string[] = [];
-        let dynamicCssText: string[] = [];
-        // TODO: is there a better way to differentiate static declarations from non-static?
-        cssTextArray.map((line) => {
-          const lineWithoutWhitespace = line.replace(/\s/g, '');
-          if (lineWithoutWhitespace && line.indexOf('var(--') === -1) {
-            staticCssText.push(line);
-          } else if (lineWithoutWhitespace) {
-            dynamicCssText.push(line);
-          }
-        });
-        // restore the missing ; at the end
-        cssText =
-          dynamicCssText.length > 0
-            ? dynamicCssText.concat('\n').join(';')
-            : '';
-
-        const atomicString = createAtomicString(
-          atomize,
-          staticCssText.join(';'),
-          displayName,
-          className,
-          state,
-          path
-        );
-
-        const classList: string =
-          (staticCssText.length > 0 && atomicString ? `${atomicString} ` : '') +
-            className || '';
-
-        props.push(
-          t.objectProperty(t.identifier('class'), t.stringLiteral(classList!))
-        );
-      } else {
+      if (styled.type === 'styled') {
         props.push(
           t.objectProperty(t.identifier('class'), t.stringLiteral(className!))
         );
@@ -367,6 +333,31 @@ export default function getTemplateProcessor(
       );
 
       path.addComment('leading', '#__PURE__');
+
+      if (styled.type === 'atomic-styled') {
+        const { atomize } = options;
+        const isStyledWrapping = t.isIdentifier(styled.component.node);
+        const atomicString = createAtomicString(
+          atomize,
+          cssText,
+          displayName,
+          className,
+          state,
+          path,
+          // is styled(Component), so we need to increase property priority
+          isStyledWrapping
+        );
+
+        const classList: string =
+          (atomicString ? `${atomicString} ` : '') + className || '';
+
+        props.push(
+          t.objectProperty(t.identifier('class'), t.stringLiteral(classList!))
+        );
+
+        // atomic-styled doesn't need to generate .className{cssText}
+        return;
+      }
     } else if (type === 'css') {
       path.replaceWith(t.stringLiteral(className!));
     }
@@ -383,7 +374,8 @@ export default function getTemplateProcessor(
         displayName,
         className,
         state,
-        path
+        path,
+        false
       );
       path.replaceWith(t.stringLiteral(atomicString));
     } else {

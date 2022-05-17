@@ -700,7 +700,7 @@ it('compiles atomic css with keyframes', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('compiles atomic styled with only static css', async () => {
+it('compiles atomic styled with static css', async () => {
   const { code, metadata } = await transpile(
     dedent`
     /* @flow */
@@ -720,7 +720,7 @@ it('compiles atomic styled with only static css', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
-it('compiles atomic styled with static interpolations as static css', async () => {
+it('compiles atomic styled with plain css, static and dynamic interpolations', async () => {
   const { code, metadata } = await transpile(
     dedent`
     /* @flow */
@@ -731,46 +731,6 @@ it('compiles atomic styled with static interpolations as static css', async () =
       color: blue;
       height: 100px;
       margin: ${'${100 / 2}'}px;
-    \`;
-
-    console.log(Component);
-
-      `
-  );
-  expect(code).toMatchSnapshot();
-  expect(metadata).toMatchSnapshot();
-});
-
-it('compiles atomic styled with only dynamic interpolations as @linaria/react would', async () => {
-  const { code, metadata } = await transpile(
-    dedent`
-    /* @flow */
-
-    import { styled } from '@linaria/atomic';
-
-    const Component = styled.div\`
-      background-color: ${'${props => props.color}'};
-      margin: ${'${size}'}px;
-    \`;
-
-    console.log(Component);
-
-      `
-  );
-  expect(code).toMatchSnapshot();
-  expect(metadata).toMatchSnapshot();
-});
-
-it('compiles atomic styled with static css and dynamic interpolations', async () => {
-  const { code, metadata } = await transpile(
-    dedent`
-    /* @flow */
-
-    import { styled } from '@linaria/atomic';
-
-    const Component = styled.div\`
-      color: blue;
-      height: 100px;
       background-color: ${'${props => props.color}'};
     \`;
 
@@ -810,7 +770,7 @@ it('compiles atoms that are shared between css and styled templates', async () =
   expect(metadata).toMatchSnapshot();
 });
 
-it('compiles atomic styled wrapping components as @linaria/react would', async () => {
+it('compiles atomic styled wrapping other components with extra priority', async () => {
   const { code, metadata } = await transpile(
     dedent`
     /* @flow */
@@ -818,13 +778,13 @@ it('compiles atomic styled wrapping components as @linaria/react would', async (
     import { styled } from '@linaria/atomic';
 
     const Component = styled.div\`
-      color: blue;
+      background-color: blue;
       height: 100px;
     \`;
 
     const ComponentCompositing = styled(Component)\`
-      color: red;
-      height: 100px;
+      background: red;
+      height: 105px;
     \`;
 
     console.log(ComponentCompositing);
