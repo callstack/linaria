@@ -1,5 +1,3 @@
-/* @flow */
-
 import 'ignore-styles';
 
 import fs from 'fs';

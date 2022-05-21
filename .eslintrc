@@ -1,6 +1,11 @@
 {
   "extends": "@callstack",
   "rules": {
+    "@typescript-eslint/consistent-type-imports": [
+      "warn",
+      { "prefer": "type-imports" }
+    ],
+
     "no-redeclare": "off",
     "jest/no-try-expect": "off",
     "global-require": "off",

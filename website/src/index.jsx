@@ -1,12 +1,9 @@
-/* @flow */
-
 import { css } from '@linaria/core';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 import constants from './styles/constants';
 
-/* $FlowFixMe */
 ReactDOM.render(<App />, document.getElementById('root'));
 
 export const globals = css`

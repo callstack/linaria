@@ -10,7 +10,7 @@ import glob from 'glob';
 import yargs from 'yargs';
 import { transform } from '@linaria/babel-preset';
 
-const { argv } = yargs
+const argv = yargs
   .usage('Usage: $0 [options] <files ...>')
   .option('config', {
     alias: 'c',
@@ -54,7 +54,8 @@ const { argv } = yargs
   })
   .alias('help', 'h')
   .alias('version', 'v')
-  .strict();
+  .strict()
+  .parseSync();
 
 processFiles(argv._, {
   outDir: argv['out-dir'],
@@ -74,13 +75,16 @@ type Options = {
   ignore?: string;
 };
 
-function processFiles(files: string[], options: Options) {
+function processFiles(files: (number | string)[], options: Options) {
   let count = 0;
 
   const resolvedFiles = files.reduce(
     (acc, pattern) => [
       ...acc,
-      ...glob.sync(pattern, { absolute: true, ignore: options.ignore }),
+      ...glob.sync(pattern.toString(), {
+        absolute: true,
+        ignore: options.ignore,
+      }),
     ],
     [] as string[]
   );

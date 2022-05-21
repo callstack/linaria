@@ -185,6 +185,7 @@ export default function extract(
               lazyValues = evaluation.value.__linariaPreval || [];
               debug('lazy-deps:values', evaluation.value.__linariaPreval);
             } catch (e: unknown) {
+              console.log(e);
               error('lazy-deps:evaluate:error', code);
               if (e instanceof Error) {
                 throw new Error(

@@ -85,7 +85,7 @@ export type State = {
   replacements: Replacements;
   index: number;
   dependencies: Dependencies;
-  file: {
+  file?: {
     opts: {
       cwd: string;
       root: string;

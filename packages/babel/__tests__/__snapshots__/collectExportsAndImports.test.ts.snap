@@ -1,0 +1,273 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`collectExportsAndImports dynamic imports: compiled with "as is" 1`] = `
+"const fullNamespace = import('@linaria/shaker');
+const { named } = await import('@linaria/shaker');
+const { ...unknownRest } = await import('@linaria/unknown');
+
+export { fullNamespace, named, unknownRest };"
+`;
+
+exports[`collectExportsAndImports dynamic imports: compiled with "babelCommonJS" 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+exports.unknownRest = exports.named = exports.fullNamespace = void 0;
+
+function _typeof(obj) { \\"@babel/helpers - typeof\\"; return _typeof = \\"function\\" == typeof Symbol && \\"symbol\\" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && \\"function\\" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? \\"symbol\\" : typeof obj; }, _typeof(obj); }
+
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== \\"function\\") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== \\"object\\" && typeof obj !== \\"function\\") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== \\"default\\" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+var fullNamespace = Promise.resolve().then(function () {
+  return _interopRequireWildcard(require('@linaria/shaker'));
+});
+exports.fullNamespace = fullNamespace;
+
+var _await$import = await Promise.resolve().then(function () {
+  return _interopRequireWildcard(require('@linaria/shaker'));
+}),
+    named = _await$import.named;
+
+exports.named = named;
+
+var _await$import2 = await Promise.resolve().then(function () {
+  return _interopRequireWildcard(require('@linaria/unknown'));
+}),
+    unknownRest = _extends({}, _await$import2);
+
+exports.unknownRest = unknownRest;"
+`;
+
+exports[`collectExportsAndImports exports: compiled with "as is" 1`] = `
+"const a = 1;
+
+export { a };
+
+export const b = 2;
+
+export default function () {};"
+`;
+
+exports[`collectExportsAndImports imports: compiled with "as is" 1`] = `
+"import unknownDefault, { unknown, another as unknownRenamed } from 'unknown-package';
+import type types from '@linaria/types';
+import atomic from '@linaria/atomic';
+import * as ns from '@linaria/namespace';
+import * as linaria from '@linaria/core';
+import {
+  test,
+  another as customName,
+  type Styled
+} from '@linaria/react';
+
+const { only, few, fields } = linaria;
+
+const bar = linaria.bar;
+
+export { unknownDefault, unknown, unknownRenamed, types, atomic, ns, test, customName, Styled, only, few, fields, bar };"
+`;
+
+exports[`collectExportsAndImports imports: compiled with "babelCommonJS" 1`] = `
+"\\"use strict\\";
+
+function _typeof(obj) { \\"@babel/helpers - typeof\\"; return _typeof = \\"function\\" == typeof Symbol && \\"symbol\\" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && \\"function\\" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? \\"symbol\\" : typeof obj; }, _typeof(obj); }
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+Object.defineProperty(exports, \\"atomic\\", {
+  enumerable: true,
+  get: function get() {
+    return _atomic.default;
+  }
+});
+exports.bar = void 0;
+Object.defineProperty(exports, \\"customName\\", {
+  enumerable: true,
+  get: function get() {
+    return _react.another;
+  }
+});
+exports.only = exports.ns = exports.fields = exports.few = void 0;
+Object.defineProperty(exports, \\"test\\", {
+  enumerable: true,
+  get: function get() {
+    return _react.test;
+  }
+});
+Object.defineProperty(exports, \\"unknown\\", {
+  enumerable: true,
+  get: function get() {
+    return _unknownPackage.unknown;
+  }
+});
+Object.defineProperty(exports, \\"unknownDefault\\", {
+  enumerable: true,
+  get: function get() {
+    return _unknownPackage.default;
+  }
+});
+Object.defineProperty(exports, \\"unknownRenamed\\", {
+  enumerable: true,
+  get: function get() {
+    return _unknownPackage.another;
+  }
+});
+
+var _unknownPackage = _interopRequireWildcard(require(\\"unknown-package\\"));
+
+var _atomic = _interopRequireDefault(require(\\"@linaria/atomic\\"));
+
+var ns = _interopRequireWildcard(require(\\"@linaria/namespace\\"));
+
+exports.ns = ns;
+
+var linaria = _interopRequireWildcard(require(\\"@linaria/core\\"));
+
+var _react = require(\\"@linaria/react\\");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== \\"function\\") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== \\"object\\" && typeof obj !== \\"function\\") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== \\"default\\" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+var only = linaria.only,
+    few = linaria.few,
+    fields = linaria.fields;
+exports.fields = fields;
+exports.few = few;
+exports.only = only;
+var bar = linaria.bar;
+exports.bar = bar;"
+`;
+
+exports[`collectExportsAndImports imports: compiled with "typescriptCommonJS" 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+exports.bar = exports.fields = exports.few = exports.only = exports.customName = exports.test = exports.ns = exports.atomic = exports.unknownRenamed = exports.unknown = exports.unknownDefault = void 0;
+var unknown_package_1 = require(\\"unknown-package\\");
+exports.unknownDefault = unknown_package_1.default;
+Object.defineProperty(exports, \\"unknown\\", { enumerable: true, get: function () { return unknown_package_1.unknown; } });
+Object.defineProperty(exports, \\"unknownRenamed\\", { enumerable: true, get: function () { return unknown_package_1.another; } });
+var atomic_1 = require(\\"@linaria/atomic\\");
+exports.atomic = atomic_1.default;
+var ns = require(\\"@linaria/namespace\\");
+exports.ns = ns;
+var linaria = require(\\"@linaria/core\\");
+var react_1 = require(\\"@linaria/react\\");
+Object.defineProperty(exports, \\"test\\", { enumerable: true, get: function () { return react_1.test; } });
+Object.defineProperty(exports, \\"customName\\", { enumerable: true, get: function () { return react_1.another; } });
+var only = linaria.only, few = linaria.few, fields = linaria.fields;
+exports.only = only;
+exports.few = few;
+exports.fields = fields;
+var bar = linaria.bar;
+exports.bar = bar;
+"
+`;
+
+exports[`collectExportsAndImports requires: compiled with "as is" 1`] = `
+"const notModule = (() => {
+  const require = () => ({});
+  const { dep } = require('@linaria/shaker');
+  return result;
+})();
+const module = (() => {
+  const { dep } = require('@linaria/something');
+  return result;
+})();
+const fullNamespace = require('@linaria/shaker');
+const { named } = require('@linaria/shaker');
+const { ...unknownRest } = require('@linaria/unknown');
+
+export { notModule, module, fullNamespace, named, unknownRest };"
+`;
+
+exports[`collectExportsAndImports requires: compiled with "babelCommonJS" 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+exports.unknownRest = exports.notModule = exports.named = exports.module = exports.fullNamespace = void 0;
+
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+var notModule = function () {
+  var require = function require() {
+    return {};
+  };
+
+  var _require = require('@linaria/shaker'),
+      dep = _require.dep;
+
+  return result;
+}();
+
+exports.notModule = notModule;
+
+var _module = function () {
+  var _require2 = require('@linaria/something'),
+      dep = _require2.dep;
+
+  return result;
+}();
+
+exports.module = _module;
+
+var fullNamespace = require('@linaria/shaker');
+
+exports.fullNamespace = fullNamespace;
+
+var _require3 = require('@linaria/shaker'),
+    named = _require3.named;
+
+exports.named = named;
+
+var _require4 = require('@linaria/unknown'),
+    unknownRest = _extends({}, _require4);
+
+exports.unknownRest = unknownRest;"
+`;
+
+exports[`collectExportsAndImports requires: compiled with "typescriptCommonJS" 1`] = `
+"\\"use strict\\";
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === \\"function\\")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+exports.unknownRest = exports.named = exports.fullNamespace = exports.module = exports.notModule = void 0;
+var notModule = (function () {
+    var require = function () { return ({}); };
+    var dep = require('@linaria/shaker').dep;
+    return result;
+})();
+exports.notModule = notModule;
+var module = (function () {
+    var dep = require('@linaria/something').dep;
+    return result;
+})();
+exports.module = module;
+var fullNamespace = require('@linaria/shaker');
+exports.fullNamespace = fullNamespace;
+var named = require('@linaria/shaker').named;
+exports.named = named;
+var unknownRest = __rest(require('@linaria/unknown'), []);
+exports.unknownRest = unknownRest;
+"
+`;

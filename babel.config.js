@@ -70,7 +70,7 @@ module.exports = {
                 exclude: [
                   /es\.array\.(?:filter|for-each|index-of|join|reduce|slice)/,
                   'es.function.name',
-                  'es.object.keys',
+                  /es\.object\.(?:keys|to-string)/,
                   'web.dom-collections.for-each',
                 ],
                 corejs: 3,

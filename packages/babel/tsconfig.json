@@ -1,10 +1,4 @@
 {
   "extends": "../../tsconfig.json",
-  "compilerOptions": { "paths": {}, "rootDir": "src/" },
-  "references": [
-    { "path": "../atomic" },
-    { "path": "../core" },
-    { "path": "../logger" },
-    { "path": "../utils" }
-  ]
+  "compilerOptions": { "paths": {}, "rootDir": "src/" }
 }

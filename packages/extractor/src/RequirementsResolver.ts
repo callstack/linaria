@@ -67,7 +67,7 @@ export default class RequirementsResolver {
             binding.path.parentPath.node.source
           );
         } else {
-          result = binding.path.parentPath.node as Statement;
+          result = binding.path.parentPath!.node as Statement;
         }
         break;
       case 'const':

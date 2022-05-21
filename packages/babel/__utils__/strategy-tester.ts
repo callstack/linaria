@@ -92,13 +92,13 @@ export function run(
   it('evaluates identifier in scope', async () => {
     const { code, metadata } = await transpile(
       dedent`
-      import { styled } from '@linaria/react';
+      import { styled as reactStyled } from '@linaria/react';
 
       const answer = 42;
       const foo = () => answer;
       const days = foo() + ' days';
 
-      export const Title = styled.h1\`
+      export const Title = reactStyled.h1\`
         &:before {
           content: "${'${days}'}"
         }
