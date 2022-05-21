@@ -307,7 +307,7 @@ export default function getTemplateProcessor(
       }
       const atomicRules = atomize(cssText);
       atomicRules.forEach((rule) => {
-        state.rules[rule.property] = {
+        state.rules[rule.cssText] = {
           cssText: rule.cssText,
           start: path.parent?.loc?.start ?? null,
           className: className!,
