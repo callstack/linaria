@@ -29,7 +29,7 @@ export { default as getVisitorKeys } from './utils/getVisitorKeys';
 export type { VisitorKeys } from './utils/getVisitorKeys';
 export { default as peek } from './utils/peek';
 export { default as CollectDependencies } from './visitors/CollectDependencies';
-export { default as DetectStyledImportName } from './visitors/DetectStyledImportName';
+export { default as DetectLinariaImportName } from './visitors/DetectLinariaImportName';
 export { default as GenerateClassNames } from './visitors/GenerateClassNames';
 
 function isEnabled(caller?: TransformCaller & { evaluate?: true }) {

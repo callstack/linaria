@@ -1,3 +1,4 @@
+import { debug } from '@linaria/logger';
 import type {
   CallExpression,
   Expression,
@@ -17,7 +18,7 @@ type Result =
 function getTemplateTypeByTag(
   t: Core['types'],
   path: NodePath<TaggedTemplateExpression>,
-  localName: string,
+  localName: { styled: string; coreCss: string; atomicCss: string },
   has: (identifier: string, sources: string[]) => boolean
 ): Result {
   const { tag } = path.node;
@@ -27,8 +28,8 @@ function getTemplateTypeByTag(
     t.isCallExpression(tag) &&
     t.isIdentifier(tag.callee) &&
     tag.arguments.length === 1 &&
-    tag.callee.name === localName &&
-    has(localName, ['@linaria/react', 'linaria/react'])
+    tag.callee.name === localName.styled &&
+    has(localName.styled, ['@linaria/react', 'linaria/react'])
   ) {
     const tagPath = path.get('tag') as NodePath<CallExpression>;
     return {
@@ -41,8 +42,8 @@ function getTemplateTypeByTag(
     t.isMemberExpression(tag) &&
     t.isIdentifier(tag.object) &&
     t.isIdentifier(tag.property) &&
-    tag.object.name === localName &&
-    has(localName, ['@linaria/react', 'linaria/react'])
+    tag.object.name === localName.styled &&
+    has(localName.styled, ['@linaria/react', 'linaria/react'])
   ) {
     return {
       component: { node: t.stringLiteral(tag.property.name) },
@@ -51,18 +52,18 @@ function getTemplateTypeByTag(
 
   // css``
   if (
-    has('css', ['@linaria/core', 'linaria']) &&
+    has(localName.coreCss, ['@linaria/core', 'linaria']) &&
     t.isIdentifier(tag) &&
-    tag.name === 'css'
+    tag.name === localName.coreCss
   ) {
     return 'css';
   }
 
   // css`` but atomic
   if (
-    has('css', ['@linaria/atomic']) &&
+    has(localName.atomicCss, ['@linaria/atomic']) &&
     t.isIdentifier(tag) &&
-    tag.name === 'css'
+    tag.name === localName.atomicCss
   ) {
     return 'atomic-css';
   }
@@ -79,7 +80,11 @@ export default function getTemplateType(
   libResolver?: LibResolverFn
 ): Result {
   if (!cache.has(path)) {
-    const localName = state.file.metadata.localName || 'styled';
+    const localName = {
+      styled: state.file.metadata.localName?.styled || 'styled',
+      coreCss: state.file.metadata.localName?.coreCss || 'css',
+      atomicCss: state.file.metadata.localName?.atomicCss || 'css',
+    };
     const has = (identifier: string, sources: string[]) =>
       hasImport(
         t,
@@ -89,6 +94,10 @@ export default function getTemplateType(
         sources,
         libResolver
       );
+
+    const templateType = getTemplateTypeByTag(t, path, localName, has);
+
+    debug('get-template-type:template-type', templateType);
 
     cache.set(path, getTemplateTypeByTag(t, path, localName, has));
   }

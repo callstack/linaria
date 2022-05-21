@@ -633,6 +633,46 @@ Dependencies: NA
 
 `;
 
+exports[`transpiles renamed css and atomic-css imports in the same file 1`] = `
+"/* @flow */
+import { css as coreCss } from '@linaria/core';
+import { css as atomicCss } from '@linaria/atomic';
+const x = \\"x17gu1mi\\";
+const y = \\"atm_26_5scuol\\";
+console.log(x, y);"
+`;
+
+exports[`transpiles renamed css and atomic-css imports in the same file 2`] = `
+
+CSS:
+
+.x17gu1mi {
+  background: red;
+}
+.atm_26_5scuol{background:red;}
+
+Dependencies: NA
+
+`;
+
+exports[`transpiles renamed css from linaria v2 1`] = `
+"import { css as coreCss } from 'linaria';
+const x = \\"x17gu1mi\\";
+console.log(x);"
+`;
+
+exports[`transpiles renamed css from linaria v2 2`] = `
+
+CSS:
+
+.x17gu1mi {
+  background: red;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`transpiles renamed styled import 1`] = `
 "import { styled as custom } from '@linaria/react';
 export const Title = /*#__PURE__*/custom('h1')({

@@ -282,7 +282,7 @@ export default function getTemplateProcessor(
       path.replaceWith(
         t.callExpression(
           t.callExpression(
-            t.identifier(state.file.metadata.localName || 'styled'),
+            t.identifier(state.file.metadata.localName?.styled || 'styled'),
             [styled.component.node]
           ),
           [t.objectExpression(props)]
