@@ -94,7 +94,12 @@ export type State = {
       filename: string;
     };
     metadata: {
-      localName?: string;
+      localName?: {
+        styled?: string;
+        coreCss?: string;
+        atomicCss?: string;
+        atomicStyled?: string;
+      };
       linaria?: {
         rules: Rules;
         replacements: Replacements;

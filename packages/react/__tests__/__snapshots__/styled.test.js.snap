@@ -22,13 +22,22 @@ exports[`does not filter attributes for components 1`] = `
 </div>
 `;
 
-exports[`does not filter attributes for custom elements 1`] = `
+exports[`does not filter attributes for kebab cased custom elements 1`] = `
 <my-element
   className="abcdefg"
   unknownAttribute="voila"
 >
   This is a test
 </my-element>
+`;
+
+exports[`does not filter attributes for upper camel cased custom elements 1`] = `
+<View
+  className="abcdefg"
+  hoverClass="voila"
+>
+  This is a test
+</View>
 `;
 
 exports[`filters unknown html attributes for HTML tag 1`] = `

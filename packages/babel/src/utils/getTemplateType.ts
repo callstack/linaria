@@ -1,3 +1,4 @@
+import { debug } from '@linaria/logger';
 import type {
   CallExpression,
   Expression,
@@ -17,7 +18,12 @@ type Result =
 function getTemplateTypeByTag(
   t: Core['types'],
   path: NodePath<TaggedTemplateExpression>,
-  localName: string,
+  localName: {
+    styled: string;
+    coreCss: string;
+    atomicCss: string;
+    atomicStyled: string;
+  },
   has: (identifier: string, sources: string[]) => boolean
 ): Result {
   const { tag } = path.node;
@@ -27,14 +33,17 @@ function getTemplateTypeByTag(
     t.isCallExpression(tag) &&
     t.isIdentifier(tag.callee) &&
     tag.arguments.length === 1 &&
-    tag.callee.name === localName &&
-    (has(localName, ['@linaria/react', 'linaria/react']) ||
-      has(localName, ['@linaria/atomic']))
+    (tag.callee.name === localName.styled ||
+      tag.callee.name === localName.atomicStyled) &&
+    (has(localName.styled, ['@linaria/react', 'linaria/react']) ||
+      has(localName.atomicStyled, ['@linaria/atomic']))
   ) {
     const tagPath = path.get('tag') as NodePath<CallExpression>;
     return {
       component: tagPath.get('arguments')[0] as NodePath<Expression>,
-      type: has(localName, ['@linaria/atomic']) ? 'atomic-styled' : 'styled',
+      type: has(localName.atomicStyled, ['@linaria/atomic'])
+        ? 'atomic-styled'
+        : 'styled',
     };
   }
 
@@ -43,30 +52,33 @@ function getTemplateTypeByTag(
     t.isMemberExpression(tag) &&
     t.isIdentifier(tag.object) &&
     t.isIdentifier(tag.property) &&
-    tag.object.name === localName &&
-    (has(localName, ['@linaria/react', 'linaria/react']) ||
-      has(localName, ['@linaria/atomic']))
+    (tag.object.name === localName.styled ||
+      tag.object.name === localName.atomicStyled) &&
+    (has(localName.styled, ['@linaria/react', 'linaria/react']) ||
+      has(localName.atomicStyled, ['@linaria/atomic']))
   ) {
     return {
       component: { node: t.stringLiteral(tag.property.name) },
-      type: has(localName, ['@linaria/atomic']) ? 'atomic-styled' : 'styled',
+      type: has(localName.atomicStyled, ['@linaria/atomic'])
+        ? 'atomic-styled'
+        : 'styled',
     };
   }
 
   // css``
   if (
-    has('css', ['@linaria/core', 'linaria']) &&
+    has(localName.coreCss, ['@linaria/core', 'linaria']) &&
     t.isIdentifier(tag) &&
-    tag.name === 'css'
+    tag.name === localName.coreCss
   ) {
     return 'css';
   }
 
   // css`` but atomic
   if (
-    has('css', ['@linaria/atomic']) &&
+    has(localName.atomicCss, ['@linaria/atomic']) &&
     t.isIdentifier(tag) &&
-    tag.name === 'css'
+    tag.name === localName.atomicCss
   ) {
     return 'atomic-css';
   }
@@ -83,7 +95,13 @@ export default function getTemplateType(
   libResolver?: LibResolverFn
 ): Result {
   if (!cache.has(path)) {
-    const localName = state.file.metadata.localName || 'styled';
+    const localName = {
+      styled: state.file.metadata.localName?.styled || 'styled',
+      coreCss: state.file.metadata.localName?.coreCss || 'css',
+      atomicCss: state.file.metadata.localName?.atomicCss || 'css',
+      atomicStyled:
+        state.file.metadata.localName?.atomicStyled || 'atomic-styled',
+    };
     const has = (identifier: string, sources: string[]) =>
       hasImport(
         t,
@@ -93,6 +111,10 @@ export default function getTemplateType(
         sources,
         libResolver
       );
+
+    const templateType = getTemplateTypeByTag(t, path, localName, has);
+
+    debug('get-template-type:template-type', templateType);
 
     cache.set(path, getTemplateTypeByTag(t, path, localName, has));
   }

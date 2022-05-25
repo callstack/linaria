@@ -57,7 +57,7 @@ function createAtomicString(
   }
   const atomicRules = atomize(cssText, hasPriority);
   atomicRules.forEach((rule) => {
-    state.rules[rule.className || rule.cssText] = {
+    state.rules[rule.cssText] = {
       cssText: rule.cssText,
       start: path.parent?.loc?.start ?? null,
       className: className!,
@@ -325,7 +325,7 @@ export default function getTemplateProcessor(
       path.replaceWith(
         t.callExpression(
           t.callExpression(
-            t.identifier(state.file.metadata.localName || 'styled'),
+            t.identifier(state.file.metadata.localName?.styled || 'styled'),
             [styled.component.node]
           ),
           [t.objectExpression(props)]

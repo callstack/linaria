@@ -134,6 +134,47 @@ it('transpiles renamed styled import', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('transpiles renamed css and atomic-css imports in the same file', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+
+    import { css as coreCss } from '@linaria/core';
+    import { css as atomicCss } from '@linaria/atomic';
+
+    const x = coreCss\`
+      background: red;
+    \`;
+
+    const y = atomicCss\`
+      background: red;
+    \`;
+
+    console.log(x, y);
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('transpiles renamed css from linaria v2', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import {css as coreCss} from 'linaria';
+
+    const x = coreCss\`
+      background: red;
+    \`;
+
+    console.log(x);
+      `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('transpiles styled template literal with function and component', async () => {
   const { code, metadata } = await transpile(
     dedent`
@@ -716,6 +757,25 @@ it('compiles atomic styled with static css', async () => {
 
       `
   );
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('compiles atomic css with unique atoms based on key value pairs', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    /* @flow */
+    import { css } from '@linaria/atomic';
+    const x = css\`
+      height: 100px;
+    \`;
+    const y = css\`
+      height: 99px
+    \`;
+    console.log(x, y);
+      `
+  );
+
   expect(code).toMatchSnapshot();
   expect(metadata).toMatchSnapshot();
 });

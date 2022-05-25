@@ -129,117 +129,93 @@ Dependencies: NA
 
 `;
 
-exports[`compiles atomic styled with plain css, static and dynamic interpolations 1`] = `
+exports[`compiles atomic css with unique atoms based on key value pairs 1`] = `
 "/* @flow */
-import { styled } from '@linaria/atomic';
-const Component = /*#__PURE__*/styled(\\"div\\")({
-  name: \\"Component\\",
-  vars: {
-    \\"c17gu1mi-1\\": [props => props.color]
-  },
-  class: \\"atm_7l_13q2bts atm_e2_12xxubj atm_gi_12am3vd atm_2d_e0fa3s c17gu1mi\\"
-});
-console.log(Component);"
+import { css } from '@linaria/atomic';
+const x = \\"atm_e2_12xxubj\\";
+const y = \\"atm_e2_tnzek8\\";
+console.log(x, y);"
 `;
 
-exports[`compiles atomic styled with plain css, static and dynamic interpolations 2`] = `
+exports[`compiles atomic css with unique atoms based on key value pairs 2`] = `
 
 CSS:
 
-.atm_7l_13q2bts{color:blue;}
 .atm_e2_12xxubj{height:100px;}
-.atm_gi_12am3vd{margin:50px;}
-.atm_2d_e0fa3s.atm_2d_e0fa3s{background-color:var(--c17gu1mi-1);}
+.atm_e2_tnzek8{height:99px;}
 
 Dependencies: NA
 
 `;
+
+exports[`compiles atomic styled with plain css, static and dynamic interpolations 1`] = `
+"/* @flow */
+import { styled } from '@linaria/atomic';
+const Component = styled.div\`
+  color: blue;
+  height: 100px;
+  margin: \${100 / 2}px;
+  background-color: \${props => props.color};
+\`;
+console.log(Component);"
+`;
+
+exports[`compiles atomic styled with plain css, static and dynamic interpolations 2`] = `Object {}`;
 
 exports[`compiles atomic styled with static css 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
-const Component = /*#__PURE__*/styled(\\"div\\")({
-  name: \\"Component\\",
-  class: \\"atm_7l_13q2bts atm_e2_12xxubj c17gu1mi\\"
-});
+const Component = styled.div\`
+  color: blue;
+  height: 100px;
+\`;
 console.log(Component);"
 `;
 
-exports[`compiles atomic styled with static css 2`] = `
-
-CSS:
-
-.atm_7l_13q2bts{color:blue;}
-.atm_e2_12xxubj{height:100px;}
-
-Dependencies: NA
-
-`;
+exports[`compiles atomic styled with static css 2`] = `Object {}`;
 
 exports[`compiles atomic styled without colliding by property 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
-export const Component = /*#__PURE__*/styled(\\"ul\\")({
-  name: \\"Component\\",
-  class: \\"atm_9s_1txwivl atm_l8_idpfg4 c17gu1mi\\"
-});
-export const Component2 = /*#__PURE__*/styled(\\"ul\\")({
-  name: \\"Component2\\",
-  class: \\"atm_9s_1ulexfb atm_l8_idpfg4 cccybe9\\"
-});"
+export const Component = styled.ul\`
+  display: flex;
+  padding: 0;
+\`;
+export const Component2 = styled.ul\`
+  display: block;
+  padding: 0;
+\`;"
 `;
 
-exports[`compiles atomic styled without colliding by property 2`] = `
-
-CSS:
-
-.atm_9s_1txwivl{display:flex;}
-.atm_l8_idpfg4{padding:0;}
-.atm_9s_1ulexfb{display:block;}
-
-Dependencies: NA
-
-`;
+exports[`compiles atomic styled without colliding by property 2`] = `Object {}`;
 
 exports[`compiles atomic styled wrapping other components with extra priority 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
-const Component = /*#__PURE__*/styled(\\"div\\")({
-  name: \\"Component\\",
-  class: \\"atm_2d_13q2bts atm_e2_12xxubj c17gu1mi\\"
-});
-const ComponentCompositing = /*#__PURE__*/styled(Component)({
-  name: \\"ComponentCompositing\\",
-  class: \\"atm_26_5scuol atm_e2_1nzxncv cccybe9\\"
-});
+const Component = styled.div\`
+  background-color: blue;
+  height: 100px;
+\`;
+const ComponentCompositing = styled(Component)\`
+  background: red;
+  height: 105px;
+\`;
 console.log(ComponentCompositing);"
 `;
 
-exports[`compiles atomic styled wrapping other components with extra priority 2`] = `
-
-CSS:
-
-.atm_2d_13q2bts.atm_2d_13q2bts{background-color:blue;}
-.atm_e2_12xxubj{height:100px;}
-.atm_26_5scuol.atm_26_5scuol{background:red;}
-.atm_e2_1nzxncv.atm_e2_1nzxncv{height:105px;}
-
-Dependencies: NA
-
-`;
+exports[`compiles atomic styled wrapping other components with extra priority 2`] = `Object {}`;
 
 exports[`compiles atoms that are shared between css and styled templates 1`] = `
 "/* @flow */
 import { css } from '@linaria/atomic';
 import { styled } from '@linaria/atomic';
 const x = \\"atm_26_5scuol atm_e2_12xxubj\\";
-const Component = /*#__PURE__*/styled(\\"div\\")({
-  name: \\"Component\\",
-  vars: {
-    \\"cccybe9-1\\": [props => props.color]
-  },
-  class: \\"atm_26_5scuol atm_e2_12xxubj atm_gi_19bvopo atm_7l_gcaogf cccybe9\\"
-});
+const Component = styled.div\`
+  background: red;
+  height: \${200 / 2}px;
+  margin: 10px;
+  color: \${props => props.color};
+\`;
 console.log(x, Component);"
 `;
 
@@ -249,8 +225,6 @@ CSS:
 
 .atm_26_5scuol{background:red;}
 .atm_e2_12xxubj{height:100px;}
-.atm_gi_19bvopo{margin:10px;}
-.atm_7l_gcaogf{color:var(--cccybe9-1);}
 
 Dependencies: NA
 
@@ -735,6 +709,46 @@ CSS:
 
 .t17gu1mi {
   font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`transpiles renamed css and atomic-css imports in the same file 1`] = `
+"/* @flow */
+import { css as coreCss } from '@linaria/core';
+import { css as atomicCss } from '@linaria/atomic';
+const x = \\"x17gu1mi\\";
+const y = \\"atm_26_5scuol\\";
+console.log(x, y);"
+`;
+
+exports[`transpiles renamed css and atomic-css imports in the same file 2`] = `
+
+CSS:
+
+.x17gu1mi {
+  background: red;
+}
+.atm_26_5scuol{background:red;}
+
+Dependencies: NA
+
+`;
+
+exports[`transpiles renamed css from linaria v2 1`] = `
+"import { css as coreCss } from 'linaria';
+const x = \\"x17gu1mi\\";
+console.log(x);"
+`;
+
+exports[`transpiles renamed css from linaria v2 2`] = `
+
+CSS:
+
+.x17gu1mi {
+  background: red;
 }
 
 Dependencies: NA

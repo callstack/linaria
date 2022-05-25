@@ -7,7 +7,7 @@ import type { Program, Statement, VariableDeclaration } from '@babel/types';
 import type { State, StrictOptions } from '@linaria/babel-preset';
 import {
   GenerateClassNames,
-  DetectStyledImportName,
+  DetectLinariaImportName,
   JSXElement,
   ProcessStyled,
   ProcessCSS,
@@ -53,7 +53,7 @@ function index(babel: Core, options: StrictOptions) {
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
-            ImportDeclaration: (p) => DetectStyledImportName(babel, p, state),
+            ImportDeclaration: (p) => DetectLinariaImportName(babel, p, state),
             TaggedTemplateExpression: (p) =>
               GenerateClassNames(babel, p, state, options),
             JSXElement,
