@@ -8,6 +8,7 @@ import generator from '@babel/generator';
 
 import type { StyledMeta } from '@linaria/core';
 import { debug } from '@linaria/logger';
+import { slugify } from '@linaria/utils';
 import { units } from '../units';
 import type {
   State,
@@ -234,7 +235,12 @@ export default function getTemplateProcessor(
           }
 
           if (styled) {
-            const id = `${slug}-${i}`;
+            const id =
+              // atomize the dynamic interpolation to make it unique
+              styled.type === 'atomic-styled'
+                ? slugify(ex.getSource() || generator(ex.node).code)
+                : // or make the variable unique to this styled component
+                  `${slug}-${i}`;
 
             interpolations.push({
               id,

@@ -41,9 +41,11 @@ function getTemplateTypeByTag(
     const tagPath = path.get('tag') as NodePath<CallExpression>;
     return {
       component: tagPath.get('arguments')[0] as NodePath<Expression>,
-      type: has(localName.atomicStyled, ['@linaria/atomic'])
-        ? 'atomic-styled'
-        : 'styled',
+      type:
+        has(localName.atomicStyled, ['@linaria/atomic']) &&
+        tag.callee.name === localName.atomicStyled
+          ? 'atomic-styled'
+          : 'styled',
     };
   }
 
@@ -59,9 +61,11 @@ function getTemplateTypeByTag(
   ) {
     return {
       component: { node: t.stringLiteral(tag.property.name) },
-      type: has(localName.atomicStyled, ['@linaria/atomic'])
-        ? 'atomic-styled'
-        : 'styled',
+      type:
+        has(localName.atomicStyled, ['@linaria/atomic']) &&
+        tag.object.name === localName.atomicStyled
+          ? 'atomic-styled'
+          : 'styled',
     };
   }
 
@@ -99,8 +103,7 @@ export default function getTemplateType(
       styled: state.file.metadata.localName?.styled || 'styled',
       coreCss: state.file.metadata.localName?.coreCss || 'css',
       atomicCss: state.file.metadata.localName?.atomicCss || 'css',
-      atomicStyled:
-        state.file.metadata.localName?.atomicStyled || 'atomic-styled',
+      atomicStyled: state.file.metadata.localName?.atomicStyled || 'styled',
     };
     const has = (identifier: string, sources: string[]) =>
       hasImport(
