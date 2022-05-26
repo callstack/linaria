@@ -157,7 +157,8 @@ const Component = /*#__PURE__*/styled(\\"div\\")({
     \\"1p69eoh\\": [props => props.color],
     \\"l12cfn\\": [props => props.backgroundColor]
   },
-  class: \\"atm_7l_15g95l5 atm_4b_15g95l5 atm_2d_1en4k16 c17gu1mi\\"
+  class: \\"atm_7l_15g95l5 atm_4b_15g95l5 atm_2d_1en4k16 c17gu1mi\\",
+  atomic: true
 });
 const Component2 = /*#__PURE__*/styled(\\"div\\")({
   name: \\"Component2\\",
@@ -165,7 +166,8 @@ const Component2 = /*#__PURE__*/styled(\\"div\\")({
     \\"1p69eoh\\": [props => props.color],
     \\"1n9iccq\\": [props => props.color || \\"black\\"]
   },
-  class: \\"atm_7l_15g95l5 atm_4b_1kgl01d cccybe9\\"
+  class: \\"atm_7l_15g95l5 atm_4b_1kgl01d cccybe9\\",
+  atomic: true
 });
 console.log(Component, Component2);"
 `;
@@ -191,7 +193,8 @@ const Component = /*#__PURE__*/styled(\\"div\\")({
   vars: {
     \\"1p69eoh\\": [props => props.color]
   },
-  class: \\"atm_7l_13q2bts atm_e2_12xxubj atm_gi_12am3vd atm_2d_15g95l5 c17gu1mi\\"
+  class: \\"atm_7l_13q2bts atm_e2_12xxubj atm_gi_12am3vd atm_2d_15g95l5 c17gu1mi\\",
+  atomic: true
 });
 console.log(Component);"
 `;
@@ -214,7 +217,8 @@ exports[`compiles atomic styled with static css 1`] = `
 import { styled } from '@linaria/atomic';
 const Component = /*#__PURE__*/styled(\\"div\\")({
   name: \\"Component\\",
-  class: \\"atm_7l_13q2bts atm_e2_12xxubj c17gu1mi\\"
+  class: \\"atm_7l_13q2bts atm_e2_12xxubj c17gu1mi\\",
+  atomic: true
 });
 console.log(Component);"
 `;
@@ -235,11 +239,13 @@ exports[`compiles atomic styled without colliding by property 1`] = `
 import { styled } from '@linaria/atomic';
 export const Component = /*#__PURE__*/styled(\\"ul\\")({
   name: \\"Component\\",
-  class: \\"atm_9s_1txwivl atm_l8_idpfg4 c17gu1mi\\"
+  class: \\"atm_9s_1txwivl atm_l8_idpfg4 c17gu1mi\\",
+  atomic: true
 });
 export const Component2 = /*#__PURE__*/styled(\\"ul\\")({
   name: \\"Component2\\",
-  class: \\"atm_9s_1ulexfb atm_l8_idpfg4 cccybe9\\"
+  class: \\"atm_9s_1ulexfb atm_l8_idpfg4 cccybe9\\",
+  atomic: true
 });"
 `;
 
@@ -260,11 +266,13 @@ exports[`compiles atomic styled wrapping other components with extra priority 1`
 import { styled } from '@linaria/atomic';
 const Component = /*#__PURE__*/styled(\\"div\\")({
   name: \\"Component\\",
-  class: \\"atm_2d_13q2bts atm_e2_12xxubj c17gu1mi\\"
+  class: \\"atm_2d_13q2bts atm_e2_12xxubj c17gu1mi\\",
+  atomic: true
 });
 const ComponentCompositing = /*#__PURE__*/styled(Component)({
   name: \\"ComponentCompositing\\",
-  class: \\"atm_26_5scuol atm_e2_1nzxncv cccybe9\\"
+  class: \\"atm_26_5scuol atm_e2_1nzxncv cccybe9\\",
+  atomic: true
 });
 console.log(ComponentCompositing);"
 `;
@@ -292,7 +300,8 @@ const Component = /*#__PURE__*/styled(\\"div\\")({
   vars: {
     \\"1p69eoh\\": [props => props.color]
   },
-  class: \\"atm_26_5scuol atm_e2_12xxubj atm_gi_19bvopo atm_7l_15g95l5 cccybe9\\"
+  class: \\"atm_26_5scuol atm_e2_12xxubj atm_gi_19bvopo atm_7l_15g95l5 cccybe9\\",
+  atomic: true
 });
 console.log(x, Component);"
 `;
@@ -849,11 +858,13 @@ const StyledComponent2 = /*#__PURE__*/reactStyled(StyledComponent)({
 });
 const AtomicComponent = /*#__PURE__*/reactStyled(\\"div\\")({
   name: \\"AtomicComponent\\",
-  class: \\"atm_26_5scuol aw1s2ox\\"
+  class: \\"atm_26_5scuol aw1s2ox\\",
+  atomic: true
 });
 const AtomicComponent2 = /*#__PURE__*/reactStyled(AtomicComponent)({
   name: \\"AtomicComponent2\\",
-  class: \\"atm_26_13q2bts a1080ijw\\"
+  class: \\"atm_26_13q2bts a1080ijw\\",
+  atomic: true
 });
 console.log(StyledComponent, StyledComponent2, AtomicComponent, AtomicComponent2);"
 `;

@@ -361,6 +361,10 @@ export default function getTemplateProcessor(
           t.objectProperty(t.identifier('class'), t.stringLiteral(classList!))
         );
 
+        props.push(
+          t.objectProperty(t.identifier('atomic'), t.booleanLiteral(true))
+        );
+
         // atomic-styled doesn't need to generate .className{cssText}
         return;
       }
