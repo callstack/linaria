@@ -21,7 +21,12 @@ import { Core } from '../babel';
 /**
  * Hoist the node and its dependencies to the highest scope possible
  */
-function hoist(babel: Core, ex: NodePath<Expression | null>) {
+function hoist(
+  babel: Core,
+  ex: NodePath<Expression | null>,
+  state: State,
+  options: StrictOptions
+) {
   const Identifier = (idPath: NodePath<IdentifierNode>) => {
     if (!idPath.isReferencedIdentifier()) {
       return;
@@ -37,7 +42,18 @@ function hoist(babel: Core, ex: NodePath<Expression | null>) {
 
     if (bindingPath.isVariableDeclarator()) {
       const initPath = bindingPath.get('init') as NodePath<Expression | null>;
-      hoist(babel, initPath);
+      hoist(babel, initPath, state, options);
+      if (initPath.isTaggedTemplateExpression()) {
+        const templateType = getTemplateType(
+          babel,
+          initPath,
+          state,
+          options.libResolver
+        );
+        if (templateType) {
+          return;
+        }
+      }
       initPath.hoist(scope);
       if (initPath.isIdentifier()) {
         referencePaths.forEach((referencePath) => {
@@ -92,7 +108,7 @@ export default function CollectDependencies(
         // save original expression that may be changed during hoisting
         const originalExNode = t.cloneNode(ex.node);
 
-        hoist(babel, ex as NodePath<Expression | null>);
+        hoist(babel, ex as NodePath<Expression | null>, state, options);
 
         // save hoisted expression to be used to evaluation
         const hoistedExNode = t.cloneNode(ex.node);

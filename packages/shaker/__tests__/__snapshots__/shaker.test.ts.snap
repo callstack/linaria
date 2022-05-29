@@ -1048,6 +1048,38 @@ Dependencies: NA
 
 `;
 
+exports[`shaker should process \`css\` calls referencing other \`css\` calls inside components 1`] = `
+"import React from 'react';
+import { css } from '@linaria/core';
+export function Component() {
+  const outer = \\"outer_o1t92lw9\\";
+  const inner = \\"inner_i1xjmq2i\\";
+  return React.createElement(\\"div\\", {
+    className: outer
+  }, \\"outer\\", React.createElement(\\"div\\", {
+    className: inner
+  }, \\"inner\\"));
+}"
+`;
+
+exports[`shaker should process \`css\` calls referencing other \`css\` calls inside components 2`] = `
+
+CSS:
+
+.outer_o1t92lw9 {
+    color: red;
+  }
+.inner_i1xjmq2i {
+    color: green;
+    .outer_o1t92lw9:hover & {
+      color: blue;
+    }
+  }
+
+Dependencies: NA
+
+`;
+
 exports[`shaker should process \`css\` calls with complex interpolation inside components 1`] = `
 "import React from 'react';
 import { css } from '@linaria/core';
