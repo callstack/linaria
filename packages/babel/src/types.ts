@@ -53,9 +53,11 @@ export type ExpressionValue =
   | FunctionValue
   | EvaluatedValue;
 
+export type Path = NodePath<TaggedTemplateExpression>;
+
 export type TemplateExpression = {
-  styled?: { component: any };
-  path: NodePath<TaggedTemplateExpression>;
+  styled?: { component: any; type: 'atomic-styled' | 'styled' };
+  path: Path;
   expressionValues: ExpressionValue[];
 };
 
@@ -96,6 +98,7 @@ export type State = {
         styled?: string;
         coreCss?: string;
         atomicCss?: string;
+        atomicStyled?: string;
       };
       linaria?: {
         rules: Rules;
@@ -133,7 +136,10 @@ type ClassNameFn = (
   args: ClassNameSlugVars
 ) => string;
 
-type AtomizeFn = (cssText: string) => {
+export type AtomizeFn = (
+  cssText: string,
+  hasPriority: boolean
+) => {
   className?: string;
   cssText: string;
   property: string;

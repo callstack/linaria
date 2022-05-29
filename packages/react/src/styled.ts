@@ -20,6 +20,7 @@ type Has<T, TObj> = [T] extends [TObj] ? T : T & TObj;
 type Options = {
   name: string;
   class: string;
+  atomic?: boolean;
   vars?: {
     [key: string]: [
       string | number | ((props: unknown) => string | number),
@@ -139,10 +140,9 @@ function styled(tag: any): any {
       ]);
 
       filteredProps.ref = ref;
-      filteredProps.className = cx(
-        filteredProps.className || className,
-        options.class
-      );
+      filteredProps.className = options.atomic
+        ? cx(options.class, filteredProps.className || className)
+        : cx(filteredProps.className || className, options.class);
 
       const { vars } = options;
 

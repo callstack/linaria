@@ -8,12 +8,15 @@ import generator from '@babel/generator';
 
 import type { StyledMeta } from '@linaria/core';
 import { debug } from '@linaria/logger';
+import { slugify } from '@linaria/utils';
 import { units } from '../units';
 import type {
   State,
   StrictOptions,
   TemplateExpression,
   ValueCache,
+  AtomizeFn,
+  Path,
 } from '../types';
 
 import isSerializable from '../utils/isSerializable';
@@ -38,6 +41,45 @@ function hasMeta(value: any): value is StyledMeta {
 }
 
 const processedPaths = new WeakSet();
+
+function createAtomicString(
+  atomize: AtomizeFn | undefined,
+  cssText: string,
+  displayName: string | null,
+  className: string | null,
+  state: State,
+  path: Path,
+  hasPriority: boolean
+) {
+  if (!atomize) {
+    throw new Error(
+      'The atomic css API was detected, but an atomize function was not passed in the linaria configuration.'
+    );
+  }
+  const atomicRules = atomize(cssText, hasPriority);
+  atomicRules.forEach((rule) => {
+    state.rules[rule.cssText] = {
+      cssText: rule.cssText,
+      start: path.parent?.loc?.start ?? null,
+      className: className!,
+      displayName: displayName!,
+      atom: true,
+    };
+
+    debug(
+      'evaluator:template-processor:extracted-atomic-rule',
+      `\n${rule.cssText}`
+    );
+  });
+
+  const atomicString = atomicRules
+    // Some atomic rules produced (eg. keyframes) don't have class names, and they also don't need to appear in the object
+    .filter((rule) => !!rule.className)
+    .map((rule) => rule.className!)
+    .join(' ');
+
+  return atomicString;
+}
 
 export default function getTemplateProcessor(
   { types: t }: Core,
@@ -193,7 +235,12 @@ export default function getTemplateProcessor(
           }
 
           if (styled) {
-            const id = `${slug}-${i}`;
+            const id =
+              // atomize the dynamic interpolation to make it unique
+              styled.type === 'atomic-styled'
+                ? slugify(ex.getSource() || generator(ex.node).code)
+                : // or make the variable unique to this styled component
+                  `${slug}-${i}`;
 
             interpolations.push({
               id,
@@ -233,9 +280,11 @@ export default function getTemplateProcessor(
         t.objectProperty(t.identifier('name'), t.stringLiteral(displayName!))
       );
 
-      props.push(
-        t.objectProperty(t.identifier('class'), t.stringLiteral(className!))
-      );
+      if (styled.type === 'styled') {
+        props.push(
+          t.objectProperty(t.identifier('class'), t.stringLiteral(className!))
+        );
+      }
 
       // If we found any interpolations, also pass them so they can be applied
       if (interpolations.length) {
@@ -290,6 +339,35 @@ export default function getTemplateProcessor(
       );
 
       path.addComment('leading', '#__PURE__');
+
+      if (styled.type === 'atomic-styled') {
+        const { atomize } = options;
+        const isStyledWrapping = t.isIdentifier(styled.component.node);
+        const atomicString = createAtomicString(
+          atomize,
+          cssText,
+          displayName,
+          className,
+          state,
+          path,
+          // is styled(Component), so we need to increase property priority
+          isStyledWrapping
+        );
+
+        const classList: string =
+          (atomicString ? `${atomicString} ` : '') + className || '';
+
+        props.push(
+          t.objectProperty(t.identifier('class'), t.stringLiteral(classList!))
+        );
+
+        props.push(
+          t.objectProperty(t.identifier('atomic'), t.booleanLiteral(true))
+        );
+
+        // atomic-styled doesn't need to generate .className{cssText}
+        return;
+      }
     } else if (type === 'css') {
       path.replaceWith(t.stringLiteral(className!));
     }
@@ -300,36 +378,16 @@ export default function getTemplateProcessor(
 
     if (type === 'atomic-css') {
       const { atomize } = options;
-      if (!atomize) {
-        throw new Error(
-          'The atomic css API was detected, but an atomize function was not passed in the linaria configuration.'
-        );
-      }
-      const atomicRules = atomize(cssText);
-      atomicRules.forEach((rule) => {
-        state.rules[rule.cssText] = {
-          cssText: rule.cssText,
-          start: path.parent?.loc?.start ?? null,
-          className: className!,
-          displayName: displayName!,
-          atom: true,
-        };
-
-        debug(
-          'evaluator:template-processor:extracted-atomic-rule',
-          `\n${rule.cssText}`
-        );
-      });
-
-      const atomicString = t.stringLiteral(
-        atomicRules
-          // Some atomic rules produced (eg. keyframes) don't have class names, and they also don't need to appear in the object
-          .filter((rule) => !!rule.className)
-          .map((rule) => rule.className!)
-          .join(' ')
+      const atomicString = createAtomicString(
+        atomize,
+        cssText,
+        displayName,
+        className,
+        state,
+        path,
+        false
       );
-
-      path.replaceWith(atomicString);
+      path.replaceWith(t.stringLiteral(atomicString));
     } else {
       debug(
         'evaluator:template-processor:extracted-rule',

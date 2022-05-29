@@ -63,6 +63,12 @@ export default function DetectLinariaImportName(
     if (localImportName) {
       state.file.metadata.localName ||= {};
       state.file.metadata.localName.atomicCss = localImportName;
+    } else {
+      const localImportName = getLocalImportName(core, path);
+      if (localImportName) {
+        state.file.metadata.localName ||= {};
+        state.file.metadata.localName.atomicStyled = localImportName;
+      }
     }
   }
 }
