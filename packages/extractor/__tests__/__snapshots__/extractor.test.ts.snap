@@ -41,9 +41,9 @@ Dependencies: NA
 `;
 
 exports[`extractor does not strip instanbul coverage sequences 1`] = `
-"var cov_2dr9r1nt95 = function () {
+"function cov_2dr9r1nt95() {
   var path = \\"/home/user/project/file.js\\";
-  var hash = \\"23f56bbaeb2ebcd213f41374d3b2af1bce287bd3\\";
+  var hash = \\"a8a3adb000979641fede8be9905bccded8326d52\\";
   var global = new Function(\\"return this\\")();
   var gcv = \\"__coverage__\\";
   var coverageData = {
@@ -78,21 +78,29 @@ exports[`extractor does not strip instanbul coverage sequences 1`] = `
     },
     f: {},
     b: {},
-    _coverageSchema: \\"43e27e138ebf9cfc5966b082cf9a028302ed4184\\",
-    hash: \\"23f56bbaeb2ebcd213f41374d3b2af1bce287bd3\\"
+    _coverageSchema: \\"1a1c01bbd47fc00a2c39e90264f33305004495a9\\",
+    hash: \\"a8a3adb000979641fede8be9905bccded8326d52\\"
   };
   var coverage = global[gcv] || (global[gcv] = {});
 
-  if (coverage[path] && coverage[path].hash === hash) {
-    return coverage[path];
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
   }
 
-  return coverage[path] = coverageData;
-}();
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_2dr9r1nt95 = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
 
+cov_2dr9r1nt95();
 import { styled } from '@linaria/react';
-const a = (cov_2dr9r1nt95.s[0]++, 42);
-export const Title = (cov_2dr9r1nt95.s[1]++, /*#__PURE__*/styled(\\"h1\\")({
+const a = (cov_2dr9r1nt95().s[0]++, 42);
+export const Title = (cov_2dr9r1nt95().s[1]++, /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_tow9xsn\\"
 }));"
@@ -809,9 +817,9 @@ Dependencies: NA
 `;
 
 exports[`extractor non-hoistable identifiers 1`] = `
-"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: 
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression:
 
-  > days is not defined. 
+  > days is not defined.
 
   Make sure you are not using a browser or Node specific API and all the variables are available in static context.
   Linaria have to extract pieces of your code to resolve the interpolated values.
@@ -1097,9 +1105,9 @@ Dependencies: @babel/runtime/helpers/interopRequireDefault, react
 `;
 
 exports[`extractor throws codeframe error when evaluation fails 1`] = `
-"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: 
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression:
 
-  > This will fail. 
+  > This will fail.
 
   Make sure you are not using a browser or Node specific API and all the variables are available in static context.
   Linaria have to extract pieces of your code to resolve the interpolated values.
@@ -1157,4 +1165,240 @@ exports[`extractor throws when interpolation evaluates to undefined 1`] = `
 > 6 |   font-size: \${fontSize};
     |                ^^^^^^^^
   7 | \`;"
+`;
+
+exports[`keeps objects as is 1`] = `
+"{
+  const fill1 = (top = 0, left = 0, right = 0, bottom = 0) => ({
+    position: 'absolute',
+    top,
+    right,
+    bottom,
+    left
+  });
+
+  {
+    const fill2 = (top = 0, left = 0, right = 0, bottom = 0) => {
+      return {
+        position: 'absolute',
+        top,
+        right,
+        bottom,
+        left
+      };
+    };
+
+    {
+      exports.__linariaPreval = [fill1, fill2];
+    }
+  }
+}"
+`;
+
+exports[`keeps only code which is related to \`a\` 1`] = `
+"{
+  const {
+    whiteColor: color,
+    anotherColor
+  } = require('…');
+
+  {
+    const a = color || anotherColor;
+    {
+      exports.__linariaPreval = [a];
+    }
+  }
+}"
+`;
+
+exports[`keeps only code which is related to \`anotherColor\` 1`] = `
+"{
+  const {
+    whiteColor: color,
+    anotherColor
+  } = require('…');
+
+  {
+    exports.__linariaPreval = [anotherColor];
+  }
+}"
+`;
+
+exports[`keeps only code which is related to \`color\` 1`] = `
+"{
+  const {
+    whiteColor: color,
+    anotherColor
+  } = require('…');
+
+  {
+    exports.__linariaPreval = [color];
+  }
+}"
+`;
+
+exports[`removes all 1`] = `
+"{
+  exports.__linariaPreval = [];
+}"
+`;
+
+exports[`shakes assignment patterns 1`] = `
+"{
+  const [identifier = 1] = [2];
+  {
+    const [{ ...object
+    } = {}] = [{
+      a: 1,
+      b: 2
+    }];
+    {
+      const [[...array] = []] = [[1, 2, 3, 4]];
+      {
+        const obj = {
+          member: null
+        };
+        {
+          exports.__linariaPreval = [identifier, object, array, obj];
+        }
+      }
+    }
+  }
+}"
+`;
+
+exports[`shakes es5 exports 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+exports.redColor = 'red';
+Object.defineProperty(exports, \\"blueColor\\", {
+  enumerable: true,
+  get: function get() {
+    return 'blue';
+  }
+});
+Object.defineProperty(exports, \\"greenColor\\", {
+  enumerable: true,
+  get: function get() {
+    return 'green';
+  }
+});"
+`;
+
+exports[`shakes exports 1`] = `
+"{
+  var _ = require(\\"\\\\u2026\\");
+
+  {
+    const a = _.whiteColor;
+    {
+      exports.__linariaPreval = [a];
+    }
+  }
+}"
+`;
+
+exports[`shakes imports 1`] = `
+"{
+  var _ = _interopRequireWildcard(require(\\"\\\\u2026\\"));
+
+  {
+    function _getRequireWildcardCache(nodeInterop) {
+      if (typeof WeakMap !== \\"function\\") return null;
+      var cacheBabelInterop = new WeakMap();
+      var cacheNodeInterop = new WeakMap();
+      return (_getRequireWildcardCache = function (nodeInterop) {
+        return nodeInterop ? cacheNodeInterop : cacheBabelInterop;
+      })(nodeInterop);
+    }
+
+    {
+      function _interopRequireWildcard(obj, nodeInterop) {
+        if (!nodeInterop && obj && obj.__esModule) {
+          return obj;
+        }
+
+        if (obj === null || typeof obj !== \\"object\\" && typeof obj !== \\"function\\") {
+          return {
+            default: obj
+          };
+        }
+
+        var cache = _getRequireWildcardCache(nodeInterop);
+
+        if (cache && cache.has(obj)) {
+          return cache.get(obj);
+        }
+
+        var newObj = {};
+        var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor;
+
+        for (var key in obj) {
+          if (key !== \\"default\\" && Object.prototype.hasOwnProperty.call(obj, key)) {
+            var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null;
+
+            if (desc && (desc.get || desc.set)) {
+              Object.defineProperty(newObj, key, desc);
+            } else {
+              newObj[key] = obj[key];
+            }
+          }
+        }
+
+        newObj.default = obj;
+
+        if (cache) {
+          cache.set(obj, newObj);
+        }
+
+        return newObj;
+      }
+
+      {
+        exports.__linariaPreval = [_.whiteColor, _.default];
+      }
+    }
+  }
+}"
+`;
+
+exports[`shakes sequence expression 1`] = `
+"{
+  var _ = require(\\"\\\\u2026\\");
+
+  {
+    const color1 = () => 'blue';
+
+    {
+      let local = '';
+      {
+        const color2 = () => local;
+
+        {
+          exports.__linariaPreval = [color2];
+        }
+      }
+    }
+  }
+}"
+`;
+
+exports[`should keep member expression key 1`] = `
+"{
+  const key = 'blue';
+  {
+    const obj = {
+      blue: '#00F'
+    };
+    {
+      const blue = obj[key];
+      {
+        exports.__linariaPreval = [blue];
+      }
+    }
+  }
+}"
 `;

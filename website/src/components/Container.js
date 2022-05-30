@@ -1,5 +1,3 @@
-/* @flow */
-
 import { styled } from '@linaria/react';
 
 const Container = styled.div`

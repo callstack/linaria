@@ -1,4 +1,4 @@
-import { ClassNameSlugVars } from '../types';
+import type { ClassNameSlugVars } from '../types';
 
 const isSlugVar = (
   key: string,

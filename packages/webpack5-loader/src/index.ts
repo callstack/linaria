@@ -8,17 +8,45 @@ import path from 'path';
 import loaderUtils from 'loader-utils';
 import enhancedResolve from 'enhanced-resolve';
 import type { RawSourceMap } from 'source-map';
-import { EvalCache, Module, Result, transform } from '@linaria/babel-preset';
+import type { Result, Preprocessor } from '@linaria/babel-preset';
+import { EvalCache, Module, transform } from '@linaria/babel-preset';
 import { debug, notify } from '@linaria/logger';
+import type { RawLoaderDefinitionFunction } from 'webpack';
+import type { ICache } from './cache';
 import { getCacheInstance } from './cache';
 
 const outputCssLoader = require.resolve('./outputCssLoader');
 
-export default function webpack5Loader(
-  this: any,
-  content: string,
-  inputSourceMap: RawSourceMap | null
+type Loader = RawLoaderDefinitionFunction<{
+  sourceMap?: boolean;
+  preprocessor?: Preprocessor;
+  extension?: string;
+  cacheProvider?: string | ICache;
+  resolveOptions?: enhancedResolve.ResolveOptions;
+}>;
+
+const webpack5Loader: Loader = function webpack5LoaderPlugin(
+  content,
+  inputSourceMap
 ) {
+  function convertSourceMap(
+    value: typeof inputSourceMap,
+    filename: string
+  ): RawSourceMap | undefined {
+    if (typeof value === 'string' || !value) {
+      return undefined;
+    }
+
+    return {
+      ...value,
+      file: value.file ?? filename,
+      mappings: value.mappings ?? '',
+      names: value.names ?? [],
+      sources: value.sources ?? [],
+      version: value.version ?? 3,
+    };
+  }
+
   // tell Webpack this loader is async
   this.async();
 
@@ -91,19 +119,19 @@ export default function webpack5Loader(
   try {
     // Use webpack's resolution when evaluating modules
     Module._resolveFilename = (id, { filename }) => {
-      const result = resolveSync(path.dirname(filename), id);
-      if (!result) {
+      const res = resolveSync(path.dirname(filename), id);
+      if (!res) {
         // enhanced-resolve v4 throws a error when dependency is missed
         throw new Error('No result');
       }
 
-      this.addDependency(result);
-      return result;
+      this.addDependency(res);
+      return res;
     };
 
-    result = transform(content, {
+    result = transform(content.toString(), {
       filename: path.relative(process.cwd(), this.resourcePath),
-      inputSourceMap: inputSourceMap ?? undefined,
+      inputSourceMap: convertSourceMap(inputSourceMap, this.resourcePath),
       pluginOptions: rest,
       preprocessor,
     });
@@ -125,8 +153,14 @@ export default function webpack5Loader(
       result.dependencies.forEach((dep) => {
         try {
           const f = resolveSync(path.dirname(this.resourcePath), dep);
-
-          this.addDependency(f);
+          if (f) {
+            this.addDependency(f);
+          } else {
+            // eslint-disable-next-line no-console
+            console.warn(
+              `[linaria] ${dep} cannot be resolved in ${this.resourcePath}`
+            );
+          }
         } catch (e) {
           // eslint-disable-next-line no-console
           console.warn(`[linaria] failed to add dependency for: ${dep}`, e);
@@ -138,8 +172,9 @@ export default function webpack5Loader(
       .then((cacheInstance) => cacheInstance.set(this.resourcePath, cssText))
       .then(() => {
         const request = `${outputFileName}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
-          cacheProvider ?? ''
+          typeof cacheProvider === 'string' ? cacheProvider : ''
         )}!${this.resourcePath}`;
+        // @ts-expect-error there are no types for loader-utils ^3.0.0
         const stringifiedRequest = loaderUtils.stringifyRequest(this, request);
 
         return this.callback(
@@ -153,6 +188,6 @@ export default function webpack5Loader(
   }
 
   this.callback(null, result.code, result.sourceMap ?? undefined);
-}
+};
 
-export type Webpack5Loader = typeof webpack5Loader;
+export default webpack5Loader;

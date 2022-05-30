@@ -136,9 +136,7 @@ export function extractCssFromAst(
         });
 
         mappings.forEach((mapping) =>
-          generator.addMapping(
-            Object.assign({}, mapping, { source: options.filename })
-          )
+          generator.addMapping({ ...mapping, source: options.filename })
         );
 
         generator.setSourceContent(options.filename, code);

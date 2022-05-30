@@ -1,13 +1,17 @@
 const babel = require('@babel/core');
 const dedent = require('dedent');
-const plugin = require('../');
+const plugin = require('../src');
 
-const getCode = (src) => {
-  const { code } = babel.transform(dedent(src), { plugins: [plugin] });
+const getCode = (src: string) => {
+  const { code } = babel.transform(dedent(src), {
+    filename: 'test.js',
+    babelrc: false,
+    plugins: [plugin],
+  });
   return code;
 };
 
-describe('styled-components', function () {
+describe('styled-components', () => {
   it('keeps linaria', () => {
     const code = getCode(`
     import styled from "linaria/react";

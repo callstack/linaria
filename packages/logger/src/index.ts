@@ -37,8 +37,8 @@ const format = <T>(text: T) => {
 function log(
   level: LogLevel,
   namespaces: string,
-  arg1: any | (() => void),
-  ...restArgs: any[]
+  arg1: unknown | (() => void),
+  ...restArgs: unknown[]
 ) {
   if (currentLevel < levels.indexOf(level)) {
     return;
@@ -64,6 +64,7 @@ export const warn = log.bind(null, 'warn');
 export const error = log.bind(null, 'error');
 
 export const notify = (message: string) => {
+  // eslint-disable-next-line no-console
   console.log(
     pc.red(
       message.replace(/(`.*?`)/g, (s) =>

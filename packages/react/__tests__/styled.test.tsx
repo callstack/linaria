@@ -1,8 +1,8 @@
+import React from 'react';
 import { omit } from '../src/styled';
 
-const React = require('react');
 const renderer = require('react-test-renderer');
-const styled = require('../src').styled;
+const { styled } = require('../src');
 
 it('renders tag with display name and class name', () => {
   const Test = styled('h1')({
@@ -20,7 +20,7 @@ it('renders tag with display name and class name', () => {
 });
 
 it('renders component with display name and class name', () => {
-  const Custom = (props) => <div {...props} />;
+  const Custom: React.FC = (props) => <div {...props} />;
 
   const Test = styled(Custom)({
     name: 'TestComponent',
@@ -43,7 +43,7 @@ it('applies CSS variables in style prop', () => {
     vars: {
       foo: ['tomato'],
       bar: [20, 'px'],
-      baz: [(props) => props.size, 'px'],
+      baz: [(props: { size: number }) => props.size, 'px'],
     },
   });
 
@@ -106,7 +106,9 @@ it('replaces simple component with as prop', () => {
 });
 
 it('replaces custom component with as prop for primitive', () => {
-  const Custom = (props) => <div {...props} style={{ fontSize: 12 }} />;
+  const Custom: React.FC = (props) => (
+    <div {...props} style={{ fontSize: 12 }} />
+  );
 
   const Test = styled(Custom)({
     name: 'TestComponent',
@@ -123,7 +125,9 @@ it('replaces custom component with as prop for primitive', () => {
 });
 
 it('replaces primitive with as prop for custom component', () => {
-  const Custom = (props) => <div {...props} style={{ fontSize: 12 }} />;
+  const Custom: React.FC = (props) => (
+    <div {...props} style={{ fontSize: 12 }} />
+  );
 
   const Test = styled('div')({
     name: 'TestComponent',
@@ -209,7 +213,9 @@ it('does not filter attributes for upper camel cased custom elements', () => {
 });
 
 it('does not filter attributes for components', () => {
-  const Custom = (props) => <div>{props.unknownAttribute}</div>;
+  const Custom: React.FC<{ unknownAttribute: string }> = (props) => (
+    <div>{props.unknownAttribute}</div>
+  );
 
   const Test = styled(Custom)({
     name: 'TestComponent',
@@ -224,7 +230,7 @@ it('does not filter attributes for components', () => {
 });
 
 it('provides linaria component className for composition as last item in props.className', () => {
-  const Custom = (props) => {
+  const Custom: React.FC<{ className: string }> = (props) => {
     const classnames = props.className.split(' ');
     const linariaClassName = classnames[classnames.length - 1];
     const newClassNames = [

@@ -8,13 +8,13 @@ beforeEach(() => Module.invalidate());
 
 const evaluator: Evaluator = (filename, options, text) => {
   const { code } = babel.transformSync(text, {
-    filename: filename,
+    filename,
   })!;
   return [code!, null];
 };
 
 function getFileName() {
-  return path.resolve(__dirname, `../__fixtures__/test.js`);
+  return path.resolve(__dirname, '../__fixtures__/test.js');
 }
 
 const options: StrictOptions = {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * This file contains an runtime version of `styled` component. Responsibilities of the component are:
  * - returns ReactElement based on HTML tag used with `styled` or custom React Component
@@ -9,7 +10,7 @@ import validAttr from '@emotion/is-prop-valid';
 import { cx } from '@linaria/core';
 import type { CSSProperties, StyledMeta } from '@linaria/core';
 
-export type NoInfer<A extends any> = [A][A extends any ? 0 : never];
+export type NoInfer<A> = [A][A extends any ? 0 : never];
 
 type Component<TProps> =
   | ((props: TProps) => unknown)
@@ -73,11 +74,11 @@ function filterProps<T extends Record<string, unknown>, TKeys extends keyof T>(
   return filteredProps;
 }
 
-const warnIfInvalid = (value: any, componentName: string) => {
+const warnIfInvalid = (value: unknown, componentName: string) => {
   if (process.env.NODE_ENV !== 'production') {
     if (
       typeof value === 'string' ||
-      // eslint-disable-next-line no-self-compare
+      // eslint-disable-next-line no-self-compare,no-restricted-globals
       (typeof value === 'number' && isFinite(value))
     ) {
       return;
@@ -134,7 +135,7 @@ function styled(tag: any): any {
 
     const render = (props: any, ref: any) => {
       const { as: component = tag, class: className } = props;
-      let filteredProps: IProps = filterProps(component, props, [
+      const filteredProps: IProps = filterProps(component, props, [
         'as',
         'class',
       ]);
@@ -149,7 +150,7 @@ function styled(tag: any): any {
       if (vars) {
         const style: { [key: string]: string } = {};
 
-        // eslint-disable-next-line guard-for-in
+        // eslint-disable-next-line guard-for-in,no-restricted-syntax
         for (const name in vars) {
           const variable = vars[name];
           const result = variable[0];
@@ -211,7 +212,7 @@ type StyledComponent<T> = StyledMeta &
 type StaticPlaceholder = string | number | CSSProperties | StyledMeta;
 
 type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
-  TAdditionalProps = {}
+  TAdditionalProps = Record<string, unknown>
 >(
   strings: TemplateStringsArray,
   ...exprs: Array<
@@ -232,7 +233,9 @@ type ComponentStyledTagWithoutInterpolation<TOrigCmp> = (
   >
 ) => StyledMeta & TOrigCmp;
 
-type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
+type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <
+  OwnProps = Record<string, unknown>
+>(
   strings: TemplateStringsArray,
   ...exprs: Array<
     | StaticPlaceholder

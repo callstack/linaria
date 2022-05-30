@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /**
  * This file is a babel preset used to transform files inside evaluators.
  * It works the same as main `babel/extract` preset, but do not evaluate lazy dependencies.
@@ -7,12 +8,11 @@ import type { Program, Statement, VariableDeclaration } from '@babel/types';
 import type { State, StrictOptions } from '@linaria/babel-preset';
 import {
   GenerateClassNames,
-  DetectLinariaImportName,
   JSXElement,
   ProcessStyled,
   ProcessCSS,
 } from '@linaria/babel-preset';
-import { Core } from './babel';
+import type { Core } from './babel';
 
 const isHoistableExport = (
   node: NodePath<Statement>
@@ -53,7 +53,6 @@ function index(babel: Core, options: StrictOptions) {
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
-            ImportDeclaration: (p) => DetectLinariaImportName(babel, p, state),
             TaggedTemplateExpression: (p) =>
               GenerateClassNames(babel, p, state, options),
             JSXElement,
@@ -69,7 +68,7 @@ function index(babel: Core, options: StrictOptions) {
             .get('body')
             .filter(isHoistableExport)
             .forEach((p) => {
-              const node = p.node;
+              const { node } = p;
               p.remove();
               path.unshiftContainer('body', node);
             });
@@ -81,7 +80,7 @@ function index(babel: Core, options: StrictOptions) {
   };
 }
 
-export default function preset(context: any, options: StrictOptions) {
+export default function preset(context: unknown, options: StrictOptions) {
   return {
     plugins: [[index, options]],
   };

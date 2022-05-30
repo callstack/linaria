@@ -20,25 +20,27 @@ interface ICX {
  * @returns the combined, space separated class names that can be applied directly to the class attribute
  */
 const cx: ICX = function cx() {
-  const presentClassNames = Array.prototype.slice
-    .call(arguments)
-    .filter(Boolean);
+  const presentClassNames: (ClassName | ClassName<LinariaClassName>)[] =
+    Array.prototype.slice
+      // eslint-disable-next-line prefer-rest-params
+      .call(arguments)
+      .filter(Boolean);
 
   const atomicClasses: { [k: string]: string } = {};
-  const nonAtomicClasses = [];
-  for (const className of presentClassNames) {
+  const nonAtomicClasses: string[] = [];
+  presentClassNames.forEach((arg) => {
     // className could be the output of a previous cx call, so split by ' ' first
-    const individualClassNames = className.split(' ');
+    const individualClassNames = arg ? arg.split(' ') : [];
 
-    for (const className of individualClassNames) {
+    individualClassNames.forEach((className) => {
       if (className.startsWith('atm_')) {
         const [, keyHash] = className.split('_');
         atomicClasses[keyHash] = className;
       } else {
         nonAtomicClasses.push(className);
       }
-    }
-  }
+    });
+  });
 
   return [...Object.values(atomicClasses), ...nonAtomicClasses].join(
     ' '

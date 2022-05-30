@@ -1,5 +1,3 @@
-/* @flow */
-
 export const breakpoints = {
   medium: 640,
   large: 1024,

@@ -1,5 +1,3 @@
-/* @flow */
-
 import React from 'react';
 import { css, cx } from '@linaria/atomic';
 import Header from './Header';

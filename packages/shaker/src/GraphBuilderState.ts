@@ -2,14 +2,16 @@ import type { Node } from '@babel/types';
 import type { VisitorKeys } from '@linaria/babel-preset';
 import ScopeManager from './scope';
 import DepsGraph from './DepsGraph';
-import { VisitorAction } from './types';
+import type { VisitorAction } from './types';
 
 export type OnVisitCallback = (n: Node) => void;
 
 export default abstract class GraphBuilderState {
   public readonly scope = new ScopeManager();
+
   public readonly graph = new DepsGraph(this.scope);
-  public readonly meta = new Map<string, any>();
+
+  public readonly meta = new Map<string, unknown>();
 
   protected callbacks: OnVisitCallback[] = [];
 

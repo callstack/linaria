@@ -71,6 +71,7 @@ module.exports = {
                   /es\.array\.(?:filter|for-each|index-of|join|reduce|slice)/,
                   'es.function.name',
                   'es.object.keys',
+                  'es.object.to-string',
                   'web.dom-collections.for-each',
                 ],
                 corejs: 3,

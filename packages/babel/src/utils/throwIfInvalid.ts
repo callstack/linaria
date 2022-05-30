@@ -1,11 +1,12 @@
 import generator from '@babel/generator';
+import type { NodePath } from '@babel/traverse';
 import type { Serializable } from '../types';
 import isSerializable from './isSerializable';
 
 // Throw if we can't handle the interpolated value
 function throwIfInvalid(
-  value: Error | Function | string | number | Serializable | undefined,
-  ex: any
+  value: Error | (() => void) | string | number | Serializable | undefined,
+  ex: NodePath
 ): void {
   if (
     typeof value === 'function' ||
@@ -19,9 +20,9 @@ function throwIfInvalid(
   // We can't use instanceof here so let's use duck typing
   if (value && typeof value !== 'number' && value.stack && value.message) {
     throw ex.buildCodeFrameError(
-      `An error occurred when evaluating the expression: 
+      `An error occurred when evaluating the expression:
 
-  > ${value.message}. 
+  > ${value.message}.
 
   Make sure you are not using a browser or Node specific API and all the variables are available in static context.
   Linaria have to extract pieces of your code to resolve the interpolated values.

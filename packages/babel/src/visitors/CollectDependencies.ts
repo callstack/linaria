@@ -16,17 +16,12 @@ import throwIfInvalid from '../utils/throwIfInvalid';
 import type { State, StrictOptions, ExpressionValue } from '../types';
 import { ValueType } from '../types';
 import getTemplateType from '../utils/getTemplateType';
-import { Core } from '../babel';
+import type { Core } from '../babel';
 
 /**
  * Hoist the node and its dependencies to the highest scope possible
  */
-function hoist(
-  babel: Core,
-  ex: NodePath<Expression | null>,
-  state: State,
-  options: StrictOptions
-) {
+function hoist(babel: Core, ex: NodePath<Expression | null>): void {
   const Identifier = (idPath: NodePath<IdentifierNode>) => {
     if (!idPath.isReferencedIdentifier()) {
       return;
@@ -42,14 +37,9 @@ function hoist(
 
     if (bindingPath.isVariableDeclarator()) {
       const initPath = bindingPath.get('init') as NodePath<Expression | null>;
-      hoist(babel, initPath, state, options);
+      hoist(babel, initPath);
       if (initPath.isTaggedTemplateExpression()) {
-        const templateType = getTemplateType(
-          babel,
-          initPath,
-          state,
-          options.libResolver
-        );
+        const templateType = getTemplateType(babel, initPath);
         if (templateType) {
           return;
         }
@@ -64,7 +54,8 @@ function hoist(
   };
 
   if (ex.isIdentifier()) {
-    return Identifier(ex);
+    Identifier(ex);
+    return;
   }
 
   ex.traverse({
@@ -78,9 +69,8 @@ export default function CollectDependencies(
   state: State,
   options: StrictOptions
 ) {
-  const { libResolver } = options;
   const { types: t } = babel;
-  const templateType = getTemplateType(babel, path, state, libResolver);
+  const templateType = getTemplateType(babel, path);
   if (!templateType) {
     return;
   }
@@ -108,7 +98,7 @@ export default function CollectDependencies(
         // save original expression that may be changed during hoisting
         const originalExNode = t.cloneNode(ex.node);
 
-        hoist(babel, ex as NodePath<Expression | null>, state, options);
+        hoist(babel, ex as NodePath<Expression | null>);
 
         // save hoisted expression to be used to evaluation
         const hoistedExNode = t.cloneNode(ex.node);
@@ -133,7 +123,8 @@ export default function CollectDependencies(
   if (
     templateType !== 'css' &&
     templateType !== 'atomic-css' &&
-    'name' in templateType.component.node
+    'name' in templateType.component.node &&
+    templateType.component.node.name
   ) {
     // It's not a real dependency.
     // It can be simplified because we need just a className.

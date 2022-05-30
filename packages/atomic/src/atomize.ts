@@ -1,4 +1,5 @@
-import postcss, { Document, AtRule, Container, Rule } from 'postcss';
+import type { Document, AtRule, Container, Rule } from 'postcss';
+import postcss from 'postcss';
 import { slugify } from '@linaria/utils';
 import stylis from 'stylis';
 import { all as knownProperties } from 'known-css-properties';

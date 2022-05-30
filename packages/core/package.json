@@ -14,6 +14,11 @@
     "lib/",
     "esm/"
   ],
+  "linaria": {
+    "tags": {
+      "css": "./lib/processors/css.js"
+    }
+  },
   "license": "MIT",
   "repository": "git@github.com:callstack/linaria.git",
   "bugs": {
@@ -29,6 +34,7 @@
   ],
   "scripts": {
     "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:corejs-test": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore \"src/processors/**/*\"",
     "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "build": "yarn build:lib && yarn build:esm",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",

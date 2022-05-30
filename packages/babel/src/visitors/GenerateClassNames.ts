@@ -14,7 +14,7 @@ import type { ClassNameSlugVars, State, StrictOptions } from '../types';
 import toValidCSSIdentifier from '../utils/toValidCSSIdentifier';
 import getLinariaComment from '../utils/getLinariaComment';
 import getTemplateType from '../utils/getTemplateType';
-import { Core } from '../babel';
+import type { Core } from '../babel';
 import isSlugVar from '../utils/isSlugVar';
 
 export default function GenerateClassNames(
@@ -23,9 +23,8 @@ export default function GenerateClassNames(
   state: State,
   options: StrictOptions
 ) {
-  const { libResolver } = options;
   const { types: t } = babel;
-  const templateType = getTemplateType(babel, path, state, libResolver);
+  const templateType = getTemplateType(babel, path);
   if (!templateType) {
     return;
   }
@@ -37,8 +36,10 @@ export default function GenerateClassNames(
   // Increment the index of the style we're processing
   // This is used for slug generation to prevent collision
   // Also used for display name if it couldn't be determined
-  state.index++;
+  // eslint-disable-next-line no-param-reassign
+  state.index += 1;
 
+  // eslint-disable-next-line prefer-const
   let [, slug, displayName, predefinedClassName] = getLinariaComment(path);
 
   const parent = path.findParent(
@@ -76,13 +77,13 @@ export default function GenerateClassNames(
     // Try to derive the path from the filename
     displayName = basename(state.file.opts.filename);
 
-    if (/^index\.[a-z0-9]+$/.test(displayName)) {
+    if (/^index\.[a-z\d]+$/.test(displayName)) {
       // If the file name is 'index', better to get name from parent folder
       displayName = basename(dirname(state.file.opts.filename));
     }
 
     // Remove the file extension
-    displayName = displayName.replace(/\.[a-z0-9]+$/, '');
+    displayName = displayName.replace(/\.[a-z\d]+$/, '');
 
     if (displayName) {
       displayName += state.index;
@@ -121,11 +122,11 @@ export default function GenerateClassNames(
     dir: dirname(file).split(sep).pop() as string,
   };
 
-  let className = predefinedClassName
-    ? predefinedClassName
-    : options.displayName
-    ? `${toValidCSSIdentifier(displayName!)}_${slug!}`
-    : slug!;
+  let className =
+    predefinedClassName ||
+    (options.displayName
+      ? `${toValidCSSIdentifier(displayName!)}_${slug!}`
+      : slug!);
 
   // The className can be defined by the user either as fn or a string
   if (typeof options.classNameSlug === 'function') {
@@ -134,7 +135,7 @@ export default function GenerateClassNames(
         options.classNameSlug(slug, displayName, slugVars)
       );
     } catch {
-      throw new Error(`classNameSlug option must return a string`);
+      throw new Error('classNameSlug option must return a string');
     }
   }
 

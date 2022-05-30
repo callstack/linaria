@@ -235,7 +235,7 @@ describe('include atrule once', () => {
 });
 
 describe('ignore empty class attribute', () => {
-  const html = dedent`
+  const code = dedent`
     <div class=""></div>
     <div class="a"></div>
     <div class=""></div>
@@ -247,6 +247,6 @@ describe('ignore empty class attribute', () => {
     .not-exist {}
   `;
 
-  const { critical } = collect(html, css);
+  const { critical } = collect(code, css);
   test('critical should be empty', () => expect(critical).toEqual(''));
 });

@@ -14,8 +14,8 @@ const waitForProcess = async (process) => {
 
 it('Ensures that package do not include core-js dependency after build', async () => {
   // eslint-disable-next-line import/no-extraneous-dependencies
-  const packageJSON = require('@linaria/babel-preset/package.json');
-  const buildScript = packageJSON.scripts['build:lib'];
+  const packageJSON = require('@linaria/react/package.json');
+  const buildScript = packageJSON.scripts['build:corejs-test'];
 
   const proc = cp.exec(buildScript, {
     stdio: 'ignore',

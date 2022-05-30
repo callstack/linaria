@@ -1,7 +1,7 @@
 import type { Serializable } from '../types';
 import isBoxedPrimitive from './isBoxedPrimitive';
 
-export default function isSerializable(o: any): o is Serializable {
+export default function isSerializable(o: unknown): o is Serializable {
   return (
     (Array.isArray(o) && o.every(isSerializable)) ||
     (typeof o === 'object' &&

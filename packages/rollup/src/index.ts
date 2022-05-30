@@ -6,8 +6,12 @@
 
 import path from 'path';
 import { createFilter } from '@rollup/pluginutils';
-import { transform, slugify, Result } from '@linaria/babel-preset';
-import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
+import { transform, slugify } from '@linaria/babel-preset';
+import type {
+  PluginOptions,
+  Preprocessor,
+  Result,
+} from '@linaria/babel-preset';
 
 type RollupPluginOptions = {
   include?: string | string[];
@@ -71,7 +75,7 @@ export default function linaria({
 
       cssLookup[filename] = cssText;
       if (config?.command === 'serve' && config?.root) {
-        cssLookup['/' + path.posix.relative(config.root, filename)] = cssText;
+        cssLookup[`/${path.posix.relative(config.root, filename)}`] = cssText;
       }
 
       result.code += `\nimport ${JSON.stringify(filename)};\n`;

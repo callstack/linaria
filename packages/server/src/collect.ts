@@ -10,6 +10,26 @@ type CollectResult = {
   other: string;
 };
 
+const extractClassesFromHtml = (html: string): RegExp => {
+  const htmlClasses: string[] = [];
+  const regex = /\s+class="([^"]+)"/gm;
+  let match = regex.exec(html);
+
+  while (match !== null) {
+    match[1].split(' ').forEach((className) => {
+      // eslint-disable-next-line no-param-reassign
+      className = className.replace(
+        /\\|\^|\$|\{|\}|\[|\]|\(|\)|\.|\*|\+|\?|\|/g,
+        '\\$&'
+      );
+      htmlClasses.push(className);
+    });
+    match = regex.exec(html);
+  }
+
+  return new RegExp(htmlClasses.join('|'), 'gm');
+};
+
 export default function collect(html: string, css: string): CollectResult {
   const animations = new Set();
   const other = postcss.root();
@@ -94,22 +114,3 @@ export default function collect(html: string, css: string): CollectResult {
     other: other.toString(),
   };
 }
-
-const extractClassesFromHtml = (html: string): RegExp => {
-  const htmlClasses: string[] = [];
-  const regex = /\s+class="([^"]+)"/gm;
-  let match = regex.exec(html);
-
-  while (match !== null) {
-    match[1].split(' ').forEach((className) => {
-      className = className.replace(
-        /\\|\^|\$|\{|\}|\[|\]|\(|\)|\.|\*|\+|\?|\|/g,
-        '\\$&'
-      );
-      htmlClasses.push(className);
-    });
-    match = regex.exec(html);
-  }
-
-  return new RegExp(htmlClasses.join('|'), 'gm');
-};

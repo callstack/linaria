@@ -84,30 +84,39 @@ const cookModuleId = (rawId: string) => {
 
 class Module {
   static invalidate: () => void;
+
   static invalidateEvalCache: () => void;
+
   static _resolveFilename: (
     id: string,
     options: { id: string; filename: string; paths: string[] }
   ) => string;
+
   static _nodeModulePaths: (filename: string) => string[];
 
   id: string;
+
   filename: string;
+
   options: StrictOptions;
+
   imports: Map<string, string[]> | null;
+
   paths: string[];
-  exports: any;
+
+  exports: Record<string, unknown> | string | undefined;
+
   extensions: string[];
+
   dependencies: string[] | null;
+
   transform: ((text: string) => BabelFileResult | null) | null;
+
   debug: typeof debug;
+
   debuggerDepth: number;
 
-  constructor(
-    filename: string,
-    options: StrictOptions,
-    debuggerDepth: number = 0
-  ) {
+  constructor(filename: string, options: StrictOptions, debuggerDepth = 0) {
     this.id = filename;
     this.filename = filename;
     this.options = options;
@@ -150,7 +159,7 @@ class Module {
     const id = cookModuleId(rawId);
     const extensions = (
       NativeModule as unknown as {
-        _extensions: { [key: string]: Function };
+        _extensions: { [key: string]: () => void };
       }
     )._extensions;
     const added: string[] = [];
@@ -177,6 +186,7 @@ class Module {
   };
 
   require: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (id: string): any;
     resolve: (id: string) => string;
     ensure: () => void;
@@ -264,7 +274,7 @@ class Module {
   );
 
   evaluate(text: string, only: string[] | null = null) {
-    const filename = this.filename;
+    const { filename } = this;
     const matchedRules = this.options.rules
       .filter(({ test }) => {
         if (!test) {
@@ -272,8 +282,6 @@ class Module {
         }
 
         if (typeof test === 'function') {
-          // this is not a test
-          // eslint-disable-next-line jest/no-disabled-tests
           return test(filename);
         }
 
@@ -359,7 +367,7 @@ Module.invalidateEvalCache = () => {
 Module._resolveFilename = (id, options) =>
   (
     NativeModule as unknown as {
-      _resolveFilename: (id: string, options: any) => string;
+      _resolveFilename: typeof Module._resolveFilename;
     }
   )._resolveFilename(id, options);
 

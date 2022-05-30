@@ -4,7 +4,14 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "index.js",
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "types": "types",
+  "files": [
+    "types/",
+    "lib/",
+    "esm/"
+  ],
   "repository": "https://github.com/callstack/linaria/tree/master/packages/interop",
   "homepage": "https://github.com/callstack/linaria/tree/master/packages/interop#readme",
   "author": {
@@ -12,7 +19,14 @@
     "email": "anton@evz.name"
   },
   "scripts": {
-    "test": "jest --config ../../jest.config.js --rootDir ."
+    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build": "yarn build:lib && yarn build:esm",
+    "build:declarations": "tsc --emitDeclarationOnly --outDir types",
+    "prepare": "yarn build && yarn build:declarations",
+    "test": "jest --config ../../jest.config.js --rootDir .",
+    "typecheck": "tsc --noEmit --composite false",
+    "watch": "yarn build --watch"
   },
   "license": "MIT",
   "devDependencies": {

@@ -2,15 +2,25 @@ import { types as t } from '@babel/core';
 import type { AssignmentExpression, Node } from '@babel/types';
 import { isNode, getVisitorKeys } from '@linaria/babel-preset';
 import type { VisitorKeys } from '@linaria/babel-preset';
-import DepsGraph from './DepsGraph';
+import type DepsGraph from './DepsGraph';
 import GraphBuilderState from './GraphBuilderState';
 import { getVisitors } from './Visitors';
-import type { VisitorAction } from './types';
+import type { VisitorAction, Visitor } from './types';
 import ScopeManager from './scope';
-import { Visitor } from './types';
 
 const isVoid = (node: Node): boolean =>
   t.isUnaryExpression(node) && node.operator === 'void';
+
+function isTSExporterCall(
+  node: Node
+): node is t.CallExpression & { arguments: [t.StringLiteral, t.Identifier] } {
+  if (!t.isCallExpression(node) || node.arguments.length !== 2) {
+    return false;
+  }
+
+  // FIXME: more precisely check
+  return !(!t.isIdentifier(node.callee) || node.callee.name !== 'exporter');
+}
 
 class GraphBuilder extends GraphBuilderState {
   static build(root: Node): DepsGraph {
@@ -63,17 +73,6 @@ class GraphBuilder extends GraphBuilderState {
     return false;
   }
 
-  private isTSExporterCall(
-    node: Node
-  ): node is t.CallExpression & { arguments: [t.StringLiteral, t.Identifier] } {
-    if (!t.isCallExpression(node) || node.arguments.length !== 2) {
-      return false;
-    }
-
-    // FIXME: more precisely check
-    return !(!t.isIdentifier(node.callee) || node.callee.name !== 'exporter');
-  }
-
   /*
    * Implements a default behaviour for AST-nodes:
    * • visits every child;
@@ -83,13 +82,13 @@ class GraphBuilder extends GraphBuilderState {
    * both of them are required for evaluating the value of the expression
    */
   baseVisit<TNode extends Node>(node: TNode, ignoreDeps = false) {
-    const dependencies = [];
+    const dependencies: t.Node[] = [];
     const isExpression = t.isExpression(node);
     const keys = getVisitorKeys(node);
-    for (const key of keys) {
+    keys.forEach((key) => {
       // Ignore all types
       if (key === 'typeArguments' || key === 'typeParameters') {
-        continue;
+        return;
       }
 
       const subNode = node[key as keyof TNode];
@@ -107,7 +106,7 @@ class GraphBuilder extends GraphBuilderState {
       ) {
         dependencies.push(subNode);
       }
-    }
+    });
 
     if (isExpression && !ignoreDeps) {
       dependencies.forEach((dep) => this.graph.addEdge(node, dep));
@@ -177,7 +176,7 @@ class GraphBuilder extends GraphBuilderState {
           );
         }
       }
-    } else if (this.isTSExporterCall(node)) {
+    } else if (isTSExporterCall(node)) {
       const [name, identifier] = node.arguments;
       this.graph.addExport(name.value, node);
       this.graph.addEdge(node, identifier);
@@ -191,7 +190,7 @@ class GraphBuilder extends GraphBuilderState {
         ) {
           let currentAssignmentExpression: t.Expression = declaration.init;
           let addedExport = false;
-          let edgesToAdd = [];
+          const edgesToAdd = [];
 
           // loop through the assignments looking for possible exports
           while (t.isAssignmentExpression(currentAssignmentExpression)) {
@@ -234,6 +233,7 @@ class GraphBuilder extends GraphBuilderState {
     let action: VisitorAction;
     if (visitors.length > 0) {
       let visitor: Visitor<TNode> | undefined;
+      // eslint-disable-next-line no-cond-assign
       while (!action && (visitor = visitors.shift())) {
         const method: Visitor<TNode> = visitor.bind(this);
         action = method(node, parent, parentKey, listIdx);

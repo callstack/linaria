@@ -43,20 +43,24 @@
     "@types/cosmiconfig": "^5.0.3",
     "@types/dedent": "^0.7.0",
     "dedent": "^0.7.0",
-    "strip-ansi": "^5.2.0"
+    "strip-ansi": "^5.2.0",
+    "typescript": "*"
   },
   "dependencies": {
     "@babel/generator": ">=7",
     "@babel/plugin-syntax-dynamic-import": ">=7",
     "@babel/template": ">=7",
+    "@babel/traverse": ">=7",
     "@linaria/core": "^3.0.0-beta.18",
     "@linaria/logger": "^3.0.0-beta.15",
     "@linaria/utils": "^3.0.0-beta.18",
     "cosmiconfig": "^5.1.0",
+    "find-up": "^5.0.0",
     "source-map": "^0.7.3",
     "stylis": "^3.5.4"
   },
   "peerDependencies": {
-    "@babel/core": ">=7"
+    "@babel/core": ">=7",
+    "@babel/traverse": ">=7"
   }
 }

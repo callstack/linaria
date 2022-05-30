@@ -13,10 +13,11 @@ function shakeNode<TNode extends Node>(node: TNode, alive: Set<Node>): Node {
   const changes: Partial<TNode> = {};
   const isNodeAlive = (n: Node) => alive.has(n);
 
-  for (const key of keys) {
+  keys.forEach((key) => {
     const subNode = node[key];
 
     if (Array.isArray(subNode)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const list: any = [];
       let hasChanges = false;
       for (let i = 0; i < subNode.length; i++) {
@@ -39,13 +40,14 @@ function shakeNode<TNode extends Node>(node: TNode, alive: Set<Node>): Node {
       if (isNodeAlive(subNode)) {
         const shaken = shakeNode(subNode, alive);
         if (shaken && shaken !== subNode) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           changes[key] = shaken as any;
         }
       } else {
         changes[key] = undefined;
       }
     }
-  }
+  });
 
   return Object.keys(changes).length ? { ...node, ...changes } : node;
 }
@@ -110,7 +112,7 @@ export default function shake(
   debug('evaluator:shaker:shake', () => dumpNode(rootPath, alive));
 
   const imports = new Map<string, string[]>();
-  for (let [source, members] of depsGraph.imports.entries()) {
+  [...depsGraph.imports.entries()].forEach(([source, members]) => {
     const importType = depsGraph.importTypes.get(source);
     const defaultMembers = importType === 'wildcard' ? ['*'] : [];
     const aliveMembers = new Set(
@@ -127,7 +129,7 @@ export default function shake(
       source,
       aliveMembers.size > 0 ? Array.from(aliveMembers) : defaultMembers
     );
-  }
+  });
 
   return [shaken, imports];
 }

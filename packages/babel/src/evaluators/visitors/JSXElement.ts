@@ -1,8 +1,11 @@
 import { types as t } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
-import type { Function, JSXElement as JSXElementNode } from '@babel/types';
+import type {
+  Function as FunctionNode,
+  JSXElement as JSXElementNode,
+} from '@babel/types';
 
-function getFunctionName(path: NodePath<Function>): string | null {
+function getFunctionName(path: NodePath<FunctionNode>): string | null {
   if (path.isClassMethod() && t.isIdentifier(path.node.key)) {
     return path.node.key.name;
   }
@@ -39,7 +42,7 @@ export default function JSXElement(path: NodePath<JSXElementNode>) {
     const body = scopePath.get('body');
     if (Array.isArray(body)) {
       throw new Error(
-        `A body of a function is expected to be a single element but an array was returned. It's possible if JS syntax has been changed since that code was written.`
+        "A body of a function is expected to be a single element but an array was returned. It's possible if JS syntax has been changed since that code was written."
       );
     }
 
