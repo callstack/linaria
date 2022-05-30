@@ -1,14 +1,12 @@
-/* @flow */
-
 import { css } from '@linaria/core';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 import constants from './styles/constants';
 
-/* $FlowFixMe */
 ReactDOM.render(<App />, document.getElementById('root'));
 
+// eslint-disable-next-line import/prefer-default-export
 export const globals = css`
   :global() {
     html {

@@ -67,7 +67,7 @@ it('removes fake replacement patterns in string classNameSlug', async () => {
     \`;
 `,
     {
-      classNameSlug: `[not]_[actual]_[replacements]`,
+      classNameSlug: '[not]_[actual]_[replacements]',
     }
   );
 
@@ -524,7 +524,9 @@ it('throws when contains dynamic expression without evaluate: true in css tag', 
     );
   } catch (e) {
     expect(
-      stripAnsi(e.message.replace(__dirname, '<<DIRNAME>>'))
+      stripAnsi(
+        (e as { message: string }).message.replace(__dirname, '<<DIRNAME>>')
+      )
     ).toMatchSnapshot();
   }
 });
@@ -930,32 +932,6 @@ it('compiles atomic styled with dynamic interpolations as unique variables based
 
       `
   );
-  expect(code).toMatchSnapshot();
-  expect(metadata).toMatchSnapshot();
-});
-
-it('can re-export lib apis using a custom resolver', async () => {
-  const { code, metadata } = await transpile(
-    dedent`
-    import { css } from './my-folder';
-
-    const x = css\`
-      background: red;
-      height: 100px;
-    \`
-
-    console.log(x);
-    `,
-    {
-      libResolver: () => {
-        // In testing, since ./my-folder isn't a real folder, to match the
-        // resolution we need to return null here. In a real use case, the full
-        // file path to the correct resolution would be returned
-        return null;
-      },
-    }
-  );
-
   expect(code).toMatchSnapshot();
   expect(metadata).toMatchSnapshot();
 });

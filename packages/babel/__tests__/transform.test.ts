@@ -3,14 +3,13 @@
 import path from 'path';
 import dedent from 'dedent';
 import transform, { transformUrl } from '../src/transform';
-import evaluator from '../../extractor/src';
 
 const outputFilename = './.linaria-cache/test.css';
 
 const rules = [
   {
     test: () => true,
-    action: evaluator,
+    action: require('../../extractor/src').default,
   },
 ];
 
@@ -30,9 +29,9 @@ describe('transformUrl', () => {
   };
 
   it('should work with posix paths', () => {
-    for (const result of Object.keys(dataset)) {
+    Object.keys(dataset).forEach((result) => {
       expect(transformUrl(...dataset[result])).toBe(result);
-    }
+    });
   });
 
   it('should work with win32 paths', () => {
@@ -50,9 +49,9 @@ describe('transformUrl', () => {
       {} as Record<string, TransformUrlArgs>
     );
 
-    for (const result of Object.keys(win32Dataset)) {
+    Object.keys(win32Dataset).forEach((result) => {
       expect(transformUrl(...win32Dataset[result])).toBe(result);
-    }
+    });
   });
 });
 

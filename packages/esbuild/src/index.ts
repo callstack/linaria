@@ -8,7 +8,8 @@ import path from 'path';
 import fs from 'fs';
 import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
 import { slugify, transform } from '@linaria/babel-preset';
-import { transformSync, Plugin, TransformOptions, Loader } from 'esbuild';
+import type { Plugin, TransformOptions, Loader } from 'esbuild';
+import { transformSync } from 'esbuild';
 
 type EsbuildPluginOptions = {
   sourceMap?: boolean;
@@ -24,6 +25,7 @@ export default function linaria({
   esbuildOptions,
   ...rest
 }: EsbuildPluginOptions = {}): Plugin {
+  let options = esbuildOptions;
   return {
     name: 'linaria',
     setup(build) {
@@ -56,13 +58,13 @@ export default function linaria({
           };
         }
 
-        if (typeof esbuildOptions === 'undefined') {
-          esbuildOptions = {};
+        if (!options) {
+          options = {};
           if ('jsxFactory' in build.initialOptions) {
-            esbuildOptions.jsxFactory = build.initialOptions.jsxFactory;
+            options.jsxFactory = build.initialOptions.jsxFactory;
           }
           if ('jsxFragment' in build.initialOptions) {
-            esbuildOptions.jsxFragment = build.initialOptions.jsxFragment;
+            options.jsxFragment = build.initialOptions.jsxFragment;
           }
         }
 

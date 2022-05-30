@@ -11,7 +11,7 @@ export interface JSONObject {
   [x: string]: JSONValue;
 }
 
-export interface JSONArray extends Array<JSONValue> {}
+export type JSONArray = Array<JSONValue>;
 
 export type Serializable = JSONArray | JSONObject;
 
@@ -22,7 +22,7 @@ export enum ValueType {
   VALUE,
 }
 
-export type Value = Function | StyledMeta | string | number;
+export type Value = (() => void) | StyledMeta | string | number;
 
 export type ValueCache = Map<Expression | string, Value>;
 
@@ -39,7 +39,7 @@ export type LazyValue = {
 
 export type FunctionValue = {
   kind: ValueType.FUNCTION;
-  ex: any;
+  ex: unknown;
 };
 
 export type EvaluatedValue = {
@@ -56,7 +56,10 @@ export type ExpressionValue =
 export type Path = NodePath<TaggedTemplateExpression>;
 
 export type TemplateExpression = {
-  styled?: { component: any; type: 'atomic-styled' | 'styled' };
+  styled?: {
+    component: NodePath<Expression>;
+    type: 'atomic-styled' | 'styled';
+  };
   path: Path;
   expressionValues: ExpressionValue[];
 };
@@ -94,12 +97,6 @@ export type State = {
       filename: string;
     };
     metadata: {
-      localName?: {
-        styled?: string;
-        coreCss?: string;
-        atomicCss?: string;
-        atomicStyled?: string;
-      };
       linaria?: {
         rules: Rules;
         replacements: Replacements;

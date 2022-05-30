@@ -24,10 +24,10 @@ import type {
   LazyValue,
   ExpressionValue,
   ValueCache,
+  Value,
 } from './types';
 import { ValueType } from './types';
 import CollectDependencies from './visitors/CollectDependencies';
-import DetectLinariaImportName from './visitors/DetectLinariaImportName';
 import GenerateClassNames from './visitors/GenerateClassNames';
 import type { Core } from './babel';
 
@@ -74,9 +74,9 @@ const expressionWrapperTpl = statement(`
   };
 `);
 
-const expressionTpl = expression(`%%wrapName%%(() => %%expression%%)`);
+const expressionTpl = expression('%%wrapName%%(() => %%expression%%)');
 const exportsLinariaPrevalTpl = statement(
-  `exports.__linariaPreval = %%expressions%%`
+  'exports.__linariaPreval = %%expressions%%'
 );
 
 function addLinariaPreval(
@@ -90,7 +90,7 @@ function addLinariaPreval(
     expressionWrapperTpl({ wrapName }),
     exportsLinariaPrevalTpl({
       expressions: t.arrayExpression(
-        lazyDeps.map((expression) => expressionTpl({ expression, wrapName }))
+        lazyDeps.map((exp) => expressionTpl({ expression: exp, wrapName }))
       ),
     }),
   ];
@@ -128,7 +128,6 @@ export default function extract(
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
-            ImportDeclaration: (p) => DetectLinariaImportName(babel, p, state),
             TaggedTemplateExpression: (p) => {
               GenerateClassNames(babel, p, state, options);
               CollectDependencies(babel, p, state, options);
@@ -150,7 +149,7 @@ export default function extract(
 
           debug('lazy-deps:count', lazyDeps.length);
 
-          let lazyValues: any[] = [];
+          let lazyValues: Value[] = [];
 
           if (expressionsToEvaluate.length > 0) {
             debug(
@@ -182,15 +181,16 @@ export default function extract(
               debug('lazy-deps:sub-files', evaluation.dependencies);
 
               state.dependencies.push(...evaluation.dependencies);
-              lazyValues = evaluation.value.__linariaPreval || [];
-              debug('lazy-deps:values', evaluation.value.__linariaPreval);
+              lazyValues =
+                evaluation.value && typeof evaluation.value !== 'string'
+                  ? (evaluation.value?.__linariaPreval as Value[]) || []
+                  : [];
+              debug('lazy-deps:values', lazyValues);
             } catch (e: unknown) {
               error('lazy-deps:evaluate:error', code);
               if (e instanceof Error) {
                 throw new Error(
-                  'An unexpected runtime error occurred during dependencies evaluation: \n' +
-                    e.stack +
-                    '\n\nIt may happen when your code or third party module is invalid or uses identifiers not available in Node environment, eg. window. \n' +
+                  `An unexpected runtime error occurred during dependencies evaluation: \n${e.stack}\n\nIt may happen when your code or third party module is invalid or uses identifiers not available in Node environment, eg. window. \n` +
                     'Note that line numbers in above stack trace will most likely not match, because Linaria needed to transform your code a bit.\n'
                 );
               } else {
@@ -205,7 +205,7 @@ export default function extract(
           );
           state.queue.forEach((item) => process(item, state, valueCache));
         },
-        exit(_: any, state: State) {
+        exit(_: unknown, state: State) {
           if (Object.keys(state.rules).length) {
             // Store the result as the file metadata under linaria key
             state.file.metadata.linaria = {

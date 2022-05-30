@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import { types as t } from '@babel/core';
 import invariant from 'ts-invariant';
 
@@ -13,8 +14,8 @@ const ResolvedNode = Symbol('ResolvedNode');
 const functionScopes = new WeakSet<Scope>();
 
 export class PromisedNode<T = t.Node> {
-  static is<TNode>(obj: any): obj is PromisedNode<TNode> {
-    return obj && ResolvedNode in obj;
+  static is<TNode>(obj: unknown): obj is PromisedNode<TNode> {
+    return typeof obj === 'object' && obj !== null && ResolvedNode in obj;
   }
 
   [ResolvedNode]: T | undefined;
@@ -37,11 +38,11 @@ const getExportName = (node: t.Node): string => {
   const { object, property } = node;
   invariant(
     t.isIdentifier(object) && object.name === 'exports',
-    `getExportName expects a member expression with 'exports'`
+    "getExportName expects a member expression with 'exports'"
   );
   invariant(
     t.isIdentifier(property) || t.isStringLiteral(property),
-    `getExportName supports only identifiers and literals as names of exported values`
+    'getExportName supports only identifiers and literals as names of exported values'
   );
 
   const name = t.isIdentifier(property) ? property.name : property.value;
@@ -60,11 +61,17 @@ const globalIdentifiers = new Set(['exports', 'module']);
 
 export default class ScopeManager {
   public static globalExportsIdentifier = t.identifier('exports');
+
   public static globalModuleIdentifier = t.identifier('module');
+
   private nextId = 0;
+
   private readonly stack: Array<Scope> = [];
+
   private readonly map: Map<ScopeId, Scope> = new Map();
+
   private readonly handlers: Map<ScopeId, Array<DeclareHandler>> = new Map();
+
   private readonly declarations: Map<
     string,
     t.Identifier | t.MemberExpression | PromisedNode<t.Identifier>
@@ -80,6 +87,7 @@ export default class ScopeManager {
     this.declare(ScopeManager.globalModuleIdentifier, false);
   }
 
+  // eslint-disable-next-line no-plusplus
   new(isFunction: boolean, scopeId: ScopeId = this.nextId++): Scope {
     const scope: Scope = new Map();
     if (isFunction) {
@@ -166,7 +174,7 @@ export default class ScopeManager {
   }
 
   whereIsDeclared(identifier: t.Identifier): ScopeId | undefined {
-    const name = identifier.name;
+    const { name } = identifier;
     const scope = this.stack.find(
       (s) => s.has(name) && s.get(name)!.has(identifier)
     );

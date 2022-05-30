@@ -1,9 +1,9 @@
 import cp from 'child_process';
 
-const waitForProcess = async (process) => {
+const waitForProcess = async (process: cp.ChildProcess) => {
   return new Promise((resolve) => {
     let output = '';
-    process.stdout.on('data', (chunk) => {
+    process.stdout?.on('data', (chunk) => {
       output += chunk.toString();
     });
     process.on('close', () => {
@@ -14,11 +14,10 @@ const waitForProcess = async (process) => {
 
 it('Ensures that package do not include core-js dependency after build', async () => {
   // eslint-disable-next-line import/no-extraneous-dependencies
-  const packageJSON = require('@linaria/babel-preset/package.json');
-  const buildScript = packageJSON.scripts['build:lib'];
+  const packageJSON = require('@linaria/core/package.json');
+  const buildScript = packageJSON.scripts['build:corejs-test'];
 
   const proc = cp.exec(buildScript, {
-    stdio: 'ignore',
     env: {
       ...process.env,
       DEBUG_CORE_JS: 'true',

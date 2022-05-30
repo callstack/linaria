@@ -1,5 +1,7 @@
 import { types as t } from '@babel/core';
-import ScopeManager, { PromisedNode, resolveNode } from './scope';
+import type { PromisedNode } from './scope';
+import type ScopeManager from './scope';
+import { resolveNode } from './scope';
 
 type Action = (this: DepsGraph, a: t.Node, b: t.Node) => void;
 
@@ -26,17 +28,24 @@ function addEdge(this: DepsGraph, a: t.Node, b: t.Node) {
 export default class DepsGraph {
   public readonly imports: Map<string, (t.Identifier | t.StringLiteral)[]> =
     new Map();
+
   public readonly importAliases: Map<t.Identifier, string> = new Map();
+
   public readonly importTypes: Map<
     string,
     'wildcard' | 'default' | 'reexport'
   > = new Map();
+
   public readonly reexports: Array<t.Identifier> = [];
 
   protected readonly parents: WeakMap<t.Node, t.Node> = new WeakMap();
+
   protected readonly edges: Array<[t.Node, t.Node]> = [];
+
   protected readonly exports: Map<string, t.Node> = new Map();
+
   protected readonly dependencies: Map<t.Node, Set<t.Node>> = new Map();
+
   protected readonly dependents: Map<t.Node, Set<t.Node>> = new Map();
 
   private actionQueue: Array<
@@ -48,13 +57,13 @@ export default class DepsGraph {
       return;
     }
 
-    for (const [action, a, b] of this.actionQueue) {
+    this.actionQueue.forEach(([action, a, b]) => {
       const resolvedA = resolveNode(a);
       const resolvedB = resolveNode(b);
       if (resolvedA && resolvedB) {
         action.call(this, resolvedA, resolvedB);
       }
-    }
+    });
 
     this.actionQueue = [];
   }
@@ -97,12 +106,12 @@ export default class DepsGraph {
   getDependenciesByBinding(id: string) {
     this.processQueue();
     const allReferences = this.getAllReferences(id);
-    const dependencies = [];
-    for (let [a, b] of this.edges) {
+    const dependencies: t.Node[] = [];
+    this.edges.forEach(([a, b]) => {
       if (t.isIdentifier(a) && allReferences.includes(a)) {
         dependencies.push(b);
       }
-    }
+    });
 
     return dependencies;
   }
@@ -110,16 +119,17 @@ export default class DepsGraph {
   getDependentsByBinding(id: string) {
     this.processQueue();
     const allReferences = this.getAllReferences(id);
-    const dependents = [];
-    for (let [a, b] of this.edges) {
+    const dependents: t.Node[] = [];
+    this.edges.forEach(([a, b]) => {
       if (t.isIdentifier(b) && allReferences.includes(b)) {
         dependents.push(a);
       }
-    }
+    });
 
     return dependents;
   }
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   findDependencies(like: Object) {
     this.processQueue();
     return this.edges

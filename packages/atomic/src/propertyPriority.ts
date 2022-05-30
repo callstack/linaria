@@ -202,9 +202,5 @@ export function getPropertyPriority(property: string) {
     []
   );
 
-  if (longhands.includes(property)) {
-    return 2;
-  } else {
-    return 1;
-  }
+  return longhands.includes(property) ? 2 : 1;
 }

@@ -8,7 +8,7 @@ import type {
 } from '@babel/types';
 
 type Hooks = {
-  [key: string]: (node: any) => string | number;
+  [T in Node['type']]?: (node: Node & { type: T }) => string | number;
 };
 
 const hooks: Hooks = {
@@ -18,7 +18,7 @@ const hooks: Hooks = {
   StringLiteral: (node: StringLiteral) => node.value,
 };
 
-function isNode(obj: any): obj is Node {
+function isNode(obj: unknown): obj is Node {
   return !!obj;
 }
 
@@ -37,7 +37,8 @@ export default function dumpNode<T extends Node>(
         }`;
 
   const { type } = node;
-  result += `${prefix}${type}${type in hooks ? ` ${hooks[type](node)}` : ''}`;
+  const hook = hooks[type] as ((node: T) => string | number) | undefined;
+  result += `${prefix}${type}${hook ? hook(node) : ''}`;
 
   if (alive) {
     result += alive.has(node) ? ' ✅' : ' ❌';
@@ -45,7 +46,7 @@ export default function dumpNode<T extends Node>(
 
   result += '\n';
   const keys = t.VISITOR_KEYS[type] as Array<keyof T>;
-  for (const key of keys) {
+  keys.forEach((key) => {
     const subNode = node[key];
 
     result += `${'| '.repeat(level)}|-${key}\n`;
@@ -57,7 +58,7 @@ export default function dumpNode<T extends Node>(
     } else if (isNode(subNode)) {
       result += dumpNode(subNode, alive, level + 2);
     }
-  }
+  });
 
   return result;
 }

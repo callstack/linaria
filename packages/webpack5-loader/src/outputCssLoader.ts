@@ -1,5 +1,6 @@
-import webpack from 'webpack';
-import { getCacheInstance, ICache } from './cache';
+import type webpack from 'webpack';
+import type { ICache } from './cache';
+import { getCacheInstance } from './cache';
 
 export default function outputCssLoader(
   this: webpack.LoaderContext<{ cacheProvider: string | ICache | undefined }>

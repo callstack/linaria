@@ -1,0 +1,166 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`styled-components css 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+exports.default = void 0;
+
+var _styledComponents = require(\\"styled-components\\");
+
+var _Title = _interopRequireDefault(require(\\"./Title\\"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = (0, _styledComponents.css)\`
+  & > \${(i => i && i.__linaria ? '.' + i.__linaria.className : i)(_Title.default)} {
+    color: red;
+  }
+\`;
+
+exports.default = _default;"
+`;
+
+exports[`styled-components keeps linaria 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require(\\"linaria/react\\"));
+
+var _Title = _interopRequireDefault(require(\\"./Title\\"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = _react.default.h1\`
+  & > \${_Title.default} {
+    color: red;
+  }
+\`;
+
+exports.default = _default;"
+`;
+
+exports[`styled-components member expression as selector 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+exports.default = void 0;
+
+var _styledComponents = _interopRequireDefault(require(\\"styled-components\\"));
+
+var _Title = _interopRequireDefault(require(\\"./Title\\"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = _styledComponents.default.h1\`
+  & > \${(i => i && i.__linaria ? '.' + i.__linaria.className : i)(_Title.default.Small)} {
+    color: red;
+  }
+\`;
+
+exports.default = _default;"
+`;
+
+exports[`styled-components styled(Cmp) 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+exports.default = void 0;
+
+var _styledComponents = _interopRequireDefault(require(\\"styled-components\\"));
+
+var _Cmp = _interopRequireDefault(require(\\"./Cmp\\"));
+
+var _Title = _interopRequireDefault(require(\\"./Title\\"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = (0, _styledComponents.default)(_Cmp.default)\`
+  & > \${(i => i && i.__linaria ? '.' + i.__linaria.className : i)(_Title.default)} {
+    color: red;
+  }
+\`;
+
+exports.default = _default;"
+`;
+
+exports[`styled-components styled(Cmp).attrs({}) 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+exports.default = void 0;
+
+var _styledComponents = _interopRequireDefault(require(\\"styled-components\\"));
+
+var _Cmp = _interopRequireDefault(require(\\"./Cmp\\"));
+
+var _Title = _interopRequireDefault(require(\\"./Title\\"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = (0, _styledComponents.default)(_Cmp.default).attrs(() => ({}))\`
+  & > \${(i => i && i.__linaria ? '.' + i.__linaria.className : i)(_Title.default)} {
+    color: red;
+  }
+\`;
+
+exports.default = _default;"
+`;
+
+exports[`styled-components styled.h1 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+exports.default = void 0;
+
+var _styledComponents = _interopRequireDefault(require(\\"styled-components\\"));
+
+var _Title = _interopRequireDefault(require(\\"./Title\\"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = _styledComponents.default.h1\`
+  & > \${(i => i && i.__linaria ? '.' + i.__linaria.className : i)(_Title.default)} {
+    color: red;
+  }
+\`;
+
+exports.default = _default;"
+`;
+
+exports[`styled-components styled.h1.attrs({}) 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+exports.default = void 0;
+
+var _styledComponents = _interopRequireDefault(require(\\"styled-components\\"));
+
+var _Title = _interopRequireDefault(require(\\"./Title\\"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = _styledComponents.default.h1.attrs(() => ({}))\`
+  & > \${(i => i && i.__linaria ? '.' + i.__linaria.className : i)(_Title.default)} {
+    color: red;
+  }
+\`;
+
+exports.default = _default;"
+`;

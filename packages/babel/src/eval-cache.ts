@@ -2,12 +2,15 @@ import { createHash } from 'crypto';
 import { debug } from '@linaria/logger';
 
 const fileHashes = new Map<string, string>();
-const evalCache = new Map<string, any>();
+const evalCache = new Map<
+  string,
+  Record<string, unknown> | string | undefined
+>();
 const fileKeys = new Map<string, string[]>();
 
 const hash = (text: string) => createHash('sha1').update(text).digest('base64');
 
-let lastText: string = '';
+let lastText = '';
 let lastHash: string = hash(lastText);
 
 const memoizedHash: typeof hash = (text) => {
@@ -36,10 +39,10 @@ export const clearForFile = (filename: string) => {
 
   debug('eval-cache:clear-for-file', filename);
 
-  for (const key of keys) {
+  keys.forEach((key) => {
     fileHashes.delete(key);
     evalCache.delete(key);
-  }
+  });
 
   fileKeys.set(filename, []);
 };
@@ -55,7 +58,10 @@ export const has = (
   return fileHashes.get(key) === textHash;
 };
 
-export const get = ([filename, ...exports]: string[], text: string): any => {
+export const get = (
+  [filename, ...exports]: string[],
+  text: string
+): Record<string, unknown> | string | undefined => {
   const key = toKey(filename, exports);
   const textHash = memoizedHash(text);
   debug('eval-cache:get', `${key} ${textHash}`);
@@ -70,7 +76,7 @@ export const get = ([filename, ...exports]: string[], text: string): any => {
 export const set = (
   [filename, ...exports]: string[],
   text: string,
-  value: any
+  value: Record<string, unknown> | string | undefined
 ): void => {
   const key = toKey(filename, exports);
   const textHash = memoizedHash(text);

@@ -1,11 +1,11 @@
 import type { Import } from '@babel/types';
-import type { NodePath } from '@babel/traverse';
+import type { NodePath, Visitor } from '@babel/traverse';
+// @ts-expect-error
 import syntax from '@babel/plugin-syntax-dynamic-import';
-import type { Visitor } from '@babel/traverse';
-import { Core } from './babel';
+import type { Core } from './babel';
 
 export default function dynamic({ types: t }: Core): {
-  inherits: any;
+  inherits: unknown;
   visitor: Visitor;
 } {
   return {

@@ -1,5 +1,3 @@
-/* @flow */
-
 import { css } from '@linaria/core';
 import { css as atomicCss } from '@linaria/atomic';
 

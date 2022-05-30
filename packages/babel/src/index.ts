@@ -29,7 +29,6 @@ export { default as getVisitorKeys } from './utils/getVisitorKeys';
 export type { VisitorKeys } from './utils/getVisitorKeys';
 export { default as peek } from './utils/peek';
 export { default as CollectDependencies } from './visitors/CollectDependencies';
-export { default as DetectLinariaImportName } from './visitors/DetectLinariaImportName';
 export { default as GenerateClassNames } from './visitors/GenerateClassNames';
 
 function isEnabled(caller?: TransformCaller & { evaluate?: true }) {
@@ -42,6 +41,7 @@ export default function linaria(babel: ConfigAPI, options: PluginOptions) {
   }
   debug('options', JSON.stringify(options));
   return {
+    // eslint-disable-next-line global-require
     plugins: [[require('./extract'), loadOptions(options)]],
   };
 }

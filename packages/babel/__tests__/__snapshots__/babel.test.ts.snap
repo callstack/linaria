@@ -1,24 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`can re-export lib apis using a custom resolver 1`] = `
-"import { css } from './my-folder';
-const x = \\"x17gu1mi\\";
-console.log(x);"
-`;
-
-exports[`can re-export lib apis using a custom resolver 2`] = `
-
-CSS:
-
-.x17gu1mi {
-  background: red;
-  height: 100px;
-}
-
-Dependencies: NA
-
-`;
-
 exports[`compiles atomic css 1`] = `
 "/* @flow */
 import { css } from '@linaria/atomic';
@@ -856,12 +837,12 @@ const StyledComponent2 = /*#__PURE__*/reactStyled(StyledComponent)({
   name: \\"StyledComponent2\\",
   class: \\"sccybe9\\"
 });
-const AtomicComponent = /*#__PURE__*/reactStyled(\\"div\\")({
+const AtomicComponent = /*#__PURE__*/atomicStyled(\\"div\\")({
   name: \\"AtomicComponent\\",
   class: \\"atm_26_5scuol aw1s2ox\\",
   atomic: true
 });
-const AtomicComponent2 = /*#__PURE__*/reactStyled(AtomicComponent)({
+const AtomicComponent2 = /*#__PURE__*/atomicStyled(AtomicComponent)({
   name: \\"AtomicComponent2\\",
   class: \\"atm_26_13q2bts a1080ijw\\",
   atomic: true

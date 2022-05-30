@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 /**
  * This file contains a utility to generate hashes to be used as generated class names
  */
@@ -8,7 +9,28 @@
  * murmurhash2 via https://gist.github.com/raycmorgan/588423
  */
 
-function doHash(str: string, seed: number = 0) {
+function UInt32(str: string, pos: number) {
+  return (
+    str.charCodeAt(pos++) +
+    (str.charCodeAt(pos++) << 8) +
+    (str.charCodeAt(pos++) << 16) +
+    (str.charCodeAt(pos) << 24)
+  );
+}
+
+function UInt16(str: string, pos: number) {
+  return str.charCodeAt(pos++) + (str.charCodeAt(pos++) << 8);
+}
+
+function Umul32(n: number, m: number) {
+  n |= 0;
+  m |= 0;
+  const nlo = n & 0xffff;
+  const nhi = n >>> 16;
+  return (nlo * m + (((nhi * m) & 0xffff) << 16)) | 0;
+}
+
+function doHash(str: string, seed = 0) {
   const m = 0x5bd1e995;
   const r = 24;
   let h = seed ^ str.length;
@@ -52,28 +74,6 @@ function doHash(str: string, seed: number = 0) {
   h ^= h >>> 15;
 
   return h >>> 0;
-}
-
-function UInt32(str: string, pos: number) {
-  return (
-    str.charCodeAt(pos++) +
-    (str.charCodeAt(pos++) << 8) +
-    (str.charCodeAt(pos++) << 16) +
-    (str.charCodeAt(pos) << 24)
-  );
-}
-
-function UInt16(str: string, pos: number) {
-  return str.charCodeAt(pos++) + (str.charCodeAt(pos++) << 8);
-}
-
-function Umul32(n: number, m: number) {
-  n |= 0;
-  m |= 0;
-  const nlo = n & 0xffff;
-  const nhi = n >>> 16;
-  const res = (nlo * m + (((nhi * m) & 0xffff) << 16)) | 0;
-  return res;
 }
 
 function slugify(code: string) {

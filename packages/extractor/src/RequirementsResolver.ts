@@ -67,7 +67,7 @@ export default class RequirementsResolver {
             binding.path.parentPath.node.source
           );
         } else {
-          result = binding.path.parentPath.node as Statement;
+          result = binding.path.parentPath?.node as Statement;
         }
         break;
       case 'const':
@@ -120,8 +120,7 @@ export default class RequirementsResolver {
       path.isReferenced() &&
       binding &&
       !this.isAdded(binding.path) &&
-      // @ts-ignore binding.kind can be param
-      binding.kind !== 'param'
+      (binding.kind as unknown) !== 'param'
     ) {
       this.resolveBinding(binding);
       return binding;
@@ -163,7 +162,7 @@ export default class RequirementsResolver {
    */
   private get statements(): Statement[] {
     const statements: Statement[] = [];
-    let requirements = this.requirements;
+    let { requirements } = this;
     while (requirements.length > 0) {
       // On each step, we add to the result list only that statements
       // which don't have any dependencies (`zeroDeps`)
@@ -202,9 +201,8 @@ export default class RequirementsResolver {
     statements.sort((a, b) => {
       if (a.start && b.start) {
         return b.start - a.start;
-      } else {
-        return 0;
       }
+      return 0;
     });
 
     return statements;

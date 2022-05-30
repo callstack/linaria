@@ -41,6 +41,7 @@
     "@types/enhanced-resolve": "^3.0.6",
     "@types/loader-utils": "^1.1.3",
     "@types/mkdirp": "^0.5.2",
+    "@types/webpack": "^4.41.26",
     "source-map": "^0.7.3"
   },
   "dependencies": {
@@ -51,6 +52,7 @@
     "mkdirp": "^0.5.1"
   },
   "peerDependencies": {
-    "@babel/core": ">=7"
+    "@babel/core": ">=7",
+    "webpack": "^4.0.0"
   }
 }

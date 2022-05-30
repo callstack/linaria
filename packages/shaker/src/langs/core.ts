@@ -8,7 +8,7 @@ import type {
   ExpressionStatement,
   ForInStatement,
   ForStatement,
-  Function,
+  Function as FunctionNode,
   Identifier,
   IfStatement,
   MemberExpression,
@@ -26,9 +26,9 @@ import type {
 
 import { peek } from '@linaria/babel-preset';
 import type { IdentifierHandlers, Visitors } from '../types';
-import GraphBuilderState from '../GraphBuilderState';
+import type GraphBuilderState from '../GraphBuilderState';
 import ScopeManager from '../scope';
-import DepsGraph from '../DepsGraph';
+import type DepsGraph from '../DepsGraph';
 
 function isIdentifier(
   node: Node,
@@ -145,10 +145,10 @@ function findWildcardReexportStatement(
 
       if (!t.isExpressionStatement(statement)) return false;
 
-      const expression = statement.expression;
+      const { expression } = statement;
       if (!t.isCallExpression(expression)) return false;
 
-      const callee = expression.callee;
+      const { callee } = expression;
       if (!t.isMemberExpression(callee)) return false;
 
       const { object, property } = callee;
@@ -301,7 +301,7 @@ export const visitors: Visitors = {
    * In general, a body depends on parameters of a function.
    * In real life, some of the parameters can be omitted, but it's not trivial to implement that type of tree shaking.
    */
-  Function(this: GraphBuilderState, node: Function) {
+  Function(this: GraphBuilderState, node: FunctionNode) {
     const unsubscribe = this.onVisit((descendant) =>
       this.graph.addEdge(node, descendant)
     );
@@ -680,59 +680,57 @@ export const visitors: Visitors = {
       }
 
       // Define all declared variables as external dependencies.
-      declared.forEach(([local, _imported]) =>
+      declared.forEach(([local]) => {
         // FIXME: var slugify = require('../slugify').default;
-        {
-          if (!this.graph.imports.has(source)) {
-            this.graph.imports.set(source, []);
-          }
-
-          if (
-            parent &&
-            t.isMemberExpression(parent) &&
-            t.isIdentifier(parent.property)
-          ) {
-            // An imported function is specified right here.
-            // eg. require('../slugify').default
-            this.graph.imports.get(source)!.push(parent.property);
-          } else {
-            if (
-              t.isCallExpression(parent) &&
-              t.isIdentifier(parent.callee) &&
-              typeof parent.callee.name === 'string'
-            ) {
-              if (parent.callee.name.startsWith('_interopRequireDefault')) {
-                this.graph.importTypes.set(source, 'default');
-              } else if (
-                parent.callee.name.startsWith('_interopRequireWildcard')
-              ) {
-                this.graph.importTypes.set(source, 'wildcard');
-              } else {
-                // What I've missed?
-              }
-            }
-
-            // Do we know the type of import?
-            if (!this.graph.importTypes.has(source)) {
-              // Is it a wildcard reexport? Let's check.
-              const statement = findWildcardReexportStatement(
-                node,
-                local.name,
-                this.graph
-              );
-              if (statement) {
-                this.graph.addEdge(local, statement);
-                this.graph.reexports.push(local);
-                this.graph.importTypes.set(source, 'reexport');
-              }
-            }
-
-            // The whole namespace was imported. We will know later, what exactly we need.
-            // eg. const slugify = require('../slugify');
-            this.graph.importAliases.set(local, source);
-          }
+        if (!this.graph.imports.has(source)) {
+          this.graph.imports.set(source, []);
         }
-      );
+
+        if (
+          parent &&
+          t.isMemberExpression(parent) &&
+          t.isIdentifier(parent.property)
+        ) {
+          // An imported function is specified right here.
+          // eg. require('../slugify').default
+          this.graph.imports.get(source)!.push(parent.property);
+        } else {
+          if (
+            t.isCallExpression(parent) &&
+            t.isIdentifier(parent.callee) &&
+            typeof parent.callee.name === 'string'
+          ) {
+            if (parent.callee.name.startsWith('_interopRequireDefault')) {
+              this.graph.importTypes.set(source, 'default');
+            } else if (
+              parent.callee.name.startsWith('_interopRequireWildcard')
+            ) {
+              this.graph.importTypes.set(source, 'wildcard');
+            } else {
+              // What I've missed?
+            }
+          }
+
+          // Do we know the type of import?
+          if (!this.graph.importTypes.has(source)) {
+            // Is it a wildcard reexport? Let's check.
+            const statement = findWildcardReexportStatement(
+              node,
+              local.name,
+              this.graph
+            );
+            if (statement) {
+              this.graph.addEdge(local, statement);
+              this.graph.reexports.push(local);
+              this.graph.importTypes.set(source, 'reexport');
+            }
+          }
+
+          // The whole namespace was imported. We will know later, what exactly we need.
+          // eg. const slugify = require('../slugify');
+          this.graph.importAliases.set(local, source);
+        }
+      });
 
       return;
     }
@@ -745,7 +743,7 @@ export const visitors: Visitors = {
         return;
       }
 
-      return callback(node, this);
+      callback(node, this);
     });
 
     getAffectedNodes(node, this).forEach((affectedNode) => {

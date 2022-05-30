@@ -45,6 +45,9 @@
     "@linaria/babel-preset": "^3.0.0-beta.18",
     "@linaria/preeval": "^3.0.0-beta.18"
   },
+  "devDependencies": {
+    "dedent": "^0.7.0"
+  },
   "peerDependencies": {
     "@babel/core": ">=7"
   }

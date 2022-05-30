@@ -2,7 +2,7 @@
 
 import dedent from 'dedent';
 import * as babel from '@babel/core';
-import buildDepsGraph from '../../shaker/src/graphBuilder';
+import buildDepsGraph from '../src/graphBuilder';
 
 function _build(literal: TemplateStringsArray, ...placeholders: string[]) {
   const code = dedent(literal, ...placeholders);

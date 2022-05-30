@@ -8,7 +8,8 @@ import path from 'path';
 import loaderUtils from 'loader-utils';
 import enhancedResolve from 'enhanced-resolve';
 import type { RawSourceMap } from 'source-map';
-import { EvalCache, Module, Result, transform } from '@linaria/babel-preset';
+import type { Result } from '@linaria/babel-preset';
+import { EvalCache, Module, transform } from '@linaria/babel-preset';
 import { debug, notify } from '@linaria/logger';
 import { getCacheInstance } from './cache';
 
@@ -103,9 +104,9 @@ export default function webpack4Loader(
   try {
     // Use webpack's resolution when evaluating modules
     Module._resolveFilename = (id, { filename }) => {
-      const result = resolveSync(path.dirname(filename), id);
-      this.addDependency(result);
-      return result;
+      const res = resolveSync(path.dirname(filename), id);
+      this.addDependency(res);
+      return res;
     };
 
     result = transform(content, {

@@ -1,5 +1,8 @@
 import type { Node } from '@babel/types';
 
-const isNode = (obj: any): obj is Node => obj?.type !== undefined;
+const isNode = (obj: unknown): obj is Node =>
+  typeof obj === 'object' &&
+  obj !== null &&
+  (obj as { type: unknown })?.type !== undefined;
 
 export default isNode;

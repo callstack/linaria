@@ -4,14 +4,13 @@
  * invoke RequirementsResolver to get parts of code that needs to be executed in order to evaluate the dependency.
  */
 
-import { traverse, types as t } from '@babel/core';
+import { traverse, types as t, parseSync, transformSync } from '@babel/core';
 import type {
   ExpressionStatement,
   MemberExpression,
   Program,
   SequenceExpression,
 } from '@babel/types';
-import { parseSync, transformSync } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import generator from '@babel/generator';
 
@@ -20,14 +19,14 @@ import { buildOptions } from '@linaria/babel-preset';
 import RequirementsResolver from './RequirementsResolver';
 
 function isMemberExpression(
-  path: NodePath<any> | NodePath<any>[]
+  path: NodePath | NodePath[]
 ): path is NodePath<MemberExpression> {
   return !Array.isArray(path) && path.isMemberExpression();
 }
 
 // Checks that passed node is `exports.__linariaPreval = /* something */`
 function isLinariaPrevalExport(
-  path: NodePath<any>
+  path: NodePath
 ): path is NodePath<ExpressionStatement> {
   if (!path.isExpressionStatement()) {
     return false;
@@ -93,7 +92,7 @@ const extractor: Evaluator = (filename, options, text, only = null) => {
   // because there is some kind of cache inside `traverse` which
   // reuses `NodePath` with a wrong scope.
   // There is probably a better solution, but I haven't found it yet.
-  const ast = parseSync(code!, { filename: filename + '.preval' });
+  const ast = parseSync(code!, { filename: `${filename}.preval` });
   // First of all, let's find a __linariaPreval export
   traverse(ast!, {
     // We know that export has been added to the program body,

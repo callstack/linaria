@@ -10,7 +10,7 @@ import glob from 'glob';
 import yargs from 'yargs';
 import { transform } from '@linaria/babel-preset';
 
-const { argv } = yargs
+const argv = yargs
   .usage('Usage: $0 [options] <files ...>')
   .option('config', {
     alias: 'c',
@@ -54,16 +54,8 @@ const { argv } = yargs
   })
   .alias('help', 'h')
   .alias('version', 'v')
-  .strict();
-
-processFiles(argv._, {
-  outDir: argv['out-dir'],
-  sourceMaps: argv['source-maps'],
-  sourceRoot: argv['source-root'],
-  insertCssRequires: argv['insert-css-requires'],
-  configFile: argv.config,
-  ignore: argv.ignore,
-});
+  .strict()
+  .parseSync();
 
 type Options = {
   outDir: string;
@@ -74,13 +66,33 @@ type Options = {
   ignore?: string;
 };
 
-function processFiles(files: string[], options: Options) {
+function resolveRequireInsertionFilename(filename: string) {
+  return filename.replace(/\.tsx?/, '.js');
+}
+
+function resolveOutputFilename(
+  filename: string,
+  outDir: string,
+  sourceRoot: string
+) {
+  const outputFolder = path.relative(sourceRoot, path.dirname(filename));
+  const outputBasename = path
+    .basename(filename)
+    .replace(path.extname(filename), '.css');
+
+  return path.join(outDir, outputFolder, outputBasename);
+}
+
+function processFiles(files: (number | string)[], options: Options) {
   let count = 0;
 
   const resolvedFiles = files.reduce(
     (acc, pattern) => [
       ...acc,
-      ...glob.sync(pattern, { absolute: true, ignore: options.ignore }),
+      ...glob.sync(pattern.toString(), {
+        absolute: true,
+        ignore: options.ignore,
+      }),
     ],
     [] as string[]
   );
@@ -152,7 +164,7 @@ function processFiles(files: string[], options: Options) {
         }
       }
 
-      count++;
+      count += 1;
     }
   });
 
@@ -160,19 +172,11 @@ function processFiles(files: string[], options: Options) {
   console.log(`Successfully extracted ${count} CSS files.`);
 }
 
-function resolveRequireInsertionFilename(filename: string) {
-  return filename.replace(/\.tsx?/, '.js');
-}
-
-function resolveOutputFilename(
-  filename: string,
-  outDir: string,
-  sourceRoot: string
-) {
-  const outputFolder = path.relative(sourceRoot, path.dirname(filename));
-  const outputBasename = path
-    .basename(filename)
-    .replace(path.extname(filename), '.css');
-
-  return path.join(outDir, outputFolder, outputBasename);
-}
+processFiles(argv._, {
+  outDir: argv['out-dir'],
+  sourceMaps: argv['source-maps'],
+  sourceRoot: argv['source-root'],
+  insertCssRequires: argv['insert-css-requires'],
+  configFile: argv.config,
+  ignore: argv.ignore,
+});

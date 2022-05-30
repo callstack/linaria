@@ -29,7 +29,6 @@ type TranspileFn = (
   conf?: (original: babel.TransformOptions) => babel.TransformOptions
 ) => Promise<babel.BabelFileResult>;
 
-// eslint-disable-next-line jest/no-export
 export function run(
   dirname: string,
   evaluator: Evaluator,
@@ -151,7 +150,9 @@ export function run(
       );
     } catch (e) {
       expect(
-        stripAnsi(e.message.replace(dirname, '<<DIRNAME>>'))
+        stripAnsi(
+          (e as { message: string }).message.replace(dirname, '<<DIRNAME>>')
+        )
       ).toMatchSnapshot();
     }
   });
@@ -371,7 +372,9 @@ export function run(
       );
     } catch (e) {
       expect(
-        stripAnsi(e.message.replace(dirname, '<<DIRNAME>>'))
+        stripAnsi(
+          (e as { message: string }).message.replace(dirname, '<<DIRNAME>>')
+        )
       ).toMatchSnapshot();
     }
   });
@@ -393,7 +396,9 @@ export function run(
       );
     } catch (e) {
       expect(
-        stripAnsi(e.message.replace(dirname, '<<DIRNAME>>'))
+        stripAnsi(
+          (e as { message: string }).message.replace(dirname, '<<DIRNAME>>')
+        )
       ).toMatchSnapshot();
     }
   });
@@ -415,7 +420,9 @@ export function run(
       );
     } catch (e) {
       expect(
-        stripAnsi(e.message.replace(dirname, '<<DIRNAME>>'))
+        stripAnsi(
+          (e as { message: string }).message.replace(dirname, '<<DIRNAME>>')
+        )
       ).toMatchSnapshot();
     }
   });
@@ -643,7 +650,9 @@ export function run(
       );
     } catch (e) {
       expect(
-        stripAnsi(e.message.replace(dirname, '<<DIRNAME>>'))
+        stripAnsi(
+          (e as { message: string }).message.replace(dirname, '<<DIRNAME>>')
+        )
       ).toMatchSnapshot();
     }
   });
@@ -735,7 +744,9 @@ export function run(
       );
     } catch (e) {
       expect(
-        stripAnsi(e.message.replace(dirname, '<<DIRNAME>>'))
+        stripAnsi(
+          (e as { message: string }).message.replace(dirname, '<<DIRNAME>>')
+        )
       ).toMatchSnapshot();
     }
   });

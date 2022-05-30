@@ -1,5 +1,88 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`keeps objects as is 1`] = `
+"\\"use strict\\";
+
+var fill1 = function fill1() {
+  var top = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var left = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var right = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var bottom = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  return {
+    position: 'absolute',
+    top: top,
+    right: right,
+    bottom: bottom,
+    left: left
+  };
+};
+
+var fill2 = function fill2() {
+  var top = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var left = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var right = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var bottom = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  return {
+    position: 'absolute',
+    top: top,
+    right: right,
+    bottom: bottom,
+    left: left
+  };
+};
+
+exports.__linariaPreval = [fill1, fill2];"
+`;
+
+exports[`keeps only code which is related to \`a\` 1`] = `
+"\\"use strict\\";
+
+var _require = require('…'),
+    color = _require.whiteColor,
+    anotherColor = _require.anotherColor;
+
+var a = color || anotherColor;
+color.green = '#0f0';
+exports.__linariaPreval = [a];"
+`;
+
+exports[`keeps only code which is related to \`anotherColor\` 1`] = `
+"\\"use strict\\";
+
+var _require = require('…'),
+    anotherColor = _require.anotherColor;
+
+exports.__linariaPreval = [anotherColor];"
+`;
+
+exports[`keeps only code which is related to \`color\` 1`] = `
+"\\"use strict\\";
+
+var _require = require('…'),
+    color = _require.whiteColor;
+
+color.green = '#0f0';
+exports.__linariaPreval = [color];"
+`;
+
+exports[`keeps reused exports 1`] = `
+"\\"use strict\\";
+
+var bar = function bar() {
+  return 'hello world';
+};
+
+exports.bar = bar;
+var foo = exports.bar();
+exports.__linariaPreval = [foo];"
+`;
+
+exports[`removes all 1`] = `
+"\\"use strict\\";
+
+exports.__linariaPreval = [];"
+`;
+
 exports[`shaker assigning to exports 1`] = `
 "import { css } from \\"@linaria/core\\";
 import { Padding } from \\"../__fixtures__/assignToExport\\";
@@ -61,9 +144,9 @@ Dependencies: NA
 `;
 
 exports[`shaker does not strip instanbul coverage sequences 1`] = `
-"var cov_2dr9r1nt95 = function () {
+"function cov_2dr9r1nt95() {
   var path = \\"/home/user/project/file.js\\";
-  var hash = \\"23f56bbaeb2ebcd213f41374d3b2af1bce287bd3\\";
+  var hash = \\"a8a3adb000979641fede8be9905bccded8326d52\\";
   var global = new Function(\\"return this\\")();
   var gcv = \\"__coverage__\\";
   var coverageData = {
@@ -98,21 +181,29 @@ exports[`shaker does not strip instanbul coverage sequences 1`] = `
     },
     f: {},
     b: {},
-    _coverageSchema: \\"43e27e138ebf9cfc5966b082cf9a028302ed4184\\",
-    hash: \\"23f56bbaeb2ebcd213f41374d3b2af1bce287bd3\\"
+    _coverageSchema: \\"1a1c01bbd47fc00a2c39e90264f33305004495a9\\",
+    hash: \\"a8a3adb000979641fede8be9905bccded8326d52\\"
   };
   var coverage = global[gcv] || (global[gcv] = {});
 
-  if (coverage[path] && coverage[path].hash === hash) {
-    return coverage[path];
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
   }
 
-  return coverage[path] = coverageData;
-}();
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_2dr9r1nt95 = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
 
+cov_2dr9r1nt95();
 import { styled } from '@linaria/react';
-const a = (cov_2dr9r1nt95.s[0]++, 42);
-export const Title = (cov_2dr9r1nt95.s[1]++, /*#__PURE__*/styled(\\"h1\\")({
+const a = (cov_2dr9r1nt95().s[0]++, 42);
+export const Title = (cov_2dr9r1nt95().s[1]++, /*#__PURE__*/styled(\\"h1\\")({
   name: \\"Title\\",
   class: \\"Title_tow9xsn\\"
 }));"
@@ -937,9 +1028,9 @@ Dependencies: NA
 `;
 
 exports[`shaker non-hoistable identifiers 1`] = `
-"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: 
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression:
 
-  > days is not defined. 
+  > days is not defined.
 
   Make sure you are not using a browser or Node specific API and all the variables are available in static context.
   Linaria have to extract pieces of your code to resolve the interpolated values.
@@ -1302,9 +1393,9 @@ Dependencies: @babel/runtime/helpers/interopRequireDefault, react
 `;
 
 exports[`shaker throws codeframe error when evaluation fails 1`] = `
-"<<DIRNAME>>/source.js: An error occurred when evaluating the expression: 
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression:
 
-  > This will fail. 
+  > This will fail.
 
   Make sure you are not using a browser or Node specific API and all the variables are available in static context.
   Linaria have to extract pieces of your code to resolve the interpolated values.
@@ -1362,4 +1453,121 @@ exports[`shaker throws when interpolation evaluates to undefined 1`] = `
 > 6 |   font-size: \${fontSize};
     |                ^^^^^^^^
   7 | \`;"
+`;
+
+exports[`shakes assignment patterns 1`] = `
+"\\"use strict\\";
+
+var _interopRequireDefault = require(\\"@babel/runtime/helpers/interopRequireDefault\\");
+
+var _toArray2 = _interopRequireDefault(require(\\"@babel/runtime/helpers/toArray\\"));
+
+var _extends2 = _interopRequireDefault(require(\\"@babel/runtime/helpers/extends\\"));
+
+var _ = 2,
+    identifier = _ === void 0 ? 1 : _;
+var _a$b = {
+  a: 1,
+  b: 2
+};
+_a$b = _a$b === void 0 ? {} : _a$b;
+var object = (_extends2.default)({}, _a$b);
+var _ref = [1, 2, 3, 4];
+_ref = _ref === void 0 ? [] : _ref;
+
+var _ref2 = (_toArray2.default)(_ref),
+    array = _ref2.slice(0);
+
+var obj = {
+  member: null
+};
+var _2 = 1;
+obj.member = _2 === void 0 ? 42 : _2;
+exports.__linariaPreval = [identifier, object, array, obj];"
+`;
+
+exports[`shakes es5 exports 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+exports.redColor = 'red';
+exports['yellowColor'] = 'yellow';
+Object.defineProperty(exports, \\"greenColor\\", {
+  enumerable: true,
+  get: function get() {
+    return 'green';
+  }
+});"
+`;
+
+exports[`shakes exports 1`] = `
+"\\"use strict\\";
+
+var _ = require(\\"\\\\u2026\\");
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+var a = _.whiteColor;
+exports.__linariaPreval = [a];"
+`;
+
+exports[`shakes for-in statements 1`] = `
+"\\"use strict\\";
+
+var obj1 = {
+  a: 1,
+  b: 2
+};
+var obj2 = {};
+
+for (var key in obj1) {
+  obj2[key] = obj1[key];
+}
+
+exports.__linariaPreval = [obj2];"
+`;
+
+exports[`shakes imports 1`] = `
+"\\"use strict\\";
+
+var _typeof = require(\\"@babel/runtime/helpers/typeof\\");
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: true
+});
+
+var _ = _interopRequireWildcard(require(\\"\\\\u2026\\"));
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== \\"function\\") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== \\"object\\" && typeof obj !== \\"function\\") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== \\"default\\" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+exports.__linariaPreval = [_.whiteColor, _.default];"
+`;
+
+exports[`shakes sequence expression 1`] = `
+"\\"use strict\\";
+
+var color1 = (function () {
+  return 'blue';
+});
+var local = '';
+var color2 = (local = color1(), function () {
+  return local;
+});
+exports.__linariaPreval = [color2];"
+`;
+
+exports[`should keep member expression key 1`] = `
+"\\"use strict\\";
+
+var key = 'blue';
+var obj = {
+  blue: '#00F'
+};
+var blue = obj[key];
+exports.__linariaPreval = [blue];"
 `;

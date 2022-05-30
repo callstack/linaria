@@ -11,12 +11,12 @@ import { debug } from '@linaria/logger';
 import { slugify } from '@linaria/utils';
 import { units } from '../units';
 import type {
+  AtomizeFn,
+  Path,
   State,
   StrictOptions,
   TemplateExpression,
   ValueCache,
-  AtomizeFn,
-  Path,
 } from '../types';
 
 import isSerializable from '../utils/isSerializable';
@@ -24,7 +24,8 @@ import throwIfInvalid from '../utils/throwIfInvalid';
 import stripLines from '../utils/stripLines';
 import toCSS from '../utils/toCSS';
 import getLinariaComment from '../utils/getLinariaComment';
-import { Core } from '../babel';
+import type { Core } from '../babel';
+import unwrapSequence from '../utils/unwrapSequence';
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
 const unitRegex = new RegExp(`^(${units.join('|')})(;|,|\n| |\\))`);
@@ -36,8 +37,8 @@ type Interpolation = {
   unit: string;
 };
 
-function hasMeta(value: any): value is StyledMeta {
-  return value && typeof value === 'object' && (value as any).__linaria;
+function hasMeta(value: unknown): value is StyledMeta {
+  return typeof value === 'object' && value !== null && '__linaria' in value;
 }
 
 const processedPaths = new WeakSet();
@@ -58,6 +59,7 @@ function createAtomicString(
   }
   const atomicRules = atomize(cssText, hasPriority);
   atomicRules.forEach((rule) => {
+    // eslint-disable-next-line no-param-reassign
     state.rules[rule.cssText] = {
       cssText: rule.cssText,
       start: path.parent?.loc?.start ?? null,
@@ -72,13 +74,13 @@ function createAtomicString(
     );
   });
 
-  const atomicString = atomicRules
-    // Some atomic rules produced (eg. keyframes) don't have class names, and they also don't need to appear in the object
-    .filter((rule) => !!rule.className)
-    .map((rule) => rule.className!)
-    .join(' ');
-
-  return atomicString;
+  return (
+    atomicRules
+      // Some atomic rules produced (eg. keyframes) don't have class names, and they also don't need to appear in the object
+      .filter((rule) => !!rule.className)
+      .map((rule) => rule.className!)
+      .join(' ')
+  );
 }
 
 export default function getTemplateProcessor(
@@ -129,7 +131,8 @@ export default function getTemplateProcessor(
     // Serialize the tagged template literal to a string
     let cssText = '';
 
-    const expressions = path.get('quasi').get('expressions');
+    const q = path.get('quasi');
+    const expressions = q.get('expressions');
 
     quasi.quasis.forEach((el, i, self) => {
       let appended = false;
@@ -253,7 +256,7 @@ export default function getTemplateProcessor(
           } else {
             // CSS custom properties can't be used outside components
             throw ex.buildCodeFrameError(
-              `The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.`
+              "The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin."
             );
           }
         }
@@ -328,15 +331,29 @@ export default function getTemplateProcessor(
         );
       }
 
-      path.replaceWith(
-        t.callExpression(
-          t.callExpression(
-            t.identifier(state.file.metadata.localName?.styled || 'styled'),
-            [styled.component.node]
-          ),
-          [t.objectExpression(props)]
-        )
-      );
+      // replace `styled.div` and `styled(Cmp)` with `styled('div')(props)` and `styled(Cmp)(props)`
+      const tagPath = unwrapSequence(path.get('tag'));
+      if (tagPath?.isCallExpression() || tagPath?.isSequenceExpression()) {
+        // It is styled(Cmp) or (0, react_1.styled)(Cmp)
+        // so just add the props to the call
+        path.replaceWith(
+          t.callExpression(tagPath.node, [t.objectExpression(props)])
+        );
+      } else if (tagPath?.isMemberExpression()) {
+        // It is styled.div
+        const obj = tagPath.get('object');
+        const prop = tagPath.get('property');
+
+        // It can be only an Identifier… At least I hope.
+        if (prop.isIdentifier()) {
+          path.replaceWith(
+            t.callExpression(
+              t.callExpression(obj.node, [t.stringLiteral(prop.node.name)]),
+              [t.objectExpression(props)]
+            )
+          );
+        }
+      }
 
       path.addComment('leading', '#__PURE__');
 
@@ -394,6 +411,7 @@ export default function getTemplateProcessor(
         `\n${selector} {${cssText}\n}`
       );
 
+      // eslint-disable-next-line no-param-reassign
       state.rules[selector] = {
         cssText,
         className: className!,

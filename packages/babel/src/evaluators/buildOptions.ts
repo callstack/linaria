@@ -23,7 +23,7 @@ export default function buildOptions(
 
   const defaults: DefaultOptions = {
     caller: { name: 'linaria', evaluate: true },
-    filename: filename,
+    filename,
     presets: [
       [
         require.resolve('../index'),

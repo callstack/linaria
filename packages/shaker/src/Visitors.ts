@@ -3,7 +3,7 @@ import type { Identifier, Node } from '@babel/types';
 import { warn } from '@linaria/logger';
 import { peek } from '@linaria/babel-preset';
 import type { VisitorKeys } from '@linaria/babel-preset';
-import GraphBuilderState from './GraphBuilderState';
+import type GraphBuilderState from './GraphBuilderState';
 import identifierHandlers from './identifierHandlers';
 import type { Visitor, Visitors } from './types';
 

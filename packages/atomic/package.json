@@ -14,6 +14,12 @@
     "lib/",
     "esm/"
   ],
+  "linaria": {
+    "tags": {
+      "css": "./lib/processors/css.js",
+      "styled": "./lib/processors/styled.js"
+    }
+  },
   "license": "MIT",
   "repository": "git@github.com:callstack/linaria.git",
   "bugs": {

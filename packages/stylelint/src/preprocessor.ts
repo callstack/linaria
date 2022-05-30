@@ -81,7 +81,7 @@ function preprocessor() {
 
       // Construct a CSS-ish file from the unprocessed style rules
       let generatedLineNumber = 1;
-      let cssText = Object.values(rules)
+      const cssText = Object.values(rules)
         .map((rule) => {
           const ruleText = `.${rule.className} {${rule.cssText}}`;
 
@@ -108,7 +108,7 @@ function preprocessor() {
       cache[filename] = replacements;
       offsets[filename] = offsets[filename]?.reverse();
 
-      return cssText + '\n';
+      return `${cssText}\n`;
     },
     result(result: LintResult, filename: string) {
       const error = errors[filename];
@@ -116,11 +116,13 @@ function preprocessor() {
       const sourceMap = offsets[filename];
 
       if (sourceMap) {
+        // eslint-disable-next-line no-param-reassign
         result.warnings = result.warnings.map((warning) => {
           const offset = sourceMap.find(
             (o) => o.generated.line <= warning.line
           );
           if (offset) {
+            // eslint-disable-next-line no-param-reassign
             warning.line += offset.original.line - offset.generated.line;
           }
 
@@ -207,4 +209,4 @@ function preprocessor() {
   };
 }
 
-module.exports = preprocessor;
+export default preprocessor;

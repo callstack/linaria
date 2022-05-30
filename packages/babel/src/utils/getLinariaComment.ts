@@ -4,7 +4,7 @@ const pattern = /^linaria (atomic-css|css|styled) (.+)$/;
 
 export default function getLinariaComment(
   path: { node: Node },
-  remove: boolean = true
+  remove = true
 ): ['css' | 'atomic-css' | 'styled' | null, ...(string | null)[]] {
   const comments = path.node.leadingComments;
   if (!comments) {
@@ -22,6 +22,7 @@ export default function getLinariaComment(
   }
 
   if (remove) {
+    // eslint-disable-next-line no-param-reassign
     path.node.leadingComments = comments.filter((_, i) => i !== idx);
   }
 
@@ -31,5 +32,5 @@ export default function getLinariaComment(
   } else if (matched[1] === 'atomic-css') {
     type = 'atomic-css';
   }
-  return [type, ...matched[2].split(' ').map((i) => (i ? i : null))];
+  return [type, ...matched[2].split(' ').map((i) => i || null)];
 }

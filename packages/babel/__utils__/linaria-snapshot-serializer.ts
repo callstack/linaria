@@ -1,18 +1,20 @@
 import type { LinariaMetadata } from '../src';
 
 type Serializer<T> = {
-  test: (value: any) => value is T;
-  print: (value: T) => string;
+  test: (value: unknown) => value is T;
+  serialize: (value: T) => string;
 };
 
 const withLinariaMetadata = (
-  value: any
+  value: unknown
 ): value is { linaria: LinariaMetadata } =>
-  value && typeof value.linaria === 'object';
+  typeof value === 'object' &&
+  value !== null &&
+  typeof (value as { linaria: unknown }).linaria === 'object';
 
 export default {
   test: withLinariaMetadata,
-  print: ({ linaria }) => `
+  serialize: ({ linaria }) => `
 CSS:
 
 ${Object.keys(linaria.rules)
