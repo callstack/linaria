@@ -1,4 +1,5 @@
 import cosmiconfig from 'cosmiconfig';
+
 import type { StrictOptions } from '../types';
 
 export type PluginOptions = StrictOptions & {

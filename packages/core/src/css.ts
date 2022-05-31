@@ -1,6 +1,6 @@
-import type { LinariaClassName } from '@linaria/utils';
 import type { CSSProperties } from './CSSProperties';
 import type { StyledMeta } from './StyledMeta';
+import type { LinariaClassName } from './cx';
 
 type CSS = (
   strings: TemplateStringsArray,

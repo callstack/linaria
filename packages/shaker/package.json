@@ -15,6 +15,9 @@
   ],
   "license": "MIT",
   "repository": "git@github.com:callstack/linaria.git",
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
   "bugs": {
     "url": "https://github.com/callstack/linaria/issues"
   },
@@ -51,7 +54,7 @@
     "@linaria/logger": "^3.0.0-beta.15",
     "@linaria/preeval": "^3.0.0-beta.18",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "ts-invariant": "^0.9.0"
+    "ts-invariant": "^0.10.3"
   },
   "peerDependencies": {
     "@babel/core": ">=7"

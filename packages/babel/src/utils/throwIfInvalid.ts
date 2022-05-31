@@ -1,13 +1,21 @@
 import generator from '@babel/generator';
 import type { NodePath } from '@babel/traverse';
+
 import type { Serializable } from '../types';
+
 import isSerializable from './isSerializable';
+
+const isLikeError = (value: unknown): value is Error =>
+  typeof value === 'object' &&
+  value !== null &&
+  'stack' in value &&
+  'message' in value;
 
 // Throw if we can't handle the interpolated value
 function throwIfInvalid(
-  value: Error | (() => void) | string | number | Serializable | undefined,
+  value: Error | unknown,
   ex: NodePath
-): void {
+): asserts value is (() => void) | string | number | Serializable {
   if (
     typeof value === 'function' ||
     typeof value === 'string' ||
@@ -18,7 +26,7 @@ function throwIfInvalid(
   }
 
   // We can't use instanceof here so let's use duck typing
-  if (value && typeof value !== 'number' && value.stack && value.message) {
+  if (isLikeError(value) && value.stack && value.message) {
     throw ex.buildCodeFrameError(
       `An error occurred when evaluating the expression:
 

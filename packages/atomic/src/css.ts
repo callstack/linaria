@@ -1,4 +1,5 @@
-import type { LinariaClassName } from '@linaria/utils';
+import type { LinariaClassName } from '@linaria/core';
+
 import type { CSSProperties } from './CSSProperties';
 
 type CSS = (

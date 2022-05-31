@@ -3,20 +3,25 @@
  * For each template it makes a list of dependencies, try to evaluate expressions, and if it is not possible, mark them as lazy dependencies.
  */
 
+import generator from '@babel/generator';
+import type { NodePath } from '@babel/traverse';
 import type {
   Expression,
   Identifier as IdentifierNode,
   TaggedTemplateExpression,
+  TemplateElement,
   TSType,
 } from '@babel/types';
-import type { NodePath } from '@babel/traverse';
+
 import { debug } from '@linaria/logger';
-import generator from '@babel/generator';
-import throwIfInvalid from '../utils/throwIfInvalid';
-import type { State, StrictOptions, ExpressionValue } from '../types';
-import { ValueType } from '../types';
-import getTemplateType from '../utils/getTemplateType';
+
 import type { Core } from '../babel';
+import type { StrictOptions, ExpressionValue, State } from '../types';
+import { ValueType } from '../types';
+
+import getSource from './getSource';
+import getTagProcessor from './getTagProcessor';
+import throwIfInvalid from './throwIfInvalid';
 
 /**
  * Hoist the node and its dependencies to the highest scope possible
@@ -38,12 +43,6 @@ function hoist(babel: Core, ex: NodePath<Expression | null>): void {
     if (bindingPath.isVariableDeclarator()) {
       const initPath = bindingPath.get('init') as NodePath<Expression | null>;
       hoist(babel, initPath);
-      if (initPath.isTaggedTemplateExpression()) {
-        const templateType = getTemplateType(babel, initPath);
-        if (templateType) {
-          return;
-        }
-      }
       initPath.hoist(scope);
       if (initPath.isIdentifier()) {
         referencePaths.forEach((referencePath) => {
@@ -63,23 +62,21 @@ function hoist(babel: Core, ex: NodePath<Expression | null>): void {
   });
 }
 
-export default function CollectDependencies(
+export default function collectTemplateDependencies(
   babel: Core,
   path: NodePath<TaggedTemplateExpression>,
   state: State,
-  options: StrictOptions
-) {
+  options: Pick<StrictOptions, 'classNameSlug' | 'displayName' | 'evaluate'>
+): [quasis: NodePath<TemplateElement>[], expressionValues: ExpressionValue[]] {
   const { types: t } = babel;
-  const templateType = getTemplateType(babel, path);
-  if (!templateType) {
-    return;
-  }
-  const expressions = path.get('quasi').get('expressions');
+  const quasi = path.get('quasi');
+  const quasis = quasi.get('quasis');
+  const expressions = quasi.get('expressions');
 
   debug('template-parse:identify-expressions', expressions.length);
 
   const expressionValues: ExpressionValue[] = expressions.map(
-    (ex: NodePath<Expression | TSType>) => {
+    (ex: NodePath<Expression | TSType>): ExpressionValue => {
       if (!ex.isExpression()) {
         throw ex.buildCodeFrameError(
           `The expression '${generator(ex.node).code}' is not supported.`
@@ -87,13 +84,40 @@ export default function CollectDependencies(
       }
 
       const result = ex.evaluate();
+      let value: unknown;
       if (result.confident) {
-        throwIfInvalid(result.value, ex);
-        return { kind: ValueType.VALUE, value: result.value };
+        value = result.value;
+      } else {
+        // @ts-expect-error result has deopt field, but it's not in types
+        const { deopt } = result as { deopt: NodePath };
+        // At least in some cases deopt contains an expression hidden behind an identifier
+        // If it is a TaggedTemplateExpression, we can get class name for it
+        if (deopt && deopt.isTaggedTemplateExpression()) {
+          const context = getTagProcessor(deopt, state, options);
+          if (context?.asSelector) {
+            return {
+              kind: ValueType.VALUE,
+              value: context.asSelector,
+              ex,
+              source: getSource(ex),
+            };
+          }
+        }
       }
+
+      if (value !== undefined) {
+        throwIfInvalid(value, ex);
+        return {
+          kind: ValueType.VALUE,
+          value,
+          ex,
+          source: getSource(ex),
+        };
+      }
+
       if (
         options.evaluate &&
-        !(t.isFunctionExpression(ex) || t.isArrowFunctionExpression(ex))
+        !(ex.isFunctionExpression() || ex.isArrowFunctionExpression())
       ) {
         // save original expression that may be changed during hoisting
         const originalExNode = t.cloneNode(ex.node);
@@ -106,10 +130,15 @@ export default function CollectDependencies(
         // get back original expression to the tree
         ex.replaceWith(originalExNode);
 
-        return { kind: ValueType.LAZY, ex: hoistedExNode, originalEx: ex };
+        return {
+          kind: ValueType.LAZY,
+          ex: hoistedExNode,
+          originalEx: ex,
+          source: getSource(ex),
+        };
       }
 
-      return { kind: ValueType.FUNCTION, ex };
+      return { kind: ValueType.FUNCTION, ex, source: getSource(ex) };
     }
   );
 
@@ -120,28 +149,5 @@ export default function CollectDependencies(
     )
   );
 
-  if (
-    templateType !== 'css' &&
-    templateType !== 'atomic-css' &&
-    'name' in templateType.component.node &&
-    templateType.component.node.name
-  ) {
-    // It's not a real dependency.
-    // It can be simplified because we need just a className.
-    expressionValues.push({
-      // kind: ValueType.COMPONENT,
-      kind: ValueType.LAZY,
-      ex: templateType.component.node.name,
-      originalEx: templateType.component.node.name,
-    });
-  }
-
-  state.queue.push({
-    styled:
-      templateType !== 'css' && templateType !== 'atomic-css'
-        ? templateType
-        : undefined,
-    path,
-    expressionValues,
-  });
+  return [quasis, expressionValues];
 }

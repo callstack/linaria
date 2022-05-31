@@ -10,105 +10,23 @@
  *  - store result of extraction in babel's file metadata
  */
 
-import type { Node, Program, Expression } from '@babel/types';
-import type { NodePath, Scope, Visitor } from '@babel/traverse';
-import { expression, statement } from '@babel/template';
-import generator from '@babel/generator';
-import { debug, error } from '@linaria/logger';
-import evaluate from './evaluators';
+import type { NodePath, Visitor } from '@babel/traverse';
+import type { Program } from '@babel/types';
+
+import { debug } from '@linaria/logger';
+
+import type { Core } from './babel';
 import getTemplateProcessor from './evaluators/templateProcessor';
 import Module from './module';
-import type {
-  State,
-  StrictOptions,
-  LazyValue,
-  ExpressionValue,
-  ValueCache,
-  Value,
-} from './types';
-import { ValueType } from './types';
-import CollectDependencies from './visitors/CollectDependencies';
-import GenerateClassNames from './visitors/GenerateClassNames';
-import type { Core } from './babel';
-
-function isLazyValue(v: ExpressionValue): v is LazyValue {
-  return v.kind === ValueType.LAZY;
-}
-
-function isNodePath<T extends Node>(obj: NodePath<T> | T): obj is NodePath<T> {
-  return 'node' in obj && obj?.node !== undefined;
-}
-
-function findFreeName(scope: Scope, name: string): string {
-  // By default `name` is used as a name of the function …
-  let nextName = name;
-  let idx = 0;
-  while (scope.hasBinding(nextName, false)) {
-    // … but if there is an already defined variable with this name …
-    // … we are trying to use a name like wrap_N
-    idx += 1;
-    nextName = `wrap_${idx}`;
-  }
-
-  return nextName;
-}
-
-function unwrapNode<T extends Node>(
-  item: NodePath<T> | T | string
-): T | string {
-  if (typeof item === 'string') {
-    return item;
-  }
-
-  return isNodePath(item) ? item.node : item;
-}
-
-// All exported values will be wrapped with this function
-const expressionWrapperTpl = statement(`
-  const %%wrapName%% = (fn) => {
-    try {
-      return fn();
-    } catch (e) {
-      return e;
-    }
-  };
-`);
-
-const expressionTpl = expression('%%wrapName%%(() => %%expression%%)');
-const exportsLinariaPrevalTpl = statement(
-  'exports.__linariaPreval = %%expressions%%'
-);
-
-function addLinariaPreval(
-  { types: t }: Core,
-  path: NodePath<Program>,
-  lazyDeps: Array<Expression | string>
-): Program {
-  // Constant __linariaPreval with all dependencies
-  const wrapName = findFreeName(path.scope, '_wrap');
-  const statements = [
-    expressionWrapperTpl({ wrapName }),
-    exportsLinariaPrevalTpl({
-      expressions: t.arrayExpression(
-        lazyDeps.map((exp) => expressionTpl({ expression: exp, wrapName }))
-      ),
-    }),
-  ];
-
-  const programNode = path.node;
-  return t.program(
-    [...programNode.body, ...statements],
-    programNode.directives,
-    programNode.sourceType,
-    programNode.interpreter
-  );
-}
+import type { State, StrictOptions } from './types';
+import evaluateExpressions from './utils/evaluateExpressions';
+import processTemplateExpression from './utils/processTemplateExpression';
 
 export default function extract(
   babel: Core,
   options: StrictOptions
 ): { visitor: Visitor<State> } {
-  const process = getTemplateProcessor(babel, options);
+  const process = getTemplateProcessor(options);
 
   return {
     visitor: {
@@ -129,80 +47,20 @@ export default function extract(
           // So we traverse here instead of a in a visitor
           path.traverse({
             TaggedTemplateExpression: (p) => {
-              GenerateClassNames(babel, p, state, options);
-              CollectDependencies(babel, p, state, options);
+              processTemplateExpression(babel, 'extract', p, state, options);
             },
           });
 
-          const lazyDeps = state.queue.reduce(
-            (acc, { expressionValues: values }) => {
-              acc.push(...values.filter(isLazyValue));
-              return acc;
-            },
-            [] as LazyValue[]
+          const [dependencies, valueCache] = evaluateExpressions(
+            babel,
+            path,
+            state.queue,
+            options,
+            state.file.opts.filename
           );
 
-          const expressionsToEvaluate = lazyDeps.map((v) => unwrapNode(v.ex));
-          const originalLazyExpressions = lazyDeps.map((v) =>
-            unwrapNode(v.originalEx)
-          );
+          state.dependencies.push(...dependencies);
 
-          debug('lazy-deps:count', lazyDeps.length);
-
-          let lazyValues: Value[] = [];
-
-          if (expressionsToEvaluate.length > 0) {
-            debug(
-              'lazy-deps:original-expressions-list',
-              originalLazyExpressions.map((node) =>
-                typeof node !== 'string' ? generator(node).code : node
-              )
-            );
-            debug(
-              'lazy-deps:expressions-to-eval-list',
-              expressionsToEvaluate.map((node) =>
-                typeof node !== 'string' ? generator(node).code : node
-              )
-            );
-
-            const program = addLinariaPreval(
-              babel,
-              path,
-              expressionsToEvaluate
-            );
-            const { code } = generator(program);
-            debug('lazy-deps:evaluate', '');
-            try {
-              const evaluation = evaluate(
-                code,
-                state.file.opts.filename,
-                options
-              );
-              debug('lazy-deps:sub-files', evaluation.dependencies);
-
-              state.dependencies.push(...evaluation.dependencies);
-              lazyValues =
-                evaluation.value && typeof evaluation.value !== 'string'
-                  ? (evaluation.value?.__linariaPreval as Value[]) || []
-                  : [];
-              debug('lazy-deps:values', lazyValues);
-            } catch (e: unknown) {
-              error('lazy-deps:evaluate:error', code);
-              if (e instanceof Error) {
-                throw new Error(
-                  `An unexpected runtime error occurred during dependencies evaluation: \n${e.stack}\n\nIt may happen when your code or third party module is invalid or uses identifiers not available in Node environment, eg. window. \n` +
-                    'Note that line numbers in above stack trace will most likely not match, because Linaria needed to transform your code a bit.\n'
-                );
-              } else {
-                throw e;
-              }
-            }
-          }
-
-          const valueCache: ValueCache = new Map();
-          originalLazyExpressions.forEach((key, idx) =>
-            valueCache.set(key, lazyValues[idx])
-          );
           state.queue.forEach((item) => process(item, state, valueCache));
         },
         exit(_: unknown, state: State) {

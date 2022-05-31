@@ -105,7 +105,7 @@ Dependencies: ../__fixtures__/assignToExport
 
 exports[`shaker derives display name from filename 1`] = `
 "import { styled } from '@linaria/react';
-export default /*#__PURE__*/styled(\\"h1\\")({
+export default /*#__PURE__*/styled('h1')({
   name: \\"FancyName0\\",
   class: \\"FancyName0_f1tjvuuv\\"
 });"
@@ -125,7 +125,7 @@ Dependencies: NA
 
 exports[`shaker derives display name from parent folder name 1`] = `
 "import { styled } from '@linaria/react';
-export default /*#__PURE__*/styled(\\"h1\\")({
+export default /*#__PURE__*/styled('h1')({
   name: \\"FancyName0\\",
   class: \\"FancyName0_fud4l0y\\"
 });"
@@ -203,7 +203,7 @@ exports[`shaker does not strip instanbul coverage sequences 1`] = `
 cov_2dr9r1nt95();
 import { styled } from '@linaria/react';
 const a = (cov_2dr9r1nt95().s[0]++, 42);
-export const Title = (cov_2dr9r1nt95().s[1]++, /*#__PURE__*/styled(\\"h1\\")({
+export const Title = (cov_2dr9r1nt95().s[1]++, /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_tow9xsn\\"
 }));"
@@ -235,7 +235,7 @@ const obj = copyAndExtend({
 }, {
   a: 2
 });
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });"
@@ -259,7 +259,7 @@ exports[`shaker evaluates chain of reexports 1`] = `
 "import { styled } from '@linaria/react';
 import { fooStyles } from \\"@linaria/babel-preset/__fixtures__/reexports\\";
 const value = fooStyles.foo;
-export const H1 = /*#__PURE__*/styled(\\"h1\\")({
+export const H1 = /*#__PURE__*/styled('h1')({
   name: \\"H1\\",
   class: \\"H1_h1t92lw9\\"
 });"
@@ -308,11 +308,11 @@ exports[`shaker evaluates component interpolations 1`] = `
   styled
 } = require('@linaria/react');
 
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });
-export const Paragraph = /*#__PURE__*/styled(\\"p\\")({
+export const Paragraph = /*#__PURE__*/styled('p')({
   name: \\"Paragraph\\",
   class: \\"Paragraph_p1xjmq2i\\"
 });"
@@ -339,7 +339,7 @@ exports[`shaker evaluates dependencies with sequence expression 1`] = `
 "import { styled } from '@linaria/react';
 let external = 0;
 const color = (external, () => 'blue');
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\",
   vars: {
@@ -363,7 +363,7 @@ Dependencies: NA
 exports[`shaker evaluates expressions with dependencies 1`] = `
 "import { styled } from '@linaria/react';
 import slugify from '@linaria/babel-preset/__fixtures__/slugify';
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });"
@@ -392,7 +392,7 @@ const boo = t => slugify(t) + 'boo';
 
 const bar = t => slugify(t) + 'bar';
 
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });"
@@ -425,7 +425,7 @@ const foo = k => {
   return obj;
 };
 
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });"
@@ -450,7 +450,7 @@ const answer = 42;
 const foo = () => answer;
 
 const days = foo() + ' days';
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });"
@@ -473,7 +473,7 @@ Dependencies: NA
 exports[`shaker evaluates imported typescript enums 1`] = `
 "import { styled } from '@linaria/react';
 import { Colors } from '@linaria/babel-preset/__fixtures__/enums';
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_taxxqrn\\"
 });"
@@ -494,7 +494,7 @@ Dependencies: @linaria/babel-preset/__fixtures__/enums
 exports[`shaker evaluates interpolations with sequence expression 1`] = `
 "import { styled } from '@linaria/react';
 let external = 0;
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\",
   vars: {
@@ -521,7 +521,7 @@ const answer = 42;
 
 const foo = () => answer;
 
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });"
@@ -550,7 +550,7 @@ const boo = t => slugify(t) + 'boo';
 
 const bar = t => slugify(t) + 'bar';
 
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });"
@@ -579,7 +579,7 @@ var Colors;
   Colors[\\"BLUE\\"] = \\"#27509A\\";
 })(Colors || (Colors = {}));
 
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_taxxqrn\\"
 });"
@@ -659,19 +659,19 @@ Dependencies: @babel/runtime/helpers/interopRequireDefault, ../__fixtures__/sequ
 
 exports[`shaker generates stable class names 1`] = `
 "import { styled } from '@linaria/react';
-export const T1 = /*#__PURE__*/styled(\\"h1\\")({
+export const T1 = /*#__PURE__*/styled('h1')({
   name: \\"T1\\",
   class: \\"T1_t16d1w5s\\"
 });
-export const T2 = /*#__PURE__*/styled(\\"h2\\")({
+export const T2 = /*#__PURE__*/styled('h2')({
   name: \\"T2\\",
   class: \\"T2_t18j681n\\"
 });
-export const T3 = /*#__PURE__*/styled(\\"h3\\")({
+export const T3 = /*#__PURE__*/styled('h3')({
   name: \\"T3\\",
   class: \\"T3_t16ajafo\\"
 });
-export default /*#__PURE__*/styled(\\"p\\")({
+export default /*#__PURE__*/styled('p')({
   name: \\"components-library3\\",
   class: \\"components-library3_c16bmp8w\\"
 });"
@@ -723,7 +723,7 @@ const foo = k => {
 
 objects.font.fontWeight = 'bold';
 export const whiteColor = '#fff';
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t16vg7lb\\"
 });"
@@ -745,7 +745,7 @@ Dependencies: NA
 exports[`shaker handles escapes properly 1`] = `
 "import { styled } from '@linaria/react';
 const selectors = ['a', 'b'];
-export const Block = /*#__PURE__*/styled(\\"div\\")({
+export const Block = /*#__PURE__*/styled('div')({
   name: \\"Block\\",
   class: \\"Block_b11ngyv0\\"
 });"
@@ -768,7 +768,7 @@ exports[`shaker handles indirect wrapping another styled component 1`] = `
   styled
 } = require('@linaria/react');
 
-const Title = /*#__PURE__*/styled(\\"h1\\")({
+const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });
@@ -788,7 +788,7 @@ CSS:
 .Title_t1t92lw9 {
   color: red;
 }
-.CustomTitle_c1xjmq2i {
+.CustomTitle_c1xjmq2i.Title_t1t92lw9 {
   font-size: 24px;
   color: blue;
 }
@@ -806,7 +806,7 @@ const {
   styled
 } = require('@linaria/react');
 
-const Title = /*#__PURE__*/styled(\\"h1\\")({
+const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });
@@ -844,7 +844,7 @@ exports[`shaker hoistable identifiers 1`] = `
 {
   var days = 42;
 }
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });"
@@ -869,7 +869,7 @@ exports[`shaker ignores external expressions 1`] = `
 
 const generate = props => props.content;
 
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\",
   vars: {
@@ -894,7 +894,7 @@ Dependencies: NA
 
 exports[`shaker ignores inline arrow function expressions 1`] = `
 "import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\",
   vars: {
@@ -919,7 +919,7 @@ Dependencies: NA
 
 exports[`shaker ignores inline vanilla function expressions 1`] = `
 "import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\",
   vars: {
@@ -956,7 +956,7 @@ const fill = (top = 0, left = 0, right = 0, bottom = 0) => [{
   left
 }];
 
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });"
@@ -985,7 +985,7 @@ const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
   left
 });
 
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t1t92lw9\\"
 });"
@@ -1242,7 +1242,7 @@ const Styled1 = styled.p\`
 export function Component() {
   const classes = {
     value: 0.2,
-    cell: \\"cell_c1t92lw9\\"
+    cell: \\"cell_c1xjmq2i\\"
   };
   const classes2 = classes;
   const MyComponent = styled\`
@@ -1263,7 +1263,7 @@ exports[`shaker should process \`styled\` calls with complex interpolation insid
 
 CSS:
 
-.cell_c1t92lw9 {
+.cell_c1xjmq2i {
       opacity: 0;
     }
 

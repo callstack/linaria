@@ -1,7 +1,10 @@
 import path from 'path';
-import { run } from '@linaria/babel-preset/__utils__/strategy-tester';
-import dedent from 'dedent';
+
 import type { TransformOptions } from '@babel/core';
+import dedent from 'dedent';
+
+import { run } from '@linaria/babel-preset/__utils__/strategy-tester';
+
 import exctract from '../src';
 
 function getFileName() {

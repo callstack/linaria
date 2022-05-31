@@ -1,7 +1,8 @@
-import type { Import } from '@babel/types';
-import type { NodePath, Visitor } from '@babel/traverse';
 // @ts-expect-error
 import syntax from '@babel/plugin-syntax-dynamic-import';
+import type { NodePath, Visitor } from '@babel/traverse';
+import type { Import } from '@babel/types';
+
 import type { Core } from './babel';
 
 export default function dynamic({ types: t }: Core): {

@@ -1,9 +1,11 @@
-import type { Node, Program } from '@babel/types';
 import generator from '@babel/generator';
-import { debug } from '@linaria/logger';
+import type { Node, Program } from '@babel/types';
+
 import { isNode, getVisitorKeys } from '@linaria/babel-preset';
-import build from './graphBuilder';
+import { debug } from '@linaria/logger';
+
 import dumpNode from './dumpNode';
+import build from './graphBuilder';
 
 /*
  * Returns new tree without dead nodes

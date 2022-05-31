@@ -1,78 +1,78 @@
-import type { Expression, TaggedTemplateExpression } from '@babel/types';
 import type { TransformOptions } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
-import type { StyledMeta } from '@linaria/core';
+import type {
+  Expression,
+  TaggedTemplateExpression,
+  TemplateElement,
+} from '@babel/types';
 import type { RawSourceMap } from 'source-map';
+
+import type { Value } from '@linaria/core/processors/types';
+import type { ClassNameFn } from '@linaria/core/processors/utils/types';
+
 import type { PluginOptions } from './utils/loadOptions';
 
-export type JSONValue = string | number | boolean | JSONObject | JSONArray;
-
-export interface JSONObject {
-  [x: string]: JSONValue;
-}
-
-export type JSONArray = Array<JSONValue>;
-
-export type Serializable = JSONArray | JSONObject;
+export type {
+  JSONValue,
+  JSONObject,
+  JSONArray,
+  Serializable,
+  Value,
+  ValueCache,
+} from '@linaria/core/processors/types';
 
 export enum ValueType {
-  COMPONENT,
   LAZY,
   FUNCTION,
   VALUE,
 }
 
-export type Value = (() => void) | StyledMeta | string | number;
-
-export type ValueCache = Map<Expression | string, Value>;
-
-export type ComponentValue = {
-  kind: ValueType.COMPONENT;
-  ex: NodePath<Expression> | Expression | string;
+export type ComponentDependency = {
+  ex: NodePath<Expression>; // | Expression | string;
+  source: string;
+  value?: string;
 };
 
 export type LazyValue = {
   kind: ValueType.LAZY;
-  ex: NodePath<Expression> | Expression | string;
-  originalEx: NodePath<Expression> | Expression | string;
+  ex: NodePath<Expression> | Expression; // | string;
+  originalEx: NodePath<Expression>; // | Expression | string;
+  source: string;
 };
 
 export type FunctionValue = {
   kind: ValueType.FUNCTION;
-  ex: unknown;
+  ex: NodePath<Expression>;
+  source: string;
 };
 
 export type EvaluatedValue = {
   kind: ValueType.VALUE;
   value: Value;
+  ex: NodePath<Expression>;
+  source: string;
 };
 
-export type ExpressionValue =
-  | ComponentValue
-  | LazyValue
-  | FunctionValue
-  | EvaluatedValue;
+export type ExpressionValue = LazyValue | FunctionValue | EvaluatedValue;
 
 export type Path = NodePath<TaggedTemplateExpression>;
 
 export type TemplateExpression = {
-  styled?: {
-    component: NodePath<Expression>;
-    type: 'atomic-styled' | 'styled';
-  };
   path: Path;
-  expressionValues: ExpressionValue[];
+  quasis: NodePath<TemplateElement>[];
+  expressions: ExpressionValue[];
+  dependencies: ComponentDependency[];
 };
 
-type Rules = {
-  [selector: string]: {
-    className: string;
-    displayName: string;
-    cssText: string;
-    start: Location | null | undefined;
-    atom?: boolean;
-  };
-};
+export interface ICSSRule {
+  className: string;
+  displayName: string;
+  cssText: string;
+  start: Location | null | undefined;
+  atom?: boolean;
+}
+
+export type Rules = Record<string, ICSSRule>;
 
 type Replacements = Array<{
   original: {
@@ -118,30 +118,6 @@ export type EvalRule = {
   action: Evaluator | 'ignore' | string;
 };
 
-export type ClassNameSlugVars = {
-  hash: string;
-  title: string;
-  file: string;
-  ext: string;
-  name: string;
-  dir: string;
-};
-
-type ClassNameFn = (
-  hash: string,
-  title: string,
-  args: ClassNameSlugVars
-) => string;
-
-export type AtomizeFn = (
-  cssText: string,
-  hasPriority: boolean
-) => {
-  className?: string;
-  cssText: string;
-  property: string;
-}[];
-
 export type LibResolverFn = (linariaLibPath: string) => string | null;
 
 export type StrictOptions = {
@@ -149,10 +125,8 @@ export type StrictOptions = {
   displayName: boolean;
   evaluate: boolean;
   ignore?: RegExp;
-  atomize?: AtomizeFn;
   babelOptions: TransformOptions;
   rules: EvalRule[];
-  libResolver?: LibResolverFn;
 };
 
 export type Location = {

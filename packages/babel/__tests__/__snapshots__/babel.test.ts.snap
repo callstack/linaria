@@ -132,22 +132,22 @@ Dependencies: NA
 exports[`compiles atomic styled with dynamic interpolations as unique variables based on the interpolation text 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
-const Component = /*#__PURE__*/styled(\\"div\\")({
+const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
+  class: \\"atm_7l_15g95l5 atm_4b_15g95l5 atm_2d_1en4k16 c17gu1mi\\",
   vars: {
     \\"1p69eoh\\": [props => props.color],
     \\"l12cfn\\": [props => props.backgroundColor]
   },
-  class: \\"atm_7l_15g95l5 atm_4b_15g95l5 atm_2d_1en4k16 c17gu1mi\\",
   atomic: true
 });
-const Component2 = /*#__PURE__*/styled(\\"div\\")({
+const Component2 = /*#__PURE__*/styled('div')({
   name: \\"Component2\\",
+  class: \\"atm_7l_15g95l5 atm_4b_1kgl01d cccybe9\\",
   vars: {
     \\"1p69eoh\\": [props => props.color],
     \\"1n9iccq\\": [props => props.color || \\"black\\"]
   },
-  class: \\"atm_7l_15g95l5 atm_4b_1kgl01d cccybe9\\",
   atomic: true
 });
 console.log(Component, Component2);"
@@ -169,12 +169,12 @@ Dependencies: NA
 exports[`compiles atomic styled with plain css, static and dynamic interpolations 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
-const Component = /*#__PURE__*/styled(\\"div\\")({
+const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
+  class: \\"atm_7l_13q2bts atm_e2_12xxubj atm_gi_12am3vd atm_2d_15g95l5 c17gu1mi\\",
   vars: {
     \\"1p69eoh\\": [props => props.color]
   },
-  class: \\"atm_7l_13q2bts atm_e2_12xxubj atm_gi_12am3vd atm_2d_15g95l5 c17gu1mi\\",
   atomic: true
 });
 console.log(Component);"
@@ -196,7 +196,7 @@ Dependencies: NA
 exports[`compiles atomic styled with static css 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
-const Component = /*#__PURE__*/styled(\\"div\\")({
+const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
   class: \\"atm_7l_13q2bts atm_e2_12xxubj c17gu1mi\\",
   atomic: true
@@ -218,12 +218,12 @@ Dependencies: NA
 exports[`compiles atomic styled without colliding by property 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
-export const Component = /*#__PURE__*/styled(\\"ul\\")({
+export const Component = /*#__PURE__*/styled('ul')({
   name: \\"Component\\",
   class: \\"atm_9s_1txwivl atm_l8_idpfg4 c17gu1mi\\",
   atomic: true
 });
-export const Component2 = /*#__PURE__*/styled(\\"ul\\")({
+export const Component2 = /*#__PURE__*/styled('ul')({
   name: \\"Component2\\",
   class: \\"atm_9s_1ulexfb atm_l8_idpfg4 cccybe9\\",
   atomic: true
@@ -245,7 +245,7 @@ Dependencies: NA
 exports[`compiles atomic styled wrapping other components with extra priority 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
-const Component = /*#__PURE__*/styled(\\"div\\")({
+const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
   class: \\"atm_2d_13q2bts atm_e2_12xxubj c17gu1mi\\",
   atomic: true
@@ -276,12 +276,12 @@ exports[`compiles atoms that are shared between css and styled templates 1`] = `
 import { css } from '@linaria/atomic';
 import { styled } from '@linaria/atomic';
 const x = \\"atm_26_5scuol atm_e2_12xxubj\\";
-const Component = /*#__PURE__*/styled(\\"div\\")({
+const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
+  class: \\"atm_26_5scuol atm_e2_12xxubj atm_gi_19bvopo atm_7l_15g95l5 cccybe9\\",
   vars: {
     \\"1p69eoh\\": [props => props.color]
   },
-  class: \\"atm_26_5scuol atm_e2_12xxubj atm_gi_19bvopo atm_7l_15g95l5 cccybe9\\",
   atomic: true
 });
 console.log(x, Component);"
@@ -303,7 +303,7 @@ Dependencies: NA
 exports[`does not include styles if not referenced anywhere 1`] = `
 "import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
-const Title = /*#__PURE__*/styled(\\"h1\\")({
+const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"t17gu1mi\\"
 });
@@ -340,7 +340,7 @@ Dependencies: NA
 exports[`evaluates and inlines expressions in scope 1`] = `
 "import { styled } from '@linaria/react';
 const color = 'blue';
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"t17gu1mi\\"
 });"
@@ -415,7 +415,7 @@ Dependencies: NA
 
 exports[`handles interpolation followed by unit 1`] = `
 "import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"t17gu1mi\\",
   vars: {
@@ -458,7 +458,7 @@ Dependencies: NA
 
 exports[`handles nested blocks 1`] = `
 "import { styled } from '@linaria/react';
-export const Button = /*#__PURE__*/styled(\\"button\\")({
+export const Button = /*#__PURE__*/styled('button')({
   name: \\"Button\\",
   class: \\"b17gu1mi\\",
   vars: {
@@ -530,7 +530,7 @@ exports[`includes unreferenced styles for :global 1`] = `
 "import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
 const a = \\"a17gu1mi\\";
-const B = /*#__PURE__*/styled(\\"div\\")({
+const B = /*#__PURE__*/styled('div')({
   name: \\"B\\",
   class: \\"bccybe9\\"
 });"
@@ -565,7 +565,7 @@ const styles = [{
   display: 'block',
   height: 24
 }];
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"t17gu1mi\\"
 });"
@@ -612,7 +612,7 @@ const cover = {
     msTransition: '400ms'
   }
 };
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"t17gu1mi\\"
 });"
@@ -632,7 +632,7 @@ Dependencies: NA
 
 exports[`outputs valid CSS classname 1`] = `
 "import { styled } from '@linaria/react';
-export const ΩPage$Title = /*#__PURE__*/styled(\\"h1\\")({
+export const ΩPage$Title = /*#__PURE__*/styled('h1')({
   name: \\"\\\\u03A9Page$Title\\",
   class: \\"\\\\u03C917gu1mi\\"
 });"
@@ -652,7 +652,7 @@ Dependencies: NA
 
 exports[`prevents class name collision 1`] = `
 "import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"t17gu1mi\\",
   vars: {
@@ -662,7 +662,7 @@ export const Title = /*#__PURE__*/styled(\\"h1\\")({
 });
 
 function Something() {
-  const Title = /*#__PURE__*/styled(\\"h1\\")({
+  const Title = /*#__PURE__*/styled('h1')({
     name: \\"Title\\",
     class: \\"tccybe9\\",
     vars: {
@@ -711,7 +711,7 @@ Dependencies: NA
 
 exports[`replaces unknown expressions with CSS custom properties 1`] = `
 "import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"t17gu1mi\\",
   vars: {
@@ -737,7 +737,7 @@ Dependencies: NA
 exports[`supports both css and styled tags 1`] = `
 "import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"t17gu1mi\\"
 });
@@ -829,7 +829,7 @@ exports[`transpiles renamed styled and atomic-styled imports in the same file 1`
 "/* @flow */
 import { styled as reactStyled } from '@linaria/react';
 import { styled as atomicStyled } from '@linaria/atomic';
-const StyledComponent = /*#__PURE__*/reactStyled(\\"div\\")({
+const StyledComponent = /*#__PURE__*/reactStyled('div')({
   name: \\"StyledComponent\\",
   class: \\"s17gu1mi\\"
 });
@@ -837,7 +837,7 @@ const StyledComponent2 = /*#__PURE__*/reactStyled(StyledComponent)({
   name: \\"StyledComponent2\\",
   class: \\"sccybe9\\"
 });
-const AtomicComponent = /*#__PURE__*/atomicStyled(\\"div\\")({
+const AtomicComponent = /*#__PURE__*/atomicStyled('div')({
   name: \\"AtomicComponent\\",
   class: \\"atm_26_5scuol aw1s2ox\\",
   atomic: true
@@ -857,7 +857,7 @@ CSS:
 .s17gu1mi {
   background: red;
 }
-.sccybe9 {
+.sccybe9.s17gu1mi {
   background: blue;
 }
 .atm_26_5scuol{background:red;}
@@ -880,6 +880,26 @@ exports[`transpiles renamed styled import 2`] = `
 CSS:
 
 .t17gu1mi {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`transpiles styled template literal with TS component 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled(() => {})({
+  name: \\"Title\\",
+  class: \\"tkullng\\"
+});"
+`;
+
+exports[`transpiles styled template literal with TS component 2`] = `
+
+CSS:
+
+.tkullng {
   font-size: 14px;
 }
 
@@ -932,7 +952,7 @@ Dependencies: NA
 
 exports[`transpiles styled template literal with object 1`] = `
 "import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled(\\"h1\\")({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"t17gu1mi\\"
 });"
@@ -944,6 +964,30 @@ CSS:
 
 .t17gu1mi {
   font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`transpiles with typed fn as interpolated value 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('div')({
+  name: \\"Title\\",
+  class: \\"tkullng\\",
+  vars: {
+    \\"tkullng-0\\": [props => props.className]
+  }
+});"
+`;
+
+exports[`transpiles with typed fn as interpolated value 2`] = `
+
+CSS:
+
+.tkullng {
+  font-size: 14px;
+  content: "var(--tkullng-0)"
 }
 
 Dependencies: NA
@@ -972,7 +1016,7 @@ Dependencies: NA
 
 exports[`uses the same custom property for the same expression 1`] = `
 "import { styled } from '@linaria/react';
-export const Box = /*#__PURE__*/styled(\\"div\\")({
+export const Box = /*#__PURE__*/styled('div')({
   name: \\"Box\\",
   class: \\"b17gu1mi\\",
   vars: {
@@ -996,7 +1040,7 @@ Dependencies: NA
 
 exports[`uses the same custom property for the same identifier 1`] = `
 "import { styled } from '@linaria/react';
-export const Box = /*#__PURE__*/styled(\\"div\\")({
+export const Box = /*#__PURE__*/styled('div')({
   name: \\"Box\\",
   class: \\"b17gu1mi\\",
   vars: {

@@ -16,6 +16,9 @@
   ],
   "license": "MIT",
   "repository": "git@github.com:callstack/linaria.git",
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
   "bugs": {
     "url": "https://github.com/callstack/linaria/issues"
   },
@@ -33,7 +36,6 @@
     "build": "yarn build:lib && yarn build:esm",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
     "prepare": "yarn build && yarn build:declarations",
-    "test": "jest --config ../../jest.config.js --rootDir .",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "yarn build --watch"
   }

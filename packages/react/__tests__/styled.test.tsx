@@ -1,7 +1,9 @@
 import React from 'react';
+
 import { omit } from '../src/styled';
 
 const renderer = require('react-test-renderer');
+
 const { styled } = require('../src');
 
 it('renders tag with display name and class name', () => {

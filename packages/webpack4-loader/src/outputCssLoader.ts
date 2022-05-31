@@ -1,4 +1,5 @@
 import loaderUtils from 'loader-utils';
+
 import { getCacheInstance } from './cache';
 
 type LoaderContext = Parameters<typeof loaderUtils.getOptions>[0];

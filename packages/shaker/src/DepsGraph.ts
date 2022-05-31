@@ -1,4 +1,5 @@
 import { types as t } from '@babel/core';
+
 import type { PromisedNode } from './scope';
 import type ScopeManager from './scope';
 import { resolveNode } from './scope';

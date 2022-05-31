@@ -19,12 +19,15 @@
   ],
   "linaria": {
     "tags": {
-      "css": "@linaria/core/lib/processors/css.js",
-      "styled": "@linaria/react/lib/processors/styled.js"
+      "css": "@linaria/core/processors/css",
+      "styled": "@linaria/react/processors/styled"
     }
   },
   "license": "MIT",
   "repository": "git@github.com:callstack/linaria.git",
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
   "bugs": {
     "url": "https://github.com/callstack/linaria/issues"
   },

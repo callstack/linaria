@@ -25,10 +25,11 @@ import type {
 } from '@babel/types';
 
 import { peek } from '@linaria/babel-preset';
-import type { IdentifierHandlers, Visitors } from '../types';
+
+import type DepsGraph from '../DepsGraph';
 import type GraphBuilderState from '../GraphBuilderState';
 import ScopeManager from '../scope';
-import type DepsGraph from '../DepsGraph';
+import type { IdentifierHandlers, Visitors } from '../types';
 
 function isIdentifier(
   node: Node,

@@ -1,11 +1,13 @@
 import { types as t } from '@babel/core';
 import type { Aliases, Identifier, Node } from '@babel/types';
+
 import { peek } from '@linaria/babel-preset';
 import type { VisitorKeys } from '@linaria/babel-preset';
+
 import type GraphBuilderState from './GraphBuilderState';
-import type { IdentifierHandlerType, NodeType } from './types';
 import { identifierHandlers as core } from './langs/core';
 import ScopeManager from './scope';
+import type { IdentifierHandlerType, NodeType } from './types';
 
 type HandlerFn = <TParent extends Node = Node>(
   builder: GraphBuilderState,

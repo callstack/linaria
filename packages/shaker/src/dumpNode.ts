@@ -49,7 +49,7 @@ export default function dumpNode<T extends Node>(
   keys.forEach((key) => {
     const subNode = node[key];
 
-    result += `${'| '.repeat(level)}|-${key}\n`;
+    result += `${'| '.repeat(level)}|-${key.toString()}\n`;
     if (Array.isArray(subNode)) {
       for (let i = 0; i < subNode.length; i++) {
         const child = subNode[i];

@@ -1,13 +1,14 @@
 import { types as t } from '@babel/core';
 import type { Identifier, Node } from '@babel/types';
-import { warn } from '@linaria/logger';
+
 import { peek } from '@linaria/babel-preset';
 import type { VisitorKeys } from '@linaria/babel-preset';
+import { warn } from '@linaria/logger';
+
 import type GraphBuilderState from './GraphBuilderState';
 import identifierHandlers from './identifierHandlers';
-import type { Visitor, Visitors } from './types';
-
 import { visitors as core } from './langs/core';
+import type { Visitor, Visitors } from './types';
 
 const visitors: Visitors = {
   Identifier<TParent extends Node>(

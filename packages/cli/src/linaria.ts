@@ -2,12 +2,14 @@
  * This file contains a CLI for Linaria.
  */
 
-import path from 'path';
 import fs from 'fs';
-import normalize from 'normalize-path';
-import mkdirp from 'mkdirp';
+import path from 'path';
+
 import glob from 'glob';
+import mkdirp from 'mkdirp';
+import normalize from 'normalize-path';
 import yargs from 'yargs';
+
 import { transform } from '@linaria/babel-preset';
 
 const argv = yargs
