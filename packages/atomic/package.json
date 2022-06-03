@@ -1,6 +1,6 @@
 {
   "name": "@linaria/atomic",
-  "version": "3.0.0-beta.18",
+  "version": "3.0.0-beta.19",
   "publishConfig": {
     "access": "public"
   },
@@ -46,10 +46,10 @@
     "watch": "yarn build --watch"
   },
   "dependencies": {
-    "@linaria/core": "^3.0.0-beta.18",
-    "@linaria/logger": "^3.0.0-beta.15",
-    "@linaria/utils": "^3.0.0-beta.18",
-    "@linaria/react": "^3.0.0-beta.18",
+    "@linaria/core": "^3.0.0-beta.19",
+    "@linaria/logger": "^3.0.0-beta.19",
+    "@linaria/react": "^3.0.0-beta.19",
+    "@linaria/utils": "^3.0.0-beta.19",
     "known-css-properties": "^0.24.0",
     "postcss": "^8.3.11",
     "stylis": "^3.5.4",

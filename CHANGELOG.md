@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.19](https://github.com/callstack/linaria/compare/v3.0.0-beta.18...v3.0.0-beta.19) (2022-06-03)
+
+
+### Bug Fixes
+
+* **atomic:** fix duplication of the same css properties in the same file ([#972](https://github.com/callstack/linaria/issues/972)) ([f60039e](https://github.com/callstack/linaria/commit/f60039e9145627456d18cbff6b3610a95f1e7219))
+* **babel:** error when css calls reference css calls inside components ([#971](https://github.com/callstack/linaria/issues/971)) ([fe6e083](https://github.com/callstack/linaria/commit/fe6e083fb48e71274a4e506824ccb8b461b7fb89))
+* **esbuild:** add add missing loader and resolveDir ([#955](https://github.com/callstack/linaria/issues/955)) ([ef1051f](https://github.com/callstack/linaria/commit/ef1051ff81a9a147743d798b1262c5f49a41b14b))
+* **react:** support UpperCamelCase custom elements [#968](https://github.com/callstack/linaria/issues/968) ([#970](https://github.com/callstack/linaria/issues/970)) ([59800db](https://github.com/callstack/linaria/commit/59800dba540e09c0c43b1f0ec1d4b2c46d8a4672))
+* **stylelint:** remove console.log from stylelint preprocessor ([#969](https://github.com/callstack/linaria/issues/969)) ([1ae913b](https://github.com/callstack/linaria/commit/1ae913b0e6091e95c8d9ee42d98bfbe78260d65d))
+
+
+### Features
+
+* **atomic:** add support for atomic using styled API ([#966](https://github.com/callstack/linaria/issues/966)) ([f59860b](https://github.com/callstack/linaria/commit/f59860b09c5f91b0423dbf188e5f8aaaef38a6b5))
+* **babel:** api for custom tags ([#976](https://github.com/callstack/linaria/issues/976)) ([3285ccc](https://github.com/callstack/linaria/commit/3285ccc1d00449b78b3fc74087528cd38cbdd116))
+* **babel:** new way for detecting tag imports ([#974](https://github.com/callstack/linaria/issues/974)) ([3305cfb](https://github.com/callstack/linaria/commit/3305cfb0c0f65abdacceeb7e6bad118c59f7d551))
+* **core:** allow renaming of css template literals ([#973](https://github.com/callstack/linaria/issues/973)) ([8f59a82](https://github.com/callstack/linaria/commit/8f59a82400143ef35b6ffc7f024ad5e6a16552d8))
+
+
+
+
+
 # [3.0.0-beta.18](https://github.com/callstack/linaria/compare/v3.0.0-beta.17...v3.0.0-beta.18) (2022-04-01)
 
 

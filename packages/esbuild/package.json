@@ -1,6 +1,6 @@
 {
   "name": "@linaria/esbuild",
-  "version": "3.0.0-beta.18",
+  "version": "3.0.0-beta.19",
   "publishConfig": {
     "access": "public"
   },
@@ -42,7 +42,7 @@
     "watch": "yarn build --watch"
   },
   "dependencies": {
-    "@linaria/babel-preset": "^3.0.0-beta.18",
+    "@linaria/babel-preset": "^3.0.0-beta.19",
     "esbuild": "^0.12.5"
   },
   "peerDependencies": {
