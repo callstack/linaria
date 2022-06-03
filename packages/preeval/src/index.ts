@@ -5,13 +5,14 @@
  */
 import type { NodePath } from '@babel/traverse';
 import type { Program, Statement, VariableDeclaration } from '@babel/types';
+
 import type { State, StrictOptions } from '@linaria/babel-preset';
 import {
-  GenerateClassNames,
   JSXElement,
-  ProcessStyled,
-  ProcessCSS,
+  replaceTagWithValue,
+  processTemplateExpression,
 } from '@linaria/babel-preset';
+
 import type { Core } from './babel';
 
 const isHoistableExport = (
@@ -53,8 +54,10 @@ function index(babel: Core, options: StrictOptions) {
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
-            TaggedTemplateExpression: (p) =>
-              GenerateClassNames(babel, p, state, options),
+            TaggedTemplateExpression: (p) => {
+              processTemplateExpression(babel, 'preeval', p, state, options);
+              replaceTagWithValue(p, state, options);
+            },
             JSXElement,
           });
         },
@@ -74,8 +77,6 @@ function index(babel: Core, options: StrictOptions) {
             });
         },
       },
-      CallExpression: ProcessStyled,
-      TaggedTemplateExpression: ProcessCSS, // TaggedTemplateExpression is processed before CallExpression
     },
   };
 }

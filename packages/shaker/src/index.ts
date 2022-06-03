@@ -1,9 +1,11 @@
-import generator from '@babel/generator';
 import { transformSync } from '@babel/core';
+import generator from '@babel/generator';
 import type { Program } from '@babel/types';
-import { debug } from '@linaria/logger';
+
 import type { Evaluator, StrictOptions } from '@linaria/babel-preset';
 import { buildOptions } from '@linaria/babel-preset';
+import { debug } from '@linaria/logger';
+
 import shake from './shaker';
 
 function prepareForShake(
@@ -18,8 +20,6 @@ function prepareForShake(
     require.resolve('@babel/preset-env'),
     {
       targets: 'ie 11',
-      // we need this plugin so we list it explicitly, explanation in `packages/extractor/src/index`
-      include: ['@babel/plugin-transform-template-literals'],
     },
   ]);
   transformOptions.presets!.unshift([

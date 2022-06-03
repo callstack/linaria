@@ -1,7 +1,9 @@
 /* eslint-disable no-template-curly-in-string */
 
 import path from 'path';
+
 import dedent from 'dedent';
+
 import transform, { transformUrl } from '../src/transform';
 
 const outputFilename = './.linaria-cache/test.css';

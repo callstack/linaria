@@ -1,11 +1,13 @@
 /* eslint-env jest */
 import { join } from 'path';
+
 import * as babel from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import traverse from '@babel/traverse';
-import dedent from 'dedent';
 import type { Program } from '@babel/types';
+import dedent from 'dedent';
 import * as ts from 'typescript';
+
 import collectExportsAndImports from '../src/utils/collectExportsAndImports';
 import type { IImport, IState } from '../src/utils/collectExportsAndImports';
 

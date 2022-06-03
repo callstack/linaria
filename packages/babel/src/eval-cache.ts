@@ -1,4 +1,5 @@
 import { createHash } from 'crypto';
+
 import { debug } from '@linaria/logger';
 
 const fileHashes = new Map<string, string>();

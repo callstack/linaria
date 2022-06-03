@@ -1,6 +1,8 @@
 import path from 'path';
-import dedent from 'dedent';
+
 import * as babel from '@babel/core';
+import dedent from 'dedent';
+
 import { Module } from '../src';
 import type { Evaluator, StrictOptions } from '../src';
 

@@ -1,4 +1,5 @@
 import type webpack from 'webpack';
+
 import type { ICache } from './cache';
 import { getCacheInstance } from './cache';
 

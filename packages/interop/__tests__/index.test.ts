@@ -1,5 +1,6 @@
 const babel = require('@babel/core');
 const dedent = require('dedent');
+
 const plugin = require('../src');
 
 const getCode = (src: string) => {

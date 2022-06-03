@@ -1,7 +1,8 @@
 /* eslint-disable no-template-curly-in-string */
 
-import dedent from 'dedent';
 import * as babel from '@babel/core';
+import dedent from 'dedent';
+
 import buildDepsGraph from '../src/graphBuilder';
 
 function _build(literal: TemplateStringsArray, ...placeholders: string[]) {

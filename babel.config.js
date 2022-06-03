@@ -4,9 +4,9 @@
  * (unspecified): Produces ES module output, no language features
  *   (except non-standard ones) are transpiled.
  * "legacy": Produces CommonJS output, uses @babel/preset-env to target
- *   Node.js 10 and specific browsers.
+ *   Node.js 12 and specific browsers.
  * "test": Used by Jest, produces CommonJS output, targetting
- *   the current Node.js version.
+ *   the same version as legacy.
  */
 
 /*
@@ -14,13 +14,13 @@
  */
 
 const commonJSTargets = {
-  browsers: ['last 2 versions', 'not op_mini all', 'not dead'],
-  node: '10',
+  browsers: '> 0.25% and supports array-includes',
+  // browsers: 'chrome > 90',
+  node: '12',
 };
 
 module.exports = {
   presets: ['@babel/preset-typescript'],
-  plugins: ['@babel/plugin-proposal-class-properties'],
   env: {
     legacy: {
       presets: [
@@ -40,7 +40,7 @@ module.exports = {
           '@babel/preset-env',
           {
             targets: {
-              node: '10',
+              node: commonJSTargets.node,
             },
           },
         ],
@@ -52,7 +52,7 @@ module.exports = {
       /**
        * only react and core packages are targeted to be run in the browser
        */
-      test: /\/packages\/((react)|(core))\//,
+      test: /\/packages\/(?:atomic|core|react)\/(?!src\/processors\/)/,
       presets: ['@babel/preset-react'],
       env: {
         legacy: {
@@ -60,20 +60,12 @@ module.exports = {
             [
               '@babel/preset-env',
               {
-                targets: {
-                  browsers: commonJSTargets.browsers,
-                },
+                targets: commonJSTargets.browsers,
                 loose: true,
                 // our styled component should not need to use any polyfill. We do not include core-js in dependencies. However, we leave this to detect if future changes would not introduce any need for polyfill
                 useBuiltIns: 'usage',
                 // Even core-js doesn't remember IE11
-                exclude: [
-                  /es\.array\.(?:filter|for-each|index-of|join|reduce|slice)/,
-                  'es.function.name',
-                  'es.object.keys',
-                  'es.object.to-string',
-                  'web.dom-collections.for-each',
-                ],
+                exclude: ['es.array.includes', 'web.dom-collections.iterator'],
                 corejs: 3,
                 // this is used to test if we do not introduced core-js polyfill
                 debug: process.env.DEBUG_CORE_JS === 'true',

@@ -1,7 +1,9 @@
 import type { Node } from '@babel/types';
+
 import type { VisitorKeys } from '@linaria/babel-preset';
-import ScopeManager from './scope';
+
 import DepsGraph from './DepsGraph';
+import ScopeManager from './scope';
 import type { VisitorAction } from './types';
 
 export type OnVisitCallback = (n: Node) => void;

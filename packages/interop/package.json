@@ -13,6 +13,9 @@
     "esm/"
   ],
   "repository": "https://github.com/callstack/linaria/tree/master/packages/interop",
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
   "homepage": "https://github.com/callstack/linaria/tree/master/packages/interop#readme",
   "author": {
     "name": "Anton Evzhakov",

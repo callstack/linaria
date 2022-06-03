@@ -1,7 +1,8 @@
-import { unitless } from '../units';
 import type { JSONValue } from '../types';
-import isSerializable from './isSerializable';
+import { unitless } from '../units';
+
 import isBoxedPrimitive from './isBoxedPrimitive';
+import isSerializable from './isSerializable';
 
 const hyphenate = (s: string) => {
   if (s.startsWith('--')) {

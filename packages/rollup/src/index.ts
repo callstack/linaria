@@ -5,7 +5,9 @@
  */
 
 import path from 'path';
+
 import { createFilter } from '@rollup/pluginutils';
+
 import { transform, slugify } from '@linaria/babel-preset';
 import type {
   PluginOptions,

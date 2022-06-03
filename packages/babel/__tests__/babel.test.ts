@@ -1,9 +1,12 @@
 import { join } from 'path';
+
+import type { TransformOptions } from '@babel/core';
 import { transformAsync } from '@babel/core';
 import dedent from 'dedent';
 import stripAnsi from 'strip-ansi';
-import type { StrictOptions } from '../src';
+
 import serializer from '../__utils__/linaria-snapshot-serializer';
+import type { StrictOptions } from '../src';
 
 expect.addSnapshotSerializer(serializer);
 
@@ -11,16 +14,25 @@ const transpile = async (
   input: string,
   opts: Partial<StrictOptions> = {
     evaluate: false,
-    atomize: require('@linaria/atomic').atomize,
+  },
+  isTS = false
+) => {
+  const presets: TransformOptions['presets'] = [
+    [require.resolve('../src'), opts],
+  ];
+
+  if (isTS) {
+    presets.unshift(require.resolve('@babel/preset-typescript'));
   }
-) =>
-  (await transformAsync(input, {
+
+  return (await transformAsync(input, {
     babelrc: false,
-    presets: [[require.resolve('../src'), opts]],
+    presets,
     plugins: ['@babel/plugin-syntax-jsx'],
-    filename: join(__dirname, 'app/index.js'),
+    filename: join(__dirname, `app/index.${isTS ? 'ts' : 'js'}`),
     configFile: false,
   }))!;
+};
 
 it('transpiles styled template literal with object', async () => {
   const { code, metadata } = await transpile(
@@ -215,6 +227,49 @@ it('transpiles styled template literal with function and component', async () =>
       font-size: 14px;
     \`;
     `
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('transpiles styled template literal with TS component', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from '@linaria/react';
+
+    type Props = { className?: string; children?: React.ReactNode };
+
+    export const Title = styled((props: Props) => null)\`
+      font-size: 14px;
+    \`;
+    `,
+    {
+      evaluate: false,
+    },
+    true
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
+it('transpiles with typed fn as interpolated value', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { styled } from '@linaria/react';
+
+    type Props = { className?: string; children?: React.ReactNode };
+
+    export const Title = styled.div\`
+      font-size: 14px;
+      content: "${'${(props: Props) => props.className}'}"
+    \`;
+    `,
+    {
+      evaluate: false,
+    },
+    true
   );
 
   expect(code).toMatchSnapshot();

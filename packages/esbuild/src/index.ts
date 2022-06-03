@@ -4,12 +4,14 @@
  * returns transformed code without template literals and attaches generated source maps
  */
 
-import path from 'path';
 import fs from 'fs';
-import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
-import { slugify, transform } from '@linaria/babel-preset';
+import path from 'path';
+
 import type { Plugin, TransformOptions, Loader } from 'esbuild';
 import { transformSync } from 'esbuild';
+
+import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
+import { slugify, transform } from '@linaria/babel-preset';
 
 type EsbuildPluginOptions = {
   sourceMap?: boolean;

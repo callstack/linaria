@@ -1,8 +1,10 @@
+import { all as knownProperties } from 'known-css-properties';
 import type { Document, AtRule, Container, Rule } from 'postcss';
 import postcss from 'postcss';
-import { slugify } from '@linaria/utils';
 import stylis from 'stylis';
-import { all as knownProperties } from 'known-css-properties';
+
+import { slugify } from '@linaria/utils';
+
 import { getPropertyPriority } from './propertyPriority';
 
 const knownPropertiesMap = knownProperties.reduce(
@@ -23,6 +25,18 @@ function hashProperty(property: string) {
   return slugify(property);
 }
 
+const parseCss = (cssText: string) => {
+  try {
+    return postcss.parse(cssText);
+  } catch (e) {
+    if (e instanceof Error) {
+      throw new Error(`Error parsing CSS: ${e.message}\nCSS:\n${cssText}`);
+    }
+
+    throw new Error(`Unknown error parsing CSS.\nCSS:\n${cssText}`);
+  }
+};
+
 export default function atomize(cssText: string, hasPriority = false) {
   stylis.set({
     prefix: false,
@@ -34,7 +48,7 @@ export default function atomize(cssText: string, hasPriority = false) {
     property: string;
   }[] = [];
 
-  const stylesheet = postcss.parse(cssText);
+  const stylesheet = parseCss(cssText);
 
   // We want to extract all keyframes and leave them as-is.
   // This isn't scoped locally yet

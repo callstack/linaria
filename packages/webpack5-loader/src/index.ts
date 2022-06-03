@@ -5,13 +5,16 @@
  */
 
 import path from 'path';
-import loaderUtils from 'loader-utils';
+
 import enhancedResolve from 'enhanced-resolve';
+import loaderUtils from 'loader-utils';
 import type { RawSourceMap } from 'source-map';
+import type { RawLoaderDefinitionFunction } from 'webpack';
+
 import type { Result, Preprocessor } from '@linaria/babel-preset';
 import { EvalCache, Module, transform } from '@linaria/babel-preset';
 import { debug, notify } from '@linaria/logger';
-import type { RawLoaderDefinitionFunction } from 'webpack';
+
 import type { ICache } from './cache';
 import { getCacheInstance } from './cache';
 

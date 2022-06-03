@@ -1,12 +1,14 @@
 import { types as t } from '@babel/core';
 import type { AssignmentExpression, Node } from '@babel/types';
+
 import { isNode, getVisitorKeys } from '@linaria/babel-preset';
 import type { VisitorKeys } from '@linaria/babel-preset';
+
 import type DepsGraph from './DepsGraph';
 import GraphBuilderState from './GraphBuilderState';
 import { getVisitors } from './Visitors';
-import type { VisitorAction, Visitor } from './types';
 import ScopeManager from './scope';
+import type { VisitorAction, Visitor } from './types';
 
 const isVoid = (node: Node): boolean =>
   t.isUnaryExpression(node) && node.operator === 'void';

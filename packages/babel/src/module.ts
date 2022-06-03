@@ -11,12 +11,15 @@
  *
  */
 
-import NativeModule from 'module';
-import vm from 'vm';
 import fs from 'fs';
+import NativeModule from 'module';
 import path from 'path';
+import vm from 'vm';
+
 import type { BabelFileResult } from '@babel/core';
+
 import { debug } from '@linaria/logger';
+
 import * as EvalCache from './eval-cache';
 import * as process from './process';
 import type { Evaluator, StrictOptions } from './types';

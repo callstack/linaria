@@ -3,6 +3,7 @@
  */
 
 import type { PluginItem, TransformOptions } from '@babel/core';
+
 import type { StrictOptions } from '../types';
 
 type DefaultOptions = Partial<TransformOptions> & {

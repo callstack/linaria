@@ -1,5 +1,6 @@
 import dedent from 'dedent';
 import prettier from 'prettier';
+
 import collect from '../src/collect';
 
 const prettyPrint = (src: string) => prettier.format(src, { parser: 'scss' });

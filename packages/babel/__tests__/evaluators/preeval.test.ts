@@ -1,6 +1,8 @@
 import { join } from 'path';
+
 import { transformAsync } from '@babel/core';
 import dedent from 'dedent';
+
 import serializer from '../../__utils__/linaria-snapshot-serializer';
 import type { StrictOptions } from '../../src';
 

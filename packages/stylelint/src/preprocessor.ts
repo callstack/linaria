@@ -1,4 +1,5 @@
 import stripAnsi from 'strip-ansi';
+
 import { transform } from '@linaria/babel-preset';
 import type { Replacement } from '@linaria/babel-preset';
 

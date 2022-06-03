@@ -1,12 +1,14 @@
 /* eslint-env jest */
 /* eslint-disable import/no-extraneous-dependencies */
 import { join, resolve } from 'path';
+
 import * as babel from '@babel/core';
 import dedent from 'dedent';
 import stripAnsi from 'strip-ansi';
 
 import { Module } from '../src';
 import type { Evaluator, StrictOptions } from '../src';
+
 import serializer from './linaria-snapshot-serializer';
 
 expect.addSnapshotSerializer(serializer);

@@ -21,6 +21,9 @@
   },
   "license": "MIT",
   "repository": "git@github.com:callstack/linaria.git",
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
   "bugs": {
     "url": "https://github.com/callstack/linaria/issues"
   },
@@ -44,6 +47,31 @@
     "watch": "yarn build --watch"
   },
   "dependencies": {
+    "@linaria/logger": "^3.0.0-beta.15",
     "@linaria/utils": "^3.0.0-beta.18"
+  },
+  "devDependencies": {
+    "@babel/traverse": ">=7",
+    "@babel/types": ">=7"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./esm/index.js",
+      "default": "./lib/index.js"
+    },
+    "./*": {
+      "types": "./types/*.d.ts",
+      "import": "./esm/*.js",
+      "default": "./lib/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "processors/*": [
+        "./types/processors/*.d.ts"
+      ]
+    }
   }
 }

@@ -1,4 +1,5 @@
 import type { Aliases, Node } from '@babel/types';
+
 import type { VisitorKeys } from '@linaria/babel-preset';
 
 export type NodeOfType<T> = Extract<Node, { type: T }>;

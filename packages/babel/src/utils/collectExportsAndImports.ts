@@ -19,6 +19,7 @@ import type {
 } from '@babel/types';
 
 import { warn } from '@linaria/logger';
+
 import isRequire from './isRequire';
 
 interface IImportSpecifier {

@@ -1,7 +1,9 @@
 /* tslint:disable:no-unnecessary-generics */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as React from 'react';
+
 import { css } from '@linaria/core';
+
 import { styled } from '../src';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
