@@ -44,6 +44,7 @@ module.exports = {
             },
           },
         ],
+        '@babel/preset-typescript',
       ],
     },
   },
@@ -79,7 +80,7 @@ module.exports = {
       /**
        * we have to transpile JSX in tests
        */
-      test: /\/((__tests__)|(__fixtures__))\//,
+      test: /\/(__tests__|__fixtures__|packages\/teskit\/src)\//,
       presets: ['@babel/preset-react'],
     },
   ],

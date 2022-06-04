@@ -52,13 +52,14 @@ function buildCodeFrameError(path: NodePath, message: string): Error {
 
 const definedTagsCache = new Map<string, Record<string, string> | undefined>();
 const getDefinedTagsFromPackage = (
-  pkgName: string
+  pkgName: string,
+  filename: string
 ): Record<string, string> | undefined => {
   if (definedTagsCache.has(pkgName)) {
     return definedTagsCache.get(pkgName);
   }
 
-  const pkgPath = require.resolve(pkgName);
+  const pkgPath = require.resolve(pkgName, { paths: [dirname(filename)] });
   const packageJSONPath = findUp.sync('package.json', { cwd: pkgPath });
   if (!packageJSONPath) {
     return undefined;
@@ -75,7 +76,7 @@ const getDefinedTagsFromPackage = (
           ...acc,
           [key]: value.startsWith('.')
             ? join(packageDir, value)
-            : require.resolve(value),
+            : require.resolve(value, { paths: [packageDir] }),
         }),
         {} as Record<string, string>
       )
@@ -92,9 +93,10 @@ function isValidProcessorClass(module: unknown): module is ProcessorClass {
 
 function getProcessor(
   packageName: string,
-  tagName: string
+  tagName: string,
+  filename: string
 ): ProcessorClass | null {
-  const definedTags = getDefinedTagsFromPackage(packageName);
+  const definedTags = getDefinedTagsFromPackage(packageName, filename);
   const processorPath = definedTags?.[tagName];
   if (!processorPath) {
     return null;
@@ -110,7 +112,8 @@ function getProcessor(
 
 function getBuilderForTemplate(
   path: NodePath<TaggedTemplateExpression>,
-  imports: IImport[]
+  imports: IImport[],
+  filename: string
 ): Builder | null {
   let tagPath: NodePath | undefined;
 
@@ -139,7 +142,11 @@ function getBuilderForTemplate(
     return null;
   }
 
-  const Processor = getProcessor(relatedImport.source, relatedImport.imported);
+  const Processor = getProcessor(
+    relatedImport.source,
+    relatedImport.imported,
+    filename
+  );
 
   if (!Processor) {
     return null;
@@ -288,9 +295,16 @@ export default function getTagProcessor(
       return null;
     }
 
-    const { imports } = collectExportsAndImports(root);
+    const { imports } = collectExportsAndImports(
+      root,
+      state.file.opts.filename
+    );
     try {
-      const builder = getBuilderForTemplate(path, imports);
+      const builder = getBuilderForTemplate(
+        path,
+        imports,
+        state.file.opts.filename
+      );
       if (builder) {
         const displayName = getDisplayName(path, idx, state);
         const processor = builder(displayName, idx, options, state.file.opts);

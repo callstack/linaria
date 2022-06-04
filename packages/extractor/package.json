@@ -1,57 +1,55 @@
 {
   "name": "@linaria/extractor",
-  "version": "3.0.0-beta.19",
-  "publishConfig": {
-    "access": "public"
-  },
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "main": "lib/index.js",
-  "module": "esm/index.js",
-  "types": "types",
+  "version": "3.0.0-beta.19",
+  "bugs": "https://github.com/callstack/linaria/issues",
+  "dependencies": {
+    "@babel/core": "^7.18.2",
+    "@babel/generator": ">=7",
+    "@babel/plugin-transform-runtime": ">=7",
+    "@babel/plugin-transform-template-literals": ">=7",
+    "@linaria/babel-preset": "workspace:^",
+    "@linaria/preeval": "workspace:^"
+  },
+  "devDependencies": {
+    "@babel/types": "^7.18.4",
+    "@types/babel__core": "^7.1.19",
+    "@types/babel__generator": "^7.6.4",
+    "@types/babel__traverse": "^7.17.1"
+  },
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
   "files": [
     "types/",
     "lib/",
     "esm/"
   ],
-  "license": "MIT",
-  "repository": "git@github.com:callstack/linaria.git",
-  "engines": {
-    "node": "^12.16.0 || >=13.7.0"
-  },
-  "bugs": {
-    "url": "https://github.com/callstack/linaria/issues"
-  },
   "homepage": "https://github.com/callstack/linaria#readme",
   "keywords": [
-    "react",
-    "linaria",
+    "babel",
+    "babel-plugin",
     "css",
     "css-in-js",
-    "styled-components",
-    "babel-plugin",
-    "babel"
+    "linaria",
+    "react",
+    "styled-components"
   ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "git@github.com:callstack/linaria.git",
   "scripts": {
-    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
-    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
-    "build": "yarn build:lib && yarn build:esm",
+    "build": "npm run build:lib && npm run build:esm",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
-    "prepare": "yarn build && yarn build:declarations",
-    "test": "jest --config ../../jest.config.js --rootDir .",
+    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "prepare": "npm run build && npm run build:declarations",
     "typecheck": "tsc --noEmit --composite false",
-    "watch": "yarn build --watch"
+    "watch": "npm run build --watch"
   },
-  "dependencies": {
-    "@babel/generator": ">=7",
-    "@babel/plugin-transform-runtime": ">=7",
-    "@babel/plugin-transform-template-literals": ">=7",
-    "@linaria/babel-preset": "^3.0.0-beta.19",
-    "@linaria/preeval": "^3.0.0-beta.19"
-  },
-  "devDependencies": {
-    "dedent": "^0.7.0"
-  },
-  "peerDependencies": {
-    "@babel/core": ">=7"
-  }
+  "types": "types"
 }

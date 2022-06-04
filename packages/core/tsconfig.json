@@ -1,5 +1,9 @@
 {
   "extends": "../../tsconfig.json",
-  "compilerOptions": { "paths": {}, "rootDir": "src/" },
+  "compilerOptions": {
+    "paths": {},
+    "rootDir": "src/",
+    "types": ["node"]
+  },
   "references": [{ "path": "../logger" }, { "path": "../utils" }]
 }

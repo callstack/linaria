@@ -3,10 +3,7 @@ import { createHash } from 'crypto';
 import { debug } from '@linaria/logger';
 
 const fileHashes = new Map<string, string>();
-const evalCache = new Map<
-  string,
-  Record<string, unknown> | string | undefined
->();
+const evalCache = new Map<string, unknown>();
 const fileKeys = new Map<string, string[]>();
 
 const hash = (text: string) => createHash('sha1').update(text).digest('base64');
@@ -62,7 +59,7 @@ export const has = (
 export const get = (
   [filename, ...exports]: string[],
   text: string
-): Record<string, unknown> | string | undefined => {
+): unknown => {
   const key = toKey(filename, exports);
   const textHash = memoizedHash(text);
   debug('eval-cache:get', `${key} ${textHash}`);
@@ -77,7 +74,7 @@ export const get = (
 export const set = (
   [filename, ...exports]: string[],
   text: string,
-  value: Record<string, unknown> | string | undefined
+  value: unknown
 ): void => {
   const key = toKey(filename, exports);
   const textHash = memoizedHash(text);

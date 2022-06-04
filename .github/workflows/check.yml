@@ -11,22 +11,33 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x, 18.x]
+        node-version: [14.x, 16.x, 18.x]
 
     steps:
       - uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+          run_install: false
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: 'pnpm'
+
       - name: Install and prepare
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies
       - name: ESLint
-        run: yarn lint
+        run: pnpm lint
       - name: TSLint
-        run: yarn test:dts
+        run: pnpm turbo run test:dts
       - name: Tests
-        run: yarn test
+        run: pnpm turbo run test

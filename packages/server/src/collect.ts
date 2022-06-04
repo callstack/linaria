@@ -72,7 +72,7 @@ export default function collect(html: string, css: string): CollectResult {
      * @font-face rules may be defined also in CSS conditional groups (eg. @media)
      * we want only handle those from top-level, rest will be handled in stylesheet.walkRules
      */
-    if (rule.parent.type === 'root') {
+    if (rule.parent?.type === 'root') {
       critical.append(rule);
     }
   });
@@ -80,13 +80,17 @@ export default function collect(html: string, css: string): CollectResult {
   const walkedAtRules = new Set();
 
   stylesheet.walkRules((rule) => {
-    if ('name' in rule.parent && rule.parent.name === 'keyframes') {
+    if (
+      rule.parent &&
+      'name' in rule.parent &&
+      (rule.parent as { name: string }).name === 'keyframes'
+    ) {
       return;
     }
 
-    if (rule.parent.type === 'atrule') {
+    if (rule.parent?.type === 'atrule') {
       if (!walkedAtRules.has(rule.parent)) {
-        handleAtRule(rule.parent);
+        handleAtRule(rule.parent as AtRule);
         walkedAtRules.add(rule.parent);
       }
       return;

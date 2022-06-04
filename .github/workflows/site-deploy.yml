@@ -6,17 +6,27 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2.3.1
-        with:
-          persist-credentials: false
 
-      - name: Install and Build 🔧
-        run: |
-          yarn install --frozen-lockfile
-          yarn website install --frozen-lockfile
-          yarn website build
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+          run_install: false
+
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'pnpm'
+
+      - name: Install and prepare
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1

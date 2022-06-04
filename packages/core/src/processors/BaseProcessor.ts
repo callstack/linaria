@@ -55,13 +55,7 @@ export default abstract class BaseProcessor {
    * @param source
    * @return chunk of CSS that should be added to extracted CSS
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public addInterpolation(node: Expression, source: string): string {
-    // CSS custom properties can't be used outside components
-    throw new Error(
-      "The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin."
-    );
-  }
+  public abstract addInterpolation(node: Expression, source: string): string;
 
   public abstract extractRules(
     valueCache: ValueCache,

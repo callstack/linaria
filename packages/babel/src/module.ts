@@ -13,7 +13,7 @@
 
 import fs from 'fs';
 import NativeModule from 'module';
-import path from 'path';
+import path, { dirname } from 'path';
 import vm from 'vm';
 
 import type { BabelFileResult } from '@babel/core';
@@ -107,7 +107,7 @@ class Module {
 
   paths: string[];
 
-  exports: Record<string, unknown> | string | undefined;
+  exports: unknown;
 
   extensions: string[];
 
@@ -311,7 +311,11 @@ class Module {
     } else {
       // Action can be a function or a module name
       const evaluator: Evaluator =
-        typeof action === 'function' ? action : require(action).default;
+        typeof action === 'function'
+          ? action
+          : require(require.resolve(action, {
+              paths: [dirname(this.filename)],
+            })).default;
 
       // For JavaScript files, we need to transpile it and to get the exports of the module
       let imports: Module['imports'];

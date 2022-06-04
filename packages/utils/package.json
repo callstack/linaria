@@ -1,42 +1,40 @@
 {
   "name": "@linaria/utils",
-  "version": "3.0.0-beta.19",
-  "publishConfig": {
-    "access": "public"
-  },
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "sideEffects": false,
-  "main": "lib/index.js",
-  "module": "esm/index.js",
-  "types": "types/index.d.ts",
+  "version": "3.0.0-beta.19",
+  "bugs": "https://github.com/callstack/linaria/issues",
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
   "files": [
     "types/",
     "lib/",
     "esm/"
   ],
-  "license": "MIT",
-  "repository": "git@github.com:callstack/linaria.git",
-  "engines": {
-    "node": "^12.16.0 || >=13.7.0"
-  },
-  "bugs": {
-    "url": "https://github.com/callstack/linaria/issues"
-  },
   "homepage": "https://github.com/callstack/linaria#readme",
   "keywords": [
-    "react",
-    "linaria",
     "css",
     "css-in-js",
+    "linaria",
+    "react",
     "styled-components"
   ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "git@github.com:callstack/linaria.git",
   "scripts": {
-    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
-    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
-    "build": "yarn build:lib && yarn build:esm",
+    "build": "npm run build:lib && npm run build:esm",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
-    "prepare": "yarn build && yarn build:declarations",
+    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "prepare": "npm run build && npm run build:declarations",
     "typecheck": "tsc --noEmit --composite false",
-    "watch": "yarn build --watch"
-  }
+    "watch": "npm run build --watch"
+  },
+  "sideEffects": false,
+  "types": "types/index.d.ts"
 }

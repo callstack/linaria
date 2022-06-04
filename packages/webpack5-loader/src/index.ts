@@ -7,7 +7,6 @@
 import path from 'path';
 
 import enhancedResolve from 'enhanced-resolve';
-import loaderUtils from 'loader-utils';
 import type { RawSourceMap } from 'source-map';
 import type { RawLoaderDefinitionFunction } from 'webpack';
 
@@ -177,8 +176,10 @@ const webpack5Loader: Loader = function webpack5LoaderPlugin(
         const request = `${outputFileName}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
           typeof cacheProvider === 'string' ? cacheProvider : ''
         )}!${this.resourcePath}`;
-        // @ts-expect-error there are no types for loader-utils ^3.0.0
-        const stringifiedRequest = loaderUtils.stringifyRequest(this, request);
+        this.utils.contextify(this.context || this.rootContext, request);
+        const stringifiedRequest = JSON.stringify(
+          this.utils.contextify(this.context || this.rootContext, request)
+        );
 
         return this.callback(
           null,

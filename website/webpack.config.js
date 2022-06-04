@@ -1,4 +1,3 @@
-const path = require('path');
 const webpack = require('webpack'); // eslint-disable-line import/no-extraneous-dependencies
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // eslint-disable-line import/no-extraneous-dependencies
 
@@ -11,12 +10,11 @@ module.exports = {
     app: './src/index',
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
     publicPath: '/dist/',
     filename: '[name].bundle.js',
   },
   optimization: {
-    noEmitOnErrors: true,
+    emitOnErrors: false,
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -24,15 +22,18 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({ filename: 'styles.css' }),
   ],
+  resolve: {
+    extensions: ['.js', '.jsx'],
+  },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.jsx?$/,
         exclude: /node_modules/,
         use: [
           { loader: 'babel-loader' },
           {
-            loader: require.resolve('@linaria/webpack4-loader'),
+            loader: require.resolve('@linaria/webpack5-loader'),
             options: { sourceMap: dev },
           },
         ],
@@ -50,7 +51,14 @@ module.exports = {
       },
       {
         test: /\.(png|jpg|gif|svg)$/,
-        use: [{ loader: 'file-loader' }],
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              esModule: false,
+            },
+          },
+        ],
       },
     ],
   },

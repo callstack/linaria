@@ -1,0 +1,61 @@
+{
+  "name": "@linaria/testkit",
+  "description": "Blazing fast zero-runtime CSS in JS library",
+  "version": "3.0.0-beta.19",
+  "bugs": "https://github.com/callstack/linaria/issues",
+  "dependencies": {
+    "@babel/core": "^7.18.2",
+    "@babel/generator": ">=7",
+    "@babel/traverse": ">=7",
+    "@linaria/babel-preset": "workspace:^",
+    "@linaria/extractor": "workspace:^",
+    "@linaria/preeval": "workspace:^",
+    "@linaria/react": "workspace:^",
+    "@linaria/shaker": "workspace:^",
+    "dedent": "^0.7.0",
+    "strip-ansi": "^5.2.0",
+    "typescript": "^4.7.3"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.18.2",
+    "@babel/runtime": "^7.18.3",
+    "@babel/types": "^7.18.4",
+    "@linaria/atomic": "workspace:^",
+    "@linaria/core": "workspace:^",
+    "@linaria/logger": "workspace:^",
+    "@linaria/utils": "workspace:^",
+    "@types/babel__core": "^7.1.19",
+    "@types/babel__generator": "^7.6.4",
+    "@types/babel__traverse": "^7.17.1",
+    "@types/dedent": "^0.7.0",
+    "@types/jest": "^28.1.0",
+    "@types/node": "^17.0.39",
+    "babel-plugin-istanbul": "^6.1.1",
+    "jest": "^28.1.0",
+    "linaria": "workspace:^",
+    "ts-jest": "^28.0.4"
+  },
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
+  "homepage": "https://github.com/callstack/linaria#readme",
+  "keywords": [
+    "babel",
+    "babel-plugin",
+    "css",
+    "css-in-js",
+    "linaria",
+    "react",
+    "styled-components"
+  ],
+  "license": "MIT",
+  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "git@github.com:callstack/linaria.git",
+  "scripts": {
+    "test": "jest --config ./jest.config.js --rootDir .",
+    "typecheck": "tsc --noEmit --composite false"
+  }
+}
