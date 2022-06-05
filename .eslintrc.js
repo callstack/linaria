@@ -187,6 +187,9 @@ module.exports = {
       parserOptions: {
         requireConfigFile: false,
       },
+      rules: {
+        'import/no-unresolved': noUnresolved,
+      },
     },
     {
       files: [
@@ -248,6 +251,7 @@ module.exports = {
         },
       },
       rules: {
+        'import/no-unresolved': noUnresolved,
         'global-require': 0,
       },
     },
