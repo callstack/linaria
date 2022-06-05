@@ -192,7 +192,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
         try {
           const { ex: expression } = expressionValue;
           cssText += tagProcessor.addInterpolation(
-            expression instanceof NodePath ? expression.node : expression,
+            'node' in expression ? expression.node : expression,
             expressionValue.source
           );
         } catch (e) {
