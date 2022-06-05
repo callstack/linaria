@@ -25,7 +25,7 @@ export default function loadOptions(
       {
         // FIXME: if `rule` is not specified in a config, `@linaria/shaker` should be added as a dependency
         // eslint-disable-next-line import/no-extraneous-dependencies
-        action: require('@linaria/shaker').default,
+        action: '@linaria/shaker',
       },
       {
         // The old `ignore` option is used as a default value for `ignore` rule.

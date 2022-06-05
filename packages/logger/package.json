@@ -1,48 +1,46 @@
 {
   "name": "@linaria/logger",
-  "version": "3.0.0-beta.19",
-  "publishConfig": {
-    "access": "public"
-  },
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "main": "lib/index.js",
-  "module": "esm/index.js",
-  "types": "types",
+  "version": "3.0.0-beta.19",
+  "bugs": "https://github.com/callstack/linaria/issues",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "picocolors": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.5",
+    "@types/node": "^17.0.39"
+  },
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
   "files": [
     "types/",
     "lib/",
     "esm/"
   ],
-  "license": "MIT",
-  "repository": "git@github.com:callstack/linaria.git",
-  "engines": {
-    "node": "^12.16.0 || >=13.7.0"
-  },
-  "bugs": {
-    "url": "https://github.com/callstack/linaria/issues"
-  },
   "homepage": "https://github.com/callstack/linaria#readme",
   "keywords": [
-    "react",
-    "linaria",
     "css",
     "css-in-js",
+    "linaria",
+    "react",
     "styled-components"
   ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "git@github.com:callstack/linaria.git",
   "scripts": {
-    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
-    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
-    "build": "yarn build:lib && yarn build:esm",
+    "build": "npm run build:lib && npm run build:esm && npm run build:declarations",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
-    "prepare": "yarn build && yarn build:declarations",
+    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "typecheck": "tsc --noEmit --composite false",
-    "watch": "yarn build --watch"
+    "watch": "npm run build --watch"
   },
-  "devDependencies": {
-    "@types/debug": "^4.1.5"
-  },
-  "dependencies": {
-    "debug": "^4.1.1",
-    "picocolors": "^1.0.0"
-  }
+  "types": "types"
 }

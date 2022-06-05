@@ -8,6 +8,8 @@ import { debug } from '@linaria/logger';
 
 import shake from './shaker';
 
+export { default as buildDepsGraph } from './graphBuilder';
+
 function prepareForShake(
   filename: string,
   options: StrictOptions,

@@ -13,6 +13,14 @@ export default class CssProcessor extends BaseProcessor {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  public override addInterpolation(): string {
+    // CSS custom properties can't be used outside components
+    throw new Error(
+      "The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin."
+    );
+  }
+
   public override extractRules(
     valueCache: ValueCache,
     cssText: string,

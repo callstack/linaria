@@ -1,0 +1,30 @@
+module.exports = {
+  dev: true,
+  filter: '.',
+  indent: '  ',
+  overrides: true,
+  peer: false,
+  pnpmOverrides: true,
+  prod: true,
+  resolutions: true,
+  semverGroups: [],
+  semverRange: '',
+  sortAz: [
+    'contributors',
+    'dependencies',
+    'devDependencies',
+    'keywords',
+    'peerDependencies',
+    'resolutions',
+    'scripts',
+  ],
+  sortFirst: ['name', 'description', 'version', 'author'],
+  source: [],
+  versionGroups: [
+    {
+      dependencies: ['@types/enhanced-resolve', 'enhanced-resolve', 'webpack'],
+      packages: ['@linaria/webpack4-loader'],
+    },
+  ],
+  workspace: true,
+};

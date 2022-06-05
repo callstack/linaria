@@ -83,6 +83,16 @@ const getExpression = (
 ): NodePath<Expression> =>
   'originalEx' in value ? value.originalEx : value.ex;
 
+function hasPreval(
+  exports: unknown
+): exports is { __linariaPreval: Value[] | null | undefined } {
+  if (!exports || typeof exports !== 'object') {
+    return false;
+  }
+
+  return '__linariaPreval' in exports;
+}
+
 export default function evaluateExpressions(
   babel: Core,
   program: NodePath<Program>,
@@ -147,10 +157,9 @@ export default function evaluateExpressions(
       debug('lazy-deps:sub-files', evaluation.dependencies);
 
       dependencies.push(...evaluation.dependencies);
-      lazyValues =
-        evaluation.value && typeof evaluation.value !== 'string'
-          ? (evaluation.value?.__linariaPreval as Value[]) || []
-          : [];
+      lazyValues = hasPreval(evaluation.value)
+        ? evaluation.value.__linariaPreval || []
+        : [];
       debug('lazy-deps:values', lazyValues);
     } catch (e: unknown) {
       error('lazy-deps:evaluate:error', code);

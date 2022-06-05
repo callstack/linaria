@@ -17,25 +17,25 @@ export default function getClassNameAndSlug(
   options: IOptions,
   context: IFileContext
 ): { className: string; slug: string } {
+  const relativeFilename = relative(context.root, context.filename);
   // Custom properties need to start with a letter, so we prefix the slug
   // Also use append the index of the class to the filename for uniqueness in the file
   const slug = toValidCSSIdentifier(
     `${displayName.charAt(0).toLowerCase()}${slugify(
-      `${relative(context.root, context.filename)}:${idx}`
+      `${relativeFilename}:${idx}`
     )}`
   );
 
   // Collect some useful replacement patterns from the filename
   // Available variables for the square brackets used in `classNameSlug` options
-  const file = relative(process.cwd(), context.filename).slice(1);
-  const ext = extname(file);
+  const ext = extname(relativeFilename);
   const slugVars: ClassNameSlugVars = {
     hash: slug,
     title: displayName,
-    file,
+    file: relativeFilename,
     ext,
-    name: basename(file, ext),
-    dir: dirname(file).split(sep).pop() as string,
+    name: basename(relativeFilename, ext),
+    dir: dirname(relativeFilename).split(sep).pop() as string,
   };
 
   let className = options.displayName

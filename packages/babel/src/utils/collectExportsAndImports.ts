@@ -1,4 +1,6 @@
 /* eslint-disable no-restricted-syntax,no-continue */
+import { dirname } from 'path';
+
 import type { NodePath } from '@babel/traverse';
 import type {
   CallExpression,
@@ -39,11 +41,14 @@ export interface IExport {
 export interface IState {
   imports: IImport[];
   exports: IExport[];
+  filename: string;
 }
 
-const safeResolve = (name: string): string => {
+const safeResolve = (name: string, filename: string): string => {
   try {
-    return require.resolve(name);
+    return require.resolve(name, {
+      paths: [dirname(filename)],
+    });
   } catch (e: unknown) {
     return name;
   }
@@ -105,7 +110,7 @@ function collectFromImportDeclaration(
   // If importKind is specified, and it's not a value, ignore that import
   if (!isImportKindIsValue(path)) return;
 
-  const source = safeResolve(getValue(path.get('source')));
+  const source = safeResolve(getValue(path.get('source')), state.filename);
   path
     .get('specifiers')
     .forEach(<T extends SpecifierTypes>(specifier: NodePath<T>) => {
@@ -220,7 +225,7 @@ function collectFromDynamicImport(path: NodePath<Import>, state: IState): void {
     return;
   }
 
-  const source = safeResolve(sourcePath.node.value);
+  const source = safeResolve(sourcePath.node.value, state.filename);
 
   let { parentPath: container, key } = callExpression;
   let isAwaited = false;
@@ -279,7 +284,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
     return;
   }
 
-  const source = safeResolve(sourcePath.node.value);
+  const source = safeResolve(sourcePath.node.value, state.filename);
 
   const { parentPath: container, key } = callExpression;
 
@@ -502,10 +507,14 @@ function collectFromExportNamedDeclaration(
 
 const cache = new WeakMap<NodePath, IState>();
 
-export default function collectExportsAndImports(path: NodePath) {
+export default function collectExportsAndImports(
+  path: NodePath,
+  filename: string
+): IState {
   const state: IState = {
     imports: [],
     exports: [],
+    filename,
   };
 
   if (cache.has(path)) {

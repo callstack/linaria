@@ -42,9 +42,18 @@ const cx: ICX = function cx() {
     });
   });
 
-  return [...Object.values(atomicClasses), ...nonAtomicClasses].join(
-    ' '
-  ) as LinariaClassName;
+  const result: string[] = [];
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const keyHash in atomicClasses) {
+    if (Object.prototype.hasOwnProperty.call(atomicClasses, keyHash)) {
+      result.push(atomicClasses[keyHash]);
+    }
+  }
+
+  result.push(...nonAtomicClasses);
+
+  return result.join(' ') as LinariaClassName;
 };
 
 export default cx;

@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": { "paths": {}, "rootDir": "src/", "types": ["jest", "node"] },
+  "references": [
+    { "path": "../babel" },
+    { "path": "../core" },
+    { "path": "../logger" },
+    { "path": "../react" },
+    { "path": "../shaker" },
+    { "path": "../utils" }
+  ]
+}

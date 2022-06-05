@@ -21,8 +21,15 @@ export {
   default as transform,
   extractCssFromAst,
   shouldTransformCode,
+  transformUrl,
 } from './transform';
 export * from './types';
+export { default as collectExportsAndImports } from './utils/collectExportsAndImports';
+export type {
+  IImport,
+  IExport,
+  IState,
+} from './utils/collectExportsAndImports';
 export type { PluginOptions } from './utils/loadOptions';
 export { default as isNode } from './utils/isNode';
 export { default as getTagProcessor } from './utils/getTagProcessor';
