@@ -39,11 +39,10 @@
   },
   "repository": "git@github.com:callstack/linaria.git",
   "scripts": {
-    "build": "npm run build:lib && npm run build:esm",
+    "build": "npm run build:lib && npm run build:esm && npm run build:declarations",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
     "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
-    "prepare": "npm run build && npm run build:declarations",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "npm run build --watch"
   },

@@ -11,9 +11,6 @@
     "check:all": {
       "dependsOn": ["test:dts", "typecheck", "test"]
     },
-    "prepare": {
-      "dependsOn": ["^prepare"]
-    },
     "lint": {},
     "test": {
       "dependsOn": [],
