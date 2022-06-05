@@ -15,12 +15,7 @@ var _Hero = _interopRequireDefault(require("./Hero"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const Page = {
-  "background": "atm_barbmq",
-  "color": "atm_mysskn",
-  "min-height": "atm_81bpwl",
-  "text-shadow": "atm_8mi21e"
-};
+const Page = "atm_26_1u0dmv0 atm_7l_u67f1s atm_j6_1kxcs5u atm_sy_12yic89";
 
 function Index() {
   return /*#__PURE__*/_react.default.createElement("div", {

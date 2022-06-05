@@ -25,35 +25,35 @@ function Hero() {
   })))));
 }
 
-const HeroContainer = /*#__PURE__*/(0, _react.styled)("main")({
+const HeroContainer = /*#__PURE__*/(0, _react.styled)('main')({
   name: "HeroContainer",
-  class: "h1rolopv"
+  class: "h1tylktb"
 });
-const Row = /*#__PURE__*/(0, _react.styled)("div")({
+const Row = /*#__PURE__*/(0, _react.styled)('div')({
   name: "Row",
-  class: "r13wc1tf"
+  class: "r1f6r3fj"
 });
-const LeftColumn = /*#__PURE__*/(0, _react.styled)("div")({
+const LeftColumn = /*#__PURE__*/(0, _react.styled)('div')({
   name: "LeftColumn",
-  class: "l146m3r4"
+  class: "la3rybj"
 });
-const RightColumn = /*#__PURE__*/(0, _react.styled)("div")({
+const RightColumn = /*#__PURE__*/(0, _react.styled)('div')({
   name: "RightColumn",
-  class: "r1oacsu2"
+  class: "rw75u8k"
 });
-const Heading = /*#__PURE__*/(0, _react.styled)("h1")({
+const Heading = /*#__PURE__*/(0, _react.styled)('h1')({
   name: "Heading",
-  class: "hfjre8y"
+  class: "h8pe7ne"
 });
-const Description = /*#__PURE__*/(0, _react.styled)("p")({
+const Description = /*#__PURE__*/(0, _react.styled)('p')({
   name: "Description",
-  class: "d1jprizp"
+  class: "dimtlf9"
 });
-const Button = /*#__PURE__*/(0, _react.styled)("button")({
+const Button = /*#__PURE__*/(0, _react.styled)('button')({
   name: "Button",
-  class: "b199eznj"
+  class: "b1gqb1d3"
 });
-const CodeSample = /*#__PURE__*/(0, _react.styled)("img")({
+const CodeSample = /*#__PURE__*/(0, _react.styled)('img')({
   name: "CodeSample",
-  class: "c19oj5n"
+  class: "cyne737"
 });

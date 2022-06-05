@@ -37,17 +37,17 @@ function Header() {
 
 const NavBar = /*#__PURE__*/(0, _react.styled)(_Container.default)({
   name: "NavBar",
-  class: "n2pbki2"
+  class: "n11jhqd8"
 });
-const LogoImage = /*#__PURE__*/(0, _react.styled)("img")({
+const LogoImage = /*#__PURE__*/(0, _react.styled)('img')({
   name: "LogoImage",
-  class: "lqydogw"
+  class: "l2h01z2"
 });
-const Links = /*#__PURE__*/(0, _react.styled)("ul")({
+const Links = /*#__PURE__*/(0, _react.styled)('ul')({
   name: "Links",
-  class: "l1xo6fno"
+  class: "lkd2pf6"
 });
-const LinkItem = /*#__PURE__*/(0, _react.styled)("a")({
+const LinkItem = /*#__PURE__*/(0, _react.styled)('a')({
   name: "LinkItem",
-  class: "l1yoku03"
+  class: "l6fgol"
 });

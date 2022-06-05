@@ -17,8 +17,8 @@ var _constants = _interopRequireDefault(require("./styles/constants"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/* $FlowFixMe */
-_reactDom.default.render( /*#__PURE__*/_react.default.createElement(_App.default, null), document.getElementById('root'));
+_reactDom.default.render( /*#__PURE__*/_react.default.createElement(_App.default, null), document.getElementById('root')); // eslint-disable-next-line import/prefer-default-export
 
-const globals = "g1cus5as";
+
+const globals = "gulwyw3";
 exports.globals = globals;
