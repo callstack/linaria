@@ -3,10 +3,12 @@
   "baseBranch": "origin/master",
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": ["esm/**", "lib/**", "types/**"]
     },
     "build:declarations": {
-      "dependsOn": ["^build:declarations"]
+      "dependsOn": ["^build:declarations"],
+      "outputs": ["types/**"]
     },
     "check:all": {
       "dependsOn": ["test:dts", "typecheck", "test"]
@@ -14,7 +16,8 @@
     "lint": {},
     "test": {
       "dependsOn": [],
-      "outputs": []
+      "outputs": [],
+      "cache": false
     },
     "@linaria/atomic#test": {
       "dependsOn": ["@linaria/core#build", "@linaria/react#build"]
