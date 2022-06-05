@@ -1,0 +1,32 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@linaria/atomic": "3.0.0-beta.19",
+    "@linaria/babel-preset": "3.0.0-beta.19",
+    "@linaria/cli": "3.0.0-beta.19",
+    "@linaria/core": "3.0.0-beta.19",
+    "@linaria/esbuild": "3.0.0-beta.19",
+    "@linaria/extractor": "3.0.0-beta.19",
+    "@linaria/babel-plugin-interop": "3.0.0-beta.19",
+    "linaria": "3.0.0-beta.19",
+    "@linaria/logger": "3.0.0-beta.19",
+    "@linaria/preeval": "3.0.0-beta.19",
+    "@linaria/react": "3.0.0-beta.19",
+    "@linaria/rollup": "3.0.0-beta.19",
+    "@linaria/server": "3.0.0-beta.19",
+    "@linaria/shaker": "3.0.0-beta.19",
+    "@linaria/stylelint": "3.0.0-beta.19",
+    "@linaria/testkit": "3.0.0-beta.19",
+    "@linaria/utils": "3.0.0-beta.19",
+    "@linaria/webpack-loader": "3.0.0-beta.19",
+    "@linaria/webpack4-loader": "3.0.0-beta.19",
+    "@linaria/webpack5-loader": "3.0.0-beta.19",
+    "linaria-website": "3.0.0-beta.19"
+  },
+  "changesets": [
+    "cool-rockets-battle",
+    "curly-birds-joke",
+    "tall-dolls-compete"
+  ]
+}
