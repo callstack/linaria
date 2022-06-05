@@ -4,7 +4,7 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["esm/**", "lib/**", "types/**"]
+      "outputs": ["dist/**", "esm/**", "lib/**", "types/**"]
     },
     "build:declarations": {
       "dependsOn": ["^build:declarations"],
