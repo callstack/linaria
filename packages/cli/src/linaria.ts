@@ -56,7 +56,6 @@ const argv = yargs
   })
   .alias('help', 'h')
   .alias('version', 'v')
-  .strict()
   .parseSync();
 
 type Options = {
