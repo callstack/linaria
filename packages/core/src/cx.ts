@@ -3,7 +3,8 @@ export type LinariaClassName = string & { __linariaClassName: true };
 export type ClassName<T = string> = T | false | void | null | 0 | '';
 
 interface ICX {
-  (...classNames: (ClassName | ClassName<LinariaClassName>)[]): string;
+  (...classNames: ClassName<LinariaClassName>[]): LinariaClassName;
+  (...classNames: ClassName[]): string;
 }
 /**
  * Takes a list of class names and filters for truthy ones, joining them into a single class name for convenience.
