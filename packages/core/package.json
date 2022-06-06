@@ -62,6 +62,7 @@
     "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "test": "jest --config ../../jest.config.js --rootDir .",
+    "test:dts": "dtslint --localTs ../../node_modules/typescript/lib __dtslint__",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "npm run build --watch"
   },
