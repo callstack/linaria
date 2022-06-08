@@ -234,9 +234,8 @@ type ComponentStyledTagWithoutInterpolation<TOrigCmp> = (
   >
 ) => StyledMeta & TOrigCmp;
 
-type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <
-  OwnProps = Record<string, unknown>
->(
+// eslint-disable-next-line @typescript-eslint/ban-types
+type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
   strings: TemplateStringsArray,
   ...exprs: Array<
     | StaticPlaceholder

@@ -19,8 +19,9 @@ const Fabric =
 
 const Header = (p: { children: string }) => React.createElement('h1', p);
 
-const Generic = <T>(p: T & { className?: string }) =>
-  React.createElement('h1', p);
+const Generic = <T>(
+  p: T & { className?: string; style?: React.CSSProperties }
+) => React.createElement('h1', p);
 
 const StyledDiv = styled.div``;
 // $ExpectType "extends"
