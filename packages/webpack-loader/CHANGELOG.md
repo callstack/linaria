@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.0.0-beta.21
+
+### Patch Changes
+
+- @linaria/webpack4-loader@3.0.0-beta.21
+- @linaria/webpack5-loader@3.0.0-beta.21
+
 ## 3.0.0-beta.20
 
 ### Patch Changes

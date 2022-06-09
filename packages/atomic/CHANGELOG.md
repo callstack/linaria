@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.0.0-beta.21
+
+### Patch Changes
+
+- 17c83e34: Aliases for environments without the support of `exports` in package.json.
+- Updated dependencies [609d79ba]
+- Updated dependencies [f726eb3b]
+- Updated dependencies [17c83e34]
+  - @linaria/react@3.0.0-beta.21
+  - @linaria/core@3.0.0-beta.21
+
 ## 3.0.0-beta.20
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.0.0-beta.21
+
+### Patch Changes
+
+- 17c83e34: Fix for the case when `styled` wraps an imported component.
+- Updated dependencies [f726eb3b]
+- Updated dependencies [17c83e34]
+  - @linaria/core@3.0.0-beta.21
+
 ## 3.0.0-beta.20
 
 ### Patch Changes

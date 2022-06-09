@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.0.0-beta.21
+
+### Patch Changes
+
+- f726eb3b: `cx` should return `LinariaClassName` if all arguments are `LinariaClassName`
+- 17c83e34: Aliases for environments without the support of `exports` in package.json.
+
 ## 3.0.0-beta.20
 
 ### Patch Changes

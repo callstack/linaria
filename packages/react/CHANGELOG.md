@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.0.0-beta.21
+
+### Patch Changes
+
+- 609d79ba: Generic parameters of wrapped components had been missed in some cases.
+- 17c83e34: Aliases for environments without the support of `exports` in package.json.
+- Updated dependencies [f726eb3b]
+- Updated dependencies [17c83e34]
+  - @linaria/core@3.0.0-beta.21
+
 ## 3.0.0-beta.20
 
 ### Patch Changes

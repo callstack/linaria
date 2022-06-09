@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.0.0-beta.21
+
+### Patch Changes
+
+- Updated dependencies [17c83e34]
+- Updated dependencies [17c83e34]
+  - @linaria/babel-preset@3.0.0-beta.21
+
 ## 3.0.0-beta.20
 
 ### Patch Changes
