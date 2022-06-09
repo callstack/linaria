@@ -71,7 +71,7 @@ export default function linaria({
         }
 
         const { code } = transformSync(rawCode, {
-          ...esbuildOptions,
+          ...options,
           loader,
         });
         const result = transform(code, {
@@ -84,7 +84,7 @@ export default function linaria({
           return {
             contents: code,
             loader,
-            resolveDir: path.basename(args.path),
+            resolveDir: path.dirname(args.path),
           };
         }
 
@@ -106,7 +106,7 @@ export default function linaria({
           ${result.code}
           `,
           loader,
-          resolveDir: path.basename(args.path),
+          resolveDir: path.dirname(args.path),
         };
       });
     },
