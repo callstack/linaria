@@ -15,6 +15,7 @@ import type { StrictOptions } from '../types';
 import type { IImport } from './collectExportsAndImports';
 import collectExportsAndImports from './collectExportsAndImports';
 import getSource from './getSource';
+import isNotNull from './isNotNull';
 
 type BuilderArgs = ConstructorParameters<typeof BaseProcessor> extends [
   typeof t,
@@ -50,6 +51,23 @@ function buildCodeFrameError(path: NodePath, message: string): Error {
   }
 }
 
+function findPackageJSON(pkgName: string, filename: string) {
+  try {
+    const pkgPath = require.resolve(pkgName, { paths: [dirname(filename)] });
+    return findUp.sync('package.json', { cwd: pkgPath });
+  } catch (er: unknown) {
+    if (
+      typeof er === 'object' &&
+      er !== null &&
+      (er as { code?: unknown }).code === 'MODULE_NOT_FOUND'
+    ) {
+      return undefined;
+    }
+
+    throw er;
+  }
+}
+
 const definedTagsCache = new Map<string, Record<string, string> | undefined>();
 const getDefinedTagsFromPackage = (
   pkgName: string,
@@ -59,8 +77,7 @@ const getDefinedTagsFromPackage = (
     return definedTagsCache.get(pkgName);
   }
 
-  const pkgPath = require.resolve(pkgName, { paths: [dirname(filename)] });
-  const packageJSONPath = findUp.sync('package.json', { cwd: pkgPath });
+  const packageJSONPath = findPackageJSON(pkgName, filename);
   if (!packageJSONPath) {
     return undefined;
   }
@@ -115,40 +132,44 @@ function getBuilderForTemplate(
   imports: IImport[],
   filename: string
 ): Builder | null {
-  let tagPath: NodePath | undefined;
+  const relatedImports = imports
+    .map((i): [IImport, NodePath] | null => {
+      const { local } = i;
 
-  const isDescendant = (a: NodePath, b: NodePath) => {
-    if (a.isDescendant(b)) {
-      tagPath = a;
-      return true;
-    }
+      if (!local.isIdentifier()) {
+        if (local.isDescendant(path)) {
+          return [i, local];
+        }
 
-    return false;
-  };
+        return null;
+      }
 
-  const relatedImport = imports.find((i) => {
-    const { local } = i;
+      const binding = local.scope.getBinding(local.node.name);
 
-    if (!local.isIdentifier()) {
-      return isDescendant(local, path);
-    }
+      const tagPath = binding?.referencePaths.find((p) => p.isDescendant(path));
 
-    const binding = local.scope.getBinding(local.node.name);
+      if (tagPath) {
+        return [i, tagPath];
+      }
 
-    return binding?.referencePaths.some((p) => isDescendant(p, path));
-  });
+      return null;
+    })
+    .filter(isNotNull)
+    .filter((i) => i[1].isExpression());
 
-  if (!tagPath || !relatedImport || !tagPath.isExpression()) {
+  if (relatedImports.length === 0) {
     return null;
   }
 
-  const Processor = getProcessor(
-    relatedImport.source,
-    relatedImport.imported,
-    filename
-  );
+  const [Processor, tagPath] =
+    relatedImports
+      .map(([imp, p]): [ProcessorClass | null, NodePath] => [
+        getProcessor(imp.source, imp.imported, filename),
+        p,
+      ])
+      .find(([proc]) => proc) ?? [];
 
-  if (!Processor) {
+  if (!Processor || !tagPath) {
     return null;
   }
 
