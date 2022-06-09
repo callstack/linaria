@@ -3,7 +3,6 @@
  * It uses CSS code from template literals and evaluated values of lazy dependencies stored in ValueCache.
  */
 
-import { NodePath } from '@babel/traverse';
 import type { TemplateElement } from '@babel/types';
 
 import type { StyledMeta } from '@linaria/core';
