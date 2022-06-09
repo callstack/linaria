@@ -49,6 +49,19 @@ describe('getTagProcessor', () => {
     expect(tagSource(result)).toBe('renamedStyled(Cmp)');
   });
 
+  it('imported component', () => {
+    const result = run(
+      dedent`
+      import Layout from "../__fixtures__/components-library";
+      import { styled } from "@linaria/react";
+
+      export const StyledLayout = styled(Layout)\`\`;
+    `
+    );
+
+    expect(tagSource(result)).toBe('styled(Layout)');
+  });
+
   it('renamedStyled(Cmp)``', () => {
     const result = run(
       dedent`
