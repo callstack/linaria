@@ -20,9 +20,10 @@
     "node": "^12.16.0 || >=13.7.0"
   },
   "files": [
-    "types/",
+    "esm/",
     "lib/",
-    "esm/"
+    "processors/",
+    "types/"
   ],
   "homepage": "https://github.com/callstack/linaria#readme",
   "keywords": [

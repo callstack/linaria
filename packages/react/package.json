@@ -33,9 +33,10 @@
     }
   },
   "files": [
-    "types/",
+    "esm/",
     "lib/",
-    "esm/"
+    "processors/",
+    "types/"
   ],
   "homepage": "https://github.com/callstack/linaria#readme",
   "keywords": [
