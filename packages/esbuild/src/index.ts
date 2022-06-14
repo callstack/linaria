@@ -70,10 +70,19 @@ export default function linaria({
           }
         }
 
-        const { code } = transformSync(rawCode, {
+        const transformed = transformSync(rawCode, {
           ...options,
+          sourcefile: args.path,
+          sourcemap: sourceMap,
           loader,
         });
+        let { code } = transformed;
+
+        if (sourceMap) {
+          const esbuildMap = Buffer.from(transformed.map).toString('base64');
+          code += `/*# sourceMappingURL=data:application/json;base64,${esbuildMap}*/`;
+        }
+
         const result = transform(code, {
           filename: args.path,
           preprocessor,
@@ -93,18 +102,21 @@ export default function linaria({
         const slug = slugify(cssText);
         const cssFilename = `${filename}_${slug}.linaria.css`;
 
+        let contents = `import ${JSON.stringify(cssFilename)}; ${result.code}`;
+
         if (sourceMap && result.cssSourceMapText) {
           const map = Buffer.from(result.cssSourceMapText).toString('base64');
           cssText += `/*# sourceMappingURL=data:application/json;base64,${map}*/`;
+          const linariaMap = Buffer.from(
+            JSON.stringify(result.sourceMap)
+          ).toString('base64');
+          contents += `/*# sourceMappingURL=data:application/json;base64,${linariaMap}*/`;
         }
 
         cssLookup.set(cssFilename, cssText);
 
         return {
-          contents: `
-          import ${JSON.stringify(cssFilename)};
-          ${result.code}
-          `,
+          contents,
           loader,
           resolveDir: path.dirname(args.path),
         };
