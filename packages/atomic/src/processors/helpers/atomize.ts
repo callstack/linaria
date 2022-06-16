@@ -38,17 +38,29 @@ const parseCss = (cssText: string) => {
 };
 
 export default function atomize(cssText: string, hasPriority = false) {
+  // We first slugify the keyframes in cssText
+  const cssSlug = slugify(cssText);
   stylis.set({
     prefix: false,
+    keyframe: true,
+  });
+  const newCssText = stylis(`.${cssSlug}`, cssText).replace(
+    new RegExp(`\\.${cssSlug}`, 'g'),
+    ''
+  );
+  // Enable vendor prefix
+  stylis.set({
+    prefix: true,
     keyframe: false,
   });
+
   const atomicRules: {
     className?: string;
     cssText: string;
     property: string;
   }[] = [];
 
-  const stylesheet = parseCss(cssText);
+  const stylesheet = parseCss(newCssText);
 
   // We want to extract all keyframes and leave them as-is.
   // This isn't scoped locally yet
@@ -109,6 +121,7 @@ export default function atomize(cssText: string, hasPriority = false) {
       getPropertyPriority(decl.prop) +
       (hasAtRule ? 1 : 0) +
       (hasPriority ? 1 : 0);
+
     const processedCss = stylis(`.${className}`.repeat(propertyPriority), css);
 
     atomicRules.push({
