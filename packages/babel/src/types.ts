@@ -157,10 +157,11 @@ export type LinariaMetadata = {
 
 export type Options = {
   filename: string;
-  preprocessor?: Preprocessor;
-  outputFilename?: string;
   inputSourceMap?: RawSourceMap;
+  outputFilename?: string;
   pluginOptions?: Partial<PluginOptions>;
+  preprocessor?: Preprocessor;
+  root?: string;
 };
 
 export type PreprocessorFn = (selector: string, cssText: string) => string;

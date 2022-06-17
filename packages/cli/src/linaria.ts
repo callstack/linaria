@@ -141,6 +141,7 @@ function processFiles(files: (number | string)[], options: Options) {
         pluginOptions: {
           configFile: options.configFile,
         },
+        root: options.sourceRoot,
       }
     );
 
