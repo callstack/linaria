@@ -187,6 +187,7 @@ export default function transform(code: string, options: Options): Result {
     sourceMaps: true,
     sourceFileName: options.filename,
     inputSourceMap: options.inputSourceMap,
+    root: options.root,
   })!;
 
   return extractCssFromAst(babelFileResult, code, options);
