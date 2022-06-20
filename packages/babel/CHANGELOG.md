@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.0.0-beta.22
+
+### Patch Changes
+
+- 592b89b5: Fix for broken object interpolation (#995)
+- 782deb6f: Pass source-root option from CLI to babel-preset
+- Updated dependencies [12d35cb9]
+  - @linaria/core@3.0.0-beta.22
+
 ## 3.0.0-beta.21
 
 ### Patch Changes

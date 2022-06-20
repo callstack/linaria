@@ -1,5 +1,19 @@
 # @linaria/testkit
 
+## 3.0.0-beta.22
+
+### Patch Changes
+
+- 592b89b5: Fix for broken object interpolation (#995)
+- Updated dependencies [592b89b5]
+- Updated dependencies [12d35cb9]
+- Updated dependencies [782deb6f]
+  - @linaria/babel-preset@3.0.0-beta.22
+  - @linaria/react@3.0.0-beta.22
+  - @linaria/extractor@3.0.0-beta.22
+  - @linaria/preeval@3.0.0-beta.22
+  - @linaria/shaker@3.0.0-beta.22
+
 ## 3.0.0-beta.21
 
 ### Patch Changes

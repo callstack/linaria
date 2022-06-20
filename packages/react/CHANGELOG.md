@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.0.0-beta.22
+
+### Patch Changes
+
+- 12d35cb9: `processors` aliases have been lost during publishing. (fixes #984)
+- Updated dependencies [12d35cb9]
+  - @linaria/core@3.0.0-beta.22
+
 ## 3.0.0-beta.21
 
 ### Patch Changes

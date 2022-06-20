@@ -1,5 +1,21 @@
 # Change Log
 
+## 3.0.0-beta.22
+
+### Patch Changes
+
+- Updated dependencies [592b89b5]
+- Updated dependencies [12d35cb9]
+- Updated dependencies [782deb6f]
+  - @linaria/babel-preset@3.0.0-beta.22
+  - @linaria/core@3.0.0-beta.22
+  - @linaria/react@3.0.0-beta.22
+  - @linaria/extractor@3.0.0-beta.22
+  - @linaria/rollup@3.0.0-beta.22
+  - @linaria/shaker@3.0.0-beta.22
+  - @linaria/stylelint@3.0.0-beta.22
+  - @linaria/webpack4-loader@3.0.0-beta.22
+
 ## 3.0.0-beta.21
 
 ### Patch Changes
