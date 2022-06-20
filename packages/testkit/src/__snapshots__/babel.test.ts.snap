@@ -359,6 +359,34 @@ Dependencies: NA
 
 `;
 
+exports[`evaluates nested nested object interpolation 1`] = `
+"import { css } from '@linaria/core';
+const defaultStyle = \\"d17gu1mi\\";
+const obj = {
+  [\`&.\${defaultStyle} .green\`]: {
+    display: \\"inline-block\\",
+    border: \\"1px solid green\\"
+  }
+};
+export const greenContentStyles = \\"gccybe9\\";"
+`;
+
+exports[`evaluates nested nested object interpolation 2`] = `
+
+CSS:
+
+.d17gu1mi {
+  color: red;
+  padding-bottom: 0px;
+}
+.gccybe9 {
+  &.d17gu1mi .green { display: inline-block; border: 1px solid green; }
+}
+
+Dependencies: @babel/runtime/helpers/interopRequireDefault, @babel/runtime/helpers/defineProperty
+
+`;
+
 exports[`handles css template literal in JSX element 1`] = `
 "import { css } from '@linaria/core';
 <Title class={\\"t17gu1mi\\"} />;"

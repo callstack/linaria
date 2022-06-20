@@ -62,6 +62,21 @@ function hoist(babel: Core, ex: NodePath<Expression | null>): void {
   });
 }
 
+function findValuePath(
+  path: NodePath<Expression>
+): NodePath<Expression | null | undefined> | undefined {
+  if (!path.isIdentifier()) {
+    return undefined;
+  }
+
+  const binding = path.scope.getBinding(path.node.name);
+  if (binding?.path.isVariableDeclarator()) {
+    return binding.path.get('init');
+  }
+
+  return undefined;
+}
+
 export default function collectTemplateDependencies(
   babel: Core,
   path: NodePath<TaggedTemplateExpression>,
@@ -88,12 +103,11 @@ export default function collectTemplateDependencies(
       if (result.confident) {
         value = result.value;
       } else {
-        // @ts-expect-error result has deopt field, but it's not in types
-        const { deopt } = result as { deopt: NodePath };
-        // At least in some cases deopt contains an expression hidden behind an identifier
-        // If it is a TaggedTemplateExpression, we can get class name for it
-        if (deopt && deopt.isTaggedTemplateExpression()) {
-          const context = getTagProcessor(deopt, state, options);
+        // In some cases we can find a value of expression without evaluation
+        // If the value is a TaggedTemplateExpression, we can get class name for it
+        const valuePath = findValuePath(ex);
+        if (valuePath?.isTaggedTemplateExpression()) {
+          const context = getTagProcessor(valuePath, state, options);
           if (context?.asSelector) {
             return {
               kind: ValueType.VALUE,

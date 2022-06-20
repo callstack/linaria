@@ -294,6 +294,36 @@ it('outputs valid CSS classname', async () => {
   expect(metadata).toMatchSnapshot();
 });
 
+it('evaluates nested nested object interpolation', async () => {
+  const { code, metadata } = await transpile(
+    dedent`
+    import { css } from '@linaria/core';
+
+    const defaultStyle = css\`
+      color: red;
+      padding-bottom: ${'${0}'}px;
+    \`;
+
+    const obj = {
+      [\`&.${'${defaultStyle}'} .green\`]: {
+        display: "inline-block",
+        border: "1px solid green",
+      },
+    };
+
+    export const greenContentStyles = css\`
+      ${'${obj}'}
+    \`;
+    `,
+    {
+      evaluate: true,
+    }
+  );
+
+  expect(code).toMatchSnapshot();
+  expect(metadata).toMatchSnapshot();
+});
+
 it('evaluates and inlines expressions in scope', async () => {
   const { code, metadata } = await transpile(
     dedent`
