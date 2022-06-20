@@ -162,7 +162,7 @@ export default function getTemplateProcessor(options: StrictOptions) {
 
         const value = valueCache.get(exNode);
 
-        if (value && typeof value !== 'function') {
+        if (value !== undefined && typeof value !== 'function') {
           // Skip the blank string instead of throw ing an error
           if (value === '') {
             return;
