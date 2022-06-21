@@ -31,12 +31,19 @@ export type Serializable = JSONValue;
 
 export type Value = (() => void) | StyledMeta | CSSable;
 
-export type ValueCache = WeakMap<Expression, unknown>;
+export type ValueCache = Map<string, unknown>;
+
+export type Artifact = [name: string, data: unknown];
 
 export type Location = {
   column: number;
   line: number;
 };
+
+export interface IPlaceholder {
+  id: string;
+  resolver: () => string;
+}
 
 export interface ICSSRule {
   atom?: boolean;

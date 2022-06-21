@@ -24,15 +24,15 @@ export default class CssProcessor extends BaseProcessor {
     this.replacer(this.value, false);
   }
 
-  public override doRuntimeReplacement(classes: string): void {
-    this.replacer(this.astService.stringLiteral(classes), false);
+  public override doRuntimeReplacement(): void {
+    this.replacer(this.astService.stringLiteral(this.className), false);
   }
 
   public override extractRules(
     valueCache: ValueCache,
     cssText: string,
     loc?: SourceLocation | null
-  ): [Rules, string] {
+  ): Rules {
     const rules: Rules = {};
 
     const selector = `.${this.className}`;
@@ -44,7 +44,7 @@ export default class CssProcessor extends BaseProcessor {
       start: loc?.start ?? null,
     };
 
-    return [rules, this.className];
+    return rules;
   }
 
   public override get asSelector(): string {

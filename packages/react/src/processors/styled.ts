@@ -91,10 +91,10 @@ export default class StyledProcessor extends BaseProcessor {
     this.replacer(this.value, false);
   }
 
-  public override doRuntimeReplacement(classes: string): void {
+  public override doRuntimeReplacement(): void {
     const t = this.astService;
 
-    const props = this.getProps(classes);
+    const props = this.getProps();
 
     this.replacer(
       t.callExpression(this.tagExpression, [this.getTagComponentProps(props)]),
@@ -106,7 +106,7 @@ export default class StyledProcessor extends BaseProcessor {
     valueCache: ValueCache,
     cssText: string,
     loc?: SourceLocation | null
-  ): [Rules, string] {
+  ): Rules {
     const rules: Rules = {};
 
     let selector = `.${this.className}`;
@@ -117,7 +117,7 @@ export default class StyledProcessor extends BaseProcessor {
     let value =
       typeof this.component === 'string'
         ? null
-        : valueCache.get(this.component.node);
+        : valueCache.get(this.component.node.name);
     while (hasMeta(value)) {
       selector += `.${value.__linaria.className}`;
       value = value.__linaria.extends;
@@ -130,7 +130,7 @@ export default class StyledProcessor extends BaseProcessor {
       start: loc?.start ?? null,
     };
 
-    return [rules, this.className];
+    return rules;
   }
 
   public override get asSelector(): string {
@@ -147,7 +147,7 @@ export default class StyledProcessor extends BaseProcessor {
       return singleQuotedStringLiteral(this.component);
     }
 
-    return t.identifier(this.component.node.name);
+    return t.callExpression(t.identifier(this.component.node.name), []);
   }
 
   protected get tagExpression(): CallExpression {
@@ -183,8 +183,7 @@ export default class StyledProcessor extends BaseProcessor {
     ]);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected getProps(classes: string): IProps {
+  protected getProps(): IProps {
     const propsObj: IProps = {
       name: this.displayName,
       class: this.className,

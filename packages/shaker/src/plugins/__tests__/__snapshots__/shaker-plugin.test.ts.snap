@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`shaker should keep referenced exports 1`] = `
+"var _foo;
+
+_foo = 10;
+exports.defaultValue = Math.random() * _foo;
+exports.foo = _foo;"
+`;
+
+exports[`shaker should process array patterns 1`] = `
+"const [,, c] = array;
+export { c };"
+`;
+
+exports[`shaker should process object patterns 1`] = `
+"const {
+  b: b1
+} = obj;
+export { b1 };"
+`;
+
+exports[`shaker should process transpiled enums 1`] = `
+"var _Kind;
+
+exports.Kind = void 0;
+var Kind;
+
+(function (Kind) {
+  Kind[\\"DEFAULT\\"] = \\"default\\";
+  Kind[\\"TRANSPARENT\\"] = \\"transparent\\";
+  Kind[\\"RED\\"] = \\"red\\";
+  Kind[\\"BLACK\\"] = \\"black\\";
+})(Kind = _Kind || (_Kind = {}));
+
+export const defaultValue = Kind.DEFAULT;
+exports.Kind = _Kind;"
+`;
+
+exports[`shaker should remove all references of \`a\` 1`] = `"exports.b = 10;"`;
+
+exports[`shaker should remove related code 1`] = `
+"const a = 1;
+export { a };"
+`;
+
+exports[`shaker should remove unused export 1`] = `"export const a = 1;"`;
+
+exports[`shaker should throw out unused referenced exports 1`] = `"exports.defaultValue = 20;"`;

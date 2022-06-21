@@ -5,13 +5,14 @@ import path from 'path';
 import dedent from 'dedent';
 
 import { transform, transformUrl } from '@linaria/babel-preset';
+import { asyncResolveFallback } from '@linaria/utils';
 
 const outputFilename = './.linaria-cache/test.css';
 
 const rules = [
   {
     test: () => true,
-    action: require('@linaria/extractor').default,
+    action: require('@linaria/shaker').default,
   },
 ];
 
@@ -74,7 +75,8 @@ it('rewrites a relative path in url() declarations', async () => {
       pluginOptions: {
         rules,
       },
-    }
+    },
+    asyncResolveFallback
   );
 
   expect(cssText).toMatchSnapshot();
@@ -98,7 +100,8 @@ it('rewrites multiple relative paths in url() declarations', async () => {
       pluginOptions: {
         rules,
       },
-    }
+    },
+    asyncResolveFallback
   );
 
   expect(cssText).toMatchSnapshot();
@@ -119,7 +122,8 @@ it("doesn't rewrite an absolute path in url() declarations", async () => {
       pluginOptions: {
         rules,
       },
-    }
+    },
+    asyncResolveFallback
   );
 
   expect(cssText).toMatchSnapshot();
@@ -128,13 +132,13 @@ it("doesn't rewrite an absolute path in url() declarations", async () => {
 it('respects passed babel options', async () => {
   expect.assertions(2);
 
-  expect(() =>
+  await expect(() =>
     transform(
       dedent`
-      import { css } from '@linaria/core';
+        import { css } from '@linaria/core';
 
-      export const error = <jsx />;
-      `,
+        export const error = <jsx />;
+        `,
       {
         filename: './test.js',
         outputFilename,
@@ -146,13 +150,14 @@ it('respects passed babel options', async () => {
             presets: [['@babel/preset-env', { loose: true }]],
           },
         },
-      }
+      },
+      asyncResolveFallback
     )
-  ).toThrow(
+  ).rejects.toThrow(
     /Support for the experimental syntax 'jsx' isn't currently enabled/
   );
 
-  expect(() =>
+  await expect(() =>
     transform(
       dedent`
       import { css } from '@linaria/core';
@@ -176,7 +181,8 @@ it('respects passed babel options', async () => {
             ],
           },
         },
-      }
+      },
+      asyncResolveFallback
     )
   ).not.toThrow('Unexpected token');
 });
@@ -211,7 +217,8 @@ it("doesn't throw due to duplicate preset", async () => {
             ],
           },
         },
-      }
+      },
+      asyncResolveFallback
     )
   ).not.toThrow('Duplicate plugin/preset detected');
 });
@@ -231,7 +238,8 @@ it('should return transformed code even when file only contains unused linaria c
       pluginOptions: {
         rules,
       },
-    }
+    },
+    asyncResolveFallback
   );
 
   expect(code).not.toContain('css`');

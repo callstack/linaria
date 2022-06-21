@@ -13,16 +13,19 @@
 
 import fs from 'fs';
 import NativeModule from 'module';
-import path, { dirname } from 'path';
+import path from 'path';
 import vm from 'vm';
 
 import type { BabelFileResult } from '@babel/core';
 
-import { debug } from '@linaria/logger';
+import type BaseProcessor from '@linaria/core/types/processors/BaseProcessor';
+import type { CustomDebug } from '@linaria/logger';
+import { createCustomDebug } from '@linaria/logger';
+import type { StrictOptions } from '@linaria/utils';
+import { getFileIdx } from '@linaria/utils';
 
-import * as EvalCache from './eval-cache';
 import * as process from './process';
-import type { Evaluator, StrictOptions } from './types';
+import type { CodeCache } from './types';
 
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty
@@ -62,28 +65,17 @@ const builtins = {
   zlib: true,
 };
 
-// Separate cache for evaluated modules
-let cache: { [id: string]: Module } = {};
+const VALUES = Symbol('values');
+
+const isProxy = (
+  obj: unknown
+): obj is { [VALUES]: Record<string | symbol, unknown> } =>
+  typeof obj === 'object' && obj !== null && VALUES in obj;
 
 const NOOP = () => {};
 
-const createCustomDebug =
-  (depth: number) =>
-  (..._args: Parameters<typeof debug>) => {
-    const [namespaces, arg1, ...args] = _args;
-    const modulePrefix = depth === 0 ? 'module' : `sub-module-${depth}`;
-    debug(`${modulePrefix}:${namespaces}`, arg1, ...args);
-  };
-
-const cookModuleId = (rawId: string) => {
-  // It's a dirty hack for avoiding conflicts with babel-preset-react-app
-  // https://github.com/callstack/linaria/issues/745
-  // FIXME @Anber: I'll try to figure out a better solution. Probably, using Terser as a shaker's core can solve problems with interfered plugins.
-  return rawId.replace(
-    '/@babel/runtime/helpers/esm/',
-    '/@babel/runtime/helpers/'
-  );
-};
+const padStart = (num: number, len: number) =>
+  num.toString(10).padStart(len, '0');
 
 class Module {
   static invalidate: () => void;
@@ -97,6 +89,16 @@ class Module {
 
   static _nodeModulePaths: (filename: string) => string[];
 
+  #isEvaluated = false;
+
+  #exports: Record<string, unknown> | unknown;
+
+  // #exportsProxy: Record<string, unknown>;
+
+  #lazyValues: Map<string | symbol, () => unknown>;
+
+  readonly idx: number;
+
   id: string;
 
   filename: string;
@@ -107,19 +109,26 @@ class Module {
 
   paths: string[];
 
-  exports: unknown;
-
   extensions: string[];
 
   dependencies: string[] | null;
 
+  tagProcessors: BaseProcessor[] = [];
+
   transform: ((text: string) => BabelFileResult | null) | null;
 
-  debug: typeof debug;
+  debug: CustomDebug;
 
-  debuggerDepth: number;
-
-  constructor(filename: string, options: StrictOptions, debuggerDepth = 0) {
+  constructor(
+    filename: string,
+    options: StrictOptions,
+    private resolveCache: Map<string, string>,
+    private codeCache: CodeCache,
+    private evalCache: Map<string, Module>,
+    private debuggerDepth = 0,
+    private parentModule?: Module
+  ) {
+    this.idx = getFileIdx(filename);
     this.id = filename;
     this.filename = filename;
     this.options = options;
@@ -127,8 +136,7 @@ class Module {
     this.paths = [];
     this.dependencies = null;
     this.transform = null;
-    this.debug = createCustomDebug(debuggerDepth);
-    this.debuggerDepth = debuggerDepth;
+    this.debug = createCustomDebug('module', this.idx);
 
     Object.defineProperties(this, {
       id: {
@@ -151,15 +159,104 @@ class Module {
       },
     });
 
-    this.exports = {};
+    this.#lazyValues = new Map();
 
-    // We support following extensions by default
-    this.extensions = ['.json', '.js', '.jsx', '.ts', '.tsx'];
-    this.debug('prepare', filename);
+    const exports: Record<string | symbol, unknown> = {};
+
+    this.#exports = new Proxy(exports, {
+      get: (target, key) => {
+        if (key === VALUES) {
+          const values: Record<string | symbol, unknown> = {};
+          this.#lazyValues.forEach((v, k) => {
+            values[k] = v();
+          });
+
+          return values;
+        }
+        const value = this.#lazyValues.get(key)?.();
+        this.debug('evaluated', 'get %s: %o', key, value);
+        return value;
+      },
+      has: (target, key) => {
+        if (key === VALUES) return true;
+        return this.#lazyValues.has(key);
+      },
+      ownKeys: () => {
+        return Array.from(this.#lazyValues.keys());
+      },
+      set: (target, key, value) => {
+        if (value !== undefined) {
+          if (key !== '__esModule') {
+            this.debug('evaluated', 'set %s: %o', key, value);
+          }
+
+          this.#lazyValues.set(key, () => value);
+        }
+
+        return true;
+      },
+      defineProperty: (target, key, descriptor) => {
+        const { value } = descriptor;
+        if (value !== undefined) {
+          this.#lazyValues.set(key, () => value);
+
+          if (key !== '__esModule') {
+            this.debug(
+              'evaluated',
+              'defineProperty %s with value %o',
+              key,
+              value
+            );
+          }
+
+          this.#lazyValues.set(key, () => value);
+
+          return true;
+        }
+
+        if ('get' in descriptor) {
+          this.#lazyValues.set(key, descriptor.get!);
+          this.debug('evaluated', 'defineProperty %s with getter', key);
+        }
+
+        return true;
+      },
+      getOwnPropertyDescriptor() {
+        return {
+          enumerable: true,
+          configurable: true,
+        };
+      },
+    });
+
+    this.extensions = options.extensions;
+    this.debug('init', filename);
   }
 
-  resolve = (rawId: string) => {
-    const id = cookModuleId(rawId);
+  public get exports() {
+    return this.#exports;
+  }
+
+  public set exports(value) {
+    if (isProxy(value)) {
+      this.#exports = value[VALUES];
+    } else {
+      this.#exports = value;
+    }
+
+    this.debug(
+      'evaluated',
+      'the whole exports was overridden with %O',
+      this.#exports
+    );
+  }
+
+  resolve = (id: string) => {
+    const resolveCacheKey = `${this.filename} -> ${id}`;
+    if (this.resolveCache.has(resolveCacheKey)) {
+      return this.resolveCache.get(resolveCacheKey)!;
+    }
+
     const extensions = (
       NativeModule as unknown as {
         _extensions: { [key: string]: () => void };
@@ -193,16 +290,14 @@ class Module {
     (id: string): any;
     resolve: (id: string) => string;
     ensure: () => void;
-    cache: typeof cache;
   } = Object.assign(
-    (rawId: string) => {
-      const id = cookModuleId(rawId);
-      this.debug('require', id);
+    (id: string) => {
       if (id in builtins) {
         // The module is in the allowed list of builtin node modules
         // Ideally we should prevent importing them, but webpack polyfills some
         // So we check for the list of polyfills to determine which ones to support
         if (builtins[id as keyof typeof builtins]) {
+          this.debug('require', `builtin '${id}'`);
           return require(id);
         }
 
@@ -210,7 +305,8 @@ class Module {
       }
 
       // Resolve module id (and filename) relatively to parent module
-      const filename = this.resolve(id);
+      const resolved = this.resolve(id);
+      const [filename, onlyList] = resolved.split('\0');
       if (filename === id && !path.isAbsolute(id)) {
         // The module is a builtin node modules, but not in the allowed list
         throw new Error(
@@ -220,153 +316,158 @@ class Module {
 
       this.dependencies?.push(id);
 
-      let cacheKey = filename;
-      let only: string[] = [];
-      if (this.imports?.has(id)) {
-        // We know what exactly we need from this module. Let's shake it!
-        only = this.imports.get(id)!.sort();
-        if (only.length === 0) {
-          // Probably the module is used as a value itself
-          // like `'The answer is ' + require('./module')`
-          only = ['default'];
-        }
+      let m: Module;
 
-        cacheKey += `:${only.join(',')}`;
-      }
+      this.debug('require', `${id} -> ${filename}`);
 
-      let m = cache[cacheKey];
-
-      if (!m) {
-        this.debug('cached:not-exist', id);
+      if (this.evalCache.has(filename)) {
+        m = this.evalCache.get(filename)!;
+        this.debug('eval-cache', '✅ %r has been gotten from cache', {
+          namespace: `module:${padStart(m.idx, 5)}`,
+        });
+      } else {
+        this.debug('eval-cache', `❌ %r is going to be initialized`, {
+          namespace: `module:${padStart(getFileIdx(filename), 5)}`,
+        });
         // Create the module if cached module is not available
-        m = new Module(filename, this.options, this.debuggerDepth + 1);
+        m = new Module(
+          filename,
+          this.options,
+          this.resolveCache,
+          this.codeCache,
+          this.evalCache,
+          this.debuggerDepth + 1,
+          this
+        );
         m.transform = this.transform;
 
         // Store it in cache at this point with, otherwise
         // we would end up in infinite loop with cyclic dependencies
-        cache[cacheKey] = m;
+        this.evalCache.set(filename, m);
+      }
 
-        if (this.extensions.includes(path.extname(filename))) {
-          // To evaluate the file, we need to read it first
-          const code = fs.readFileSync(filename, 'utf-8');
-          if (/\.json$/.test(filename)) {
-            // For JSON files, parse it to a JS object similar to Node
-            m.exports = JSON.parse(code);
-          } else {
-            // For JS/TS files, evaluate the module
-            // The module will be transpiled using provided transform
-            m.evaluate(code, only.includes('*') ? ['*'] : only);
+      const extension = path.extname(filename);
+      if (extension === '.json' || this.extensions.includes(extension)) {
+        let code: string[] | undefined;
+        // Requested file can be already prepared for evaluation on the stage 1
+        if (this.codeCache.has(filename)) {
+          const perExportCache = this.codeCache.get(filename)!;
+          const only = onlyList
+            ?.split(',')
+            .filter((token) => !m.#lazyValues.has(token));
+          const codeSet = new Set<string>();
+          if (only && only.every((o) => perExportCache.has(o))) {
+            m.debug('code-cache', '✅');
+            only.forEach((o) => codeSet.add(perExportCache.get(o)!.code));
+          } else if (!only && perExportCache.has('*')) {
+            m.debug('code-cache', '✳️');
+            // The whole file is required
+            codeSet.add(perExportCache.get('*')!.code);
           }
+
+          code = Array.from(codeSet);
+        } else if (m.#isEvaluated) {
+          m.debug(
+            'code-cache',
+            '✅ not in the code cache, but is already evaluated'
+          );
+          code = [];
+        }
+
+        if (!code) {
+          // If code wasn't extracted from cache, read it from the file system
+          // TODO: transpile the file
+          m.debug('code-cache', '❌');
+          code = [fs.readFileSync(filename, 'utf-8')];
+        }
+
+        if (/\.json$/.test(filename) && code.length === 1) {
+          // For JSON files, parse it to a JS object similar to Node
+          m.exports = JSON.parse(code[0]);
+          m.#isEvaluated = true;
         } else {
-          // For non JS/JSON requires, just export the id
-          // This is to support importing assets in webpack
-          // The module will be resolved by css-loader
-          m.exports = id;
+          // For JS/TS files, evaluate the module
+          m.evaluate(code);
         }
       } else {
-        this.debug('cached:exist', id);
+        // For non JS/JSON requires, just export the id
+        // This is to support importing assets in webpack
+        // The module will be resolved by css-loader
+        m.exports = filename;
+        m.#isEvaluated = true;
       }
 
       return m.exports;
     },
     {
       ensure: NOOP,
-      cache,
       resolve: this.resolve,
     }
   );
 
-  evaluate(text: string, only: string[] | null = null) {
+  evaluate(arg: string | string[]): void {
+    const code = Array.isArray(arg) ? arg : [arg];
     const { filename } = this;
-    const matchedRules = this.options.rules
-      .filter(({ test }) => {
-        if (!test) {
-          return true;
-        }
 
-        if (typeof test === 'function') {
-          return test(filename);
-        }
-
-        if (test instanceof RegExp) {
-          return test.test(filename);
-        }
-
-        return false;
-      })
-      .reverse();
-
-    const cacheKey = [this.filename, ...(only ?? [])];
-
-    if (EvalCache.has(cacheKey, text)) {
-      this.exports = EvalCache.get(cacheKey, text);
-      return;
+    if (code.length === 0) {
+      this.debug(`evaluate`, 'there is nothing to evaluate');
     }
 
-    let code: string | null | undefined;
-    const action = matchedRules.length > 0 ? matchedRules[0].action : 'ignore';
-    if (action === 'ignore') {
-      this.debug('ignore', `${filename}`);
-      code = text;
-    } else {
-      // Action can be a function or a module name
-      const evaluator: Evaluator =
-        typeof action === 'function'
-          ? action
-          : require(require.resolve(action, {
-              paths: [dirname(this.filename)],
-            })).default;
+    const context = vm.createContext({
+      clearImmediate: NOOP,
+      clearInterval: NOOP,
+      clearTimeout: NOOP,
+      setImmediate: NOOP,
+      setInterval: NOOP,
+      setTimeout: NOOP,
+      global,
+      process,
+      module: this,
+      exports: this.#exports,
+      require: this.require,
+      __filename: filename,
+      __dirname: path.dirname(filename),
+    });
 
-      // For JavaScript files, we need to transpile it and to get the exports of the module
-      let imports: Module['imports'];
+    code.forEach((source, idx) => {
+      this.debug(`evaluate:fragment-${padStart(idx + 1, 2)}`, `\n${source}`);
 
-      this.debug('prepare-evaluation', this.filename, 'using', evaluator.name);
+      try {
+        const script = new vm.Script(
+          `(function (exports) { ${source}\n})(exports);`,
+          {
+            filename,
+          }
+        );
 
-      [code, imports] = evaluator(this.filename, this.options, text, only);
-      this.imports = imports;
+        script.runInContext(context);
+        return;
+      } catch (e) {
+        if (e instanceof EvalError) {
+          throw e;
+        }
 
-      this.debug(
-        'evaluate',
-        `${this.filename} (only ${(only || []).join(', ')}):\n${code}`
-      );
-    }
+        const callstack: string[] = ['', this.filename];
+        let module = this.parentModule;
+        while (module) {
+          callstack.push(module.filename);
+          module = module.parentModule;
+        }
 
-    const script = new vm.Script(
-      `(function (exports) { ${code}\n})(exports);`,
-      {
-        filename: this.filename,
+        this.debug('evaluate:error', '%O\n%O', e, callstack);
+        throw new EvalError(
+          `${(e as Error).message} in${callstack.join('\n| ')}\n`
+        );
       }
-    );
+    });
 
-    script.runInContext(
-      vm.createContext({
-        clearImmediate: NOOP,
-        clearInterval: NOOP,
-        clearTimeout: NOOP,
-        setImmediate: NOOP,
-        setInterval: NOOP,
-        setTimeout: NOOP,
-        global,
-        process,
-        module: this,
-        exports: this.exports,
-        require: this.require,
-        __filename: this.filename,
-        __dirname: path.dirname(this.filename),
-      })
-    );
-
-    EvalCache.set(cacheKey, text, this.exports);
+    this.#isEvaluated = true;
   }
 }
 
-Module.invalidate = () => {
-  cache = {};
-};
+Module.invalidate = () => {};
 
-Module.invalidateEvalCache = () => {
-  EvalCache.clear();
-};
+Module.invalidateEvalCache = () => {};
 
 // Alias to resolve the module using node's resolve algorithm
 // This static property can be overriden by the webpack loader

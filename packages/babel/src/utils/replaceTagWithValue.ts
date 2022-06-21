@@ -6,13 +6,15 @@
 import type { NodePath } from '@babel/traverse';
 import type { TaggedTemplateExpression } from '@babel/types';
 
-import type { State, StrictOptions } from '../types';
+import type { StrictOptions } from '@linaria/utils';
+
+import type { IPluginState } from '../types';
 
 import getTagProcessor from './getTagProcessor';
 
 export default function replaceTagWithValue(
   path: NodePath<TaggedTemplateExpression>,
-  state: State,
+  state: IPluginState,
   options: Pick<StrictOptions, 'classNameSlug' | 'displayName' | 'evaluate'>
 ) {
   const tagProcessor = getTagProcessor(path, state, options);

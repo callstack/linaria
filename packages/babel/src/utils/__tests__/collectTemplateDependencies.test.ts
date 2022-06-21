@@ -21,7 +21,7 @@ async function go(code: string): Promise<string> {
       const expressions = path.get('expressions');
       expressions.forEach((exp) => {
         if (exp.isExpression()) {
-          extractExpression(exp, '', { displayName: true, evaluate: true });
+          extractExpression(exp, true, false);
         }
       });
     },

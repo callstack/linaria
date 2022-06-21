@@ -1,0 +1,22 @@
+{
+  "private": true,
+  "name": "vite-example",
+  "version": "0.0.0",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "linaria-website": "workspace:^"
+  },
+  "devDependencies": {
+    "@linaria/rollup": "workspace:^",
+    "@linaria/shaker": "workspace:^",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@vitejs/plugin-react": "^1.3.2",
+    "rollup": "^2.76.0",
+    "vite": "^2.9.9"
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "author": "Anton Evzhakov"
+}

@@ -1,10 +1,15 @@
 import generator from '@babel/generator';
 import type { NodePath } from '@babel/traverse';
 
-const getSource = (path: NodePath): string => {
+const getSource = (path: NodePath, force = false): string => {
+  if (path.isIdentifier()) {
+    // Fast-lane for identifiers
+    return path.node.name;
+  }
+
   let source: string | undefined;
   try {
-    source = path.getSource();
+    source = force ? undefined : path.getSource();
     // eslint-disable-next-line no-empty
   } catch {}
 

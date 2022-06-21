@@ -7,30 +7,22 @@ import type { ConfigAPI, TransformCaller } from '@babel/core';
 
 import { debug } from '@linaria/logger';
 
-import type { PluginOptions } from './utils/loadOptions';
-import loadOptions from './utils/loadOptions';
+import transform from './plugins/babel-transform';
+import type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
+import loadLinariaOptions from './transform-stages/helpers/loadLinariaOptions';
 
 export { slugify } from '@linaria/utils';
 
-export * as EvalCache from './eval-cache';
-export { default as buildOptions } from './evaluators/buildOptions';
-export { default as JSXElement } from './evaluators/visitors/JSXElement';
+export * from './utils/collectTemplateDependencies';
+export { default as collectTemplateDependencies } from './utils/collectTemplateDependencies';
 export { default as replaceTagWithValue } from './utils/replaceTagWithValue';
+export { default as withLinariaMetadata } from './utils/withLinariaMetadata';
 export { default as Module } from './module';
-export {
-  default as transform,
-  extractCssFromAst,
-  shouldTransformCode,
-  transformUrl,
-} from './transform';
+export { default as transform } from './transform';
 export * from './types';
-export { default as collectExportsAndImports } from './utils/collectExportsAndImports';
-export type {
-  IImport,
-  IExport,
-  IState,
-} from './utils/collectExportsAndImports';
-export type { PluginOptions } from './utils/loadOptions';
+export { default as loadLinariaOptions } from './transform-stages/helpers/loadLinariaOptions';
+export type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
+export { transformUrl } from './transform-stages/4-extract';
 export { default as isNode } from './utils/isNode';
 export { default as getTagProcessor } from './utils/getTagProcessor';
 export { default as getVisitorKeys } from './utils/getVisitorKeys';
@@ -48,7 +40,6 @@ export default function linaria(babel: ConfigAPI, options: PluginOptions) {
   }
   debug('options', JSON.stringify(options));
   return {
-    // eslint-disable-next-line global-require
-    plugins: [[require('./extract'), loadOptions(options)]],
+    plugins: [[transform, loadLinariaOptions(options)]],
   };
 }

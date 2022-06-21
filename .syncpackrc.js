@@ -22,8 +22,14 @@ module.exports = {
   source: [],
   versionGroups: [
     {
-      dependencies: ['@types/enhanced-resolve', 'enhanced-resolve', 'webpack'],
-      packages: ['@linaria/webpack4-loader'],
+      dependencies: [
+        '@types/enhanced-resolve',
+        'css-loader',
+        'enhanced-resolve',
+        'mini-css-extract-plugin',
+        'webpack'
+      ],
+      packages: ['@linaria/webpack4-loader', 'webpack4-example'],
     },
   ],
   workspace: true,

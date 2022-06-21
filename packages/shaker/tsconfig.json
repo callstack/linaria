@@ -1,9 +1,8 @@
 {
   "extends": "../../tsconfig.json",
-  "compilerOptions": { "paths": {}, "rootDir": "src/" },
+  "compilerOptions": { "paths": {}, "rootDir": "src/", "types": ["node"] },
   "references": [
     { "path": "../babel" },
-    { "path": "../logger" },
-    { "path": "../preeval" }
+    { "path": "../logger" }
   ]
 }
