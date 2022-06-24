@@ -13,10 +13,10 @@ import getTagProcessor from './getTagProcessor';
 export default function replaceTagWithValue(
   path: NodePath<TaggedTemplateExpression>,
   state: State,
-  options: Pick<StrictOptions, 'classNameSlug' | 'displayName'>
+  options: Pick<StrictOptions, 'classNameSlug' | 'displayName' | 'evaluate'>
 ) {
   const tagProcessor = getTagProcessor(path, state, options);
   if (!tagProcessor) return;
 
-  path.replaceWithSourceString(tagProcessor.valueSource);
+  path.replaceWith(tagProcessor.value);
 }

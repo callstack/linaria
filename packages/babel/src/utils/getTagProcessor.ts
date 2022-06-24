@@ -3,7 +3,11 @@ import { basename, dirname, join } from 'path';
 
 import { types as t } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
-import type { Expression, TaggedTemplateExpression } from '@babel/types';
+import type {
+  Expression,
+  TaggedTemplateExpression,
+  SourceLocation,
+} from '@babel/types';
 import findUp from 'find-up';
 
 import BaseProcessor from '@linaria/core/processors/BaseProcessor';
@@ -14,13 +18,19 @@ import type { StrictOptions } from '../types';
 
 import type { IImport } from './collectExportsAndImports';
 import collectExportsAndImports from './collectExportsAndImports';
+import collectTemplateDependencies, {
+  extractExpression,
+} from './collectTemplateDependencies';
 import getSource from './getSource';
 import isNotNull from './isNotNull';
+import { dereferenceAll, referenceAll } from './scopeHelpers';
 
 type BuilderArgs = ConstructorParameters<typeof BaseProcessor> extends [
   typeof t,
   Params,
   Expression,
+  SourceLocation | null,
+  (replacement: Expression, isPure: boolean) => void,
   ...infer T
 ]
   ? T
@@ -32,7 +42,7 @@ type ProcessorClass = new (
   ...args: ConstructorParameters<typeof BaseProcessor>
 ) => BaseProcessor;
 
-interface IState {
+export interface IState {
   file: {
     opts: {
       root: string;
@@ -42,6 +52,16 @@ interface IState {
 }
 
 const last = <T>(arr: T[]): T | undefined => arr[arr.length - 1];
+
+function zip<T1, T2>(arr1: T1[], arr2: T2[]) {
+  const result: (T1 | T2)[] = [];
+  for (let i = 0; i < arr1.length; i++) {
+    result.push(arr1[i]);
+    if (arr2[i]) result.push(arr2[i]);
+  }
+
+  return result;
+}
 
 function buildCodeFrameError(path: NodePath, message: string): Error {
   try {
@@ -130,7 +150,8 @@ function getProcessor(
 function getBuilderForTemplate(
   path: NodePath<TaggedTemplateExpression>,
   imports: IImport[],
-  filename: string
+  filename: string,
+  options: Pick<StrictOptions, 'classNameSlug' | 'displayName' | 'evaluate'>
 ): Builder | null {
   const relatedImports = imports
     .map((i): [IImport, NodePath] | null => {
@@ -189,12 +210,19 @@ function getBuilderForTemplate(
 
     if (current?.isCallExpression() && current.node.callee === prev.node) {
       const args = current.get('arguments');
-      params.push([
-        'call',
-        ...args.map(
-          (arg) => [getSource(arg), arg] as [string, NodePath<Expression>]
-        ),
-      ]);
+      const cookedArgs = args
+        .map((arg) => {
+          const buildError = arg.buildCodeFrameError.bind(arg);
+          if (!arg.isExpression()) {
+            throw buildError(`Unexpected type of an argument ${arg.type}`);
+          }
+          const source = getSource(arg);
+          const extracted = extractExpression(arg, source, options);
+          return { ...extracted, buildCodeFrameError: buildError };
+        })
+        .filter(isNotNull);
+
+      params.push(['call', ...cookedArgs]);
       prev = current;
       current = current.parentPath;
       // eslint-disable-next-line no-continue
@@ -203,12 +231,14 @@ function getBuilderForTemplate(
 
     if (current?.isMemberExpression() && current.node.object === prev.node) {
       const property = current.get('property');
-      if (property.isPrivateName()) {
-        // eslint-disable-next-line no-continue
-        continue;
+      if (property.isIdentifier() && !current.node.computed) {
+        params.push(['member', property.node.name]);
+      } else if (property.isStringLiteral()) {
+        params.push(['member', property.node.value]);
+      } else {
+        throw property.buildCodeFrameError(`Unexpected type of a property`);
       }
 
-      params.push(['member', property as NodePath<Expression>]);
       prev = current;
       current = current.parentPath;
       // eslint-disable-next-line no-continue
@@ -218,8 +248,26 @@ function getBuilderForTemplate(
     throw buildCodeFrameError(path, 'Unexpected tag usage');
   }
 
+  const replacer = (replacement: Expression, isPure: boolean) => {
+    dereferenceAll(path);
+
+    path.replaceWith(replacement);
+    if (isPure) {
+      path.addComment('leading', '#__PURE__');
+    }
+
+    referenceAll(path);
+  };
+
   return (...args: BuilderArgs) =>
-    new Processor(t, params, (tagPath as NodePath<Expression>).node, ...args);
+    new Processor(
+      t,
+      params,
+      (tagPath as NodePath<Expression>).node,
+      tagPath.node.loc ?? null,
+      replacer,
+      ...args
+    );
 }
 
 function getDisplayName(
@@ -286,6 +334,34 @@ function getDisplayName(
   return displayName;
 }
 
+function isTagReferenced(path: NodePath): boolean {
+  // Check if the variable is referenced anywhere for basic DCE
+  // Only works when it's assigned to a variable
+  let isReferenced = true;
+
+  const parent = path.findParent(
+    (p) =>
+      p.isObjectProperty() ||
+      p.isJSXOpeningElement() ||
+      p.isVariableDeclarator()
+  );
+
+  if (parent) {
+    if (parent.isVariableDeclarator()) {
+      const id = parent.get('id');
+      if (id.isIdentifier()) {
+        const { referencePaths } = path.scope.getBinding(id.node.name) || {
+          referencePaths: [],
+        };
+
+        isReferenced = referencePaths.length !== 0;
+      }
+    }
+  }
+
+  return isReferenced;
+}
+
 const counters = new WeakMap<IState, number>();
 const getNextIndex = (state: IState) => {
   const counter = counters.get(state) ?? 0;
@@ -301,7 +377,7 @@ const cache = new WeakMap<
 export default function getTagProcessor(
   path: NodePath<TaggedTemplateExpression>,
   state: IState,
-  options: Pick<StrictOptions, 'classNameSlug' | 'displayName'>
+  options: Pick<StrictOptions, 'classNameSlug' | 'displayName' | 'evaluate'>
 ): BaseProcessor | null {
   if (!cache.has(path)) {
     // Increment the index of the style we're processing
@@ -324,12 +400,30 @@ export default function getTagProcessor(
       const builder = getBuilderForTemplate(
         path,
         imports,
-        state.file.opts.filename
+        state.file.opts.filename,
+        options
       );
       if (builder) {
+        const [quasis, expressionValues] = collectTemplateDependencies(
+          path,
+          state,
+          options
+        );
+
         const displayName = getDisplayName(path, idx, state);
-        const processor = builder(displayName, idx, options, state.file.opts);
+        const processor = builder(
+          zip(quasis, expressionValues),
+          displayName,
+          isTagReferenced(path),
+          idx,
+          options,
+          state.file.opts
+        );
+
         cache.set(path, processor);
+
+        // Replace tag with metadata
+        processor.doEvaltimeReplacement();
       } else {
         cache.set(path, null);
       }

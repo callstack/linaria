@@ -27,7 +27,12 @@
     "@types/babel__traverse": "^7.17.1",
     "@types/cosmiconfig": "^5.0.3",
     "@types/dedent": "^0.7.0",
+    "@types/jest": "^28.1.0",
     "@types/node": "^17.0.39",
+    "dedent": "^0.7.0",
+    "jest": "^28.1.0",
+    "strip-ansi": "^5.2.0",
+    "ts-jest": "^28.0.4",
     "typescript": "^4.7.3"
   },
   "engines": {
@@ -60,6 +65,7 @@
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
     "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "test": "jest --config ./jest.config.js --rootDir src",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "npm run build --watch"
   },

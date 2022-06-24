@@ -1,13 +1,10 @@
 import type { SourceLocation } from '@babel/types';
 
-import type {
-  IInterpolation,
-  Rules,
-  ValueCache,
-} from '@linaria/core/processors/types';
+import type { Rules, ValueCache } from '@linaria/core/processors/types';
+import hasMeta from '@linaria/core/processors/utils/hasMeta';
 import { debug } from '@linaria/logger';
 import type { IProps } from '@linaria/react/processors/styled';
-import StyledProcessor, { hasMeta } from '@linaria/react/processors/styled';
+import StyledProcessor from '@linaria/react/processors/styled';
 import { slugify } from '@linaria/utils';
 
 import atomize from './helpers/atomize';
@@ -51,11 +48,8 @@ export default class AtomicStyledProcessor extends StyledProcessor {
     return [rules, classes];
   }
 
-  protected override getProps(
-    classes: string,
-    uniqInterpolations: IInterpolation[]
-  ): IProps {
-    const props = super.getProps(classes, uniqInterpolations);
+  protected override getProps(classes: string): IProps {
+    const props = super.getProps(classes);
     props.class = [classes, this.className].filter(Boolean).join(' ');
     props.atomic = true;
     return props;

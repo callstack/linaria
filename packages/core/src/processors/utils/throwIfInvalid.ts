@@ -1,9 +1,4 @@
-import generator from '@babel/generator';
-import type { NodePath } from '@babel/traverse';
-
-import type { Serializable } from '../types';
-
-import isSerializable from './isSerializable';
+import type { BuildCodeFrameErrorFn } from '../types';
 
 const isLikeError = (value: unknown): value is Error =>
   typeof value === 'object' &&
@@ -12,19 +7,12 @@ const isLikeError = (value: unknown): value is Error =>
   'message' in value;
 
 // Throw if we can't handle the interpolated value
-function throwIfInvalid(
+function throwIfInvalid<T>(
+  checker: (value: unknown) => value is T,
   value: Error | unknown,
-  ex: NodePath
-): asserts value is (() => void) | string | number | Serializable {
-  if (
-    typeof value === 'function' ||
-    typeof value === 'string' ||
-    (typeof value === 'number' && Number.isFinite(value)) ||
-    isSerializable(value)
-  ) {
-    return;
-  }
-
+  ex: { buildCodeFrameError: BuildCodeFrameErrorFn },
+  source: string
+): asserts value is T {
   // We can't use instanceof here so let's use duck typing
   if (isLikeError(value) && value.stack && value.message) {
     throw ex.buildCodeFrameError(
@@ -45,13 +33,15 @@ function throwIfInvalid(
     );
   }
 
+  if (checker(value)) {
+    return;
+  }
+
   const stringified =
     typeof value === 'object' ? JSON.stringify(value) : String(value);
 
   throw ex.buildCodeFrameError(
-    `The expression evaluated to '${stringified}', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(${
-      generator(ex.node).code
-    })'.`
+    `The expression evaluated to '${stringified}', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(${source})'.`
   );
 }
 

@@ -1,8 +1,31 @@
-import type { JSONValue } from '../types';
-import { unitless } from '../units';
+import type { CSSPropertyValue, CSSable } from '../types';
 
 import isBoxedPrimitive from './isBoxedPrimitive';
-import isSerializable from './isSerializable';
+import { unitless } from './units';
+
+const isCSSPropertyValue = (o: unknown): o is CSSPropertyValue => {
+  return (
+    isBoxedPrimitive(o) ||
+    typeof o === 'string' ||
+    (typeof o === 'number' && Number.isFinite(o))
+  );
+};
+
+export const isCSSable = (o: unknown): o is CSSable => {
+  if (isCSSPropertyValue(o)) {
+    return true;
+  }
+
+  if (Array.isArray(o)) {
+    return o.every(isCSSable);
+  }
+
+  if (typeof o === 'object') {
+    return o !== null && Object.values(o).every(isCSSable);
+  }
+
+  return false;
+};
 
 const hyphenate = (s: string) => {
   if (s.startsWith('--')) {
@@ -20,12 +43,12 @@ const hyphenate = (s: string) => {
 
 // Some tools such as polished.js output JS objects
 // To support them transparently, we convert JS objects to CSS strings
-export default function toCSS(o: JSONValue): string {
+export default function toCSS(o: CSSable): string {
   if (Array.isArray(o)) {
     return o.map(toCSS).join('\n');
   }
 
-  if (isBoxedPrimitive(o)) {
+  if (isCSSPropertyValue(o)) {
     return o.valueOf().toString();
   }
 
@@ -36,7 +59,7 @@ export default function toCSS(o: JSONValue): string {
         typeof value === 'number' || value
     )
     .map(([key, value]) => {
-      if (isSerializable(value)) {
+      if (!isCSSPropertyValue(value)) {
         return `${key} { ${toCSS(value)} }`;
       }
 

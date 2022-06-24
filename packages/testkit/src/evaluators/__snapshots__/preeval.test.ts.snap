@@ -3,10 +3,10 @@
 exports[`handles locally named import 1`] = `
 "import { styled as custom } from '@linaria/react';
 const Component = {
-  displayName: \\"Component\\",
-  __linaria: {
-    className: \\"Component_c19dwjzm\\",
-    extends: null
+  \\"displayName\\": \\"Component\\",
+  \\"__linaria\\": {
+    \\"className\\": \\"Component_c19dwjzm\\",
+    \\"extends\\": null
   }
 };"
 `;
@@ -36,10 +36,10 @@ Object.defineProperty(exports, \\"bar\\", {
 exports[`preserves classNames 1`] = `
 "import { styled } from '@linaria/react';
 const Component = {
-  displayName: \\"Component\\",
-  __linaria: {
-    className: \\"Component_c19dwjzm\\",
-    extends: null
+  \\"displayName\\": \\"Component\\",
+  \\"__linaria\\": {
+    \\"className\\": \\"Component_c19dwjzm\\",
+    \\"extends\\": null
   }
 };"
 `;

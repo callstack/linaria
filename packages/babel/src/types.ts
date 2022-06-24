@@ -1,68 +1,28 @@
 import type { TransformOptions } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
-import type {
-  Expression,
-  TaggedTemplateExpression,
-  TemplateElement,
-} from '@babel/types';
+import type { File } from '@babel/types';
 import type { RawSourceMap } from 'source-map';
 
-import type { Value } from '@linaria/core/processors/types';
+import type BaseProcessor from '@linaria/core/processors/BaseProcessor';
+import type { Replacements } from '@linaria/core/processors/types';
 import type { ClassNameFn } from '@linaria/core/processors/utils/types';
 
 import type { PluginOptions } from './utils/loadOptions';
 
 export type {
-  JSONValue,
-  JSONObject,
+  ComponentDependency,
+  ExpressionValue,
+  FunctionValue,
   JSONArray,
+  JSONObject,
+  JSONValue,
+  LazyValue,
   Serializable,
   Value,
   ValueCache,
 } from '@linaria/core/processors/types';
 
-export enum ValueType {
-  LAZY,
-  FUNCTION,
-  VALUE,
-}
-
-export type ComponentDependency = {
-  ex: NodePath<Expression>; // | Expression | string;
-  source: string;
-  value?: string;
-};
-
-export type LazyValue = {
-  kind: ValueType.LAZY;
-  ex: NodePath<Expression> | Expression; // | string;
-  originalEx: NodePath<Expression>; // | Expression | string;
-  source: string;
-};
-
-export type FunctionValue = {
-  kind: ValueType.FUNCTION;
-  ex: NodePath<Expression>;
-  source: string;
-};
-
-export type EvaluatedValue = {
-  kind: ValueType.VALUE;
-  value: Value;
-  ex: NodePath<Expression>;
-  source: string;
-};
-
-export type ExpressionValue = LazyValue | FunctionValue | EvaluatedValue;
-
-export type Path = NodePath<TaggedTemplateExpression>;
-
-export type TemplateExpression = {
-  path: Path;
-  quasis: NodePath<TemplateElement>[];
-  expressions: ExpressionValue[];
-  dependencies: ComponentDependency[];
-};
+export { ValueType } from '@linaria/core/processors/types';
 
 export interface ICSSRule {
   className: string;
@@ -74,21 +34,10 @@ export interface ICSSRule {
 
 export type Rules = Record<string, ICSSRule>;
 
-type Replacements = Array<{
-  original: {
-    start: Location;
-    end: Location;
-  };
-  length: number;
-}>;
-
-type Dependencies = string[];
+export type Dependencies = string[];
 
 export type State = {
-  queue: TemplateExpression[];
-  rules: Rules;
-  replacements: Replacements;
-  index: number;
+  processors: BaseProcessor[];
   dependencies: Dependencies;
   file: {
     opts: {
@@ -166,3 +115,10 @@ export type Options = {
 
 export type PreprocessorFn = (selector: string, cssText: string) => string;
 export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
+
+export type MissedBabelCoreTypes = {
+  File: new (
+    options: { filename: string },
+    file: { code: string; ast: File }
+  ) => { path: NodePath<File> };
+};
