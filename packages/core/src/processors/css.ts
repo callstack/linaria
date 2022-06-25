@@ -1,4 +1,4 @@
-import type { Expression, SourceLocation } from '@babel/types';
+import type { Expression, SourceLocation, StringLiteral } from '@babel/types';
 
 import type { ProcessorParams } from './BaseProcessor';
 import BaseProcessor from './BaseProcessor';
@@ -14,11 +14,18 @@ export default class CssProcessor extends BaseProcessor {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public override addInterpolation(): string {
-    // CSS custom properties can't be used outside components
+  public override addInterpolation(node: unknown, source: string): string {
     throw new Error(
-      "The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin."
+      `css tag cannot handle '${source}' as an interpolated value`
     );
+  }
+
+  public override doEvaltimeReplacement(): void {
+    this.replacer(this.value, false);
+  }
+
+  public override doRuntimeReplacement(classes: string): void {
+    this.replacer(this.astService.stringLiteral(classes), false);
   }
 
   public override extractRules(
@@ -40,13 +47,6 @@ export default class CssProcessor extends BaseProcessor {
     return [rules, this.className];
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  public override getRuntimeReplacement(
-    classes: string
-  ): [Expression, boolean] {
-    return [this.astService.stringLiteral(classes), false];
-  }
-
   public override get asSelector(): string {
     return this.className;
   }
@@ -55,7 +55,7 @@ export default class CssProcessor extends BaseProcessor {
     return this.tagExp;
   }
 
-  public override get valueSource(): string {
-    return `"${this.className}"`;
+  public override get value(): StringLiteral {
+    return this.astService.stringLiteral(this.className);
   }
 }

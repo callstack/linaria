@@ -13,68 +13,80 @@
 import type { NodePath, Visitor } from '@babel/traverse';
 import type { Program } from '@babel/types';
 
+import type { Replacements } from '@linaria/core/processors/types';
 import { debug } from '@linaria/logger';
 
 import type { Core } from './babel';
-import getTemplateProcessor from './evaluators/templateProcessor';
 import Module from './module';
-import type { State, StrictOptions } from './types';
+import type { Rules, State, StrictOptions } from './types';
 import evaluateExpressions from './utils/evaluateExpressions';
 import processTemplateExpression from './utils/processTemplateExpression';
+import removeUnusedCode from './utils/removeUnusedCode';
 
 export default function extract(
   babel: Core,
   options: StrictOptions
 ): { visitor: Visitor<State> } {
-  const process = getTemplateProcessor(options);
-
   return {
     visitor: {
       Program: {
         enter(path: NodePath<Program>, state: State) {
           // Collect all the style rules from the styles we encounter
-          state.queue = [];
-          state.rules = {};
-          state.index = -1;
-          state.dependencies = [];
-          state.replacements = [];
+          state.processors = [];
           debug('extraction:start', state.file.opts.filename);
 
           // Invalidate cache for module evaluation to get fresh modules
           Module.invalidate();
 
           // We need our transforms to run before anything else
-          // So we traverse here instead of a in a visitor
+          // So we traverse here instead of in a visitor
           path.traverse({
             TaggedTemplateExpression: (p) => {
-              processTemplateExpression(babel, 'extract', p, state, options);
+              processTemplateExpression(p, state, options);
             },
           });
 
-          const [dependencies, valueCache] = evaluateExpressions(
+          state.dependencies = evaluateExpressions(
             babel,
             path,
-            state.queue,
+            state.processors,
             options,
             state.file.opts.filename
           );
-
-          state.dependencies.push(...dependencies);
-
-          state.queue.forEach((item) => process(item, state, valueCache));
         },
-        exit(_: unknown, state: State) {
-          if (Object.keys(state.rules).length) {
-            // Store the result as the file metadata under linaria key
-            state.file.metadata.linaria = {
-              rules: state.rules,
-              replacements: state.replacements,
+        exit(path: NodePath<Program>, state: State) {
+          if (state.processors.length > 0) {
+            const metadata = {
+              rules: {} as Rules,
+              replacements: [] as Replacements,
               dependencies: state.dependencies,
             };
+
+            state.processors.forEach((processor) => {
+              processor.artifacts.forEach((artifact) => {
+                if (artifact[0] !== 'css') return;
+                const [rules, replacements] = artifact[1] as [
+                  rules: Rules,
+                  sourceMapReplacements: Replacements
+                ];
+
+                metadata.rules = {
+                  ...metadata.rules,
+                  ...rules,
+                };
+
+                metadata.replacements.push(...replacements);
+              });
+            });
+
+            state.file.metadata.linaria = metadata;
           }
 
           // Invalidate cache for module evaluation when we're done
           Module.invalidate();
+
+          // We have some garbage after extraction. Let's remove it.
+          removeUnusedCode(path);
 
           debug('extraction:end', state.file.opts.filename);
         },

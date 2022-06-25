@@ -3,37 +3,122 @@
  * For each template it makes a list of dependencies, try to evaluate expressions, and if it is not possible, mark them as lazy dependencies.
  */
 
-import generator from '@babel/generator';
+import { statement } from '@babel/template';
 import type { NodePath } from '@babel/traverse';
 import type {
   Expression,
   Identifier as IdentifierNode,
+  Statement,
   TaggedTemplateExpression,
   TemplateElement,
   TSType,
+  VariableDeclaration,
 } from '@babel/types';
 
+import hasMeta from '@linaria/core/processors/utils/hasMeta';
 import { debug } from '@linaria/logger';
 
-import type { Core } from '../babel';
-import type { StrictOptions, ExpressionValue, State } from '../types';
+import type { StrictOptions, ExpressionValue } from '../types';
 import { ValueType } from '../types';
 
+import findIdentifiers, { findAllIdentifiersIn } from './findIdentifiers';
 import getSource from './getSource';
-import getTagProcessor from './getTagProcessor';
-import throwIfInvalid from './throwIfInvalid';
+import type { IState } from './getTagProcessor';
+import { dereference, reference } from './scopeHelpers';
+import valueToLiteral from './vlueToLiteral';
+
+type Options = Pick<
+  StrictOptions,
+  'classNameSlug' | 'displayName' | 'evaluate'
+>;
+
+const expressionDeclarationTpl = statement(
+  'const %%expId%% = /*#__PURE__*/ () => %%expression%%',
+  {
+    preserveComments: true,
+  }
+);
+
+function moveDeclarationBefore(
+  declaration: NodePath<VariableDeclaration>,
+  target: NodePath<Statement>
+) {
+  const { scope } = target;
+  const { node } = declaration;
+  const declaredIdentifiers = findAllIdentifiersIn(declaration, 'id');
+  const references: NodePath[] = [];
+  declaredIdentifiers.forEach((path) => {
+    references.push(
+      ...(path.scope.getBinding(path.node.name)?.referencePaths ?? [])
+    );
+  });
+
+  declaration.remove();
+  const [newDeclaration] = target.insertBefore([node]);
+  scope.registerDeclaration(newDeclaration);
+
+  references.forEach((path) => {
+    if (path.isIdentifier()) {
+      reference(path);
+    }
+  });
+}
+
+function hoistVariableDeclaration(
+  ex: NodePath<VariableDeclaration>,
+  keepName = false
+) {
+  const referencedIdentifiers = findAllIdentifiersIn(ex, 'init');
+  const declaredIdentifiers = findAllIdentifiersIn(ex, 'id');
+
+  const rootStatement = ex.findParent((p) =>
+    p.parentPath!.isProgram()
+  )! as NodePath<Statement>;
+
+  if (!keepName) {
+    declaredIdentifiers.forEach((path) => {
+      const newName = path.scope.generateUid('ref');
+      path.scope.rename(path.node.name, newName);
+    });
+  }
+
+  referencedIdentifiers.forEach((identifier) => {
+    const binding = identifier.scope.getBinding(identifier.node.name);
+    if (!binding || !binding.scope.parent) {
+      // This is a global variable, we don't need to hoist it.
+      return;
+    }
+
+    if (!['var', 'let', 'const'].includes(binding.kind)) {
+      // This is not a variable, we can't hoist it
+      throw binding.path.buildCodeFrameError(
+        'Function parameters cannot be referenced in a Linaria template.'
+      );
+    }
+
+    const declaration = binding?.path.parentPath;
+
+    if (declaration?.isVariableDeclaration()) {
+      hoistVariableDeclaration(declaration);
+    }
+  });
+
+  moveDeclarationBefore(ex, rootStatement);
+}
 
 /**
- * Hoist the node and its dependencies to the highest scope possible
+ * Hoist the node and its dependencies to the root scope
  */
-function hoist(babel: Core, ex: NodePath<Expression | null>): void {
+export function hoistExpression(
+  ex: NodePath<Expression>
+): NodePath<Expression> {
   const Identifier = (idPath: NodePath<IdentifierNode>) => {
-    if (!idPath.isReferencedIdentifier()) {
+    if (!idPath.isReferenced()) {
       return;
     }
     const binding = idPath.scope.getBinding(idPath.node.name);
     if (!binding) return;
-    const { scope, path: bindingPath, referencePaths } = binding;
+    const { scope, path: bindingPath } = binding;
     // parent here can be null or undefined in different versions of babel
     if (!scope.parent) {
       // It's a variable from global scope
@@ -41,49 +126,103 @@ function hoist(babel: Core, ex: NodePath<Expression | null>): void {
     }
 
     if (bindingPath.isVariableDeclarator()) {
-      const initPath = bindingPath.get('init') as NodePath<Expression | null>;
-      hoist(babel, initPath);
-      initPath.hoist(scope);
-      if (initPath.isIdentifier()) {
-        referencePaths.forEach((referencePath) => {
-          referencePath.replaceWith(babel.types.identifier(initPath.node.name));
-        });
+      const parent = bindingPath.parentPath;
+      if (parent.isVariableDeclaration()) {
+        const keepName = Boolean(parent.getData('isLinariaTemplateExpression'));
+        hoistVariableDeclaration(parent, keepName);
+      }
+
+      const init = bindingPath.get('init');
+      if (init.isExpression()) {
+        hoistExpression(init);
       }
     }
   };
 
   if (ex.isIdentifier()) {
     Identifier(ex);
-    return;
+    return ex;
   }
 
   ex.traverse({
     Identifier,
   });
+
+  return ex;
 }
 
-function findValuePath(
-  path: NodePath<Expression>
-): NodePath<Expression | null | undefined> | undefined {
-  if (!path.isIdentifier()) {
-    return undefined;
-  }
+function staticEval(
+  ex: NodePath<Expression>,
+  options: Options
+): [unknown] | undefined {
+  if (!options.evaluate) return undefined;
 
-  const binding = path.scope.getBinding(path.node.name);
-  if (binding?.path.isVariableDeclarator()) {
-    return binding.path.get('init');
+  const result = ex.evaluate();
+  if (result.confident && !hasMeta(result.value)) {
+    return [result.value];
   }
 
   return undefined;
 }
 
+export function extractExpression(
+  ex: NodePath<Expression>,
+  source: string,
+  options: Options
+): Omit<ExpressionValue, 'buildCodeFrameError'> {
+  const { loc } = ex.node;
+
+  const firstParentStatement = ex.findParent((p) => p.isStatement())!;
+
+  const isFunction =
+    ex.isFunctionExpression() || ex.isArrowFunctionExpression();
+  const expId = firstParentStatement.scope.generateUidIdentifier('exp');
+
+  const evaluated = staticEval(ex, options);
+
+  // If expression has other identifiers, try to evaluate them
+  findIdentifiers([ex]).forEach((id) => {
+    const evaluatedId = staticEval(id, options);
+    if (evaluatedId) {
+      dereference(id);
+      id.replaceWith(valueToLiteral(evaluatedId[0], ex));
+    }
+  });
+
+  const kind = isFunction ? ValueType.FUNCTION : ValueType.LAZY;
+
+  const declaration = expressionDeclarationTpl({
+    expId,
+    expression: evaluated ? valueToLiteral(evaluated[0], ex) : ex.node,
+  });
+
+  const [inserted] = firstParentStatement.insertBefore(declaration);
+  firstParentStatement.scope.registerDeclaration(inserted);
+  inserted.setData('isLinariaTemplateExpression', true);
+
+  if (ex.isIdentifier()) {
+    dereference(ex);
+  }
+
+  ex.replaceWith(expId);
+
+  hoistExpression(ex);
+
+  // eslint-disable-next-line no-param-reassign
+  ex.node.loc = loc;
+
+  return {
+    kind,
+    ex: expId,
+    source,
+  };
+}
+
 export default function collectTemplateDependencies(
-  babel: Core,
   path: NodePath<TaggedTemplateExpression>,
-  state: State,
-  options: Pick<StrictOptions, 'classNameSlug' | 'displayName' | 'evaluate'>
-): [quasis: NodePath<TemplateElement>[], expressionValues: ExpressionValue[]] {
-  const { types: t } = babel;
+  state: IState,
+  options: Options
+): [quasis: TemplateElement[], expressionValues: ExpressionValue[]] {
   const quasi = path.get('quasi');
   const quasis = quasi.get('quasis');
   const expressions = quasi.get('expressions');
@@ -92,76 +231,23 @@ export default function collectTemplateDependencies(
 
   const expressionValues: ExpressionValue[] = expressions.map(
     (ex: NodePath<Expression | TSType>): ExpressionValue => {
+      const buildCodeFrameError = ex.buildCodeFrameError.bind(ex);
+      const source = getSource(ex);
+
       if (!ex.isExpression()) {
-        throw ex.buildCodeFrameError(
-          `The expression '${generator(ex.node).code}' is not supported.`
+        throw buildCodeFrameError(
+          `The expression '${source}' is not supported.`
         );
       }
 
-      const result = ex.evaluate();
-      let value: unknown;
-      if (result.confident) {
-        value = result.value;
-      } else {
-        // In some cases we can find a value of expression without evaluation
-        // If the value is a TaggedTemplateExpression, we can get class name for it
-        const valuePath = findValuePath(ex);
-        if (valuePath?.isTaggedTemplateExpression()) {
-          const context = getTagProcessor(valuePath, state, options);
-          if (context?.asSelector) {
-            return {
-              kind: ValueType.VALUE,
-              value: context.asSelector,
-              ex,
-              source: getSource(ex),
-            };
-          }
-        }
-      }
+      const extracted = extractExpression(ex, source, options);
 
-      if (value !== undefined) {
-        throwIfInvalid(value, ex);
-        return {
-          kind: ValueType.VALUE,
-          value,
-          ex,
-          source: getSource(ex),
-        };
-      }
-
-      if (
-        options.evaluate &&
-        !(ex.isFunctionExpression() || ex.isArrowFunctionExpression())
-      ) {
-        // save original expression that may be changed during hoisting
-        const originalExNode = t.cloneNode(ex.node);
-
-        hoist(babel, ex as NodePath<Expression | null>);
-
-        // save hoisted expression to be used to evaluation
-        const hoistedExNode = t.cloneNode(ex.node);
-
-        // get back original expression to the tree
-        ex.replaceWith(originalExNode);
-
-        return {
-          kind: ValueType.LAZY,
-          ex: hoistedExNode,
-          originalEx: ex,
-          source: getSource(ex),
-        };
-      }
-
-      return { kind: ValueType.FUNCTION, ex, source: getSource(ex) };
+      return {
+        ...extracted,
+        buildCodeFrameError,
+      };
     }
   );
 
-  debug(
-    'template-parse:evaluate-expressions',
-    expressionValues.map((expressionValue) =>
-      expressionValue.kind === ValueType.VALUE ? expressionValue.value : 'lazy'
-    )
-  );
-
-  return [quasis, expressionValues];
+  return [quasis.map((p) => p.node), expressionValues];
 }

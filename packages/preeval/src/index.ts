@@ -7,11 +7,7 @@ import type { NodePath } from '@babel/traverse';
 import type { Program, Statement, VariableDeclaration } from '@babel/types';
 
 import type { State, StrictOptions } from '@linaria/babel-preset';
-import {
-  JSXElement,
-  replaceTagWithValue,
-  processTemplateExpression,
-} from '@linaria/babel-preset';
+import { JSXElement, processTemplateExpression } from '@linaria/babel-preset';
 
 import type { Core } from './babel';
 
@@ -45,18 +41,13 @@ function index(babel: Core, options: StrictOptions) {
       Program: {
         enter(path: NodePath<Program>, state: State) {
           // Collect all the style rules from the styles we encounter
-          state.queue = [];
-          state.rules = {};
-          state.index = -1;
-          state.dependencies = [];
-          state.replacements = [];
+          state.processors = [];
 
           // We need our transforms to run before anything else
           // So we traverse here instead of a in a visitor
           path.traverse({
             TaggedTemplateExpression: (p) => {
-              processTemplateExpression(babel, 'preeval', p, state, options);
-              replaceTagWithValue(p, state, options);
+              processTemplateExpression(p, state, options);
             },
             JSXElement,
           });

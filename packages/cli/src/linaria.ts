@@ -69,7 +69,6 @@ const argv = yargs
   })
   .implies('insert-css-requires', 'source-root')
   .implies('transform', 'insert-css-requires')
-  .implies('modules', 'transform')
   .option('ignore', {
     alias: 'x',
     type: 'string',

@@ -4,7 +4,7 @@ import type { Location } from '../types';
 // This is useful in case of tools such as the stylelint pre-processor
 // This should be safe because strings cannot contain newline: https://www.w3.org/TR/CSS2/syndata.html#strings
 export default function stripLines(
-  loc: { start: Location; end: Location },
+  loc: { end: Location; start: Location },
   text: string | number
 ) {
   let result = String(text)

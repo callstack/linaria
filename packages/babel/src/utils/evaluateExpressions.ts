@@ -1,47 +1,21 @@
 import generator from '@babel/generator';
-import { expression, statement } from '@babel/template';
+import { statement } from '@babel/template';
 import type { NodePath } from '@babel/traverse';
-import type { Program, Expression } from '@babel/types';
+import type { Program, Expression, TemplateElement } from '@babel/types';
 
+import type BaseProcessor from '@linaria/core/processors/BaseProcessor';
 import { debug, error } from '@linaria/logger';
 
 import type { Core } from '../babel';
 import evaluate from '../evaluators';
 import type {
-  LazyValue,
-  State,
   StrictOptions,
-  TemplateExpression,
   Value,
   ValueCache,
   ExpressionValue,
-  EvaluatedValue,
+  Dependencies,
 } from '../types';
-import { ValueType } from '../types';
 
-import throwIfInvalid from './throwIfInvalid';
-import unwrapNode from './unwrapNode';
-
-function isLazyValue(v: ExpressionValue): v is LazyValue {
-  return v.kind === ValueType.LAZY;
-}
-
-function isEvaluatedValue(v: ExpressionValue): v is EvaluatedValue {
-  return v.kind === ValueType.VALUE;
-}
-
-// All exported values will be wrapped with this function
-const expressionWrapperTpl = statement(`
-  const %%wrapName%% = (fn) => {
-    try {
-      return fn();
-    } catch (e) {
-      return e;
-    }
-  };
-`);
-
-const expressionTpl = expression('%%wrapName%%(() => %%expression%%)');
 const exportsLinariaPrevalTpl = statement(
   'exports.__linariaPreval = %%expressions%%'
 );
@@ -49,16 +23,12 @@ const exportsLinariaPrevalTpl = statement(
 function addLinariaPreval(
   { types: t }: Core,
   path: NodePath<Program>,
-  lazyDeps: Array<Expression>
+  expressions: Array<Expression>
 ): Program {
   // Constant __linariaPreval with all dependencies
-  const wrapName = path.scope.generateUidIdentifier('wrap');
   const statements = [
-    expressionWrapperTpl({ wrapName }),
     exportsLinariaPrevalTpl({
-      expressions: t.arrayExpression(
-        lazyDeps.map((exp) => expressionTpl({ expression: exp, wrapName }))
-      ),
+      expressions: t.arrayExpression(expressions),
     }),
   ];
 
@@ -71,21 +41,9 @@ function addLinariaPreval(
   );
 }
 
-const getExpression = (
-  value:
-    | {
-        originalEx: NodePath<Expression>;
-        ex: NodePath<Expression> | Expression;
-      }
-    | {
-        ex: NodePath<Expression>;
-      }
-): NodePath<Expression> =>
-  'originalEx' in value ? value.originalEx : value.ex;
-
-function hasPreval(
-  exports: unknown
-): exports is { __linariaPreval: Value[] | null | undefined } {
+function hasPreval(exports: unknown): exports is {
+  __linariaPreval: (() => Value)[] | null | undefined;
+} {
   if (!exports || typeof exports !== 'object') {
     return false;
   }
@@ -93,63 +51,52 @@ function hasPreval(
   return '__linariaPreval' in exports;
 }
 
+const wrap = <T>(fn: () => T): T | Error => {
+  try {
+    return fn();
+  } catch (e) {
+    return e as Error;
+  }
+};
+
+const isLazyValue = (
+  value: ExpressionValue | TemplateElement
+): value is ExpressionValue => 'kind' in value;
+
 export default function evaluateExpressions(
   babel: Core,
   program: NodePath<Program>,
-  templateExpressions: TemplateExpression[],
+  processors: BaseProcessor[],
   options: StrictOptions,
   filename: string
-): [dependencies: State['dependencies'], valueCache: ValueCache] {
-  const dependencies: State['dependencies'] = [];
+): Dependencies {
+  const dependencies: Dependencies = [];
 
-  const lazyDeps: Omit<LazyValue, 'kind'>[] = [];
-  const evaluatedDeps: Omit<EvaluatedValue, 'kind'>[] = [];
+  const expressions: ExpressionValue[] = [];
 
-  templateExpressions.forEach(({ expressions, dependencies: deps }) => {
-    lazyDeps.push(...expressions.filter(isLazyValue));
-    evaluatedDeps.push(...expressions.filter(isEvaluatedValue));
-
-    deps.forEach((dep) => {
-      if (dep.value !== undefined) {
-        evaluatedDeps.push({
-          ex: dep.ex,
-          source: dep.source,
-          value: dep.value,
-        });
-      } else {
-        lazyDeps.push({
-          ex: dep.ex,
-          originalEx: dep.ex,
-          source: dep.source,
-        });
-      }
-    });
-  });
-
-  const expressionsToEvaluate = lazyDeps.map((v) => unwrapNode(v.ex));
-  const originalLazyExpressions = lazyDeps.map((v) =>
-    unwrapNode(getExpression(v))
+  processors.forEach((processor) =>
+    [
+      ...processor.template.filter(isLazyValue),
+      ...processor.dependencies,
+    ].forEach((dependency) => {
+      expressions.push(dependency);
+    })
   );
 
-  debug('lazy-deps:count', lazyDeps.length);
+  let lazyValues: (() => Value)[] = [];
 
-  let lazyValues: Value[] = [];
-
-  if (expressionsToEvaluate.length > 0) {
-    debug(
-      'lazy-deps:original-expressions-list',
-      originalLazyExpressions.map((node) => generator(node).code)
-    );
+  if (expressions.length > 0) {
     debug(
       'lazy-deps:expressions-to-eval-list',
-      expressionsToEvaluate.map((node) => generator(node).code)
+      expressions.map((ex) => ex.source)
     );
 
     const programWithPreval = addLinariaPreval(
       babel,
       program,
-      expressionsToEvaluate
+      expressions.map((ex) => ex.ex)
     );
+
     const { code } = generator(programWithPreval);
     debug('lazy-deps:evaluate', '');
     try {
@@ -174,17 +121,17 @@ export default function evaluateExpressions(
     }
   }
 
-  const valueCache: ValueCache = new Map();
+  const valueCache: ValueCache = new WeakMap();
 
-  originalLazyExpressions.forEach((key, idx) => {
-    throwIfInvalid(lazyValues[idx], getExpression(lazyDeps[idx]));
-    return valueCache.set(key, lazyValues[idx]);
+  // eslint-disable-next-line no-restricted-syntax
+  expressions.forEach((ex, idx) => {
+    const value = wrap(lazyValues[idx]);
+    valueCache.set(ex.ex, value);
   });
 
-  evaluatedDeps.forEach((dep) => {
-    throwIfInvalid(dep.value, dep.ex);
-    return valueCache.set(dep.ex.node, dep.value);
+  processors.forEach((processor) => {
+    processor.build(valueCache);
   });
 
-  return [dependencies, valueCache];
+  return dependencies;
 }
