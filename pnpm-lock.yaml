@@ -2151,22 +2151,22 @@ packages:
       find-up: 4.1.0
     dev: true
 
-  /@definitelytyped/header-parser/0.0.118:
-    resolution: {integrity: sha512-dlOlN+SFetncKK+ecvpJxdk6j6SsZiTv3yrubpme4XR65UHqyt+iYtGUHpufMoTI6QNw85EpxlmT4OPIZ4Y3Jw==}
+  /@definitelytyped/header-parser/0.0.119:
+    resolution: {integrity: sha512-KpXNrV0Im2BdyEPSpw2NrMPSWZIeILVe5+RcH2zSBSJwLfFNZ7xDT9DtzlD43FKMqcMcpKeAk8SYL47frXPceA==}
     dependencies:
-      '@definitelytyped/typescript-versions': 0.0.118
+      '@definitelytyped/typescript-versions': 0.0.119
       '@types/parsimmon': 1.10.6
       parsimmon: 1.18.1
     dev: true
 
-  /@definitelytyped/typescript-versions/0.0.118:
-    resolution: {integrity: sha512-XcQNmK1KLLdtEv6BZpjhBzLOo+qMZI1R18r1JmJcaL9RvdlJaOsCIjPAUrf6sEaqHZRdXwJuWm2kFGG9uPrBBA==}
+  /@definitelytyped/typescript-versions/0.0.119:
+    resolution: {integrity: sha512-l9rmef0FdT0q66sEsIuzQjCOV08MhJFIZoz0rgnTB5FecP6dvToQFyMmheRtf8w5SoTGLu2utBYYjt9J+WeP+g==}
     dev: true
 
-  /@definitelytyped/utils/0.0.118:
-    resolution: {integrity: sha512-yk1xILGHje/1+FJ+LcWFJ5DP/NENcKkHBNSeRLLGLB9ZIrP3zN31OeaPXxif0QDRuLs6xkRAGY3yOfKrJNmilw==}
+  /@definitelytyped/utils/0.0.119:
+    resolution: {integrity: sha512-6TUOXNozyMEJUa65uvZsofdNJKL866SUbQDDG7iYPc5+Vty+YJB7z1GdT6kw8if5TyeufEY6gE/vP1j8SZvuDw==}
     dependencies:
-      '@definitelytyped/typescript-versions': 0.0.118
+      '@definitelytyped/typescript-versions': 0.0.119
       '@qiwi/npm-registry-client': 8.9.1
       '@types/node': 14.18.20
       charm: 1.0.2
@@ -4831,7 +4831,7 @@ packages:
     peerDependencies:
       typescript: '*'
     dependencies:
-      '@definitelytyped/header-parser': 0.0.118
+      '@definitelytyped/header-parser': 0.0.119
       command-exists: 1.2.9
       rimraf: 3.0.2
       semver: 6.3.0
@@ -4847,9 +4847,9 @@ packages:
     peerDependencies:
       typescript: '>= 3.0.0-dev || >= 3.1.0-dev || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.7.0-dev || >= 3.8.0-dev || >= 3.9.0-dev || >= 4.0.0-dev'
     dependencies:
-      '@definitelytyped/header-parser': 0.0.118
-      '@definitelytyped/typescript-versions': 0.0.118
-      '@definitelytyped/utils': 0.0.118
+      '@definitelytyped/header-parser': 0.0.119
+      '@definitelytyped/typescript-versions': 0.0.119
+      '@definitelytyped/utils': 0.0.119
       dts-critic: 3.3.11_typescript@4.7.3
       fs-extra: 6.0.1
       json-stable-stringify: 1.0.1

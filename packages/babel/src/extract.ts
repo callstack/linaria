@@ -86,7 +86,7 @@ export default function extract(
           Module.invalidate();
 
           // We have some garbage after extraction. Let's remove it.
-          removeUnusedCode(path);
+          // removeUnusedCode(path);
 
           debug('extraction:end', state.file.opts.filename);
         },
