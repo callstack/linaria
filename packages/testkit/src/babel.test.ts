@@ -2375,6 +2375,16 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('respects module-resolver plugin', async () => {
+    const { code, metadata } = await transformFile(
+      resolve(__dirname, './__fixtures__/with-babelrc/index.js'),
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('handles complex component', async () => {
     const { code, metadata } = await transformFile(
       resolve(__dirname, './__fixtures__/complex-component.js'),

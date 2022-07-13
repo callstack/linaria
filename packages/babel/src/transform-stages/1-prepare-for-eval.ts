@@ -20,6 +20,11 @@ export type FileInQueue = {
   only: string[];
 } | null;
 
+const isModuleResolver = (i: unknown): i is { options: unknown } =>
+  typeof i === 'object' &&
+  i !== null &&
+  (i as { key?: string }).key === 'module-resolver';
+
 function runPreevalStage(
   filename: string,
   code: string,
@@ -32,11 +37,22 @@ function runPreevalStage(
     perFileBabelConfig
   );
 
-  const file = cachedParseSync(code, loadBabelOptions(filename, parseConfig));
+  const fullParserOptions = loadBabelOptions(filename, parseConfig);
+  const file = cachedParseSync(code, fullParserOptions);
+
+  const transformPlugins: babel.PluginItem[] = [
+    [require.resolve('../plugins/preeval'), pluginOptions],
+  ];
+
+  const moduleResolverPlugin =
+    fullParserOptions.plugins?.find(isModuleResolver);
+  if (moduleResolverPlugin) {
+    transformPlugins.unshift(moduleResolverPlugin);
+  }
 
   const transformConfig = buildOptions({
     envName: 'linaria',
-    plugins: [[require.resolve('../plugins/preeval'), pluginOptions]],
+    plugins: transformPlugins,
     sourceMaps: true,
     sourceFileName: filename,
     inputSourceMap: options.inputSourceMap,
