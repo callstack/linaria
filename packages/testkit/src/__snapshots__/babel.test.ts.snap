@@ -1615,6 +1615,26 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker respects module-resolver plugin 1`] = `
+"import { styled } from '@linaria/react';
+export const H1 = /*#__PURE__*/styled('h1')({
+  name: \\"H1\\",
+  class: \\"H1_hlxjig5\\"
+});"
+`;
+
+exports[`strategy shaker respects module-resolver plugin 2`] = `
+
+CSS:
+
+.H1_hlxjig5 {
+  color: foo;
+}
+
+Dependencies: /Users/anber/Sources/linaria/packages/testkit/src/__fixtures__/re-exports
+
+`;
+
 exports[`strategy shaker should handle shadowed identifier inside components 1`] = `
 "import React from 'react';
 const color = 'red';
