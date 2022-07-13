@@ -5,6 +5,8 @@
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
     "@linaria/babel-preset": "workspace:^",
+    "@linaria/logger": "workspace:^",
+    "@linaria/utils": "workspace:^",
     "@rollup/pluginutils": "^4.1.0"
   },
   "devDependencies": {

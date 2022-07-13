@@ -6,13 +6,12 @@
   "dependencies": {
     "@babel/core": "^7.18.2",
     "@babel/generator": ">=7",
-    "@babel/plugin-proposal-export-namespace-from": ">=7",
-    "@babel/plugin-syntax-dynamic-import": ">=7",
-    "@babel/plugin-transform-modules-commonjs": "^7.18.2",
     "@babel/template": ">=7",
     "@babel/traverse": ">=7",
+    "@babel/types": "^7.18.4",
     "@linaria/core": "workspace:^",
     "@linaria/logger": "workspace:^",
+    "@linaria/shaker": "workspace:^",
     "@linaria/utils": "workspace:^",
     "cosmiconfig": "^5.1.0",
     "find-up": "^5.0.0",
@@ -20,7 +19,6 @@
     "stylis": "^3.5.4"
   },
   "devDependencies": {
-    "@babel/types": "^7.18.4",
     "@types/babel__core": "^7.1.19",
     "@types/babel__generator": "^7.6.4",
     "@types/babel__template": "^7.4.1",

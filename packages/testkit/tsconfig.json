@@ -1,5 +1,8 @@
 {
   "extends": "../../tsconfig.json",
+  "exclude": [
+    "node_modules"
+  ],
   "compilerOptions": { "paths": {}, "rootDir": "src/", "types": ["jest", "node"] },
   "references": [
     { "path": "../babel" },

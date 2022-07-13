@@ -4,13 +4,12 @@ import constants from '../styles/constants';
 import { media } from '../styles/utils';
 import Container from './Container';
 
+import logo from '../../assets/linaria-logo.svg';
+
 export default function Header() {
   return (
     <NavBar>
-      <LogoImage
-        src={require('../../assets/linaria-logo.svg')}
-        alt="Linaria Logo"
-      />
+      <LogoImage src={logo} alt="Linaria Logo" />
       <Links>
         <li>
           <LinkItem href="https://github.com/callstack/linaria#features">

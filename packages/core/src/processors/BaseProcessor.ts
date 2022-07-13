@@ -5,10 +5,12 @@ import type { SourceLocation, Expression, TemplateElement } from '@babel/types';
 import type {
   ExpressionValue,
   IInterpolation,
+  IPlaceholder,
   Params,
   Rules,
   Value,
   ValueCache,
+  Artifact,
 } from './types';
 import getClassNameAndSlug from './utils/getClassNameAndSlug';
 import hasMeta from './utils/hasMeta';
@@ -21,13 +23,15 @@ export { Expression };
 export type ProcessorParams = ConstructorParameters<typeof BaseProcessor>;
 
 export default abstract class BaseProcessor {
-  public readonly artifacts: [name: string, data: unknown][] = [];
+  public readonly artifacts: Artifact[] = [];
 
   public readonly className: string;
 
   public readonly dependencies: ExpressionValue[] = [];
 
   public interpolations: IInterpolation[] = [];
+
+  #placeholders: IPlaceholder[] = [];
 
   public readonly slug: string;
 
@@ -62,7 +66,7 @@ export default abstract class BaseProcessor {
     this.slug = slug;
   }
 
-  public build(values: ValueCache): void {
+  public build(values: ValueCache): Artifact[] {
     if (this.artifacts.length > 0) {
       // FIXME: why it was called twice?
       throw new Error('Tag is already built');
@@ -72,6 +76,8 @@ export default abstract class BaseProcessor {
     if (artifact) {
       this.artifacts.push(['css', artifact]);
     }
+
+    return this.artifacts;
   }
 
   public isValidValue(value: unknown): value is Value {
@@ -99,18 +105,19 @@ export default abstract class BaseProcessor {
   public abstract doEvaltimeReplacement(): void;
 
   /**
-   * Perform a replacement for the tag in runtime.
+   * Perform a replacement for the tag with its runtime version.
    * For example, `css` tag will be replaced with its className,
    * whereas `styled` tag will be replaced with a component.
-   * @param classes
+   * If some parts require evaluated data for render,
+   * they will be replaced with placeholders.
    */
-  public abstract doRuntimeReplacement(classes: string): void;
+  public abstract doRuntimeReplacement(): void;
 
   public abstract extractRules(
     valueCache: ValueCache,
     cssText: string,
     loc?: SourceLocation | null
-  ): [rules: Rules, classes: string];
+  ): Rules;
 
   /**
    * A replacement for tag referenced in a template literal.

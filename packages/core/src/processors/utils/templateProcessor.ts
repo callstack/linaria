@@ -67,7 +67,7 @@ export default function templateProcessor(
         : { line: end.line, column: end.column + 1 },
     };
 
-    const value = valueCache.get(ex);
+    const value = valueCache.get(ex.name);
 
     throwIfInvalid(
       tagProcessor.isValidValue.bind(tagProcessor),
@@ -137,13 +137,13 @@ export default function templateProcessor(
     }
   }
 
-  const [rules, classes] = tagProcessor.extractRules(
+  const rules = tagProcessor.extractRules(
     valueCache,
     cssText,
     tagProcessor.location
   );
 
-  tagProcessor.doRuntimeReplacement(classes);
+  // tagProcessor.doRuntimeReplacement(classes);
   if (!isReferenced && !cssText.includes(':global')) {
     return null;
   }

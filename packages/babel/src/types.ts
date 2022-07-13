@@ -1,13 +1,11 @@
-import type { TransformOptions } from '@babel/core';
+import type { BabelFile, BabelFileMetadata, PluginPass } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import type { File } from '@babel/types';
 import type { RawSourceMap } from 'source-map';
 
 import type BaseProcessor from '@linaria/core/processors/BaseProcessor';
-import type { Replacements } from '@linaria/core/processors/types';
-import type { ClassNameFn } from '@linaria/core/processors/utils/types';
 
-import type { PluginOptions } from './utils/loadOptions';
+import type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
 
 export type {
   ComponentDependency,
@@ -36,47 +34,32 @@ export type Rules = Record<string, ICSSRule>;
 
 export type Dependencies = string[];
 
-export type State = {
+export type LinariaMetadata = {
+  processors: BaseProcessor[];
+
+  rules: Rules;
+  replacements: Replacement[];
+  dependencies: string[];
+};
+
+export interface IPluginState extends PluginPass {
   processors: BaseProcessor[];
   dependencies: Dependencies;
-  file: {
-    opts: {
-      cwd: string;
-      root: string;
-      filename: string;
-    };
+  file: BabelFile & {
     metadata: {
-      linaria?: {
-        rules: Rules;
-        replacements: Replacements;
-        dependencies: Dependencies;
-      };
+      linaria?: LinariaMetadata;
     };
   };
-};
+}
 
-export type Evaluator = (
-  filename: string,
-  options: StrictOptions,
-  text: string,
-  only: string[] | null
-) => [string, Map<string, string[]> | null];
+export interface ITransformFileResult {
+  metadata?: BabelFileMetadata;
+  code: string;
+}
 
-export type EvalRule = {
-  test?: RegExp | ((path: string) => boolean);
-  action: Evaluator | 'ignore' | string;
-};
+export type CodeCache = Map<string, Map<string, ITransformFileResult>>;
 
-export type LibResolverFn = (linariaLibPath: string) => string | null;
-
-export type StrictOptions = {
-  classNameSlug?: string | ClassNameFn;
-  displayName: boolean;
-  evaluate: boolean;
-  ignore?: RegExp;
-  babelOptions: TransformOptions;
-  rules: EvalRule[];
-};
+export type Stage = 'preeval' | 'collect';
 
 export type Location = {
   line: number;
@@ -96,12 +79,6 @@ export type Result = {
   dependencies?: string[];
   rules?: Rules;
   replacements?: Replacement[];
-};
-
-export type LinariaMetadata = {
-  rules: Rules;
-  replacements: Replacement[];
-  dependencies: string[];
 };
 
 export type Options = {

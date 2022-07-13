@@ -1,12 +1,18 @@
-import { join, resolve } from 'path';
+import { readFileSync } from 'fs';
+import { dirname, join, resolve } from 'path';
 
 import * as babel from '@babel/core';
-import type { PluginTarget, PluginItem } from '@babel/core';
+import type { PluginItem } from '@babel/core';
 import dedent from 'dedent';
 import stripAnsi from 'strip-ansi';
 
-import type { StrictOptions, Evaluator } from '@linaria/babel-preset';
-import { Module } from '@linaria/babel-preset';
+import type { PluginOptions, Stage } from '@linaria/babel-preset';
+import {
+  Module,
+  transform as linariaTransform,
+  loadLinariaOptions,
+} from '@linaria/babel-preset';
+import type { Evaluator, StrictOptions } from '@linaria/utils';
 
 import serializer from './__utils__/linaria-snapshot-serializer';
 
@@ -14,17 +20,24 @@ expect.addSnapshotSerializer(serializer);
 
 const dirName = __dirname;
 
-type Config = babel.TransformOptions & {
-  presets: [[PluginTarget, StrictOptions], ...PluginItem[]];
+type Options = [
+  evaluator: Evaluator,
+  linariaConfig?: Partial<StrictOptions>,
+  extension?: 'js' | 'ts' | 'jsx' | 'tsx',
+  babelConfig?: babel.TransformOptions
+];
+
+const asyncResolve = (what: string, importer: string, stack: string[]) => {
+  const where = [importer, ...stack].map((p) => dirname(p));
+  try {
+    return Promise.resolve(require.resolve(what, { paths: where }));
+  } catch {
+    return Promise.reject();
+  }
 };
 
-const getBabelConfig = (
-  evaluator: Evaluator,
-  linariaConfig: Partial<StrictOptions> = {},
-  extension: 'js' | 'ts' | 'jsx' | 'tsx' = 'js'
-): Config => {
+const getPresets = (extension: 'js' | 'ts' | 'jsx' | 'tsx') => {
   const presets: PluginItem[] = [];
-  const plugins: PluginItem[] = [];
   if (extension === 'ts' || extension === 'tsx') {
     presets.push(require.resolve('@babel/preset-typescript'));
   }
@@ -33,178 +46,175 @@ const getBabelConfig = (
     presets.push(require.resolve('@babel/preset-react'));
   }
 
-  return {
-    filename: join(dirName, `source.${extension}`),
-    babelrc: false,
-    configFile: false,
-    plugins,
-    presets: [
-      [
-        require.resolve('@linaria/babel-preset'),
-        {
-          babelOptions: {
-            presets,
-            plugins,
-          },
-          displayName: true,
-          rules: [
-            {
-              action: evaluator,
-            },
-            {
-              test: /\/node_modules\/(?!@linaria)/,
-              action: 'ignore',
-            },
+  return presets;
+};
+
+const getLinariaConfig = (
+  evaluator: Evaluator,
+  linariaConfig: Partial<StrictOptions>,
+  presets: PluginItem[],
+  stage?: Stage
+): PluginOptions =>
+  loadLinariaOptions({
+    babelOptions: {
+      presets,
+      plugins: [],
+    },
+    displayName: true,
+    rules: [
+      {
+        action: evaluator,
+        babelOptions: {
+          plugins: [
+            require.resolve('@babel/plugin-transform-modules-commonjs'),
           ],
-          evaluate: true,
-          ...linariaConfig,
         },
-      ],
-      ...presets,
+      },
+      {
+        test: /\/node_modules\/(?!@linaria)/,
+        action: 'ignore',
+      },
     ],
+    stage,
+    ...linariaConfig,
+  });
+
+async function transform(originalCode: string, opts: Options) {
+  const [
+    evaluator,
+    linariaPartialConfig = {},
+    extension = 'js',
+    babelPartialConfig = {},
+  ] = opts;
+
+  const filename = join(dirName, `source.${extension}`);
+
+  const presets = getPresets(extension);
+  const linariaConfig = getLinariaConfig(
+    evaluator,
+    linariaPartialConfig,
+    presets,
+    'collect'
+  );
+
+  const result = await linariaTransform(
+    originalCode,
+    {
+      filename: babelPartialConfig.filename ?? filename,
+      pluginOptions: linariaConfig,
+    },
+    asyncResolve,
+    babelPartialConfig
+  );
+
+  return {
+    code: result.code,
+    metadata: {
+      linaria: {
+        rules: result.rules,
+        dependencies: result.dependencies,
+      },
+    },
   };
-};
-
-async function transformAsync(
-  code: string,
-  opts?: babel.TransformOptions
-): Promise<babel.BabelFileResult> {
-  return (await babel.transformAsync(code, opts))!;
 }
 
-async function transformFileAsync(
-  filename: string,
-  opts?: babel.TransformOptions
-): Promise<babel.BabelFileResult> {
-  return (await babel.transformFileAsync(filename, opts))!;
+async function transformFile(filename: string, opts: Options) {
+  const [
+    evaluator,
+    linariaPartialConfig = {},
+    extension = 'js',
+    babelPartialConfig = {},
+  ] = opts;
+  const code = readFileSync(filename, 'utf8');
+  return transform(code, [
+    evaluator,
+    linariaPartialConfig,
+    extension,
+    {
+      ...babelPartialConfig,
+      filename,
+    },
+  ]);
 }
 
-const strategies: [string, Evaluator][] = [
-  ['extractor', require('@linaria/extractor').default],
-  ['shaker', require('@linaria/shaker').default],
-];
+describe('strategy shaker', () => {
+  const evaluator = require('@linaria/shaker').default;
+  beforeEach(() => {
+    Module.invalidateEvalCache();
+  });
 
-const truncateTestName = (testName: string) => {
-  const prefixLength = testName.split(' ', 2).join('').length + 2;
-  return testName.slice(prefixLength);
-};
-
-const prefixes = strategies.map(([name]) => `strategy ${name}`);
-
-/*
- * After each test, we check that the result is the same for all strategies.
- */
-function validateSnapshots() {
-  const state = expect.getState();
-  const { snapshotState, currentTestName } = state;
-  if (snapshotState.unmatched > 0) {
-    // If there are unmatched snapshots, don't check equality.
-    return;
-  }
-
-  const snapshotData: Record<string, string> = snapshotState._snapshotData;
-  const testName = truncateTestName(currentTestName);
-
-  let i = 1;
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const set = new Set();
-    // eslint-disable-next-line no-restricted-syntax
-    for (const prefix of prefixes) {
-      const snapshot = snapshotData[`${prefix} ${testName} ${i}`];
-
-      if (snapshot) {
-        set.add(snapshot);
-      }
-    }
-
-    if (set.size === 0) {
-      return;
-    }
-
-    if (set.size > 1) {
-      const values = Array.from(set);
-      expect(values[0]).toBe(values[1]);
-    }
-
-    i += 1;
-  }
-}
-
-describe('strategy', () => {
-  describe.each(strategies)('%s', (strategyName, evaluator) => {
-    afterEach(() => {
-      validateSnapshots();
-    });
-
-    beforeEach(() => {
-      Module.invalidateEvalCache();
-    });
-
-    it('transpiles styled template literal with object', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('transpiles styled template literal with object', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     export const Title = styled.h1\`
       font-size: 14px;
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('uses string passed in as classNameSlug', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('uses string passed in as classNameSlug', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     export const Title = styled('h1')\`
       font-size: 14px;
     \`;
 `,
-        getBabelConfig(evaluator, {
+      [
+        evaluator,
+        {
           classNameSlug: ['hash', 'title', 'file', 'name', 'ext', 'dir']
             .map((s) => `[${s}]`)
             .join('_'),
-        })
-      );
+        },
+      ]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('removes fake replacement patterns in string classNameSlug', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('removes fake replacement patterns in string classNameSlug', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     export const Title = styled('h1')\`
       font-size: 14px;
     \`;
 `,
-        getBabelConfig(evaluator, {
+      [
+        evaluator,
+        {
           classNameSlug: '[not]_[actual]_[replacements]',
-        })
-      );
+        },
+      ]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('handles fn passed in as classNameSlug', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('handles fn passed in as classNameSlug', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     export const Title = styled('h1')\`
       font-size: 14px;
     \`;
 `,
-        getBabelConfig(evaluator, {
+      [
+        evaluator,
+        {
           classNameSlug: (hash, title, vars) =>
             [
               hash,
@@ -216,48 +226,49 @@ describe('strategy', () => {
               vars.ext,
               vars.dir,
             ].join('_'),
-        })
-      );
+        },
+      ]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('transpiles styled template literal with function and tag', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('transpiles styled template literal with function and tag', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     export const Title = styled('h1')\`
       font-size: 14px;
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('transpiles renamed styled import', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('transpiles renamed styled import', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled as custom } from '@linaria/react';
 
     export const Title = custom('h1')\`
       font-size: 14px;
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('transpiles renamed css and atomic-css imports in the same file', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('transpiles renamed css and atomic-css imports in the same file', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { css as coreCss } from '@linaria/core';
@@ -273,16 +284,16 @@ describe('strategy', () => {
 
     console.log(x, y);
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('transpiles renamed styled and atomic-styled imports in the same file', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('transpiles renamed styled and atomic-styled imports in the same file', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { styled as reactStyled } from '@linaria/react';
@@ -304,16 +315,16 @@ describe('strategy', () => {
 
     console.log(StyledComponent, StyledComponent2, AtomicComponent, AtomicComponent2);
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('transpiles renamed css from linaria v2', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('transpiles renamed css from linaria v2', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import {css as coreCss} from 'linaria';
 
     const x = coreCss\`
@@ -322,16 +333,16 @@ describe('strategy', () => {
 
     console.log(x);
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('transpiles styled template literal with function and component', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('transpiles styled template literal with function and component', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
     const Heading = () => null;
 
@@ -339,16 +350,16 @@ describe('strategy', () => {
       font-size: 14px;
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('transpiles styled template literal with TS component', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('transpiles styled template literal with TS component', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     type Props = { className?: string; children?: React.ReactNode };
@@ -357,22 +368,22 @@ describe('strategy', () => {
       font-size: 14px;
     \`;
     `,
-        getBabelConfig(
-          evaluator,
-          {
-            evaluate: false,
-          },
-          'ts'
-        )
-      );
+      [
+        evaluator,
+        {
+          evaluate: false,
+        },
+        'ts',
+      ]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('transpiles with typed fn as interpolated value', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('transpiles with typed fn as interpolated value', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     type Props = { className?: string; children?: React.ReactNode };
@@ -382,38 +393,38 @@ describe('strategy', () => {
       content: "${'${(props: Props) => props.className}'}"
     \`;
     `,
-        getBabelConfig(
-          evaluator,
-          {
-            evaluate: false,
-          },
-          'ts'
-        )
-      );
+      [
+        evaluator,
+        {
+          evaluate: false,
+        },
+        'ts',
+      ]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('outputs valid CSS classname', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('outputs valid CSS classname', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     export const ΩPage$Title = styled.h1\`
       font-size: 14px;
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates nested nested object interpolation', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates nested nested object interpolation', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { css } from '@linaria/core';
 
     const defaultStyle = css\`
@@ -432,16 +443,16 @@ describe('strategy', () => {
       ${'${obj}'}
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('keeps cx import and removes css', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('keeps cx import and removes css', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { css, cx } from '@linaria/core';
 
     const defaultStyle = css\`
@@ -450,16 +461,16 @@ describe('strategy', () => {
 
     export const combined = cx(defaultStyle, Math.random() > 0.5 ? 'green' : 'red');
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates and inlines expressions in scope', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates and inlines expressions in scope', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     const color = 'blue';
@@ -469,16 +480,16 @@ describe('strategy', () => {
       width: ${'${100 / 3}'}%;
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('inlines object styles as CSS string', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('inlines object styles as CSS string', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     const cover = {
@@ -515,16 +526,16 @@ describe('strategy', () => {
       ${'${cover}'}
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('inlines array styles as CSS string', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('inlines array styles as CSS string', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     const styles = [
@@ -536,16 +547,16 @@ describe('strategy', () => {
       ${'${styles}'}
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('handles interpolation followed by unit', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('handles interpolation followed by unit', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     const size = () => 100;
@@ -562,16 +573,16 @@ describe('strategy', () => {
       border-radius: ${'${function(props) { return 200 }}'}px
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('uses the same custom property for the same identifier', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('uses the same custom property for the same identifier', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     const size = () => 100;
@@ -581,16 +592,16 @@ describe('strategy', () => {
       width: ${'${size}'}px;
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('uses the same custom property for the same expression', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('uses the same custom property for the same expression', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     export const Box = styled.div\`
@@ -598,16 +609,16 @@ describe('strategy', () => {
       width: ${'${props => props.size}'}px;
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('handles nested blocks', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('handles nested blocks', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     const regular = () => "arial";
@@ -624,16 +635,16 @@ describe('strategy', () => {
       }
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('prevents class name collision', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('prevents class name collision', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { styled } from '@linaria/react';
 
     const size = () => 100;
@@ -652,30 +663,30 @@ describe('strategy', () => {
       return <Title />;
     }
     `,
-        getBabelConfig(evaluator, {}, 'jsx')
-      );
+      [evaluator, {}, 'jsx']
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('does not output CSS if none present', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('does not output CSS if none present', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       const number = 42;
 
       const title = String.raw\`This is something\`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('does not output CSS property when value is a blank string', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('does not output CSS property when value is a blank string', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { css } from '@linaria/core';
 
     export const title = css\`
@@ -683,32 +694,32 @@ describe('strategy', () => {
       margin: 6px;
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('transpiles css template literal', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('transpiles css template literal', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { css } from '@linaria/core';
 
     export const title = css\`
       font-size: 14px;
     \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('handles css template literal in object property', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('handles css template literal in object property', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { css } from '@linaria/core';
 
     const components = {
@@ -717,33 +728,33 @@ describe('strategy', () => {
       \`
     };
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('handles css template literal in JSX element', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('handles css template literal in JSX element', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     import { css } from '@linaria/core';
 
     <Title class={css\` font-size: 14px; \`} />
     `,
-        getBabelConfig(evaluator, {}, 'jsx')
-      );
+      [evaluator, {}, 'jsx']
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('throws when contains unsupported expression', async () => {
-      expect.assertions(1);
+  it('throws when contains unsupported expression', async () => {
+    expect.assertions(1);
 
-      try {
-        await transformAsync(
-          dedent`
+    try {
+      await transform(
+        dedent`
       import { css } from '@linaria/core';
 
       const size = 100;
@@ -752,20 +763,20 @@ describe('strategy', () => {
         font-size: ${'${() => size}'}px;
       \`;
       `,
-          getBabelConfig(evaluator)
-        );
-      } catch (e) {
-        expect(
-          stripAnsi(
-            (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
-          )
-        ).toMatchSnapshot();
-      }
-    });
+        [evaluator]
+      );
+    } catch (e) {
+      expect(
+        stripAnsi(
+          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+        )
+      ).toMatchSnapshot();
+    }
+  });
 
-    it('supports both css and styled tags', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('supports both css and styled tags', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from '@linaria/core';
       import { styled } from '@linaria/react';
 
@@ -777,16 +788,16 @@ describe('strategy', () => {
         color: blue;
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('does not include styles if not referenced anywhere', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('does not include styles if not referenced anywhere', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from '@linaria/core';
       import { styled } from '@linaria/react';
 
@@ -798,16 +809,16 @@ describe('strategy', () => {
         color: blue;
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('includes unreferenced styles for :global', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('includes unreferenced styles for :global', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from '@linaria/core';
       import { styled } from '@linaria/react';
 
@@ -825,16 +836,16 @@ describe('strategy', () => {
         }
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('handles objects with numeric keys', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('handles objects with numeric keys', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from '@linaria/core';
 
       export const object = {
@@ -842,38 +853,37 @@ describe('strategy', () => {
         42: css\`\`,
       }
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('handles objects with enums as keys', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('handles objects with enums as keys', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from '@linaria/core';
-      import { TestEnum } from './ts-data.ts';
+      import { TestEnum } from './__fixtures__/ts-data.ts';
 
       export const object = {
         [TestEnum.FirstValue]: css\`\`,
         [TestEnum.SecondValue]: css\`\`,
       }
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator, {}, 'ts']
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('compiles atomic css', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('compiles atomic css', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { css } from '@linaria/atomic';
-    import { styled } from '@linaria/react';
 
     const x = css\`
       background: red;
@@ -883,20 +893,19 @@ describe('strategy', () => {
     console.log(x);
 
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('compiles atomic css with property priorities', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('compiles atomic css with property priorities', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { css } from '@linaria/atomic';
-    import { styled } from '@linaria/react';
 
     const y = css\`
       margin-left: 5px;
@@ -909,20 +918,19 @@ describe('strategy', () => {
     console.log(x, y);
 
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('compiles atomic css with at-rules and pseudo classes', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('compiles atomic css with at-rules and pseudo classes', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { css } from '@linaria/atomic';
-    import { styled } from '@linaria/react';
 
     const x = css\`
       @media (max-width: 500px) {
@@ -943,20 +951,19 @@ describe('strategy', () => {
     console.log(x);
 
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('compiles atomic css with at-rules and property priorities', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('compiles atomic css with at-rules and property priorities', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { css } from '@linaria/atomic';
-    import { styled } from '@linaria/react';
 
     const x = css\`
       @media (max-width: 500px) {
@@ -975,20 +982,19 @@ describe('strategy', () => {
 
     console.log(x);
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('compiles atomic css with keyframes', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('compiles atomic css with keyframes', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { css } from '@linaria/atomic';
-    import { styled } from '@linaria/react';
 
     const x = css\`
       @keyframes fade {
@@ -1008,16 +1014,16 @@ describe('strategy', () => {
     console.log(x);
 
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('compiles atomic styled with static css', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('compiles atomic styled with static css', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { styled } from '@linaria/atomic';
@@ -1030,15 +1036,15 @@ describe('strategy', () => {
     console.log(Component);
 
       `,
-        getBabelConfig(evaluator)
-      );
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+      [evaluator]
+    );
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('compiles atomic css with unique atoms based on key value pairs', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('compiles atomic css with unique atoms based on key value pairs', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
     import { css } from '@linaria/atomic';
     const x = css\`
@@ -1049,16 +1055,16 @@ describe('strategy', () => {
     \`;
     console.log(x, y);
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('compiles atomic styled with plain css, static and dynamic interpolations', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('compiles atomic styled with plain css, static and dynamic interpolations', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { styled } from '@linaria/atomic';
@@ -1073,15 +1079,15 @@ describe('strategy', () => {
     console.log(Component);
 
       `,
-        getBabelConfig(evaluator)
-      );
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+      [evaluator]
+    );
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('compiles atoms that are shared between css and styled templates', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('compiles atoms that are shared between css and styled templates', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { css } from '@linaria/atomic';
@@ -1102,15 +1108,15 @@ describe('strategy', () => {
     console.log(x, Component);
 
       `,
-        getBabelConfig(evaluator)
-      );
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+      [evaluator]
+    );
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('compiles atomic styled wrapping other components with extra priority', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('compiles atomic styled wrapping other components with extra priority', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { styled } from '@linaria/atomic';
@@ -1128,15 +1134,15 @@ describe('strategy', () => {
     console.log(ComponentCompositing);
 
       `,
-        getBabelConfig(evaluator)
-      );
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+      [evaluator]
+    );
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('compiles atomic styled without colliding by property', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('compiles atomic styled without colliding by property', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { styled } from '@linaria/atomic';
@@ -1152,15 +1158,15 @@ describe('strategy', () => {
     \`;
 
       `,
-        getBabelConfig(evaluator)
-      );
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+      [evaluator]
+    );
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('compiles atomic styled with dynamic interpolations as unique variables based on the interpolation text', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('compiles atomic styled with dynamic interpolations as unique variables based on the interpolation text', async () => {
+    const { code, metadata } = await transform(
+      dedent`
     /* @flow */
 
     import { styled } from '@linaria/atomic';
@@ -1179,15 +1185,15 @@ describe('strategy', () => {
     console.log(Component, Component2);
 
       `,
-        getBabelConfig(evaluator)
-      );
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+      [evaluator]
+    );
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates identifier in scope', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates identifier in scope', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       const answer = 42;
@@ -1200,15 +1206,15 @@ describe('strategy', () => {
         }
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+      [evaluator]
+    );
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('hoistable identifiers', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('hoistable identifiers', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       {
@@ -1221,19 +1227,19 @@ describe('strategy', () => {
         }
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('non-hoistable identifiers', async () => {
-      expect.assertions(1);
+  it('non-hoistable identifiers', async () => {
+    expect.assertions(1);
 
-      try {
-        await transformAsync(
-          dedent`
+    try {
+      await transform(
+        dedent`
         import { styled } from '@linaria/react';
 
         {
@@ -1246,20 +1252,20 @@ describe('strategy', () => {
           }
         \`;
         `,
-          getBabelConfig(evaluator)
-        );
-      } catch (e) {
-        expect(
-          stripAnsi(
-            (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
-          )
-        ).toMatchSnapshot();
-      }
-    });
+        [evaluator]
+      );
+    } catch (e) {
+      expect(
+        stripAnsi(
+          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+        )
+      ).toMatchSnapshot();
+    }
+  });
 
-    it('evaluates imported typescript enums', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates imported typescript enums', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
       import { Colors } from './__fixtures__/enums';
 
@@ -1267,16 +1273,16 @@ describe('strategy', () => {
         color: ${'${Colors.BLUE}'};
       \`;
       `,
-        getBabelConfig(evaluator, {}, 'ts')
-      );
+      [evaluator, {}, 'ts']
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates local expressions', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates local expressions', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       const answer = 42;
@@ -1288,16 +1294,16 @@ describe('strategy', () => {
         }
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates functions with nested identifiers', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates functions with nested identifiers', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       const objects = { key: { fontSize: 12 } };
@@ -1310,16 +1316,16 @@ describe('strategy', () => {
         ${"${foo('key')}"}
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates expressions with dependencies', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates expressions with dependencies', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
       import slugify from './__fixtures__/slugify';
 
@@ -1329,16 +1335,16 @@ describe('strategy', () => {
         }
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates expressions with expressions depending on shared dependency', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates expressions with expressions depending on shared dependency', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
       const slugify = require('./__fixtures__/slugify').default;
 
@@ -1351,16 +1357,16 @@ describe('strategy', () => {
         }
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates multiple expressions with shared dependency', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates multiple expressions with shared dependency', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
       const slugify = require('./__fixtures__/slugify').default;
 
@@ -1374,32 +1380,32 @@ describe('strategy', () => {
         }
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates interpolations with sequence expression', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates interpolations with sequence expression', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
       let external = 0;
       export const Title = styled.h1\`
         color: ${'${(external, () => "blue")}'};
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates dependencies with sequence expression', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates dependencies with sequence expression', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
       let external = 0;
       const color = (external, () => 'blue');
@@ -1408,15 +1414,15 @@ describe('strategy', () => {
         color: ${'${color}'};
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+      [evaluator]
+    );
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates component interpolations', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates component interpolations', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       const { styled } = require('@linaria/react');
 
       export const Title = styled.h1\`
@@ -1429,19 +1435,19 @@ describe('strategy', () => {
         }
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('throws when interpolation evaluates to undefined', async () => {
-      expect.assertions(1);
+  it('throws when interpolation evaluates to undefined', async () => {
+    expect.assertions(1);
 
-      try {
-        await transformAsync(
-          dedent`
+    try {
+      await transform(
+        dedent`
         const { styled } = require('@linaria/react');
 
         let fontSize;
@@ -1450,23 +1456,23 @@ describe('strategy', () => {
           font-size: ${'${fontSize}'};
         \`;
         `,
-          getBabelConfig(evaluator)
-        );
-      } catch (e) {
-        expect(
-          stripAnsi(
-            (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
-          )
-        ).toMatchSnapshot();
-      }
-    });
+        [evaluator]
+      );
+    } catch (e) {
+      expect(
+        stripAnsi(
+          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+        )
+      ).toMatchSnapshot();
+    }
+  });
 
-    it('throws when interpolation evaluates to null', async () => {
-      expect.assertions(1);
+  it('throws when interpolation evaluates to null', async () => {
+    expect.assertions(1);
 
-      try {
-        await transformAsync(
-          dedent`
+    try {
+      await transform(
+        dedent`
         const { styled } = require('@linaria/react');
 
         const color = null;
@@ -1475,23 +1481,23 @@ describe('strategy', () => {
           color: ${'${color}'};
         \`;
         `,
-          getBabelConfig(evaluator)
-        );
-      } catch (e) {
-        expect(
-          stripAnsi(
-            (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
-          )
-        ).toMatchSnapshot();
-      }
-    });
+        [evaluator]
+      );
+    } catch (e) {
+      expect(
+        stripAnsi(
+          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+        )
+      ).toMatchSnapshot();
+    }
+  });
 
-    it('throws when interpolation evaluates to NaN', async () => {
-      expect.assertions(1);
+  it('throws when interpolation evaluates to NaN', async () => {
+    expect.assertions(1);
 
-      try {
-        await transformAsync(
-          dedent`
+    try {
+      await transform(
+        dedent`
         const { styled } = require('@linaria/react');
 
         const height = NaN;
@@ -1500,21 +1506,20 @@ describe('strategy', () => {
           height: ${'${height}'}px;
         \`;
         `,
-          getBabelConfig(evaluator)
-        );
-      } catch (e) {
-        expect(
-          stripAnsi(
-            (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
-          )
-        ).toMatchSnapshot();
-      }
-    });
+        [evaluator]
+      );
+    } catch (e) {
+      expect(
+        stripAnsi(
+          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+        )
+      ).toMatchSnapshot();
+    }
+  });
 
-    it('handles wrapping another styled component', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
-      const { css } = require('..');
+  it('handles wrapping another styled component', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       const { styled } = require('@linaria/react');
 
       const Title = styled.h1\`
@@ -1530,15 +1535,15 @@ describe('strategy', () => {
         color: green;
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+      [evaluator]
+    );
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('handles indirect wrapping another styled component', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('handles indirect wrapping another styled component', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       const { styled } = require('@linaria/react');
 
       const Title = styled.h1\`
@@ -1552,16 +1557,16 @@ describe('strategy', () => {
         color: blue;
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('inlines object styles as CSS string', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('inlines object styles as CSS string', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       const fill = (top = 0, left = 0, right = 0, bottom = 0) => ({
@@ -1576,16 +1581,16 @@ describe('strategy', () => {
         ${'${fill(0, 0)}'}
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('inlines array styles as CSS string', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('inlines array styles as CSS string', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       const fill = (top = 0, left = 0, right = 0, bottom = 0) => [
@@ -1602,16 +1607,16 @@ describe('strategy', () => {
         ${'${fill(0, 0)}'}
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('ignores inline arrow function expressions', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('ignores inline arrow function expressions', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       export const Title = styled.h1\`
@@ -1620,17 +1625,17 @@ describe('strategy', () => {
         }
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('simplifies react components', async () => {
-      const div = '<div>{props.children + constant}</div>';
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('simplifies react components', async () => {
+    const div = '<div>{props.children + constant}</div>';
+    const { code, metadata } = await transform(
+      dedent`
       import React from 'react';
       import { styled } from '@linaria/react';
       import constant from './broken-dependency';
@@ -1647,6 +1652,14 @@ describe('strategy', () => {
         }
       }
 
+      const ComplexFunctionComponent = (props) => {
+        if (import.meta.env.PROD) {
+          return ${div};
+        }
+
+        return null;
+      }
+
       export const StyledFunc = styled(FuncComponent)\`
         color: red;
       \`;
@@ -1654,16 +1667,16 @@ describe('strategy', () => {
         color: blue;
       \`;
       `,
-        getBabelConfig(evaluator, {}, 'jsx')
-      );
+      [evaluator, {}, 'jsx']
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('ignores inline vanilla function expressions', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('ignores inline vanilla function expressions', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       export const Title = styled.h1\`
@@ -1672,16 +1685,16 @@ describe('strategy', () => {
         }
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('ignores external expressions', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('ignores external expressions', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       const generate = props => props.content;
@@ -1692,19 +1705,19 @@ describe('strategy', () => {
         }
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('throws codeframe error when evaluation fails', async () => {
-      expect.assertions(1);
+  it('throws codeframe error when evaluation fails', async () => {
+    expect.assertions(1);
 
-      try {
-        await transformAsync(
-          dedent`
+    try {
+      await transform(
+        dedent`
         import { styled } from '@linaria/react';
 
         const foo = props => { throw new Error('This will fail') };
@@ -1713,102 +1726,128 @@ describe('strategy', () => {
           font-size: ${'${foo()}'}px;
         \`;
         `,
-          getBabelConfig(evaluator)
-        );
-      } catch (e) {
-        expect(
-          stripAnsi(
-            (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
-          )
-        ).toMatchSnapshot();
-      }
-    });
-
-    it('generates stable class names', async () => {
-      const { code, metadata } = await transformFileAsync(
-        resolve(__dirname, './__fixtures__/components-library.js'),
-        getBabelConfig(evaluator)
+        [evaluator]
       );
+    } catch (e) {
+      expect(
+        stripAnsi(
+          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+        )
+      ).toMatchSnapshot();
+    }
+  });
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+  it('generates stable class names', async () => {
+    const { code, metadata } = await transformFile(
+      resolve(__dirname, './__fixtures__/components-library.js'),
+      [evaluator]
+    );
 
-    it('derives display name from filename', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('derives display name from filename', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       export default styled.h1\`
         font-size: 14px;
       \`;
       `,
+      [
+        evaluator,
+        {},
+        'js',
         {
-          ...getBabelConfig(evaluator),
           filename: join(dirName, 'FancyName.js'),
-        }
-      );
+        },
+      ]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('derives display name from parent folder name', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('derives display name from parent folder name', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       export default styled.h1\`
         font-size: 14px;
       \`;
       `,
+      [
+        evaluator,
+        {},
+        'js',
         {
-          ...getBabelConfig(evaluator),
           filename: join(dirName, 'FancyName/index.js'),
-        }
-      )!;
+        },
+      ]
+    )!;
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it("throws if couldn't determine a display name", async () => {
-      expect.assertions(1);
+  it("throws if couldn't determine a display name", async () => {
+    expect.assertions(1);
 
-      try {
-        await transformAsync(
-          dedent`
+    try {
+      await transform(
+        dedent`
         import { styled } from '@linaria/react';
 
         export default styled.h1\`
           font-size: 14px;
         \`;
         `,
+        [
+          evaluator,
           {
-            ...getBabelConfig(evaluator),
+            extensions: [''],
+          },
+          'js',
+          {
             filename: join(dirName, '/.js'),
-          }
-        );
-      } catch (e) {
-        expect(
-          stripAnsi(
-            (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
-          )
-        ).toMatchSnapshot();
-      }
-    });
+          },
+        ]
+      );
+    } catch (e) {
+      expect(
+        stripAnsi(
+          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+        )
+      ).toMatchSnapshot();
+    }
+  });
 
-    it('does not strip istanbul coverage sequences', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('does not strip istanbul coverage sequences', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { css } from './custom-css-tag';
       const a = 42;
 
-      export const Title = \`
+      export const titleClass = css\`
         height: ${'${a}'}px;
       \`;
       `,
+      [
+        evaluator,
         {
-          ...getBabelConfig(evaluator),
+          tagResolver: (source, tag) => {
+            if (source === './custom-css-tag' && tag === 'css') {
+              return require.resolve('@linaria/core/processors/css');
+            }
+
+            return null;
+          },
+        },
+        'js',
+        {
           cwd: '/home/user/project',
           filename: 'file.js',
           plugins: [
@@ -1821,17 +1860,18 @@ describe('strategy', () => {
               { cwd: '/home/user/project' },
             ],
           ],
-        }
-      );
+        },
+      ]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    // PR #524
-    it('should work with String and Number object', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  // PR #524
+  it('should work with String and Number object', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from '@linaria/core';
 
       export const style = css\`
@@ -1839,16 +1879,16 @@ describe('strategy', () => {
         opacity: ${'${new Number(0.75)}'};
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('should work with generated classnames as selectors', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('should work with generated classnames as selectors', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from "@linaria/core";
 
       export const text = css\`\`;
@@ -1859,16 +1899,16 @@ describe('strategy', () => {
         }
       \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('should process `css` calls inside components', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('should process `css` calls inside components', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import React from 'react'
       import {css} from '@linaria/core'
 
@@ -1881,18 +1921,18 @@ describe('strategy', () => {
         return React.createElement("div", { className });
       }
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('should process `styled` calls inside components', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('should process `styled` calls inside components', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import React from 'react'
-      import {css} from '@linaria/core'
+      import { styled } from '@linaria/react'
 
       export function Component() {
         const opacity = 0.2;
@@ -1903,16 +1943,16 @@ describe('strategy', () => {
         return React.createElement(MyComponent);
       }
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('should process `css` calls with complex interpolation inside components', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('should process `css` calls with complex interpolation inside components', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import React from 'react'
       import {css} from '@linaria/core'
       import externalDep from './__fixtures__/sample-script';
@@ -1944,16 +1984,16 @@ describe('strategy', () => {
         return React.createElement("div", { className });
       }
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('should process `css` calls referencing other `css` calls inside components', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('should process `css` calls referencing other `css` calls inside components', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import React from 'react'
       import {css} from '@linaria/core'
 
@@ -1977,18 +2017,19 @@ describe('strategy', () => {
         );
       }
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('should process `styled` calls with complex interpolation inside components', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('should process `styled` calls with complex interpolation inside components', async () => {
+    const { code, metadata } = await transform(
+      dedent`
         import React from 'react'
         import {css} from '@linaria/core'
+        import {styled} from '@linaria/react'
 
         const globalObj = {
           opacity: 0.5,
@@ -2008,7 +2049,7 @@ describe('strategy', () => {
 
           const classes2 = classes;
 
-          const MyComponent = styled\`
+          const MyComponent = styled.h1\`
             opacity: ${'${globalObj.opacity}'};
 
             &:hover .${'${classes2.cell}'} {
@@ -2022,16 +2063,16 @@ describe('strategy', () => {
           return React.createElement(MyComponent);
         }
         `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('should handle shadowed identifier inside components', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('should handle shadowed identifier inside components', async () => {
+    const { code, metadata } = await transform(
+      dedent`
         import React from 'react'
         import {css} from '@linaria/core'
 
@@ -2043,16 +2084,16 @@ describe('strategy', () => {
           return React.createElement('div', {className: css\`background-color:${'${val.color}'};\`});
         }
         `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('it should not throw location error for hoisted identifier', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('it should not throw location error for hoisted identifier', async () => {
+    const { code, metadata } = await transform(
+      dedent`
         import React from 'react'
         import {css} from '@linaria/core'
 
@@ -2062,16 +2103,16 @@ describe('strategy', () => {
           return css\`opacity:${'${color}'};\`
         }
         `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('should wrap memoized components', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('should wrap memoized components', async () => {
+    const { code, metadata } = await transform(
+      dedent`
         import React from 'react';
         import { styled } from '@linaria/react';
 
@@ -2081,29 +2122,26 @@ describe('strategy', () => {
           color: red;
         \`
         `,
-        getBabelConfig(evaluator, {}, 'jsx')
-      );
+      [evaluator, {}, 'jsx']
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    // The rest of tests are too complicated for extractor strategy
-    if (strategyName === 'extractor') return;
+  it('handles escapes properly', async () => {
+    const { code, metadata } = await transformFile(
+      resolve(__dirname, './__fixtures__/escape-character.js'),
+      [evaluator]
+    );
 
-    it('handles escapes properly', async () => {
-      const { code, metadata } = await transformFileAsync(
-        resolve(__dirname, './__fixtures__/escape-character.js'),
-        getBabelConfig(evaluator)
-      );
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
-
-    it('evaluates babel helpers', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates babel helpers', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       function copyAndExtend(a, b) {
@@ -2118,16 +2156,16 @@ describe('strategy', () => {
         }
       \`;
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates complex styles with functions and nested selectors', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates complex styles with functions and nested selectors', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from '@linaria/core';
       export const bareIconClass = css\`\`;
 
@@ -2141,16 +2179,16 @@ describe('strategy', () => {
         XS: css\`${'${getSizeStyles(11)}'}\`,
       };
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('should work with wildcard imports', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('should work with wildcard imports', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from "@linaria/core";
       import * as mod from "./__fixtures__/complex-component";
 
@@ -2162,16 +2200,16 @@ describe('strategy', () => {
         }
       \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('assigning to exports', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('assigning to exports', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from "@linaria/core";
       import { Padding } from "./__fixtures__/assignToExport";
 
@@ -2181,16 +2219,16 @@ describe('strategy', () => {
         }
       \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('exporting objects', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('exporting objects', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from "@linaria/core";
       import object from "./__fixtures__/objectExport";
 
@@ -2200,16 +2238,16 @@ describe('strategy', () => {
         }
       \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('exporting objects with computed keys', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('exporting objects with computed keys', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from "@linaria/core";
       import { object } from "./__fixtures__/computedKeys";
 
@@ -2219,16 +2257,16 @@ describe('strategy', () => {
         }
       \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('exporting sequence expressions', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('exporting sequence expressions', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from "@linaria/core";
       import number from "./__fixtures__/sequenceExport";
 
@@ -2238,16 +2276,16 @@ describe('strategy', () => {
         }
       \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('should work with wildcard reexports', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('should work with wildcard reexports', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from "@linaria/core";
       import { foo1 } from "./__fixtures__/reexports";
 
@@ -2255,16 +2293,16 @@ describe('strategy', () => {
         color: ${'${foo1}'};
       \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('should interpolate imported components', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('should interpolate imported components', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from "@linaria/core";
       import { Title } from "./__fixtures__/complex-component";
 
@@ -2274,16 +2312,16 @@ describe('strategy', () => {
         }
       \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('should interpolate imported variables', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('should interpolate imported variables', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { css } from "@linaria/core";
       import { whiteColor } from "./__fixtures__/complex-component";
 
@@ -2291,16 +2329,16 @@ describe('strategy', () => {
         color: ${'${whiteColor}'}
       \`;
     `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates typescript enums', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates typescript enums', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
 
       enum Colors {
@@ -2311,16 +2349,16 @@ describe('strategy', () => {
         color: ${'${Colors.BLUE}'};
       \`;
       `,
-        getBabelConfig(evaluator, {}, 'ts')
-      );
+      [evaluator, {}, 'ts']
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('evaluates chain of reexports', async () => {
-      const { code, metadata } = await transformAsync(
-        dedent`
+  it('evaluates chain of reexports', async () => {
+    const { code, metadata } = await transform(
+      dedent`
       import { styled } from '@linaria/react';
       import { fooStyles } from "./__fixtures__/re-exports";
 
@@ -2330,21 +2368,20 @@ describe('strategy', () => {
         color: ${'${value}'};
       \`
       `,
-        getBabelConfig(evaluator)
-      );
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 
-    it('handles complex component', async () => {
-      const { code, metadata } = await transformFileAsync(
-        resolve(__dirname, './__fixtures__/complex-component.js'),
-        getBabelConfig(evaluator)
-      );
+  it('handles complex component', async () => {
+    const { code, metadata } = await transformFile(
+      resolve(__dirname, './__fixtures__/complex-component.js'),
+      [evaluator]
+    );
 
-      expect(code).toMatchSnapshot();
-      expect(metadata).toMatchSnapshot();
-    });
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
   });
 });

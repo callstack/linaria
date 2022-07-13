@@ -5,6 +5,7 @@
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
     "@linaria/babel-preset": "workspace:^",
+    "@linaria/utils": "workspace:^",
     "strip-ansi": "^5.2.0"
   },
   "devDependencies": {

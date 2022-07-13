@@ -77,16 +77,58 @@ module.exports = {
   ];
   ```
 
+- `tagResolver: (source, tag) => string`
+
+  A custom function to use when resolving template tags.
+
+  By default, linaria APIs like `css` and `styled` **must** be imported directly from the package – this is because babel needs to be able to recognize the API's to do static style extraction. `tagResolver` allows `css` and `styled` APIs to be imported from other files too.
+
+  `tagResolver` takes the path for the source module (eg. `@linaria/core`) and the name of imported tag (eg. `css`), and returns the full path to the related processor. If `tagResolver` returns `null`, the default tag processor will be used.
+
+  For example, we can use this to map `@linaria/core` , `@linaria/react` or `@linaria/atomic` where we re-export the module.
+
+   ```js
+   {
+     tagResolver: (source, tag) => {
+       const pathToLocalFile = join(__dirname, './my-local-folder/linaria.js');
+       if (source === pathToLocalFile) {
+         if (tag === 'css') {
+           return require.resolve('@linaria/core/processors/css');
+         }
+  
+         if (tag === 'styled') {
+           return require.resolve('@linaria/react/processors/styled');
+         }
+       }
+  
+       return null;
+     };
+   }
+   ```
+
+  We can then re-export and use linaria API's from `./my-local-folder`:
+
+   ```js
+   // my-file.js
+   import { css, styled } from './my-local-folder/linaria';
+
+   export const MyComponent = styled.div`
+      color: red;
+   `;
+  
+   export default css`
+     border: 1px solid black;
+   `;
+   ```
+
+   ```js
+   // ./my-local-folder/core.js
+   export * from '@linaria/core';
+   ```
+
 - `babelOptions: Object`
 
   If you need to specify custom babel configuration, you can pass them here. These babel options will be used by Linaria when parsing and evaluating modules.
-
-- `resolveOptions: Object`
-
-  By default, the loader will resolve modules using the `alias` and `modules`
-  settings from your Webpack configuration. If you need additional custom
-  configuration for resolving modules, use this property to add or customize the
-  [enhanced-resolve options](https://www.npmjs.com/package/enhanced-resolve#user-content-resolver-options).
 
 ## `@linaria/babel-preset`
 

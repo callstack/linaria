@@ -2,15 +2,14 @@
 
 exports[`collectTemplateDependencies hoist chain of statements 1`] = `
 "import str from \\"module\\";
-const _ref2 = str;
+let arg = str;
+let variable = arg + \\"2\\";
 
-const _ref = _ref2 + \\"2\\";
-
-const _exp = /*#__PURE__*/() => _ref;
+const _exp = /*#__PURE__*/() => variable;
 
 function fn() {
   {
-    const template = tag\`\${_exp}\`;
+    const template = tag\`\${_exp()}\`;
   }
 }"
 `;
@@ -27,44 +26,37 @@ const _exp3 = /*#__PURE__*/() => () => \\"result\\";
 const _exp4 = /*#__PURE__*/() => 21 * x;
 
 function fn() {
-  const value = 21;
-  const variable = \\"test\\";
-  const result = \\"result\\";
-  const template = tag\`\${_exp}\${_exp2}\${_exp3}\${_exp4}\`;
+  const template = tag\`\${_exp()}\${_exp2()}\${_exp3()}\${_exp4()}\`;
 }"
 `;
 
 exports[`collectTemplateDependencies hoistExpression with destructuring 1`] = `
-"const _ref2 = \\"result\\";
-const {
-  variable: _ref
+"let result = \\"result\\";
+let {
+  variable
 } = {
-  variable: _ref2
+  variable: result
 };
 
-const _exp = /*#__PURE__*/() => _ref;
+const _exp = /*#__PURE__*/() => variable;
 
 function fn() {
-  const template = tag\`\${_exp}\`;
+  const template = tag\`\${_exp()}\`;
 }"
 `;
 
 exports[`collectTemplateDependencies hoistExpression with object 1`] = `
-"const obj = {
-  variable: \\"test\\"
-};
-
-const _exp = /*#__PURE__*/() => ({
+"const _exp = /*#__PURE__*/() => ({
   variable: \\"test\\"
 }).variable;
 
 function fn() {
-  const template = tag\`\${_exp}\`;
+  const template = tag\`\${_exp()}\`;
 }"
 `;
 
 exports[`collectTemplateDependencies non-hoistable expression 1`] = `
-"Function parameters cannot be referenced in a Linaria template.
+"This identifier cannot be used in the template, because it is a function parameter.
 > 1 | function fn(arg) {
     |             ^^^
   2 |   {
@@ -80,7 +72,7 @@ const _exp = /*#__PURE__*/() => slugify('test');
 
 export const Title = styled.h1\`
   &:before {
-    content: \\"\${_exp}\\"
+    content: \\"\${_exp()}\\"
   }
 \`;"
 `;

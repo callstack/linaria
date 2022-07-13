@@ -9,7 +9,6 @@
     "@babel/traverse": ">=7",
     "@linaria/babel-preset": "workspace:^",
     "@linaria/extractor": "workspace:^",
-    "@linaria/preeval": "workspace:^",
     "@linaria/react": "workspace:^",
     "@linaria/shaker": "workspace:^",
     "dedent": "^0.7.0",

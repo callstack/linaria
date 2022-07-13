@@ -1,67 +1,60 @@
+import type { TransformOptions } from '@babel/core';
 import { transformSync } from '@babel/core';
-import generator from '@babel/generator';
-import type { Program } from '@babel/types';
 
-import type { Evaluator, StrictOptions } from '@linaria/babel-preset';
-import { buildOptions } from '@linaria/babel-preset';
-import { debug } from '@linaria/logger';
+import { buildOptions, loadBabelOptions } from '@linaria/utils';
+import type { Evaluator } from '@linaria/utils';
 
-import shake from './shaker';
+import { hasShakerMetadata } from './plugins/shaker-plugin';
 
-export { default as buildDepsGraph } from './graphBuilder';
+export { default as shakerPlugin } from './plugins/shaker-plugin';
 
-function prepareForShake(
-  filename: string,
-  options: StrictOptions,
-  code: string
-): Program {
-  const transformOptions = buildOptions(filename, options);
-
-  transformOptions.ast = true;
-  transformOptions.presets!.unshift([
-    require.resolve('@babel/preset-env'),
-    {
-      targets: 'ie 11',
-    },
-  ]);
-  transformOptions.presets!.unshift([
-    require.resolve('@linaria/preeval'),
-    options,
-  ]);
-  transformOptions.plugins!.unshift(
-    require.resolve('babel-plugin-transform-react-remove-prop-types')
-  );
-  transformOptions.plugins!.unshift([
-    require.resolve('@babel/plugin-transform-runtime'),
-    { useESModules: false },
-  ]);
-
-  debug(
-    'evaluator:shaker:transform',
-    `Transform ${filename} with options ${JSON.stringify(
-      transformOptions,
-      null,
-      2
-    )}`
-  );
-  const transformed = transformSync(code, transformOptions);
-
-  if (transformed === null || !transformed.ast) {
-    throw new Error(`${filename} cannot be transformed`);
+const configCache = new Map<string, TransformOptions>();
+const getShakerConfig = (only: string[] | null): TransformOptions => {
+  const sortedOnly = [...(only ?? [])];
+  sortedOnly.sort();
+  const key = sortedOnly.join('\0');
+  if (configCache.has(key)) {
+    return configCache.get(key)!;
   }
 
-  return transformed.ast.program;
-}
+  const config = {
+    ast: true,
+    envName: 'linaria',
+    targets: {
+      node: 'current',
+      esmodules: false,
+    },
+    plugins: [
+      [
+        require.resolve('./plugins/shaker-plugin'),
+        {
+          onlyExports: sortedOnly,
+        },
+      ],
+      require.resolve('@babel/plugin-transform-modules-commonjs'),
+    ],
+  };
+
+  configCache.set(key, config);
+  return config;
+};
 
 const shaker: Evaluator = (filename, options, text, only = null) => {
-  const [shaken, imports] = shake(
-    prepareForShake(filename, options, text),
-    only
+  const transformOptions = loadBabelOptions(
+    filename,
+    buildOptions(options?.babelOptions, getShakerConfig(only))
   );
 
-  debug('evaluator:shaker:generate', `Generate shaken source code ${filename}`);
-  const { code: shakenCode } = generator(shaken!);
-  return [shakenCode, imports];
+  const transformed = transformSync(text, {
+    ...transformOptions,
+    filename,
+  });
+
+  if (!transformed || !hasShakerMetadata(transformed.metadata)) {
+    throw new Error(`${filename} has no shaker metadata`);
+  }
+
+  return [transformed.code ?? '', transformed.metadata.__linariaShaker.imports];
 };
 
 export default shaker;
