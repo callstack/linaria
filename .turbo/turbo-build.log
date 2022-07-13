@@ -1,33 +1,32 @@
-linaria-website:build: cache hit, replaying output [2m54f74fe285611deb[0m
-[34mlinaria-website:build: [0m
-[34mlinaria-website:build: [0m> linaria-website@3.0.0-beta.21 build /Users/anber/Sources/linaria/website
-[34mlinaria-website:build: [0m> yarn build:client && yarn build:server
-[34mlinaria-website:build: [0m
-[34mlinaria-website:build: [0myarn run v1.22.17
-[34mlinaria-website:build: [0m$ cross-env NODE_ENV=production webpack
-[34mlinaria-website:build: [0massets by status 82.7 KiB [cached] 4 assets
-[34mlinaria-website:build: [0massets by path . 137 KiB
-[34mlinaria-website:build: [0m  asset app.bundle.js 135 KiB [emitted] [minimized] (name: app) 2 related assets
-[34mlinaria-website:build: [0m  asset styles.css 2.58 KiB [compared for emit] (name: app)
-[34mlinaria-website:build: [0mEntrypoint app 137 KiB (415 KiB) = styles.css 2.58 KiB app.bundle.js 135 KiB 5 auxiliary assets
-[34mlinaria-website:build: [0morphan modules 26.9 KiB (javascript) 82 bytes (asset) 4.68 KiB (runtime) [orphan] 46 modules
-[34mlinaria-website:build: [0mruntime modules 307 bytes 2 modules
-[34mlinaria-website:build: [0mcacheable modules 152 KiB (javascript) 2.61 KiB (css/mini-extract)
-[34mlinaria-website:build: [0m  javascript modules 152 KiB
-[34mlinaria-website:build: [0m    modules by path ./ 20.3 KiB
-[34mlinaria-website:build: [0m      modules by path ./src/ 20.1 KiB 6 modules
-[34mlinaria-website:build: [0m      modules by path ./assets/ 246 bytes 3 modules
-[34mlinaria-website:build: [0m    modules by path ../node_modules/.pnpm/ 131 KiB 7 modules
-[34mlinaria-website:build: [0m  css modules 2.61 KiB
-[34mlinaria-website:build: [0m    modules by path ./src/components/*.jsx 2.24 KiB
-[34mlinaria-website:build: [0m      css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/components/App.jsx 200 bytes [built] [code generated]
-[34mlinaria-website:build: [0m      css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/components/Header.jsx 805 bytes [built] [code generated]
-[34mlinaria-website:build: [0m      css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/components/Hero.jsx 1.26 KiB [built] [code generated]
-[34mlinaria-website:build: [0m    css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/index.jsx 311 bytes [built] [code generated]
-[34mlinaria-website:build: [0m    css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/components/Container.js 60 bytes [built] [code generated]
-[34mlinaria-website:build: [0mwebpack 5.73.0 compiled successfully in 1881 ms
-[34mlinaria-website:build: [0mDone in 2.65s.
-[34mlinaria-website:build: [0myarn run v1.22.17
-[34mlinaria-website:build: [0m$ cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
-[34mlinaria-website:build: [0mSuccessfully compiled 11 files with Babel (370ms).
-[34mlinaria-website:build: [0mDone in 0.65s.
+linaria-website:build: cache hit, replaying output [2m509f67ed6d4a429c[0m
+[32mlinaria-website:build: [0m
+[32mlinaria-website:build: [0m> linaria-website@3.0.0-beta.21 build /Users/anber/Sources/linaria/website
+[32mlinaria-website:build: [0m> yarn build:client && yarn build:server
+[32mlinaria-website:build: [0m
+[32mlinaria-website:build: [0myarn run v1.22.17
+[32mlinaria-website:build: [0m$ cross-env NODE_ENV=production webpack
+[32mlinaria-website:build: [0massets by status 82.6 KiB [cached] 3 assets
+[32mlinaria-website:build: [0massets by status 142 KiB [compared for emit]
+[32mlinaria-website:build: [0m  asset app.bundle.js 139 KiB [compared for emit] [minimized] (name: app) 2 related assets
+[32mlinaria-website:build: [0m  asset styles.css 2.58 KiB [compared for emit] (name: app)
+[32mlinaria-website:build: [0mEntrypoint app 142 KiB (424 KiB) = styles.css 2.58 KiB app.bundle.js 139 KiB 4 auxiliary assets
+[32mlinaria-website:build: [0morphan modules 17.2 KiB (javascript) 4.68 KiB (runtime) [orphan] 37 modules
+[32mlinaria-website:build: [0mruntime modules 703 bytes 4 modules
+[32mlinaria-website:build: [0mcacheable modules 162 KiB (javascript) 2.61 KiB (css/mini-extract) 82.6 KiB (asset)
+[32mlinaria-website:build: [0m  javascript modules 162 KiB
+[32mlinaria-website:build: [0m    modules by path ../ 153 KiB 14 modules
+[32mlinaria-website:build: [0m    modules by path ./src/ 8.96 KiB 12 modules
+[32mlinaria-website:build: [0m  css modules 2.61 KiB
+[32mlinaria-website:build: [0m    modules by path ./src/components/*.jsx 2.24 KiB 3 modules
+[32mlinaria-website:build: [0m    css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/index.jsx 311 bytes [built] [code generated]
+[32mlinaria-website:build: [0m    css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/components/Container.js 60 bytes [built] [code generated]
+[32mlinaria-website:build: [0m  asset modules 126 bytes (javascript) 82.6 KiB (asset)
+[32mlinaria-website:build: [0m    ./assets/linaria-logo.svg 42 bytes (javascript) 2.88 KiB (asset) [built] [code generated]
+[32mlinaria-website:build: [0m    ./assets/code-sample.png 42 bytes (javascript) 78.8 KiB (asset) [built] [code generated]
+[32mlinaria-website:build: [0m    ./assets/linaria-logomark.svg 42 bytes (javascript) 939 bytes (asset) [built] [code generated] [build time executed]
+[32mlinaria-website:build: [0mwebpack 5.73.0 compiled successfully in 2130 ms
+[32mlinaria-website:build: [0mDone in 3.20s.
+[32mlinaria-website:build: [0myarn run v1.22.17
+[32mlinaria-website:build: [0m$ cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
+[32mlinaria-website:build: [0mSuccessfully compiled 11 files with Babel (366ms).
+[32mlinaria-website:build: [0mDone in 0.69s.

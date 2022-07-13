@@ -3,6 +3,9 @@ import React from 'react';
 import { media } from '../styles/utils';
 import Container from './Container';
 
+import codeSample from '../../assets/code-sample.png';
+import linariaLogomark from '../../assets/linaria-logomark.svg';
+
 export default function Hero() {
   return (
     <HeroContainer>
@@ -24,10 +27,7 @@ export default function Hero() {
             </Button>
           </LeftColumn>
           <RightColumn>
-            <CodeSample
-              alt="Linaria code sample"
-              src={require('../../assets/code-sample.png')}
-            />
+            <CodeSample alt="Linaria code sample" src={codeSample} />
           </RightColumn>
         </Row>
       </Container>
@@ -40,7 +40,7 @@ const HeroContainer = styled.main`
 
   ${media.large} {
     padding: 64px 0;
-    background-image: url(${require('../../assets/linaria-logomark.svg')});
+    background-image: url(${linariaLogomark});
     background-repeat: no-repeat;
     background-position: bottom right;
   }
