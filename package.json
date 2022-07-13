@@ -1,6 +1,6 @@
 {
   "name": "umbrella",
-  "version": "3.0.0-beta.19",
+  "version": "4.0.0-beta.0",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
     "git-raw-commits": "^2.0.3"

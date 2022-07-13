@@ -1,5 +1,28 @@
 # Change Log
 
+## 4.0.0-beta.0
+
+### Major Changes
+
+- bc0cbeea: A completely new async mode with native support for Vite, Rollup, esbuild and Webpack resolvers.
+
+  BREAKING CHANGES: Despite the fact, that it should be fully compatible with 3.0 and 2.0 branches, the new version of styles evaluator can have some serious bugs which can make your project unbuildable (however, since there is no runtime, if the build is finished successfully, everything will continue work as it was on 2.0 and 3.0). If you face some problems please let us know and we will fix it as soon as possible.
+
+### Patch Changes
+
+- Updated dependencies [bc0cbeea]
+- Updated dependencies [bc0cbeea]
+- Updated dependencies [9a50c1c1]
+  - @linaria/babel-preset@4.0.0-beta.0
+  - @linaria/core@4.0.0-beta.0
+  - @linaria/extractor@4.0.0-beta.0
+  - @linaria/react@4.0.0-beta.0
+  - @linaria/rollup@4.0.0-beta.0
+  - @linaria/shaker@4.0.0-beta.0
+  - @linaria/stylelint@4.0.0-beta.0
+  - @linaria/webpack4-loader@4.0.0-beta.0
+  - @linaria/server@4.0.0-beta.0
+
 ## 3.0.0-beta.22
 
 ### Patch Changes

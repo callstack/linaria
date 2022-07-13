@@ -1,7 +1,7 @@
 {
   "name": "@linaria/logger",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "3.0.0-beta.20",
+  "version": "4.0.0-beta.0",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
     "debug": "^4.1.1",
