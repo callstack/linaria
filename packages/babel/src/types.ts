@@ -1,68 +1,26 @@
-import type { TransformOptions } from '@babel/core';
+import type { BabelFile, BabelFileMetadata, PluginPass } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
-import type {
-  Expression,
-  TaggedTemplateExpression,
-  TemplateElement,
-} from '@babel/types';
+import type { File } from '@babel/types';
 import type { RawSourceMap } from 'source-map';
 
-import type { Value } from '@linaria/core/processors/types';
-import type { ClassNameFn } from '@linaria/core/processors/utils/types';
+import type BaseProcessor from '@linaria/core/processors/BaseProcessor';
 
-import type { PluginOptions } from './utils/loadOptions';
+import type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
 
 export type {
-  JSONValue,
-  JSONObject,
+  ComponentDependency,
+  ExpressionValue,
+  FunctionValue,
   JSONArray,
+  JSONObject,
+  JSONValue,
+  LazyValue,
   Serializable,
   Value,
   ValueCache,
 } from '@linaria/core/processors/types';
 
-export enum ValueType {
-  LAZY,
-  FUNCTION,
-  VALUE,
-}
-
-export type ComponentDependency = {
-  ex: NodePath<Expression>; // | Expression | string;
-  source: string;
-  value?: string;
-};
-
-export type LazyValue = {
-  kind: ValueType.LAZY;
-  ex: NodePath<Expression> | Expression; // | string;
-  originalEx: NodePath<Expression>; // | Expression | string;
-  source: string;
-};
-
-export type FunctionValue = {
-  kind: ValueType.FUNCTION;
-  ex: NodePath<Expression>;
-  source: string;
-};
-
-export type EvaluatedValue = {
-  kind: ValueType.VALUE;
-  value: Value;
-  ex: NodePath<Expression>;
-  source: string;
-};
-
-export type ExpressionValue = LazyValue | FunctionValue | EvaluatedValue;
-
-export type Path = NodePath<TaggedTemplateExpression>;
-
-export type TemplateExpression = {
-  path: Path;
-  quasis: NodePath<TemplateElement>[];
-  expressions: ExpressionValue[];
-  dependencies: ComponentDependency[];
-};
+export { ValueType } from '@linaria/core/processors/types';
 
 export interface ICSSRule {
   className: string;
@@ -74,60 +32,34 @@ export interface ICSSRule {
 
 export type Rules = Record<string, ICSSRule>;
 
-type Replacements = Array<{
-  original: {
-    start: Location;
-    end: Location;
-  };
-  length: number;
-}>;
+export type Dependencies = string[];
 
-type Dependencies = string[];
+export type LinariaMetadata = {
+  processors: BaseProcessor[];
 
-export type State = {
-  queue: TemplateExpression[];
   rules: Rules;
-  replacements: Replacements;
-  index: number;
+  replacements: Replacement[];
+  dependencies: string[];
+};
+
+export interface IPluginState extends PluginPass {
+  processors: BaseProcessor[];
   dependencies: Dependencies;
-  file: {
-    opts: {
-      cwd: string;
-      root: string;
-      filename: string;
-    };
+  file: BabelFile & {
     metadata: {
-      linaria?: {
-        rules: Rules;
-        replacements: Replacements;
-        dependencies: Dependencies;
-      };
+      linaria?: LinariaMetadata;
     };
   };
-};
+}
 
-export type Evaluator = (
-  filename: string,
-  options: StrictOptions,
-  text: string,
-  only: string[] | null
-) => [string, Map<string, string[]> | null];
+export interface ITransformFileResult {
+  metadata?: BabelFileMetadata;
+  code: string;
+}
 
-export type EvalRule = {
-  test?: RegExp | ((path: string) => boolean);
-  action: Evaluator | 'ignore' | string;
-};
+export type CodeCache = Map<string, Map<string, ITransformFileResult>>;
 
-export type LibResolverFn = (linariaLibPath: string) => string | null;
-
-export type StrictOptions = {
-  classNameSlug?: string | ClassNameFn;
-  displayName: boolean;
-  evaluate: boolean;
-  ignore?: RegExp;
-  babelOptions: TransformOptions;
-  rules: EvalRule[];
-};
+export type Stage = 'preeval' | 'collect';
 
 export type Location = {
   line: number;
@@ -149,12 +81,6 @@ export type Result = {
   replacements?: Replacement[];
 };
 
-export type LinariaMetadata = {
-  rules: Rules;
-  replacements: Replacement[];
-  dependencies: string[];
-};
-
 export type Options = {
   filename: string;
   inputSourceMap?: RawSourceMap;
@@ -166,3 +92,10 @@ export type Options = {
 
 export type PreprocessorFn = (selector: string, cssText: string) => string;
 export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
+
+export type MissedBabelCoreTypes = {
+  File: new (
+    options: { filename: string },
+    file: { code: string; ast: File }
+  ) => { path: NodePath<File> };
+};

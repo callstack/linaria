@@ -1,14 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`compiles atomic css 1`] = `
+exports[`strategy shaker assigning to exports 1`] = `"export const square = \\"square_s13jq05\\";"`;
+
+exports[`strategy shaker assigning to exports 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  div {
+    padding: 4px;
+  }
+}
+
+Dependencies: ./__fixtures__/assignToExport
+
+`;
+
+exports[`strategy shaker compiles atomic css 1`] = `
 "/* @flow */
-import { css } from '@linaria/atomic';
-import { styled } from '@linaria/react';
 const x = \\"atm_26_5scuol atm_e2_12xxubj\\";
 console.log(x);"
 `;
 
-exports[`compiles atomic css 2`] = `
+exports[`strategy shaker compiles atomic css 2`] = `
 
 CSS:
 
@@ -19,15 +33,13 @@ Dependencies: NA
 
 `;
 
-exports[`compiles atomic css with at-rules and property priorities 1`] = `
+exports[`strategy shaker compiles atomic css with at-rules and property priorities 1`] = `
 "/* @flow */
-import { css } from '@linaria/atomic';
-import { styled } from '@linaria/react';
 const x = \\"atm_1h9nsec_idpfg4 atm_7xgmf7_14y27yu atm_ci1k5c_i2wt44 atm_le_1v6z61t\\";
 console.log(x);"
 `;
 
-exports[`compiles atomic css with at-rules and property priorities 2`] = `
+exports[`strategy shaker compiles atomic css with at-rules and property priorities 2`] = `
 
 CSS:
 
@@ -40,15 +52,13 @@ Dependencies: NA
 
 `;
 
-exports[`compiles atomic css with at-rules and pseudo classes 1`] = `
+exports[`strategy shaker compiles atomic css with at-rules and pseudo classes 1`] = `
 "/* @flow */
-import { css } from '@linaria/atomic';
-import { styled } from '@linaria/react';
 const x = \\"atm_1apu8aw_13q2bts atm_1yli2by_1cnho6b atm_1hwwax4_1osqo2v atm_26_5scuol atm_e2_12xxubj\\";
 console.log(x);"
 `;
 
-exports[`compiles atomic css with at-rules and pseudo classes 2`] = `
+exports[`strategy shaker compiles atomic css with at-rules and pseudo classes 2`] = `
 
 CSS:
 
@@ -62,15 +72,13 @@ Dependencies: NA
 
 `;
 
-exports[`compiles atomic css with keyframes 1`] = `
+exports[`strategy shaker compiles atomic css with keyframes 1`] = `
 "/* @flow */
-import { css } from '@linaria/atomic';
-import { styled } from '@linaria/react';
 const x = \\"atm_p_x1wbsp atm_26_5scuol atm_e2_12xxubj\\";
 console.log(x);"
 `;
 
-exports[`compiles atomic css with keyframes 2`] = `
+exports[`strategy shaker compiles atomic css with keyframes 2`] = `
 
 CSS:
 
@@ -90,16 +98,14 @@ Dependencies: NA
 
 `;
 
-exports[`compiles atomic css with property priorities 1`] = `
+exports[`strategy shaker compiles atomic css with property priorities 1`] = `
 "/* @flow */
-import { css } from '@linaria/atomic';
-import { styled } from '@linaria/react';
 const y = \\"atm_gz_14y27yu\\";
 const x = \\"atm_gi_idpfg4\\";
 console.log(x, y);"
 `;
 
-exports[`compiles atomic css with property priorities 2`] = `
+exports[`strategy shaker compiles atomic css with property priorities 2`] = `
 
 CSS:
 
@@ -110,15 +116,14 @@ Dependencies: NA
 
 `;
 
-exports[`compiles atomic css with unique atoms based on key value pairs 1`] = `
+exports[`strategy shaker compiles atomic css with unique atoms based on key value pairs 1`] = `
 "/* @flow */
-import { css } from '@linaria/atomic';
 const x = \\"atm_e2_12xxubj\\";
 const y = \\"atm_e2_tnzek8\\";
 console.log(x, y);"
 `;
 
-exports[`compiles atomic css with unique atoms based on key value pairs 2`] = `
+exports[`strategy shaker compiles atomic css with unique atoms based on key value pairs 2`] = `
 
 CSS:
 
@@ -129,31 +134,41 @@ Dependencies: NA
 
 `;
 
-exports[`compiles atomic styled with dynamic interpolations as unique variables based on the interpolation text 1`] = `
+exports[`strategy shaker compiles atomic styled with dynamic interpolations as unique variables based on the interpolation text 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
+
+const _exp2 = /*#__PURE__*/() => props => props.color;
+
+const _exp3 = /*#__PURE__*/() => props => props.backgroundColor;
+
 const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
-  class: \\"atm_7l_15g95l5 atm_4b_15g95l5 atm_2d_1en4k16 c17gu1mi\\",
+  class: \\"atm_7l_15g95l5 atm_4b_15g95l5 atm_2d_1en4k16 Component_c13jq05\\",
   vars: {
-    \\"1p69eoh\\": [props => props.color],
-    \\"l12cfn\\": [props => props.backgroundColor]
+    \\"1p69eoh\\": [_exp2()],
+    \\"l12cfn\\": [_exp3()]
   },
   atomic: true
 });
+
+const _exp4 = /*#__PURE__*/() => props => props.color;
+
+const _exp5 = /*#__PURE__*/() => props => props.color || \\"black\\";
+
 const Component2 = /*#__PURE__*/styled('div')({
   name: \\"Component2\\",
-  class: \\"atm_7l_15g95l5 atm_4b_1kgl01d cccybe9\\",
+  class: \\"atm_7l_15g95l5 atm_4b_1kgl01d Component2_c1vhermz\\",
   vars: {
-    \\"1p69eoh\\": [props => props.color],
-    \\"1n9iccq\\": [props => props.color || \\"black\\"]
+    \\"1p69eoh\\": [_exp4()],
+    \\"1n9iccq\\": [_exp5()]
   },
   atomic: true
 });
 console.log(Component, Component2);"
 `;
 
-exports[`compiles atomic styled with dynamic interpolations as unique variables based on the interpolation text 2`] = `
+exports[`strategy shaker compiles atomic styled with dynamic interpolations as unique variables based on the interpolation text 2`] = `
 
 CSS:
 
@@ -166,21 +181,24 @@ Dependencies: NA
 
 `;
 
-exports[`compiles atomic styled with plain css, static and dynamic interpolations 1`] = `
+exports[`strategy shaker compiles atomic styled with plain css, static and dynamic interpolations 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
+
+const _exp2 = /*#__PURE__*/() => props => props.color;
+
 const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
-  class: \\"atm_7l_13q2bts atm_e2_12xxubj atm_gi_12am3vd atm_2d_15g95l5 c17gu1mi\\",
+  class: \\"atm_7l_13q2bts atm_e2_12xxubj atm_gi_12am3vd atm_2d_15g95l5 Component_c13jq05\\",
   vars: {
-    \\"1p69eoh\\": [props => props.color]
+    \\"1p69eoh\\": [_exp2()]
   },
   atomic: true
 });
 console.log(Component);"
 `;
 
-exports[`compiles atomic styled with plain css, static and dynamic interpolations 2`] = `
+exports[`strategy shaker compiles atomic styled with plain css, static and dynamic interpolations 2`] = `
 
 CSS:
 
@@ -193,18 +211,18 @@ Dependencies: NA
 
 `;
 
-exports[`compiles atomic styled with static css 1`] = `
+exports[`strategy shaker compiles atomic styled with static css 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
 const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
-  class: \\"atm_7l_13q2bts atm_e2_12xxubj c17gu1mi\\",
+  class: \\"atm_7l_13q2bts atm_e2_12xxubj Component_c13jq05\\",
   atomic: true
 });
 console.log(Component);"
 `;
 
-exports[`compiles atomic styled with static css 2`] = `
+exports[`strategy shaker compiles atomic styled with static css 2`] = `
 
 CSS:
 
@@ -215,22 +233,22 @@ Dependencies: NA
 
 `;
 
-exports[`compiles atomic styled without colliding by property 1`] = `
+exports[`strategy shaker compiles atomic styled without colliding by property 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
 export const Component = /*#__PURE__*/styled('ul')({
   name: \\"Component\\",
-  class: \\"atm_9s_1txwivl atm_l8_idpfg4 c17gu1mi\\",
+  class: \\"atm_9s_1txwivl atm_l8_idpfg4 Component_c13jq05\\",
   atomic: true
 });
 export const Component2 = /*#__PURE__*/styled('ul')({
   name: \\"Component2\\",
-  class: \\"atm_9s_1ulexfb atm_l8_idpfg4 cccybe9\\",
+  class: \\"atm_9s_1ulexfb atm_l8_idpfg4 Component2_c1vhermz\\",
   atomic: true
 });"
 `;
 
-exports[`compiles atomic styled without colliding by property 2`] = `
+exports[`strategy shaker compiles atomic styled without colliding by property 2`] = `
 
 CSS:
 
@@ -242,23 +260,26 @@ Dependencies: NA
 
 `;
 
-exports[`compiles atomic styled wrapping other components with extra priority 1`] = `
+exports[`strategy shaker compiles atomic styled wrapping other components with extra priority 1`] = `
 "/* @flow */
 import { styled } from '@linaria/atomic';
 const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
-  class: \\"atm_2d_13q2bts atm_e2_12xxubj c17gu1mi\\",
+  class: \\"atm_2d_13q2bts atm_e2_12xxubj Component_c13jq05\\",
   atomic: true
 });
-const ComponentCompositing = /*#__PURE__*/styled(Component)({
+
+const _exp = /*#__PURE__*/() => Component;
+
+const ComponentCompositing = /*#__PURE__*/styled(_exp())({
   name: \\"ComponentCompositing\\",
-  class: \\"atm_26_5scuol atm_e2_1nzxncv cccybe9\\",
+  class: \\"atm_26_5scuol atm_e2_1nzxncv ComponentCompositing_c1vhermz\\",
   atomic: true
 });
 console.log(ComponentCompositing);"
 `;
 
-exports[`compiles atomic styled wrapping other components with extra priority 2`] = `
+exports[`strategy shaker compiles atomic styled wrapping other components with extra priority 2`] = `
 
 CSS:
 
@@ -271,23 +292,25 @@ Dependencies: NA
 
 `;
 
-exports[`compiles atoms that are shared between css and styled templates 1`] = `
+exports[`strategy shaker compiles atoms that are shared between css and styled templates 1`] = `
 "/* @flow */
-import { css } from '@linaria/atomic';
 import { styled } from '@linaria/atomic';
 const x = \\"atm_26_5scuol atm_e2_12xxubj\\";
+
+const _exp2 = /*#__PURE__*/() => props => props.color;
+
 const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
-  class: \\"atm_26_5scuol atm_e2_12xxubj atm_gi_19bvopo atm_7l_15g95l5 cccybe9\\",
+  class: \\"atm_26_5scuol atm_e2_12xxubj atm_gi_19bvopo atm_7l_15g95l5 Component_c1vhermz\\",
   vars: {
-    \\"1p69eoh\\": [props => props.color]
+    \\"1p69eoh\\": [_exp2()]
   },
   atomic: true
 });
 console.log(x, Component);"
 `;
 
-exports[`compiles atoms that are shared between css and styled templates 2`] = `
+exports[`strategy shaker compiles atoms that are shared between css and styled templates 2`] = `
 
 CSS:
 
@@ -300,35 +323,88 @@ Dependencies: NA
 
 `;
 
-exports[`does not include styles if not referenced anywhere 1`] = `
-"import { css } from '@linaria/core';
-import { styled } from '@linaria/react';
-const Title = /*#__PURE__*/styled('h1')({
-  name: \\"Title\\",
-  class: \\"t17gu1mi\\"
-});
-const title = \\"tccybe9\\";"
+exports[`strategy shaker derives display name from filename 1`] = `
+"import { styled } from '@linaria/react';
+export default /*#__PURE__*/styled('h1')({
+  name: \\"FancyName0\\",
+  class: \\"FancyName0_f15w9xbr\\"
+});"
 `;
 
-exports[`does not include styles if not referenced anywhere 2`] = `Object {}`;
-
-exports[`does not output CSS if none present 1`] = `
-"const number = 42;
-const title = String.raw\`This is something\`;"
-`;
-
-exports[`does not output CSS if none present 2`] = `Object {}`;
-
-exports[`does not output CSS property when value is a blank string 1`] = `
-"import { css } from '@linaria/core';
-export const title = \\"t17gu1mi\\";"
-`;
-
-exports[`does not output CSS property when value is a blank string 2`] = `
+exports[`strategy shaker derives display name from filename 2`] = `
 
 CSS:
 
-.t17gu1mi {
+.FancyName0_f15w9xbr {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker derives display name from parent folder name 1`] = `
+"import { styled } from '@linaria/react';
+export default /*#__PURE__*/styled('h1')({
+  name: \\"FancyName0\\",
+  class: \\"FancyName0_f13t8ham\\"
+});"
+`;
+
+exports[`strategy shaker derives display name from parent folder name 2`] = `
+
+CSS:
+
+.FancyName0_f13t8ham {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker does not include styles if not referenced anywhere 1`] = `
+"import { styled } from '@linaria/react';
+const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});
+const title = \\"title_t1vhermz\\";"
+`;
+
+exports[`strategy shaker does not include styles if not referenced anywhere 2`] = `
+
+CSS:
+
+
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker does not output CSS if none present 1`] = `
+"const number = 42;
+
+const title = String.raw\`This is something\`;"
+`;
+
+exports[`strategy shaker does not output CSS if none present 2`] = `
+
+CSS:
+
+
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker does not output CSS property when value is a blank string 1`] = `"export const title = \\"title_t13jq05\\";"`;
+
+exports[`strategy shaker does not output CSS property when value is a blank string 2`] = `
+
+CSS:
+
+.title_t13jq05 {
   font-size: ;
   margin: 6px;
 }
@@ -337,20 +413,68 @@ Dependencies: NA
 
 `;
 
-exports[`evaluates and inlines expressions in scope 1`] = `
-"import { styled } from '@linaria/react';
-const color = 'blue';
-export const Title = /*#__PURE__*/styled('h1')({
-  name: \\"Title\\",
-  class: \\"t17gu1mi\\"
-});"
+exports[`strategy shaker does not strip istanbul coverage sequences 1`] = `
+"function cov_2dr9r1nt95() {
+  var path = \\"/home/user/project/file.js\\";
+  var hash = \\"91161e7e5b00b52dc483815fb73cd0b6fb94a785\\";
+  var global = new Function(\\"return this\\")();
+  var gcv = \\"__coverage__\\";
+  var coverageData = {
+    path: \\"/home/user/project/file.js\\",
+    statementMap: {},
+    fnMap: {},
+    branchMap: {},
+    s: {},
+    f: {},
+    b: {},
+    _coverageSchema: \\"1a1c01bbd47fc00a2c39e90264f33305004495a9\\",
+    hash: \\"91161e7e5b00b52dc483815fb73cd0b6fb94a785\\"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_2dr9r1nt95 = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+
+cov_2dr9r1nt95();
+export const titleClass = \\"titleClass_tow9xsn\\";"
 `;
 
-exports[`evaluates and inlines expressions in scope 2`] = `
+exports[`strategy shaker does not strip istanbul coverage sequences 2`] = `
 
 CSS:
 
-.t17gu1mi {
+.titleClass_tow9xsn {
+  height: 42px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker evaluates and inlines expressions in scope 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});"
+`;
+
+exports[`strategy shaker evaluates and inlines expressions in scope 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
   color: blue;
   width: 33.333333333333336%;
 }
@@ -359,61 +483,500 @@ Dependencies: NA
 
 `;
 
-exports[`evaluates nested nested object interpolation 1`] = `
-"import { css } from '@linaria/core';
-const defaultStyle = \\"d17gu1mi\\";
-const obj = {
-  [\`&.\${defaultStyle} .green\`]: {
-    display: \\"inline-block\\",
-    border: \\"1px solid green\\"
+exports[`strategy shaker evaluates babel helpers 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});"
+`;
+
+exports[`strategy shaker evaluates babel helpers 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  &:before {
+    content: "2"
   }
-};
-export const greenContentStyles = \\"gccybe9\\";"
-`;
-
-exports[`evaluates nested nested object interpolation 2`] = `
-
-CSS:
-
-.d17gu1mi {
-  color: red;
-  padding-bottom: 0px;
 }
-.gccybe9 {
-  &.d17gu1mi .green { display: inline-block; border: 1px solid green; }
-}
-
-Dependencies: @babel/runtime/helpers/interopRequireDefault, @babel/runtime/helpers/defineProperty
-
-`;
-
-exports[`handles css template literal in JSX element 1`] = `
-"import { css } from '@linaria/core';
-<Title class={\\"t17gu1mi\\"} />;"
-`;
-
-exports[`handles css template literal in JSX element 2`] = `
-
-CSS:
-
-.t17gu1mi { font-size: 14px; }
 
 Dependencies: NA
 
 `;
 
-exports[`handles css template literal in object property 1`] = `
-"import { css } from '@linaria/core';
-const components = {
-  title: \\"t17gu1mi\\"
-};"
+exports[`strategy shaker evaluates chain of reexports 1`] = `
+"import { styled } from '@linaria/react';
+export const H1 = /*#__PURE__*/styled('h1')({
+  name: \\"H1\\",
+  class: \\"H1_h13jq05\\"
+});"
 `;
 
-exports[`handles css template literal in object property 2`] = `
+exports[`strategy shaker evaluates chain of reexports 2`] = `
 
 CSS:
 
-.t17gu1mi {
+.H1_h13jq05 {
+  color: foo;
+}
+
+Dependencies: ./__fixtures__/re-exports
+
+`;
+
+exports[`strategy shaker evaluates complex styles with functions and nested selectors 1`] = `
+"export const bareIconClass = \\"bareIconClass_b13jq05\\";
+export const SIZES = {
+  XS: \\"XS_x1vhermz\\"
+};"
+`;
+
+exports[`strategy shaker evaluates complex styles with functions and nested selectors 2`] = `
+
+CSS:
+
+.bareIconClass_b13jq05 {}
+.XS_x1vhermz {&.bareIconClass_b13jq05 { font-size: 16.5px; }}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker evaluates component interpolations 1`] = `
+"const {
+  styled
+} = require('@linaria/react');
+
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});
+export const Paragraph = /*#__PURE__*/styled('p')({
+  name: \\"Paragraph\\",
+  class: \\"Paragraph_p1vhermz\\"
+});"
+`;
+
+exports[`strategy shaker evaluates component interpolations 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  color: red;
+}
+.Paragraph_p1vhermz {
+  .Title_t13jq05 {
+    color: blue;
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker evaluates dependencies with sequence expression 1`] = `
+"import { styled } from '@linaria/react';
+let external = 0;
+const color = (external, () => 'blue');
+
+const _exp = /*#__PURE__*/() => color;
+
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\",
+  vars: {
+    \\"t13jq05-0\\": [_exp()]
+  }
+});"
+`;
+
+exports[`strategy shaker evaluates dependencies with sequence expression 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  color: var(--t13jq05-0);
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker evaluates expressions with dependencies 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});"
+`;
+
+exports[`strategy shaker evaluates expressions with dependencies 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  &:before {
+    content: "6og6jy"
+  }
+}
+
+Dependencies: ./__fixtures__/slugify
+
+`;
+
+exports[`strategy shaker evaluates expressions with expressions depending on shared dependency 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});"
+`;
+
+exports[`strategy shaker evaluates expressions with expressions depending on shared dependency 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  &:before {
+    content: "6og6jyboo6og6jybar"
+  }
+}
+
+Dependencies: ./__fixtures__/slugify
+
+`;
+
+exports[`strategy shaker evaluates functions with nested identifiers 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});"
+`;
+
+exports[`strategy shaker evaluates functions with nested identifiers 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  font-size: 12px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker evaluates identifier in scope 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});"
+`;
+
+exports[`strategy shaker evaluates identifier in scope 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  &:before {
+    content: "42 days"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker evaluates imported typescript enums 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t9vkbjs\\"
+});"
+`;
+
+exports[`strategy shaker evaluates imported typescript enums 2`] = `
+
+CSS:
+
+.Title_t9vkbjs {
+  color: #27509A;
+}
+
+Dependencies: ./__fixtures__/enums
+
+`;
+
+exports[`strategy shaker evaluates interpolations with sequence expression 1`] = `
+"import { styled } from '@linaria/react';
+
+const _exp = /*#__PURE__*/() => (0, () => \\"blue\\");
+
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\",
+  vars: {
+    \\"t13jq05-0\\": [_exp()]
+  }
+});"
+`;
+
+exports[`strategy shaker evaluates interpolations with sequence expression 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  color: var(--t13jq05-0);
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker evaluates local expressions 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});"
+`;
+
+exports[`strategy shaker evaluates local expressions 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  &:before {
+    content: "42 days"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker evaluates multiple expressions with shared dependency 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});"
+`;
+
+exports[`strategy shaker evaluates multiple expressions with shared dependency 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  &:before {
+    content: "6og6jyboo"
+    content: "6og6jybar"
+  }
+}
+
+Dependencies: ./__fixtures__/slugify
+
+`;
+
+exports[`strategy shaker evaluates nested nested object interpolation 1`] = `"export const greenContentStyles = \\"greenContentStyles_g1vhermz\\";"`;
+
+exports[`strategy shaker evaluates nested nested object interpolation 2`] = `
+
+CSS:
+
+.defaultStyle_d13jq05 {
+  color: red;
+  padding-bottom: 0px;
+}
+.greenContentStyles_g1vhermz {
+  &.defaultStyle_d13jq05 .green { display: inline-block; border: 1px solid green; }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker evaluates typescript enums 1`] = `
+"import { styled } from '@linaria/react';
+var Colors;
+
+(function (Colors) {
+  Colors[\\"BLUE\\"] = \\"#27509A\\";
+})(Colors || (Colors = {}));
+
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t9vkbjs\\"
+});"
+`;
+
+exports[`strategy shaker evaluates typescript enums 2`] = `
+
+CSS:
+
+.Title_t9vkbjs {
+  color: #27509A;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker exporting objects 1`] = `"export const square = \\"square_s13jq05\\";"`;
+
+exports[`strategy shaker exporting objects 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  div {
+    margin: 5px;
+  }
+}
+
+Dependencies: ./__fixtures__/objectExport
+
+`;
+
+exports[`strategy shaker exporting objects with computed keys 1`] = `"export const square = \\"square_s13jq05\\";"`;
+
+exports[`strategy shaker exporting objects with computed keys 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  div {
+    color: blue;
+  }
+}
+
+Dependencies: ./__fixtures__/computedKeys
+
+`;
+
+exports[`strategy shaker exporting sequence expressions 1`] = `"export const square = \\"square_s13jq05\\";"`;
+
+exports[`strategy shaker exporting sequence expressions 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  div {
+    height: 5px;
+  }
+}
+
+Dependencies: ./__fixtures__/sequenceExport
+
+`;
+
+exports[`strategy shaker generates stable class names 1`] = `
+"import { styled } from '@linaria/react';
+export const T1 = /*#__PURE__*/styled('h1')({
+  name: \\"T1\\",
+  class: \\"T1_t11kcpnd\\"
+});
+export const T2 = /*#__PURE__*/styled('h2')({
+  name: \\"T2\\",
+  class: \\"T2_t1xdipzs\\"
+});
+export const T3 = /*#__PURE__*/styled('h3')({
+  name: \\"T3\\",
+  class: \\"T3_tmgfls7\\"
+});
+export default /*#__PURE__*/styled('p')({
+  name: \\"components-library3\\",
+  class: \\"components-library3_c30gynh\\"
+});"
+`;
+
+exports[`strategy shaker generates stable class names 2`] = `
+
+CSS:
+
+.T1_t11kcpnd {
+  background: #111;
+}
+.T2_t1xdipzs {
+  background: #222;
+}
+.T3_tmgfls7 {
+  .T2_t1xdipzs {
+    background: #333;
+  }
+}
+.components-library3_c30gynh {
+  background: #333;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker handles complex component 1`] = `
+"// Dead code in this file should be ignored
+import deadDep from 'unknown-dependency';
+import { styled } from '@linaria/react';
+export const deadValue = deadDep();
+const objects = {
+  font: {
+    fontSize: 12
+  },
+  box: {
+    border: '1px solid red'
+  }
+};
+objects.font.fontWeight = 'bold';
+export const whiteColor = '#fff';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t1us8k4s\\"
+});"
+`;
+
+exports[`strategy shaker handles complex component 2`] = `
+
+CSS:
+
+.Title_t1us8k4s {
+  font-size: 12px; font-weight: bold;
+  border: 1px solid red;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker handles css template literal in JSX element 1`] = `
+"/*#__PURE__*/
+React.createElement(Title, {
+  class: \\"Title_twgemqq\\"
+});"
+`;
+
+exports[`strategy shaker handles css template literal in JSX element 2`] = `
+
+CSS:
+
+.Title_twgemqq { font-size: 14px; }
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker handles css template literal in object property 1`] = `
+"const components = {
+  title: \\"title_t13jq05\\"
+};"
+`;
+
+exports[`strategy shaker handles css template literal in object property 2`] = `
+
+CSS:
+
+.title_t13jq05 {
     font-size: 14px;
   }
 
@@ -421,19 +984,42 @@ Dependencies: NA
 
 `;
 
-exports[`handles fn passed in as classNameSlug 1`] = `
+exports[`strategy shaker handles escapes properly 1`] = `
 "import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled('h1')({
-  name: \\"Title\\",
-  class: \\"t17gu1mi_Title_t17gu1mi_Title___tests___app_index_js_index__js_app\\"
+export const Block = /*#__PURE__*/styled('div')({
+  name: \\"Block\\",
+  class: \\"Block_b3rflbm\\"
 });"
 `;
 
-exports[`handles fn passed in as classNameSlug 2`] = `
+exports[`strategy shaker handles escapes properly 2`] = `
 
 CSS:
 
-.t17gu1mi_Title_t17gu1mi_Title___tests___app_index_js_index__js_app {
+.Block_b3rflbm {
+  a { content: "\\u000A"; } b { content: "\\u000A"; };
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker handles fn passed in as classNameSlug 1`] = `
+"import { styled } from '@linaria/react';
+
+const _exp = /*#__PURE__*/() => \\"h1\\";
+
+export const Title = /*#__PURE__*/styled(_exp())({
+  name: \\"Title\\",
+  class: \\"t13jq05_Title_t13jq05_Title_src_source_js_source__js_src\\"
+});"
+`;
+
+exports[`strategy shaker handles fn passed in as classNameSlug 2`] = `
+
+CSS:
+
+.t13jq05_Title_t13jq05_Title_src_source_js_source__js_src {
   font-size: 14px;
 }
 
@@ -441,66 +1027,128 @@ Dependencies: NA
 
 `;
 
-exports[`handles interpolation followed by unit 1`] = `
-"import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled('h1')({
+exports[`strategy shaker handles indirect wrapping another styled component 1`] = `
+"const {
+  styled
+} = require('@linaria/react');
+
+const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"t17gu1mi\\",
-  vars: {
-    \\"t17gu1mi-0\\": [size, \\"em\\"],
-    \\"t17gu1mi-1\\": [shadow, \\"px\\"],
-    \\"t17gu1mi-2\\": [size, \\"px\\"],
-    \\"t17gu1mi-3\\": [props => props.width, \\"vw\\"],
-    \\"t17gu1mi-4\\": [props => {
-      if (true) {
-        return props.height;
-      } else {
-        return 200;
-      }
-    }, \\"px\\"],
-    \\"t17gu1mi-5\\": [unit, \\"fr\\"],
-    \\"t17gu1mi-7\\": [function (props) {
-      return 200;
-    }, \\"px\\"]
-  }
+  class: \\"Title_t13jq05\\"
+});
+
+const hoc = Cmp => Cmp;
+
+const _exp = /*#__PURE__*/() => hoc(Title);
+
+export const CustomTitle = /*#__PURE__*/styled(_exp())({
+  name: \\"CustomTitle\\",
+  class: \\"CustomTitle_c1vhermz\\"
 });"
 `;
 
-exports[`handles interpolation followed by unit 2`] = `
+exports[`strategy shaker handles indirect wrapping another styled component 2`] = `
 
 CSS:
 
-.t17gu1mi {
-  font-size: var(--t17gu1mi-0);
-  text-shadow: black 1px var(--t17gu1mi-1), white -2px -2px;
-  margin: var(--t17gu1mi-2);
-  width: calc(2 * var(--t17gu1mi-3));
-  height: var(--t17gu1mi-4);
-  grid-template-columns: var(--t17gu1mi-5) 1fr 1fr var(--t17gu1mi-5);
-  border-radius: var(--t17gu1mi-7)
+.Title_t13jq05 {
+  color: red;
+}
+.CustomTitle_c1vhermz.Title_t13jq05 {
+  font-size: 24px;
+  color: blue;
 }
 
 Dependencies: NA
 
 `;
 
-exports[`handles nested blocks 1`] = `
+exports[`strategy shaker handles interpolation followed by unit 1`] = `
 "import { styled } from '@linaria/react';
-export const Button = /*#__PURE__*/styled('button')({
-  name: \\"Button\\",
-  class: \\"b17gu1mi\\",
+
+const size = () => 100;
+
+const shadow = () => 5;
+
+const unit = () => 1;
+
+const _exp = /*#__PURE__*/() => size;
+
+const _exp2 = /*#__PURE__*/() => shadow;
+
+const _exp3 = /*#__PURE__*/() => size;
+
+const _exp4 = /*#__PURE__*/() => props => props.width;
+
+const _exp5 = /*#__PURE__*/() => props => {
+  if (true) {
+    return props.height;
+  } else {
+    return 200;
+  }
+};
+
+const _exp7 = /*#__PURE__*/() => unit;
+
+const _exp8 = /*#__PURE__*/() => function (props) {
+  return 200;
+};
+
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\",
   vars: {
-    \\"b17gu1mi-0\\": [regular]
+    \\"t13jq05-0\\": [_exp(), \\"em\\"],
+    \\"t13jq05-1\\": [_exp2(), \\"px\\"],
+    \\"t13jq05-2\\": [_exp3(), \\"px\\"],
+    \\"t13jq05-3\\": [_exp4(), \\"vw\\"],
+    \\"t13jq05-4\\": [_exp5(), \\"px\\"],
+    \\"t13jq05-5\\": [_exp7(), \\"fr\\"],
+    \\"t13jq05-6\\": [_exp8(), \\"px\\"]
   }
 });"
 `;
 
-exports[`handles nested blocks 2`] = `
+exports[`strategy shaker handles interpolation followed by unit 2`] = `
 
 CSS:
 
-.b17gu1mi {
-  font-family: var(--b17gu1mi-0);
+.Title_t13jq05 {
+  font-size: var(--t13jq05-0);
+  text-shadow: black 1px var(--t13jq05-1), white -2px -2px;
+  margin: var(--t13jq05-2);
+  width: calc(2 * var(--t13jq05-3));
+  height: var(--t13jq05-4);
+  grid-template-columns: var(--t13jq05-5) 1fr 1fr var(--t13jq05-5);
+  border-radius: var(--t13jq05-6)
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker handles nested blocks 1`] = `
+"import { styled } from '@linaria/react';
+
+const regular = () => \\"arial\\";
+
+const _exp = /*#__PURE__*/() => regular;
+
+export const Button = /*#__PURE__*/styled('button')({
+  name: \\"Button\\",
+  class: \\"Button_b13jq05\\",
+  vars: {
+    \\"b13jq05-0\\": [_exp()]
+  }
+});"
+`;
+
+exports[`strategy shaker handles nested blocks 2`] = `
+
+CSS:
+
+.Button_b13jq05 {
+  font-family: var(--b13jq05-0);
 
   &:hover {
     border-color: blue;
@@ -515,67 +1163,218 @@ Dependencies: NA
 
 `;
 
-exports[`handles objects with enums as keys 1`] = `
-"import { css } from '@linaria/core';
-import { TestEnum } from './ts-data.ts';
+exports[`strategy shaker handles objects with enums as keys 1`] = `
+"import { TestEnum } from './__fixtures__/ts-data.ts';
 export const object = {
-  [TestEnum.FirstValue]: \\"t17gu1mi\\",
-  [TestEnum.SecondValue]: \\"tccybe9\\"
+  [TestEnum.FirstValue]: \\"TestEnum_FirstValue_t9vkbjs\\",
+  [TestEnum.SecondValue]: \\"TestEnum_SecondValue_t17e3x2d\\"
 };"
 `;
 
-exports[`handles objects with enums as keys 2`] = `
+exports[`strategy shaker handles objects with enums as keys 2`] = `
 
 CSS:
 
-.t17gu1mi {}
-.tccybe9 {}
+.TestEnum_FirstValue_t9vkbjs {}
+.TestEnum_SecondValue_t17e3x2d {}
 
 Dependencies: NA
 
 `;
 
-exports[`handles objects with numeric keys 1`] = `
-"import { css } from '@linaria/core';
-export const object = {
-  stringKey: \\"s17gu1mi\\",
-  42: \\"_ccybe9\\"
+exports[`strategy shaker handles objects with numeric keys 1`] = `
+"export const object = {
+  stringKey: \\"stringKey_s13jq05\\",
+  42: \\"_2__1vhermz\\"
 };"
 `;
 
-exports[`handles objects with numeric keys 2`] = `
+exports[`strategy shaker handles objects with numeric keys 2`] = `
 
 CSS:
 
-.s17gu1mi {}
-._ccybe9 {}
+.stringKey_s13jq05 {}
+._2__1vhermz {}
 
 Dependencies: NA
 
 `;
 
-exports[`includes unreferenced styles for :global 1`] = `
-"import { css } from '@linaria/core';
-import { styled } from '@linaria/react';
-const a = \\"a17gu1mi\\";
-const B = /*#__PURE__*/styled('div')({
-  name: \\"B\\",
-  class: \\"bccybe9\\"
+exports[`strategy shaker handles wrapping another styled component 1`] = `
+"const {
+  styled
+} = require('@linaria/react');
+
+const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});
+
+const _exp = /*#__PURE__*/() => Title;
+
+export const BlueTitle = /*#__PURE__*/styled(_exp())({
+  name: \\"BlueTitle\\",
+  class: \\"BlueTitle_b1vhermz\\"
+});
+
+const _exp2 = /*#__PURE__*/() => BlueTitle;
+
+export const GreenTitle = /*#__PURE__*/styled(_exp2())({
+  name: \\"GreenTitle\\",
+  class: \\"GreenTitle_g1egpet8\\"
 });"
 `;
 
-exports[`includes unreferenced styles for :global 2`] = `
+exports[`strategy shaker handles wrapping another styled component 2`] = `
 
 CSS:
 
-.a17gu1mi {
+.Title_t13jq05 {
+  color: red;
+}
+.BlueTitle_b1vhermz.Title_t13jq05 {
+  font-size: 24px;
+  color: blue;
+}
+.GreenTitle_g1egpet8.BlueTitle_b1vhermz.Title_t13jq05 {
+  color: green;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker hoistable identifiers 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});"
+`;
+
+exports[`strategy shaker hoistable identifiers 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  &:before {
+    content: "42"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker ignores external expressions 1`] = `
+"import { styled } from '@linaria/react';
+
+const generate = props => props.content;
+
+const _exp = /*#__PURE__*/() => generate;
+
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\",
+  vars: {
+    \\"t13jq05-0\\": [_exp()]
+  }
+});"
+`;
+
+exports[`strategy shaker ignores external expressions 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  &:before {
+    content: "var(--t13jq05-0)"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker ignores inline arrow function expressions 1`] = `
+"import { styled } from '@linaria/react';
+
+const _exp = /*#__PURE__*/() => props => props.content;
+
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\",
+  vars: {
+    \\"t13jq05-0\\": [_exp()]
+  }
+});"
+`;
+
+exports[`strategy shaker ignores inline arrow function expressions 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  &:before {
+    content: "var(--t13jq05-0)"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker ignores inline vanilla function expressions 1`] = `
+"import { styled } from '@linaria/react';
+
+const _exp = /*#__PURE__*/() => function (props) {
+  return props.content;
+};
+
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\",
+  vars: {
+    \\"t13jq05-0\\": [_exp()]
+  }
+});"
+`;
+
+exports[`strategy shaker ignores inline vanilla function expressions 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  &:before {
+    content: "var(--t13jq05-0)"
+  }
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker includes unreferenced styles for :global 1`] = `
+"import { styled } from '@linaria/react';
+const a = \\"a_a13jq05\\";
+const B = /*#__PURE__*/styled('div')({
+  name: \\"B\\",
+  class: \\"B_b1vhermz\\"
+});"
+`;
+
+exports[`strategy shaker includes unreferenced styles for :global 2`] = `
+
+CSS:
+
+.a_a13jq05 {
   :global() {
     .title {
       font-size: 14px;
     }
   }
 }
-.bccybe9 {
+.B_b1vhermz {
   :global(.title) {
     font-size: 14px;
   }
@@ -585,25 +1384,19 @@ Dependencies: NA
 
 `;
 
-exports[`inlines array styles as CSS string 1`] = `
+exports[`strategy shaker inlines array styles as CSS string 1`] = `
 "import { styled } from '@linaria/react';
-const styles = [{
-  flex: 1
-}, {
-  display: 'block',
-  height: 24
-}];
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"t17gu1mi\\"
+  class: \\"Title_t13jq05\\"
 });"
 `;
 
-exports[`inlines array styles as CSS string 2`] = `
+exports[`strategy shaker inlines array styles as CSS string 2`] = `
 
 CSS:
 
-.t17gu1mi {
+.Title_t13jq05 {
   flex: 1; display: block; height: 24px;
 }
 
@@ -611,46 +1404,39 @@ Dependencies: NA
 
 `;
 
-exports[`inlines object styles as CSS string 1`] = `
+exports[`strategy shaker inlines array styles as CSS string 3`] = `
 "import { styled } from '@linaria/react';
-const cover = {
-  '--color-primaryText': '#222',
-  position: 'absolute',
-  top: 0,
-  right: 0,
-  bottom: 0,
-  left: 0,
-  opacity: 1,
-  minHeight: 420,
-  '&.shouldNotBeChanged': {
-    borderColor: '#fff'
-  },
-  '@media (min-width: 200px)': {
-    WebkitOpacity: .8,
-    MozOpacity: .8,
-    msOpacity: .8,
-    OOpacity: .8,
-    WebkitBorderRadius: 2,
-    MozBorderRadius: 2,
-    msBorderRadius: 2,
-    OBorderRadius: 2,
-    WebkitTransition: '400ms',
-    MozTransition: '400ms',
-    OTransition: '400ms',
-    msTransition: '400ms'
-  }
-};
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"t17gu1mi\\"
+  class: \\"Title_t13jq05\\"
 });"
 `;
 
-exports[`inlines object styles as CSS string 2`] = `
+exports[`strategy shaker inlines array styles as CSS string 4`] = `
 
 CSS:
 
-.t17gu1mi {
+.Title_t13jq05 {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker inlines object styles as CSS string 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});"
+`;
+
+exports[`strategy shaker inlines object styles as CSS string 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
   --color-primaryText: #222; position: absolute; top: 0; right: 0; bottom: 0; left: 0; opacity: 1; min-height: 420px; &.shouldNotBeChanged { border-color: #fff; } @media (min-width: 200px) { -webkit-opacity: 0.8; -moz-opacity: 0.8; -ms-opacity: 0.8; -o-opacity: 0.8; -webkit-border-radius: 2px; -moz-border-radius: 2px; -ms-border-radius: 2px; -o-border-radius: 2px; -webkit-transition: 400ms; -moz-transition: 400ms; -o-transition: 400ms; -ms-transition: 400ms; }
 }
 
@@ -658,19 +1444,97 @@ Dependencies: NA
 
 `;
 
-exports[`outputs valid CSS classname 1`] = `
+exports[`strategy shaker inlines object styles as CSS string 3`] = `
 "import { styled } from '@linaria/react';
-export const ΩPage$Title = /*#__PURE__*/styled('h1')({
-  name: \\"\\\\u03A9Page$Title\\",
-  class: \\"\\\\u03C917gu1mi\\"
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
 });"
 `;
 
-exports[`outputs valid CSS classname 2`] = `
+exports[`strategy shaker inlines object styles as CSS string 4`] = `
 
 CSS:
 
-.ω17gu1mi {
+.Title_t13jq05 {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker it should not throw location error for hoisted identifier 1`] = `
+"import React from 'react';
+export default function Component() {
+  return \\"source0_s13jq05\\";
+}"
+`;
+
+exports[`strategy shaker it should not throw location error for hoisted identifier 2`] = `
+
+CSS:
+
+.source0_s13jq05 {opacity:5;}
+
+Dependencies: react
+
+`;
+
+exports[`strategy shaker keeps cx import and removes css 1`] = `
+"import { cx } from '@linaria/core';
+const defaultStyle = \\"defaultStyle_d13jq05\\";
+export const combined = cx(defaultStyle, Math.random() > 0.5 ? 'green' : 'red');"
+`;
+
+exports[`strategy shaker keeps cx import and removes css 2`] = `
+
+CSS:
+
+.defaultStyle_d13jq05 {
+  color: red;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker non-hoistable identifiers 1`] = `
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression:
+
+  > days is not defined.
+
+  Make sure you are not using a browser or Node specific API and all the variables are available in static context.
+  Linaria have to extract pieces of your code to resolve the interpolated values.
+  Defining styled component or class will not work inside:
+    - function,
+    - class,
+    - method,
+    - loop,
+  because it cannot be statically determined in which context you use them.
+  That's why some variables may be not defined during evaluation.
+      
+   7 | export const Title = styled.h1\`
+   8 |   &:before {
+>  9 |     content: \\"\${days}\\"
+     |                 ^^^^
+  10 |   }
+  11 | \`;"
+`;
+
+exports[`strategy shaker outputs valid CSS classname 1`] = `
+"import { styled } from '@linaria/react';
+export const ΩPage$Title = /*#__PURE__*/styled('h1')({
+  name: \\"\\\\u03A9Page$Title\\",
+  class: \\"\\\\u03A9Page_Title_\\\\u03C913jq05\\"
+});"
+`;
+
+exports[`strategy shaker outputs valid CSS classname 2`] = `
+
+CSS:
+
+.ΩPage_Title_ω13jq05 {
   font-size: 14px;
 }
 
@@ -678,54 +1542,68 @@ Dependencies: NA
 
 `;
 
-exports[`prevents class name collision 1`] = `
+exports[`strategy shaker prevents class name collision 1`] = `
 "import { styled } from '@linaria/react';
+
+const size = () => 100;
+
+const regular = () => \\"arial\\";
+
+const _exp = /*#__PURE__*/() => size;
+
+const _exp2 = /*#__PURE__*/() => props => props.color;
+
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"t17gu1mi\\",
+  class: \\"Title_twgemqq\\",
   vars: {
-    \\"t17gu1mi-0\\": [size, \\"px\\"],
-    \\"t17gu1mi-1\\": [props => props.color]
+    \\"twgemqq-0\\": [_exp(), \\"px\\"],
+    \\"twgemqq-1\\": [_exp2()]
   }
 });
 
-function Something() {
+const _exp3 = /*#__PURE__*/() => regular;
+
+export function Something() {
   const Title = /*#__PURE__*/styled('h1')({
     name: \\"Title\\",
-    class: \\"tccybe9\\",
+    class: \\"Title_tjtmpns\\",
     vars: {
-      \\"tccybe9-0\\": [regular]
+      \\"tjtmpns-0\\": [_exp3()]
     }
   });
-  return <Title />;
+  return /*#__PURE__*/React.createElement(Title, null);
 }"
 `;
 
-exports[`prevents class name collision 2`] = `
+exports[`strategy shaker prevents class name collision 2`] = `
 
 CSS:
 
-.t17gu1mi {
-  font-size: var(--t17gu1mi-0);
-  color: var(--t17gu1mi-1)
+.Title_twgemqq {
+  font-size: var(--twgemqq-0);
+  color: var(--twgemqq-1)
 }
-.tccybe9 {
-    font-family: var(--tccybe9-0);
+.Title_tjtmpns {
+    font-family: var(--tjtmpns-0);
   }
 
 Dependencies: NA
 
 `;
 
-exports[`removes fake replacement patterns in string classNameSlug 1`] = `
+exports[`strategy shaker removes fake replacement patterns in string classNameSlug 1`] = `
 "import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled('h1')({
+
+const _exp = /*#__PURE__*/() => \\"h1\\";
+
+export const Title = /*#__PURE__*/styled(_exp())({
   name: \\"Title\\",
   class: \\"__\\"
 });"
 `;
 
-exports[`removes fake replacement patterns in string classNameSlug 2`] = `
+exports[`strategy shaker removes fake replacement patterns in string classNameSlug 2`] = `
 
 CSS:
 
@@ -737,49 +1615,360 @@ Dependencies: NA
 
 `;
 
-exports[`replaces unknown expressions with CSS custom properties 1`] = `
+exports[`strategy shaker respects module-resolver plugin 1`] = `
 "import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled('h1')({
-  name: \\"Title\\",
-  class: \\"t17gu1mi\\",
-  vars: {
-    \\"t17gu1mi-0\\": [size, \\"px\\"],
-    \\"t17gu1mi-1\\": [props => props.color]
-  }
+export const H1 = /*#__PURE__*/styled('h1')({
+  name: \\"H1\\",
+  class: \\"H1_hlxjig5\\"
 });"
 `;
 
-exports[`replaces unknown expressions with CSS custom properties 2`] = `
+exports[`strategy shaker respects module-resolver plugin 2`] = `
 
 CSS:
 
-.t17gu1mi {
-  font-size: var(--t17gu1mi-0);
-  color: var(--t17gu1mi-1);
+.H1_hlxjig5 {
+  color: foo;
+}
+
+Dependencies: /Users/anber/Sources/linaria/packages/testkit/src/__fixtures__/re-exports
+
+`;
+
+exports[`strategy shaker should handle shadowed identifier inside components 1`] = `
+"import React from 'react';
+const color = 'red';
+export default function Component() {
+  return React.createElement('div', {
+    className: \\"className_c13jq05\\"
+  });
+}"
+`;
+
+exports[`strategy shaker should handle shadowed identifier inside components 2`] = `
+
+CSS:
+
+.className_c13jq05 {background-color:blue;}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker should interpolate imported components 1`] = `"export const square = \\"square_s13jq05\\";"`;
+
+exports[`strategy shaker should interpolate imported components 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  .Title_t1us8k4s {
+    color: red;
+  }
+}
+
+Dependencies: ./__fixtures__/complex-component
+
+`;
+
+exports[`strategy shaker should interpolate imported variables 1`] = `"export const square = \\"square_s13jq05\\";"`;
+
+exports[`strategy shaker should interpolate imported variables 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  color: #fff
+}
+
+Dependencies: ./__fixtures__/complex-component
+
+`;
+
+exports[`strategy shaker should process \`css\` calls inside components 1`] = `
+"import React from 'react';
+export function Component() {
+  const className = \\"className_c13jq05\\";
+  return React.createElement(\\"div\\", {
+    className
+  });
+}"
+`;
+
+exports[`strategy shaker should process \`css\` calls inside components 2`] = `
+
+CSS:
+
+.className_c13jq05 {
+    opacity: 0.2;
+  }
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker should process \`css\` calls referencing other \`css\` calls inside components 1`] = `
+"import React from 'react';
+export function Component() {
+  const outer = \\"outer_o13jq05\\";
+  const inner = \\"inner_i1vhermz\\";
+  return React.createElement(\\"div\\", {
+    className: outer
+  }, \\"outer\\", React.createElement(\\"div\\", {
+    className: inner
+  }, \\"inner\\"));
+}"
+`;
+
+exports[`strategy shaker should process \`css\` calls referencing other \`css\` calls inside components 2`] = `
+
+CSS:
+
+.outer_o13jq05 {
+    color: red;
+  }
+.inner_i1vhermz {
+    color: green;
+    .outer_o13jq05:hover & {
+      color: blue;
+    }
+  }
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker should process \`css\` calls with complex interpolation inside components 1`] = `
+"import React from 'react';
+export function Component() {
+  const className = \\"className_c1vhermz\\";
+  return React.createElement(\\"div\\", {
+    className
+  });
+}"
+`;
+
+exports[`strategy shaker should process \`css\` calls with complex interpolation inside components 2`] = `
+
+CSS:
+
+.cell_c13jq05 {
+      opacity: 0;
+    }
+.className_c1vhermz {
+    opacity: 0.5;
+    font-size: 42
+    font-size: 42
+
+    &:hover .cell_c13jq05 {
+      opacity: 0.2;
+    }
+  }
+
+Dependencies: ./__fixtures__/sample-script
+
+`;
+
+exports[`strategy shaker should process \`styled\` calls inside components 1`] = `
+"import React from 'react';
+import { styled } from '@linaria/react';
+export function Component() {
+  const MyComponent = /*#__PURE__*/styled('h1')({
+    name: \\"MyComponent\\",
+    class: \\"MyComponent_m13jq05\\"
+  });
+  return React.createElement(MyComponent);
+}"
+`;
+
+exports[`strategy shaker should process \`styled\` calls inside components 2`] = `
+
+CSS:
+
+.MyComponent_m13jq05 {
+    opacity: 0.2;
+  }
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker should process \`styled\` calls with complex interpolation inside components 1`] = `
+"import React from 'react';
+import { styled } from '@linaria/react';
+export function Component() {
+  const MyComponent = /*#__PURE__*/styled('h1')({
+    name: \\"MyComponent\\",
+    class: \\"MyComponent_m1egpet8\\"
+  });
+  return React.createElement(MyComponent);
+}"
+`;
+
+exports[`strategy shaker should process \`styled\` calls with complex interpolation inside components 2`] = `
+
+CSS:
+
+.Styled1_s13jq05 {
+  opacity: 0.5
+}
+.cell_c1vhermz {
+      opacity: 0;
+    }
+.MyComponent_m1egpet8 {
+    opacity: 0.5;
+
+    &:hover .cell_c1vhermz {
+      opacity: 0.2;
+    }
+    .Styled1_s13jq05 {
+      font-size: 1;
+    }
+  }
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker should work with String and Number object 1`] = `"export const style = \\"style_s13jq05\\";"`;
+
+exports[`strategy shaker should work with String and Number object 2`] = `
+
+CSS:
+
+.style_s13jq05 {
+  width: 100%;
+  opacity: 0.75;
 }
 
 Dependencies: NA
 
 `;
 
-exports[`supports both css and styled tags 1`] = `
-"import { css } from '@linaria/core';
-import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled('h1')({
-  name: \\"Title\\",
-  class: \\"t17gu1mi\\"
-});
-export const title = \\"tccybe9\\";"
+exports[`strategy shaker should work with generated classnames as selectors 1`] = `
+"export const text = \\"text_t13jq05\\";
+export const square = \\"square_s1vhermz\\";"
 `;
 
-exports[`supports both css and styled tags 2`] = `
+exports[`strategy shaker should work with generated classnames as selectors 2`] = `
 
 CSS:
 
-.t17gu1mi {
-  font-size: 14px;
+.text_t13jq05 {}
+.square_s1vhermz {
+  .text_t13jq05 {
+    color: red;
+  }
 }
-.tccybe9 {
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker should work with wildcard imports 1`] = `"export const square = \\"square_s13jq05\\";"`;
+
+exports[`strategy shaker should work with wildcard imports 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  .Title_t1us8k4s {
+    color: #fff;
+  }
+}
+
+Dependencies: ./__fixtures__/complex-component
+
+`;
+
+exports[`strategy shaker should work with wildcard reexports 1`] = `"export const square = \\"square_s13jq05\\";"`;
+
+exports[`strategy shaker should work with wildcard reexports 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  color: foo1;
+}
+
+Dependencies: ./__fixtures__/reexports
+
+`;
+
+exports[`strategy shaker should wrap memoized components 1`] = `
+"import React from 'react';
+import { styled } from '@linaria/react';
+const MyComponent = /*#__PURE__*/React.memo(() => /*#__PURE__*/React.createElement(\\"div\\", null));
+
+const _exp = /*#__PURE__*/() => MyComponent;
+
+export default /*#__PURE__*/styled(_exp())({
+  name: \\"source0\\",
+  class: \\"source0_swgemqq\\"
+});"
+`;
+
+exports[`strategy shaker should wrap memoized components 2`] = `
+
+CSS:
+
+.source0_swgemqq {
+  color: red;
+}
+
+Dependencies: react
+
+`;
+
+exports[`strategy shaker simplifies react components 1`] = `
+"import React from 'react';
+import { styled } from '@linaria/react';
+import constant from './broken-dependency';
+
+const FuncComponent = props => /*#__PURE__*/React.createElement(\\"div\\", null, props.children + constant);
+
+class ClassComponent extends React.PureComponent {
+  method() {
+    return constant;
+  }
+
+  render() {
+    return /*#__PURE__*/React.createElement(\\"div\\", null, props.children + constant);
+  }
+
+}
+
+const ComplexFunctionComponent = props => {
+  if (import.meta.env.PROD) {
+    return /*#__PURE__*/React.createElement(\\"div\\", null, props.children + constant);
+  }
+
+  return null;
+};
+
+const _exp = /*#__PURE__*/() => FuncComponent;
+
+export const StyledFunc = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledFunc\\",
+  class: \\"StyledFunc_swgemqq\\"
+});
+
+const _exp2 = /*#__PURE__*/() => ClassComponent;
+
+export const StyledClass = /*#__PURE__*/styled(_exp2())({
+  name: \\"StyledClass\\",
+  class: \\"StyledClass_sjtmpns\\"
+});"
+`;
+
+exports[`strategy shaker simplifies react components 2`] = `
+
+CSS:
+
+.StyledFunc_swgemqq {
+  color: red;
+}
+.StyledClass_sjtmpns {
   color: blue;
 }
 
@@ -787,25 +1976,109 @@ Dependencies: NA
 
 `;
 
-exports[`throws when contains dynamic expression without evaluate: true in css tag 1`] = `
-"<<DIRNAME>>/__tests__/app/index.js: The CSS cannot contain JavaScript expressions when using the 'css' tag. To evaluate the expressions at build time, pass 'evaluate: true' to the babel plugin.
-  2 |
-  3 | const title = css\`
-> 4 |   font-size: \${size}px;
-    |                ^^^^
-  5 | \`;"
+exports[`strategy shaker supports both css and styled tags 1`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});
+export const title = \\"title_t1vhermz\\";"
 `;
 
-exports[`transpiles css template literal 1`] = `
-"import { css } from '@linaria/core';
-export const title = \\"t17gu1mi\\";"
-`;
-
-exports[`transpiles css template literal 2`] = `
+exports[`strategy shaker supports both css and styled tags 2`] = `
 
 CSS:
 
-.t17gu1mi {
+.Title_t13jq05 {
+  font-size: 14px;
+}
+.title_t1vhermz {
+  color: blue;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker throws codeframe error when evaluation fails 1`] = `
+"<<DIRNAME>>/source.js: An error occurred when evaluating the expression:
+
+  > This will fail.
+
+  Make sure you are not using a browser or Node specific API and all the variables are available in static context.
+  Linaria have to extract pieces of your code to resolve the interpolated values.
+  Defining styled component or class will not work inside:
+    - function,
+    - class,
+    - method,
+    - loop,
+  because it cannot be statically determined in which context you use them.
+  That's why some variables may be not defined during evaluation.
+      
+  4 |
+  5 | export const Title = styled.h1\`
+> 6 |   font-size: \${foo()}px;
+    |                ^^^^^
+  7 | \`;"
+`;
+
+exports[`strategy shaker throws if couldn't determine a display name 1`] = `
+"<<DIRNAME>>/.js: Couldn't determine a name for the component. Ensure that it's either:
+- Assigned to a variable
+- Is an object property
+- Is a prop in a JSX element
+
+  1 | import { styled } from '@linaria/react';
+  2 |
+> 3 | export default styled.h1\`
+    |                ^
+  4 |   font-size: 14px;
+  5 | \`;"
+`;
+
+exports[`strategy shaker throws when contains unsupported expression 1`] = `
+"<<DIRNAME>>/source.js: css tag cannot handle '() => size' as an interpolated value
+  4 |
+  5 | const title = css\`
+> 6 |   font-size: \${() => size}px;
+    |                ^^^^^^^^^^
+  7 | \`;"
+`;
+
+exports[`strategy shaker throws when interpolation evaluates to NaN 1`] = `
+"<<DIRNAME>>/source.js: The expression evaluated to 'NaN', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(height)'.
+  4 |
+  5 | export const Title = styled.h1\`
+> 6 |   height: \${height}px;
+    |             ^^^^^^
+  7 | \`;"
+`;
+
+exports[`strategy shaker throws when interpolation evaluates to null 1`] = `
+"<<DIRNAME>>/source.js: The expression evaluated to 'null', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(color)'.
+  4 |
+  5 | export const Title = styled.h1\`
+> 6 |   color: \${color};
+    |            ^^^^^
+  7 | \`;"
+`;
+
+exports[`strategy shaker throws when interpolation evaluates to undefined 1`] = `
+"<<DIRNAME>>/source.js: The expression evaluated to 'undefined', which is probably a mistake. If you want it to be inserted into CSS, explicitly cast or transform the value to a string, e.g. - 'String(fontSize)'.
+  4 |
+  5 | export const Title = styled.h1\`
+> 6 |   font-size: \${fontSize};
+    |                ^^^^^^^^
+  7 | \`;"
+`;
+
+exports[`strategy shaker transpiles css template literal 1`] = `"export const title = \\"title_t13jq05\\";"`;
+
+exports[`strategy shaker transpiles css template literal 2`] = `
+
+CSS:
+
+.title_t13jq05 {
   font-size: 14px;
 }
 
@@ -813,20 +2086,18 @@ Dependencies: NA
 
 `;
 
-exports[`transpiles renamed css and atomic-css imports in the same file 1`] = `
+exports[`strategy shaker transpiles renamed css and atomic-css imports in the same file 1`] = `
 "/* @flow */
-import { css as coreCss } from '@linaria/core';
-import { css as atomicCss } from '@linaria/atomic';
-const x = \\"x17gu1mi\\";
+const x = \\"x_x13jq05\\";
 const y = \\"atm_26_5scuol\\";
 console.log(x, y);"
 `;
 
-exports[`transpiles renamed css and atomic-css imports in the same file 2`] = `
+exports[`strategy shaker transpiles renamed css and atomic-css imports in the same file 2`] = `
 
 CSS:
 
-.x17gu1mi {
+.x_x13jq05 {
   background: red;
 }
 .atm_26_5scuol{background:red;}
@@ -835,17 +2106,16 @@ Dependencies: NA
 
 `;
 
-exports[`transpiles renamed css from linaria v2 1`] = `
-"import { css as coreCss } from 'linaria';
-const x = \\"x17gu1mi\\";
+exports[`strategy shaker transpiles renamed css from linaria v2 1`] = `
+"const x = \\"x_x13jq05\\";
 console.log(x);"
 `;
 
-exports[`transpiles renamed css from linaria v2 2`] = `
+exports[`strategy shaker transpiles renamed css from linaria v2 2`] = `
 
 CSS:
 
-.x17gu1mi {
+.x_x13jq05 {
   background: red;
 }
 
@@ -853,39 +2123,45 @@ Dependencies: NA
 
 `;
 
-exports[`transpiles renamed styled and atomic-styled imports in the same file 1`] = `
+exports[`strategy shaker transpiles renamed styled and atomic-styled imports in the same file 1`] = `
 "/* @flow */
 import { styled as reactStyled } from '@linaria/react';
 import { styled as atomicStyled } from '@linaria/atomic';
 const StyledComponent = /*#__PURE__*/reactStyled('div')({
   name: \\"StyledComponent\\",
-  class: \\"s17gu1mi\\"
+  class: \\"StyledComponent_s13jq05\\"
 });
-const StyledComponent2 = /*#__PURE__*/reactStyled(StyledComponent)({
+
+const _exp = /*#__PURE__*/() => StyledComponent;
+
+const StyledComponent2 = /*#__PURE__*/reactStyled(_exp())({
   name: \\"StyledComponent2\\",
-  class: \\"sccybe9\\"
+  class: \\"StyledComponent2_s1vhermz\\"
 });
 const AtomicComponent = /*#__PURE__*/atomicStyled('div')({
   name: \\"AtomicComponent\\",
-  class: \\"atm_26_5scuol aw1s2ox\\",
+  class: \\"atm_26_5scuol AtomicComponent_a1egpet8\\",
   atomic: true
 });
-const AtomicComponent2 = /*#__PURE__*/atomicStyled(AtomicComponent)({
+
+const _exp2 = /*#__PURE__*/() => AtomicComponent;
+
+const AtomicComponent2 = /*#__PURE__*/atomicStyled(_exp2())({
   name: \\"AtomicComponent2\\",
-  class: \\"atm_26_13q2bts a1080ijw\\",
+  class: \\"atm_26_13q2bts AtomicComponent2_avc9xb3\\",
   atomic: true
 });
 console.log(StyledComponent, StyledComponent2, AtomicComponent, AtomicComponent2);"
 `;
 
-exports[`transpiles renamed styled and atomic-styled imports in the same file 2`] = `
+exports[`strategy shaker transpiles renamed styled and atomic-styled imports in the same file 2`] = `
 
 CSS:
 
-.s17gu1mi {
+.StyledComponent_s13jq05 {
   background: red;
 }
-.sccybe9.s17gu1mi {
+.StyledComponent2_s1vhermz.StyledComponent_s13jq05 {
   background: blue;
 }
 .atm_26_5scuol{background:red;}
@@ -895,19 +2171,22 @@ Dependencies: NA
 
 `;
 
-exports[`transpiles renamed styled import 1`] = `
+exports[`strategy shaker transpiles renamed styled import 1`] = `
 "import { styled as custom } from '@linaria/react';
-export const Title = /*#__PURE__*/custom('h1')({
+
+const _exp = /*#__PURE__*/() => \\"h1\\";
+
+export const Title = /*#__PURE__*/custom(_exp())({
   name: \\"Title\\",
-  class: \\"t17gu1mi\\"
+  class: \\"Title_t13jq05\\"
 });"
 `;
 
-exports[`transpiles renamed styled import 2`] = `
+exports[`strategy shaker transpiles renamed styled import 2`] = `
 
 CSS:
 
-.t17gu1mi {
+.Title_t13jq05 {
   font-size: 14px;
 }
 
@@ -915,19 +2194,19 @@ Dependencies: NA
 
 `;
 
-exports[`transpiles styled template literal with TS component 1`] = `
+exports[`strategy shaker transpiles styled template literal with TS component 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled(() => {})({
   name: \\"Title\\",
-  class: \\"tkullng\\"
+  class: \\"Title_t9vkbjs\\"
 });"
 `;
 
-exports[`transpiles styled template literal with TS component 2`] = `
+exports[`strategy shaker transpiles styled template literal with TS component 2`] = `
 
 CSS:
 
-.tkullng {
+.Title_t9vkbjs {
   font-size: 14px;
 }
 
@@ -935,22 +2214,24 @@ Dependencies: NA
 
 `;
 
-exports[`transpiles styled template literal with function and component 1`] = `
+exports[`strategy shaker transpiles styled template literal with function and component 1`] = `
 "import { styled } from '@linaria/react';
 
 const Heading = () => null;
 
-export const Title = /*#__PURE__*/styled(Heading)({
+const _exp = /*#__PURE__*/() => Heading;
+
+export const Title = /*#__PURE__*/styled(_exp())({
   name: \\"Title\\",
-  class: \\"t17gu1mi\\"
+  class: \\"Title_t13jq05\\"
 });"
 `;
 
-exports[`transpiles styled template literal with function and component 2`] = `
+exports[`strategy shaker transpiles styled template literal with function and component 2`] = `
 
 CSS:
 
-.t17gu1mi {
+.Title_t13jq05 {
   font-size: 14px;
 }
 
@@ -958,19 +2239,42 @@ Dependencies: NA
 
 `;
 
-exports[`transpiles styled template literal with function and tag 1`] = `
+exports[`strategy shaker transpiles styled template literal with function and tag 1`] = `
+"import { styled } from '@linaria/react';
+
+const _exp = /*#__PURE__*/() => \\"h1\\";
+
+export const Title = /*#__PURE__*/styled(_exp())({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\"
+});"
+`;
+
+exports[`strategy shaker transpiles styled template literal with function and tag 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  font-size: 14px;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker transpiles styled template literal with object 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"t17gu1mi\\"
+  class: \\"Title_t13jq05\\"
 });"
 `;
 
-exports[`transpiles styled template literal with function and tag 2`] = `
+exports[`strategy shaker transpiles styled template literal with object 2`] = `
 
 CSS:
 
-.t17gu1mi {
+.Title_t13jq05 {
   font-size: 14px;
 }
 
@@ -978,63 +2282,49 @@ Dependencies: NA
 
 `;
 
-exports[`transpiles styled template literal with object 1`] = `
+exports[`strategy shaker transpiles with typed fn as interpolated value 1`] = `
 "import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled('h1')({
-  name: \\"Title\\",
-  class: \\"t17gu1mi\\"
-});"
-`;
 
-exports[`transpiles styled template literal with object 2`] = `
+const _exp = /*#__PURE__*/() => props => props.className;
 
-CSS:
-
-.t17gu1mi {
-  font-size: 14px;
-}
-
-Dependencies: NA
-
-`;
-
-exports[`transpiles with typed fn as interpolated value 1`] = `
-"import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('div')({
   name: \\"Title\\",
-  class: \\"tkullng\\",
+  class: \\"Title_t9vkbjs\\",
   vars: {
-    \\"tkullng-0\\": [props => props.className]
+    \\"t9vkbjs-0\\": [_exp()]
   }
 });"
 `;
 
-exports[`transpiles with typed fn as interpolated value 2`] = `
+exports[`strategy shaker transpiles with typed fn as interpolated value 2`] = `
 
 CSS:
 
-.tkullng {
+.Title_t9vkbjs {
   font-size: 14px;
-  content: "var(--tkullng-0)"
+  content: "var(--t9vkbjs-0)"
 }
 
 Dependencies: NA
 
 `;
 
-exports[`uses string passed in as classNameSlug 1`] = `
+exports[`strategy shaker uses string passed in as classNameSlug 1`] = `
 "import { styled } from '@linaria/react';
-export const Title = /*#__PURE__*/styled('h1')({
+
+const _exp = /*#__PURE__*/() => \\"h1\\";
+
+export const Title = /*#__PURE__*/styled(_exp())({
   name: \\"Title\\",
-  class: \\"t17gu1mi_Title___tests___app_index_js_index__js_app\\"
+  class: \\"t13jq05_Title_src_source_js_source__js_src\\"
 });"
 `;
 
-exports[`uses string passed in as classNameSlug 2`] = `
+exports[`strategy shaker uses string passed in as classNameSlug 2`] = `
 
 CSS:
 
-.t17gu1mi_Title___tests___app_index_js_index__js_app {
+.t13jq05_Title_src_source_js_source__js_src {
   font-size: 14px;
 }
 
@@ -1042,48 +2332,56 @@ Dependencies: NA
 
 `;
 
-exports[`uses the same custom property for the same expression 1`] = `
+exports[`strategy shaker uses the same custom property for the same expression 1`] = `
 "import { styled } from '@linaria/react';
+
+const _exp2 = /*#__PURE__*/() => props => props.size;
+
 export const Box = /*#__PURE__*/styled('div')({
   name: \\"Box\\",
-  class: \\"b17gu1mi\\",
+  class: \\"Box_b13jq05\\",
   vars: {
-    \\"b17gu1mi-0\\": [props => props.size, \\"px\\"]
+    \\"b13jq05-0\\": [_exp2(), \\"px\\"]
   }
 });"
 `;
 
-exports[`uses the same custom property for the same expression 2`] = `
+exports[`strategy shaker uses the same custom property for the same expression 2`] = `
 
 CSS:
 
-.b17gu1mi {
-  height: var(--b17gu1mi-0);
-  width: var(--b17gu1mi-0);
+.Box_b13jq05 {
+  height: var(--b13jq05-0);
+  width: var(--b13jq05-0);
 }
 
 Dependencies: NA
 
 `;
 
-exports[`uses the same custom property for the same identifier 1`] = `
+exports[`strategy shaker uses the same custom property for the same identifier 1`] = `
 "import { styled } from '@linaria/react';
+
+const size = () => 100;
+
+const _exp2 = /*#__PURE__*/() => size;
+
 export const Box = /*#__PURE__*/styled('div')({
   name: \\"Box\\",
-  class: \\"b17gu1mi\\",
+  class: \\"Box_b13jq05\\",
   vars: {
-    \\"b17gu1mi-0\\": [size, \\"px\\"]
+    \\"b13jq05-0\\": [_exp2(), \\"px\\"]
   }
 });"
 `;
 
-exports[`uses the same custom property for the same identifier 2`] = `
+exports[`strategy shaker uses the same custom property for the same identifier 2`] = `
 
 CSS:
 
-.b17gu1mi {
-  height: var(--b17gu1mi-0);
-  width: var(--b17gu1mi-0);
+.Box_b13jq05 {
+  height: var(--b13jq05-0);
+  width: var(--b13jq05-0);
 }
 
 Dependencies: NA

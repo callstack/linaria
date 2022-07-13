@@ -1,37 +1,25 @@
 import type { NodePath } from '@babel/traverse';
 import type { TaggedTemplateExpression } from '@babel/types';
 
-import type { Core } from '../babel';
-import type { State, StrictOptions } from '../types';
+import type BaseProcessor from '@linaria/core/processors/BaseProcessor';
+import type { IFileContext } from '@linaria/core/processors/utils/types';
+import type { StrictOptions } from '@linaria/utils';
 
-import collectTemplateDependencies from './collectTemplateDependencies';
 import getTagProcessor from './getTagProcessor';
 
 const processTemplateExpression = (
-  babel: Core,
-  stage: 'extract' | 'preeval',
   p: NodePath<TaggedTemplateExpression>,
-  state: State,
-  options: StrictOptions
+  fileContext: IFileContext,
+  options: Pick<
+    StrictOptions,
+    'classNameSlug' | 'displayName' | 'evaluate' | 'tagResolver'
+  >,
+  emit: (processor: BaseProcessor) => void
 ) => {
-  const tagProcessor = getTagProcessor(p, state, options);
+  const tagProcessor = getTagProcessor(p, fileContext, options);
   if (tagProcessor === null) return;
 
-  if (stage === 'extract') {
-    const [quasis, expressions] = collectTemplateDependencies(
-      babel,
-      p,
-      state,
-      options
-    );
-
-    state.queue.push({
-      path: p,
-      quasis,
-      expressions,
-      dependencies: tagProcessor.dependencies,
-    });
-  }
+  emit(tagProcessor);
 };
 
 export default processTemplateExpression;

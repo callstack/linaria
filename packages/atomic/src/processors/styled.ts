@@ -1,29 +1,38 @@
 import type { SourceLocation } from '@babel/types';
 
-import type {
-  IInterpolation,
-  Rules,
-  ValueCache,
-} from '@linaria/core/processors/types';
+import type { Rules, ValueCache } from '@linaria/core/processors/types';
+import hasMeta from '@linaria/core/processors/utils/hasMeta';
 import { debug } from '@linaria/logger';
 import type { IProps } from '@linaria/react/processors/styled';
-import StyledProcessor, { hasMeta } from '@linaria/react/processors/styled';
+import StyledProcessor from '@linaria/react/processors/styled';
 import { slugify } from '@linaria/utils';
 
 import atomize from './helpers/atomize';
 
 export default class AtomicStyledProcessor extends StyledProcessor {
+  #classes: string | undefined;
+
+  private get classes(): string {
+    if (this.#classes) {
+      return this.#classes;
+    }
+
+    throw new Error(
+      'Styles are not extracted yet. Please call `extractRules` first.'
+    );
+  }
+
   public override extractRules(
     valueCache: ValueCache,
     cssText: string,
     loc?: SourceLocation | null
-  ): [Rules, string] {
+  ): Rules {
     const rules: Rules = {};
 
     const wrappedValue =
       typeof this.component === 'string'
         ? null
-        : valueCache.get(this.component.node);
+        : valueCache.get(this.component.node.name);
 
     const atomicRules = atomize(cssText, hasMeta(wrappedValue));
     atomicRules.forEach((rule) => {
@@ -42,21 +51,18 @@ export default class AtomicStyledProcessor extends StyledProcessor {
       );
     });
 
-    const classes = atomicRules
+    this.#classes = atomicRules
       // Some atomic rules produced (eg. keyframes) don't have class names, and they also don't need to appear in the object
       .filter((rule) => !!rule.className)
       .map((rule) => rule.className!)
       .join(' ');
 
-    return [rules, classes];
+    return rules;
   }
 
-  protected override getProps(
-    classes: string,
-    uniqInterpolations: IInterpolation[]
-  ): IProps {
-    const props = super.getProps(classes, uniqInterpolations);
-    props.class = [classes, this.className].filter(Boolean).join(' ');
+  protected override getProps(): IProps {
+    const props = super.getProps();
+    props.class = [this.classes, this.className].filter(Boolean).join(' ');
     props.atomic = true;
     return props;
   }

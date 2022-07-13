@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * This file contains a CLI for Linaria.
  */
@@ -10,7 +11,9 @@ import mkdirp from 'mkdirp';
 import normalize from 'normalize-path';
 import yargs from 'yargs';
 
+import type { CodeCache, Module } from '@linaria/babel-preset';
 import { transform } from '@linaria/babel-preset';
+import { asyncResolveFallback } from '@linaria/utils';
 
 const modulesOptions = [
   'commonjs',
@@ -69,7 +72,6 @@ const argv = yargs
   })
   .implies('insert-css-requires', 'source-root')
   .implies('transform', 'insert-css-requires')
-  .implies('modules', 'transform')
   .option('ignore', {
     alias: 'x',
     type: 'string',
@@ -108,7 +110,8 @@ function resolveOutputFilename(
   return path.join(outDir, outputFolder, outputBasename);
 }
 
-function processFiles(files: (number | string)[], options: Options) {
+async function processFiles(files: (number | string)[], options: Options) {
+  const startedAt = performance.now();
   let count = 0;
 
   const resolvedFiles = files.reduce(
@@ -122,7 +125,36 @@ function processFiles(files: (number | string)[], options: Options) {
     [] as string[]
   );
 
-  resolvedFiles.forEach((filename) => {
+  const codeCache: CodeCache = new Map();
+  const resolveCache = new Map<string, string>();
+  const evalCache = new Map<string, Module>();
+
+  const timings = new Map<string, number>();
+  const addTiming = (key: string, value: number) => {
+    timings.set(key, Math.round((timings.get(key) || 0) + value));
+  };
+
+  const startTimes = new Map<string, number>();
+  const onEvent = (unknownEvent: unknown) => {
+    const ev = unknownEvent as { type: string; filename: string };
+    const [, stage, type] = ev.type.split(':');
+    if (type === 'start') {
+      startTimes.set(ev.filename, performance.now());
+      startTimes.set(stage, performance.now());
+    } else {
+      const startTime = startTimes.get(ev.filename);
+      if (startTime) {
+        addTiming(ev.filename, performance.now() - startTime);
+      }
+      const stageStartTime = startTimes.get(stage);
+      if (stageStartTime) {
+        addTiming(stage, performance.now() - stageStartTime);
+      }
+    }
+  };
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const filename of resolvedFiles) {
     if (fs.lstatSync(filename).isDirectory()) {
       return;
     }
@@ -133,7 +165,8 @@ function processFiles(files: (number | string)[], options: Options) {
       options.sourceRoot
     );
 
-    const { code, cssText, sourceMap, cssSourceMapText } = transform(
+    // eslint-disable-next-line no-await-in-loop
+    const { code, cssText, sourceMap, cssSourceMapText } = await transform(
       fs.readFileSync(filename).toString(),
       {
         filename,
@@ -142,7 +175,13 @@ function processFiles(files: (number | string)[], options: Options) {
           configFile: options.configFile,
         },
         root: options.sourceRoot,
-      }
+      },
+      asyncResolveFallback,
+      {},
+      resolveCache,
+      codeCache,
+      evalCache,
+      onEvent
     );
 
     if (cssText) {
@@ -199,10 +238,31 @@ function processFiles(files: (number | string)[], options: Options) {
 
       count += 1;
     }
-  });
+  }
 
-  // eslint-disable-next-line no-console
   console.log(`Successfully extracted ${count} CSS files.`);
+
+  console.log(`\nTimings:`);
+  console.log(`  Total: ${(performance.now() - startedAt).toFixed()}ms`);
+  console.log(`\n  By stages:`);
+  let stage = 1;
+  while (timings.has(`stage-${stage}`)) {
+    console.log(`    Stage ${stage}: ${timings.get(`stage-${stage}`)}ms`);
+    timings.delete(`stage-${stage}`);
+    stage += 1;
+  }
+
+  console.log('\n  By files:');
+
+  const byFiles = Array.from(timings.entries());
+  byFiles.sort(([, a], [, b]) => b - a);
+  byFiles.forEach(([filename, time]) => {
+    const relativeFilename = path.relative(
+      options.sourceRoot ?? process.cwd(),
+      filename
+    );
+    console.log(`    ${relativeFilename}: ${time}ms`);
+  });
 }
 
 processFiles(argv._, {

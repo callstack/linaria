@@ -63,10 +63,10 @@
   "scripts": {
     "add-contributor": "all-contributors add",
     "bootstrap": "pnpm install",
-    "check:all": "turbo run check:all && npm run lint && npm run sp:check",
+    "check:all": "turbo run check:all --output-logs=new-only && npm run lint && npm run sp:check",
     "clean": "del 'packages/*/{coverage,esm,lib,types,tsconfig.tsbuildinfo}'",
     "lint": "eslint --ext .js,.ts,.tsx .",
-    "prepare": "turbo run build",
+    "prepare": "turbo run build --output-logs=new-only",
     "release": "release-it",
     "sp:check": "syncpack",
     "sp:fix": "syncpack format && syncpack fix-mismatches",

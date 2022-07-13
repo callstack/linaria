@@ -7,13 +7,18 @@
 import path from 'path';
 
 import { createFilter } from '@rollup/pluginutils';
+import type { Plugin } from 'rollup';
 
 import { transform, slugify } from '@linaria/babel-preset';
 import type {
   PluginOptions,
   Preprocessor,
   Result,
+  CodeCache,
+  Module,
 } from '@linaria/babel-preset';
+import { createCustomDebug } from '@linaria/logger';
+import { getFileIdx } from '@linaria/utils';
 
 type RollupPluginOptions = {
   include?: string | string[];
@@ -33,10 +38,16 @@ export default function linaria({
   sourceMap,
   preprocessor,
   ...rest
-}: RollupPluginOptions = {}) {
+}: RollupPluginOptions = {}): Plugin & {
+  configResolved: (config: ViteConfig) => void;
+} {
   const filter = createFilter(include, exclude);
   const cssLookup: { [key: string]: string } = {};
   let config: ViteConfig;
+
+  const codeCache: CodeCache = new Map();
+  const resolveCache = new Map<string, string>();
+  const evalCache = new Map<string, Module>();
 
   return {
     name: 'linaria',
@@ -50,18 +61,42 @@ export default function linaria({
     resolveId(importee: string) {
       if (importee in cssLookup) return importee;
     },
-    transform(
+    async transform(
       code: string,
       id: string
-    ): { code: string; map: Result['sourceMap'] } | undefined {
+    ): Promise<{ code: string; map: Result['sourceMap'] } | undefined> {
       // Do not transform ignored and generated files
       if (!filter(id) || id in cssLookup) return;
 
-      const result = transform(code, {
-        filename: id,
-        preprocessor,
-        pluginOptions: rest,
-      });
+      const log = createCustomDebug('rollup', getFileIdx(id));
+
+      log('rollup-init', id);
+
+      const asyncResolve = async (what: string, importer: string) => {
+        const resolved = await this.resolve(what, importer);
+        if (resolved) {
+          log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
+          // Vite adds param like `?v=667939b3` to cached modules
+          return resolved.id.split('?')[0];
+        }
+
+        log('resolve', "❌ '%s'@'%s", what, importer);
+        throw new Error(`Could not resolve ${what}`);
+      };
+
+      const result = await transform(
+        code,
+        {
+          filename: id,
+          preprocessor,
+          pluginOptions: rest,
+        },
+        asyncResolve,
+        {},
+        resolveCache,
+        codeCache,
+        evalCache
+      );
 
       if (!result.cssText) return;
 

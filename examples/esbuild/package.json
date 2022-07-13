@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "name": "esbuild-example",
+  "version": "0.0.0",
+  "license": "MIT",
+  "dependencies": {
+    "linaria-website": "workspace:^"
+  },
+  "devDependencies": {
+    "@linaria/esbuild": "workspace:^",
+    "esbuild": "^0.14.48"
+  },
+  "scripts": {
+    "build": "node build.js"
+  },
+  "author": "Anton Evzhakov"
+}

@@ -26,6 +26,17 @@ function gerOrCreate(namespace: string | null | undefined): Debugger {
   return loggers.get(namespace)!;
 }
 
+genericDebug.formatters.r = (ref: { namespace: string; text?: string }) => {
+  const color = parseInt(gerOrCreate(ref.namespace).color, 10);
+  const colorCode = `\u001B[3${color < 8 ? color : `8;5;${color}`}`;
+  const text = ref.text ?? ref.namespace;
+  return `${colorCode};1m${text}\u001B[0m`;
+};
+
+genericDebug.formatters.f = function f(fn: () => unknown) {
+  return JSON.stringify(fn());
+};
+
 const format = <T>(text: T) => {
   if (typeof text === 'string') {
     return text.replace(/\n/g, '\n\t');
@@ -37,7 +48,7 @@ const format = <T>(text: T) => {
 function log(
   level: LogLevel,
   namespaces: string,
-  arg1: unknown | (() => void),
+  template: unknown | (() => void),
   ...restArgs: unknown[]
 ) {
   if (currentLevel < levels.indexOf(level)) {
@@ -47,15 +58,15 @@ function log(
   const logger = gerOrCreate(namespaces);
   if (!logger.enabled) return;
 
-  if (typeof arg1 === 'function') {
-    const text = arg1();
+  if (typeof template === 'function') {
+    const text = template();
     if (text) {
-      logger('', format(text), ...restArgs);
+      logger(format(text), ...restArgs);
     }
     return;
   }
 
-  logger('', format(arg1), ...restArgs);
+  logger(format(template), ...restArgs);
 }
 
 export const debug = log.bind(null, 'debug');
@@ -73,3 +84,19 @@ export const notify = (message: string) => {
     )
   );
 };
+
+const padStart = (num: number, len: number) =>
+  num.toString(10).padStart(len, '0');
+
+export type CustomDebug = (
+  namespace: string,
+  template: string,
+  ...args: unknown[]
+) => void;
+
+export function createCustomDebug(name: string, id: number): CustomDebug {
+  return (..._args: Parameters<typeof debug>) => {
+    const [namespace, arg1, ...args] = _args;
+    debug(`${name}:${padStart(id, 5)}`, `[${namespace}] ${arg1}`, ...args);
+  };
+}

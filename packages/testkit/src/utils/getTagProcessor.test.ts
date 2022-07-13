@@ -6,20 +6,22 @@ import traverse from '@babel/traverse';
 import dedent from 'dedent';
 
 import { getTagProcessor } from '@linaria/babel-preset';
-import type BaseProcessor from '@linaria/core/types/processors/BaseProcessor';
+import type BaseProcessor from '@linaria/core/processors/BaseProcessor';
 
 const run = (code: string): BaseProcessor | null => {
-  const opts = { filename: join(__dirname, 'test.js'), code: true, ast: true };
-  const state = {
-    index: 0,
-    file: { opts: { ...opts, root: '.' } },
+  const opts = {
+    filename: join(__dirname, 'test.js'),
+    root: '.',
+    code: true,
+    ast: true,
   };
   const rootNode = parseSync(code, opts)!;
   let result: BaseProcessor | null = null;
   traverse(rootNode, {
     TaggedTemplateExpression(path) {
-      result = getTagProcessor(path, state, {
+      result = getTagProcessor(path, opts, {
         displayName: true,
+        evaluate: true,
       });
     },
   });
@@ -46,7 +48,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('renamedStyled(Cmp)');
+    expect(tagSource(result)).toBe('renamedStyled(_exp())');
   });
 
   it('imported component', () => {
@@ -59,7 +61,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(Layout)');
+    expect(tagSource(result)).toBe('styled(_exp())');
   });
 
   it('renamedStyled(Cmp)``', () => {
@@ -73,7 +75,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('renamedStyled(Cmp)');
+    expect(tagSource(result)).toBe('renamedStyled(_exp())');
   });
 
   it('(0, react_1.styled)(Cmp)``', () => {
@@ -87,7 +89,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('react_1.styled(Cmp)');
+    expect(tagSource(result)).toBe('react_1.styled(_exp())');
   });
 
   it('styled(Cmp)``', () => {
@@ -101,7 +103,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(Cmp)');
+    expect(tagSource(result)).toBe('styled(_exp())');
   });
 
   it('styled(hoc(Title))``', () => {
@@ -122,7 +124,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(hoc(Title))');
+    expect(tagSource(result)).toBe('styled(_exp())');
   });
 
   it('styled(() => { someLogic(); })``', () => {
@@ -176,6 +178,18 @@ describe('getTagProcessor', () => {
     );
 
     expect(tagSource(result)).toBe("styled('div')");
+  });
+
+  it('styled("div")``', () => {
+    const result = run(
+      dedent`
+      import { styled } from "@linaria/react";
+
+      export const Square = styled('div')\`\`;
+    `
+    );
+
+    expect(tagSource(result)).toBe('styled(_exp())');
   });
 
   it('(0, core_1.css)``', () => {

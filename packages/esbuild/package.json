@@ -6,6 +6,7 @@
   "dependencies": {
     "@babel/core": "^7.18.2",
     "@linaria/babel-preset": "workspace:^",
+    "@linaria/utils": "workspace:^",
     "esbuild": "^0.12.5"
   },
   "devDependencies": {

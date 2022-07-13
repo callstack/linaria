@@ -1,23 +1,10 @@
-export type ClassNameSlugVars = {
-  dir: string;
-  ext: string;
-  file: string;
-  hash: string;
-  name: string;
-  title: string;
-};
+import type { TransformOptions } from '@babel/core';
 
-export type ClassNameFn = (
-  hash: string,
-  title: string,
-  args: ClassNameSlugVars
-) => string;
+import type { ClassNameFn } from '@linaria/utils';
 
 export interface IOptions {
   classNameSlug?: string | ClassNameFn;
   displayName: boolean;
 }
-export interface IFileContext {
-  filename: string;
-  root: string;
-}
+
+export type IFileContext = Pick<TransformOptions, 'root' | 'filename'>;

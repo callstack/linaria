@@ -3,8 +3,8 @@ module.exports = {
   env: {
     server: {
       presets: [
-        ['@babel/preset-env', { targets: { node: 8 } }],
         require.resolve('@linaria/babel-preset'),
+        ['@babel/preset-env', { targets: { node: 12 } }],
       ],
       plugins: [
         [

@@ -1,11 +1,11 @@
 {
   "exclude": [
     "node_modules",
-    "packages/*/__dtslint__/**",
-    "packages/*/__tests__/**",
-    "packages/*/__fixtures__/**",
-    "packages/*/__utils__/**",
-    "packages/*/types/**"
+    "packages/**/__dtslint__/**",
+    "packages/**/__tests__/**",
+    "packages/**/__fixtures__/**",
+    "packages/**/__utils__/**",
+    "packages/**/types/**"
   ],
   "compilerOptions": {
     "baseUrl": ".",

@@ -2,14 +2,14 @@
 import { join } from 'path';
 
 import * as babel from '@babel/core';
-import type { NodePath } from '@babel/traverse';
-import traverse from '@babel/traverse';
-import type { Program } from '@babel/types';
+import generator from '@babel/generator';
 import dedent from 'dedent';
 import * as ts from 'typescript';
 
-import { collectExportsAndImports } from '@linaria/babel-preset';
-import type { IImport, IState } from '@linaria/babel-preset';
+import type { MissedBabelCoreTypes } from '@linaria/babel-preset';
+import { collectExportsAndImports } from '@linaria/utils';
+
+const { File } = babel as typeof babel & MissedBabelCoreTypes;
 
 function typescriptCommonJS(source: string): string {
   const result = ts.transpileModule(source, {
@@ -22,6 +22,7 @@ function typescriptCommonJS(source: string): string {
 function babelCommonJS(source: string): string {
   const result = babel.transformSync(source, {
     babelrc: false,
+    configFile: false,
     filename: join(__dirname, 'source.ts'),
     presets: [
       [
@@ -40,6 +41,7 @@ function babelCommonJS(source: string): string {
 function babelNode16(source: string): string {
   const result = babel.transformSync(source, {
     babelrc: false,
+    configFile: false,
     filename: join(__dirname, 'source.ts'),
     presets: [
       [
@@ -60,178 +62,633 @@ const compilers: [name: string, compiler: (code: string) => string][] = [
   ['typescriptCommonJS', typescriptCommonJS],
 ];
 
-function run(compiler: (code: string) => string, code: string) {
+function runWithCompiler(compiler: (code: string) => string, code: string) {
   const compiled = compiler(code);
   const filename = join(__dirname, 'source.ts');
-  expect(compiled).toMatchSnapshot('compiled with');
 
   const ast = babel.parse(compiled, {
     babelrc: false,
     filename,
-  });
+  })!;
 
-  let collected: IState | undefined;
+  const file = new File({ filename }, { code, ast });
 
-  traverse(ast, {
-    Program: {
-      enter(path: NodePath<Program>) {
-        collected = collectExportsAndImports(path, filename);
-      },
-    },
-  });
+  const collected = collectExportsAndImports(file.path, filename);
 
-  return (
-    collected ?? {
-      imports: [],
-      exports: [],
+  const sortImports = (
+    a: { imported: string | null; source: string },
+    b: { imported: string | null; source: string }
+  ): number => {
+    if (a.imported === null || b.imported === null) {
+      if (a.imported === null && b.imported === null) {
+        return a.source.localeCompare(b.source);
+      }
+
+      return a.imported === null ? -1 : 1;
     }
-  );
+
+    return a.imported.localeCompare(b.imported);
+  };
+
+  return {
+    exports:
+      collected?.exports
+        .map(({ local, ...i }) => ({
+          ...i,
+          local: generator(local.node).code,
+        }))
+        .sort((a, b) => a.exported.localeCompare(b.exported)) ?? [],
+    imports:
+      collected?.imports
+        .map(({ local, ...i }) => ({
+          ...i,
+          local: generator(local.node).code,
+        }))
+        .sort(sortImports) ?? [],
+    reexports: collected?.reexports ?? [],
+  };
 }
 
-const safeResolve = (name: string): string => {
-  try {
-    return require.resolve(name);
-  } catch (e: unknown) {
-    return name;
-  }
-};
-
-const findBySource = (imports: IImport[], source: string) => {
-  const resolved = safeResolve(source);
-  return imports
-    .filter((item) => item.source === resolved)
-    .map((item) => item.imported)
-    .sort();
-};
-
 describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
-  it('imports', () => {
-    const { imports } = run(
-      compiler,
-      dedent`
-        import unknownDefault, { unknown, another as unknownRenamed } from 'unknown-package';
-        import type types from '@linaria/types';
-        import atomic from '@linaria/atomic';
-        import * as ns from '@linaria/namespace';
-        import * as linaria from '@linaria/core';
-        import {
-          test,
-          another as customName,
-          type Styled
-        } from '@linaria/react';
+  const run = (code: TemplateStringsArray) =>
+    runWithCompiler(compiler, dedent(code));
 
-        const { only, few, fields } = linaria;
+  describe('import', () => {
+    it('default', () => {
+      const { imports } = run`
+        import unknownDefault from 'unknown-package';
 
-        const bar = linaria.bar;
+        console.log(unknownDefault);
+      `;
 
-        export { unknownDefault, unknown, unknownRenamed, types, atomic, ns, test, customName, Styled, only, few, fields, bar };
-      `
-    );
+      expect(imports).toMatchObject([
+        {
+          source: 'unknown-package',
+          imported: 'default',
+        },
+      ]);
+    });
 
-    expect(imports).toHaveLength(11);
+    it('named', () => {
+      const { imports } = run`
+        import { named } from 'unknown-package';
 
-    const find = (source: string) => findBySource(imports, source);
+        console.log(named);
+      `;
 
-    expect(find('unknown-package')).toEqual(['=', 'another', 'unknown']);
+      expect(imports).toMatchObject([
+        {
+          source: 'unknown-package',
+          imported: 'named',
+        },
+      ]);
+    });
 
-    expect(find('@linaria/types')).toHaveLength(0);
+    it('renamed', () => {
+      const { imports } = run`
+        import { named as renamed } from 'unknown-package';
 
-    expect(find('@linaria/namespace')).toEqual(['*']);
+        console.log(renamed);
+      `;
 
-    expect(find('@linaria/atomic')).toEqual(['=']);
+      expect(imports).toMatchObject([
+        {
+          source: 'unknown-package',
+          imported: 'named',
+        },
+      ]);
+    });
 
-    expect(find('@linaria/core')).toEqual(['bar', 'few', 'fields', 'only']);
+    it('types', () => {
+      const { imports } = run`
+        import type { Named as Renamed } from 'unknown-package';
 
-    expect(find('@linaria/react')).toEqual(['another', 'test']);
+        const value: Renamed = 'value';
+
+        console.log(value);
+      `;
+
+      expect(imports).toHaveLength(0);
+    });
+
+    it('side-effects', () => {
+      const { imports } = run`
+        import 'unknown-package';
+      `;
+
+      expect(imports).toHaveLength(1);
+    });
+
+    describe('wildcard', () => {
+      it('unclear usage of the imported namespace', () => {
+        const { imports } = run`
+          import * as ns from 'unknown-package';
+
+          console.log(ns);
+        `;
+
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: '*',
+          },
+        ]);
+      });
+
+      it('dynamic usage of the imported namespace', () => {
+        const { imports } = run`
+          import * as ns from 'unknown-package';
+
+          const key = Math.random() > 0.5 ? 'a' : 'b';
+
+          console.log(ns[key]);
+        `;
+
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: '*',
+          },
+        ]);
+      });
+
+      it('clear usage of the imported namespace', () => {
+        const { imports } = run`
+          import * as ns from 'unknown-package';
+
+          console.log(ns.named, ns['anotherNamed']);
+        `;
+
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: 'anotherNamed',
+          },
+          {
+            source: 'unknown-package',
+            imported: 'named',
+          },
+        ]);
+      });
+
+      it('destructed namespace', () => {
+        const { imports } = run`
+          import * as ns from 'unknown-package';
+
+          const { named } = ns;
+
+          console.log(named);
+        `;
+
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: 'named',
+          },
+        ]);
+      });
+
+      it('unevaluable usage', () => {
+        const { imports } = run`
+          import * as ns from 'unknown-package';
+
+          const getNamed = (n) => n.name;
+          const named = getNamed(ns);;
+
+          console.log(named);
+        `;
+
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: '*',
+          },
+        ]);
+      });
+    });
   });
 
-  it('requires', () => {
-    const { imports } = run(
-      compiler,
-      dedent`
+  describe('require', () => {
+    it('default', () => {
+      const { imports } = run`
+        const unknownDefault = require('unknown-package');
+
+        console.log(unknownDefault.default);
+      `;
+
+      expect(imports).toMatchObject([
+        {
+          source: 'unknown-package',
+          imported: 'default',
+        },
+      ]);
+    });
+
+    it('named', () => {
+      const { imports } = run`
+        const namedDefault = require('unknown-package').named;
+
+        console.log(namedDefault);
+      `;
+
+      expect(imports).toMatchObject([
+        {
+          source: 'unknown-package',
+          imported: 'named',
+        },
+      ]);
+    });
+
+    it('renamed', () => {
+      const { imports } = run`
+        const { named: renamed } = require('unknown-package');
+
+        console.log(renamed);
+      `;
+
+      expect(imports).toMatchObject([
+        {
+          source: 'unknown-package',
+          imported: 'named',
+        },
+      ]);
+    });
+
+    it('deep', () => {
+      const { imports } = run`
+        const { very: { deep: { token } } } = require('unknown-package');
+
+        console.log(namedDefault);
+      `;
+
+      expect(imports).toMatchObject([
+        {
+          source: 'unknown-package',
+          imported: 'very',
+        },
+      ]);
+    });
+
+    it('two tokens', () => {
+      const { imports } = run`
+        const { very: { deep: { oneToken, anotherToken } } } = require('unknown-package');
+
+        console.log(oneToken, anotherToken);
+      `;
+
+      // Different compilers may resolve this case to one or two tokens
+      imports.forEach((item) => {
+        expect(item).toMatchObject({
+          source: 'unknown-package',
+          imported: 'very',
+        });
+      });
+    });
+
+    it('not an import', () => {
+      const { imports } = run`
         const notModule = (() => {
           const require = () => ({});
-          const { dep } = require('@linaria/shaker');
+          const { dep } = require('unknown-package');
           return result;
         })();
+
+        console.log(notModule);
+      `;
+
+      expect(imports).toHaveLength(0);
+    });
+
+    it('not in a root scope', () => {
+      const { imports } = run`
         const module = (() => {
-          const { dep } = require('@linaria/something');
+          const { dep } = require('unknown-package');
           return result;
         })();
-        const fullNamespace = require('@linaria/shaker');
-        const { named } = require('@linaria/shaker');
-        const { ...unknownRest } = require('@linaria/unknown');
 
-        export { notModule, module, fullNamespace, named, unknownRest };
-      `
-    );
+        console.log(module);
+      `;
 
-    const find = (source: string) => findBySource(imports, source);
+      expect(imports).toMatchObject([
+        {
+          source: 'unknown-package',
+          imported: 'dep',
+        },
+      ]);
+    });
 
-    expect(imports).toHaveLength(4);
+    describe('wildcard', () => {
+      it('unclear usage of the imported namespace', () => {
+        const { imports } = run`
+        const fullNamespace = require('unknown-package');
 
-    expect(find('@linaria/something')).toEqual(['dep']);
-    expect(find('@linaria/shaker')).toEqual(['*', 'named']);
-    expect(find('@linaria/unknown')).toEqual(['*']);
+        console.log(fullNamespace);
+      `;
+
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: '*',
+          },
+        ]);
+      });
+
+      it('clear usage of the imported namespace', () => {
+        const { imports } = run`
+        const fullNamespace = require('unknown-package');
+
+        console.log(fullNamespace.foo.bar);
+      `;
+
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: 'foo',
+          },
+        ]);
+      });
+
+      it('using rest operator', () => {
+        const { imports } = run`
+        const { ...fullNamespace } = require('unknown-package');
+
+        console.log(fullNamespace);
+      `;
+
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: '*',
+          },
+        ]);
+      });
+
+      it('using rest operator and named import', () => {
+        const { imports } = run`
+        const { named, ...fullNamespace } = require('unknown-package');
+
+        console.log(fullNamespace, named);
+      `;
+
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: '*',
+          },
+          {
+            source: 'unknown-package',
+            imported: 'named',
+          },
+        ]);
+      });
+    });
   });
 
   xit('dynamic imports', () => {
-    const { imports } = run(
-      compiler,
-      dedent`
-        const fullNamespace = import('@linaria/shaker');
-        const { named } = await import('@linaria/shaker');
-        const { ...unknownRest } = await import('@linaria/unknown');
-
-        export { fullNamespace, named, unknownRest };
-      `
-    );
-
-    const find = (source: string) => findBySource(imports, source);
-
-    expect(imports).toHaveLength(3);
-
-    expect(find('@linaria/shaker')).toEqual(['*', 'named']);
-    expect(find('@linaria/unknown')).toEqual(['*']);
+    // const { imports } = run`
+    //   const fullNamespace = import('@linaria/shaker');
+    //   const { named } = await import('@linaria/shaker');
+    //   const { ...unknownRest } = await import('@linaria/unknown');
+    //
+    //   export { fullNamespace, named, unknownRest };
+    // `;
+    // const find = (source: string) => findBySource(imports, source);
+    //
+    // expect(imports).toHaveLength(3);
+    //
+    // expect(find('@linaria/shaker')).toEqual(['*', 'named']);
+    // expect(find('@linaria/unknown')).toEqual(['*']);
   });
 
-  xit('exports', () => {
-    const { exports } = run(
-      compiler,
-      dedent`
+  describe('export', () => {
+    it('default', () => {
+      const { exports } = run`
+        export default 'value';
+      `;
+
+      expect(exports).toMatchObject([
+        {
+          exported: 'default',
+        },
+      ]);
+    });
+
+    it('named', () => {
+      const { exports } = run`
         const a = 1;
+        export { a as named };
+      `;
 
-        export { a };
+      expect(exports).toMatchObject([
+        {
+          exported: 'named',
+        },
+      ]);
+    });
 
-        export const b = 2;
+    it('with declaration', () => {
+      const { exports } = run`
+        export const a = 1, b = 2;
+      `;
 
-        export default function () {};
-      `
-    );
+      expect(exports).toMatchObject([
+        {
+          exported: 'a',
+        },
+        {
+          exported: 'b',
+        },
+      ]);
+    });
 
-    expect(exports.map((i) => i.exported)).toHaveLength(4);
+    it('with destruction', () => {
+      const { exports } = run`
+        const obj = { a: 1, b: 2 };
+        export const { a, b } = obj;
+      `;
 
-    // expect(find('@linaria/something')).toEqual(['dep']);
-    // expect(find('@linaria/shaker')).toEqual(['*', 'named']);
-    // expect(find('@linaria/unknown')).toEqual(['*']);
+      expect(exports).toMatchObject([
+        {
+          exported: 'a',
+        },
+        {
+          exported: 'b',
+        },
+      ]);
+    });
+
+    it('with destruction and rest operator', () => {
+      const { exports } = run`
+        const obj = { a: 1, b: 2 };
+        export const { a, ...rest } = obj;
+      `;
+
+      expect(exports).toMatchObject([
+        {
+          exported: 'a',
+        },
+        {
+          exported: 'rest',
+        },
+      ]);
+    });
   });
 
-  xit('re-exports', () => {
-    const { exports } = run(
-      compiler,
-      dedent`
-        export * from "module1";
-        export * as name7 from "module2";
-        export { name8, name9, name10 } from "module3";
-        export { import1 as name11, import2 as name12, name13 } from "module4";
-        export { default } from "module5";
-      `
-    );
+  describe('re-export', () => {
+    // `export default from …` is an experimental feature
+    xit('default', () => {
+      const { exports, imports, reexports } = run`
+        export default from "unknown-package";
+      `;
 
-    expect(exports).toHaveLength(4);
+      if (reexports.length) {
+        expect(reexports).toMatchObject([
+          {
+            imported: 'default',
+            exported: 'default',
+            source: 'unknown-package',
+          },
+        ]);
+        expect(exports).toHaveLength(0);
+        expect(imports).toHaveLength(0);
+      } else {
+        expect(reexports).toHaveLength(0);
+        expect(exports).toMatchObject([
+          {
+            exported: 'default',
+          },
+        ]);
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: 'default',
+          },
+        ]);
+      }
+    });
 
-    // expect(find('@linaria/something')).toEqual(['dep']);
-    // expect(find('@linaria/shaker')).toEqual(['*', 'named']);
-    // expect(find('@linaria/unknown')).toEqual(['*']);
+    it('named', () => {
+      const { exports, imports, reexports } = run`
+        export { token } from "unknown-package";
+      `;
+
+      if (reexports.length) {
+        expect(reexports).toMatchObject([
+          {
+            imported: 'token',
+            exported: 'token',
+            source: 'unknown-package',
+          },
+        ]);
+        expect(exports).toHaveLength(0);
+        expect(imports).toHaveLength(0);
+      } else {
+        expect(reexports).toHaveLength(0);
+        expect(exports).toMatchObject([
+          {
+            exported: 'token',
+          },
+        ]);
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: 'token',
+          },
+        ]);
+      }
+    });
+
+    it('renamed', () => {
+      const { exports, imports, reexports } = run`
+        export { token as renamed } from "unknown-package";
+      `;
+
+      if (reexports.length) {
+        expect(reexports).toMatchObject([
+          {
+            imported: 'token',
+            exported: 'renamed',
+            source: 'unknown-package',
+          },
+        ]);
+        expect(exports).toHaveLength(0);
+        expect(imports).toHaveLength(0);
+      } else {
+        expect(reexports).toHaveLength(0);
+        expect(exports).toMatchObject([
+          {
+            exported: 'renamed',
+          },
+        ]);
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: 'token',
+          },
+        ]);
+      }
+    });
+
+    it('named namespace', () => {
+      const { exports, imports, reexports } = run`
+        export * as ns from "unknown-package";
+      `;
+
+      if (reexports.length) {
+        expect(reexports).toMatchObject([
+          {
+            imported: '*',
+            exported: 'ns',
+            source: 'unknown-package',
+          },
+        ]);
+        expect(exports).toHaveLength(0);
+        expect(imports).toHaveLength(0);
+      } else {
+        expect(reexports).toHaveLength(0);
+        expect(exports).toMatchObject([
+          {
+            exported: 'ns',
+          },
+        ]);
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: '*',
+          },
+        ]);
+      }
+    });
+
+    it('export all', () => {
+      const { exports, imports, reexports } = run`
+        export * from "unknown-package";
+      `;
+
+      if (reexports.length) {
+        expect(reexports).toMatchObject([
+          {
+            imported: '*',
+            exported: '*',
+            source: 'unknown-package',
+          },
+        ]);
+        expect(exports).toHaveLength(0);
+        expect(imports).toHaveLength(0);
+      } else {
+        expect(reexports).toHaveLength(0);
+        expect(exports).toMatchObject([
+          {
+            exported: '*',
+          },
+        ]);
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package',
+            imported: '*',
+          },
+        ]);
+      }
+    });
   });
 });

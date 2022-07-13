@@ -1,3 +1,7 @@
 packages:
+    - 'examples/esbuild'
+    - 'examples/rollup'
+    - 'examples/vite'
+    - 'examples/webpack5'
     - 'packages/*'
     - 'website'

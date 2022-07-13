@@ -6,19 +6,15 @@ import type {
   StringLiteral,
 } from '@babel/types';
 
-import type { StyledMeta } from '@linaria/core';
 import type { ProcessorParams } from '@linaria/core/processors/BaseProcessor';
 import BaseProcessor from '@linaria/core/processors/BaseProcessor';
 import type {
   Rules,
   WrappedNode,
-  IInterpolation,
   ValueCache,
 } from '@linaria/core/processors/types';
-
-export function hasMeta(value: unknown): value is StyledMeta {
-  return typeof value === 'object' && value !== null && '__linaria' in value;
-}
+import { ValueType } from '@linaria/core/processors/types';
+import hasMeta from '@linaria/core/processors/utils/hasMeta';
 
 const isNotNull = <T>(x: T | null): x is T => x !== null;
 
@@ -41,40 +37,30 @@ const singleQuotedStringLiteral = (value: string): StringLiteral => ({
 export default class StyledProcessor extends BaseProcessor {
   public component: WrappedNode;
 
+  #variableIdx = 0;
+
+  #variablesCache = new Map<string, string>();
+
   constructor(...args: ProcessorParams) {
     super(...args);
 
     let component: WrappedNode | undefined;
     const [type, value, ...rest] = this.params[0] ?? [];
     if (type === 'call' && rest.length === 0) {
-      const [source, path] = value;
-      if (path.node.type === 'StringLiteral') {
-        component = path.node.value;
-      } else if (
-        path.node.type === 'ArrowFunctionExpression' ||
-        path.node.type === 'FunctionExpression'
-      ) {
-        // Special case when styled wraps a function
-        // It's actually the same as wrapping a built-in tag
+      if (value.kind === ValueType.FUNCTION) {
         component = 'FunctionalComponent';
       } else {
         component = {
-          node: path.node,
-          source,
+          node: value.ex,
+          source: value.source,
         };
-        this.dependencies.push({
-          ex: path,
-          source,
-        });
+
+        this.dependencies.push(value);
       }
     }
 
     if (type === 'member') {
-      if (value.node.type === 'Identifier') {
-        component = value.node.name;
-      } else if (value.node.type === 'StringLiteral') {
-        component = value.node.value;
-      }
+      component = value;
     }
 
     if (!component || this.params.length > 1) {
@@ -84,24 +70,43 @@ export default class StyledProcessor extends BaseProcessor {
     this.component = component;
   }
 
-  public override addInterpolation(node: Expression, source: string) {
-    const id = this.getVariableId(source);
+  public override addInterpolation(
+    node: Expression,
+    source: string,
+    unit = ''
+  ): string {
+    const id = this.getVariableId(source + unit);
 
     this.interpolations.push({
       id,
       node,
       source,
-      unit: '',
+      unit,
     });
 
-    return `var(--${id})`;
+    return id;
+  }
+
+  public override doEvaltimeReplacement(): void {
+    this.replacer(this.value, false);
+  }
+
+  public override doRuntimeReplacement(): void {
+    const t = this.astService;
+
+    const props = this.getProps();
+
+    this.replacer(
+      t.callExpression(this.tagExpression, [this.getTagComponentProps(props)]),
+      true
+    );
   }
 
   public override extractRules(
     valueCache: ValueCache,
     cssText: string,
     loc?: SourceLocation | null
-  ): [Rules, string] {
+  ): Rules {
     const rules: Rules = {};
 
     let selector = `.${this.className}`;
@@ -112,7 +117,7 @@ export default class StyledProcessor extends BaseProcessor {
     let value =
       typeof this.component === 'string'
         ? null
-        : valueCache.get(this.component.node);
+        : valueCache.get(this.component.node.name);
     while (hasMeta(value)) {
       selector += `.${value.__linaria.className}`;
       value = value.__linaria.extends;
@@ -125,21 +130,7 @@ export default class StyledProcessor extends BaseProcessor {
       start: loc?.start ?? null,
     };
 
-    return [rules, this.className];
-  }
-
-  public override getRuntimeReplacement(
-    classes: string,
-    uniqInterpolations: IInterpolation[]
-  ): [Expression, boolean] {
-    const t = this.astService;
-
-    const props = this.getProps(classes, uniqInterpolations);
-
-    return [
-      t.callExpression(this.tagExpression, [this.getTagComponentProps(props)]),
-      true,
-    ];
+    return rules;
   }
 
   public override get asSelector(): string {
@@ -156,7 +147,7 @@ export default class StyledProcessor extends BaseProcessor {
       return singleQuotedStringLiteral(this.component);
     }
 
-    return t.identifier(this.component.source);
+    return t.callExpression(t.identifier(this.component.node.name), []);
   }
 
   protected get tagExpression(): CallExpression {
@@ -164,22 +155,35 @@ export default class StyledProcessor extends BaseProcessor {
     return t.callExpression(this.tagExp, [this.tagExpressionArgument]);
   }
 
-  public override get valueSource(): string {
+  public override get value(): ObjectExpression {
+    const t = this.astService;
     const extendsNode =
-      typeof this.component === 'string' ? null : this.component.source;
-    return `{
-    displayName: "${this.displayName}",
-    __linaria: {
-      className: "${this.className}",
-      extends: ${extendsNode}
-    }
-  }`;
+      typeof this.component === 'string' ? null : this.component.node.name;
+
+    return t.objectExpression([
+      t.objectProperty(
+        t.stringLiteral('displayName'),
+        t.stringLiteral(this.displayName)
+      ),
+      t.objectProperty(
+        t.stringLiteral('__linaria'),
+        t.objectExpression([
+          t.objectProperty(
+            t.stringLiteral('className'),
+            t.stringLiteral(this.className)
+          ),
+          t.objectProperty(
+            t.stringLiteral('extends'),
+            extendsNode
+              ? t.callExpression(t.identifier(extendsNode), [])
+              : t.nullLiteral()
+          ),
+        ])
+      ),
+    ]);
   }
 
-  protected getProps(
-    classes: string,
-    uniqInterpolations: IInterpolation[]
-  ): IProps {
+  protected getProps(): IProps {
     const propsObj: IProps = {
       name: this.displayName,
       class: this.className,
@@ -188,8 +192,8 @@ export default class StyledProcessor extends BaseProcessor {
     // If we found any interpolations, also pass them, so they can be applied
     if (this.interpolations.length) {
       propsObj.vars = {};
-      uniqInterpolations.forEach(({ id, unit, node }) => {
-        const items: Expression[] = [node];
+      this.interpolations.forEach(({ id, unit, node }) => {
+        const items: Expression[] = [this.astService.callExpression(node, [])];
 
         if (unit) {
           items.push(this.astService.stringLiteral(unit));
@@ -237,7 +241,12 @@ export default class StyledProcessor extends BaseProcessor {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getVariableId(value: string): string {
-    // make the variable unique to this styled component
-    return `${this.slug}-${this.interpolations.length}`;
+    if (!this.#variablesCache.has(value)) {
+      // make the variable unique to this styled component
+      // eslint-disable-next-line no-plusplus
+      this.#variablesCache.set(value, `${this.slug}-${this.#variableIdx++}`);
+    }
+
+    return this.#variablesCache.get(value)!;
   }
 }

@@ -2,6 +2,7 @@ import stripAnsi from 'strip-ansi';
 
 import { transform } from '@linaria/babel-preset';
 import type { Replacement } from '@linaria/babel-preset';
+import { asyncResolveFallback } from '@linaria/utils';
 
 type Errors = {
   [key: string]:
@@ -53,13 +54,17 @@ function preprocessor() {
   const offsets: Record<string, ISourceOffset[] | undefined> = {};
 
   return {
-    code(input: string, filename: string) {
+    async code(input: string, filename: string) {
       let result;
 
       try {
-        result = transform(input, {
-          filename,
-        });
+        result = await transform(
+          input,
+          {
+            filename,
+          },
+          asyncResolveFallback
+        );
 
         cache[filename] = undefined;
         errors[filename] = undefined;

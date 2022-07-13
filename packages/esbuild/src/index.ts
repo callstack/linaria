@@ -33,6 +33,26 @@ export default function linaria({
     setup(build) {
       const cssLookup = new Map<string, string>();
 
+      const asyncResolve = async (
+        token: string,
+        importer: string
+      ): Promise<string> => {
+        const context = path.isAbsolute(importer)
+          ? path.dirname(importer)
+          : path.join(process.cwd(), path.dirname(importer));
+
+        // @ts-expect-error
+        const result = await build.resolve(token, {
+          resolveDir: context,
+        });
+
+        if (result.errors.length > 0) {
+          throw new Error(`Cannot resolve ${token}`);
+        }
+
+        return result.path;
+      };
+
       build.onResolve({ filter: /\.linaria\.css$/ }, (args) => {
         return {
           namespace: 'linaria',
@@ -48,7 +68,7 @@ export default function linaria({
         };
       });
 
-      build.onLoad({ filter: /\.(js|jsx|ts|tsx)$/ }, (args) => {
+      build.onLoad({ filter: /\.(js|jsx|ts|tsx)$/ }, async (args) => {
         const rawCode = fs.readFileSync(args.path, 'utf8');
         const { ext, name: filename } = path.parse(args.path);
         const loader = ext.replace(/^\./, '') as Loader;
@@ -83,11 +103,15 @@ export default function linaria({
           code += `/*# sourceMappingURL=data:application/json;base64,${esbuildMap}*/`;
         }
 
-        const result = transform(code, {
-          filename: args.path,
-          preprocessor,
-          pluginOptions: rest,
-        });
+        const result = await transform(
+          code,
+          {
+            filename: args.path,
+            preprocessor,
+            pluginOptions: rest,
+          },
+          asyncResolve
+        );
 
         if (!result.cssText) {
           return {
