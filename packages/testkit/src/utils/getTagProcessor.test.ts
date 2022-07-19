@@ -6,7 +6,7 @@ import traverse from '@babel/traverse';
 import dedent from 'dedent';
 
 import { getTagProcessor } from '@linaria/babel-preset';
-import type BaseProcessor from '@linaria/core/processors/BaseProcessor';
+import type { BaseProcessor } from '@linaria/tags';
 
 const run = (code: string): BaseProcessor | null => {
   const opts = {

@@ -323,6 +323,34 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker compiles css with keyframes 1`] = `
+"const x = \\"x_x13jq05\\";
+console.log(x);"
+`;
+
+exports[`strategy shaker compiles css with keyframes 2`] = `
+
+CSS:
+
+.x_x13jq05 {
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  animation: fade 1s infinite;
+
+  background: red;
+  height: 100px;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker derives display name from filename 1`] = `
 "import { styled } from '@linaria/react';
 export default /*#__PURE__*/styled('h1')({
@@ -1631,7 +1659,7 @@ CSS:
   color: foo;
 }
 
-Dependencies: /Users/anber/Sources/linaria/packages/testkit/src/__fixtures__/re-exports
+Dependencies: ../re-exports
 
 `;
 

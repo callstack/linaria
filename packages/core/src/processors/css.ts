@@ -1,8 +1,7 @@
 import type { Expression, SourceLocation, StringLiteral } from '@babel/types';
 
-import type { ProcessorParams } from './BaseProcessor';
-import BaseProcessor from './BaseProcessor';
-import type { Rules, ValueCache } from './types';
+import type { ProcessorParams, Rules, ValueCache } from '@linaria/tags';
+import { BaseProcessor } from '@linaria/tags';
 
 export default class CssProcessor extends BaseProcessor {
   constructor(...args: ProcessorParams) {

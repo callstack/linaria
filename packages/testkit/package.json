@@ -4,21 +4,22 @@
   "version": "3.0.0-beta.21",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
-    "@babel/core": "^7.18.2",
-    "@babel/generator": ">=7",
-    "@babel/traverse": ">=7",
+    "@babel/core": "^7.18.9",
+    "@babel/generator": "^7.18.9",
+    "@babel/traverse": "^7.18.9",
     "@linaria/babel-preset": "workspace:^",
     "@linaria/extractor": "workspace:^",
     "@linaria/react": "workspace:^",
     "@linaria/shaker": "workspace:^",
+    "@linaria/tags": "workspace:^",
     "dedent": "^0.7.0",
     "strip-ansi": "^5.2.0",
-    "typescript": "^4.7.3"
+    "typescript": "^4.7.4"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.18.2",
     "@babel/runtime": "^7.18.3",
-    "@babel/types": "^7.18.4",
+    "@babel/types": "^7.18.9",
     "@linaria/atomic": "workspace:^",
     "@linaria/core": "workspace:^",
     "@linaria/logger": "workspace:^",

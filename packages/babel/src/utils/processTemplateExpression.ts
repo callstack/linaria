@@ -1,8 +1,7 @@
 import type { NodePath } from '@babel/traverse';
 import type { TaggedTemplateExpression } from '@babel/types';
 
-import type BaseProcessor from '@linaria/core/processors/BaseProcessor';
-import type { IFileContext } from '@linaria/core/processors/utils/types';
+import type { BaseProcessor, IFileContext } from '@linaria/tags';
 import type { StrictOptions } from '@linaria/utils';
 
 import getTagProcessor from './getTagProcessor';
