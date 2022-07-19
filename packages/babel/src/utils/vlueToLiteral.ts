@@ -1,7 +1,7 @@
 import type { NodePath } from '@babel/traverse';
 import type { Expression } from '@babel/types';
 
-import isSerializable from '@linaria/core/processors/utils/isSerializable';
+import { isSerializable } from '@linaria/tags';
 
 import getSource from './getSource';
 

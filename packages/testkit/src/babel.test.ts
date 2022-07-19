@@ -989,6 +989,36 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('compiles css with keyframes', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+    import { css } from '@linaria/core';
+
+    const x = css\`
+      @keyframes fade {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      animation: fade 1s infinite;
+
+      background: red;
+      height: 100px;
+    \`;
+
+    console.log(x);
+
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('compiles atomic css with keyframes', async () => {
     const { code, metadata } = await transform(
       dedent`

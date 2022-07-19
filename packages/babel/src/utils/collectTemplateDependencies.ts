@@ -25,8 +25,8 @@ import type {
 } from '@babel/types';
 import { cloneNode } from '@babel/types';
 
-import hasMeta from '@linaria/core/processors/utils/hasMeta';
 import { debug } from '@linaria/logger';
+import { hasMeta } from '@linaria/tags';
 import {
   findIdentifiers,
   mutate,

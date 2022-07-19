@@ -6,7 +6,7 @@ module.exports = {
       "module-resolver",
       {
         "alias": {
-          "_": path.join(__dirname, "..")
+          "_": "./src/__fixtures__"
         }
       }
     ]

@@ -1,10 +1,10 @@
 import type { SourceLocation } from '@babel/types';
 
-import type { Rules, ValueCache } from '@linaria/core/processors/types';
-import hasMeta from '@linaria/core/processors/utils/hasMeta';
 import { debug } from '@linaria/logger';
 import type { IProps } from '@linaria/react/processors/styled';
 import StyledProcessor from '@linaria/react/processors/styled';
+import { hasMeta } from '@linaria/tags';
+import type { Rules, ValueCache } from '@linaria/tags';
 import { slugify } from '@linaria/utils';
 
 import atomize from './helpers/atomize';

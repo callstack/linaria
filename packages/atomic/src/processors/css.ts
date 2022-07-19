@@ -1,8 +1,8 @@
 import type { SourceLocation } from '@babel/types';
 
 import CssProcessor from '@linaria/core/processors/css';
-import type { Rules, ValueCache } from '@linaria/core/processors/types';
 import { debug } from '@linaria/logger';
+import type { Rules, ValueCache } from '@linaria/tags';
 
 import atomize from './helpers/atomize';
 

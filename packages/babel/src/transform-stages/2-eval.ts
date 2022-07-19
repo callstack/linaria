@@ -1,5 +1,5 @@
-import type { ValueCache } from '@linaria/core/types/processors/types';
 import { createCustomDebug } from '@linaria/logger';
+import type { ValueCache } from '@linaria/tags';
 import { getFileIdx } from '@linaria/utils';
 
 import evaluate from '../evaluators';
