@@ -4,8 +4,7 @@ import type { Mapping } from 'source-map';
 import { SourceMapGenerator } from 'source-map';
 import stylis from 'stylis';
 
-import type BaseProcessor from '@linaria/core/types/processors/BaseProcessor';
-import type { Replacements } from '@linaria/core/types/processors/types';
+import type { BaseProcessor, Replacements } from '@linaria/tags';
 
 import type { Rules, Options, PreprocessorFn } from '../types';
 

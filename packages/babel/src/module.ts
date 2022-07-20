@@ -18,9 +18,9 @@ import vm from 'vm';
 
 import type { BabelFileResult } from '@babel/core';
 
-import type BaseProcessor from '@linaria/core/types/processors/BaseProcessor';
 import type { CustomDebug } from '@linaria/logger';
 import { createCustomDebug } from '@linaria/logger';
+import type { BaseProcessor } from '@linaria/tags';
 import type { StrictOptions } from '@linaria/utils';
 import { getFileIdx } from '@linaria/utils';
 

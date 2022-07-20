@@ -1,5 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`shaker should keep assigment even if export is marked for removing 1`] = `
+"let _a;
+
+exports.a = _a = {};
+exports.b = _a;"
+`;
+
 exports[`shaker should keep referenced exports 1`] = `
 "var _foo;
 
@@ -45,5 +52,12 @@ export { a };"
 `;
 
 exports[`shaker should remove unused export 1`] = `"export const a = 1;"`;
+
+exports[`shaker should respect implicit references 1`] = `
+"let _a;
+
+exports.a = _a = {};
+exports.b = _a;"
+`;
 
 exports[`shaker should throw out unused referenced exports 1`] = `"exports.defaultValue = 20;"`;

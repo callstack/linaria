@@ -4,12 +4,12 @@
   "version": "4.0.0-beta.0",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
-    "@babel/core": "^7.18.2",
+    "@babel/core": "^7.18.9",
     "@babel/plugin-proposal-export-namespace-from": ">=7",
     "@babel/plugin-syntax-dynamic-import": ">=7",
     "@babel/plugin-transform-modules-commonjs": "^7.18.2",
-    "@babel/traverse": ">=7",
-    "@babel/types": "^7.18.4",
+    "@babel/traverse": "^7.18.9",
+    "@babel/types": "^7.18.9",
     "@linaria/logger": "workspace:^",
     "babel-merge": "^3.0.0"
   },

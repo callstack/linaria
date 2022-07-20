@@ -3,7 +3,7 @@ import type { NodePath } from '@babel/traverse';
 import type { File } from '@babel/types';
 import type { RawSourceMap } from 'source-map';
 
-import type BaseProcessor from '@linaria/core/processors/BaseProcessor';
+import type { BaseProcessor } from '@linaria/tags';
 
 import type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
 
@@ -18,9 +18,9 @@ export type {
   Serializable,
   Value,
   ValueCache,
-} from '@linaria/core/processors/types';
+} from '@linaria/tags';
 
-export { ValueType } from '@linaria/core/processors/types';
+export { ValueType } from '@linaria/tags';
 
 export interface ICSSRule {
   className: string;

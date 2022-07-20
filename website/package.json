@@ -20,8 +20,8 @@
     "react-dom": "^16.14.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.17.10",
-    "@babel/core": "^7.18.2",
+    "@babel/cli": "^7.18.9",
+    "@babel/core": "^7.18.9",
     "@linaria/babel-preset": "workspace:^",
     "@linaria/shaker": "workspace:^",
     "@linaria/stylelint": "workspace:^",

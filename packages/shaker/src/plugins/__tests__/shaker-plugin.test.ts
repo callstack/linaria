@@ -139,4 +139,26 @@ describe('shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata.imports.size).toBe(0);
   });
+
+  it('should respect implicit references', () => {
+    const { code, metadata } = keep(['a'])`
+      let _a;
+      exports.a = _a = {};
+      exports.b = _a;
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
+  });
+
+  it('should keep assigment even if export is marked for removing', () => {
+    const { code, metadata } = keep(['b'])`
+      let _a;
+      exports.a = _a = {};
+      exports.b = _a;
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
+  });
 });

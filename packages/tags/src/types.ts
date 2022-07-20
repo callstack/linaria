@@ -1,6 +1,11 @@
 import type { Expression, Identifier } from '@babel/types';
 
-import type { StyledMeta } from '../StyledMeta';
+export type StyledMeta = {
+  __linaria: {
+    className: string;
+    extends: StyledMeta;
+  };
+};
 
 export type CSSPropertyValue = string | number;
 

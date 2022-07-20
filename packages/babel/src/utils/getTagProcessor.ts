@@ -10,9 +10,8 @@ import type {
 } from '@babel/types';
 import findUp from 'find-up';
 
-import BaseProcessor from '@linaria/core/processors/BaseProcessor';
-import type { Params } from '@linaria/core/processors/types';
-import type { IFileContext } from '@linaria/core/processors/utils/types';
+import { BaseProcessor } from '@linaria/tags';
+import type { Params, IFileContext } from '@linaria/tags';
 import type { IImport, StrictOptions } from '@linaria/utils';
 import {
   collectExportsAndImports,

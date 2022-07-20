@@ -6,15 +6,13 @@ import type {
   StringLiteral,
 } from '@babel/types';
 
-import type { ProcessorParams } from '@linaria/core/processors/BaseProcessor';
-import BaseProcessor from '@linaria/core/processors/BaseProcessor';
+import { BaseProcessor, ValueType, hasMeta } from '@linaria/tags';
 import type {
   Rules,
   WrappedNode,
   ValueCache,
-} from '@linaria/core/processors/types';
-import { ValueType } from '@linaria/core/processors/types';
-import hasMeta from '@linaria/core/processors/utils/hasMeta';
+  ProcessorParams,
+} from '@linaria/tags';
 
 const isNotNull = <T>(x: T | null): x is T => x !== null;
 

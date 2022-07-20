@@ -6,9 +6,9 @@
     "git-raw-commits": "^2.0.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.17.10",
-    "@babel/core": "^7.18.2",
-    "@babel/eslint-parser": "^7.18.2",
+    "@babel/cli": "^7.18.9",
+    "@babel/core": "^7.18.9",
+    "@babel/eslint-parser": "^7.18.9",
     "@babel/plugin-proposal-class-properties": ">=7",
     "@babel/plugin-syntax-jsx": ">=7",
     "@babel/preset-env": ">=7",
@@ -41,7 +41,7 @@
     "react": "^16.14.0",
     "syncpack": "^8.0.0",
     "turbo": "^1.2.16",
-    "typescript": "^4.7.3"
+    "typescript": "^4.7.4"
   },
   "engines": {
     "node": "^12.16.0 || >=13.7.0"
