@@ -21,7 +21,8 @@
     "@linaria/webpack-loader": "3.0.0-beta.19",
     "@linaria/webpack4-loader": "3.0.0-beta.19",
     "@linaria/webpack5-loader": "3.0.0-beta.19",
-    "linaria-website": "3.0.0-beta.19"
+    "linaria-website": "3.0.0-beta.19",
+    "@linaria/tags": "4.0.0-beta.1"
   },
   "changesets": [
     "angry-donuts-hide",
@@ -29,7 +30,9 @@
     "curly-birds-joke",
     "early-ads-admire",
     "empty-lamps-crash",
+    "empty-papayas-attack",
     "fair-cars-attack",
+    "itchy-ears-judge",
     "lemon-taxis-heal",
     "nasty-snakes-join",
     "plenty-peas-rescue",

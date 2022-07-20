@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.0.0-beta.1
+
+### Patch Changes
+
+- ea41d440: New package @linaria/tags that contains all abstract logic for tags processors.
+- Updated dependencies [ea41d440]
+  - @linaria/webpack4-loader@4.0.0-beta.1
+  - @linaria/webpack5-loader@4.0.0-beta.1
+
 ## 4.0.0-beta.0
 
 ### Major Changes

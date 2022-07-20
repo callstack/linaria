@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.0.0-beta.1
+
+### Patch Changes
+
+- b8515929: In some cases, the shaker mistakenly removed assignment expressions. Fixes #1008.
+- ea41d440: New package @linaria/tags that contains all abstract logic for tags processors.
+- Updated dependencies [ea41d440]
+  - @linaria/logger@4.0.0-beta.1
+
 ## 4.0.0-beta.0
 
 ### Major Changes

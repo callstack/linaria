@@ -1,5 +1,18 @@
 # @linaria/testkit
 
+## 4.0.0-beta.1
+
+### Patch Changes
+
+- ea41d440: New package @linaria/tags that contains all abstract logic for tags processors.
+- Updated dependencies [b8515929]
+- Updated dependencies [ea41d440]
+  - @linaria/shaker@4.0.0-beta.1
+  - @linaria/babel-preset@4.0.0-beta.1
+  - @linaria/extractor@4.0.0-beta.1
+  - @linaria/react@4.0.0-beta.1
+  - @linaria/tags@4.0.0-beta.2
+
 ## 4.0.0-beta.0
 
 ### Major Changes

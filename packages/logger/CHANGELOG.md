@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.0-beta.1
+
+### Patch Changes
+
+- ea41d440: New package @linaria/tags that contains all abstract logic for tags processors.
+
 ## 4.0.0-beta.0
 
 ### Major Changes
