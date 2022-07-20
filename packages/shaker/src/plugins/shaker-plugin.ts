@@ -57,6 +57,13 @@ function getBindingForExport(exportPath: NodePath): Binding | undefined {
     }
   }
 
+  if (exportPath.isAssignmentExpression()) {
+    const left = exportPath.get('left');
+    if (left.isIdentifier()) {
+      return exportPath.scope.getBinding(left.node.name);
+    }
+  }
+
   return undefined;
 }
 
@@ -156,6 +163,17 @@ export default function shakerPlugin(
         collected.exportRefs,
         collected.exports
       );
+
+      collected.exports.forEach(({ local }) => {
+        if (local.isAssignmentExpression()) {
+          const left = local.get('left');
+          if (left.isIdentifier()) {
+            // For some reason babel does not mark id in AssignmentExpression as a reference
+            // So we need to do it manually
+            reference(left, left, true);
+          }
+        }
+      });
 
       if (
         onlyExports.length === 1 &&

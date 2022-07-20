@@ -19,14 +19,15 @@ function getBinding(path: NodePath<Identifier | JSXIdentifier>) {
 
 export function reference(
   path: NodePath<Identifier | JSXIdentifier>,
-  referencePath?: NodePath
+  referencePath: NodePath = path,
+  force = false
 ): void {
-  if (!path.isReferencedIdentifier()) return;
+  if (!force && !path.isReferencedIdentifier()) return;
 
   const binding = getBinding(path);
   if (!binding) return;
 
-  if (binding.referencePaths.includes(referencePath ?? path)) {
+  if (binding.referencePaths.includes(referencePath)) {
     return;
   }
 
@@ -55,8 +56,6 @@ function isReferenced(binding: Binding) {
 export function dereference(
   path: NodePath<Identifier | JSXIdentifier>
 ): Binding | null {
-  if (!path.isReferencedIdentifier()) return null;
-
   const binding = getBinding(path);
   if (!binding) return null;
 
