@@ -28,7 +28,7 @@ export default function collector(
 
       file.path.traverse({
         // TODO: process transformed literals
-        TaggedTemplateExpression: (p) => {
+        Identifier: (p) => {
           processTemplateExpression(p, file.opts, options, (processor) => {
             processor.build(values);
 

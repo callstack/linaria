@@ -2059,7 +2059,7 @@ exports[`strategy shaker throws if couldn't determine a display name 1`] = `
   1 | import { styled } from '@linaria/react';
   2 |
 > 3 | export default styled.h1\`
-    |                ^
+    |                ^^^^^^
   4 |   font-size: 14px;
   5 | \`;"
 `;

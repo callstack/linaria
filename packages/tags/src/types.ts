@@ -1,4 +1,4 @@
-import type { Expression, Identifier } from '@babel/types';
+import type { Expression, Identifier, TemplateElement } from '@babel/types';
 
 export type StyledMeta = {
   __linaria: {
@@ -71,8 +71,10 @@ export type Rules = Record<string, ICSSRule>;
 
 export type CallParam = ['call', ...ExpressionValue[]];
 export type MemberParam = ['member', string];
+export type TemplateParam = ['template', (TemplateElement | ExpressionValue)[]];
 
-export type Params = (CallParam | MemberParam)[];
+export type Param = CallParam | MemberParam | TemplateParam;
+export type Params = Param[];
 
 export type BuildCodeFrameErrorFn = <TError extends Error>(
   msg: string,

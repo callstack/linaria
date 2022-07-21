@@ -6,11 +6,13 @@ import type {
   ExpressionValue,
   IInterpolation,
   IPlaceholder,
+  Param,
   Params,
   Rules,
   Value,
   ValueCache,
   Artifact,
+  TemplateParam,
 } from './types';
 import getClassNameAndSlug from './utils/getClassNameAndSlug';
 import hasMeta from './utils/hasMeta';
@@ -21,6 +23,9 @@ import type { IFileContext, IOptions } from './utils/types';
 export { Expression };
 
 export type ProcessorParams = ConstructorParameters<typeof BaseProcessor>;
+
+const isTemplateParam = (param: Param): param is TemplateParam =>
+  param[0] === 'template';
 
 export default abstract class BaseProcessor {
   public readonly artifacts: Artifact[] = [];
@@ -48,7 +53,6 @@ export default abstract class BaseProcessor {
       replacement: Expression,
       isPure: boolean
     ) => void,
-    public readonly template: (TemplateElement | ExpressionValue)[],
     public readonly displayName: string,
     public readonly isReferenced: boolean,
     protected readonly idx: number,
@@ -64,6 +68,10 @@ export default abstract class BaseProcessor {
 
     this.className = className;
     this.slug = slug;
+  }
+
+  public get template(): (TemplateElement | ExpressionValue)[] {
+    return this.params.find(isTemplateParam)?.[1] ?? [];
   }
 
   public build(values: ValueCache): Artifact[] {

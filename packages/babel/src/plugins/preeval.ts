@@ -78,7 +78,7 @@ export default function preeval(
       this.processors = [];
 
       file.path.traverse({
-        TaggedTemplateExpression: (p) => {
+        Identifier: (p) => {
           processTemplateExpression(p, file.opts, options, (processor) => {
             processor.doEvaltimeReplacement();
             this.processors.push(processor);

@@ -18,11 +18,15 @@ const run = (code: string): BaseProcessor | null => {
   const rootNode = parseSync(code, opts)!;
   let result: BaseProcessor | null = null;
   traverse(rootNode, {
-    TaggedTemplateExpression(path) {
-      result = getTagProcessor(path, opts, {
+    Identifier(path) {
+      const processor = getTagProcessor(path, opts, {
         displayName: true,
         evaluate: true,
       });
+
+      if (processor) {
+        result = processor;
+      }
     },
   });
 

@@ -7,7 +7,7 @@ export default class CssProcessor extends BaseProcessor {
   constructor(...args: ProcessorParams) {
     super(...args);
 
-    if (this.params.length > 0) {
+    if (this.params.length !== 1 || this.params[0][0] !== 'template') {
       throw new Error('Invalid usage of `css` tag');
     }
   }
