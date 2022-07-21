@@ -111,7 +111,6 @@ const webpack5Loader: Loader = function webpack5LoaderPlugin(
           const request = `${outputFileName}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
             typeof cacheProvider === 'string' ? cacheProvider : ''
           )}!${this.resourcePath}`;
-          this.utils.contextify(this.context || this.rootContext, request);
           const stringifiedRequest = JSON.stringify(
             this.utils.contextify(this.context || this.rootContext, request)
           );
