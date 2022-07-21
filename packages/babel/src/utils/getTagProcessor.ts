@@ -3,11 +3,7 @@ import { basename, dirname, join } from 'path';
 
 import { types as t } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
-import type {
-  Expression,
-  TaggedTemplateExpression,
-  SourceLocation,
-} from '@babel/types';
+import type { Expression, SourceLocation, Identifier } from '@babel/types';
 import findUp from 'find-up';
 
 import { BaseProcessor } from '@linaria/tags';
@@ -150,22 +146,34 @@ function getProcessorFromFile(processorPath: string): ProcessorClass | null {
   return Processor;
 }
 
-function getBuilderForTemplate(
-  path: NodePath<TaggedTemplateExpression>,
+function getProcessorForIdentifier(
+  path: NodePath<Identifier>,
   imports: IImport[],
   filename: string | null | undefined,
   options: Pick<
     StrictOptions,
     'classNameSlug' | 'displayName' | 'evaluate' | 'tagResolver'
   >
-): Builder | null {
+): [ProcessorClass, NodePath] | [null, null] {
+  const pathBinding = path.scope.getBinding(path.node.name);
+  if (!pathBinding) {
+    // It's not a binding, so it's not a tag
+    return [null, null];
+  }
+
   const tagResolver = options.tagResolver ?? (() => null);
+
+  // FIXME: can be simplified
   const relatedImports = imports
-    .map((i): [IImport, NodePath] | null => {
+    .map((i): [IImport, NodePath | null] | null => {
       const { local } = i;
 
+      if (local === path) {
+        return [i, null];
+      }
+
       if (!local.isIdentifier()) {
-        if (local.isDescendant(path)) {
+        if (path.isDescendant(local)) {
           return [i, local];
         }
 
@@ -173,25 +181,22 @@ function getBuilderForTemplate(
       }
 
       const binding = local.scope.getBinding(local.node.name);
-
-      const tagPath = binding?.referencePaths.find((p) => p.isDescendant(path));
-
-      if (tagPath) {
-        return [i, tagPath];
+      if (pathBinding === binding) {
+        return [i, path];
       }
 
       return null;
     })
     .filter(isNotNull)
-    .filter((i) => i[1].isExpression());
+    .filter((i) => i[1] === null || i[1].isExpression());
 
   if (relatedImports.length === 0) {
-    return null;
+    return [null, null];
   }
 
-  const [Processor, tagPath] =
+  const [Processor = null, tagPath = null] =
     relatedImports
-      .map(([imp, p]): [ProcessorClass | null, NodePath] => {
+      .map(([imp, p]): [ProcessorClass | null, NodePath | null] => {
         const source = tagResolver(imp.source, imp.imported);
         const processor = source
           ? getProcessorFromFile(source)
@@ -200,12 +205,33 @@ function getBuilderForTemplate(
       })
       .find(([proc]) => proc) ?? [];
 
+  return Processor === null || tagPath === null
+    ? [null, null]
+    : [Processor, tagPath];
+}
+
+function getBuilderForIdentifier(
+  path: NodePath<Identifier>,
+  imports: IImport[],
+  filename: string | null | undefined,
+  options: Pick<
+    StrictOptions,
+    'classNameSlug' | 'displayName' | 'evaluate' | 'tagResolver'
+  >
+): Builder | null {
+  const [Processor, tagPath] = getProcessorForIdentifier(
+    path,
+    imports,
+    filename,
+    options
+  );
+
   if (!Processor || !tagPath) {
     return null;
   }
 
   const params: Params = [];
-  let prev: NodePath | null = tagPath;
+  let prev: NodePath = tagPath;
   let current: NodePath | null = tagPath.parentPath;
   while (current && current !== path) {
     if (
@@ -218,7 +244,7 @@ function getBuilderForTemplate(
       continue;
     }
 
-    if (current?.isCallExpression() && current.node.callee === prev.node) {
+    if (current?.isCallExpression({ callee: prev.node })) {
       const args = current.get('arguments');
       const cookedArgs = args
         .map((arg) => {
@@ -239,7 +265,7 @@ function getBuilderForTemplate(
       continue;
     }
 
-    if (current?.isMemberExpression() && current.node.object === prev.node) {
+    if (current?.isMemberExpression({ object: prev.node })) {
       const property = current.get('property');
       if (property.isIdentifier() && !current.node.computed) {
         params.push(['member', property.node.name]);
@@ -255,11 +281,24 @@ function getBuilderForTemplate(
       continue;
     }
 
-    throw buildCodeFrameError(path, 'Unexpected tag usage');
+    if (current?.isTaggedTemplateExpression({ tag: prev.node })) {
+      const [quasis, expressionValues] = collectTemplateDependencies(
+        current,
+        options.evaluate
+      );
+      params.push(['template', zip(quasis, expressionValues)]);
+
+      prev = current;
+      current = current.parentPath;
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    break;
   }
 
   const replacer = (replacement: Expression, isPure: boolean) => {
-    mutate(path, (p) => {
+    mutate(prev, (p) => {
       p.replaceWith(replacement);
       if (isPure) {
         p.addComment('leading', '#__PURE__');
@@ -279,7 +318,7 @@ function getBuilderForTemplate(
 }
 
 function getDisplayName(
-  path: NodePath<TaggedTemplateExpression>,
+  path: NodePath<Identifier>,
   idx: number,
   fileContext: IFileContext
 ): string {
@@ -379,10 +418,10 @@ const getNextIndex = (state: IFileContext) => {
   return counter;
 };
 
-const cache = new WeakMap<TaggedTemplateExpression, BaseProcessor | null>();
+const cache = new WeakMap<Identifier, BaseProcessor | null>();
 
 export default function getTagProcessor(
-  path: NodePath<TaggedTemplateExpression>,
+  path: NodePath<Identifier>,
   fileContext: IFileContext,
   options: Pick<
     StrictOptions,
@@ -390,30 +429,24 @@ export default function getTagProcessor(
   >
 ): BaseProcessor | null {
   if (!cache.has(path.node)) {
-    // Increment the index of the style we're processing
-    // This is used for slug generation to prevent collision
-    // Also used for display name if it couldn't be determined
-    const idx = getNextIndex(fileContext);
-
     const root = path.scope.getProgramParent().path;
     const { imports } = collectExportsAndImports(root, fileContext.filename);
     try {
-      const builder = getBuilderForTemplate(
+      const builder = getBuilderForIdentifier(
         path,
         imports.filter(explicitImport),
         fileContext.filename,
         options
       );
       if (builder) {
-        const [quasis, expressionValues] = collectTemplateDependencies(
-          path,
-          options.evaluate
-        );
+        // Increment the index of the style we're processing
+        // This is used for slug generation to prevent collision
+        // Also used for display name if it couldn't be determined
+        const idx = getNextIndex(fileContext);
 
         const displayName = getDisplayName(path, idx, fileContext);
 
         const processor = builder(
-          zip(quasis, expressionValues),
           displayName,
           isTagReferenced(path),
           idx,

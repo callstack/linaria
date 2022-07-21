@@ -1,13 +1,15 @@
 import type { NodePath } from '@babel/traverse';
-import type { TaggedTemplateExpression } from '@babel/types';
+import type { Identifier } from '@babel/types';
 
 import type { BaseProcessor, IFileContext } from '@linaria/tags';
 import type { StrictOptions } from '@linaria/utils';
 
 import getTagProcessor from './getTagProcessor';
 
+const processed = new WeakSet<Identifier>();
+
 const processTemplateExpression = (
-  p: NodePath<TaggedTemplateExpression>,
+  p: NodePath<Identifier>,
   fileContext: IFileContext,
   options: Pick<
     StrictOptions,
@@ -15,7 +17,12 @@ const processTemplateExpression = (
   >,
   emit: (processor: BaseProcessor) => void
 ) => {
+  if (processed.has(p.node)) return;
+
   const tagProcessor = getTagProcessor(p, fileContext, options);
+
+  processed.add(p.node);
+
   if (tagProcessor === null) return;
 
   emit(tagProcessor);

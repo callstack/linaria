@@ -61,7 +61,8 @@ export default class StyledProcessor extends BaseProcessor {
       component = value;
     }
 
-    if (!component || this.params.length > 1) {
+    // FIXME: stricter validation — component must have a template param
+    if (!component || this.params.length > 2) {
       throw new Error('Invalid usage of `styled` tag');
     }
 

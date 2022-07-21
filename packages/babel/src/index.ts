@@ -15,7 +15,6 @@ export { slugify } from '@linaria/utils';
 
 export * from './utils/collectTemplateDependencies';
 export { default as collectTemplateDependencies } from './utils/collectTemplateDependencies';
-export { default as replaceTagWithValue } from './utils/replaceTagWithValue';
 export { default as withLinariaMetadata } from './utils/withLinariaMetadata';
 export { default as Module } from './module';
 export { default as transform } from './transform';

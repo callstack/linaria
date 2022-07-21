@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { css, cx } from '../src';
 
 // $ExpectType LinariaClassName
