@@ -6,12 +6,18 @@ import type {
   StringLiteral,
 } from '@babel/types';
 
-import { BaseProcessor, ValueType, hasMeta } from '@linaria/tags';
 import type {
   Rules,
   WrappedNode,
   ValueCache,
-  ProcessorParams,
+  Params,
+  TailProcessorParams,
+} from '@linaria/tags';
+import {
+  TaggedTemplateProcessor,
+  ValueType,
+  hasMeta,
+  validateParams,
 } from '@linaria/tags';
 
 const isNotNull = <T>(x: T | null): x is T => x !== null;
@@ -32,19 +38,27 @@ const singleQuotedStringLiteral = (value: string): StringLiteral => ({
   },
 });
 
-export default class StyledProcessor extends BaseProcessor {
+export default class StyledProcessor extends TaggedTemplateProcessor {
   public component: WrappedNode;
 
   #variableIdx = 0;
 
   #variablesCache = new Map<string, string>();
 
-  constructor(...args: ProcessorParams) {
-    super(...args);
+  constructor(params: Params, ...args: TailProcessorParams) {
+    validateParams(
+      params,
+      ['tag', ['call', 'member'], 'template'],
+      'Invalid usage of `styled` tag'
+    );
+
+    const [tag, tagOp, template] = params;
+
+    super([tag, template], ...args);
 
     let component: WrappedNode | undefined;
-    const [type, value, ...rest] = this.params[0] ?? [];
-    if (type === 'call' && rest.length === 0) {
+    if (tagOp[0] === 'call' && tagOp.length === 2) {
+      const value = tagOp[1];
       if (value.kind === ValueType.FUNCTION) {
         component = 'FunctionalComponent';
       } else {
@@ -57,12 +71,11 @@ export default class StyledProcessor extends BaseProcessor {
       }
     }
 
-    if (type === 'member') {
-      component = value;
+    if (tagOp[0] === 'member') {
+      [, component] = tagOp;
     }
 
-    // FIXME: stricter validation — component must have a template param
-    if (!component || this.params.length > 2) {
+    if (!component) {
       throw new Error('Invalid usage of `styled` tag');
     }
 
@@ -151,7 +164,7 @@ export default class StyledProcessor extends BaseProcessor {
 
   protected get tagExpression(): CallExpression {
     const t = this.astService;
-    return t.callExpression(this.tagExp, [this.tagExpressionArgument]);
+    return t.callExpression(this.tag, [this.tagExpressionArgument]);
   }
 
   public override get value(): ObjectExpression {
@@ -180,6 +193,20 @@ export default class StyledProcessor extends BaseProcessor {
         ])
       ),
     ]);
+  }
+
+  public override toString(): string {
+    const res = (arg: string) => `${this.tagSourceCode()}(${arg})\`…\``;
+
+    if (typeof this.component === 'string') {
+      if (this.component === 'FunctionalComponent') {
+        return res('() => {…}');
+      }
+
+      return res(`'${this.component}'`);
+    }
+
+    return res(this.component.source);
   }
 
   protected getProps(): IProps {

@@ -1,31 +1,33 @@
 /* eslint-disable class-methods-use-this */
 import type { types as t } from '@babel/core';
-import type { SourceLocation, Expression, TemplateElement } from '@babel/types';
+import generator from '@babel/generator';
+import type {
+  Expression,
+  Identifier,
+  SourceLocation,
+  MemberExpression,
+} from '@babel/types';
 
 import type {
   ExpressionValue,
   IInterpolation,
-  IPlaceholder,
-  Param,
   Params,
-  Rules,
   Value,
   ValueCache,
   Artifact,
-  TemplateParam,
 } from './types';
 import getClassNameAndSlug from './utils/getClassNameAndSlug';
 import hasMeta from './utils/hasMeta';
-import templateProcessor from './utils/templateProcessor';
 import { isCSSable } from './utils/toCSS';
 import type { IFileContext, IOptions } from './utils/types';
+import { validateParams } from './utils/validateParams';
 
 export { Expression };
 
 export type ProcessorParams = ConstructorParameters<typeof BaseProcessor>;
-
-const isTemplateParam = (param: Param): param is TemplateParam =>
-  param[0] === 'template';
+export type TailProcessorParams = ProcessorParams extends [Params, ...infer T]
+  ? T
+  : never;
 
 export default abstract class BaseProcessor {
   public readonly artifacts: Artifact[] = [];
@@ -36,18 +38,19 @@ export default abstract class BaseProcessor {
 
   public interpolations: IInterpolation[] = [];
 
-  #placeholders: IPlaceholder[] = [];
-
   public readonly slug: string;
+
+  protected tag: Identifier | MemberExpression;
 
   protected evaluated:
     | Record<'dependencies' | 'expression', Value[]>
     | undefined;
 
   public constructor(
-    protected readonly astService: typeof t,
-    protected readonly params: Params,
-    protected readonly tagExp: Expression,
+    params: Params,
+    protected readonly astService: typeof t & {
+      addNamedImport: (name: string, source: string) => Identifier;
+    },
     public readonly location: SourceLocation | null,
     protected readonly replacer: (
       replacement: Expression,
@@ -59,6 +62,12 @@ export default abstract class BaseProcessor {
     protected readonly options: IOptions,
     protected readonly context: IFileContext
   ) {
+    validateParams(
+      params,
+      ['tag'],
+      'Unknown error: a tag param is not specified'
+    );
+
     const { className, slug } = getClassNameAndSlug(
       this.displayName,
       this.idx,
@@ -68,42 +77,15 @@ export default abstract class BaseProcessor {
 
     this.className = className;
     this.slug = slug;
+
+    [[, this.tag]] = params;
   }
 
-  public get template(): (TemplateElement | ExpressionValue)[] {
-    return this.params.find(isTemplateParam)?.[1] ?? [];
-  }
-
-  public build(values: ValueCache): Artifact[] {
-    if (this.artifacts.length > 0) {
-      // FIXME: why it was called twice?
-      throw new Error('Tag is already built');
-    }
-
-    const artifact = templateProcessor(this, this.template, values);
-    if (artifact) {
-      this.artifacts.push(['css', artifact]);
-    }
-
-    return this.artifacts;
-  }
+  public abstract build(values: ValueCache): void;
 
   public isValidValue(value: unknown): value is Value {
     return typeof value === 'function' || isCSSable(value) || hasMeta(value);
   }
-
-  /**
-   * It is called for each resolved expression in a template literal.
-   * @param node
-   * @param source
-   * @param unit
-   * @return chunk of CSS that should be added to extracted CSS
-   */
-  public abstract addInterpolation(
-    node: Expression,
-    source: string,
-    unit?: string
-  ): string;
 
   /**
    * Perform a replacement for the tag in evaluation time.
@@ -121,18 +103,10 @@ export default abstract class BaseProcessor {
    */
   public abstract doRuntimeReplacement(): void;
 
-  public abstract extractRules(
-    valueCache: ValueCache,
-    cssText: string,
-    loc?: SourceLocation | null
-  ): Rules;
-
   /**
    * A replacement for tag referenced in a template literal.
    */
   public abstract get asSelector(): string;
-
-  protected abstract get tagExpression(): Expression;
 
   /**
    * A replacement for the tag in evaluation time.
@@ -140,4 +114,16 @@ export default abstract class BaseProcessor {
    * whereas `styled` tag will be replaced with an object with metadata.
    */
   public abstract get value(): Expression;
+
+  protected tagSourceCode(): string {
+    if (this.tag.type === 'Identifier') {
+      return this.tag.name;
+    }
+
+    return generator(this.tag).code;
+  }
+
+  public toString(): string {
+    return this.tagSourceCode();
+  }
 }

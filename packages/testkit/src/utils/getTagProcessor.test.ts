@@ -1,7 +1,6 @@
 import { join } from 'path';
 
 import { parseSync } from '@babel/core';
-import generator from '@babel/generator';
 import traverse from '@babel/traverse';
 import dedent from 'dedent';
 
@@ -35,8 +34,7 @@ const run = (code: string): BaseProcessor | null => {
 
 function tagSource(processor: BaseProcessor | null): string | undefined {
   if (!processor) return undefined;
-  // @ts-expect-error tagExpression is protected field
-  return generator(processor.tagExpression).code;
+  return processor.toString();
 }
 
 describe('getTagProcessor', () => {
@@ -52,7 +50,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('renamedStyled(_exp())');
+    expect(tagSource(result)).toBe('renamedStyled(Cmp)`…`');
   });
 
   it('imported component', () => {
@@ -65,7 +63,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(_exp())');
+    expect(tagSource(result)).toBe('styled(Layout)`…`');
   });
 
   it('renamedStyled(Cmp)``', () => {
@@ -79,7 +77,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('renamedStyled(_exp())');
+    expect(tagSource(result)).toBe('renamedStyled(Cmp)`…`');
   });
 
   it('(0, react_1.styled)(Cmp)``', () => {
@@ -93,7 +91,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('react_1.styled(_exp())');
+    expect(tagSource(result)).toBe('react_1.styled(Cmp)`…`');
   });
 
   it('styled(Cmp)``', () => {
@@ -107,7 +105,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(_exp())');
+    expect(tagSource(result)).toBe('styled(Cmp)`…`');
   });
 
   it('styled(hoc(Title))``', () => {
@@ -128,7 +126,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(_exp())');
+    expect(tagSource(result)).toBe('styled(hoc(Title))`…`');
   });
 
   it('styled(() => { someLogic(); })``', () => {
@@ -145,7 +143,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(() => {})');
+    expect(tagSource(result)).toBe('styled(() => {…})`…`');
   });
 
   it('renamedStyled.div``', () => {
@@ -157,7 +155,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("renamedStyled('div')");
+    expect(tagSource(result)).toBe("renamedStyled('div')`…`");
   });
 
   it('(0, react_1.styled.div)``', () => {
@@ -169,7 +167,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("react_1.styled('div')");
+    expect(tagSource(result)).toBe("react_1.styled('div')`…`");
   });
 
   it('styled.div``', () => {
@@ -181,7 +179,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("styled('div')");
+    expect(tagSource(result)).toBe("styled('div')`…`");
   });
 
   it('styled("div")``', () => {
@@ -193,7 +191,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(_exp())');
+    expect(tagSource(result)).toBe("styled('div')`…`");
   });
 
   it('(0, core_1.css)``', () => {
@@ -205,7 +203,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('core_1.css');
+    expect(tagSource(result)).toBe('core_1.css`…`');
   });
 
   it('css``', () => {
@@ -217,7 +215,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('css');
+    expect(tagSource(result)).toBe('css`…`');
   });
 
   it('atomic css``', () => {
@@ -229,7 +227,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('css');
+    expect(tagSource(result)).toBe('css`…`');
   });
 
   it('re-imported css', () => {
@@ -241,7 +239,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('css');
+    expect(tagSource(result)).toBe('css`…`');
   });
 
   it('re-imported styled', () => {
@@ -253,7 +251,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("styled('div')");
+    expect(tagSource(result)).toBe("styled('div')`…`");
   });
 
   it('import from unknown package', () => {
@@ -276,7 +274,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("renamedStyled('div')");
+    expect(tagSource(result)).toBe("renamedStyled('div')`…`");
   });
 
   it('require and destructing', () => {
@@ -287,7 +285,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("styled('div')");
+    expect(tagSource(result)).toBe("styled('div')`…`");
   });
 
   describe('invalid usage', () => {
@@ -297,7 +295,7 @@ describe('getTagProcessor', () => {
           dedent`import { css } from "@linaria/core"; export const square = css.div\`\`;`
         );
 
-      expect(runner).toThrow('Invalid usage of `css` tag');
+      expect(runner).toThrow('Invalid usage of template tag');
     });
 
     it('css("div")``', () => {
@@ -306,7 +304,7 @@ describe('getTagProcessor', () => {
           dedent`import { css } from "@linaria/core"; export const square = css("div")\`\`;`
         );
 
-      expect(runner).toThrow('Invalid usage of `css` tag');
+      expect(runner).toThrow('Invalid usage of template tag');
     });
 
     it('styled`` tag', () => {

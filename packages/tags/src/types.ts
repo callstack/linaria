@@ -1,4 +1,9 @@
-import type { Expression, Identifier, TemplateElement } from '@babel/types';
+import type {
+  Expression,
+  Identifier,
+  TemplateElement,
+  MemberExpression,
+} from '@babel/types';
 
 export type StyledMeta = {
   __linaria: {
@@ -45,11 +50,6 @@ export type Location = {
   line: number;
 };
 
-export interface IPlaceholder {
-  id: string;
-  resolver: () => string;
-}
-
 export interface ICSSRule {
   atom?: boolean;
   className: string;
@@ -69,12 +69,16 @@ export type WrappedNode = string | { node: Identifier; source: string };
 
 export type Rules = Record<string, ICSSRule>;
 
-export type CallParam = ['call', ...ExpressionValue[]];
-export type MemberParam = ['member', string];
-export type TemplateParam = ['template', (TemplateElement | ExpressionValue)[]];
+export type TagParam = readonly ['tag', Identifier | MemberExpression];
+export type CallParam = readonly ['call', ...ExpressionValue[]];
+export type MemberParam = readonly ['member', string];
+export type TemplateParam = readonly [
+  'template',
+  (TemplateElement | ExpressionValue)[]
+];
 
-export type Param = CallParam | MemberParam | TemplateParam;
-export type Params = Param[];
+export type Param = TagParam | CallParam | MemberParam | TemplateParam;
+export type Params = readonly Param[];
 
 export type BuildCodeFrameErrorFn = <TError extends Error>(
   msg: string,
@@ -85,11 +89,6 @@ export enum ValueType {
   LAZY,
   FUNCTION,
 }
-
-export type ComponentDependency = {
-  ex: Identifier;
-  source: string;
-};
 
 export type LazyValue = {
   buildCodeFrameError: BuildCodeFrameErrorFn;

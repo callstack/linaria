@@ -6,6 +6,7 @@
   "dependencies": {
     "@babel/core": "^7.18.9",
     "@babel/generator": "^7.18.9",
+    "@babel/helper-module-imports": "^7.18.6",
     "@babel/template": "^7.18.6",
     "@babel/traverse": "^7.18.9",
     "@babel/types": "^7.18.9",

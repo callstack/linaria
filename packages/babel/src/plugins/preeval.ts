@@ -3,7 +3,7 @@
  * It works the same as main `babel/extract` preset, but do not evaluate lazy dependencies.
  */
 import type { BabelFile, NodePath, PluginObj } from '@babel/core';
-import type { TemplateElement, Identifier } from '@babel/types';
+import type { Identifier } from '@babel/types';
 
 import { createCustomDebug } from '@linaria/logger';
 import type { StrictOptions } from '@linaria/utils';
@@ -15,7 +15,7 @@ import {
 } from '@linaria/utils';
 
 import type { Core } from '../babel';
-import type { ExpressionValue, IPluginState } from '../types';
+import type { IPluginState } from '../types';
 import processTemplateExpression from '../utils/processTemplateExpression';
 
 export type PreevalOptions = Pick<
@@ -49,10 +49,6 @@ const forbiddenGlobals = new Set([
 const isBrowserGlobal = (id: NodePath<Identifier>) => {
   return forbiddenGlobals.has(id.node.name) && isGlobal(id);
 };
-
-const isLazyValue = (
-  value: ExpressionValue | TemplateElement
-): value is ExpressionValue => 'kind' in value;
 
 export default function preeval(
   babel: Core,
@@ -135,15 +131,8 @@ export default function preeval(
         dependencies: [],
       };
 
-      const expressions: Identifier[] = [];
-
-      this.processors.forEach((processor) =>
-        [
-          ...processor.template.filter(isLazyValue),
-          ...processor.dependencies,
-        ].forEach((dependency) => {
-          expressions.push(dependency.ex);
-        })
+      const expressions: Identifier[] = this.processors.flatMap((processor) =>
+        processor.dependencies.map((dependency) => dependency.ex)
       );
 
       const linariaPreval = file.path.scope.getData('__linariaPreval');

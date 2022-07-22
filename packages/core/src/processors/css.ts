@@ -1,17 +1,9 @@
-import type { Expression, SourceLocation, StringLiteral } from '@babel/types';
+import type { SourceLocation, StringLiteral } from '@babel/types';
 
-import type { ProcessorParams, Rules, ValueCache } from '@linaria/tags';
-import { BaseProcessor } from '@linaria/tags';
+import type { Rules, ValueCache } from '@linaria/tags';
+import { TaggedTemplateProcessor } from '@linaria/tags';
 
-export default class CssProcessor extends BaseProcessor {
-  constructor(...args: ProcessorParams) {
-    super(...args);
-
-    if (this.params.length !== 1 || this.params[0][0] !== 'template') {
-      throw new Error('Invalid usage of `css` tag');
-    }
-  }
-
+export default class CssProcessor extends TaggedTemplateProcessor {
   // eslint-disable-next-line class-methods-use-this
   public override addInterpolation(node: unknown, source: string): string {
     throw new Error(
@@ -48,10 +40,6 @@ export default class CssProcessor extends BaseProcessor {
 
   public override get asSelector(): string {
     return this.className;
-  }
-
-  protected override get tagExpression(): Expression {
-    return this.tagExp;
   }
 
   public override get value(): StringLiteral {

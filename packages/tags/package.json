@@ -4,6 +4,7 @@
   "version": "4.0.0-beta.1",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
+    "@babel/generator": "^7.18.9",
     "@linaria/logger": "workspace:^",
     "@linaria/utils": "workspace:^"
   },
@@ -11,6 +12,7 @@
     "@babel/traverse": "^7.18.9",
     "@babel/types": "^7.18.9",
     "@types/babel__core": "^7.1.19",
+    "@types/babel__generator": "^7.6.4",
     "@types/babel__traverse": "^7.17.1",
     "@types/node": "^17.0.39"
   },

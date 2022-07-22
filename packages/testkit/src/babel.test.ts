@@ -2424,4 +2424,27 @@ describe('strategy shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
+
+  it('should process griffel makeStyles', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { makeStyles } from '@linaria/griffel';
+
+        export const useStyles = makeStyles({
+          root: {
+            display: 'flex',
+
+            ':hover': { color: 'red' },
+            ':focus': { ':hover': { color: 'blue' } },
+
+            '& .foo': { ':hover': { color: 'green' } },
+          },
+        });
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 });

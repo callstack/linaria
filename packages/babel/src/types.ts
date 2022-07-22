@@ -8,7 +8,6 @@ import type { BaseProcessor } from '@linaria/tags';
 import type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
 
 export type {
-  ComponentDependency,
   ExpressionValue,
   FunctionValue,
   JSONArray,

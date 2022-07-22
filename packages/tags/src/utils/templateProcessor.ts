@@ -6,7 +6,7 @@
 
 import type { TemplateElement, SourceLocation } from '@babel/types';
 
-import type BaseProcessor from '../BaseProcessor';
+import type TaggedTemplateProcessor from '../TaggedTemplateProcessor';
 import type {
   ExpressionValue,
   ValueCache,
@@ -24,7 +24,7 @@ import { units } from './units';
 const unitRegex = new RegExp(`^(?:${units.join('|')})\\b`);
 
 export default function templateProcessor(
-  tagProcessor: BaseProcessor,
+  tagProcessor: TaggedTemplateProcessor,
   [...template]: (TemplateElement | ExpressionValue)[],
   valueCache: ValueCache
 ): [rules: Rules, sourceMapReplacements: Replacements] | null {

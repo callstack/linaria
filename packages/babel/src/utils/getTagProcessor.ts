@@ -2,12 +2,18 @@ import { readFileSync } from 'fs';
 import { basename, dirname, join } from 'path';
 
 import { types as t } from '@babel/core';
+import { addNamed } from '@babel/helper-module-imports';
 import type { NodePath } from '@babel/traverse';
-import type { Expression, SourceLocation, Identifier } from '@babel/types';
+import type {
+  Expression,
+  SourceLocation,
+  Identifier,
+  MemberExpression,
+} from '@babel/types';
 import findUp from 'find-up';
 
 import { BaseProcessor } from '@linaria/tags';
-import type { Params, IFileContext } from '@linaria/tags';
+import type { Param, Params, IFileContext } from '@linaria/tags';
 import type { IImport, StrictOptions } from '@linaria/utils';
 import {
   collectExportsAndImports,
@@ -22,9 +28,8 @@ import collectTemplateDependencies, {
 import getSource from './getSource';
 
 type BuilderArgs = ConstructorParameters<typeof BaseProcessor> extends [
-  typeof t,
   Params,
-  Expression,
+  typeof t,
   SourceLocation | null,
   (replacement: Expression, isPure: boolean) => void,
   ...infer T
@@ -154,7 +159,7 @@ function getProcessorForIdentifier(
     StrictOptions,
     'classNameSlug' | 'displayName' | 'evaluate' | 'tagResolver'
   >
-): [ProcessorClass, NodePath] | [null, null] {
+): [ProcessorClass, NodePath<Identifier | MemberExpression>] | [null, null] {
   const pathBinding = path.scope.getBinding(path.node.name);
   if (!pathBinding) {
     // It's not a binding, so it's not a tag
@@ -165,28 +170,30 @@ function getProcessorForIdentifier(
 
   // FIXME: can be simplified
   const relatedImports = imports
-    .map((i): [IImport, NodePath | null] | null => {
-      const { local } = i;
+    .map(
+      (i): [IImport, NodePath<Identifier | MemberExpression> | null] | null => {
+        const { local } = i;
 
-      if (local === path) {
-        return [i, null];
-      }
+        if (local === path) {
+          return [i, null];
+        }
 
-      if (!local.isIdentifier()) {
-        if (path.isDescendant(local)) {
-          return [i, local];
+        if (!local.isIdentifier()) {
+          if (path.isDescendant(local)) {
+            return [i, local];
+          }
+
+          return null;
+        }
+
+        const binding = local.scope.getBinding(local.node.name);
+        if (pathBinding === binding) {
+          return [i, path];
         }
 
         return null;
       }
-
-      const binding = local.scope.getBinding(local.node.name);
-      if (pathBinding === binding) {
-        return [i, path];
-      }
-
-      return null;
-    })
+    )
     .filter(isNotNull)
     .filter((i) => i[1] === null || i[1].isExpression());
 
@@ -196,13 +203,18 @@ function getProcessorForIdentifier(
 
   const [Processor = null, tagPath = null] =
     relatedImports
-      .map(([imp, p]): [ProcessorClass | null, NodePath | null] => {
-        const source = tagResolver(imp.source, imp.imported);
-        const processor = source
-          ? getProcessorFromFile(source)
-          : getProcessorFromPackage(imp.source, imp.imported, filename);
-        return [processor, p];
-      })
+      .map(
+        ([imp, p]): [
+          ProcessorClass | null,
+          NodePath<Identifier | MemberExpression> | null
+        ] => {
+          const source = tagResolver(imp.source, imp.imported);
+          const processor = source
+            ? getProcessorFromFile(source)
+            : getProcessorFromPackage(imp.source, imp.imported, filename);
+          return [processor, p];
+        }
+      )
       .find(([proc]) => proc) ?? [];
 
   return Processor === null || tagPath === null
@@ -230,7 +242,7 @@ function getBuilderForIdentifier(
     return null;
   }
 
-  const params: Params = [];
+  const params: Param[] = [['tag', tagPath.node]];
   let prev: NodePath = tagPath;
   let current: NodePath | null = tagPath.parentPath;
   while (current && current !== path) {
@@ -306,11 +318,16 @@ function getBuilderForIdentifier(
     });
   };
 
+  const astService = {
+    ...t,
+    addNamedImport: (name: string, importedSource: string) =>
+      addNamed(path, name, importedSource),
+  };
+
   return (...args: BuilderArgs) =>
     new Processor(
-      t,
       params,
-      (tagPath as NodePath<Expression>).node,
+      astService,
       tagPath.node.loc ?? null,
       replacer,
       ...args
