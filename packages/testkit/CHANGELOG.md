@@ -1,6 +1,6 @@
 # @linaria/testkit
 
-## 3.0.0
+## 4.0.0
 
 ### Major Changes
 
@@ -33,10 +33,10 @@
 - Updated dependencies [782deb6f]
 - Updated dependencies [17c83e34]
 - Updated dependencies [f0cddda4]
-  - @linaria/babel-preset@3.0.0
-  - @linaria/extractor@3.0.0
-  - @linaria/react@3.0.0
-  - @linaria/shaker@3.0.0
+  - @linaria/babel-preset@4.0.0
+  - @linaria/extractor@4.0.0
+  - @linaria/react@4.0.0
+  - @linaria/shaker@4.0.0
   - @linaria/tags@4.0.0
 
 ## 3.0.0-beta.21

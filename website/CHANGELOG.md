@@ -1,6 +1,6 @@
 # Change Log
 
-## 3.0.0
+## 4.0.0
 
 ### Major Changes
 
@@ -23,10 +23,10 @@
 - Updated dependencies [3111ca8d]
 - Updated dependencies [17c83e34]
 - Updated dependencies [f0cddda4]
-  - @linaria/atomic@3.0.0
-  - @linaria/core@3.0.0
-  - @linaria/react@3.0.0
-  - @linaria/server@3.0.0
+  - @linaria/atomic@4.0.0
+  - @linaria/core@4.0.0
+  - @linaria/react@4.0.0
+  - @linaria/server@4.0.0
 
 ## 3.0.0-beta.21
 

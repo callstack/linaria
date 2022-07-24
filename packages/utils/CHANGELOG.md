@@ -1,6 +1,6 @@
 # Change Log
 
-## 3.0.0
+## 4.0.0
 
 ### Major Changes
 
@@ -16,7 +16,7 @@
 - Updated dependencies [8be5650d]
 - Updated dependencies [bc0cbeea]
 - Updated dependencies [ea41d440]
-  - @linaria/logger@3.0.0
+  - @linaria/logger@4.0.0
 
 ## 3.0.0-beta.20
 

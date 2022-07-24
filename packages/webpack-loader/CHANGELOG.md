@@ -1,6 +1,6 @@
 # Change Log
 
-## 3.0.0
+## 4.0.0
 
 ### Major Changes
 
@@ -16,8 +16,8 @@
 - Updated dependencies [8be5650d]
 - Updated dependencies [bc0cbeea]
 - Updated dependencies [ea41d440]
-  - @linaria/webpack5-loader@3.0.0
-  - @linaria/webpack4-loader@3.0.0
+  - @linaria/webpack5-loader@4.0.0
+  - @linaria/webpack4-loader@4.0.0
 
 ## 3.0.0-beta.21
 
