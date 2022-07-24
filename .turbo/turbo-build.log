@@ -27,9 +27,9 @@ linaria-website:build:   asset modules 126 bytes (javascript) 63.5 KiB (asset)
 linaria-website:build:     [1m./assets/linaria-logo.svg[39m[22m 42 bytes (javascript) 2.88 KiB (asset) [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 linaria-website:build:     [1m./assets/code-sample-v4.png[39m[22m 42 bytes (javascript) 59.7 KiB (asset) [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 linaria-website:build:     [1m./assets/linaria-logomark.svg[39m[22m 42 bytes (javascript) 939 bytes (asset) [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m [1m[32m[build time executed][39m[22m
-linaria-website:build: webpack 5.73.0 compiled [1m[32msuccessfully[39m[22m in 4686 ms
-linaria-website:build: Done in 5.47s.
+linaria-website:build: webpack 5.73.0 compiled [1m[32msuccessfully[39m[22m in 11211 ms
+linaria-website:build: Done in 13.01s.
 linaria-website:build: yarn run v1.22.19
 linaria-website:build: $ cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
-linaria-website:build: Successfully compiled 11 files with Babel (1080ms).
-linaria-website:build: Done in 1.38s.
+linaria-website:build: Successfully compiled 11 files with Babel (1899ms).
+linaria-website:build: Done in 2.51s.
