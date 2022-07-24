@@ -3,7 +3,6 @@
 '@linaria/babel-preset': patch
 '@linaria/cli': patch
 '@linaria/core': patch
-'@linaria/preeval': patch
 '@linaria/react': patch
 '@linaria/testkit': patch
 ---

@@ -8,7 +8,6 @@
 '@linaria/babel-plugin-interop': patch
 'linaria': patch
 '@linaria/logger': patch
-'@linaria/preeval': patch
 '@linaria/react': patch
 '@linaria/rollup': patch
 '@linaria/server': patch
