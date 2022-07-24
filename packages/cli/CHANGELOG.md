@@ -1,5 +1,36 @@
 # Change Log
 
+## 3.0.0
+
+### Major Changes
+
+- bc0cbeea: A completely new async mode with native support for Vite, Rollup, esbuild and Webpack resolvers.
+
+  BREAKING CHANGES: Despite the fact, that it should be fully compatible with 3.0 and 2.0 branches, the new version of styles evaluator can have some serious bugs which can make your project unbuildable (however, since there is no runtime, if the build is finished successfully, everything will continue work as it was on 2.0 and 3.0). If you face some problems please let us know and we will fix it as soon as possible.
+
+### Patch Changes
+
+- 9a50c1c1: Option `transform` was required even if option `modules` was not specified.
+- 8be5650d: The repo has been migrated to PNPM and Turborepo
+- ea41d440: New package @linaria/tags that contains all abstract logic for tags processors.
+- 9a50c1c1: Linaria now removes all unused css-related code from the runtime.
+- ad8ea3b0: CLI now supports full inline transformations instead of just extracting styles. With the new flag --transform, Linaria CLI replaces template tags with their runtime representations.
+- 782deb6f: Pass source-root option from CLI to babel-preset
+- Updated dependencies [8be5650d]
+- Updated dependencies [bc0cbeea]
+- Updated dependencies [b8515929]
+- Updated dependencies [17c83e34]
+- Updated dependencies [ea41d440]
+- Updated dependencies [592b89b5]
+- Updated dependencies [bc0cbeea]
+- Updated dependencies [9a50c1c1]
+- Updated dependencies [4cdf0315]
+- Updated dependencies [782deb6f]
+- Updated dependencies [17c83e34]
+- Updated dependencies [f0cddda4]
+  - @linaria/babel-preset@3.0.0
+  - @linaria/utils@3.0.0
+
 ## 3.0.0-beta.21
 
 ### Patch Changes

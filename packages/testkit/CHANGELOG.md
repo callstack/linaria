@@ -1,5 +1,44 @@
 # @linaria/testkit
 
+## 3.0.0
+
+### Major Changes
+
+- bc0cbeea: A completely new async mode with native support for Vite, Rollup, esbuild and Webpack resolvers.
+
+  BREAKING CHANGES: Despite the fact, that it should be fully compatible with 3.0 and 2.0 branches, the new version of styles evaluator can have some serious bugs which can make your project unbuildable (however, since there is no runtime, if the build is finished successfully, everything will continue work as it was on 2.0 and 3.0). If you face some problems please let us know and we will fix it as soon as possible.
+
+### Patch Changes
+
+- 8be5650d: The repo has been migrated to PNPM and Turborepo
+- 17c83e34: Fix for the case when `styled` wraps an imported component.
+- ea41d440: New package @linaria/tags that contains all abstract logic for tags processors.
+- 592b89b5: Fix for broken object interpolation (#995)
+- 9a50c1c1: Linaria now removes all unused css-related code from the runtime.
+- 4cdf0315: Tagged template-specific logic has been moved from `BaseProcessor` to `TaggedTemplateProcessor`. `BaseProcessor` now can be used to define any type of expressions for zero-runtime transformations, such as `makeStyles` from `@griffel/react`.
+- 17c83e34: Aliases for environments without the support of `exports` in package.json.
+- f0cddda4: Extends `BaseProcessor` to support tags other than tagged templates, such as `makeStyles` from `@griffel/react`.
+- Updated dependencies [8be5650d]
+- Updated dependencies [bc0cbeea]
+- Updated dependencies [609d79ba]
+- Updated dependencies [b8515929]
+- Updated dependencies [17c83e34]
+- Updated dependencies [ea41d440]
+- Updated dependencies [592b89b5]
+- Updated dependencies [bc0cbeea]
+- Updated dependencies [9a50c1c1]
+- Updated dependencies [4cdf0315]
+- Updated dependencies [12d35cb9]
+- Updated dependencies [3111ca8d]
+- Updated dependencies [782deb6f]
+- Updated dependencies [17c83e34]
+- Updated dependencies [f0cddda4]
+  - @linaria/babel-preset@3.0.0
+  - @linaria/extractor@3.0.0
+  - @linaria/react@3.0.0
+  - @linaria/shaker@3.0.0
+  - @linaria/tags@4.0.0
+
 ## 3.0.0-beta.21
 
 ### Patch Changes
