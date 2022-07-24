@@ -1,32 +1,35 @@
-linaria-website:build: cache hit, replaying output dbb11e549d865ccc
+linaria-website:build: cache hit, replaying output 1fe366db629919bd
 linaria-website:build: 
-linaria-website:build: > linaria-website@3.0.0-beta.21 build /Users/anber/Sources/linaria/website
+linaria-website:build: > linaria-website@3.0.0-beta.21 build /home/runner/work/linaria/linaria/website
 linaria-website:build: > yarn build:client && yarn build:server
 linaria-website:build: 
-linaria-website:build: yarn run v1.22.17
+linaria-website:build: yarn run v1.22.19
 linaria-website:build: $ cross-env NODE_ENV=production webpack
-linaria-website:build: assets by status 82.6 KiB [cached] 3 assets
-linaria-website:build: assets by status 142 KiB [compared for emit]
-linaria-website:build:   asset app.bundle.js 139 KiB [compared for emit] [minimized] (name: app) 2 related assets
-linaria-website:build:   asset styles.css 2.58 KiB [compared for emit] (name: app)
-linaria-website:build: Entrypoint app 142 KiB (419 KiB) = styles.css 2.58 KiB app.bundle.js 139 KiB 4 auxiliary assets
-linaria-website:build: orphan modules 17.2 KiB (javascript) 4.68 KiB (runtime) [orphan] 37 modules
+linaria-website:build: assets by info 63.5 KiB [1m[32m[immutable][39m[22m
+linaria-website:build:   asset [1m[32mc9d5cf961634b7622bef.png[39m[22m 59.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/code-sample-v4.png] (auxiliary name: app)
+linaria-website:build:   asset [1m[32m62f658e6bb6e95783a3b.svg[39m[22m 2.88 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/linaria-logo.svg] (auxiliary name: app)
+linaria-website:build:   asset [1m[32mf5a906f902f5923432cc.svg[39m[22m 939 bytes [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/linaria-logomark.svg] (auxiliary name: app)
+linaria-website:build: assets by chunk 142 KiB (name: app)
+linaria-website:build:   asset [1m[32mapp.bundle.js[39m[22m 139 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: app) 2 related assets
+linaria-website:build:   asset [1m[32mstyles.css[39m[22m 2.63 KiB [1m[32m[emitted][39m[22m (name: app)
+linaria-website:build: Entrypoint [1mapp[39m[22m 142 KiB (400 KiB) = [1m[32mstyles.css[39m[22m 2.63 KiB [1m[32mapp.bundle.js[39m[22m 139 KiB 4 auxiliary assets
+linaria-website:build: orphan modules 17.3 KiB (javascript) 4.68 KiB (runtime) [1m[33m[orphan][39m[22m 37 modules
 linaria-website:build: runtime modules 703 bytes 4 modules
-linaria-website:build: cacheable modules 162 KiB (javascript) 2.61 KiB (css/mini-extract) 82.6 KiB (asset)
+linaria-website:build: cacheable modules 162 KiB (javascript) 2.66 KiB (css/mini-extract) 63.5 KiB (asset)
 linaria-website:build:   javascript modules 162 KiB
-linaria-website:build:     modules by path ../ 153 KiB 14 modules
-linaria-website:build:     modules by path ./src/ 8.96 KiB 12 modules
-linaria-website:build:   css modules 2.61 KiB
-linaria-website:build:     modules by path ./src/components/*.jsx 2.24 KiB 3 modules
-linaria-website:build:     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/index.jsx 311 bytes [built] [code generated]
-linaria-website:build:     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/components/Container.js 60 bytes [built] [code generated]
-linaria-website:build:   asset modules 126 bytes (javascript) 82.6 KiB (asset)
-linaria-website:build:     ./assets/linaria-logo.svg 42 bytes (javascript) 2.88 KiB (asset) [built] [code generated]
-linaria-website:build:     ./assets/code-sample.png 42 bytes (javascript) 78.8 KiB (asset) [built] [code generated]
-linaria-website:build:     ./assets/linaria-logomark.svg 42 bytes (javascript) 939 bytes (asset) [built] [code generated] [build time executed]
-linaria-website:build: webpack 5.73.0 compiled successfully in 2105 ms
-linaria-website:build: Done in 3.73s.
-linaria-website:build: yarn run v1.22.17
+linaria-website:build:     modules by path [1m../[39m[22m 153 KiB 14 modules
+linaria-website:build:     modules by path [1m./src/[39m[22m 8.97 KiB 12 modules
+linaria-website:build:   css modules 2.66 KiB
+linaria-website:build:     modules by path [1m./src/components/*.jsx[39m[22m 2.3 KiB 3 modules
+linaria-website:build:     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/index.jsx[39m[22m 311 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+linaria-website:build:     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Container.js[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+linaria-website:build:   asset modules 126 bytes (javascript) 63.5 KiB (asset)
+linaria-website:build:     [1m./assets/linaria-logo.svg[39m[22m 42 bytes (javascript) 2.88 KiB (asset) [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+linaria-website:build:     [1m./assets/code-sample-v4.png[39m[22m 42 bytes (javascript) 59.7 KiB (asset) [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+linaria-website:build:     [1m./assets/linaria-logomark.svg[39m[22m 42 bytes (javascript) 939 bytes (asset) [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m [1m[32m[build time executed][39m[22m
+linaria-website:build: webpack 5.73.0 compiled [1m[32msuccessfully[39m[22m in 4686 ms
+linaria-website:build: Done in 5.47s.
+linaria-website:build: yarn run v1.22.19
 linaria-website:build: $ cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
-linaria-website:build: Successfully compiled 11 files with Babel (479ms).
-linaria-website:build: Done in 1.13s.
+linaria-website:build: Successfully compiled 11 files with Babel (1080ms).
+linaria-website:build: Done in 1.38s.
