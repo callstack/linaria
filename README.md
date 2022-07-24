@@ -31,6 +31,7 @@ Zero-runtime CSS in JS library.
 - **Lint your CSS** in JS with [stylelint](https://github.com/stylelint/stylelint)
 - Use **JavaScript for logic**, no CSS preprocessor needed
 - Optionally use any **CSS preprocessor** such as Sass or PostCSS
+- Supports **atomic styles** with `@linaria/atomic`
 
 **[Why use Linaria](/docs/BENEFITS.md)**
 
@@ -257,7 +258,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://lcs.sh"><img src="https://avatars1.githubusercontent.com/u/1909761?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Lucas</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=AgtLucas" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/pronevich"><img src="https://avatars0.githubusercontent.com/u/680439?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Alexey Pronevich</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=pronevich" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/wojteg1337"><img src="https://avatars3.githubusercontent.com/u/18573330?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Wojtek Szafraniec</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=wojteg1337" title="Code">💻</a></td>
-    <td align="center"><a href="http://twitter.com/anber_ru"><img src="https://avatars3.githubusercontent.com/u/148258?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Anton Evzhakov</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=Anber" title="Code">💻</a> <a href="#ideas-Anber" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/callstack/linaria/commits?author=Anber" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://twitter.com/anber_dev"><img src="https://avatars3.githubusercontent.com/u/148258?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Anton Evzhakov</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=Anber" title="Code">💻</a> <a href="#ideas-Anber" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/callstack/linaria/commits?author=Anber" title="Documentation">📖</a></td>
   </tr>
   <tr>
     <td align="center"><a href="https://twitter.com/tushkiz"><img src="https://avatars1.githubusercontent.com/u/1854763?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tushar Sonawane</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=Tushkiz" title="Documentation">📖</a> <a href="#example-Tushkiz" title="Examples">💡</a></td>
