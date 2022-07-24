@@ -67,7 +67,7 @@
     "clean": "del 'packages/*/{coverage,esm,lib,types,tsconfig.tsbuildinfo}'",
     "lint": "eslint --ext .js,.ts,.tsx .",
     "prepare": "turbo run build --output-logs=new-only",
-    "release": "release-it",
+    "release": "pnpm run prepare && pnpm changeset publish",
     "sp:check": "syncpack",
     "sp:fix": "syncpack format && syncpack fix-mismatches",
     "sp:format": "syncpack format",
