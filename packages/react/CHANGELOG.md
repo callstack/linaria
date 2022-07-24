@@ -19,9 +19,6 @@
 - Updated dependencies [8be5650d]
   - @linaria/core@3.0.0-beta.20
 
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
-
 # [3.0.0-beta.19](https://github.com/callstack/linaria/compare/v3.0.0-beta.18...v3.0.0-beta.19) (2022-06-03)
 
 ### Bug Fixes

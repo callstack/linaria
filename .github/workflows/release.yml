@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+          run_install: false
+
+      - name: Setup Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: 'pnpm'
+
+      - name: Install and prepare
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies
+
+      - name: Create Release Pull Request
+        uses: changesets/action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

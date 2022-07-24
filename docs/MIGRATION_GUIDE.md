@@ -1,6 +1,6 @@
 # Migration Guide
 
-# 3.x from 2.x
+# 4.x, 3.x from 2.x
 
 This release was mostly a refactor to [split into more packages](https://github.com/callstack/linaria/pull/687/).
 
@@ -11,7 +11,7 @@ All these package imports in code need to be updated:
 | Old | New
 | --- | ---
 |linaria | @linaria/core
-|linaria/loader | @linaria/webpack-loader
+|linaria/loader | @linaria/webpack4-loader, @linaria/webpack5-loader
 |linaria/react | @linaria/react
 |linaria/rollup | @linaria/rollup
 |linaria/server | @linaria/server

@@ -3,7 +3,7 @@ import React from 'react';
 import { media } from '../styles/utils';
 import Container from './Container';
 
-import codeSample from '../../assets/code-sample.png';
+import codeSample from '../../assets/code-sample-v4.png';
 import linariaLogomark from '../../assets/linaria-logomark.svg';
 
 export default function Hero() {
@@ -111,8 +111,11 @@ const CodeSample = styled.img`
   width: 100%;
   height: auto;
   margin: 64px 24px;
+  padding: 20px;
+  border-radius: 5px;
   max-width: calc(100% - 48px);
   box-shadow: 3px 3px 32px rgba(0, 0, 0, 0.32);
+  background-color: #272727;
 
   ${media.large} {
     margin: 24px;
