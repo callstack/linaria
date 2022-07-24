@@ -22,6 +22,7 @@
     "@babel/types": "^7.18.9",
     "@linaria/atomic": "workspace:^",
     "@linaria/core": "workspace:^",
+    "@linaria/griffel": "workspace:^",
     "@linaria/logger": "workspace:^",
     "@linaria/utils": "workspace:^",
     "@types/babel__core": "^7.1.19",

@@ -1,23 +1,26 @@
 {
-  "name": "@linaria/server",
+  "name": "@linaria/griffel",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "3.0.0-beta.20",
+  "version": "3.0.0-beta.21",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
-    "postcss": "^8.3.11"
+    "@griffel/core": "^1.5.0",
+    "@linaria/logger": "workspace:^",
+    "@linaria/tags": "workspace:^",
+    "@linaria/utils": "workspace:^",
+    "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
-    "@types/dedent": "^0.7.0",
-    "dedent": "^0.7.0",
-    "prettier": "^2.7.1"
+    "@babel/types": "^7.18.9"
   },
   "engines": {
     "node": "^12.16.0 || >=13.7.0"
   },
   "files": [
-    "types/",
+    "esm/",
     "lib/",
-    "esm/"
+    "processors/",
+    "types/"
   ],
   "homepage": "https://github.com/callstack/linaria#readme",
   "keywords": [
@@ -28,6 +31,11 @@
     "styled-components"
   ],
   "license": "MIT",
+  "linaria": {
+    "tags": {
+      "makeStyles": "./lib/processors/makeStyles.js"
+    }
+  },
   "main": "lib/index.js",
   "module": "esm/index.js",
   "publishConfig": {
@@ -42,5 +50,6 @@
     "typecheck": "tsc --noEmit --composite false",
     "watch": "npm run build --watch"
   },
-  "types": "types"
+  "sideEffects": false,
+  "types": "types/index.d.ts"
 }

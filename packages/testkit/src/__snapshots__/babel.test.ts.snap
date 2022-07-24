@@ -1858,6 +1858,32 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker should process griffel makeStyles 1`] = `
+"import { __styles as _styles } from \\"@griffel/react\\";
+export const useStyles = /*#__PURE__*/_styles({
+  root: {
+    mc9l5x: \\"f22iagw\\",
+    Bi91k9c: \\"faf35ka\\",
+    Bb9khzn: \\"f17t1d3d\\",
+    Btk3f3y: \\"fh8e7tb\\"
+  }
+}, {
+  d: [\\".f22iagw{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}\\", \\".fh8e7tb .foo:hover{color:green;}\\"],
+  h: [\\".faf35ka:hover{color:red;}\\"],
+  f: [\\".f17t1d3d:focus:hover{color:blue;}\\"]
+});"
+`;
+
+exports[`strategy shaker should process griffel makeStyles 2`] = `
+
+CSS:
+
+
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker should work with String and Number object 1`] = `"export const style = \\"style_s13jq05\\";"`;
 
 exports[`strategy shaker should work with String and Number object 2`] = `
