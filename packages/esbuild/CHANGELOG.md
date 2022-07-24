@@ -14,17 +14,6 @@
 - ea41d440: New package @linaria/tags that contains all abstract logic for tags processors.
 - 0d67095c: Fix for broken source maps in the esbuild plugin
 - 1cbd27dd: Fix for regression from #955 that broke all imports.
-- Updated dependencies [8be5650d]
-- Updated dependencies [bc0cbeea]
-- Updated dependencies [b8515929]
-- Updated dependencies [17c83e34]
-- Updated dependencies [ea41d440]
-- Updated dependencies [592b89b5]
-- Updated dependencies [bc0cbeea]
-- Updated dependencies [9a50c1c1]
-- Updated dependencies [4cdf0315]
-- Updated dependencies [782deb6f]
-- Updated dependencies [17c83e34]
 - Updated dependencies [f0cddda4]
   - @linaria/babel-preset@4.0.0
   - @linaria/utils@4.0.0
@@ -34,7 +23,6 @@
 ### Patch Changes
 
 - 1cbd27dd: Fix for regression from #955 that broke all imports.
-- Updated dependencies [17c83e34]
 - Updated dependencies [17c83e34]
   - @linaria/babel-preset@3.0.0-beta.21
 

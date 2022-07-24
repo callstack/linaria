@@ -12,16 +12,6 @@
 
 - 8be5650d: The repo has been migrated to PNPM and Turborepo
 - ea41d440: New package @linaria/tags that contains all abstract logic for tags processors.
-- Updated dependencies [8be5650d]
-- Updated dependencies [bc0cbeea]
-- Updated dependencies [17c83e34]
-- Updated dependencies [ea41d440]
-- Updated dependencies [592b89b5]
-- Updated dependencies [bc0cbeea]
-- Updated dependencies [9a50c1c1]
-- Updated dependencies [4cdf0315]
-- Updated dependencies [782deb6f]
-- Updated dependencies [17c83e34]
 - Updated dependencies [f0cddda4]
   - @linaria/babel-preset@4.0.0
   - @linaria/logger@4.0.0
@@ -30,7 +20,6 @@
 
 ### Patch Changes
 
-- Updated dependencies [17c83e34]
 - Updated dependencies [17c83e34]
   - @linaria/babel-preset@3.0.0-beta.21
 

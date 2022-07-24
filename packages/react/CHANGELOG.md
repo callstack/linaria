@@ -19,14 +19,6 @@
 - 3111ca8d: beta.19 broke prop interploation in some enviroments. Fixed. (fix #981)
 - 17c83e34: Aliases for environments without the support of `exports` in package.json.
 - f0cddda4: Extends `BaseProcessor` to support tags other than tagged templates, such as `makeStyles` from `@griffel/react`.
-- Updated dependencies [8be5650d]
-- Updated dependencies [bc0cbeea]
-- Updated dependencies [ea41d440]
-- Updated dependencies [9a50c1c1]
-- Updated dependencies [4cdf0315]
-- Updated dependencies [12d35cb9]
-- Updated dependencies [f726eb3b]
-- Updated dependencies [17c83e34]
 - Updated dependencies [f0cddda4]
   - @linaria/core@4.0.0
   - @linaria/tags@4.0.0
@@ -37,7 +29,6 @@
 
 - 609d79ba: Generic parameters of wrapped components had been missed in some cases.
 - 17c83e34: Aliases for environments without the support of `exports` in package.json.
-- Updated dependencies [f726eb3b]
 - Updated dependencies [17c83e34]
   - @linaria/core@3.0.0-beta.21
 

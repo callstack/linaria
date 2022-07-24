@@ -20,15 +20,6 @@
 - 782deb6f: Pass source-root option from CLI to babel-preset
 - 17c83e34: Aliases for environments without the support of `exports` in package.json.
 - f0cddda4: Extends `BaseProcessor` to support tags other than tagged templates, such as `makeStyles` from `@griffel/react`.
-- Updated dependencies [8be5650d]
-- Updated dependencies [bc0cbeea]
-- Updated dependencies [b8515929]
-- Updated dependencies [ea41d440]
-- Updated dependencies [9a50c1c1]
-- Updated dependencies [4cdf0315]
-- Updated dependencies [12d35cb9]
-- Updated dependencies [f726eb3b]
-- Updated dependencies [17c83e34]
 - Updated dependencies [f0cddda4]
   - @linaria/core@4.0.0
   - @linaria/logger@4.0.0
@@ -41,7 +32,6 @@
 ### Patch Changes
 
 - 17c83e34: Fix for the case when `styled` wraps an imported component.
-- Updated dependencies [f726eb3b]
 - Updated dependencies [17c83e34]
   - @linaria/core@3.0.0-beta.21
 

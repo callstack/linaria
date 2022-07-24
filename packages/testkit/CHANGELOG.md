@@ -18,20 +18,6 @@
 - 4cdf0315: Tagged template-specific logic has been moved from `BaseProcessor` to `TaggedTemplateProcessor`. `BaseProcessor` now can be used to define any type of expressions for zero-runtime transformations, such as `makeStyles` from `@griffel/react`.
 - 17c83e34: Aliases for environments without the support of `exports` in package.json.
 - f0cddda4: Extends `BaseProcessor` to support tags other than tagged templates, such as `makeStyles` from `@griffel/react`.
-- Updated dependencies [8be5650d]
-- Updated dependencies [bc0cbeea]
-- Updated dependencies [609d79ba]
-- Updated dependencies [b8515929]
-- Updated dependencies [17c83e34]
-- Updated dependencies [ea41d440]
-- Updated dependencies [592b89b5]
-- Updated dependencies [bc0cbeea]
-- Updated dependencies [9a50c1c1]
-- Updated dependencies [4cdf0315]
-- Updated dependencies [12d35cb9]
-- Updated dependencies [3111ca8d]
-- Updated dependencies [782deb6f]
-- Updated dependencies [17c83e34]
 - Updated dependencies [f0cddda4]
   - @linaria/babel-preset@4.0.0
   - @linaria/extractor@4.0.0
@@ -44,8 +30,6 @@
 ### Patch Changes
 
 - 17c83e34: Aliases for environments without the support of `exports` in package.json.
-- Updated dependencies [609d79ba]
-- Updated dependencies [17c83e34]
 - Updated dependencies [17c83e34]
   - @linaria/react@3.0.0-beta.21
   - @linaria/babel-preset@3.0.0-beta.21
@@ -58,7 +42,6 @@
 ### Patch Changes
 
 - 8be5650d: The repo has been migrated to PNPM and Turborepo
-- Updated dependencies [8be5650d]
 - Updated dependencies
   - @linaria/babel-preset@3.0.0-beta.20
   - @linaria/extractor@3.0.0-beta.20

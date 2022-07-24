@@ -16,17 +16,6 @@
 - 9a50c1c1: Linaria now removes all unused css-related code from the runtime.
 - ad8ea3b0: CLI now supports full inline transformations instead of just extracting styles. With the new flag --transform, Linaria CLI replaces template tags with their runtime representations.
 - 782deb6f: Pass source-root option from CLI to babel-preset
-- Updated dependencies [8be5650d]
-- Updated dependencies [bc0cbeea]
-- Updated dependencies [b8515929]
-- Updated dependencies [17c83e34]
-- Updated dependencies [ea41d440]
-- Updated dependencies [592b89b5]
-- Updated dependencies [bc0cbeea]
-- Updated dependencies [9a50c1c1]
-- Updated dependencies [4cdf0315]
-- Updated dependencies [782deb6f]
-- Updated dependencies [17c83e34]
 - Updated dependencies [f0cddda4]
   - @linaria/babel-preset@4.0.0
   - @linaria/utils@4.0.0
@@ -36,7 +25,6 @@
 ### Patch Changes
 
 - ad8ea3b0: CLI now supports full inline transformations instead of just extracting styles. With the new flag --transform, Linaria CLI replaces template tags with their runtime representations.
-- Updated dependencies [17c83e34]
 - Updated dependencies [17c83e34]
   - @linaria/babel-preset@3.0.0-beta.21
 

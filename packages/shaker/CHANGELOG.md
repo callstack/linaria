@@ -13,9 +13,6 @@
 - 8be5650d: The repo has been migrated to PNPM and Turborepo
 - b8515929: In some cases, the shaker mistakenly removed assignment expressions. Fixes #1008.
 - ea41d440: New package @linaria/tags that contains all abstract logic for tags processors.
-- Updated dependencies [8be5650d]
-- Updated dependencies [bc0cbeea]
-- Updated dependencies [b8515929]
 - Updated dependencies [ea41d440]
   - @linaria/logger@4.0.0
   - @linaria/utils@4.0.0
@@ -24,7 +21,6 @@
 
 ### Patch Changes
 
-- Updated dependencies [17c83e34]
 - Updated dependencies [17c83e34]
   - @linaria/babel-preset@3.0.0-beta.21
   - @linaria/preeval@3.0.0-beta.21
