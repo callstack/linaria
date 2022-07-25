@@ -153,6 +153,8 @@ async function processFiles(files: (number | string)[], options: Options) {
     }
   };
 
+  const modifiedFiles: { name: string; content: string }[] = [];
+
   // eslint-disable-next-line no-restricted-syntax
   for (const filename of resolvedFiles) {
     if (fs.lstatSync(filename).isDirectory()) {
@@ -229,16 +231,20 @@ async function processFiles(files: (number | string)[], options: Options) {
           : fs.readFileSync(normalizedInputFilename, 'utf-8');
 
         if (!inputContent.trim().endsWith(statement)) {
-          fs.writeFileSync(
-            normalizedInputFilename,
-            `${inputContent}\n${statement}\n`
-          );
+          modifiedFiles.push({
+            name: normalizedInputFilename,
+            content: `${inputContent}\n${statement}\n`,
+          });
         }
       }
 
       count += 1;
     }
   }
+
+  modifiedFiles.forEach(({ name, content }) => {
+    fs.writeFileSync(name, content);
+  });
 
   console.log(`Successfully extracted ${count} CSS files.`);
 
