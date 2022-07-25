@@ -1,5 +1,20 @@
 # Change Log
 
+## 4.1.0
+
+### Minor Changes
+
+- 92f6d871: Instead of just replacing tags with their runtime versions, `transform` mistakenly applied all babel transformations. (fixes #1018)
+
+### Patch Changes
+
+- 92f6d871: Shaker tried to keep alive object methods even if their body was removed (fixes #1018)
+- Updated dependencies [92f6d871]
+  - @linaria/utils@4.1.0
+  - @linaria/core@4.1.0
+  - @linaria/shaker@4.1.0
+  - @linaria/tags@4.1.0
+
 ## 4.0.0
 
 ### Major Changes

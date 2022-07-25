@@ -1,5 +1,19 @@
 # @linaria/testkit
 
+## 4.1.0
+
+### Minor Changes
+
+- 92f6d871: Instead of just replacing tags with their runtime versions, `transform` mistakenly applied all babel transformations. (fixes #1018)
+
+### Patch Changes
+
+- Updated dependencies [92f6d871]
+  - @linaria/babel-preset@4.1.0
+  - @linaria/shaker@4.1.0
+  - @linaria/tags@4.1.0
+  - @linaria/react@4.1.0
+
 ## 4.0.0
 
 ### Major Changes
