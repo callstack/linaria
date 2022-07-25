@@ -1,6 +1,6 @@
 import * as babel from '@babel/core';
 
-import { loadBabelOptions } from '@linaria/utils';
+import { buildOptions, loadBabelOptions } from '@linaria/utils';
 
 import type { Options, ValueCache } from '../types';
 
@@ -25,32 +25,32 @@ export default function prepareForRuntime(
 
   const file = cachedParseSync(code, babelOptions);
 
-  const result = babel.transformFromAstSync(file, code, {
-    ...(babelOptions?.rootMode ? { rootMode: babelOptions.rootMode } : null),
-    cwd: babelConfig.cwd,
-    filename: babelConfig.filename ?? options.filename,
-    presets: [
-      ...(babelOptions?.presets ?? []),
-      ...(babelConfig?.presets ?? []),
+  const transformPlugins: babel.PluginItem[] = [
+    [
+      require.resolve('../plugins/collector'),
+      {
+        ...pluginOptions,
+        values: valueCache,
+      },
     ],
-    plugins: [
-      [
-        require.resolve('../plugins/collector'),
-        {
-          ...pluginOptions,
-          values: valueCache,
-        },
-      ],
-      ...(babelOptions?.plugins ?? []),
-      ...(babelConfig?.plugins ?? []),
-    ],
-    babelrc: false,
-    configFile: false,
+  ];
+
+  const transformConfig = buildOptions({
+    envName: 'linaria',
+    plugins: transformPlugins,
     sourceMaps: true,
-    sourceFileName: options.filename,
+    sourceFileName: babelConfig.filename ?? options.filename,
     inputSourceMap: options.inputSourceMap,
     root: options.root,
     ast: true,
+    babelrc: false,
+    configFile: false,
+  });
+
+  const result = babel.transformFromAstSync(file, code, {
+    ...transformConfig,
+    cwd: babelConfig.cwd,
+    filename: babelConfig.filename ?? options.filename,
   });
 
   if (!result || !result.ast?.program) {

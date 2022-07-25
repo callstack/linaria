@@ -62,9 +62,10 @@ function runPreevalStage(
     configFile: false,
   });
 
-  const tmp = { ...transformConfig, filename };
-
-  const result = babel.transformFromAstSync(file, code, tmp);
+  const result = babel.transformFromAstSync(file, code, {
+    ...transformConfig,
+    filename,
+  });
 
   if (!result || !result.ast?.program) {
     throw new Error('Babel transform failed');
