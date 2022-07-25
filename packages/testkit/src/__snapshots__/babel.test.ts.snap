@@ -444,19 +444,43 @@ Dependencies: NA
 exports[`strategy shaker does not strip istanbul coverage sequences 1`] = `
 "function cov_2dr9r1nt95() {
   var path = \\"/home/user/project/file.js\\";
-  var hash = \\"91161e7e5b00b52dc483815fb73cd0b6fb94a785\\";
+  var hash = \\"36a1bd3d459d3717fbdf9bd0068161503f8053a5\\";
   var global = new Function(\\"return this\\")();
   var gcv = \\"__coverage__\\";
   var coverageData = {
     path: \\"/home/user/project/file.js\\",
-    statementMap: {},
+    statementMap: {
+      \\"0\\": {
+        start: {
+          line: 2,
+          column: 10
+        },
+        end: {
+          line: 2,
+          column: 12
+        }
+      },
+      \\"1\\": {
+        start: {
+          line: 4,
+          column: 26
+        },
+        end: {
+          line: 6,
+          column: 1
+        }
+      }
+    },
     fnMap: {},
     branchMap: {},
-    s: {},
+    s: {
+      \\"0\\": 0,
+      \\"1\\": 0
+    },
     f: {},
     b: {},
     _coverageSchema: \\"1a1c01bbd47fc00a2c39e90264f33305004495a9\\",
-    hash: \\"91161e7e5b00b52dc483815fb73cd0b6fb94a785\\"
+    hash: \\"36a1bd3d459d3717fbdf9bd0068161503f8053a5\\"
   };
   var coverage = global[gcv] || (global[gcv] = {});
 
@@ -475,14 +499,14 @@ exports[`strategy shaker does not strip istanbul coverage sequences 1`] = `
 }
 
 cov_2dr9r1nt95();
-export const titleClass = \\"titleClass_tow9xsn\\";"
+export const titleClass = \\"titleClass_t13jq05\\";"
 `;
 
 exports[`strategy shaker does not strip istanbul coverage sequences 2`] = `
 
 CSS:
 
-.titleClass_tow9xsn {
+.titleClass_t13jq05 {
   height: 42px;
 }
 
@@ -828,12 +852,9 @@ Dependencies: NA
 
 exports[`strategy shaker evaluates typescript enums 1`] = `
 "import { styled } from '@linaria/react';
-var Colors;
-
-(function (Colors) {
-  Colors[\\"BLUE\\"] = \\"#27509A\\";
-})(Colors || (Colors = {}));
-
+enum Colors {
+  BLUE = '#27509A',
+}
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t9vkbjs\\"
@@ -977,12 +998,7 @@ Dependencies: NA
 
 `;
 
-exports[`strategy shaker handles css template literal in JSX element 1`] = `
-"/*#__PURE__*/
-React.createElement(Title, {
-  class: \\"Title_twgemqq\\"
-});"
-`;
+exports[`strategy shaker handles css template literal in JSX element 1`] = `"<Title class={\\"Title_twgemqq\\"} />;"`;
 
 exports[`strategy shaker handles css template literal in JSX element 2`] = `
 
@@ -1600,7 +1616,7 @@ export function Something() {
       \\"tjtmpns-0\\": [_exp3()]
     }
   });
-  return /*#__PURE__*/React.createElement(Title, null);
+  return <Title />;
 }"
 `;
 
@@ -1952,7 +1968,7 @@ Dependencies: ./__fixtures__/reexports
 exports[`strategy shaker should wrap memoized components 1`] = `
 "import React from 'react';
 import { styled } from '@linaria/react';
-const MyComponent = /*#__PURE__*/React.memo(() => /*#__PURE__*/React.createElement(\\"div\\", null));
+const MyComponent = React.memo(() => <div />);
 
 const _exp = /*#__PURE__*/() => MyComponent;
 
@@ -1979,7 +1995,7 @@ exports[`strategy shaker simplifies react components 1`] = `
 import { styled } from '@linaria/react';
 import constant from './broken-dependency';
 
-const FuncComponent = props => /*#__PURE__*/React.createElement(\\"div\\", null, props.children + constant);
+const FuncComponent = props => <div>{props.children + constant}</div>;
 
 class ClassComponent extends React.PureComponent {
   method() {
@@ -1987,14 +2003,14 @@ class ClassComponent extends React.PureComponent {
   }
 
   render() {
-    return /*#__PURE__*/React.createElement(\\"div\\", null, props.children + constant);
+    return <div>{props.children + constant}</div>;
   }
 
 }
 
 const ComplexFunctionComponent = props => {
   if (import.meta.env.PROD) {
-    return /*#__PURE__*/React.createElement(\\"div\\", null, props.children + constant);
+    return <div>{props.children + constant}</div>;
   }
 
   return null;
@@ -2250,6 +2266,10 @@ Dependencies: NA
 
 exports[`strategy shaker transpiles styled template literal with TS component 1`] = `
 "import { styled } from '@linaria/react';
+type Props = {
+  className?: string;
+  children?: React.ReactNode;
+};
 export const Title = /*#__PURE__*/styled(() => {})({
   name: \\"Title\\",
   class: \\"Title_t9vkbjs\\"
@@ -2338,8 +2358,12 @@ Dependencies: NA
 
 exports[`strategy shaker transpiles with typed fn as interpolated value 1`] = `
 "import { styled } from '@linaria/react';
+type Props = {
+  className?: string;
+  children?: React.ReactNode;
+};
 
-const _exp = /*#__PURE__*/() => props => props.className;
+const _exp = /*#__PURE__*/() => (props: Props) => props.className;
 
 export const Title = /*#__PURE__*/styled('div')({
   name: \\"Title\\",

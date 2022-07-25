@@ -1856,7 +1856,7 @@ describe('strategy shaker', () => {
   });
 
   it('does not strip istanbul coverage sequences', async () => {
-    const { code, metadata } = await transform(
+    const withIstanbul = await babel.transformAsync(
       dedent`
       import { css } from './custom-css-tag';
       const a = 42;
@@ -1865,34 +1865,38 @@ describe('strategy shaker', () => {
         height: ${'${a}'}px;
       \`;
       `,
-      [
-        evaluator,
-        {
-          tagResolver: (source, tag) => {
-            if (source === './custom-css-tag' && tag === 'css') {
-              return require.resolve('@linaria/core/processors/css');
-            }
-
-            return null;
-          },
-        },
-        'js',
-        {
-          cwd: '/home/user/project',
-          filename: 'file.js',
-          plugins: [
-            [
-              // eslint-disable-next-line import/no-extraneous-dependencies
-              require('babel-plugin-istanbul').default({
-                ...babel,
-                assertVersion: () => {},
-              }),
-              { cwd: '/home/user/project' },
-            ],
+      {
+        cwd: '/home/user/project',
+        filename: 'file.js',
+        plugins: [
+          [
+            // eslint-disable-next-line import/no-extraneous-dependencies
+            require('babel-plugin-istanbul').default({
+              ...babel,
+              assertVersion: () => {},
+            }),
+            { cwd: '/home/user/project' },
           ],
-        },
-      ]
+        ],
+      }
     );
+
+    if (!withIstanbul?.code) {
+      return;
+    }
+
+    const { code, metadata } = await transform(withIstanbul.code, [
+      evaluator,
+      {
+        tagResolver: (source, tag) => {
+          if (source === './custom-css-tag' && tag === 'css') {
+            return require.resolve('@linaria/core/processors/css');
+          }
+
+          return null;
+        },
+      },
+    ]);
 
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
