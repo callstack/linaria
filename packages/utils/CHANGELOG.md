@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.1
+
+### Patch Changes
+
+- 92f6d871: Shaker tried to keep alive object methods even if their body was removed (fixes #1018)
+
 ## 4.0.0
 
 ### Major Changes
