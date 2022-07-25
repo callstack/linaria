@@ -1,11 +1,11 @@
 # Change Log
 
-## 4.0.1
+## 4.1.0
 
 ### Patch Changes
 
-- @linaria/core@4.0.1
-- @linaria/tags@4.0.1
+- @linaria/core@4.1.0
+- @linaria/tags@4.1.0
 
 ## 4.0.0
 

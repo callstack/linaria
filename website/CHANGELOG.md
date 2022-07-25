@@ -1,12 +1,12 @@
 # Change Log
 
-## 4.0.1
+## 4.1.0
 
 ### Patch Changes
 
-- @linaria/atomic@4.0.1
-- @linaria/core@4.0.1
-- @linaria/react@4.0.1
+- @linaria/atomic@4.1.0
+- @linaria/core@4.1.0
+- @linaria/react@4.1.0
 
 ## 4.0.0
 
