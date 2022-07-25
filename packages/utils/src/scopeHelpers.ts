@@ -139,7 +139,10 @@ export function findParentForDelete(path: NodePath): NodePath | null {
     return findParentForDelete(parent);
   }
 
-  if (parent.isFunctionExpression({ body: path.node })) {
+  if (
+    parent.isFunctionExpression({ body: path.node }) ||
+    parent.isObjectMethod()
+  ) {
     return findParentForDelete(parent);
   }
 
