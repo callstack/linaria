@@ -19,6 +19,9 @@ const getShakerConfig = (only: string[] | null): TransformOptions => {
 
   const config = {
     ast: true,
+    caller: {
+      name: 'linaria',
+    },
     envName: 'linaria',
     targets: {
       node: 'current',

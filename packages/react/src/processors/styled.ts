@@ -48,13 +48,13 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
   constructor(params: Params, ...args: TailProcessorParams) {
     validateParams(
       params,
-      ['tag', ['call', 'member'], 'template'],
+      ['tag', ['call', 'member'], ['template', 'call']],
       'Invalid usage of `styled` tag'
     );
 
     const [tag, tagOp, template] = params;
 
-    super([tag, template], ...args);
+    super([tag, template[0] === 'call' ? ['template', []] : template], ...args);
 
     let component: WrappedNode | undefined;
     if (tagOp[0] === 'call' && tagOp.length === 2) {
