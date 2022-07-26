@@ -246,7 +246,7 @@ type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
   ? StyledMeta & TOrigCmp
   : StyledComponent<OwnProps & TTrgProps>;
 
-type StyledJSXIntrinsics = {
+export type StyledJSXIntrinsics = {
   readonly [P in keyof JSX.IntrinsicElements]: HtmlStyledTag<P>;
 };
 

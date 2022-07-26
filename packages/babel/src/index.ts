@@ -30,7 +30,7 @@ export { default as peek } from './utils/peek';
 export { default as processTemplateExpression } from './utils/processTemplateExpression';
 
 function isEnabled(caller?: TransformCaller & { evaluate?: true }) {
-  return caller?.name !== 'linaria' || !caller.evaluate;
+  return caller?.name !== 'linaria' || caller.evaluate === true;
 }
 
 export default function linaria(babel: ConfigAPI, options: PluginOptions) {
