@@ -2046,6 +2046,74 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker simplifies transpiled react components 1`] = `
+"import * as ReactNS from 'react';
+import React from 'react';
+import { createElement } from 'react';
+import { styled } from '@linaria/react';
+import constant from './broken-dependency';
+
+const A = () => ReactNS.createElement('div', {}, constant);
+
+const B = () => createElement(A, {}, constant);
+
+const C = () => React.createElement(FuncComponent, {}, constant);
+
+const _exp = /*#__PURE__*/() => C;
+
+export const D = /*#__PURE__*/styled(_exp())({
+  name: \\"D\\",
+  class: \\"D_dwgemqq\\"
+});"
+`;
+
+exports[`strategy shaker simplifies transpiled react components 2`] = `
+
+CSS:
+
+.D_dwgemqq {
+  color: red;
+}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker simplifies transpiled react components CJS 1`] = `
+"var _interopRequireWildcard = require(\\"@babel/runtime/helpers/interopRequireWildcard\\").default;
+
+var React = _interopRequireWildcard(require(\\"react\\"));
+
+var styled = require('@linaria/react').styled;
+
+var constant = require('./broken-dependency').default;
+
+const A = () => React.createElement('div', {}, constant);
+
+const B = () => React.createElement(A, {}, constant);
+
+const C = () => React.createElement(FuncComponent, {}, constant);
+
+const _exp = /*#__PURE__*/() => C;
+
+exports.D = /*#__PURE__*/styled(_exp())({
+  name: \\"source0\\",
+  class: \\"source0_swgemqq\\"
+});"
+`;
+
+exports[`strategy shaker simplifies transpiled react components CJS 2`] = `
+
+CSS:
+
+.source0_swgemqq {
+  color: red;
+}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker supports both css and styled tags 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
