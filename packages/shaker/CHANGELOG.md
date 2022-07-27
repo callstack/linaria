@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.1.1
+
+### Patch Changes
+
+- 2abc55b3: Fix 'Using the tag in runtime is not supported' in some enviroments (fixes #1021)
+
 ## 4.1.0
 
 ### Patch Changes

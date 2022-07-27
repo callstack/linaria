@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.1.1
+
+### Patch Changes
+
+- c5ed76ed: CLI should write files only when all transforms are finished successfully.
+- Updated dependencies [21ba7a44]
+- Updated dependencies [21ba7a44]
+- Updated dependencies [21ba7a44]
+- Updated dependencies [2abc55b3]
+- Updated dependencies [21ba7a44]
+  - @linaria/babel-preset@4.1.1
+
 ## 4.1.0
 
 ### Patch Changes

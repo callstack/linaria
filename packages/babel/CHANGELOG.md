@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.1.1
+
+### Patch Changes
+
+- 21ba7a44: Circuit breaker for cyclic dependencies.
+- 21ba7a44: The default config was changed to process ES modules inside node_modules.
+- 21ba7a44: In some cases, Linaria threw an error that the imported value is undefined.
+- 2abc55b3: Fix 'Using the tag in runtime is not supported' in some enviroments (fixes #1021)
+- 21ba7a44: The better detector of React components.
+- Updated dependencies [2abc55b3]
+  - @linaria/shaker@4.1.1
+
 ## 4.1.0
 
 ### Minor Changes
