@@ -40,6 +40,17 @@ export default function loadLinariaOptions(
         test: ignore ?? /[\\/]node_modules[\\/]/,
         action: 'ignore',
       },
+      {
+        // Do not ignore ES-modules
+        test: (filename, code) => {
+          if (!/\/node_modules\//.test(filename)) {
+            return false;
+          }
+
+          return /(?:^|\n|;)\s*(?:export|import)\s+/.test(code);
+        },
+        action: require.resolve('@linaria/shaker'),
+      },
     ],
     babelOptions,
     ...(result ? result.config : null),
