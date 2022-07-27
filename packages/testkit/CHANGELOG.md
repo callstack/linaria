@@ -1,5 +1,20 @@
 # @linaria/testkit
 
+## 4.1.1
+
+### Patch Changes
+
+- 21ba7a44: The default config was changed to process ES modules inside node_modules.
+- 21ba7a44: The better detector of React components.
+- Updated dependencies [21ba7a44]
+- Updated dependencies [21ba7a44]
+- Updated dependencies [21ba7a44]
+- Updated dependencies [2abc55b3]
+- Updated dependencies [21ba7a44]
+  - @linaria/babel-preset@4.1.1
+  - @linaria/react@4.1.1
+  - @linaria/shaker@4.1.1
+
 ## 4.1.0
 
 ### Minor Changes
