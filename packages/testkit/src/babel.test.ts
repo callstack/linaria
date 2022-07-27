@@ -1704,6 +1704,57 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('simplifies transpiled react components', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import * as ReactNS from 'react';
+      import React from 'react';
+      import { createElement } from 'react';
+      import { styled } from '@linaria/react';
+      import constant from './broken-dependency';
+
+      const A = () => ReactNS.createElement('div', {}, constant);
+
+      const B = () => createElement(A, {}, constant);
+
+      const C = () => React.createElement(FuncComponent, {}, constant);
+
+      export const D = styled(C)\`
+        color: red;
+      \`;
+      `,
+      [evaluator, {}, 'jsx']
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('simplifies transpiled react components CJS', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      var _interopRequireWildcard = require("@babel/runtime/helpers/interopRequireWildcard").default;
+      var React = _interopRequireWildcard(require("react"));
+      var styled = require('@linaria/react').styled;
+      var constant = require('./broken-dependency').default;
+
+      const A = () => React.createElement('div', {}, constant);
+
+      const B = () => React.createElement(A, {}, constant);
+
+      const C = () => React.createElement(FuncComponent, {}, constant);
+
+      exports.D = styled(C)\`
+        color: red;
+      \`;
+      `,
+      [evaluator, {}, 'jsx']
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('ignores inline vanilla function expressions', async () => {
     const { code, metadata } = await transform(
       dedent`
