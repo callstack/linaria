@@ -335,9 +335,19 @@ export default async function prepareForEval(
     const promise = resolve(importedFile, name, stack).then(
       (resolved) => {
         log('stage-1:async-resolve', `✅ ${importedFile} -> ${resolved}`);
+        const resolveCacheKey = `${name} -> ${importedFile}`;
+        const cached = resolveCache.get(resolveCacheKey);
+        const importsOnlySet = new Set(importsOnly);
+        if (cached) {
+          const [, cachedOnly] = cached.split('\0');
+          cachedOnly?.split(',').forEach((token) => {
+            importsOnlySet.add(token);
+          });
+        }
+
         resolveCache.set(
-          `${name} -> ${importedFile}`,
-          `${resolved}\0${importsOnly.join(',')}`
+          resolveCacheKey,
+          `${resolved}\0${[...importsOnlySet].join(',')}`
         );
         const fileContent = readFileSync(resolved, 'utf8');
         return {
