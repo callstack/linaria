@@ -91,6 +91,8 @@ class Module {
 
   #isEvaluated = false;
 
+  #evaluatedFragments = new Set<string>();
+
   #exports: Record<string, unknown> | unknown;
 
   // #exportsProxy: Record<string, unknown>;
@@ -430,7 +432,19 @@ class Module {
     });
 
     code.forEach((source, idx) => {
+      if (this.#evaluatedFragments.has(source)) {
+        this.debug(
+          `evaluate:fragment-${padStart(idx + 1, 2)}`,
+          `is already evaluated`
+        );
+        return;
+      }
+
       this.debug(`evaluate:fragment-${padStart(idx + 1, 2)}`, `\n${source}`);
+
+      this.#evaluatedFragments.add(source);
+
+      this.#isEvaluated = true;
 
       try {
         const script = new vm.Script(
@@ -460,8 +474,6 @@ class Module {
         );
       }
     });
-
-    this.#isEvaluated = true;
   }
 }
 
