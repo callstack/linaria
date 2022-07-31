@@ -6,7 +6,7 @@ import type { BabelFile, NodePath, PluginObj } from '@babel/core';
 import type { CallExpression, Identifier } from '@babel/types';
 
 import { createCustomDebug } from '@linaria/logger';
-import type { StrictOptions, IImport } from '@linaria/utils';
+import type { StrictOptions, IImport, ISideEffectImport } from '@linaria/utils';
 import {
   collectExportsAndImports,
   getFileIdx,
@@ -50,14 +50,25 @@ const isBrowserGlobal = (id: NodePath<Identifier>) => {
   return forbiddenGlobals.has(id.node.name) && isGlobal(id);
 };
 
-function isCreateElement(
+function isHookOrCreateElement(name: string): boolean {
+  return name === 'createElement' || /use[A-Z]/.test(name);
+}
+
+function isUnnecessaryReact(
   p: NodePath<CallExpression>,
-  reactImports: IImport[]
+  imports: (IImport | ISideEffectImport)[]
 ): boolean {
+  const reactImports = imports.filter(
+    (i) =>
+      i.source === 'react' &&
+      (i.imported === 'default' ||
+        (i.imported && isHookOrCreateElement(i.imported)))
+  ) as IImport[];
+
   if (reactImports.length === 0) return false;
   const callee = p.get('callee');
-  if (callee.isIdentifier({ name: 'createElement' })) {
-    const bindingPath = callee.scope.getBinding('createElement')?.path;
+  if (callee.isIdentifier() && isHookOrCreateElement(callee.node.name)) {
+    const bindingPath = callee.scope.getBinding(callee.node.name)?.path;
     return reactImports.some((i) => bindingPath?.isAncestor(i.local));
   }
 
@@ -73,7 +84,8 @@ function isCreateElement(
     if (
       !defaultImport ||
       !defaultImport.local.isIdentifier() ||
-      !property.isIdentifier({ name: 'createElement' }) ||
+      !property.isIdentifier() ||
+      !isHookOrCreateElement(property.node.name) ||
       !object.isIdentifier({ name: defaultImport.local.node.name })
     ) {
       return false;
@@ -103,12 +115,6 @@ export default function preeval(
         file.opts.filename
       );
 
-      const reactImports = imports.filter(
-        (i) =>
-          i.source === 'react' &&
-          (i.imported === 'default' || i.imported === 'createElement')
-      ) as IImport[];
-
       const jsxRuntime = imports.find((i) => i.source === 'react/jsx-runtime');
       const jsxRuntimeName =
         jsxRuntime?.local?.isIdentifier() && jsxRuntime?.local?.node?.name;
@@ -137,7 +143,7 @@ export default function preeval(
               }
             }
 
-            if (isCreateElement(p, reactImports)) {
+            if (isUnnecessaryReact(p, imports)) {
               JSXElementsRemover(p);
             }
           },
