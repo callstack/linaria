@@ -76,43 +76,48 @@ export default function webpack4Loader(
       preprocessor,
     },
     asyncResolve
-  ).then(async (result: Result) => {
-    if (result.cssText) {
-      let { cssText } = result;
+  ).then(
+    async (result: Result) => {
+      if (result.cssText) {
+        let { cssText } = result;
 
-      if (sourceMap) {
-        cssText += `/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
-          result.cssSourceMapText || ''
-        ).toString('base64')}*/`;
+        if (sourceMap) {
+          cssText += `/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
+            result.cssSourceMapText || ''
+          ).toString('base64')}*/`;
+        }
+
+        await Promise.all(
+          result.dependencies?.map((dep) =>
+            asyncResolve(dep, this.resourcePath)
+          ) ?? []
+        );
+
+        getCacheInstance(cacheProvider)
+          .then((cacheInstance) =>
+            cacheInstance.set(this.resourcePath, cssText)
+          )
+          .then(() => {
+            const request = `${outputFileName}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
+              cacheProvider ?? ''
+            )}!${this.resourcePath}`;
+            const stringifiedRequest = loaderUtils.stringifyRequest(
+              this,
+              request
+            );
+
+            return this.callback(
+              null,
+              `${result.code}\n\nrequire(${stringifiedRequest});`,
+              castSourceMap(result.sourceMap)
+            );
+          })
+          .catch((err: Error) => this.callback(err));
+        return;
       }
 
-      await Promise.all(
-        result.dependencies?.map((dep) =>
-          asyncResolve(dep, this.resourcePath)
-        ) ?? []
-      );
-
-      getCacheInstance(cacheProvider)
-        .then((cacheInstance) => cacheInstance.set(this.resourcePath, cssText))
-        .then(() => {
-          const request = `${outputFileName}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
-            cacheProvider ?? ''
-          )}!${this.resourcePath}`;
-          const stringifiedRequest = loaderUtils.stringifyRequest(
-            this,
-            request
-          );
-
-          return this.callback(
-            null,
-            `${result.code}\n\nrequire(${stringifiedRequest});`,
-            castSourceMap(result.sourceMap)
-          );
-        })
-        .catch((err: Error) => this.callback(err));
-      return;
-    }
-
-    this.callback(null, result.code, castSourceMap(result.sourceMap));
-  });
+      this.callback(null, result.code, castSourceMap(result.sourceMap));
+    },
+    (err: Error) => this.callback(err)
+  );
 }
