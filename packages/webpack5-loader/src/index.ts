@@ -89,44 +89,49 @@ const webpack5Loader: Loader = function webpack5LoaderPlugin(
       preprocessor,
     },
     asyncResolve
-  ).then(async (result: Result) => {
-    if (result.cssText) {
-      let { cssText } = result;
+  ).then(
+    async (result: Result) => {
+      if (result.cssText) {
+        let { cssText } = result;
 
-      if (sourceMap) {
-        cssText += `/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
-          result.cssSourceMapText || ''
-        ).toString('base64')}*/`;
+        if (sourceMap) {
+          cssText += `/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
+            result.cssSourceMapText || ''
+          ).toString('base64')}*/`;
+        }
+
+        await Promise.all(
+          result.dependencies?.map((dep) =>
+            asyncResolve(dep, this.resourcePath)
+          ) ?? []
+        );
+
+        getCacheInstance(cacheProvider)
+          .then((cacheInstance) =>
+            cacheInstance.set(this.resourcePath, cssText)
+          )
+          .then(() => {
+            const request = `${outputFileName}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
+              typeof cacheProvider === 'string' ? cacheProvider : ''
+            )}!${this.resourcePath}`;
+            const stringifiedRequest = JSON.stringify(
+              this.utils.contextify(this.context || this.rootContext, request)
+            );
+
+            return this.callback(
+              null,
+              `${result.code}\n\nrequire(${stringifiedRequest});`,
+              result.sourceMap ?? undefined
+            );
+          })
+          .catch((err: Error) => this.callback(err));
+        return;
       }
 
-      await Promise.all(
-        result.dependencies?.map((dep) =>
-          asyncResolve(dep, this.resourcePath)
-        ) ?? []
-      );
-
-      getCacheInstance(cacheProvider)
-        .then((cacheInstance) => cacheInstance.set(this.resourcePath, cssText))
-        .then(() => {
-          const request = `${outputFileName}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
-            typeof cacheProvider === 'string' ? cacheProvider : ''
-          )}!${this.resourcePath}`;
-          const stringifiedRequest = JSON.stringify(
-            this.utils.contextify(this.context || this.rootContext, request)
-          );
-
-          return this.callback(
-            null,
-            `${result.code}\n\nrequire(${stringifiedRequest});`,
-            result.sourceMap ?? undefined
-          );
-        })
-        .catch((err: Error) => this.callback(err));
-      return;
-    }
-
-    this.callback(null, result.code, result.sourceMap ?? undefined);
-  });
+      this.callback(null, result.code, result.sourceMap ?? undefined);
+    },
+    (err: Error) => this.callback(err)
+  );
 };
 
 export default webpack5Loader;
