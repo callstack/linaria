@@ -1,5 +1,12 @@
 # @linaria/tags
 
+## 4.1.1
+
+### Patch Changes
+
+- Updated dependencies [50bc0c79]
+  - @linaria/utils@4.1.1
+
 ## 4.1.0
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.1.2
+
+### Patch Changes
+
+- 3c593aa8: React hooks aren't needed for evaluation so we can replace them as we already do with react components (fixes compatability with [ariakit](https://github.com/ariakit/ariakit) and some other libraries).
+- Updated dependencies [50bc0c79]
+  - @linaria/utils@4.1.1
+  - @linaria/core@4.1.1
+  - @linaria/shaker@4.1.2
+  - @linaria/tags@4.1.1
+
 ## 4.1.1
 
 ### Patch Changes
