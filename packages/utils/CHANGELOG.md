@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.1.1
+
+### Patch Changes
+
+- 50bc0c79: Fix for "Property key of ClassMethod expected to be" (fixes #1030)
+
 ## 4.1.0
 
 ### Patch Changes

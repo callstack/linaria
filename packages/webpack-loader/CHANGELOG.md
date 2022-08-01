@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.1.2
+
+### Patch Changes
+
+- 008a5d13: Fix webpack crash when an error in Linaria happens. (fixes #1029)
+- Updated dependencies [008a5d13]
+  - @linaria/webpack4-loader@4.1.2
+  - @linaria/webpack5-loader@4.1.2
+
 ## 4.1.1
 
 ### Patch Changes

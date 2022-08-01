@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.1.2
+
+### Patch Changes
+
+- 008a5d13: Fix webpack crash when an error in Linaria happens. (fixes #1029)
+- Updated dependencies [3c593aa8]
+  - @linaria/babel-preset@4.1.2
+
 ## 4.1.1
 
 ### Patch Changes
