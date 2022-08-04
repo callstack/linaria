@@ -127,6 +127,16 @@ export function findParentForDelete(path: NodePath): NodePath | null {
     return findParentForDelete(parent);
   }
 
+  if (parent.isTemplateLiteral()) {
+    mutate(path, (p) => {
+      p.replaceWith({
+        type: 'StringLiteral',
+        value: '',
+      });
+    });
+    return null;
+  }
+
   if (parent.isAssignmentExpression()) {
     return findParentForDelete(parent);
   }
