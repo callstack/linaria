@@ -1,0 +1,25 @@
+{
+  "name": "@linaria/next",
+  "version": "1.0.9",
+  "description": "This is a linaria integration with nextjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/linaria/next-linaria-plugin.git"
+  },
+  "author": "Leonardo Teixeira <leo28tex@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/linaria/next-linaria-plugin/issues"
+  },
+  "homepage": "https://github.com/linaria/next-linaria-plugin#readme",
+  "dependencies": {
+    "@linaria/webpack-loader": "^4.1.2"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/linaria"
+  }
+}
