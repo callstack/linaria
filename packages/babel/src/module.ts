@@ -76,12 +76,14 @@ const createCustomDebug =
   };
 
 const cookModuleId = (rawId: string) => {
-  // It's a dirty hack for avoiding conflicts with babel-preset-react-app
-  // https://github.com/callstack/linaria/issues/745
-  // FIXME @Anber: I'll try to figure out a better solution. Probably, using Terser as a shaker's core can solve problems with interfered plugins.
-  return rawId.replace(
-    '/@babel/runtime/helpers/esm/',
-    '/@babel/runtime/helpers/'
+  return (
+    rawId
+      // It's a dirty hack for avoiding conflicts with babel-preset-react-app
+      // https://github.com/callstack/linaria/issues/745
+      // FIXME @Anber: I'll try to figure out a better solution. Probably, using Terser as a shaker's core can solve problems with interfered plugins.
+      .replace('/@babel/runtime/helpers/esm/', '/@babel/runtime/helpers/')
+      // The same hack for SWC helpers
+      .replace(/(@swc\/helpers\/)src(\/.+)\.mjs/, '$1lib$2.js')
   );
 };
 
