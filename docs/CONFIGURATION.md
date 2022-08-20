@@ -26,7 +26,7 @@ module.exports = {
 
   Enabling this will add a display name to generated class names, e.g. `.Title_abcdef` instead of `.abcdef'. It is disabled by default to generate smaller CSS files.
 
-- `classNameSlug: string | (hash: string, title: string) => string` (default: `default`):
+- `classNameSlug: string | (hash: string, title: string, args: ClassNameSlugVars) => string` (default: `default`):
 
   Using this will provide an interface to customize the output of the CSS class name. Example:
 
@@ -39,6 +39,17 @@ module.exports = {
       classNameSlug: (hash, title) => `${hash}__${7 * 6}__${title}`,
 
   Would generate the class name `.absdjfsdf__42__header`.
+
+  Last argument `args` is an object that contains following properties: `title`, `hash`, `dir`, `ext`, `file`, `name`. These properties
+  are useful when you want to generate your own hash:
+
+  ```js
+  const sha1 = require("sha1");
+
+  module.exports = {
+    classNameSlug: (hash, title, args) => sha1(`${args.name}-${title}`)
+  };
+  ```
 
   **note** invalid characters will be replaced with an underscore (`_`).
 
