@@ -14,14 +14,14 @@ The core team works directly on GitHub and all work is public.
 
 1. Fork the repo and create your branch from `master` (a guide on [how to fork a repository](https://help.github.com/articles/fork-a-repo/)).
 
-1. Linaria uses [Yarn](https://yarnpkg.com/en/) for running development scripts. If you haven't already done so, please [install yarn](https://yarnpkg.com/en/docs/install).
+1. Linaria uses [Pnpm](https://pnpm.io) for running development scripts. If you haven't already done so, please [install Pnpm](https://pnpm.io/installation).
 
-1. Run `yarn bootstrap` to setup the development environment.
+1. Run `pnpm bootstrap` to setup the development environment.
 
 1. When working on the code, you can use the watch mode to watch and compiles changed files:
 
    ```sh
-   yarn watch
+   pnpm watch
    ```
 
 1. If you've added code that should be tested, add tests.
@@ -35,7 +35,7 @@ The core team works directly on GitHub and all work is public.
 If you are making changes to the website, test the website folder and run the server to check if your changes are being displayed accurately. To run the development server with live reloading, run:
 
 ```sh
-yarn website start
+pnpm website start
 ```
 
 ### Commit message convention
@@ -54,20 +54,18 @@ Our pre-commit hooks verify that your commit message matches this format when co
 
 ### Linting and tests
 
-We use `flow` for type checking, `eslint` with `prettier` for linting and formatting the code, and `jest` for testing. Our pre-commit hooks verify that the linter and tests pass when commiting. You can also run the following commands manually:
+We use `eslint` with `prettier` for linting and formatting the code, and `jest` for testing. Our pre-commit hooks verify that the linter and tests pass when commiting. You can also run the following commands manually:
 
-* `yarn flow`: run flow on all files.
-* `yarn typescript`: run tests for typescript definitions.
-* `yarn lint`: lint files with eslint and prettier.
-* `yarn test`: run unit tests with jest.
-* `yarn test:integration`: run integration tests with jest and puppeteer.
+* `pnpm typecheck`: run tests for typescript definitions.
+* `pnpm lint`: lint files with eslint and prettier.
+* `pnpm test`: run unit tests with jest.
 
 ### Sending a pull request
 
 When you're sending a pull request:
 
 * Prefer small pull requests focused on one change.
-* Verify that `flow`, `eslint` and all tests are passing.
+* Verify that `eslint` and all tests are passing.
 * Preview the documentation to make sure it looks good.
 * Follow the pull request template when opening a pull request.
 
@@ -125,7 +123,7 @@ The best way to get your bug fixed is to provide a reduced test case. Please pro
 We use Prettier with ESLint integration for linting and formatting. To fix any auto-fixable lint or matting errors, run:
 
 ```sh
-yarn lint --fix
+pnpm lint -- --fix
 ```
 
 ## License
