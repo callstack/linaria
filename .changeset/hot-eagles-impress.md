@@ -6,4 +6,4 @@
 '@linaria/webpack5-loader': patch
 ---
 
-Sometimes Linaria can meet already processed code. In such a case, it shall ignore runtime versions of `styled` tags. (fixes #1037)
+Sometimes Linaria can meet already processed code. In such a case, it shall ignore runtime versions of `styled` tags. Fixes #1037.
