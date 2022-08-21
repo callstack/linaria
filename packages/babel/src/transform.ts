@@ -176,7 +176,7 @@ export default async function transform(
   eventEmitter?.({ type: 'transform:stage-1:start', filename });
 
   const entryPoint = Promise.resolve({
-    name: options.filename,
+    name: filename,
     code: originalCode,
     only: ['__linariaPreval'],
   });

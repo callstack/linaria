@@ -70,7 +70,7 @@ export default function webpack4Loader(
   transform(
     content.toString(),
     {
-      filename: path.relative(process.cwd(), this.resourcePath),
+      filename: this.resourcePath,
       inputSourceMap: inputSourceMap ?? undefined,
       pluginOptions: rest,
       preprocessor,
