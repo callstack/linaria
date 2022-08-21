@@ -1,9 +1,9 @@
 ---
-'@linaria/babel-preset': minor
-'@linaria/react': minor
-'@linaria/tags': minor
-'@linaria/webpack4-loader': minor
-'@linaria/webpack5-loader': minor
+'@linaria/babel-preset': patch
+'@linaria/react': patch
+'@linaria/tags': patch
+'@linaria/webpack4-loader': patch
+'@linaria/webpack5-loader': patch
 ---
 
 Sometimes Linaria can meet already processed code. In such a case, it shall ignore runtime versions of `styled` tags. (fixes #1037)
