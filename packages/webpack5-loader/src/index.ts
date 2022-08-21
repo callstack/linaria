@@ -83,7 +83,7 @@ const webpack5Loader: Loader = function webpack5LoaderPlugin(
   transform(
     content.toString(),
     {
-      filename: path.relative(process.cwd(), this.resourcePath),
+      filename: this.resourcePath,
       inputSourceMap: convertSourceMap(inputSourceMap, this.resourcePath),
       pluginOptions: rest,
       preprocessor,

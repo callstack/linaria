@@ -30,6 +30,8 @@ export type TailProcessorParams = ProcessorParams extends [Params, ...infer T]
   : never;
 
 export default abstract class BaseProcessor {
+  public static SKIP = Symbol('skip');
+
   public readonly artifacts: Artifact[] = [];
 
   public readonly className: string;

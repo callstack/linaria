@@ -54,7 +54,13 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
 
     const [tag, tagOp, template] = params;
 
-    super([tag, template[0] === 'call' ? ['template', []] : template], ...args);
+    if (template[0] === 'call') {
+      // It is already transformed styled-literal. Skip it.
+      // eslint-disable-next-line @typescript-eslint/no-throw-literal
+      throw TaggedTemplateProcessor.SKIP;
+    }
+
+    super([tag, template], ...args);
 
     let component: WrappedNode | undefined;
     if (tagOp[0] === 'call' && tagOp.length === 2) {

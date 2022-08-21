@@ -476,6 +476,11 @@ export default function getTagProcessor(
         cache.set(path.node, null);
       }
     } catch (e) {
+      if (e === BaseProcessor.SKIP) {
+        cache.set(path.node, null);
+        return null;
+      }
+
       if (e instanceof Error) {
         throw buildCodeFrameError(path, e.message);
       }
