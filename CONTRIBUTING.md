@@ -66,6 +66,7 @@ When you're sending a pull request:
 
 * Prefer small pull requests focused on one change.
 * Verify that `eslint` and all tests are passing.
+* Run `pnpm changeset` to generate a changeset.
 * Preview the documentation to make sure it looks good.
 * Follow the pull request template when opening a pull request.
 
