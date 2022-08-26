@@ -59,7 +59,6 @@ export interface IReexport {
 export interface IState {
   exportRefs: Map<string, NodePath<MemberExpression>[]>;
   exports: IExport[];
-  filename: string | null | undefined;
   imports: (IImport | ISideEffectImport)[];
   reexports: IReexport[];
 }
@@ -902,13 +901,11 @@ function collectFromCallExpression(
 
 export default function collectExportsAndImports(
   path: NodePath,
-  filename: string | null | undefined,
   force = false
 ): IState {
   const state: IState = {
     exportRefs: new Map(),
     exports: [],
-    filename,
     imports: [],
     reexports: [],
   };

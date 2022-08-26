@@ -3,13 +3,13 @@
  * It works the same as main `babel/extract` preset, but do not evaluate lazy dependencies.
  */
 import type { BabelFile, NodePath, PluginObj } from '@babel/core';
-import type { CallExpression, Identifier } from '@babel/types';
+import type { Identifier } from '@babel/types';
 
 import { createCustomDebug } from '@linaria/logger';
-import type { StrictOptions, IImport, ISideEffectImport } from '@linaria/utils';
+import type { StrictOptions } from '@linaria/utils';
 import {
-  collectExportsAndImports,
   getFileIdx,
+  isUnnecessaryReactCall,
   JSXElementsRemover,
   removeWithRelated,
 } from '@linaria/utils';
@@ -50,54 +50,6 @@ const isBrowserGlobal = (id: NodePath<Identifier>) => {
   return forbiddenGlobals.has(id.node.name) && isGlobal(id);
 };
 
-function isHookOrCreateElement(name: string): boolean {
-  return name === 'createElement' || /use[A-Z]/.test(name);
-}
-
-function isUnnecessaryReact(
-  p: NodePath<CallExpression>,
-  imports: (IImport | ISideEffectImport)[]
-): boolean {
-  const reactImports = imports.filter(
-    (i) =>
-      i.source === 'react' &&
-      (i.imported === 'default' ||
-        (i.imported && isHookOrCreateElement(i.imported)))
-  ) as IImport[];
-
-  if (reactImports.length === 0) return false;
-  const callee = p.get('callee');
-  if (callee.isIdentifier() && isHookOrCreateElement(callee.node.name)) {
-    const bindingPath = callee.scope.getBinding(callee.node.name)?.path;
-    return reactImports.some((i) => bindingPath?.isAncestor(i.local));
-  }
-
-  if (callee.isMemberExpression()) {
-    if (reactImports.some((i) => i.local === callee)) {
-      // It's React.createElement in CJS
-      return true;
-    }
-
-    const object = callee.get('object');
-    const property = callee.get('property');
-    const defaultImport = reactImports.find((i) => i.imported === 'default');
-    if (
-      !defaultImport ||
-      !defaultImport.local.isIdentifier() ||
-      !property.isIdentifier() ||
-      !isHookOrCreateElement(property.node.name) ||
-      !object.isIdentifier({ name: defaultImport.local.node.name })
-    ) {
-      return false;
-    }
-
-    const bindingPath = object.scope.getBinding(object.node.name)?.path;
-    return bindingPath?.isAncestor(defaultImport.local) ?? false;
-  }
-
-  return false;
-}
-
 export default function preeval(
   babel: Core,
   options: PreevalOptions
@@ -109,15 +61,6 @@ export default function preeval(
       const log = createCustomDebug('preeval', getFileIdx(file.opts.filename!));
 
       log('start', 'Looking for template literals…');
-
-      const { imports } = collectExportsAndImports(
-        file.path,
-        file.opts.filename
-      );
-
-      const jsxRuntime = imports.find((i) => i.source === 'react/jsx-runtime');
-      const jsxRuntimeName =
-        jsxRuntime?.local?.isIdentifier() && jsxRuntime?.local?.node?.name;
 
       this.processors = [];
 
@@ -136,14 +79,7 @@ export default function preeval(
         // but we have to do it after we processed template tags.
         CallExpression: {
           enter(p) {
-            if (jsxRuntimeName) {
-              const callee = p.get('callee');
-              if (callee.isIdentifier({ name: jsxRuntimeName })) {
-                JSXElementsRemover(p);
-              }
-            }
-
-            if (isUnnecessaryReact(p, imports)) {
+            if (isUnnecessaryReactCall(p)) {
               JSXElementsRemover(p);
             }
           },

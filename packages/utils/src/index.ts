@@ -11,6 +11,7 @@ export { default as isNotNull } from './isNotNull';
 export { default as isRemoved } from './isRemoved';
 export { default as isRequire } from './isRequire';
 export { default as isTypedNode } from './isTypedNode';
+export { default as isUnnecessaryReactCall } from './isUnnecessaryReactCall';
 export * from './options';
 export * from './scopeHelpers';
 export { default as slugify } from './slugify';
