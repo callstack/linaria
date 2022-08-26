@@ -73,7 +73,7 @@ function runWithCompiler(compiler: (code: string) => string, code: string) {
 
   const file = new File({ filename }, { code, ast });
 
-  const collected = collectExportsAndImports(file.path, filename);
+  const collected = collectExportsAndImports(file.path);
 
   const sortImports = (
     a: { imported: string | null; source: string },

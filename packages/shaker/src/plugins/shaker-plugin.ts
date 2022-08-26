@@ -135,7 +135,7 @@ export default function shakerPlugin(
     ifUnknownExport = 'skip-shaking',
     onlyExports,
   }: IShakerOptions
-): PluginObj<IState> {
+): PluginObj<IState & { filename: string }> {
   return {
     name: '@linaria/shaker',
     pre(file: BabelFile) {
@@ -144,7 +144,7 @@ export default function shakerPlugin(
 
       log('start', `${this.filename}, onlyExports: ${onlyExports.join(',')}`);
 
-      const collected = collectExportsAndImports(file.path, file.opts.filename);
+      const collected = collectExportsAndImports(file.path);
       const sideEffectImports = collected.imports.filter(sideEffectImport);
       log(
         'import-and-exports',

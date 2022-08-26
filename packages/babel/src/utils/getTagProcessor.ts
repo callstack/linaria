@@ -447,7 +447,7 @@ export default function getTagProcessor(
 ): BaseProcessor | null {
   if (!cache.has(path.node)) {
     const root = path.scope.getProgramParent().path;
-    const { imports } = collectExportsAndImports(root, fileContext.filename);
+    const { imports } = collectExportsAndImports(root);
     try {
       const builder = getBuilderForIdentifier(
         path,
