@@ -41,8 +41,11 @@
       "styled": "./lib/processors/styled.js"
     }
   },
-  "main": "lib/index.js",
-  "module": "esm/index.js",
+  "type": "module",
+  "exports": {
+    "import": "./esm/index.js",
+    "require": "./lib/index.js"
+  },
   "publishConfig": {
     "access": "public"
   },
