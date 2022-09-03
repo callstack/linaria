@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "paths": {},
+    "types": [],
+    "noEmit": true,
+  },
+  "files": [],
+  "include": [],
+  "exclude": ["types", "esm", "lib", ".turbo"],
+  "references": [
+//    { "path": "../core" },
+    { "path": "./tsconfig.lib.json" },
+    { "path": "./tsconfig.spec.json" }
+  ]
+}

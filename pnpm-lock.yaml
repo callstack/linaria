@@ -518,6 +518,23 @@ importers:
       ts-jest: 28.0.4_ppxpzp26on3nfwb7yosvsqarey
       typescript: 4.7.4
 
+  packages/solid:
+    specifiers:
+      '@babel/types': ^7.18.9
+      '@linaria/core': workspace:^
+      '@linaria/tags': workspace:^
+      '@types/babel__core': ^7.1.19
+      '@types/node': ^17.0.39
+      solid-js: ^1.4.8
+    dependencies:
+      '@linaria/core': link:../core
+      '@linaria/tags': link:../tags
+    devDependencies:
+      '@babel/types': 7.18.9
+      '@types/babel__core': 7.1.19
+      '@types/node': 17.0.39
+      solid-js: 1.4.8
+
   packages/stylelint:
     specifiers:
       '@linaria/babel-preset': workspace:^
@@ -3451,7 +3468,7 @@ packages:
   /@types/babel__core/7.1.19:
     resolution: {integrity: sha512-WEOTgRsbYkvA/KCsDwVEGkd7WAr1e3g31VHQ8zy5gul/V1qKullU/BU5I68X5v7V3GnB9eotmom4v5a5gjxorw==}
     dependencies:
-      '@babel/parser': 7.18.4
+      '@babel/parser': 7.18.9
       '@babel/types': 7.18.9
       '@types/babel__generator': 7.6.4
       '@types/babel__template': 7.4.1
@@ -11055,6 +11072,10 @@ packages:
       faye-websocket: 0.11.4
       uuid: 8.3.2
       websocket-driver: 0.7.4
+    dev: true
+
+  /solid-js/1.4.8:
+    resolution: {integrity: sha512-XErZdnnYYXF7OwGSUAPcua2y5/ELB/c53zFCpWiEGqxTNoH1iQghzI8EsHJXk06sNn+Z/TGhb8bPDNNGSgimag==}
     dev: true
 
   /sort-keys/1.1.2:

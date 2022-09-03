@@ -1,0 +1,89 @@
+{
+  "name": "@linaria/solid",
+  "description": "Blazing fast zero-runtime CSS in JS library for SolidJS",
+  "version": "4.0.0",
+  "bugs": "https://github.com/callstack/linaria/issues",
+  "contributors": [
+    {
+      "name": "Kirill Agalakov",
+      "email": "raveclassic@gmail.com",
+      "url": "https://github.com/raveclassic"
+    }
+  ],
+  "dependencies": {
+    "@linaria/core": "workspace:^",
+    "@linaria/tags": "workspace:^"
+  },
+  "devDependencies": {
+    "@babel/types": "^7.18.9",
+    "@types/babel__core": "^7.1.19",
+    "@types/node": "^17.0.39",
+    "solid-js": "^1.4.8"
+  },
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./esm/index.js",
+      "default": "./lib/index.js"
+    },
+    "./*": {
+      "types": "./types/*.d.ts",
+      "import": "./esm/*.js",
+      "default": "./lib/*.js"
+    }
+  },
+  "files": [
+    "esm/",
+    "lib/",
+    "processors/",
+    "types/"
+  ],
+  "homepage": "https://github.com/callstack/linaria#readme",
+  "keywords": [
+    "css",
+    "css-in-js",
+    "linaria",
+    "solid",
+    "styled-components"
+  ],
+  "license": "MIT",
+  "linaria": {
+    "tags": {
+      "styled": "./lib/processors/styled.js"
+    }
+  },
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "peerDependencies": {
+    "solid-js": "^1.4.8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "git@github.com:callstack/linaria.git",
+  "scripts": {
+    "build": "npm run build:lib && npm run build:esm && npm run build:declarations",
+    "build:corejs-test": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore \"src/processors/**/*\"",
+    "build:declarations": "tsc -p tsconfig.lib.json --emitDeclarationOnly --outDir types",
+    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "test": "jest --config ../../jest.config.js --rootDir .",
+    "test:dts": "dtslint --localTs ../../node_modules/typescript/lib __dtslint__",
+    "typecheck": "tsc -b tsconfig.spec.json",
+    "watch": "npm run build --watch",
+    "t": "tsc --listFiles -p tsconfig.lib.json"
+  },
+  "sideEffects": false,
+  "types": "types/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "processors/*": [
+        "./types/processors/*.d.ts"
+      ]
+    }
+  }
+}
