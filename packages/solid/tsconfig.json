@@ -4,6 +4,7 @@
     "paths": {},
     "types": [],
     "noEmit": true,
+    "composite": false
   },
   "files": [],
   "include": [],

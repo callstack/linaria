@@ -5,5 +5,5 @@
     "types": ["node"]
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["__dtslint__", "__tests__"]
+  "exclude": ["__tests__"]
 }

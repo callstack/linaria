@@ -8,8 +8,8 @@ import type {
   VariableDeclaration,
 } from '@babel/types';
 
-import type { IInterpolation } from '@linaria/tags';
 import {
+  type IInterpolation,
   hasMeta,
   type Params,
   type Rules,

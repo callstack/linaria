@@ -4,5 +4,5 @@
     "noEmit": true,
     "types": ["jest", "node"]
   },
-  "include": ["__tests__", "__dtslint__"]
+  "include": ["__tests__"]
 }

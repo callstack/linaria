@@ -18,6 +18,7 @@
     "@babel/types": "^7.18.9",
     "@types/babel__core": "^7.1.19",
     "@types/node": "^17.0.39",
+    "dedent": "^0.7.0",
     "solid-js": "^1.4.8"
   },
   "engines": {
@@ -68,7 +69,7 @@
   "scripts": {
     "build": "npm run build:lib && npm run build:esm && npm run build:declarations",
     "build:corejs-test": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore \"src/processors/**/*\"",
-    "build:declarations": "tsc -p tsconfig.lib.json --emitDeclarationOnly --outDir types",
+    "build:declarations": "tsc -p tsconfig.lib.json --emitDeclarationOnly --noEmit false --outDir types",
     "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "test": "jest --config ../../jest.config.js --rootDir .",
