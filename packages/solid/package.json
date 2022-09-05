@@ -22,6 +22,7 @@
     "@types/dedent": "^0.7.0",
     "@types/node": "^17.0.39",
     "babel-preset-jest": "^28.1.0",
+    "babel-preset-solid": "^1.5.4",
     "dedent": "^0.7.0",
     "solid-js": "^1.4.8"
   },
@@ -45,7 +46,8 @@
     "esm/",
     "lib/",
     "processors/",
-    "types/"
+    "types/",
+    "linaria.config.js"
   ],
   "homepage": "https://github.com/callstack/linaria#readme",
   "keywords": [
@@ -56,11 +58,6 @@
     "styled-components"
   ],
   "license": "MIT",
-  "linaria": {
-    "tags": {
-      "styled": "./lib/processors/styled.js"
-    }
-  },
   "main": "lib/index.js",
   "module": "esm/index.js",
   "peerDependencies": {
@@ -76,11 +73,10 @@
     "build:declarations": "tsc -p tsconfig.lib.json --emitDeclarationOnly --noEmit false --outDir types",
     "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
-    "test": "jest --config ../../jest.config.js --rootDir .",
+    "test": "jest --config ./jest.config.js --rootDir . --verbose",
     "test:dts": "dtslint --localTs ../../node_modules/typescript/lib __dtslint__",
     "typecheck": "tsc -b tsconfig.spec.json",
-    "watch": "npm run build --watch",
-    "t": "tsc --listFiles -p tsconfig.lib.json"
+    "watch": "npm run build --watch"
   },
   "sideEffects": false,
   "types": "types/index.d.ts",

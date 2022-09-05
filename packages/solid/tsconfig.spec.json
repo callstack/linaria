@@ -5,5 +5,5 @@
     "types": ["jest", "node"]
   },
   "include": ["__tests__"],
-  "exclude": ["types", "esm", "lib", ".turbo"]
+  "exclude": ["types", "esm", "lib", ".turbo", "tmp"]
 }

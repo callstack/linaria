@@ -1,5 +1,8 @@
-/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-  preset: 'babel-jest',
+  collectCoverageFrom: ['src/*.ts'],
+  transformIgnorePatterns: ['node_modules/(?!@linaria)'],
   testEnvironment: 'node',
+  transform: {
+    '\\.[jt]sx?$': 'babel-jest',
+  },
 };

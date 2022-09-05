@@ -1,3 +1,9 @@
-const config = require('../../babel.config');
-
-module.exports = config;
+module.exports = {
+  extends: '../../babel.config',
+  overrides: [
+    {
+      test: /\/(__tests__)\//,
+      presets: ['@linaria', 'solid'],
+    },
+  ],
+};

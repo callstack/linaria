@@ -289,3 +289,5 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
     return unit ? t.binaryExpression('+', call, t.stringLiteral(unit)) : call;
   }
 }
+
+console.log('TS styled processor');
