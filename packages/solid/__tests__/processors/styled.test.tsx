@@ -1,42 +1,71 @@
-// import * as babel from '@babel/core';
-// import {} from '@linaria/babel-preset';
-// import dedent from 'dedent';
+import './polyfill';
 
-import { styled } from '../../src';
-// import { styled } from '@linaria/react';
+import * as babel from '@babel/core';
+import { JSDOM } from 'jsdom';
+import type { JSX } from 'solid-js';
 
-// function transform(source: string): string {
-//   const result = babel.transform(source, {
-//     babelrc: false,
-//     configFile: false,
-//     filename: 'test.tsx',
-//     presets: ['@linaria/babel-preset'],
-//   });
-//   if (!result || !result.code)
-//     throw new Error('Babel cannot parse source code');
-//   return dedent(result.code.trim());
-// }
+import * as linaria from '@linaria/babel-preset';
 
-// describe('styled processor', () => {
-//   it('renders tag', () => {
-//     // const result = transform(`
-//     //   import { styled } from '@linaria/solid'
-//     //   export const Component = styled.div\`\`
-//     // `);
-//     // expect(result).toEqual(
-//     //   dedent(`
-//     //   export const Component = props => {
-//     //     const className = "cg10ziu" + (props.class ? " " + props.class : "");
-//     //     const style = props.style;
-//     //     return <div {...props} class={className} style={style} />;
-//     //   };
-//     // `)
-//     // );
-//     // const Component = styled.div`
-//     //   color: blue;
-//     // `;
-//     // console.log(Component);
-//     console.log(styled.div``);
-//   });
-// });
-console.log(styled.div``);
+import { Tag } from './components.linaria';
+
+function transform(source: string): string {
+  const result = babel.transform(source, {
+    filename: 'test.tsx',
+    presets: ['@linaria'],
+  });
+  if (!result || !result.code)
+    throw new Error('Cannot transform source with babel');
+  return result.code;
+}
+
+function toHTMLElement(element: JSX.Element): HTMLElement {
+  if (element instanceof HTMLElement) {
+    return element;
+  }
+  throw new Error('Element is not an HTMLElement');
+}
+
+describe('styled processor', () => {
+  describe('simple tag', () => {
+    it('renders tag with class', () => {
+      const result = toHTMLElement(<Tag>hi</Tag>);
+      expect(result.classList.length).toBe(1);
+    });
+    it('renders children', () => {
+      const result = toHTMLElement(<Tag>hi</Tag>);
+      expect(result.textContent).toEqual('hi');
+    });
+    it('sets attributes', () => {
+      const result = toHTMLElement(<Tag data-foo={'foo'} />);
+      expect(result.dataset.foo).toEqual('foo');
+    });
+    it('sets class', () => {
+      const result = toHTMLElement(<Tag class={'foo'} />);
+      expect(result.classList).toContain('foo');
+    });
+    it('sets style', () => {
+      const result = toHTMLElement(<Tag style={{ color: 'blue' }} />);
+      expect(result.style.color).toEqual('blue');
+    });
+    // it('jsdom with classes', () => {
+    //   const style = document.createElement('style');
+    //   style.textContent = `
+    //     .foo { color: blue; }
+    //   `;
+    //   document.head.append(style);
+    //   const div = document.createElement('div');
+    //   div.textContent = 'div';
+    //   div.classList.add('foo');
+    //   document.body.append(div);
+    //   expect(window.getComputedStyle(div).color).toBe('blue');
+    //   style.remove();
+    //   div.remove();
+    //   console.log('1', document.body.firstChild);
+    // });
+    // it('2', () => {
+    //   console.log('2', document.body.firstChild);
+    //   const span = document.createElement('span');
+    //   document.body.append(span);
+    // });
+  });
+});

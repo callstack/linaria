@@ -4,7 +4,9 @@
     "paths": {},
     "types": [],
     "noEmit": true,
-    "composite": false
+    "composite": false,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js"
   },
   "files": [],
   "include": [],

@@ -8,18 +8,22 @@ type TagExpression<Props> =
   | number
   | CSSProperties
   | StyledMeta
-  | ((props: Props) => string | number);
+  | ((props: Props) => string | number | undefined);
 
-interface StyledComponent<Props> extends StyledMeta, Component<Props> {}
+export interface StyledComponent<Props> extends StyledMeta, Component<Props> {}
 
-interface StyledTag<Props> {
+export interface StyledTag<Props> {
+  (
+    strings: TemplateStringsArray,
+    ...expressions: readonly TagExpression<Props>[]
+  ): StyledComponent<Props>;
   <AdditionalProps = Record<string, unknown>>(
     strings: TemplateStringsArray,
     ...expressions: readonly TagExpression<Props & AdditionalProps>[]
   ): StyledComponent<Props & AdditionalProps>;
 }
 
-interface Styled {
+export interface Styled {
   <Props>(component: Component<Props>): StyledTag<Props>;
   <TagName extends keyof JSX.IntrinsicElements>(tagName: TagName): StyledTag<
     JSX.IntrinsicElements[TagName]
