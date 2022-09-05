@@ -4,5 +4,6 @@
     "noEmit": true,
     "types": ["jest", "node"]
   },
-  "include": ["__tests__"]
+  "include": ["__tests__"],
+  "exclude": ["types", "esm", "lib", ".turbo"]
 }

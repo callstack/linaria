@@ -8,7 +8,7 @@
   },
   "files": [],
   "include": [],
-  "exclude": ["types", "esm", "lib", ".turbo"],
+  "exclude": [],
   "references": [
 //    { "path": "../core" },
     { "path": "./tsconfig.lib.json" },
