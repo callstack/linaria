@@ -92,7 +92,10 @@ export default function preeval(
         },
         Identifier(p) {
           if (isBrowserGlobal(p)) {
-            if (p.parentPath.isUnaryExpression({ operator: 'typeof' })) {
+            if (
+              p.parentPath.isUnaryExpression({ operator: 'typeof' }) ||
+              p.parentPath.isTSTypeQuery()
+            ) {
               // Ignore `typeof window` expressions
               return;
             }
