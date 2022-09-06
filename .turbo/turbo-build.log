@@ -1,4 +1,4 @@
-linaria-website:build: cache hit, replaying output 77b82d02813a3067
+linaria-website:build: cache hit, replaying output 9ed1590e5f28a1da
 linaria-website:build: 
 linaria-website:build: > linaria-website@4.1.2 build /home/runner/work/linaria/linaria/website
 linaria-website:build: > yarn build:client && yarn build:server
@@ -28,9 +28,9 @@ linaria-website:build:       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@
 linaria-website:build:       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Hero.jsx[39m[22m 1.32 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 linaria-website:build:     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/index.jsx[39m[22m 311 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 linaria-website:build:     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Container.js[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-linaria-website:build: webpack 5.73.0 compiled [1m[32msuccessfully[39m[22m in 7093 ms
-linaria-website:build: Done in 7.99s.
+linaria-website:build: webpack 5.73.0 compiled [1m[32msuccessfully[39m[22m in 8531 ms
+linaria-website:build: Done in 9.66s.
 linaria-website:build: yarn run v1.22.19
 linaria-website:build: $ cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
-linaria-website:build: Successfully compiled 11 files with Babel (1325ms).
-linaria-website:build: Done in 1.73s.
+linaria-website:build: Successfully compiled 11 files with Babel (1754ms).
+linaria-website:build: Done in 2.35s.
