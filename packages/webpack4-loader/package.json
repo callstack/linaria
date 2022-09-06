@@ -37,11 +37,8 @@
     "styled-components"
   ],
   "license": "MIT",
-  "type": "module",
-  "exports": {
-    "import": "./esm/index.js",
-    "require": "./lib/index.js"
-  },
+  "main": "lib/index.js",
+  "module": "esm/index.js",
   "peerDependencies": {
     "webpack": ">=4.0.0 <5.0.0"
   },

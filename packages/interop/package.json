@@ -23,11 +23,8 @@
   ],
   "homepage": "https://github.com/callstack/linaria/tree/master/packages/interop#readme",
   "license": "MIT",
-  "type": "module",
-  "exports": {
-    "import": "./esm/index.js",
-    "require": "./lib/index.js"
-  },
+  "main": "lib/index.js",
+  "module": "esm/index.js",
   "publishConfig": {
     "access": "public"
   },
