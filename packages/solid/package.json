@@ -25,6 +25,7 @@
     "babel-preset-jest": "^28.1.0",
     "babel-preset-solid": "^1.5.4",
     "dedent": "^0.7.0",
+    "esbuild": "^0.15.7",
     "jest-environment-jsdom": "^28.1.0",
     "jsdom": "^20.0.0",
     "solid-js": "^1.4.8"
@@ -80,7 +81,7 @@
     "test:dts": "dtslint --localTs ../../node_modules/typescript/lib __dtslint__",
     "typecheck": "tsc -b tsconfig.spec.json",
     "watch": "npm run build --watch",
-    "build:tests": "babel ./__tests__/processors/styled.test.tsx -o ./tmp/out.js --verbose"
+    "t": "node __tests__/processors/test.js"
   },
   "sideEffects": false,
   "types": "types/index.d.ts",
