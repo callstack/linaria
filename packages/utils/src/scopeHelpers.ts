@@ -151,6 +151,7 @@ export function findParentForDelete(path: NodePath): NodePath | null {
 
   if (
     parent.isFunctionExpression({ body: path.node }) ||
+    parent.isFunctionDeclaration() ||
     parent.isObjectMethod() ||
     parent.isClassMethod()
   ) {
