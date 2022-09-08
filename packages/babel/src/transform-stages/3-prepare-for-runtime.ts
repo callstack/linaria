@@ -1,7 +1,12 @@
-import * as babel from '@babel/core';
+import type {
+  BabelFileResult,
+  PluginItem,
+  TransformOptions,
+} from '@babel/core';
 
 import { buildOptions, loadBabelOptions } from '@linaria/utils';
 
+import type { Core } from '../babel';
 import type { Options, ValueCache } from '../types';
 
 import cachedParseSync from './helpers/cachedParseSync';
@@ -12,20 +17,22 @@ import loadLinariaOptions from './helpers/loadLinariaOptions';
  * removes dead code.
  */
 export default function prepareForRuntime(
+  babel: Core,
   code: string,
   valueCache: ValueCache,
   options: Options,
-  babelConfig: babel.TransformOptions
-) {
+  babelConfig: TransformOptions
+): BabelFileResult {
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
   const babelOptions = loadBabelOptions(
+    babel,
     options.filename,
     pluginOptions?.babelOptions
   );
 
-  const file = cachedParseSync(code, babelOptions);
+  const file = cachedParseSync(babel, code, babelOptions);
 
-  const transformPlugins: babel.PluginItem[] = [
+  const transformPlugins: PluginItem[] = [
     [
       require.resolve('../plugins/collector'),
       {

@@ -1,5 +1,7 @@
 import type { TransformOptions } from '@babel/core';
 
+import type { Core } from '../babel';
+
 export type ClassNameSlugVars = {
   dir: string;
   ext: string;
@@ -19,7 +21,8 @@ export type Evaluator = (
   filename: string,
   options: StrictOptions,
   text: string,
-  only: string[] | null
+  only: string[] | null,
+  babel: Core
 ) => [string, Map<string, string[]> | null];
 
 export type EvalRule = {

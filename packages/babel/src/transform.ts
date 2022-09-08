@@ -8,6 +8,7 @@
  */
 
 import type { TransformOptions } from '@babel/core';
+import * as babel from '@babel/core';
 
 import type Module from './module';
 import prepareForEval, {
@@ -70,6 +71,7 @@ function syncStages(
   eventEmitter?.({ type: 'transform:stage-3:start', filename });
 
   const collectStageResult = prepareForRuntime(
+    babel,
     originalCode,
     valueCache,
     options,
@@ -132,6 +134,7 @@ export function transformSync(
   };
 
   const prepareStageResults = prepareForEvalSync(
+    babel,
     resolveCache,
     codeCache,
     syncResolve,
@@ -182,6 +185,7 @@ export default async function transform(
   });
 
   const prepareStageResults = await prepareForEval(
+    babel,
     resolveCache,
     codeCache,
     asyncResolve,

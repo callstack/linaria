@@ -1,12 +1,13 @@
 import { readFileSync } from 'fs';
 import { dirname, extname } from 'path';
 
-import * as babel from '@babel/core';
+import type { BabelFileResult, TransformOptions } from '@babel/core';
 
 import { createCustomDebug } from '@linaria/logger';
 import type { EvalRule, Evaluator } from '@linaria/utils';
 import { buildOptions, getFileIdx, loadBabelOptions } from '@linaria/utils';
 
+import type { Core } from '../babel';
 import type Module from '../module';
 import type { CodeCache, ITransformFileResult, Options } from '../types';
 import withLinariaMetadata from '../utils/withLinariaMetadata';
@@ -26,19 +27,20 @@ const isModuleResolver = (i: unknown): i is { options: unknown } =>
   (i as { key?: string }).key === 'module-resolver';
 
 function runPreevalStage(
+  babel: Core,
   filename: string,
   code: string,
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>,
-  perFileBabelConfig?: babel.TransformOptions
-): babel.BabelFileResult {
+  perFileBabelConfig?: TransformOptions
+): BabelFileResult {
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
   const parseConfig = buildOptions(
     pluginOptions?.babelOptions,
     perFileBabelConfig
   );
 
-  const fullParserOptions = loadBabelOptions(filename, parseConfig);
-  const file = cachedParseSync(code, fullParserOptions);
+  const fullParserOptions = loadBabelOptions(babel, filename, parseConfig);
+  const file = cachedParseSync(babel, code, fullParserOptions);
 
   const transformPlugins: babel.PluginItem[] = [
     [require.resolve('../plugins/preeval'), pluginOptions],
@@ -98,6 +100,7 @@ function getMatchedRule(
 }
 
 function prepareCode(
+  babel: Core,
   filename: string,
   originalCode: string,
   only: string[],
@@ -128,6 +131,7 @@ function prepareCode(
   }
 
   const preevalStageResult = runPreevalStage(
+    babel,
     filename,
     originalCode,
     options,
@@ -159,7 +163,8 @@ function prepareCode(
     filename,
     pluginOptions,
     preevalStageResult.code!,
-    only
+    only,
+    babel
   );
 
   log('stage-1:evaluator:end', '');
@@ -168,6 +173,7 @@ function prepareCode(
 }
 
 function processQueueItem(
+  babel: Core,
   item: {
     name: string;
     code: string;
@@ -231,6 +237,7 @@ function processQueueItem(
   log('stage-1', `>> (${remainExports.join(', ')})`);
 
   const [preparedCode, imports, metadata] = prepareCode(
+    babel,
     name,
     code,
     remainExports,
@@ -264,6 +271,7 @@ function processQueueItem(
 }
 
 export function prepareForEvalSync(
+  babel: Core,
   resolveCache: Map<string, string>,
   codeCache: CodeCache,
   resolve: (what: string, importer: string, stack: string[]) => string,
@@ -271,7 +279,7 @@ export function prepareForEvalSync(
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>,
   stack: string[] = []
 ): ITransformFileResult[] | undefined {
-  const processed = processQueueItem(resolvedFile, codeCache, options);
+  const processed = processQueueItem(babel, resolvedFile, codeCache, options);
   if (!processed) return undefined;
 
   const { imports, name, results } = processed;
@@ -300,7 +308,7 @@ export function prepareForEvalSync(
   });
 
   queue.forEach((item) => {
-    prepareForEvalSync(resolveCache, codeCache, resolve, item, options, [
+    prepareForEvalSync(babel, resolveCache, codeCache, resolve, item, options, [
       name,
       ...stack,
     ]);
@@ -314,6 +322,7 @@ export function prepareForEvalSync(
  * finds tags, applies eval-time replacements, removes dead code.
  */
 export default async function prepareForEval(
+  babel: Core,
   resolveCache: Map<string, string>,
   codeCache: CodeCache,
   resolve: (what: string, importer: string, stack: string[]) => Promise<string>,
@@ -322,7 +331,7 @@ export default async function prepareForEval(
   stack: string[] = []
 ): Promise<ITransformFileResult[] | undefined> {
   const resolvedFile = await file;
-  const processed = processQueueItem(resolvedFile, codeCache, options);
+  const processed = processQueueItem(babel, resolvedFile, codeCache, options);
   if (!processed) return undefined;
 
   const { imports, name, results } = processed;
@@ -367,10 +376,15 @@ export default async function prepareForEval(
     );
 
     promises.push(
-      prepareForEval(resolveCache, codeCache, resolve, promise, options, [
-        name,
-        ...stack,
-      ])
+      prepareForEval(
+        babel,
+        resolveCache,
+        codeCache,
+        resolve,
+        promise,
+        options,
+        [name, ...stack]
+      )
     );
   });
 
