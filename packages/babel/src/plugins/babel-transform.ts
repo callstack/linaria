@@ -33,6 +33,7 @@ export default function collector(
       };
 
       const prepareStageResults = prepareForEvalSync(
+        babel,
         resolveCache,
         codeCache,
         syncResolve,

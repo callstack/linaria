@@ -41,8 +41,9 @@ const getShakerConfig = (only: string[] | null): TransformOptions => {
   return config;
 };
 
-const shaker: Evaluator = (filename, options, text, only = null) => {
+const shaker: Evaluator = (filename, options, text, only, babel) => {
   const transformOptions = loadBabelOptions(
+    babel,
     filename,
     buildOptions(options?.babelOptions, getShakerConfig(only))
   );
