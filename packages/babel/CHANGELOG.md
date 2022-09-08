@@ -1,5 +1,29 @@
 # Change Log
 
+## 4.2.0
+
+### Minor Changes
+
+- f7351b09: In some cases, different parts of babel-preset could use different versions of installed @babel/core. It caused the ".key is not a valid Plugin property" error. Fixed.
+
+### Patch Changes
+
+- 8590e134: Fix for incorrect shaker behaviour when it tries to keep a function declaration with a removed body (fixes #1036).
+- c0bd271a: Sometimes Linaria can meet already processed code. In such a case, it shall ignore runtime versions of `styled` tags. Fixes #1037.
+- 8f90fa75: If an expression in a string literal is deleted during preeval stage, it should be replaced with an empty string. Fixes #1039.
+- a5169f16: Do not set custom babel envName for the shaker. Fixes #1034.
+- ac0991a6: Better detection for jsx-runtime. Reduces the amount of evaluated code and improves speed and stability.
+- Updated dependencies [8590e134]
+- Updated dependencies [f7351b09]
+- Updated dependencies [c0bd271a]
+- Updated dependencies [8f90fa75]
+- Updated dependencies [a5169f16]
+- Updated dependencies [ac0991a6]
+  - @linaria/utils@4.2.0
+  - @linaria/shaker@4.2.0
+  - @linaria/tags@4.1.2
+  - @linaria/core@4.1.2
+
 ## 4.1.2
 
 ### Patch Changes

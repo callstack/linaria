@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.2.0
+
+### Minor Changes
+
+- f7351b09: In some cases, different parts of babel-preset could use different versions of installed @babel/core. It caused the ".key is not a valid Plugin property" error. Fixed.
+
+### Patch Changes
+
+- 8590e134: Fix for incorrect shaker behaviour when it tries to keep a function declaration with a removed body (fixes #1036).
+- 8f90fa75: If an expression in a string literal is deleted during preeval stage, it should be replaced with an empty string. Fixes #1039.
+- ac0991a6: Better detection for jsx-runtime. Reduces the amount of evaluated code and improves speed and stability.
+
 ## 4.1.1
 
 ### Patch Changes

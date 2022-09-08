@@ -1,7 +1,7 @@
 {
   "name": "@linaria/tags",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
     "@babel/generator": "^7.18.9",

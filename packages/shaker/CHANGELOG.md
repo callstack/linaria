@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.2.0
+
+### Minor Changes
+
+- f7351b09: In some cases, different parts of babel-preset could use different versions of installed @babel/core. It caused the ".key is not a valid Plugin property" error. Fixed.
+
+### Patch Changes
+
+- a5169f16: Do not set custom babel envName for the shaker. Fixes #1034.
+- ac0991a6: Better detection for jsx-runtime. Reduces the amount of evaluated code and improves speed and stability.
+- Updated dependencies [8590e134]
+- Updated dependencies [f7351b09]
+- Updated dependencies [8f90fa75]
+- Updated dependencies [ac0991a6]
+  - @linaria/utils@4.2.0
+
 ## 4.1.2
 
 ### Patch Changes
