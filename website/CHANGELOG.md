@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.1.3
+
+### Patch Changes
+
+- Updated dependencies [c0bd271a]
+  - @linaria/react@4.1.3
+  - @linaria/atomic@4.1.3
+  - @linaria/core@4.1.2
+
 ## 4.1.2
 
 ### Patch Changes

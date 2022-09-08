@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.1.3
+
+### Patch Changes
+
+- c0bd271a: Sometimes Linaria can meet already processed code. In such a case, it shall ignore runtime versions of `styled` tags. Fixes #1037.
+- Updated dependencies [c0bd271a]
+  - @linaria/tags@4.1.2
+  - @linaria/core@4.1.2
+
 ## 4.1.2
 
 ### Patch Changes
