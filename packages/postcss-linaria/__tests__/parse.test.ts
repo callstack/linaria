@@ -1,38 +1,93 @@
-import type { Root, Rule, Declaration, Comment } from 'postcss';
+import type { Root, Rule, Declaration } from 'postcss';
 
-import { createTestAst } from './util';
+import { createTestAst, sourceWithExpression } from './__utils__';
+
+const {
+  ruleset,
+  selectorOrAtRule,
+  declarationProperty,
+  declarationValue,
+  declarationMultipleValues,
+  declarationMixedValues,
+  combo,
+} = sourceWithExpression;
 
 describe('parse', () => {
   describe('expressions', () => {
     it('should parse a ruleset expression', () => {
-      const { source, ast } = createTestAst(`
-        const expr = 'color: black';
-        css\`
-          $\{expr}
-        \`;
-      `);
-      expect(ast.nodes.length).toEqual(1);
+      const { ast } = createTestAst(ruleset);
       const root = ast.nodes[0] as Root;
-      expect(root.source?.input.css).toEqual('  /*linaria:0*/\n');
+      expect(root.source?.input.css).toMatchInlineSnapshot(`
+        "  /* linaria:0 */
+        "
+      `);
     });
 
     it('should parse a selector or at-rule expression', () => {
-      const { source, ast } = createTestAst(`
-        const expr = '@media (min-width: 100px)';
-        css\`
-          $\{expr} {
+      const { ast } = createTestAst(selectorOrAtRule);
+      const root = ast.nodes[0] as Root;
+      expect(root.source?.input.css).toMatchInlineSnapshot(`
+        "  @linaria0 {
             color: black;
           }
-        \`;
+        "
       `);
-      expect(ast.nodes.length).toEqual(1);
-      const root = ast.nodes[0] as Root;
-      expect(root.source?.input.css).toEqual(`  @linaria0 {\n    color: black;\n  }\n`);
     });
-    it('should parse a declaration property expression', () => {});
-    it('should parse a declaration value with a single expression', () => {});
-    it('should parse a declaration value with multiple expressions', () => {});
-    it('should parse a combinations of all expressions', () => {});
+
+    it('should parse a declaration property expression', () => {
+      const { ast } = createTestAst(declarationProperty);
+      const root = ast.nodes[0] as Root;
+      expect(root.source?.input.css).toMatchInlineSnapshot(`
+        "  linaria0: black;
+        "
+      `);
+    });
+
+    it('should parse a declaration value with a single expression', () => {
+      const { ast } = createTestAst(declarationValue);
+      const root = ast.nodes[0] as Root;
+      expect(root.source?.input.css).toMatchInlineSnapshot(`
+        "  color: linaria0;
+        "
+      `);
+    });
+
+    it('should parse a declaration value with multiple expressions', () => {
+      const { ast } = createTestAst(declarationMultipleValues);
+      const root = ast.nodes[0] as Root;
+      expect(root.source?.input.css).toMatchInlineSnapshot(`
+        "  margin: linaria0 linaria1 linaria2 linaria3;
+        "
+      `);
+    });
+
+    it('should parse a decl value with some but not all values as expressions', () => {
+      const { ast } = createTestAst(declarationMixedValues);
+      const root = ast.nodes[0] as Root;
+      expect(root.source?.input.css).toMatchInlineSnapshot(`
+        "  margin: linaria0 7px linaria1 9px;
+        "
+      `);
+    });
+
+    it('should parse a combinations of all expressions', () => {
+      const { ast } = createTestAst(combo);
+      const root = ast.nodes[0] as Root;
+      expect(root.source?.input.css).toMatchInlineSnapshot(`
+      "  /* linaria:0 */
+        .foo {
+          linaria1: linaria2;
+        }
+
+        @linaria3 {
+          .bar {
+            color: black;
+          }
+        }
+        /* linaria:4 */
+      "
+      `);
+    });
   });
 
   describe('languages', () => {
@@ -201,7 +256,9 @@ describe('parse', () => {
       expect(root1.parent).toEqual(ast);
 
       expect(root2.type).toEqual('root');
-      expect(root2.raws.codeBefore).toEqual('`;\n        const classNames = {\n          container: css`\n');
+      expect(root2.raws.codeBefore).toEqual(
+        '`;\n        const classNames = {\n          container: css`\n'
+      );
       expect(root2.raws.codeAfter).toEqual('`,\n        };\n      ');
       expect(root2.parent).toEqual(ast);
 
@@ -239,49 +296,4 @@ describe('parse', () => {
       expect(ast.source!.input.css).toEqual(source);
     });
   });
-
-  // it('should parse multi-line stylesheets containing expressions', async () => {
-  //   const { source, ast } = createTestAst(`
-  //     css\`
-  //       .foo {
-  //         color: hotpink;
-  //         $\{expr}
-  //       }
-  //     \`;
-  //   `);
-  //   const root = ast.nodes[0] as Root;
-  //   const rule = root.nodes[0] as Rule;
-  //   const colour = rule.nodes[0] as Declaration;
-  //   assert.equal(ast.type, 'document');
-  //   assert.equal(root.type, 'root');
-  //   assert.equal(rule.type, 'rule');
-  //   assert.equal(colour.type, 'decl');
-  //   assert.equal(root.raws.codeBefore, '\n      css`\n');
-  //   assert.equal(root.parent, ast);
-  //   assert.equal(root.raws.codeAfter, '`;\n    ');
-  //   assert.deepEqual(ast.source!.start, {
-  //     line: 1,
-  //     column: 1,
-  //     offset: 0,
-  //   });
-  //   assert.equal(ast.source!.input.css, source);
-  // });
-
-  // it('should parse CSS containing an expression', () => {
-  //   const { source, ast } = createTestAst(`
-  //     css\`
-  //       .foo { $\{expr}color: hotpink; }
-  //     \`;
-  //   `);
-  //   const root = ast.nodes[0] as Root;
-  //   const rule = root.nodes[0] as Rule;
-  //   const placeholder = rule.nodes[0] as Comment;
-  //   const colour = rule.nodes[1] as Declaration;
-  //   assert.equal(ast.type, 'document');
-  //   assert.equal(root.type, 'root');
-  //   assert.equal(rule.type, 'rule');
-  //   assert.equal(placeholder.type, 'comment');
-  //   assert.equal(colour.type, 'decl');
-  //   assert.equal(ast.source!.input.css, source);
-  // });
 });

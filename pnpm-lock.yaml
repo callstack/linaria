@@ -527,6 +527,16 @@ importers:
     devDependencies:
       '@types/node': 17.0.39
 
+  packages/stylelint-config-standard-linaria:
+    specifiers:
+      postcss-linaria: workspace:^
+      stylelint: ^14.1.0
+      stylelint-config-standard: ^28.0.0
+    dependencies:
+      postcss-linaria: link:../postcss-linaria
+      stylelint: 14.11.0
+      stylelint-config-standard: 28.0.0_stylelint@14.11.0
+
   packages/tags:
     specifiers:
       '@babel/generator': ^7.18.9
@@ -11045,6 +11055,23 @@ packages:
     dependencies:
       stylelint: 13.13.1
     dev: true
+
+  /stylelint-config-recommended/9.0.0_stylelint@14.11.0:
+    resolution: {integrity: sha512-9YQSrJq4NvvRuTbzDsWX3rrFOzOlYBmZP+o513BJN/yfEmGSr0AxdvrWs0P/ilSpVV/wisamAHu5XSk8Rcf4CQ==}
+    peerDependencies:
+      stylelint: ^14.10.0
+    dependencies:
+      stylelint: 14.11.0
+    dev: false
+
+  /stylelint-config-standard/28.0.0_stylelint@14.11.0:
+    resolution: {integrity: sha512-q/StuowDdDmFCravzGHAwgS9pjX0bdOQUEBBDIkIWsQuYGgYz/xsO8CM6eepmIQ1fc5bKdDVimlJZ6MoOUcJ5Q==}
+    peerDependencies:
+      stylelint: ^14.11.0
+    dependencies:
+      stylelint: 14.11.0
+      stylelint-config-recommended: 9.0.0_stylelint@14.11.0
+    dev: false
 
   /stylelint/13.13.1:
     resolution: {integrity: sha512-Mv+BQr5XTUrKqAXmpqm6Ddli6Ief+AiPZkRsIrAoUKFuq/ElkUh9ZMYxXD0iQNZ5ADghZKLOWz1h7hTClB7zgQ==}

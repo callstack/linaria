@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import type { TaggedTemplateExpression } from '@babel/types';
 import type { Root, Position, Document, ChildNode, AnyNode } from 'postcss';
 
@@ -7,6 +8,7 @@ const correctLocation = (
   node: TaggedTemplateExpression,
   loc: Position,
   baseIndentations: Map<number, number>,
+  sourceAsString: string,
   prefixOffsets?: { lines: number; offset: number }
 ): Position => {
   if (!node.quasi.loc || !node.quasi.range) {
@@ -43,7 +45,11 @@ const correctLocation = (
       nextQuasi.range &&
       previousQuasi.range[1] < newOffset
     ) {
-      const placeholderSize = createPlaceholder(i).length;
+      const placeholderSize = createPlaceholder(
+        i,
+        sourceAsString,
+        node.end ?? 0
+      ).length;
       const exprSize =
         nextQuasi.range[0] - previousQuasi.range[1] - placeholderSize;
       const exprStartLine = previousQuasi.loc.end.line;
@@ -85,94 +91,6 @@ const correctLocation = (
 
   return loc;
 };
-
-/**
- * Computes the before/after strings from the original source for
- * restoration later when stringifying.
- * @param {Document|Root|ChildNode} node Node to compute strings for
- * @param {Map} baseIndentations Map of base indentations by line
- * @return {void}
- */
-function computeBeforeAfter(
-  node: Document | Root | ChildNode,
-  baseIndentations: Map<number, number>
-): void {
-  if (
-    node.raws.before &&
-    (node.raws.before.includes('\n') || node.parent?.type === 'root') &&
-    node.source?.start
-  ) {
-    const numBeforeLines = node.raws.before.split('\n').length - 1;
-    const corrected = computeCorrectedString(
-      node.raws.before,
-      node.source.start.line - numBeforeLines,
-      baseIndentations
-    );
-    node.raws.litBefore = corrected;
-  }
-
-  if (
-    node.raws.after &&
-    node.raws.after.includes('\n') &&
-    (node.type === 'root' || node.source?.end)
-  ) {
-    const numAfterLines = node.raws.after.split('\n').length - 1;
-    const line =
-      node.type === 'root'
-        ? node.nodes[node.nodes.length - 1]?.source?.end?.line
-        : node.source?.end?.line;
-    if (line !== undefined) {
-      const corrected = computeCorrectedString(
-        node.raws.after,
-        line - numAfterLines,
-        baseIndentations
-      );
-      node.raws.litAfter = corrected;
-    }
-  }
-
-  if (
-    node.raws.between &&
-    node.raws.between.includes('\n') &&
-    node.source?.start
-  ) {
-    const corrected = computeCorrectedString(
-      node.raws.between,
-      node.source.start.line,
-      baseIndentations
-    );
-
-    node.raws.litBetween = corrected;
-  }
-
-  if (node.type === 'rule' && node.selector.includes('\n')) {
-    const rawValue = computeCorrectedRawValue(
-      node,
-      'selector',
-      baseIndentations
-    );
-
-    if (rawValue !== null) {
-      (node.raws as unknown as Record<string, unknown>).litSelector = rawValue;
-    }
-  }
-
-  if (node.type === 'decl' && node.value.includes('\n')) {
-    const rawValue = computeCorrectedRawValue(node, 'value', baseIndentations);
-
-    if (rawValue !== null) {
-      (node.raws as unknown as Record<string, unknown>).litValue = rawValue;
-    }
-  }
-
-  if (node.type === 'atrule' && node.params.includes('\n')) {
-    const rawValue = computeCorrectedRawValue(node, 'params', baseIndentations);
-
-    if (rawValue !== null) {
-      (node.raws as unknown as Record<string, unknown>).litParams = rawValue;
-    }
-  }
-}
 
 /**
  * Computes the re-indented string of a given string on a given line
@@ -244,6 +162,96 @@ function computeCorrectedRawValue<T extends AnyNode>(
 }
 
 /**
+ * Computes the before/after strings from the original source for
+ * restoration later when stringifying.
+ * @param {Document|Root|ChildNode} node Node to compute strings for
+ * @param {Map} baseIndentations Map of base indentations by line
+ * @return {void}
+ */
+function computeBeforeAfter(
+  node: Document | Root | ChildNode,
+  baseIndentations: Map<number, number>
+): void {
+  if (
+    node.raws.before &&
+    (node.raws.before.includes('\n') || node.parent?.type === 'root') &&
+    node.source?.start
+  ) {
+    const numBeforeLines = node.raws.before.split('\n').length - 1;
+    const corrected = computeCorrectedString(
+      node.raws.before,
+      node.source.start.line - numBeforeLines,
+      baseIndentations
+    );
+    node.raws.linariaBefore = corrected;
+  }
+
+  if (
+    node.raws.after &&
+    node.raws.after.includes('\n') &&
+    (node.type === 'root' || node.source?.end)
+  ) {
+    const numAfterLines = node.raws.after.split('\n').length - 1;
+    const line =
+      node.type === 'root'
+        ? node.nodes[node.nodes.length - 1]?.source?.end?.line
+        : node.source?.end?.line;
+    if (line !== undefined) {
+      const corrected = computeCorrectedString(
+        node.raws.after,
+        line - numAfterLines,
+        baseIndentations
+      );
+      node.raws.linariaAfter = corrected;
+    }
+  }
+
+  if (
+    node.raws.between &&
+    node.raws.between.includes('\n') &&
+    node.source?.start
+  ) {
+    const corrected = computeCorrectedString(
+      node.raws.between,
+      node.source.start.line,
+      baseIndentations
+    );
+
+    node.raws.linariaBetween = corrected;
+  }
+
+  if (node.type === 'rule' && node.selector.includes('\n')) {
+    const rawValue = computeCorrectedRawValue(
+      node,
+      'selector',
+      baseIndentations
+    );
+
+    if (rawValue !== null) {
+      (node.raws as unknown as Record<string, unknown>).linariaSelector =
+        rawValue;
+    }
+  }
+
+  if (node.type === 'decl' && node.value.includes('\n')) {
+    const rawValue = computeCorrectedRawValue(node, 'value', baseIndentations);
+
+    if (rawValue !== null) {
+      (node.raws as unknown as Record<string, unknown>).linariaValue = rawValue;
+    }
+  }
+
+  if (node.type === 'atrule' && node.params.includes('\n')) {
+    const rawValue = computeCorrectedRawValue(node, 'params', baseIndentations);
+
+    if (rawValue !== null) {
+      (node.raws as unknown as Record<string, unknown>).linariaParams =
+        rawValue;
+    }
+  }
+}
+
+/**
  * Creates an AST walker/visitor for correcting PostCSS AST locations to
  * those in the original JavaScript document.
  * @param {TaggedTemplateExpression} expr Expression the original source came
@@ -251,7 +259,8 @@ function computeCorrectedRawValue<T extends AnyNode>(
  * @return {Function}
  */
 export function locationCorrectionWalker(
-  expr: TaggedTemplateExpression
+  expr: TaggedTemplateExpression,
+  sourceAsString: string
 ): (node: Document | Root | ChildNode) => void {
   return (node: Document | Root | ChildNode): void => {
     const root = node.root();
@@ -266,6 +275,7 @@ export function locationCorrectionWalker(
         expr,
         node.source.start,
         baseIndentations,
+        sourceAsString,
         root.raws.linariaPrefixOffsets
       );
     }
@@ -274,6 +284,7 @@ export function locationCorrectionWalker(
         expr,
         node.source.end,
         baseIndentations,
+        sourceAsString,
         root.raws.linariaPrefixOffsets
       );
     }

@@ -15,7 +15,7 @@ const placeholderPattern = /^linaria:\d+$/;
  * Stringifies PostCSS nodes while taking interpolated expressions
  * into account.
  */
-class LitStringifier extends Stringifier {
+class LinariaStringifier extends Stringifier {
   /** @inheritdoc */
   public constructor(builder: Builder) {
     const wrappedBuilder: Builder = (
@@ -89,45 +89,55 @@ class LitStringifier extends Stringifier {
   }
 
   public override decl(node: Declaration, semicolon: boolean): void {
-    let earlyReturn = false;
-    if (node.prop.includes('linaria')) {
+    const between = this.raw(node, 'between', 'colon');
+    let { prop } = node;
+    if (prop.includes('linaria')) {
       const [, expressionIndexString] = node.prop.split('linaria');
       const expressionIndex = Number(expressionIndexString);
       const root = node.root();
       const expressionStrings = root.raws.linariaTemplateExpressions;
       if (expressionStrings && !Number.isNaN(expressionIndex)) {
         const expression = expressionStrings[expressionIndex];
-
-        if (expression) {
-          this.builder(expression + node.raws.between, node);
-          earlyReturn = true;
-        }
+        if (expression) prop = expression;
       }
     }
 
-    if (node.value.includes('linaria')) {
-      const [, expressionIndexString] = node.value.split('linaria');
-      const expressionIndex = Number(expressionIndexString);
-      const root = node.root();
-      const expressionStrings = root.raws.linariaTemplateExpressions;
-
-      if (expressionStrings && !Number.isNaN(expressionIndex)) {
-        let expression = expressionStrings[expressionIndex];
-        expression += semicolon ? ';' : '';
+    let value = this.rawValue(node, 'value');
+    if (value.includes('linaria')) {
+      const values = node.value.split(' ');
+      let tempValue = '';
+      values.forEach((individualValue, index) => {
+        const [, expressionIndexString] = individualValue.split('linaria');
+        const expressionIndex = Number(expressionIndexString);
+        const root = node.root();
+        const expressionStrings = root.raws.linariaTemplateExpressions;
+        const expression =
+          expressionStrings &&
+          !Number.isNaN(expressionIndex) &&
+          expressionStrings[expressionIndex];
         if (expression) {
-          this.builder(expression, node);
-          earlyReturn = true;
+          if (index !== 0) tempValue += ' ';
+          tempValue += expression;
+        } else {
+          if (index !== 0) tempValue += ' ';
+          tempValue += individualValue;
         }
-      }
+      });
+      value = tempValue;
     }
 
-    if (earlyReturn) return;
-    super.decl(node);
+    let string = prop + between + value;
+
+    if (node.important) {
+      string += node.raws.important || ' !important';
+    }
+
+    if (semicolon) string += ';';
+    this.builder(string, node);
   }
 
   /** @inheritdoc */
   public override document(node: Document): void {
-    console.log('here');
     if (node.nodes.length === 0) {
       this.builder(node.source?.input.css ?? '');
     } else {
@@ -143,7 +153,7 @@ class LitStringifier extends Stringifier {
 
     // Here we want to recover any previously removed JS indentation
     // if possible. Otherwise, we use the `after` string as-is.
-    const after = node.raws.litAfter ?? node.raws.after;
+    const after = node.raws.linariaAfter ?? node.raws.after;
     if (after) {
       this.builder(after);
     }
@@ -157,23 +167,23 @@ class LitStringifier extends Stringifier {
     own: string,
     detect: string | undefined
   ): string {
-    if (own === 'before' && node.raws.before && node.raws.litBefore) {
-      return node.raws.litBefore;
+    if (own === 'before' && node.raws.before && node.raws.linariaBefore) {
+      return node.raws.linariaBefore;
     }
-    if (own === 'after' && node.raws.after && node.raws.litAfter) {
-      return node.raws.litAfter;
+    if (own === 'after' && node.raws.after && node.raws.linariaAfter) {
+      return node.raws.linariaAfter;
     }
-    if (own === 'between' && node.raws.between && node.raws.litBetween) {
-      return node.raws.litBetween;
+    if (own === 'between' && node.raws.between && node.raws.linariaBetween) {
+      return node.raws.linariaBetween;
     }
     return super.raw(node, own, detect);
   }
 
   /** @inheritdoc */
   public override rawValue(node: AnyNode, prop: string): string {
-    const litProp = `lit${prop[0]?.toUpperCase()}${prop.slice(1)}`;
-    if (Object.prototype.hasOwnProperty.call(node.raws, litProp)) {
-      return `${node.raws[litProp]}`;
+    const linariaProp = `linaria${prop[0]?.toUpperCase()}${prop.slice(1)}`;
+    if (Object.prototype.hasOwnProperty.call(node.raws, linariaProp)) {
+      return `${node.raws[linariaProp]}`;
     }
 
     return super.rawValue(node, prop);
@@ -184,6 +194,6 @@ export const stringify: StringifierFn = (
   node: AnyNode,
   builder: Builder
 ): void => {
-  const str = new LitStringifier(builder);
+  const str = new LinariaStringifier(builder);
   str.stringify(node);
 };

@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 import type { Document, Node } from 'postcss';
 
-import { parse } from '../src/parse';
+import { parse } from '../../src/parse';
 
 export function createTestAst(source: string): {
   ast: Document;
@@ -52,3 +52,61 @@ export function getSourceForNodeByRange(source: string, node: Node): string {
 
   return source.substring(node.source.start.offset, node.source.end.offset + 1);
 }
+
+export const sourceWithExpression = {
+  ruleset: `
+    const expr = 'color: black';
+    css\`
+      $\{expr}
+    \`;
+  `,
+  selectorOrAtRule: `
+    const expr = '@media (min-width: 100px)';
+    css\`
+      $\{expr} {
+        color: black;
+      }
+    \`;
+  `,
+  declarationProperty: `
+    const expr = 'color';
+    css\`
+      \${expr}: black;
+    \`;
+  `,
+  declarationValue: `
+    const expr = 'black';
+    css\`
+      color: \${expr};
+    \`;
+  `,
+  declarationMultipleValues: `
+    const expr1 = '10px';
+    const expr2 = '5px';
+    css\`
+      margin: \${expr1} \${expr2} \${expr1} \${expr2};
+    \`;
+  `,
+  declarationMixedValues: `
+    const expr1 = '10px';
+    const expr2 = '5px';
+    css\`
+      margin: \${expr1} 7px \${expr2} 9px;
+    \`;
+  `,
+  combo: `
+    css\`
+      \${expr0}
+      .foo {
+        \${expr1}: \${expr2};
+      }
+
+      \${expr3} {
+        .bar {
+          color: black;
+        }
+      }
+      \${expr4}
+    \`;
+  `,
+};

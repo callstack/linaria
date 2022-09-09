@@ -1,13 +1,13 @@
 import { parse as babelParse } from '@babel/parser';
 import type { NodePath } from '@babel/traverse';
 import traverse from '@babel/traverse';
-import type { TaggedTemplateExpression, VariableDeclaration } from '@babel/types';
+import type { TaggedTemplateExpression } from '@babel/types';
 import type { Parser, Root, ProcessOptions } from 'postcss';
 import { Document, Input } from 'postcss';
 import postcssParse from 'postcss/lib/parse';
 
 import { locationCorrectionWalker } from './locationCorrection';
-import { createPlaceholder, smartCreatePlaceholder } from './util';
+import { createPlaceholder } from './util';
 
 // generates
 // 1) styleText with placeholders for the expressions:
@@ -36,7 +36,7 @@ const generateStyleTextWithExpressionPlaceholders = (
           template.range[1],
           nextTemplate.range[0]
         );
-        styleText += smartCreatePlaceholder(
+        styleText += createPlaceholder(
           i,
           sourceAsString,
           nextTemplate.range[0]
@@ -116,23 +116,12 @@ export const parse: Parser<Root | Document> = (
 
   traverse(ast, {
     TaggedTemplateExpression: (
-      path: NodePath<TaggedTemplateExpression>,
-      state: any,
+      path: NodePath<TaggedTemplateExpression>
     ): void => {
       if (path.node.tag.type === 'Identifier' && path.node.tag.name === 'css') {
         extractedStyles.add(path.node);
       }
     },
-    // VariableDeclaration: (path: NodePath<VariableDeclaration>): void => {
-    //   // variables.push(path.node.declarations.map((decl) => decl.id));
-    //   path.node.declarations.forEach((decl) => {
-    //     const name = decl.id["name"]
-    //     decl.id
-    //   });
-    //   // path.node.declarations.forEach(
-    //   //   ({ id, init}) => variables[id.name] = init.value;
-    //   // )
-    // },
   });
 
   let currentOffset = 0;
@@ -151,8 +140,6 @@ export const parse: Parser<Root | Document> = (
 
     const { deindentedStyleText, prefixOffsets, baseIndentations } =
       getDeindentedStyleTextAndOffsets(styleText, node);
-
-    console.log('deindentedStyleText', deindentedStyleText);
 
     const root = postcssParse(deindentedStyleText, {
       ...opts,
@@ -176,7 +163,7 @@ export const parse: Parser<Root | Document> = (
     // TODO: stylelint relies on this existing, really unsure why.
     // it could just access root.parent to get the document...
     (root as Root & { document: Document }).document = doc;
-    const walker = locationCorrectionWalker(node);
+    const walker = locationCorrectionWalker(node, sourceAsString);
     walker(root);
     root.walk(walker);
     doc.nodes.push(root);

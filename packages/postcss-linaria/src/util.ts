@@ -1,5 +1,3 @@
-export const createPlaceholder = (i: number): string => `/*linaria:${i}*/`;
-
 const isAtRule = (sourceAsString: string, indexAfterExpression: number) => {
   return sourceAsString[indexAfterExpression + 1] === '{';
 };
@@ -9,10 +7,13 @@ const isProperty = (sourceAsString: string, indexAfterExpression: number) => {
 };
 
 const isRuleSet = (sourceAsString: string, indexAfterExpression: number) => {
-  return sourceAsString.indexOf('\n', indexAfterExpression-1) === indexAfterExpression;
+  return (
+    sourceAsString.indexOf('\n', indexAfterExpression - 1) ===
+    indexAfterExpression
+  );
 };
 
-export const smartCreatePlaceholder = (
+export const createPlaceholder = (
   i: number,
   sourceAsString: string,
   indexAfterExpression: number
