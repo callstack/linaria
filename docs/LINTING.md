@@ -9,7 +9,7 @@ For linting styles with [stylelint](https://stylelint.io/), we provide our custo
 You need to install `stylelint` and optionally your favorite config (such as `stylelint-config-recommended`) in your project:
 
 ```bash
-yarn add --dev stylelint stylelint-config-recommended
+yarn add --dev stylelint stylelint-config-recommended @stylelint/postcss-css-in-js postcss-syntax postcss
 ```
 
 ### Configuring stylelint
@@ -23,7 +23,8 @@ Here's the example `.stylelintrc` configuration file:
   "extends": [
     "stylelint-config-recommended",
     "@linaria/stylelint"
-  ]
+  ],
+  "customSyntax": "@stylelint/postcss-css-in-js"
 }
 ```
 
