@@ -138,7 +138,7 @@ describe('stringify', () => {
     expect(output).toEqual(
       `
       css\`
-        .foo { linaria0: hotpink; }
+        .foo { --postcss-linaria0: hotpink; }
       \`;
     `
     );

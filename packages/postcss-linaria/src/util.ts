@@ -13,21 +13,25 @@ const isRuleSet = (sourceAsString: string, indexAfterExpression: number) => {
   );
 };
 
+export const placeholderText = 'postcss-linaria';
+export const shortPlaceholderText = 'lnria';
+
 export const createPlaceholder = (
   i: number,
   sourceAsString: string,
   indexAfterExpression: number
 ): string => {
   if (isAtRule(sourceAsString, indexAfterExpression)) {
-    return `@linaria${i}`;
+    return `@${placeholderText}${i}`;
   }
   if (isProperty(sourceAsString, indexAfterExpression)) {
-    return `linaria${i}`;
+    return `--${placeholderText}${i}`;
   }
   if (isRuleSet(sourceAsString, indexAfterExpression)) {
-    return `/* linaria:${i} */`;
+    return `/* ${placeholderText}:${i} */`;
   }
 
   // assume it's a property value;
-  return `linaria${i}`;
+  // keep short to avoid accidental stylelint error for line length
+  return `${shortPlaceholderText}${i}`;
 };

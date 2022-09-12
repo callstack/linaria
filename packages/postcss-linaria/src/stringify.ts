@@ -9,8 +9,8 @@ import type {
   Declaration,
 } from 'postcss';
 import Stringifier from 'postcss/lib/stringifier';
+import { placeholderText, shortPlaceholderText } from './util';
 
-const placeholderPattern = /^linaria:\d+$/;
 /**
  * Stringifies PostCSS nodes while taking interpolated expressions
  * into account.
@@ -42,10 +42,10 @@ class LinariaStringifier extends Stringifier {
   }
 
   public override atrule(node: AtRule, semicolon: boolean): void {
-    if (node.name.includes('linaria')) {
+    if (node.name.includes(placeholderText)) {
       const params = node.params ? this.rawValue(node, 'params') : '';
 
-      const [, expressionIndexString] = node.name.split('linaria');
+      const [, expressionIndexString] = node.name.split(placeholderText);
       const expressionIndex = Number(expressionIndexString);
       const root = node.root();
       const expressionStrings = root.raws.linariaTemplateExpressions;
@@ -69,6 +69,7 @@ class LinariaStringifier extends Stringifier {
 
   /** @inheritdoc */
   public override comment(node: Comment): void {
+    const placeholderPattern = new RegExp(`^${placeholderText}:\\d+$`);
     if (placeholderPattern.test(node.text)) {
       const [, expressionIndexString] = node.text.split(':');
       const expressionIndex = Number(expressionIndexString);
@@ -91,8 +92,8 @@ class LinariaStringifier extends Stringifier {
   public override decl(node: Declaration, semicolon: boolean): void {
     const between = this.raw(node, 'between', 'colon');
     let { prop } = node;
-    if (prop.includes('linaria')) {
-      const [, expressionIndexString] = node.prop.split('linaria');
+    if (prop.includes(placeholderText)) {
+      const [, expressionIndexString] = node.prop.split(placeholderText);
       const expressionIndex = Number(expressionIndexString);
       const root = node.root();
       const expressionStrings = root.raws.linariaTemplateExpressions;
@@ -103,11 +104,12 @@ class LinariaStringifier extends Stringifier {
     }
 
     let value = this.rawValue(node, 'value');
-    if (value.includes('linaria')) {
+    if (value.includes(shortPlaceholderText)) {
       const values = node.value.split(' ');
       let tempValue = '';
       values.forEach((individualValue, index) => {
-        const [, expressionIndexString] = individualValue.split('linaria');
+        const [, expressionIndexString] =
+          individualValue.split(shortPlaceholderText);
         const expressionIndex = Number(expressionIndexString);
         const root = node.root();
         const expressionStrings = root.raws.linariaTemplateExpressions;

@@ -10,14 +10,13 @@ const config: any = {
     'value-no-vendor-prefix': true,
     'no-empty-source': null,
     'no-extra-semicolons': null,
-    'at-rule-no-unknown': [true, { ignoreAtRules: [/linaria/] }],
-    'property-no-unknown': [true, { ignoreProperties: [/linaria/] }],
+    'at-rule-no-unknown': [true, { ignoreAtRules: [/postcss-linaria/] }],
     'comment-empty-line-before': [
       'always',
       {
         except: ['first-nested'],
         ignore: ['stylelint-commands'],
-        ignoreComments: [/linaria/],
+        ignoreComments: [/postcss-linaria/],
       },
     ],
   },

@@ -27,7 +27,6 @@ describe('stylelint', () => {
       code: source,
       config,
     });
-
     expect(result.errored).toEqual(false);
   });
 

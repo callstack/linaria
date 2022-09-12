@@ -1,4 +1,5 @@
 import type { Root, Rule, Declaration } from 'postcss';
+import { placeholderText, shortPlaceholderText } from '../src/util';
 
 import { createTestAst, sourceWithExpression } from './__utils__';
 
@@ -18,7 +19,7 @@ describe('parse', () => {
       const { ast } = createTestAst(ruleset);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  /* linaria:0 */
+        "  /* ${placeholderText}:0 */
         "
       `);
     });
@@ -27,7 +28,7 @@ describe('parse', () => {
       const { ast } = createTestAst(selectorOrAtRule);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  @linaria0 {
+        "  @${placeholderText}0 {
             color: black;
           }
         "
@@ -38,7 +39,7 @@ describe('parse', () => {
       const { ast } = createTestAst(declarationProperty);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  linaria0: black;
+        "  --${placeholderText}0: black;
         "
       `);
     });
@@ -47,7 +48,7 @@ describe('parse', () => {
       const { ast } = createTestAst(declarationValue);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  color: linaria0;
+        "  color: ${shortPlaceholderText}0;
         "
       `);
     });
@@ -56,7 +57,7 @@ describe('parse', () => {
       const { ast } = createTestAst(declarationMultipleValues);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  margin: linaria0 linaria1 linaria2 linaria3;
+        "  margin: ${shortPlaceholderText}0 ${shortPlaceholderText}1 ${shortPlaceholderText}2 ${shortPlaceholderText}3;
         "
       `);
     });
@@ -65,7 +66,7 @@ describe('parse', () => {
       const { ast } = createTestAst(declarationMixedValues);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  margin: linaria0 7px linaria1 9px;
+        "  margin: ${shortPlaceholderText}0 7px ${shortPlaceholderText}1 9px;
         "
       `);
     });
@@ -74,17 +75,17 @@ describe('parse', () => {
       const { ast } = createTestAst(combo);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-      "  /* linaria:0 */
+      "  /* ${placeholderText}:0 */
         .foo {
-          linaria1: linaria2;
+          --${placeholderText}1: ${shortPlaceholderText}2;
         }
 
-        @linaria3 {
+        @${placeholderText}3 {
           .bar {
             color: black;
           }
         }
-        /* linaria:4 */
+        /* ${placeholderText}:4 */
       "
       `);
     });
