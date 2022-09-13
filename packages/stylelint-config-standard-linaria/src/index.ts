@@ -10,8 +10,6 @@ const config: any = {
     'value-no-vendor-prefix': true,
     'no-empty-source': null,
     'no-extra-semicolons': null,
-    // @postcss-linaria placeholder at-rule added during lint parsing
-    'at-rule-no-unknown': [true, { ignoreAtRules: [/postcss-linaria/] }],
     // /* postcss-linaria */ placeholder comments are added during parsing
     'comment-empty-line-before': [
       'always',

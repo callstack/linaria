@@ -11,12 +11,12 @@ import { createPlaceholder } from './util';
 
 // generates
 // 1) styleText with placeholders for the expressions:
-//     /*linaria:0*/
+//     /* postcss-linaria:0 */
 //     .foo {
-//       margin: 10px;
+//       --postcss-linaria1: 10px;
 //     }
 // 2) an array of the expressions:
-// ['${expr}']
+// ['${expr1}', '${expr2}']
 const generateStyleTextWithExpressionPlaceholders = (
   node: TaggedTemplateExpression,
   sourceAsString: string

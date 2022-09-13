@@ -5,11 +5,11 @@ import type {
   Document,
   AnyNode,
   Builder,
-  AtRule,
   Declaration,
   Rule,
 } from 'postcss';
 import Stringifier from 'postcss/lib/stringifier';
+
 import { placeholderText, shortPlaceholderText } from './util';
 
 const substitutePlaceholders = (
@@ -68,32 +68,6 @@ class LinariaStringifier extends Stringifier {
     super(wrappedBuilder);
   }
 
-  public override atrule(node: AtRule, semicolon: boolean): void {
-    if (node.name.includes(placeholderText)) {
-      const params = node.params ? this.rawValue(node, 'params') : '';
-
-      const [, expressionIndexString] = node.name.split(placeholderText);
-      const expressionIndex = Number(expressionIndexString);
-      const root = node.root();
-      const expressionStrings = root.raws.linariaTemplateExpressions;
-      if (expressionStrings && !Number.isNaN(expressionIndex)) {
-        const expression = expressionStrings[expressionIndex];
-
-        if (expression) {
-          if (node.nodes) {
-            this.block(node, expression + params);
-          } else {
-            const end = (node.raws.between || '') + (semicolon ? ';' : '');
-            this.builder(expression + params + end, node);
-          }
-          return;
-        }
-      }
-    }
-
-    super.atrule(node);
-  }
-
   /** @inheritdoc */
   public override comment(node: Comment): void {
     const placeholderPattern = new RegExp(`^${placeholderText}:\\d+$`);
@@ -122,8 +96,7 @@ class LinariaStringifier extends Stringifier {
     if (prop.includes(placeholderText)) {
       const [, expressionIndexString] = node.prop.split(placeholderText);
       const expressionIndex = Number(expressionIndexString);
-      const root = node.root();
-      const expressionStrings = root.raws.linariaTemplateExpressions;
+      const expressionStrings = node.root().raws.linariaTemplateExpressions;
       if (expressionStrings && !Number.isNaN(expressionIndex)) {
         const expression = expressionStrings[expressionIndex];
         if (expression) prop = expression;

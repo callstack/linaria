@@ -11,34 +11,9 @@ const getLine = (sourceAsString: string, indexAfterExpression: number) => {
   };
 };
 
-const hasCharactersBeforeExpression = (line: string) => {
-  const expressionBeginsIndex = line.indexOf('$');
-  const hasNonSpaceCharactersRegex = /[^\s]/;
-  return (
-    line.slice(0, expressionBeginsIndex).search(hasNonSpaceCharactersRegex) > 0
-  );
-};
-
-const hasCharactersAfterExpression = (line: string) => {
-  const expressionEndsIndex = line.indexOf('}');
-  const hasNonSpaceCharactersRegex = /[^\s]/;
-  return (
-    line.slice(expressionEndsIndex + 1).search(hasNonSpaceCharactersRegex) > 0
-  );
-};
-
-const isAtRule = (sourceAsString: string, indexAfterExpression: number) => {
-  const { line } = getLine(sourceAsString, indexAfterExpression);
-  const hasCharacters = hasCharactersBeforeExpression(line);
-  return sourceAsString[indexAfterExpression + 1] === '{' && !hasCharacters;
-};
-
 const isSelector = (sourceAsString: string, indexAfterExpression: number) => {
   const { line } = getLine(sourceAsString, indexAfterExpression);
-  const hasCharactersBefore = hasCharactersBeforeExpression(line);
-  const hasCharactersAfter = hasCharactersAfterExpression(line);
-  const hasCharacters = hasCharactersBefore || hasCharactersAfter;
-  return line[line.length - 2] === '{' && hasCharacters;
+  return line[line.length - 2] === '{';
 };
 
 const isProperty = (sourceAsString: string, indexAfterExpression: number) => {
@@ -62,7 +37,10 @@ const isRuleSet = (sourceAsString: string, indexAfterExpression: number) => {
   );
 };
 
+// mitigate issues with any stylelint error by providing placeholder text
+// thats easier to trace back to postcss-linaria
 export const placeholderText = 'postcss-linaria';
+// avoid line length errors with shorter placeholder
 export const shortPlaceholderText = 'lnria';
 
 export const createPlaceholder = (
@@ -70,9 +48,6 @@ export const createPlaceholder = (
   sourceAsString: string,
   indexAfterExpression: number
 ): string => {
-  if (isAtRule(sourceAsString, indexAfterExpression)) {
-    return `@${placeholderText}${i}`;
-  }
   if (isSelector(sourceAsString, indexAfterExpression)) {
     return `.${shortPlaceholderText}${i}`;
   }

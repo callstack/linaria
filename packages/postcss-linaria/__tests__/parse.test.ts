@@ -30,7 +30,7 @@ describe('parse', () => {
       const { ast } = createTestAst(selectorOrAtRule);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  @${placeholderText}0 {
+        "  .${shortPlaceholderText}0 {
             color: black;
           }
         "
@@ -104,7 +104,7 @@ describe('parse', () => {
           --${placeholderText}1: ${shortPlaceholderText}2;
         }
 
-        @${placeholderText}3 {
+        .${shortPlaceholderText}3 {
           .bar {
             color: black;
           }
