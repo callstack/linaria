@@ -1,12 +1,13 @@
 import type { Root, Rule, Declaration } from 'postcss';
 
 import syntax from '../src/index';
-
 import { createTestAst, sourceWithExpression } from './__utils__';
 
 const {
   ruleset,
   selectorOrAtRule,
+  selectorBeforeExpression,
+  selectorAfterExpression,
   declarationProperty,
   declarationValue,
   declarationMultipleValues,
@@ -24,6 +25,18 @@ describe('stringify', () => {
 
     it('should stringify a selector or at-rule expression', () => {
       const { source, ast } = createTestAst(selectorOrAtRule);
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+
+    it('should stringify selector expression with a selector before the expression', () => {
+      const { source, ast } = createTestAst(selectorBeforeExpression);
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+
+    it('should stringify selector expression with a selector after the expression', () => {
+      const { source, ast } = createTestAst(selectorBeforeExpression);
       const output = ast.toString(syntax);
       expect(output).toEqual(source);
     });

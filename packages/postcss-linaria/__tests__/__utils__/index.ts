@@ -68,6 +68,22 @@ export const sourceWithExpression = {
       }
     \`;
   `,
+  selectorBeforeExpression: `
+    const expr = '.classname';
+    css\`
+      .example $\{expr} {
+        color: black;
+      }
+    \`;
+  `,
+  selectorAfterExpression: `
+    const expr = '.classname';
+    css\`
+      $\{expr} .example {
+        color: black;
+      }
+    \`;
+  `,
   declarationProperty: `
     const expr = 'color';
     css\`

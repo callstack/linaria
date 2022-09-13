@@ -7,9 +7,36 @@ import type {
   Builder,
   AtRule,
   Declaration,
+  Rule,
 } from 'postcss';
 import Stringifier from 'postcss/lib/stringifier';
 import { placeholderText, shortPlaceholderText } from './util';
+
+const substitutePlaceholders = (
+  stringWithPlaceholders: string,
+  expressions: string[]
+) => {
+  if (!stringWithPlaceholders.includes(shortPlaceholderText)) {
+    return stringWithPlaceholders;
+  }
+
+  const values = stringWithPlaceholders.split(' ');
+  const temp: string[] = [];
+  values.forEach((val) => {
+    const [, expressionIndexString] = val.split(shortPlaceholderText);
+    const expressionIndex = Number(expressionIndexString);
+    const expression =
+      expressions &&
+      !Number.isNaN(expressionIndex) &&
+      expressions[expressionIndex];
+    if (expression) {
+      temp.push(expression);
+    } else {
+      temp.push(val);
+    }
+  });
+  return temp.join(' ');
+};
 
 /**
  * Stringifies PostCSS nodes while taking interpolated expressions
@@ -105,27 +132,8 @@ class LinariaStringifier extends Stringifier {
 
     let value = this.rawValue(node, 'value');
     if (value.includes(shortPlaceholderText)) {
-      const values = node.value.split(' ');
-      let tempValue = '';
-      values.forEach((individualValue, index) => {
-        const [, expressionIndexString] =
-          individualValue.split(shortPlaceholderText);
-        const expressionIndex = Number(expressionIndexString);
-        const root = node.root();
-        const expressionStrings = root.raws.linariaTemplateExpressions;
-        const expression =
-          expressionStrings &&
-          !Number.isNaN(expressionIndex) &&
-          expressionStrings[expressionIndex];
-        if (expression) {
-          if (index !== 0) tempValue += ' ';
-          tempValue += expression;
-        } else {
-          if (index !== 0) tempValue += ' ';
-          tempValue += individualValue;
-        }
-      });
-      value = tempValue;
+      const expressionStrings = node.root().raws.linariaTemplateExpressions;
+      value = substitutePlaceholders(value, expressionStrings);
     }
 
     let string = prop + between + value;
@@ -161,6 +169,18 @@ class LinariaStringifier extends Stringifier {
     }
 
     this.builder(node.raws.codeAfter ?? '', node, 'end');
+  }
+
+  public override rule(node: Rule): void {
+    let value = this.rawValue(node, 'selector');
+    if (value.includes(shortPlaceholderText)) {
+      const expressionStrings = node.root().raws.linariaTemplateExpressions;
+      value = substitutePlaceholders(value, expressionStrings);
+    }
+    this.block(node, value);
+    if (node.raws.ownSemicolon) {
+      this.builder(node.raws.ownSemicolon, node, 'end');
+    }
   }
 
   /** @inheritdoc */

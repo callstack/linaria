@@ -6,6 +6,8 @@ import { createTestAst, sourceWithExpression } from './__utils__';
 const {
   ruleset,
   selectorOrAtRule,
+  selectorBeforeExpression,
+  selectorAfterExpression,
   declarationProperty,
   declarationValue,
   declarationMultipleValues,
@@ -29,6 +31,28 @@ describe('parse', () => {
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
         "  @${placeholderText}0 {
+            color: black;
+          }
+        "
+      `);
+    });
+
+    it('should parse a selector expression with selectors before expression', () => {
+      const { ast } = createTestAst(selectorBeforeExpression);
+      const root = ast.nodes[0] as Root;
+      expect(root.source?.input.css).toMatchInlineSnapshot(`
+        "  .example .${shortPlaceholderText}0 {
+            color: black;
+          }
+        "
+      `);
+    });
+
+    it('should parse a selector expression with selectors after expression', () => {
+      const { ast } = createTestAst(selectorAfterExpression);
+      const root = ast.nodes[0] as Root;
+      expect(root.source?.input.css).toMatchInlineSnapshot(`
+        "  .${shortPlaceholderText}0 .example {
             color: black;
           }
         "
