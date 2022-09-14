@@ -1,6 +1,8 @@
 import type { Root, Rule, Declaration } from 'postcss';
 
 import syntax from '../src/index';
+import { placeholderText } from '../src/util';
+
 import { createTestAst, sourceWithExpression } from './__utils__';
 
 const {
@@ -36,7 +38,7 @@ describe('stringify', () => {
     });
 
     it('should stringify selector expression with a selector after the expression', () => {
-      const { source, ast } = createTestAst(selectorBeforeExpression);
+      const { source, ast } = createTestAst(selectorAfterExpression);
       const output = ast.toString(syntax);
       expect(output).toEqual(source);
     });
@@ -151,7 +153,7 @@ describe('stringify', () => {
     expect(output).toEqual(
       `
       css\`
-        .foo { --postcss-linaria0: hotpink; }
+        .foo { --${placeholderText}0: hotpink; }
       \`;
     `
     );

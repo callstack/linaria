@@ -37,11 +37,7 @@ const isRuleSet = (sourceAsString: string, indexAfterExpression: number) => {
   );
 };
 
-// mitigate issues with any stylelint error by providing placeholder text
-// thats easier to trace back to postcss-linaria
-export const placeholderText = 'postcss-linaria';
-// avoid line length errors with shorter placeholder
-export const shortPlaceholderText = 'lnria';
+export const placeholderText = 'pcss-lin';
 
 export const createPlaceholder = (
   i: number,
@@ -49,7 +45,7 @@ export const createPlaceholder = (
   indexAfterExpression: number
 ): string => {
   if (isSelector(sourceAsString, indexAfterExpression)) {
-    return `.${shortPlaceholderText}${i}`;
+    return `.${placeholderText}${i}`;
   }
   if (isProperty(sourceAsString, indexAfterExpression)) {
     return `--${placeholderText}${i}`;
@@ -58,7 +54,6 @@ export const createPlaceholder = (
     return `/* ${placeholderText}:${i} */`;
   }
 
-  // assume it's a property value;
-  // keep short to avoid accidental stylelint error for line length
-  return `${shortPlaceholderText}${i}`;
+  // assume it's a property value or part of another string;
+  return `${placeholderText}${i}`;
 };

@@ -16,7 +16,7 @@ const config: any = {
       {
         except: ['first-nested'],
         ignore: ['stylelint-commands'],
-        ignoreComments: [/postcss-linaria/],
+        ignoreComments: [/pcss-lin/],
       },
     ],
     //  '//' comments create unknown word issues while linting. Force using /* */

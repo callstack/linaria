@@ -10,20 +10,20 @@ import type {
 } from 'postcss';
 import Stringifier from 'postcss/lib/stringifier';
 
-import { placeholderText, shortPlaceholderText } from './util';
+import { placeholderText } from './util';
 
 const substitutePlaceholders = (
   stringWithPlaceholders: string,
   expressions: string[]
 ) => {
-  if (!stringWithPlaceholders.includes(shortPlaceholderText)) {
+  if (!stringWithPlaceholders.includes(placeholderText) || !expressions) {
     return stringWithPlaceholders;
   }
 
   const values = stringWithPlaceholders.split(' ');
   const temp: string[] = [];
   values.forEach((val) => {
-    const [, expressionIndexString] = val.split(shortPlaceholderText);
+    const [, expressionIndexString] = val.split(placeholderText);
     const expressionIndex = Number(expressionIndexString);
     const expression =
       expressions &&
@@ -93,19 +93,13 @@ class LinariaStringifier extends Stringifier {
   public override decl(node: Declaration, semicolon: boolean): void {
     const between = this.raw(node, 'between', 'colon');
     let { prop } = node;
+    const expressionStrings = node.root().raws.linariaTemplateExpressions;
     if (prop.includes(placeholderText)) {
-      const [, expressionIndexString] = node.prop.split(placeholderText);
-      const expressionIndex = Number(expressionIndexString);
-      const expressionStrings = node.root().raws.linariaTemplateExpressions;
-      if (expressionStrings && !Number.isNaN(expressionIndex)) {
-        const expression = expressionStrings[expressionIndex];
-        if (expression) prop = expression;
-      }
+      prop = substitutePlaceholders(prop, expressionStrings);
     }
 
     let value = this.rawValue(node, 'value');
-    if (value.includes(shortPlaceholderText)) {
-      const expressionStrings = node.root().raws.linariaTemplateExpressions;
+    if (value.includes(placeholderText)) {
       value = substitutePlaceholders(value, expressionStrings);
     }
 
@@ -146,7 +140,7 @@ class LinariaStringifier extends Stringifier {
 
   public override rule(node: Rule): void {
     let value = this.rawValue(node, 'selector');
-    if (value.includes(shortPlaceholderText)) {
+    if (value.includes(placeholderText)) {
       const expressionStrings = node.root().raws.linariaTemplateExpressions;
       value = substitutePlaceholders(value, expressionStrings);
     }

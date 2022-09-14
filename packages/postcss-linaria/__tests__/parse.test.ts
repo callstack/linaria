@@ -1,5 +1,6 @@
 import type { Root, Rule, Declaration } from 'postcss';
-import { placeholderText, shortPlaceholderText } from '../src/util';
+
+import { placeholderText } from '../src/util';
 
 import { createTestAst, sourceWithExpression } from './__utils__';
 
@@ -30,7 +31,7 @@ describe('parse', () => {
       const { ast } = createTestAst(selectorOrAtRule);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  .${shortPlaceholderText}0 {
+        "  .${placeholderText}0 {
             color: black;
           }
         "
@@ -41,7 +42,7 @@ describe('parse', () => {
       const { ast } = createTestAst(selectorBeforeExpression);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  .example .${shortPlaceholderText}0 {
+        "  .example .${placeholderText}0 {
             color: black;
           }
         "
@@ -52,7 +53,7 @@ describe('parse', () => {
       const { ast } = createTestAst(selectorAfterExpression);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  .${shortPlaceholderText}0 .example {
+        "  .${placeholderText}0 .example {
             color: black;
           }
         "
@@ -72,7 +73,7 @@ describe('parse', () => {
       const { ast } = createTestAst(declarationValue);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  color: ${shortPlaceholderText}0;
+        "  color: ${placeholderText}0;
         "
       `);
     });
@@ -81,7 +82,7 @@ describe('parse', () => {
       const { ast } = createTestAst(declarationMultipleValues);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  margin: ${shortPlaceholderText}0 ${shortPlaceholderText}1 ${shortPlaceholderText}2 ${shortPlaceholderText}3;
+        "  margin: ${placeholderText}0 ${placeholderText}1 ${placeholderText}2 ${placeholderText}3;
         "
       `);
     });
@@ -90,7 +91,7 @@ describe('parse', () => {
       const { ast } = createTestAst(declarationMixedValues);
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
-        "  margin: ${shortPlaceholderText}0 7px ${shortPlaceholderText}1 9px;
+        "  margin: ${placeholderText}0 7px ${placeholderText}1 9px;
         "
       `);
     });
@@ -101,10 +102,10 @@ describe('parse', () => {
       expect(root.source?.input.css).toMatchInlineSnapshot(`
       "  /* ${placeholderText}:0 */
         .foo {
-          --${placeholderText}1: ${shortPlaceholderText}2;
+          --${placeholderText}1: ${placeholderText}2;
         }
 
-        .${shortPlaceholderText}3 {
+        .${placeholderText}3 {
           .bar {
             color: black;
           }
