@@ -1,7 +1,7 @@
 import { parse as babelParse } from '@babel/parser';
 import type { NodePath } from '@babel/traverse';
 import traverse from '@babel/traverse';
-import type { TaggedTemplateExpression } from '@babel/types';
+import type { Identifier, TaggedTemplateExpression } from '@babel/types';
 import type { Parser, Root, ProcessOptions } from 'postcss';
 import { Document, Input } from 'postcss';
 import postcssParse from 'postcss/lib/parse';
@@ -120,6 +120,12 @@ export const parse: Parser<Root | Document> = (
     ): void => {
       if (path.node.tag.type === 'Identifier' && path.node.tag.name === 'css') {
         extractedStyles.add(path.node);
+      }
+
+      if (path.node.tag.type === 'MemberExpression') {
+        if ((path.node.tag.object as Identifier).name === 'styled') {
+          extractedStyles.add(path.node);
+        }
       }
     },
   });

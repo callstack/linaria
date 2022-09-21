@@ -30,8 +30,22 @@ const isRuleSet = (sourceAsString: string, indexAfterExpression: number) => {
     possibleRuleset.indexOf('{', indexAfterExpressionInLine) > 0;
   const hasCommmaAfterExpression =
     possibleRuleset.indexOf(',', indexAfterExpressionInLine) > 0;
+
+  // check if possible ruleset has ':' and outside of the func args if expression has a func
+  // i.e. avoid false postivive for `${func({ key: value })}
+  const indexOfOpenParenthesis = possibleRuleset.indexOf('(');
+  const indexOfClosedParenthesis = possibleRuleset.indexOf(')');
+  const hasFuncInExpression =
+    indexOfOpenParenthesis > 0 && indexOfClosedParenthesis > 0;
+  let hasColonOutsideOfExpression = possibleRuleset.includes(':');
+  if (hasFuncInExpression) {
+    hasColonOutsideOfExpression =
+      possibleRuleset.lastIndexOf(':', indexOfOpenParenthesis) > 0 &&
+      possibleRuleset.indexOf(':', indexOfClosedParenthesis) > 0;
+  }
+
   return !(
-    possibleRuleset.includes(':') ||
+    hasColonOutsideOfExpression ||
     hasCurlyBraceAfterExpression ||
     hasCommmaAfterExpression
   );
