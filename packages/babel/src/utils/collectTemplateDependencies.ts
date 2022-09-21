@@ -139,7 +139,7 @@ function hoistIdentifier(idPath: NodePath<Identifier>): void {
     return;
   }
 
-  if (!['var', 'let', 'const'].includes(binding.kind)) {
+  if (!['var', 'let', 'const', 'hoisted'].includes(binding.kind)) {
     // This is not a variable, we can't hoist it
     throw unsupported(binding.path, 'is a function parameter');
   }
