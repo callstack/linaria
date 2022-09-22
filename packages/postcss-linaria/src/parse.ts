@@ -9,14 +9,14 @@ import postcssParse from 'postcss/lib/parse';
 import { locationCorrectionWalker } from './locationCorrection';
 import { createPlaceholder } from './util';
 
-// generates
-// 1) styleText with placeholders for the expressions:
-//     /* postcss-linaria:0 */
-//     .foo {
-//       --postcss-linaria1: 10px;
-//     }
+// This function returns
+// 1) styleText with placeholders for the expressions.
+//    for example:
+//      `${selector} { ${property} : ${value} }`
+//    becomes
+//      `.pcss-lin0 { --pcss-lin1: pcss-lin2 }`
 // 2) an array of the expressions:
-// ['${expr1}', '${expr2}']
+// ['${selector}', '${property}', '${value}']
 const generateStyleTextWithExpressionPlaceholders = (
   node: TaggedTemplateExpression,
   sourceAsString: string
