@@ -56,6 +56,31 @@ describe('stylelint', () => {
     `);
   });
 
+  it('should be fixable by stylelint with styled api', async () => {
+    const source = `
+      styled.h1\`
+        .foo { width: \${p => p.size}px;; }
+      \`;`;
+    const result = await stylelint.lint({
+      code: source,
+      config: {
+        ...config,
+        rules: {
+          ...config.rules,
+          'no-extra-semicolons': true,
+        },
+      },
+      fix: true,
+    });
+    expect(result.errored).toEqual(false);
+    expect(result.output).toMatchInlineSnapshot(`
+      "
+            styled.h1\`
+              .foo { width: \${p => p.size}px; }
+            \`;"
+    `);
+  });
+
   it('should be fixable by stylelint with multi-line expressions', async () => {
     const source = `
       css\`

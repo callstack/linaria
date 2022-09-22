@@ -23,14 +23,26 @@ const substitutePlaceholders = (
   const values = stringWithPlaceholders.split(' ');
   const temp: string[] = [];
   values.forEach((val) => {
-    const [, expressionIndexString] = val.split(placeholderText);
+    let [, expressionIndexString] = val.split(placeholderText);
+    // if the val is 'pcss-lin10px', need to remove the px to get the placeholder number
+    let suffix = '';
+    while (
+      Number.isNaN(Number(expressionIndexString)) && expressionIndexString &&
+      expressionIndexString.length > 0
+    ) {
+      suffix = expressionIndexString[expressionIndexString.length - 1] + suffix;
+      expressionIndexString = expressionIndexString.slice(
+        0,
+        expressionIndexString.length - 1
+      );
+    }
     const expressionIndex = Number(expressionIndexString);
     const expression =
       expressions &&
       !Number.isNaN(expressionIndex) &&
       expressions[expressionIndex];
     if (expression) {
-      temp.push(expression);
+      temp.push(expression + suffix);
     } else {
       temp.push(val);
     }

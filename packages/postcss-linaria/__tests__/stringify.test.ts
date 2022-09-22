@@ -7,6 +7,7 @@ import { createTestAst, sourceWithExpression } from './__utils__';
 
 const {
   ruleset,
+  singleLineRuleset,
   selectorOrAtRule,
   selectorBeforeExpression,
   selectorAfterExpression,
@@ -21,6 +22,12 @@ describe('stringify', () => {
   describe('with expressions', () => {
     it('should stringify a ruleset expression', () => {
       const { source, ast } = createTestAst(ruleset);
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+
+    it('should stringify a single line ruleset expression', () => {
+      const { source, ast } = createTestAst(singleLineRuleset);
       const output = ast.toString(syntax);
       expect(output).toEqual(source);
     });
@@ -381,5 +388,15 @@ describe('stringify', () => {
       css\`.foo\\\\:bar { color: hotpink; }\`;
     `
     );
+  });
+
+  it('should stringify styled API', () => {
+    const { source, ast } = createTestAst(`
+      styled.h1\`
+        .foo { width: \${p => p.size}px; }
+      \`
+    `);
+    const output = ast.toString(syntax);
+    expect(output).toEqual(source);
   });
 });

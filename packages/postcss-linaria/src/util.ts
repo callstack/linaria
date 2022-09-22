@@ -13,7 +13,10 @@ const getLine = (sourceAsString: string, indexAfterExpression: number) => {
 
 const isSelector = (sourceAsString: string, indexAfterExpression: number) => {
   const { line } = getLine(sourceAsString, indexAfterExpression);
-  return line[line.length - 2] === '{';
+  const isSingleLineRule =
+    line.indexOf('{', indexAfterExpression) > 0 &&
+    line.indexOf('}', indexAfterExpression) > 0;
+  return isSingleLineRule || line[line.length - 2] === '{';
 };
 
 const isProperty = (sourceAsString: string, indexAfterExpression: number) => {

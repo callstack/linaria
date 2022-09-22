@@ -6,6 +6,7 @@ import { createTestAst, sourceWithExpression } from './__utils__';
 
 const {
   ruleset,
+  singleLineRuleset,
   selectorOrAtRule,
   selectorBeforeExpression,
   selectorAfterExpression,
@@ -23,6 +24,15 @@ describe('parse', () => {
       const root = ast.nodes[0] as Root;
       expect(root.source?.input.css).toMatchInlineSnapshot(`
         "  /* ${placeholderText}:0 */
+        "
+      `);
+    });
+
+    it('should parse a single line ruleset expression', () => {
+      const { ast } = createTestAst(singleLineRuleset);
+      const root = ast.nodes[0] as Root;
+      expect(root.source?.input.css).toMatchInlineSnapshot(`
+        "  .${placeholderText}0 { --${placeholderText}1: ${placeholderText}2 }
         "
       `);
     });
