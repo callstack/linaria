@@ -27,7 +27,8 @@ const substitutePlaceholders = (
     // if the val is 'pcss-lin10px', need to remove the px to get the placeholder number
     let suffix = '';
     while (
-      Number.isNaN(Number(expressionIndexString)) && expressionIndexString &&
+      Number.isNaN(Number(expressionIndexString)) &&
+      expressionIndexString &&
       expressionIndexString.length > 0
     ) {
       suffix = expressionIndexString[expressionIndexString.length - 1] + suffix;

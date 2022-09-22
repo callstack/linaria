@@ -48,7 +48,7 @@ const correctLocation = (
       const placeholderSize = createPlaceholder(
         i,
         sourceAsString,
-        node.end ?? 0
+        nextQuasi.range[0]
       ).length;
       const exprSize =
         nextQuasi.range[0] - previousQuasi.range[1] - placeholderSize;
