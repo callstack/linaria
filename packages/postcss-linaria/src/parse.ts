@@ -118,7 +118,10 @@ export const parse: Parser<Root | Document> = (
     TaggedTemplateExpression: (
       path: NodePath<TaggedTemplateExpression>
     ): void => {
-      if (path.node.tag.type === 'Identifier' && path.node.tag.name === 'css') {
+      if (
+        path.node.tag.type === 'Identifier' &&
+        path.node.tag.name.includes('css')
+      ) {
         extractedStyles.add(path.node);
       }
 

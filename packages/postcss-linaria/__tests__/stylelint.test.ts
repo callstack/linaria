@@ -1,4 +1,4 @@
-import stylelint from 'stylelint';
+import stylelint, { Config } from 'stylelint';
 
 // importing from the package would create circular dependency
 // so just import the config directly here
@@ -25,7 +25,7 @@ describe('stylelint', () => {
     `;
     const result = await stylelint.lint({
       code: source,
-      config,
+      config: config as Config,
     });
 
     expect(result.errored).toEqual(false);
@@ -44,7 +44,7 @@ describe('stylelint', () => {
           ...config.rules,
           'no-extra-semicolons': true,
         },
-      },
+      } as Config,
       fix: true,
     });
     expect(result.errored).toEqual(false);
@@ -69,7 +69,7 @@ describe('stylelint', () => {
           ...config.rules,
           'no-extra-semicolons': true,
         },
-      },
+      } as Config,
       fix: true,
     });
     expect(result.errored).toEqual(false);
@@ -95,7 +95,7 @@ describe('stylelint', () => {
           ...config.rules,
           'no-extra-semicolons': true,
         },
-      },
+      } as Config,
       fix: true,
     });
     expect(result.output).toMatchInlineSnapshot(`
@@ -123,7 +123,7 @@ describe('stylelint', () => {
           ...config.rules,
           indentation: 4,
         },
-      },
+      } as Config,
     });
 
     expect(result.errored).toEqual(false);
