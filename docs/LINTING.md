@@ -35,37 +35,37 @@ The preprocessor will use the [options from the configuration file](/docs/CONFIG
 
 ## Stylelint 14
 
-For linting styles with [stylelint 14](https://stylelint.io/), use `stylelint-config-standard-linaria`.
+For linting styles with [stylelint 14](https://stylelint.io/), use `@linaria/stylelint-config-standard-linaria`.
 
 ### Installation
 
-Install `stylelint` and `stylelint-config-standard-linaria`
+Install `stylelint` and `@linaria/stylelint-config-standard-linaria`
 
 ```bash
-yarn add --dev stylelint stylelint-config-standard-linaria
+yarn add --dev stylelint @linaria/stylelint-config-standard-linaria
 ```
 
 ### Configuring stylelint
 
-All you need to do is to set your config to extend from `stylelint-config-standard-linaria`.
+All you need to do is to set your config to extend from `@linaria/stylelint-config-standard-linaria`.
 
 Here's the example `.stylelintrc` configuration file:
 
 ```json
 {
   "extends": [
-    "stylelint-config-standard-linaria"
+    "@linaria/stylelint-config-standard-linaria"
   ]
 }
 ```
 
-`stylelint-config-standard-linaria` extends `stylelint-config-standard` which extends `stylelint-config-recommended` so you do NOT need to add those separately.
+`@linaria/stylelint-config-standard-linaria` extends `stylelint-config-standard` which extends `stylelint-config-recommended` so you do NOT need to add those separately.
 
 Please refer to the [official stylelint documentation](https://stylelint.io/user-guide/configuration/) for more info about configuration.
 
 ### Why did the configuration change between Stylelint v13 and v14?
 
-Stylelint 14 encourages the use of a [custom syntax](https://stylelint.io/developer-guide/syntaxes/) instead of a processor. `stylelint-config-standard-linaria` sets the custom syntax to postcss-linaria, a custom syntax for linaria, whereas @linaria/stylelint uses a processor.  The custom syntax has the benefit of being able to support `stylelint --fix` whereas the processor cannot.
+Stylelint 14 encourages the use of a [custom syntax](https://stylelint.io/developer-guide/syntaxes/) instead of a processor. `@linaria/stylelint-config-standard-linaria` sets the custom syntax to `@linaria/postcss-linaria`, a custom syntax for linaria, whereas @linaria/stylelint uses a processor.  The custom syntax has the benefit of being able to support `stylelint --fix` whereas the processor cannot.
 
 ## Usage
 

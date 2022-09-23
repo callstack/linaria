@@ -1,4 +1,4 @@
-import customSyntax from 'postcss-linaria';
+import customSyntax from '@linaria/postcss-linaria';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const config: any = {
@@ -10,7 +10,7 @@ const config: any = {
     'value-no-vendor-prefix': true,
     'no-empty-source': null,
     'no-extra-semicolons': null,
-    // /* postcss-linaria */ placeholder comments are added during parsing
+    // /* pcss-lin */ placeholder comments are added during parsing
     'comment-empty-line-before': [
       'always',
       {

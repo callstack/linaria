@@ -1,5 +1,5 @@
 {
-  "name": "postcss-linaria",
+  "name": "@linaria/postcss-linaria",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "version": "4.1.2",
   "bugs": "https://github.com/callstack/linaria/issues",

@@ -529,11 +529,11 @@ importers:
 
   packages/stylelint-config-standard-linaria:
     specifiers:
-      postcss-linaria: workspace:^
+      '@linaria/postcss-linaria': workspace:^
       stylelint: ^14.1.0
       stylelint-config-standard: ^28.0.0
     dependencies:
-      postcss-linaria: link:../postcss-linaria
+      '@linaria/postcss-linaria': link:../postcss-linaria
       stylelint: 14.11.0
       stylelint-config-standard: 28.0.0_stylelint@14.11.0
 
@@ -2771,22 +2771,22 @@ packages:
       postcss-selector-parser: 6.0.10
     dev: false
 
-  /@definitelytyped/header-parser/0.0.127:
-    resolution: {integrity: sha512-4BvTT/EXZPqkmpw/mhg7inbaLI16Sq1E7K6QeWoTGU60mf8sfB7me7Kta+/EYZptZzyyt/xR6I7MnptWuDCoPw==}
+  /@definitelytyped/header-parser/0.0.132:
+    resolution: {integrity: sha512-xjj2ahDRAf9pB77xFSfrCzSIIjksAieDVfc6KcrfLXHzcA3FJ5tyXWCljWmTYBR1bnknrp8XVvosC7IiUN66jg==}
     dependencies:
-      '@definitelytyped/typescript-versions': 0.0.127
+      '@definitelytyped/typescript-versions': 0.0.132
       '@types/parsimmon': 1.10.6
       parsimmon: 1.18.1
     dev: true
 
-  /@definitelytyped/typescript-versions/0.0.127:
-    resolution: {integrity: sha512-q/vGlB0sVOKeEj4L661MmYPmBBzfZltG/unjsFGBaglu1zz9BIuhSW3NYPeiPrtq8OyrwtR6slet22b2SH/xyw==}
+  /@definitelytyped/typescript-versions/0.0.132:
+    resolution: {integrity: sha512-jHe+l/djS7RGQ+YWKPGuzfh4WXKPeRmBJ+4QHXpB4moahEyK86nMaTmdqYZliO8rD4HUEK20/4V/g+uUrG1GxQ==}
     dev: true
 
-  /@definitelytyped/utils/0.0.127:
-    resolution: {integrity: sha512-EBpYDuYt8T9i63k/jBjWgF7Gr6YebKUiKaNH5kWkIfvGAC1NfyruhxBT40pFTcKICt02/w4Bws/AcjEEekWyww==}
+  /@definitelytyped/utils/0.0.132:
+    resolution: {integrity: sha512-freIvPdHEjuFqa+W/7T6m2XzxZRYe5LYiBa2tmWGQ7qwZhbBnDyZN8y0k7fe/YP+LRU5ahho7BBVrPeD4t+U7w==}
     dependencies:
-      '@definitelytyped/typescript-versions': 0.0.127
+      '@definitelytyped/typescript-versions': 0.0.132
       '@qiwi/npm-registry-client': 8.9.1
       '@types/node': 14.18.20
       charm: 1.0.2
@@ -5611,7 +5611,7 @@ packages:
     peerDependencies:
       typescript: '*'
     dependencies:
-      '@definitelytyped/header-parser': 0.0.127
+      '@definitelytyped/header-parser': 0.0.132
       command-exists: 1.2.9
       rimraf: 3.0.2
       semver: 6.3.0
@@ -5627,9 +5627,9 @@ packages:
     peerDependencies:
       typescript: '>= 3.0.0-dev || >= 3.1.0-dev || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.7.0-dev || >= 3.8.0-dev || >= 3.9.0-dev || >= 4.0.0-dev'
     dependencies:
-      '@definitelytyped/header-parser': 0.0.127
-      '@definitelytyped/typescript-versions': 0.0.127
-      '@definitelytyped/utils': 0.0.127
+      '@definitelytyped/header-parser': 0.0.132
+      '@definitelytyped/typescript-versions': 0.0.132
+      '@definitelytyped/utils': 0.0.132
       dts-critic: 3.3.11_typescript@4.7.4
       fs-extra: 6.0.1
       json-stable-stringify: 1.0.1
