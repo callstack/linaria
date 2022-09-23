@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 import type { Document, Node } from 'postcss';
 
 import { parse } from '../../src/parse';
