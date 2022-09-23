@@ -235,128 +235,44 @@ describe('locationCorrection', () => {
     );
   });
 
-  // it('should stringify a combinations of all expressions', () => {
-  //   const { source, ast } = createTestAst(combo);
-  //   const comment = (ast.nodes[0] as Root).nodes[0] as Comment;
-  //   expect(comment.type).toEqual('comment');
-  //   expect(getSourceForNodeByLoc(source, comment)).toEqual('${expr0}');
-  //   expect(getSourceForNodeByRange(source, comment)).toEqual('${expr0}');
-  // });
+  it('should account for code before', () => {
+    const { source, ast } = createTestAst(`
+      const foo = bar + baz;
+      css\`
+        .foo { color: hotpink; }
+      \`;
+    `);
+    const rule = (ast.nodes[0] as Root).nodes[0] as Rule;
+    const color = rule.nodes[0] as Declaration;
+    expect(color.type).toEqual('decl');
+    expect(rule.type).toEqual('rule');
+    expect(getSourceForNodeByLoc(source, rule)).toEqual(
+      '.foo { color: hotpink; }'
+    );
+    expect(getSourceForNodeByLoc(source, color)).toEqual('color: hotpink;');
+    expect(getSourceForNodeByRange(source, rule)).toEqual(
+      '.foo { color: hotpink; }'
+    );
+    expect(getSourceForNodeByRange(source, color)).toEqual('color: hotpink;');
+  });
 
-  // it('should account for multiple single-line expressions', () => {
-  //   const { source, ast } = createTestAst(`
-  //     css\`
-  //       .foo { $\{expr}color: $\{expr2}hotpink; }
-  //     \`;
-  //   `);
-  //   const rule = (ast.nodes[0] as Root).nodes[0] as Rule;
-  //   const color = rule.nodes[0] as Declaration;
-  //   expect(color.type).toEqual('decl');
-  //   expect(rule.type).toEqual('rule');
-  //   expect(getSourceForNodeByLoc(source, rule)).toEqual(
-  //     '.foo { ${expr}color: ${expr2}hotpink; }'
-  //   );
-  //   expect(getSourceForNodeByLoc(source, color)).toEqual(
-  //     'color: ${expr2}hotpink;'
-  //   );
-  //   expect(getSourceForNodeByRange(source, rule)).toEqual(
-  //     '.foo { ${expr}color: ${expr2}hotpink; }'
-  //   );
-  //   expect(getSourceForNodeByRange(source, color)).toEqual(
-  //     'color: ${expr2}hotpink;'
-  //   );
-  // });
-
-  // it('should account for multi-line expressions', () => {
-  //   const { source, ast } = createTestAst(`
-  //     css\`
-  //       .foo { $\{
-  //         expr
-  //       }color: hotpink; }
-  //     \`;
-  //   `);
-  //   const rule = (ast.nodes[0] as Root).nodes[0] as Rule;
-  //   const color = rule.nodes[1] as Declaration;
-  //   expect(color.type).toEqual('decl');
-  //   expect(rule.type).toEqual('rule');
-  //   expect(getSourceForNodeByLoc(source, rule)).toEqual(
-  //     `.foo { $\{
-  //         expr
-  //       }color: hotpink; }`
-  //   );
-  //   expect(getSourceForNodeByLoc(source, color)).toEqual('color: hotpink;');
-  //   expect(getSourceForNodeByRange(source, rule)).toEqual(
-  //     `.foo { $\{
-  //         expr
-  //       }color: hotpink; }`
-  //   );
-  //   expect(getSourceForNodeByRange(source, color)).toEqual('color: hotpink;');
-  // });
-
-  // it('should account for multiple mixed-size expressions', () => {
-  //   const { source, ast } = createTestAst(`
-  //     css\`
-  //       .foo { $\{
-  //         expr
-  //       } $\{expr2}color: hotpink; }
-  //     \`;
-  //   `);
-  //   const rule = (ast.nodes[0] as Root).nodes[0] as Rule;
-  //   const color = rule.nodes[2] as Declaration;
-  //   expect(color.type).toEqual('decl');
-  //   expect(rule.type).toEqual('rule');
-  //   expect(getSourceForNodeByLoc(source, rule)).toEqual(
-  //     `.foo { $\{
-  //         expr
-  //       } $\{expr2}color: hotpink; }`
-  //   );
-  //   expect(getSourceForNodeByLoc(source, color)).toEqual('color: hotpink;');
-  //   expect(getSourceForNodeByRange(source, rule)).toEqual(
-  //     `.foo { $\{
-  //         expr
-  //       } $\{expr2}color: hotpink; }`
-  //   );
-  //   expect(getSourceForNodeByRange(source, color)).toEqual('color: hotpink;');
-  // });
-
-  // it('should account for code before', () => {
-  //   const { source, ast } = createTestAst(`
-  //     const foo = bar + baz;
-  //     css\`
-  //       .foo { color: hotpink; }
-  //     \`;
-  //   `);
-  //   const rule = (ast.nodes[0] as Root).nodes[0] as Rule;
-  //   const color = rule.nodes[0] as Declaration;
-  //   expect(color.type).toEqual('decl');
-  //   expect(rule.type).toEqual('rule');
-  //   expect(getSourceForNodeByLoc(source, rule)).toEqual(
-  //     '.foo { color: hotpink; }'
-  //   );
-  //   expect(getSourceForNodeByLoc(source, color)).toEqual('color: hotpink;');
-  //   expect(getSourceForNodeByRange(source, rule)).toEqual(
-  //     '.foo { color: hotpink; }'
-  //   );
-  //   expect(getSourceForNodeByRange(source, color)).toEqual('color: hotpink;');
-  // });
-
-  // it('should account for mixed indentation', () => {
-  //   const { source, ast } = createTestAst(`
-  //     css\`
-  // .foo { $\{expr}color: hotpink; }
-  //     \`;
-  //   `);
-  //   const rule = (ast.nodes[0] as Root).nodes[0] as Rule;
-  //   const color = rule.nodes[1] as Declaration;
-  //   expect(color.type).toEqual('decl');
-  //   expect(rule.type).toEqual('rule');
-  //   expect(getSourceForNodeByLoc(source, rule)).toEqual(
-  //     '.foo { ${expr}color: hotpink; }'
-  //   );
-  //   expect(getSourceForNodeByLoc(source, color)).toEqual('color: hotpink;');
-  //   expect(getSourceForNodeByRange(source, rule)).toEqual(
-  //     '.foo { ${expr}color: hotpink; }'
-  //   );
-  //   expect(getSourceForNodeByRange(source, color)).toEqual('color: hotpink;');
-  // });
+  it('should account for mixed indentation', () => {
+    const { source, ast } = createTestAst(`
+      css\`
+  .foo { $\{expr}: hotpink; }
+      \`;
+    `);
+    const rule = (ast.nodes[0] as Root).nodes[0] as Rule;
+    const color = rule.nodes[0] as Declaration;
+    expect(color.type).toEqual('decl');
+    expect(rule.type).toEqual('rule');
+    expect(getSourceForNodeByLoc(source, rule)).toEqual(
+      '.foo { ${expr}: hotpink; }'
+    );
+    expect(getSourceForNodeByLoc(source, color)).toEqual('${expr}: hotpink;');
+    expect(getSourceForNodeByRange(source, rule)).toEqual(
+      '.foo { ${expr}: hotpink; }'
+    );
+    expect(getSourceForNodeByRange(source, color)).toEqual('${expr}: hotpink;');
+  });
 });
