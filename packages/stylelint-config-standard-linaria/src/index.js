@@ -1,6 +1,5 @@
 module.exports = {
   extends: ['stylelint-config-standard'],
-  // eslint-disable-next-line global-require
   customSyntax: '@linaria/postcss-linaria',
   rules: {
     'property-no-vendor-prefix': true,
