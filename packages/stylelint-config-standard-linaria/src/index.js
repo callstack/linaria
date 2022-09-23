@@ -1,9 +1,7 @@
-import customSyntax from '@linaria/postcss-linaria';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const config: any = {
+module.exports = {
   extends: ['stylelint-config-standard'],
-  customSyntax,
+  // eslint-disable-next-line global-require
+  customSyntax: require('@linaria/postcss-linaria'),
   rules: {
     'property-no-vendor-prefix': true,
     'string-no-newline': true,
@@ -23,5 +21,3 @@ const config: any = {
     'no-invalid-double-slash-comments': true,
   },
 };
-
-export default config;

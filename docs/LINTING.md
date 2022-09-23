@@ -47,9 +47,9 @@ yarn add --dev stylelint @linaria/stylelint-config-standard-linaria
 
 ### Configuring stylelint
 
-All you need to do is to set your config to extend from `@linaria/stylelint-config-standard-linaria`.
+For the standard configuration you can extend from `@linaria/stylelint-config-standard-linaria`.
 
-Here's the example `.stylelintrc` configuration file:
+Here's an example `.stylelintrc` configuration file:
 
 ```json
 {
@@ -59,7 +59,16 @@ Here's the example `.stylelintrc` configuration file:
 }
 ```
 
-`@linaria/stylelint-config-standard-linaria` extends `stylelint-config-standard` which extends `stylelint-config-recommended` so you do NOT need to add those separately.
+`@linaria/stylelint-config-standard-linaria` extends `stylelint-config-standard` which extends `stylelint-config-recommended` so you do NOT need to add those separately.  It also sets the customSyntax as `@linaria/postcss-linaria` and adds a few rules.
+
+Alternatively, to just use the custom syntax you can add `@linaria/postcss-linaria`
+Here's an example `.stylelintrc` configuration file:
+
+```json
+{
+  "customSyntax": "@linaria/postcss-linaria"
+}
+```
 
 Please refer to the [official stylelint documentation](https://stylelint.io/user-guide/configuration/) for more info about configuration.
 
