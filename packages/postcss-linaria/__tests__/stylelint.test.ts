@@ -1,4 +1,4 @@
-import stylelint, { Config } from 'stylelint';
+import stylelint, { type Config } from 'stylelint';
 
 // importing from the package would create circular dependency
 // so just import the config directly here
