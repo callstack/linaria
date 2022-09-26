@@ -1,0 +1,51 @@
+{
+  "name": "@linaria/stylelint-config-standard-linaria",
+  "description": "Blazing fast zero-runtime CSS in JS library",
+  "version": "4.1.2",
+  "bugs": "https://github.com/callstack/linaria/issues",
+  "dependencies": {
+    "@linaria/postcss-linaria": "workspace:^",
+    "stylelint": "^14.1.0",
+    "stylelint-config-standard": "^28.0.0"
+  },
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
+  "files": [
+    "esm/",
+    "lib/",
+    "processors/",
+    "types/"
+  ],
+  "homepage": "https://github.com/callstack/linaria#readme",
+  "keywords": [
+    "css",
+    "css-in-js",
+    "linaria",
+    "react",
+    "styled-components"
+  ],
+  "license": "MIT",
+  "linaria": {
+    "tags": {
+      "css": "./lib/processors/css.js",
+      "styled": "./lib/processors/styled.js"
+    }
+  },
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "git@github.com:callstack/linaria.git",
+  "scripts": {
+    "build": "npm run build:lib && npm run build:esm && npm run build:declarations",
+    "build:declarations": "tsc --emitDeclarationOnly --outDir types",
+    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "typecheck": "tsc --noEmit --composite false",
+    "watch": "npm run build --watch"
+  },
+  "sideEffects": false,
+  "types": "types/index.d.ts"
+}
