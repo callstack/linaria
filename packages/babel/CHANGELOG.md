@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.2.1
+
+### Patch Changes
+
+- 24b4a4bd: Fix function usage in string literals. Fixes #1047.
+- Updated dependencies [24b4a4bd]
+  - @linaria/shaker@4.2.1
+  - @linaria/utils@4.2.1
+  - @linaria/core@4.1.3
+  - @linaria/tags@4.1.3
+
 ## 4.2.0
 
 ### Minor Changes

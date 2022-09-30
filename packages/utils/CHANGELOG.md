@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.2.1
+
+### Patch Changes
+
+- 24b4a4bd: Fix function usage in string literals. Fixes #1047.
+
 ## 4.2.0
 
 ### Minor Changes
