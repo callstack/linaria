@@ -384,8 +384,7 @@ describe('parse', () => {
   });
 
   it('should return empty document if babel cannot parse file', () => {
-    const { ast } = createTestAst(`alksdjfhalksdfjhalskdfh fasd fadsfad`);
-    console.log(ast);
+    const { ast } = createTestAst(`this is not valid source code for a file`);
     expect(ast.type).toEqual('document');
     expect(ast.raws).toEqual({});
     expect(ast.nodes.length).toEqual(0);
