@@ -93,26 +93,33 @@ export default function webpack4Loader(
           ) ?? []
         );
 
-        getCacheInstance(cacheProvider)
-          .then((cacheInstance) =>
-            cacheInstance.set(this.resourcePath, cssText)
-          )
-          .then(() => {
-            const request = `${outputFileName}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
-              cacheProvider ?? ''
-            )}!${this.resourcePath}`;
-            const stringifiedRequest = loaderUtils.stringifyRequest(
-              this,
-              request
-            );
+        try {
+          const cacheInstance = await getCacheInstance(cacheProvider);
 
-            return this.callback(
-              null,
-              `${result.code}\n\nrequire(${stringifiedRequest});`,
-              castSourceMap(result.sourceMap)
-            );
-          })
-          .catch((err: Error) => this.callback(err));
+          await cacheInstance.set(this.resourcePath, cssText);
+
+          await cacheInstance.setDependencies?.(
+            this.resourcePath,
+            this.getDependencies()
+          );
+
+          const request = `${outputFileName}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
+            cacheProvider ?? ''
+          )}!${this.resourcePath}`;
+          const stringifiedRequest = loaderUtils.stringifyRequest(
+            this,
+            request
+          );
+
+          this.callback(
+            null,
+            `${result.code}\n\nrequire(${stringifiedRequest});`,
+            castSourceMap(result.sourceMap)
+          );
+        } catch (err) {
+          this.callback(err as Error);
+        }
+
         return;
       }
 

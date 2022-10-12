@@ -4,11 +4,23 @@ import { getCacheInstance } from './cache';
 
 type LoaderContext = Parameters<typeof loaderUtils.getOptions>[0];
 
-export default function outputCssLoader(this: LoaderContext) {
+export default async function outputCssLoader(this: LoaderContext) {
   this.async();
   const { cacheProvider } = loaderUtils.getOptions(this) || {};
-  getCacheInstance(cacheProvider)
-    .then((cacheInstance) => cacheInstance.get(this.resourcePath))
-    .then((result) => this.callback(null, result))
-    .catch((err: Error) => this.callback(err));
+
+  try {
+    const cacheInstance = await getCacheInstance(cacheProvider);
+
+    const result = await cacheInstance.get(this.resourcePath);
+    const dependencies =
+      (await cacheInstance.getDependencies?.(this.resourcePath)) ?? [];
+
+    dependencies.forEach((dependency) => {
+      this.addDependency(dependency);
+    });
+
+    this.callback(null, result);
+  } catch (err) {
+    this.callback(err as Error);
+  }
 }
