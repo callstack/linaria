@@ -117,6 +117,7 @@ export default function templateProcessor(
 
           const varId = tagProcessor.addInterpolation(
             item.ex,
+            cssText,
             item.source,
             unit
           );
@@ -124,7 +125,11 @@ export default function templateProcessor(
 
           cssText += next.value.cooked?.substring(unit?.length ?? 0) ?? '';
         } else {
-          const varId = tagProcessor.addInterpolation(item.ex, item.source);
+          const varId = tagProcessor.addInterpolation(
+            item.ex,
+            cssText,
+            item.source
+          );
           cssText += `var(--${varId})`;
         }
       } catch (e) {

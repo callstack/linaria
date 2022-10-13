@@ -5,7 +5,6 @@ import type { IProps } from '@linaria/react/processors/styled';
 import StyledProcessor from '@linaria/react/processors/styled';
 import { hasMeta } from '@linaria/tags';
 import type { Rules, ValueCache } from '@linaria/tags';
-import { slugify } from '@linaria/utils';
 
 import atomize from './helpers/atomize';
 
@@ -67,9 +66,18 @@ export default class AtomicStyledProcessor extends StyledProcessor {
     return props;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  protected override getVariableId(value: string): string {
+  protected override getVariableId(
+    source: string,
+    unit: string,
+    precedingCss: string
+  ): string {
+    const id = this.getCustomVariableId(source, unit, precedingCss);
+    if (id) {
+      return id;
+    }
+
+    const context = this.getVariableContext(source, unit, precedingCss);
     // id is based on the slugified value
-    return slugify(value);
+    return context.valueSlug;
   }
 }

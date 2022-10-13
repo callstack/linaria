@@ -159,7 +159,7 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
-  it('uses string passed in as classNameSlug', async () => {
+  it('uses string passed in classNameSlug', async () => {
     const { code, metadata } = await transform(
       dedent`
     import { styled } from '@linaria/react';
@@ -172,6 +172,40 @@ describe('strategy shaker', () => {
         evaluator,
         {
           classNameSlug: ['hash', 'title', 'file', 'name', 'ext', 'dir']
+            .map((s) => `[${s}]`)
+            .join('_'),
+        },
+      ]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('uses string passed in variableNameSlug', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+    import { styled as atomicStyled } from '@linaria/atomic';
+    import { styled } from '@linaria/react';
+
+    export const Title = styled('h1')\`
+      font-size: ${'${props => props.size}px'};
+    \`;
+
+    export const Body = atomicStyled('h1')\`
+      font-size: ${'${props => props.size}px'};
+    \`;
+`,
+      [
+        evaluator,
+        {
+          variableNameSlug: [
+            'componentName',
+            'componentSlug',
+            'processor',
+            'valueSlug',
+            'index',
+          ]
             .map((s) => `[${s}]`)
             .join('_'),
         },
@@ -203,7 +237,7 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
-  it('handles fn passed in as classNameSlug', async () => {
+  it('handles fn passed in classNameSlug', async () => {
     const { code, metadata } = await transform(
       dedent`
     import { styled } from '@linaria/react';
@@ -226,6 +260,35 @@ describe('strategy shaker', () => {
               vars.ext,
               vars.dir,
             ].join('_'),
+        },
+      ]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('handles fn passed in variableNameSlug', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+    import { styled as atomicStyled } from '@linaria/atomic';
+    import { styled } from '@linaria/react';
+
+    export const Title = styled('h1')\`
+      font-size: ${'${props => props.size}px'};
+    \`;
+
+    export const Body = atomicStyled('h1')\`
+      font-size: ${'${props => props.size}px'};
+    \`;
+`,
+      [
+        evaluator,
+        {
+          variableNameSlug: (context) =>
+            `${context.valueSlug}__${context.componentName}__${
+              context.precedingCss.match(/([\w-]+)\s*:\s*$/)?.[1] ?? 'unknown'
+            }`,
         },
       ]
     );

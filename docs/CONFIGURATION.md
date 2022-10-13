@@ -26,7 +26,7 @@ module.exports = {
 
   Enabling this will add a display name to generated class names, e.g. `.Title_abcdef` instead of `.abcdef'. It is disabled by default to generate smaller CSS files.
 
-- `classNameSlug: string | (hash: string, title: string, args: ClassNameSlugVars) => string` (default: `default`):
+- `classNameSlug: string | ((hash: string, title: string, args: ClassNameSlugVars) => string)` (default: `default`):
 
   Using this will provide an interface to customize the output of the CSS class name. Example:
 
@@ -57,6 +57,33 @@ module.exports = {
 
   - `hash`: The hash of the content.
   - `title`: The name of the class.
+
+- `variableNameSlug: string | ((context: IVariableContext) => string)` (default: `default`):
+
+  Using this will provide an interface to customize the output of the CSS variable name. Example:
+
+      variableNameSlug: '[componentName]-[valueSlug]-[index]',
+
+  Would generate a variable name such as `--Title-absdjfsdf-0` instead of the `@react/styled`'s default `--absdjfsdf-0`.
+
+  You may also use a function to define the slug. The function will be evaluated at build time and must return a string:
+
+      variableNameSlug: (context) => `${context.valueSlug}__${context.componentName}__${context.precedingCss.match(/([\w-]+)\s*:\s*$/)[1]}`,
+
+  Would generate the variable name `--absdjfsdf__Title__flex-direction`.
+
+  **note** invalid characters will be replaced with an underscore (`_`).
+
+  ### Variables
+
+  - `componentName` - the displayName of the component.
+  - `componentSlug` - the component slug.
+  - `index` - the index of the css variable in the current component.
+  - `precedingCss` - the preceding part of the css for the variable, i.e. `flex: 1; flex-direction: `.
+  - `preprocessor` - the preprocessor used to process the tag (e.g. 'StyledProcessor' or 'AtomicStyledProcessor').
+  - `source` - the string source of the css property value.
+  - `unit` - the unit.
+  - `valueSlug` - the value slug.
 
 - `rules: EvalRule[]`
 

@@ -1048,7 +1048,7 @@ Dependencies: NA
 
 `;
 
-exports[`strategy shaker handles fn passed in as classNameSlug 1`] = `
+exports[`strategy shaker handles fn passed in classNameSlug 1`] = `
 "import { styled } from '@linaria/react';
 
 const _exp = /*#__PURE__*/() => \\"h1\\";
@@ -1059,13 +1059,56 @@ export const Title = /*#__PURE__*/styled(_exp())({
 });"
 `;
 
-exports[`strategy shaker handles fn passed in as classNameSlug 2`] = `
+exports[`strategy shaker handles fn passed in classNameSlug 2`] = `
 
 CSS:
 
 .t13jq05_Title_t13jq05_Title_src_source_js_source__js_src {
   font-size: 14px;
 }
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker handles fn passed in variableNameSlug 1`] = `
+"import { styled as atomicStyled } from '@linaria/atomic';
+import { styled } from '@linaria/react';
+
+const _exp = /*#__PURE__*/() => \\"h1\\";
+
+const _exp2 = /*#__PURE__*/() => props => props.size;
+
+export const Title = /*#__PURE__*/styled(_exp())({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\",
+  vars: {
+    \\"_qqvhyq__Title__font-size\\": [_exp2(), \\"px\\"]
+  }
+});
+
+const _exp3 = /*#__PURE__*/() => \\"h1\\";
+
+const _exp4 = /*#__PURE__*/() => props => props.size;
+
+export const Body = /*#__PURE__*/atomicStyled(_exp3())({
+  name: \\"Body\\",
+  class: \\"atm_c8_f3y1j4 Body_b1vhermz\\",
+  vars: {
+    \\"1qqvhyq__Body__font-size\\": [_exp4(), \\"px\\"]
+  },
+  atomic: true
+});"
+`;
+
+exports[`strategy shaker handles fn passed in variableNameSlug 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  font-size: var(--_qqvhyq__Title__font-size);
+}
+.atm_c8_f3y1j4.atm_c8_f3y1j4{font-size:var(--1qqvhyq__Body__font-size);}
 
 Dependencies: NA
 
@@ -2455,7 +2498,7 @@ Dependencies: NA
 
 `;
 
-exports[`strategy shaker uses string passed in as classNameSlug 1`] = `
+exports[`strategy shaker uses string passed in classNameSlug 1`] = `
 "import { styled } from '@linaria/react';
 
 const _exp = /*#__PURE__*/() => \\"h1\\";
@@ -2466,13 +2509,56 @@ export const Title = /*#__PURE__*/styled(_exp())({
 });"
 `;
 
-exports[`strategy shaker uses string passed in as classNameSlug 2`] = `
+exports[`strategy shaker uses string passed in classNameSlug 2`] = `
 
 CSS:
 
 .t13jq05_Title_src_source_js_source__js_src {
   font-size: 14px;
 }
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker uses string passed in variableNameSlug 1`] = `
+"import { styled as atomicStyled } from '@linaria/atomic';
+import { styled } from '@linaria/react';
+
+const _exp = /*#__PURE__*/() => \\"h1\\";
+
+const _exp2 = /*#__PURE__*/() => props => props.size;
+
+export const Title = /*#__PURE__*/styled(_exp())({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\",
+  vars: {
+    \\"Title_t13jq05_StyledProcessor_1qqvhyq_0\\": [_exp2(), \\"px\\"]
+  }
+});
+
+const _exp3 = /*#__PURE__*/() => \\"h1\\";
+
+const _exp4 = /*#__PURE__*/() => props => props.size;
+
+export const Body = /*#__PURE__*/atomicStyled(_exp3())({
+  name: \\"Body\\",
+  class: \\"atm_c8_1cjuufw Body_b1vhermz\\",
+  vars: {
+    \\"Body_b1vhermz_AtomicStyledProcessor_1qqvhyq_0\\": [_exp4(), \\"px\\"]
+  },
+  atomic: true
+});"
+`;
+
+exports[`strategy shaker uses string passed in variableNameSlug 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  font-size: var(--Title_t13jq05_StyledProcessor_1qqvhyq_0);
+}
+.atm_c8_1cjuufw.atm_c8_1cjuufw{font-size:var(--Body_b1vhermz_AtomicStyledProcessor_1qqvhyq_0);}
 
 Dependencies: NA
 

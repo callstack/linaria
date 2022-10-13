@@ -7,6 +7,7 @@
     "@emotion/is-prop-valid": "^0.8.8",
     "@linaria/core": "workspace:^",
     "@linaria/tags": "workspace:^",
+    "@linaria/utils": "workspace:^",
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {

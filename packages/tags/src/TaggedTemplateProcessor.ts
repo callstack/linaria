@@ -43,12 +43,14 @@ export default abstract class TaggedTemplateProcessor extends BaseProcessor {
   /**
    * It is called for each resolved expression in a template literal.
    * @param node
+   * @param precedingCss
    * @param source
    * @param unit
    * @return chunk of CSS that should be added to extracted CSS
    */
   public abstract addInterpolation(
     node: Expression,
+    precedingCss: string,
     source: string,
     unit?: string
   ): string;
