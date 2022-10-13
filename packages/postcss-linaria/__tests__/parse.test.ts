@@ -382,4 +382,11 @@ describe('parse', () => {
       expect(ast.source!.input.css).toEqual(source);
     });
   });
+
+  it('should return empty document if babel cannot parse file', () => {
+    const { ast } = createTestAst(`this is not valid source code for a file`);
+    expect(ast.type).toEqual('document');
+    expect(ast.raws).toEqual({});
+    expect(ast.nodes.length).toEqual(0);
+  });
 });

@@ -107,11 +107,19 @@ export const parse: Parser<Root | Document> = (
 ): Root | Document => {
   const doc = new Document();
   const sourceAsString = source.toString();
-  const ast = babelParse(sourceAsString, {
-    sourceType: 'unambiguous',
-    plugins: ['typescript', 'jsx'],
-    ranges: true,
-  });
+
+  // avoid error spam (and vscode error toasts) if babel can't parse doc
+  // allows user to type new code without constant warnings
+  let ast;
+  try {
+    ast = babelParse(sourceAsString, {
+      sourceType: 'unambiguous',
+      plugins: ['typescript', 'jsx'],
+      ranges: true,
+    });
+  } catch {
+    return doc;
+  }
   const extractedStyles = new Set<TaggedTemplateExpression>();
 
   traverse(ast, {
