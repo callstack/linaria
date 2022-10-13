@@ -28,9 +28,9 @@ linaria-website:build:       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@
 linaria-website:build:       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Hero.jsx[39m[22m 1.32 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 linaria-website:build:     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/index.jsx[39m[22m 311 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 linaria-website:build:     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Container.js[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-linaria-website:build: webpack 5.73.0 compiled [1m[32msuccessfully[39m[22m in 10466 ms
+linaria-website:build: webpack 5.73.0 compiled [1m[32msuccessfully[39m[22m in 10364 ms
 linaria-website:build: Done in 12.15s.
 linaria-website:build: yarn run v1.22.19
 linaria-website:build: $ cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
-linaria-website:build: Successfully compiled 11 files with Babel (1899ms).
-linaria-website:build: Done in 2.48s.
+linaria-website:build: Successfully compiled 11 files with Babel (2225ms).
+linaria-website:build: Done in 2.96s.
