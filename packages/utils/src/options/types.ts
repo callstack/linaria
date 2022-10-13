@@ -1,5 +1,6 @@
 import type { TransformOptions } from '@babel/core';
 
+import type { IVariableContext } from '../IVariableContext';
 import type { Core } from '../babel';
 
 export type ClassNameSlugVars = {
@@ -16,6 +17,8 @@ export type ClassNameFn = (
   title: string,
   args: ClassNameSlugVars
 ) => string;
+
+export type VariableNameFn = (context: IVariableContext) => string;
 
 export type Evaluator = (
   filename: string,
@@ -38,6 +41,7 @@ export type StrictOptions = {
   evaluate: boolean;
   extensions: string[];
   ignore?: RegExp;
-  tagResolver?: (source: string, tag: string) => string | null;
   rules: EvalRule[];
+  tagResolver?: (source: string, tag: string) => string | null;
+  variableNameSlug?: string | VariableNameFn;
 };

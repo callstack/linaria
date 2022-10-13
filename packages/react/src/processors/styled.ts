@@ -7,18 +7,22 @@ import type {
 } from '@babel/types';
 
 import type {
-  Rules,
-  WrappedNode,
-  ValueCache,
   Params,
+  Rules,
   TailProcessorParams,
+  ValueCache,
+  WrappedNode,
 } from '@linaria/tags';
 import {
-  TaggedTemplateProcessor,
-  ValueType,
+  buildSlug,
   hasMeta,
+  TaggedTemplateProcessor,
   validateParams,
+  ValueType,
+  toValidCSSIdentifier,
 } from '@linaria/tags';
+import type { IVariableContext } from '@linaria/utils';
+import { slugify } from '@linaria/utils';
 
 const isNotNull = <T>(x: T | null): x is T => x !== null;
 
@@ -90,10 +94,11 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
 
   public override addInterpolation(
     node: Expression,
+    precedingCss: string,
     source: string,
     unit = ''
   ): string {
-    const id = this.getVariableId(source + unit);
+    const id = this.getVariableId(source, unit, precedingCss);
 
     this.interpolations.push({
       id,
@@ -215,6 +220,22 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
     return res(this.component.source);
   }
 
+  protected getCustomVariableId(
+    source: string,
+    unit: string,
+    precedingCss: string
+  ) {
+    const context = this.getVariableContext(source, unit, precedingCss);
+    const customSlugFn = this.options.variableNameSlug;
+    if (!customSlugFn) {
+      return undefined;
+    }
+
+    return typeof customSlugFn === 'function'
+      ? customSlugFn(context)
+      : buildSlug(customSlugFn, context);
+  }
+
   protected getProps(): IProps {
     const propsObj: IProps = {
       name: this.displayName,
@@ -271,12 +292,46 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
     return t.objectExpression(propExpressions);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected getVariableId(value: string): string {
-    if (!this.#variablesCache.has(value)) {
-      // make the variable unique to this styled component
+  protected getVariableContext(
+    source: string,
+    unit: string,
+    precedingCss: string
+  ): IVariableContext {
+    const getIndex = () => {
       // eslint-disable-next-line no-plusplus
-      this.#variablesCache.set(value, `${this.slug}-${this.#variableIdx++}`);
+      return this.#variableIdx++;
+    };
+
+    return {
+      componentName: this.displayName,
+      componentSlug: this.slug,
+      get index() {
+        return getIndex();
+      },
+      precedingCss,
+      processor: this.constructor.name,
+      source,
+      unit,
+      valueSlug: slugify(source + unit),
+    };
+  }
+
+  protected getVariableId(
+    source: string,
+    unit: string,
+    precedingCss: string
+  ): string {
+    const value = source + unit;
+    if (!this.#variablesCache.has(value)) {
+      const id = this.getCustomVariableId(source, unit, precedingCss);
+      if (id) {
+        return toValidCSSIdentifier(id);
+      }
+
+      const context = this.getVariableContext(source, unit, precedingCss);
+
+      // make the variable unique to this styled component
+      this.#variablesCache.set(value, `${this.slug}-${context.index}`);
     }
 
     return this.#variablesCache.get(value)!;

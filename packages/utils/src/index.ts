@@ -1,3 +1,4 @@
+export type { IVariableContext } from './IVariableContext';
 export {
   default as asyncResolveFallback,
   syncResolve,

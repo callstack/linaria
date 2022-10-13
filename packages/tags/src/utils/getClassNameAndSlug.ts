@@ -4,13 +4,9 @@ import { debug } from '@linaria/logger';
 import type { ClassNameSlugVars } from '@linaria/utils';
 import { slugify } from '@linaria/utils';
 
+import { buildSlug } from './buildSlug';
 import toValidCSSIdentifier from './toValidCSSIdentifier';
 import type { IFileContext, IOptions } from './types';
-
-const isSlugVar = (
-  key: string,
-  slugVars: ClassNameSlugVars
-): key is keyof ClassNameSlugVars => key in slugVars;
 
 export default function getClassNameAndSlug(
   displayName: string,
@@ -58,23 +54,9 @@ export default function getClassNameAndSlug(
   }
 
   if (typeof options.classNameSlug === 'string') {
-    const { classNameSlug } = options;
-
-    // Variables that were used in the config for `classNameSlug`
-    const optionVariables = classNameSlug.match(/\[.*?]/g) || [];
-    let cnSlug = classNameSlug;
-
-    for (let i = 0, l = optionVariables.length; i < l; i++) {
-      const v = optionVariables[i].slice(1, -1); // Remove the brackets around the variable name
-
-      // Replace the var if it key and value exist otherwise place an empty string
-      cnSlug = cnSlug.replace(
-        `[${v}]`,
-        isSlugVar(v, slugVars) ? slugVars[v] : ''
-      );
-    }
-
-    className = toValidCSSIdentifier(cnSlug);
+    className = toValidCSSIdentifier(
+      buildSlug(options.classNameSlug, slugVars)
+    );
   }
 
   debug(

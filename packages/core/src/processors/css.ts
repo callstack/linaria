@@ -5,7 +5,11 @@ import { TaggedTemplateProcessor } from '@linaria/tags';
 
 export default class CssProcessor extends TaggedTemplateProcessor {
   // eslint-disable-next-line class-methods-use-this
-  public override addInterpolation(node: unknown, source: string): string {
+  public override addInterpolation(
+    node: unknown,
+    precedingCss: string,
+    source: string
+  ): string {
     throw new Error(
       `css tag cannot handle '${source}' as an interpolated value`
     );

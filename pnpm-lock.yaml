@@ -416,6 +416,7 @@ importers:
       '@emotion/is-prop-valid': ^0.8.8
       '@linaria/core': workspace:^
       '@linaria/tags': workspace:^
+      '@linaria/utils': workspace:^
       '@types/babel__core': ^7.1.19
       '@types/node': ^17.0.39
       '@types/react': '>=16'
@@ -426,6 +427,7 @@ importers:
       '@emotion/is-prop-valid': 0.8.8
       '@linaria/core': link:../core
       '@linaria/tags': link:../tags
+      '@linaria/utils': link:../utils
       ts-invariant: 0.10.3
     devDependencies:
       '@babel/types': 7.18.9
@@ -2771,22 +2773,22 @@ packages:
       postcss-selector-parser: 6.0.10
     dev: false
 
-  /@definitelytyped/header-parser/0.0.132:
-    resolution: {integrity: sha512-xjj2ahDRAf9pB77xFSfrCzSIIjksAieDVfc6KcrfLXHzcA3FJ5tyXWCljWmTYBR1bnknrp8XVvosC7IiUN66jg==}
+  /@definitelytyped/header-parser/0.0.133:
+    resolution: {integrity: sha512-Mv1F76WeuzdO9qrVi9hRQHjbwmb9bU5Gw5jdmUVWHma68IeiMNYlcMeKwQua7yVM+zRvihWvEI9s4O5NxY/gAA==}
     dependencies:
-      '@definitelytyped/typescript-versions': 0.0.132
+      '@definitelytyped/typescript-versions': 0.0.133
       '@types/parsimmon': 1.10.6
       parsimmon: 1.18.1
     dev: true
 
-  /@definitelytyped/typescript-versions/0.0.132:
-    resolution: {integrity: sha512-jHe+l/djS7RGQ+YWKPGuzfh4WXKPeRmBJ+4QHXpB4moahEyK86nMaTmdqYZliO8rD4HUEK20/4V/g+uUrG1GxQ==}
+  /@definitelytyped/typescript-versions/0.0.133:
+    resolution: {integrity: sha512-tfitkEgTmOBXDfgzzlxoXSYsUqIimKV2rdLd+61Mfzcp34yZ3bdhS8+4Gnc6rdMR4+V/sa3yvy5lYZLK2HP11Q==}
     dev: true
 
-  /@definitelytyped/utils/0.0.132:
-    resolution: {integrity: sha512-freIvPdHEjuFqa+W/7T6m2XzxZRYe5LYiBa2tmWGQ7qwZhbBnDyZN8y0k7fe/YP+LRU5ahho7BBVrPeD4t+U7w==}
+  /@definitelytyped/utils/0.0.133:
+    resolution: {integrity: sha512-aRCduwfl3l+3FJDGGDA5HDVF5FwKLYVEFQ5xKEi8Yz4RZqpAXRN7xKAuQiGx1yQ57CkMRaaOgLrcGoYECSBWcA==}
     dependencies:
-      '@definitelytyped/typescript-versions': 0.0.132
+      '@definitelytyped/typescript-versions': 0.0.133
       '@qiwi/npm-registry-client': 8.9.1
       '@types/node': 14.18.20
       charm: 1.0.2
@@ -5611,7 +5613,7 @@ packages:
     peerDependencies:
       typescript: '*'
     dependencies:
-      '@definitelytyped/header-parser': 0.0.132
+      '@definitelytyped/header-parser': 0.0.133
       command-exists: 1.2.9
       rimraf: 3.0.2
       semver: 6.3.0
@@ -5627,9 +5629,9 @@ packages:
     peerDependencies:
       typescript: '>= 3.0.0-dev || >= 3.1.0-dev || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.7.0-dev || >= 3.8.0-dev || >= 3.9.0-dev || >= 4.0.0-dev'
     dependencies:
-      '@definitelytyped/header-parser': 0.0.132
-      '@definitelytyped/typescript-versions': 0.0.132
-      '@definitelytyped/utils': 0.0.132
+      '@definitelytyped/header-parser': 0.0.133
+      '@definitelytyped/typescript-versions': 0.0.133
+      '@definitelytyped/utils': 0.0.133
       dts-critic: 3.3.11_typescript@4.7.4
       fs-extra: 6.0.1
       json-stable-stringify: 1.0.1
