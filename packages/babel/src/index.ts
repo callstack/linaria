@@ -13,6 +13,7 @@ import loadLinariaOptions from './transform-stages/helpers/loadLinariaOptions';
 
 export { slugify } from '@linaria/utils';
 
+export { default as preeval } from './plugins/preeval';
 export * from './utils/collectTemplateDependencies';
 export { default as collectTemplateDependencies } from './utils/collectTemplateDependencies';
 export { default as withLinariaMetadata } from './utils/withLinariaMetadata';
