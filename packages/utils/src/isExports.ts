@@ -1,5 +1,7 @@
 import type { NodePath } from '@babel/traverse';
 
+import { getScope } from './getScope';
+
 /**
  * Checks that specified Identifier is a global `exports`
  * @param id
@@ -9,8 +11,9 @@ export default function isExports(id: NodePath | null | undefined) {
     return false;
   }
 
+  const scope = getScope(id);
+
   return (
-    id.scope.getBinding('exports') === undefined &&
-    id.scope.hasGlobal('exports')
+    scope.getBinding('exports') === undefined && scope.hasGlobal('exports')
   );
 }

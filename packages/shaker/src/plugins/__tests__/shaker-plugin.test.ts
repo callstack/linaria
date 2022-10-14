@@ -161,4 +161,22 @@ describe('shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata.imports.size).toBe(0);
   });
+
+  it('should process identifiers in void expressions as references', () => {
+    const { code, metadata } = keep(['b'])`
+      let _;
+
+      const a = void _;
+
+      function b(b) {
+        void _;
+      }
+
+      exports.a = a;
+      exports.b = b;
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
+  });
 });

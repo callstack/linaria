@@ -20,6 +20,16 @@ exports[`shaker should process array patterns 1`] = `
 export { c };"
 `;
 
+exports[`shaker should process identifiers in void expressions as references 1`] = `
+"let _;
+
+function b(b) {
+  void _;
+}
+
+exports.b = b;"
+`;
+
 exports[`shaker should process object patterns 1`] = `
 "const {
   b: b1

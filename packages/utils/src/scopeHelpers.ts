@@ -5,11 +5,12 @@ import type { Binding, NodePath } from '@babel/traverse';
 import type { Identifier, JSXIdentifier, Program } from '@babel/types';
 
 import findIdentifiers, { nonType } from './findIdentifiers';
+import { getScope } from './getScope';
 import isNotNull from './isNotNull';
 import isRemoved from './isRemoved';
 
 function getBinding(path: NodePath<Identifier | JSXIdentifier>) {
-  const binding = path.scope.getBinding(path.node.name);
+  const binding = getScope(path).getBinding(path.node.name);
   if (!binding) {
     return undefined;
   }
@@ -275,7 +276,7 @@ function removeUnreferenced(items: NodePath<Identifier | JSXIdentifier>[]) {
   const referenced = new Set<NodePath<Identifier | JSXIdentifier>>();
   items.forEach((item) => {
     if (!item.node || isRemoved(item)) return;
-    const binding = item.scope.getBinding(item.node.name);
+    const binding = getScope(item).getBinding(item.node.name);
     if (!binding) return;
     const hasReferences =
       binding.referencePaths.filter((i) => !isRemoved(i)).length > 0;
@@ -306,7 +307,8 @@ function removeUnreferenced(items: NodePath<Identifier | JSXIdentifier>[]) {
 function removeWithRelated(paths: NodePath[]) {
   if (paths.length === 0) return;
 
-  const rootPath = paths[0].scope.getProgramParent().path as NodePath<Program>;
+  const rootPath = getScope(paths[0]).getProgramParent()
+    .path as NodePath<Program>;
 
   if (!fixed.has(rootPath)) {
     // Some libraries don't care about bindings, references, and other staff
@@ -328,7 +330,7 @@ function removeWithRelated(paths: NodePath[]) {
     );
     declared.push(
       ...findIdentifiers([deletingPath], 'binding').map(
-        (i) => i.scope.getBinding(i.node.name)!
+        (i) => getScope(i).getBinding(i.node.name)!
       )
     );
 

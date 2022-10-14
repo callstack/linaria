@@ -27,6 +27,7 @@ import type {
 
 import { warn } from '@linaria/logger';
 
+import { getScope } from './getScope';
 import isExports from './isExports';
 import isNotNull from './isNotNull';
 import isRequire from './isRequire';
@@ -637,7 +638,7 @@ function unfoldNamespaceImport(
     return [importItem];
   }
 
-  const binding = local.scope.getBinding(local.node.name);
+  const binding = getScope(local).getBinding(local.node.name);
   if (!binding?.referenced) {
     // Imported namespace is not referenced and probably not used,
     // but it can have side effects, so we should keep it as is

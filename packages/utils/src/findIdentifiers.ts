@@ -1,12 +1,29 @@
 import type { NodePath } from '@babel/traverse';
 import type { Node, Identifier, JSXIdentifier } from '@babel/types';
 
+import { getScope } from './getScope';
+
 type FindType = 'binding' | 'both' | 'referenced';
 
+function isInVoid(path: NodePath): boolean {
+  return path.parentPath?.isUnaryExpression({ operator: 'void' }) ?? false;
+}
+
+function isBindingIdentifier(path: NodePath): path is NodePath<Identifier> {
+  return path.isBindingIdentifier() && !isInVoid(path);
+}
+
+function isReferencedIdentifier(
+  path: NodePath
+): path is NodePath<Identifier | JSXIdentifier> {
+  return path.isReferencedIdentifier() || isInVoid(path);
+}
+
+// For some reasons, `isBindingIdentifier` returns true for identifiers inside `void` expressions.
 const checkers: Record<FindType, (ex: NodePath) => boolean> = {
-  binding: (ex) => ex.isBindingIdentifier(),
-  both: (ex) => ex.isBindingIdentifier() || ex.isReferencedIdentifier(),
-  referenced: (ex) => ex.isReferencedIdentifier(),
+  binding: (ex) => isBindingIdentifier(ex),
+  both: (ex) => isBindingIdentifier(ex) || isReferencedIdentifier(ex),
+  referenced: (ex) => isReferencedIdentifier(ex),
 };
 
 export function nonType(path: NodePath): boolean {
@@ -38,7 +55,7 @@ export default function findIdentifiers(
 
       // TODO: Is there a better way to check that it's a local variable?
 
-      const binding = path.scope.getBinding(path.node.name);
+      const binding = getScope(path).getBinding(path.node.name);
       if (!binding) {
         return;
       }

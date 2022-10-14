@@ -3,6 +3,7 @@ import type { CallExpression } from '@babel/types';
 
 import type { IImport, ISideEffectImport } from './collectExportsAndImports';
 import collectExportsAndImports from './collectExportsAndImports';
+import { getScope } from './getScope';
 
 function getCallee(p: NodePath<CallExpression>) {
   const callee = p.get('callee');
@@ -66,7 +67,7 @@ function isClassicReactRuntime(
   if (reactImports.length === 0) return false;
   const callee = getCallee(p);
   if (callee.isIdentifier() && isHookOrCreateElement(callee.node.name)) {
-    const bindingPath = callee.scope.getBinding(callee.node.name)?.path;
+    const bindingPath = getScope(callee).getBinding(callee.node.name)?.path;
     return reactImports.some((i) => bindingPath?.isAncestor(i.local));
   }
 
@@ -89,7 +90,7 @@ function isClassicReactRuntime(
       return false;
     }
 
-    const bindingPath = object.scope.getBinding(object.node.name)?.path;
+    const bindingPath = getScope(object).getBinding(object.node.name)?.path;
     return bindingPath?.isAncestor(defaultImport.local) ?? false;
   }
 

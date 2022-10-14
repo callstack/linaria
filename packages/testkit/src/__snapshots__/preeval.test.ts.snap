@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`preeval should keep getGlobal but remove window-related code 1`] = `
+"function getGlobal() {
+  if (typeof globalThis !== \\"undefined\\") {
+    return globalThis;
+  }
+
+  if (typeof window !== \\"undefined\\") {}
+
+  if (typeof global !== \\"undefined\\") {
+    return global;
+  }
+
+  if (typeof self !== \\"undefined\\") {
+    return self;
+  }
+
+  return mockGlobal;
+}"
+`;
