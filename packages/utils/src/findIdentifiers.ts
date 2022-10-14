@@ -1,6 +1,8 @@
 import type { NodePath } from '@babel/traverse';
 import type { Node, Identifier, JSXIdentifier } from '@babel/types';
 
+import { getScope } from './getScope';
+
 type FindType = 'binding' | 'both' | 'referenced';
 
 const checkers: Record<FindType, (ex: NodePath) => boolean> = {
@@ -38,7 +40,7 @@ export default function findIdentifiers(
 
       // TODO: Is there a better way to check that it's a local variable?
 
-      const binding = path.scope.getBinding(path.node.name);
+      const binding = getScope(path).getBinding(path.node.name);
       if (!binding) {
         return;
       }

@@ -6,6 +6,7 @@ import type {
   JSX,
 } from '@babel/types';
 
+import { getScope } from '../getScope';
 import { mutate } from '../scopeHelpers';
 
 function getFunctionName(path: NodePath<FunctionNode>): string | null {
@@ -24,7 +25,7 @@ export default function JSXElementsRemover(
 
   // We can do even more
   // If that JSX is a result of a function, we can replace the function body.
-  const functionScope = path.scope.getFunctionParent();
+  const functionScope = getScope(path).getFunctionParent();
   const scopePath = functionScope?.path;
   if (scopePath?.isFunction()) {
     const emptyBody = t.blockStatement([t.returnStatement(nullLiteral)]);
