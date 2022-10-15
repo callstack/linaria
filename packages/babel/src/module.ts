@@ -223,11 +223,14 @@ class Module {
 
         return true;
       },
-      getOwnPropertyDescriptor() {
-        return {
-          enumerable: true,
-          configurable: true,
-        };
+      getOwnPropertyDescriptor: (target, key) => {
+        if (this.#lazyValues.has(key))
+          return {
+            enumerable: true,
+            configurable: true,
+          };
+
+        return undefined;
       },
     });
 

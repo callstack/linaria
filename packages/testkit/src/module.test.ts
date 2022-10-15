@@ -291,3 +291,15 @@ it('correctly processes export declarations in strict mode', () => {
   expect(mod.id).toBe(filename);
   expect(mod.filename).toBe(filename);
 });
+
+it('export * compiled by typescript to commonjs works', () => {
+  const mod = createModule(getFileName(), options);
+
+  mod.evaluate(dedent`
+    const { foo } = require('./ts-compiled-re-exports');
+
+    module.exports = foo;
+  `);
+
+  expect(mod.exports).toBe('foo');
+});
