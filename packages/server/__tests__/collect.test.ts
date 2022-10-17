@@ -104,7 +104,7 @@ describe('collects complex css', () => {
 
     .linaria ~ div {}
     .linaria.linaria2{}
-  `;
+`;
 
   testCollect(html, css);
 });
@@ -113,7 +113,7 @@ describe('simple class name', () => {
   const css = dedent`
     .linaria {}
     .classname {}
-  `;
+`;
 
   testCollect(html, css);
 });
@@ -250,4 +250,75 @@ describe('ignore empty class attribute', () => {
 
   const { critical } = collect(code, css);
   test('critical should be empty', () => expect(critical).toEqual(''));
+});
+
+test('handles several classes', () => {
+  const code = dedent`
+    <div class="test test2"></div>
+    <div class="a      b"></div>
+    <div class="c"></div>
+  `;
+
+  const css = dedent`
+    .test {}
+    .test2 {}
+    .blah {}
+    .a {}
+    .b {}
+    .not-included {}
+    .c {}
+  `;
+
+  const { critical } = collect(code, css);
+  expect(critical).toEqual('.test {}.test2 {}.a {}.b {}.c {}');
+});
+
+test('should not include double selectors unless classnames match fully', () => {
+  const code = dedent`<table class="grid dir dir-ltr"></table>`;
+
+  const css = dedent`
+    .dir-ltr.ignore {
+      padding-bottom: 16px;
+    }
+    .dir {
+      padding-bottom: 8px;
+    }
+    .dir-ltr.grid {
+      padding-bottom: 12px;
+    }
+  `;
+  const { critical, other } = collect(code, css);
+  expect(prettyPrint(critical)).toMatchInlineSnapshot(`
+    ".dir {
+      padding-bottom: 8px;
+    }
+    "
+  `);
+  expect(prettyPrint(other)).toMatchInlineSnapshot(`
+    ".dir-ltr.ignore {
+      padding-bottom: 16px;
+    }
+    .dir-ltr.grid {
+      padding-bottom: 12px;
+    }
+    "
+  `);
+});
+
+test('should include double selectors when classnames match fully', () => {
+  const code = dedent`<table class="grid dir dir-ltr another"></table>`;
+
+  const css = dedent`
+    .dir.another {
+      padding-bottom: 16px;
+    }
+  `;
+  const { critical, other } = collect(code, css);
+  expect(prettyPrint(critical)).toMatchInlineSnapshot(`""`);
+  expect(prettyPrint(other)).toMatchInlineSnapshot(`
+    ".dir.another {
+      padding-bottom: 16px;
+    }
+    "
+  `);
 });

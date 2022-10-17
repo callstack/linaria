@@ -129,9 +129,6 @@ exports[`collects complex css critical 1`] = `
   flex: 1;
   animation: custom-animation 0.2s;
 }
-.linaria:hover {
-  float: right;
-}
 .linaria > span,
 .linaria + .linaria,
 .linaria ~ div {
@@ -140,9 +137,6 @@ exports[`collects complex css critical 1`] = `
 .linaria > span {
   display: none;
 }
-.linaria::after {
-  display: block;
-}
 .lily {
   color: #fff;
 }
@@ -150,8 +144,6 @@ exports[`collects complex css critical 1`] = `
   color: #000;
 }
 .linaria ~ div {
-}
-.linaria.linaria2 {
 }
 @keyframes custom-animation {
   0% {
@@ -179,6 +171,14 @@ exports[`collects complex css other 1`] = `
   }
 }
 
+.linaria:hover {
+  float: right;
+}
+
+.linaria::after {
+  display: block;
+}
+
 .unrelated {
   animation-name: custom-animation;
 }
@@ -189,6 +189,9 @@ exports[`collects complex css other 1`] = `
 
 .unrelated3 {
   flex: 0;
+}
+
+.linaria.linaria2 {
 }
 "
 `;
@@ -268,31 +271,29 @@ html {
 h1 {
   font-weight: bold;
 }
-.linaria:active {
-}
-.linaria::before {
-}
 "
 `;
 
 exports[`works with global css other 1`] = `
-".other:active {
+".linaria:active {
+}
+.linaria::before {
+}
+.other:active {
 }
 .other::before {
 }
 "
 `;
 
-exports[`works with pseudo-class and pseudo-elements critical 1`] = `
+exports[`works with pseudo-class and pseudo-elements critical 1`] = `""`;
+
+exports[`works with pseudo-class and pseudo-elements other 1`] = `
 ".linaria:active {
 }
 .linaria::before {
 }
-"
-`;
-
-exports[`works with pseudo-class and pseudo-elements other 1`] = `
-".other:active {
+.other:active {
 }
 .other::before {
 }

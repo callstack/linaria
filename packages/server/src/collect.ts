@@ -22,12 +22,14 @@ const extractClassesFromHtml = (html: string): RegExp => {
         /\\|\^|\$|\{|\}|\[|\]|\(|\)|\.|\*|\+|\?|\|/g,
         '\\$&'
       );
-      htmlClasses.push(className);
+      if (className && className !== '') {
+        htmlClasses.push(`.${className}`);
+      }
     });
     match = regex.exec(html);
   }
 
-  return new RegExp(htmlClasses.join('|'), 'gm');
+  return new RegExp(`(?:[\\s]|^)(${htmlClasses.join('|')})(?=[\\s]|$)`, 'gm');
 };
 
 export default function collect(html: string, css: string): CollectResult {
@@ -40,6 +42,12 @@ export default function collect(html: string, css: string): CollectResult {
   const isCritical = (rule: ChildNode) => {
     // Only check class names selectors
     if ('selector' in rule && rule.selector.startsWith('.')) {
+      if (/\.(\w+)\.(\w+)/g.test(rule.selector)) {
+        const classNames = rule.selector.split('.');
+        return classNames.every((className) =>
+          className.match(htmlClassesRegExp)
+        );
+      }
       return Boolean(rule.selector.match(htmlClassesRegExp));
     }
 
