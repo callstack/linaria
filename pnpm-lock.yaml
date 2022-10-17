@@ -670,7 +670,7 @@ importers:
       '@types/loader-utils': ^1.1.3
       '@types/mkdirp': ^0.5.2
       '@types/node': ^17.0.39
-      '@types/webpack': ^4.41.26
+      '@types/webpack': ^4.41.33
       enhanced-resolve: ^4.1.0
       loader-utils: ^1.2.3
       mkdirp: ^0.5.1
@@ -686,7 +686,7 @@ importers:
       '@types/loader-utils': 1.1.6
       '@types/mkdirp': 0.5.2
       '@types/node': 17.0.39
-      '@types/webpack': 4.41.32
+      '@types/webpack': 4.41.33
       source-map: 0.7.3
 
   packages/webpack5-loader:
@@ -3523,7 +3523,7 @@ packages:
     resolution: {integrity: sha512-0U4S5kLpm3Cu9YkO46JrmujS2abL2tWsxA1SR8km6X0a1E96tfPu34zRdQSZsJ6dfRYwQpmuKmy9Mx2Od7AXag==}
     dependencies:
       '@types/node': 17.0.39
-      '@types/webpack': 4.41.32
+      '@types/webpack': 4.41.33
     dev: true
 
   /@types/mdast/3.0.10:
@@ -3680,8 +3680,8 @@ packages:
       source-map: 0.7.3
     dev: true
 
-  /@types/webpack/4.41.32:
-    resolution: {integrity: sha512-cb+0ioil/7oz5//7tZUSwbrSAN/NWHrQylz5cW8G0dWTcF/g+/dSdMlKVZspBYuMAN1+WnwHrkxiRrLcwd0Heg==}
+  /@types/webpack/4.41.33:
+    resolution: {integrity: sha512-PPajH64Ft2vWevkerISMtnZ8rTs4YmRbs+23c402J0INmxDKCrhZNvwZYtzx96gY2wAtXdrK1BS2fiC8MlLr3g==}
     dependencies:
       '@types/node': 17.0.39
       '@types/tapable': 1.0.8

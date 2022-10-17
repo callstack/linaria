@@ -106,25 +106,32 @@ const webpack5Loader: Loader = function webpack5LoaderPlugin(
           ) ?? []
         );
 
-        getCacheInstance(cacheProvider)
-          .then((cacheInstance) =>
-            cacheInstance.set(this.resourcePath, cssText)
-          )
-          .then(() => {
-            const request = `${outputFileName}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
-              typeof cacheProvider === 'string' ? cacheProvider : ''
-            )}!${this.resourcePath}`;
-            const stringifiedRequest = JSON.stringify(
-              this.utils.contextify(this.context || this.rootContext, request)
-            );
+        try {
+          const cacheInstance = await getCacheInstance(cacheProvider);
 
-            return this.callback(
-              null,
-              `${result.code}\n\nrequire(${stringifiedRequest});`,
-              result.sourceMap ?? undefined
-            );
-          })
-          .catch((err: Error) => this.callback(err));
+          await cacheInstance.set(this.resourcePath, cssText);
+
+          await cacheInstance.setDependencies?.(
+            this.resourcePath,
+            this.getDependencies()
+          );
+
+          const request = `${outputFileName}!=!${outputCssLoader}?cacheProvider=${encodeURIComponent(
+            typeof cacheProvider === 'string' ? cacheProvider : ''
+          )}!${this.resourcePath}`;
+          const stringifiedRequest = JSON.stringify(
+            this.utils.contextify(this.context || this.rootContext, request)
+          );
+
+          this.callback(
+            null,
+            `${result.code}\n\nrequire(${stringifiedRequest});`,
+            result.sourceMap ?? undefined
+          );
+        } catch (err) {
+          this.callback(err as Error);
+        }
+
         return;
       }
 

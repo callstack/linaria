@@ -184,9 +184,13 @@ The loader accepts the following options:
   > ```
   > interface ICache {
   >   get: (key: string) => Promise<string>;
-  >   set: (key: string, value: string) => Promise<void>
+  >   set: (key: string, value: string) => Promise<void>;
+  >   getDependencies?: (key: string) => Promise<string[]>;
+  >   setDependencies?: (key: string, value: string[]) => Promise<void>;
   > }
   > ```
+
+  When running webpack with `--watch`, `getDependencies` and `setDependencies` will be used to carry dependencies of the Linaria JavaScript source to the generated css output, ensuring both are rebuilt when dependencies change. When these methods are not present on the cache instance, dependencies for the css output will be ignored and may get out of sync with the JavaScript output. Linaria's default memory cache does not have this issue.
 
 - `extension: string` (default: `'.linaria.css'`):
 
