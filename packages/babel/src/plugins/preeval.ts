@@ -50,6 +50,18 @@ const isBrowserGlobal = (id: NodePath<Identifier>) => {
   return forbiddenGlobals.has(id.node.name) && isGlobal(id);
 };
 
+const getPropertyName = (path: NodePath): string | null => {
+  if (path.isIdentifier()) {
+    return path.node.name;
+  }
+
+  if (path.isStringLiteral()) {
+    return path.node.value;
+  }
+
+  return null;
+};
+
 export default function preeval(
   babel: Core,
   options: PreevalOptions
@@ -74,36 +86,75 @@ export default function preeval(
       });
 
       log('start', 'Strip all JSX and browser related stuff');
-      file.path.traverse({
-        // JSX can be replaced with a dummy value,
-        // but we have to do it after we processed template tags.
-        CallExpression: {
-          enter(p) {
-            if (isUnnecessaryReactCall(p)) {
-              JSXElementsRemover(p);
-            }
+      file.path.traverse(
+        {
+          // JSX can be replaced with a dummy value,
+          // but we have to do it after we processed template tags.
+          CallExpression: {
+            enter(p) {
+              if (isUnnecessaryReactCall(p)) {
+                JSXElementsRemover(p);
+              }
+            },
           },
-        },
-        JSXElement: {
-          enter: JSXElementsRemover,
-        },
-        JSXFragment: {
-          enter: JSXElementsRemover,
-        },
-        Identifier(p) {
-          if (isBrowserGlobal(p)) {
-            if (
-              p.parentPath.isUnaryExpression({ operator: 'typeof' }) ||
-              p.parentPath.isTSTypeQuery()
-            ) {
-              // Ignore `typeof window` expressions
+          JSXElement: {
+            enter: JSXElementsRemover,
+          },
+          JSXFragment: {
+            enter: JSXElementsRemover,
+          },
+          MemberExpression(p, state) {
+            const obj = p.get('object');
+            const prop = p.get('property');
+            if (!obj.isIdentifier({ name: 'window' })) {
               return;
             }
 
+            const name = getPropertyName(prop);
+            if (!name) {
+              return;
+            }
+
+            state.windowScoped.add(name);
+            // eslint-disable-next-line no-param-reassign
+            state.globals = state.globals.filter((id) => {
+              if (id.node.name === name) {
+                removeWithRelated([id]);
+                return false;
+              }
+
+              return true;
+            });
+          },
+          MetaProperty(p) {
+            // Remove all references to `import.meta`
             removeWithRelated([p]);
-          }
+          },
+          Identifier(p, state) {
+            if (isBrowserGlobal(p)) {
+              if (
+                p.parentPath.isUnaryExpression({ operator: 'typeof' }) ||
+                p.parentPath.isTSTypeQuery()
+              ) {
+                // Ignore `typeof window` expressions
+                return;
+              }
+
+              removeWithRelated([p]);
+            }
+
+            if (state.windowScoped.has(p.node.name)) {
+              removeWithRelated([p]);
+            } else if (isGlobal(p)) {
+              state.globals.push(p);
+            }
+          },
         },
-      });
+        {
+          globals: [] as NodePath<Identifier>[],
+          windowScoped: new Set<string>(),
+        }
+      );
     },
     visitor: {},
     post(file: BabelFile) {

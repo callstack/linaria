@@ -165,7 +165,7 @@ export default async function transform(
     what: string,
     importer: string,
     stack: string[]
-  ) => Promise<string>,
+  ) => Promise<string | null>,
   babelConfig: TransformOptions = {},
   resolveCache = new Map<string, string>(),
   codeCache: CodeCache = new Map(),
