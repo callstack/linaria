@@ -1,5 +1,16 @@
 # @linaria/griffel
 
+## 4.1.4
+
+### Patch Changes
+
+- Updated dependencies [8a8be242]
+- Updated dependencies [8a8be242]
+- Updated dependencies [08304e09]
+- Updated dependencies [87ffe61c]
+  - @linaria/utils@4.2.2
+  - @linaria/tags@4.1.4
+
 ## 4.1.3
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.1.5
+
+### Patch Changes
+
+- 2906ec1c: Watch dependencies from cached css files in webpack watch mode.
+- Updated dependencies [c2092f61]
+- Updated dependencies [08304e09]
+  - @linaria/babel-preset@4.2.2
+
 ## 4.1.4
 
 ### Patch Changes

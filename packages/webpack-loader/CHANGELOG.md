@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.1.5
+
+### Patch Changes
+
+- 2906ec1c: Watch dependencies from cached css files in webpack watch mode.
+- Updated dependencies [2906ec1c]
+  - @linaria/webpack4-loader@4.1.5
+  - @linaria/webpack5-loader@4.1.5
+
 ## 4.1.4
 
 ### Patch Changes

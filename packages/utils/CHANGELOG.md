@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.2.2
+
+### Patch Changes
+
+- 8a8be242: Fix an incorrect dead-code detection when a function has a parameter with the same name as the function itself. Fixes #1055
+- 8a8be242: Fix rare use case when `void`-expression causes too aggressive tree-shaking. Fixes #1055.
+- 08304e09: Fix support of re-exports compiled by tsc
+- 87ffe61c: The new `variableNameSlug` option that allows to customize css variable names (closes #1053).
+
 ## 4.2.1
 
 ### Patch Changes
