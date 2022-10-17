@@ -16,7 +16,6 @@ const {
   declarationValue,
   declarationMultipleValues,
   declarationMixedValues,
-  combo,
 } = sourceWithExpression;
 
 describe('locationCorrection', () => {

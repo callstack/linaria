@@ -325,7 +325,11 @@ export default async function prepareForEval(
   babel: Core,
   resolveCache: Map<string, string>,
   codeCache: CodeCache,
-  resolve: (what: string, importer: string, stack: string[]) => Promise<string>,
+  resolve: (
+    what: string,
+    importer: string,
+    stack: string[]
+  ) => Promise<string | null>,
   file: Promise<FileInQueue>,
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>,
   stack: string[] = []
@@ -343,6 +347,11 @@ export default async function prepareForEval(
   imports?.forEach((importsOnly, importedFile) => {
     const promise = resolve(importedFile, name, stack).then(
       (resolved) => {
+        if (resolved === null) {
+          log('stage-1:resolve', `✅ ${importedFile} is ignored`);
+          return null;
+        }
+
         log('stage-1:async-resolve', `✅ ${importedFile} -> ${resolved}`);
         const resolveCacheKey = `${name} -> ${importedFile}`;
         const cached = resolveCache.get(resolveCacheKey);

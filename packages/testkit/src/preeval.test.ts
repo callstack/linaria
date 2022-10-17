@@ -59,4 +59,17 @@ describe('preeval', () => {
 
     expect(code).toMatchSnapshot();
   });
+
+  it('should remove usages of window scoped identifiers', () => {
+    const { code } = run`
+      $RefreshReg$("Container");
+      if (import.meta.hot) {
+        window.$RefreshReg$ = () => {};
+      }
+
+      $RefreshReg$("Header");
+    `;
+
+    expect(code).toMatchSnapshot();
+  });
 });

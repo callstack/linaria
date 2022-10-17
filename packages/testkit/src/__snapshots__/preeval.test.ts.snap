@@ -19,3 +19,5 @@ exports[`preeval should keep getGlobal but remove window-related code 1`] = `
   return mockGlobal;
 }"
 `;
+
+exports[`preeval should remove usages of window scoped identifiers 1`] = `""`;
