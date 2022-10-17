@@ -1,5 +1,22 @@
 # @linaria/testkit
 
+## 4.1.5
+
+### Patch Changes
+
+- c2092f61: Support for rollup@3 and vite@3 (fixes #1044, #1060)
+- 08304e09: Fix support of re-exports compiled by tsc
+- 87ffe61c: The new `variableNameSlug` option that allows to customize css variable names (closes #1053).
+- Updated dependencies [8a8be242]
+- Updated dependencies [8a8be242]
+- Updated dependencies [c2092f61]
+- Updated dependencies [08304e09]
+- Updated dependencies [87ffe61c]
+  - @linaria/shaker@4.2.2
+  - @linaria/babel-preset@4.2.2
+  - @linaria/react@4.1.5
+  - @linaria/tags@4.1.4
+
 ## 4.1.4
 
 ### Patch Changes

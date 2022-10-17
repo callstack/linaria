@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.1.5
+
+### Patch Changes
+
+- Updated dependencies [8a8be242]
+- Updated dependencies [8a8be242]
+- Updated dependencies [c2092f61]
+- Updated dependencies [08304e09]
+- Updated dependencies [87ffe61c]
+  - @linaria/utils@4.2.2
+  - @linaria/babel-preset@4.2.2
+
 ## 4.1.4
 
 ### Patch Changes

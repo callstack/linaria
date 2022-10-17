@@ -1,5 +1,20 @@
 # Change Log
 
+## 4.2.2
+
+### Patch Changes
+
+- c2092f61: Support for rollup@3 and vite@3 (fixes #1044, #1060)
+- 08304e09: Fix support of re-exports compiled by tsc
+- Updated dependencies [8a8be242]
+- Updated dependencies [8a8be242]
+- Updated dependencies [08304e09]
+- Updated dependencies [87ffe61c]
+  - @linaria/shaker@4.2.2
+  - @linaria/utils@4.2.2
+  - @linaria/core@4.1.4
+  - @linaria/tags@4.1.4
+
 ## 4.2.1
 
 ### Patch Changes
