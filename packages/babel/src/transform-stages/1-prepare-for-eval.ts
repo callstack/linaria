@@ -317,6 +317,8 @@ export function prepareForEvalSync(
   return Array.from(results);
 }
 
+const mutexes = new Map<string, Promise<void>>();
+
 /**
  * Parses the specified file and recursively all its dependencies,
  * finds tags, applies eval-time replacements, removes dead code.
@@ -335,6 +337,11 @@ export default async function prepareForEval(
   stack: string[] = []
 ): Promise<ITransformFileResult[] | undefined> {
   const resolvedFile = await file;
+  const mutex = resolvedFile ? mutexes.get(resolvedFile.name) : null;
+  if (mutex) {
+    await mutex;
+  }
+
   const processed = processQueueItem(babel, resolvedFile, codeCache, options);
   if (!processed) return undefined;
 
@@ -397,7 +404,13 @@ export default async function prepareForEval(
     );
   });
 
-  await Promise.all(promises);
+  const promise = Promise.all(promises).then(() => {});
+
+  mutexes.set(name, promise);
+
+  await promise;
+
+  mutexes.delete(name);
 
   return Array.from(results);
 }
