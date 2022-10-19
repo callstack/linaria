@@ -17,10 +17,14 @@
   "engines": {
     "node": "^12.16.0 || >=13.7.0"
   },
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.js",
+    "types": "./types/index.d.ts"
+  },
   "files": [
-    "types/",
-    "lib/",
-    "esm/"
+    "dist/",
+    "types/"
   ],
   "homepage": "https://github.com/callstack/linaria#readme",
   "keywords": [
@@ -34,19 +38,26 @@
     "styled-components"
   ],
   "license": "MIT",
-  "main": "lib/index.js",
-  "module": "esm/index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "publishConfig": {
     "access": "public"
   },
   "repository": "git@github.com:callstack/linaria.git",
   "scripts": {
-    "build": "npm run build:lib && npm run build:esm && npm run build:declarations",
+    "build": "npm run build:dist && npm run build:declarations",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
-    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
-    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:dist": "tsup --format cjs,esm",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "npm run build --watch"
   },
-  "types": "types"
+  "tsup": {
+    "entry": [
+      "src/index.ts"
+    ],
+    "splitting": false,
+    "sourcemap": true,
+    "clean": true
+  },
+  "types": "types/index.d.ts"
 }
