@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.2.0
+
+### Minor Changes
+
+- 1e88e95d: Support for ECMAScript modules. Fixes #904 and #1043.
+
+### Patch Changes
+
+- Updated dependencies [1e88e95d]
+  - @linaria/core@4.2.0
+  - @linaria/react@4.2.0
+
 ## 4.1.5
 
 ### Patch Changes

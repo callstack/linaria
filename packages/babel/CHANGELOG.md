@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.2.3
+
+### Patch Changes
+
+- 9111b4ea: Fix an issue with async resolvers that sometimes leads to attempts to evaluate unprepared code. Fixes #1054.
+- Updated dependencies [1e88e95d]
+  - @linaria/core@4.2.0
+
 ## 4.2.2
 
 ### Patch Changes

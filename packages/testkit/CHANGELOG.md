@@ -1,5 +1,14 @@
 # @linaria/testkit
 
+## 4.1.6
+
+### Patch Changes
+
+- Updated dependencies [1e88e95d]
+- Updated dependencies [9111b4ea]
+  - @linaria/react@4.2.0
+  - @linaria/babel-preset@4.2.3
+
 ## 4.1.5
 
 ### Patch Changes
