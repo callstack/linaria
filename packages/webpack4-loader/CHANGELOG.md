@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.1.6
+
+### Patch Changes
+
+- Updated dependencies [9111b4ea]
+  - @linaria/babel-preset@4.2.3
+
 ## 4.1.5
 
 ### Patch Changes
