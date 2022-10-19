@@ -5,6 +5,7 @@
     "packages/**/__tests__/**",
     "packages/**/__fixtures__/**",
     "packages/**/__utils__/**",
+    "packages/**/dist/**",
     "packages/**/types/**"
   ],
   "compilerOptions": {

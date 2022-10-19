@@ -12,6 +12,9 @@ export default defineConfig(({ command }) => ({
     {
       ...linaria({
         include: ['**/*.{js,jsx}'],
+        babelOptions: {
+          presets: ['@babel/preset-react'],
+        },
       }),
       enforce: 'pre',
     },
