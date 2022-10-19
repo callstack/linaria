@@ -1,6 +1,6 @@
-linaria-website:build: cache hit, replaying output 8482ede1055d1b15
+linaria-website:build: cache hit, replaying output 9095a13746205ad9
 linaria-website:build: 
-linaria-website:build: > linaria-website@4.1.5 build /home/runner/work/linaria/linaria/website
+linaria-website:build: > linaria-website@4.1.6 build /home/runner/work/linaria/linaria/website
 linaria-website:build: > yarn build:client && yarn build:server
 linaria-website:build: 
 linaria-website:build: yarn run v1.22.19
@@ -28,9 +28,9 @@ linaria-website:build:       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@
 linaria-website:build:       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Hero.jsx[39m[22m 1.32 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 linaria-website:build:     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/index.jsx[39m[22m 311 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 linaria-website:build:     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Container.js[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-linaria-website:build: webpack 5.73.0 compiled [1m[32msuccessfully[39m[22m in 10150 ms
-linaria-website:build: Done in 11.83s.
+linaria-website:build: webpack 5.73.0 compiled [1m[32msuccessfully[39m[22m in 13049 ms
+linaria-website:build: Done in 15.53s.
 linaria-website:build: yarn run v1.22.19
 linaria-website:build: $ cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
-linaria-website:build: Successfully compiled 11 files with Babel (2370ms).
-linaria-website:build: Done in 3.26s.
+linaria-website:build: Successfully compiled 11 files with Babel (2361ms).
+linaria-website:build: Done in 3.12s.
