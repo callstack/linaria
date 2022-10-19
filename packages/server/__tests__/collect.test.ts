@@ -251,3 +251,37 @@ describe('ignore empty class attribute', () => {
   const { critical } = collect(code, css);
   test('critical should be empty', () => expect(critical).toEqual(''));
 });
+
+test('does not match selectors in ignoredClasses list', () => {
+  const code = dedent`
+    <div class="lily ltr dir"></div>
+  `;
+
+  const css = dedent`
+    .linaria.dir {}
+    .linaria.ltr {}
+    .lily {}
+  `;
+
+  const { critical, other } = collect(code, css, {
+    ignoredClasses: ['ltr', 'dir'],
+  });
+  expect(critical).toMatchInlineSnapshot(`".lily {}"`);
+  expect(other).toMatchInlineSnapshot(`".linaria.dir {}.linaria.ltr {}"`);
+});
+
+test('does not match selectors in blockedClasses list', () => {
+  const code = dedent`
+    <div class="lily linaria ltr dir"></div>
+  `;
+
+  const css = dedent`
+    .linaria.ltr {}
+    .linaria.rtl {}
+    .lily {}
+  `;
+
+  const { critical, other } = collect(code, css, { blockedClasses: ['rtl'] });
+  expect(critical).toMatchInlineSnapshot(`".linaria.ltr {}.lily {}"`);
+  expect(other).toMatchInlineSnapshot(`".linaria.rtl {}"`);
+});
