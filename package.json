@@ -40,6 +40,7 @@
     "prettier": "^2.7.1",
     "react": "^16.14.0",
     "syncpack": "^8.0.0",
+    "tsup": "^6.3.0",
     "turbo": "^1.2.16",
     "typescript": "^4.7.4"
   },
@@ -64,7 +65,7 @@
     "add-contributor": "all-contributors add",
     "bootstrap": "pnpm install",
     "check:all": "turbo run check:all --output-logs=new-only && npm run lint && npm run sp:check",
-    "clean": "del 'packages/*/{coverage,esm,lib,types,tsconfig.tsbuildinfo}'",
+    "clean": "del 'packages/*/{coverage,dist,esm,lib,types,tsconfig.tsbuildinfo}'",
     "lint": "eslint --ext .js,.ts,.tsx .",
     "prepare": "turbo run build --output-logs=new-only",
     "release": "pnpm run prepare && pnpm changeset publish",
