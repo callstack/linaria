@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.2.3
+
+### Patch Changes
+
+- cc2f87a8: Get rid of "expected node to be of a type" errors
+
 ## 4.2.2
 
 ### Patch Changes

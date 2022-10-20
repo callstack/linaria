@@ -1,5 +1,17 @@
 # @linaria/testkit
 
+## 4.1.7
+
+### Patch Changes
+
+- cc2f87a8: Get rid of "expected node to be of a type" errors
+- Updated dependencies [cc2f87a8]
+- Updated dependencies [6de22792]
+  - @linaria/babel-preset@4.2.4
+  - @linaria/shaker@4.2.3
+  - @linaria/react@4.2.1
+  - @linaria/tags@4.1.5
+
 ## 4.1.6
 
 ### Patch Changes

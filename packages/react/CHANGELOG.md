@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.2.1
+
+### Patch Changes
+
+- 6de22792: Upgrade @emotion/is-prop-valid to support ES modules
+- Updated dependencies [cc2f87a8]
+  - @linaria/utils@4.2.3
+  - @linaria/core@4.2.1
+  - @linaria/tags@4.1.5
+
 ## 4.2.0
 
 ### Minor Changes
