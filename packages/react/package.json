@@ -4,7 +4,7 @@
   "version": "4.2.0",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
-    "@emotion/is-prop-valid": "^0.8.8",
+    "@emotion/is-prop-valid": "^1.2.0",
     "@linaria/core": "workspace:^",
     "@linaria/tags": "workspace:^",
     "@linaria/utils": "workspace:^",
