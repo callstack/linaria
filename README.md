@@ -393,6 +393,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
       <td align="center"><a href="https://twitter.com/skovorodan"><img src="https://avatars.githubusercontent.com/u/291301?v=4?s=100" width="100px;" alt="Nikita Skovoroda"/><br /><sub><b>Nikita Skovoroda</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=ChALkeR" title="Code">💻</a></td>
       <td align="center"><a href="https://github.com/huang-xiao-jian"><img src="https://avatars.githubusercontent.com/u/4002210?v=4?s=100" width="100px;" alt="黄小健"/><br /><sub><b>黄小健</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=huang-xiao-jian" title="Code">💻</a></td>
       <td align="center"><a href="https://github.com/iMoses"><img src="https://avatars.githubusercontent.com/u/1083065?v=4?s=100" width="100px;" alt="iMoses"/><br /><sub><b>iMoses</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=iMoses" title="Code">💻</a></td>
+      <td align="center"><a href="http://jneander.com"><img src="https://avatars.githubusercontent.com/u/880186?v=4?s=100" width="100px;" alt="Jeremy Neander"/><br /><sub><b>Jeremy Neander</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=jneander" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
