@@ -415,7 +415,7 @@ importers:
   packages/react:
     specifiers:
       '@babel/types': ^7.18.9
-      '@emotion/is-prop-valid': ^0.8.8
+      '@emotion/is-prop-valid': ^1.2.0
       '@linaria/core': workspace:^
       '@linaria/tags': workspace:^
       '@linaria/utils': workspace:^
@@ -426,7 +426,7 @@ importers:
       react-test-renderer: ^16.8.3
       ts-invariant: ^0.10.3
     dependencies:
-      '@emotion/is-prop-valid': 0.8.8
+      '@emotion/is-prop-valid': 1.2.0
       '@linaria/core': link:../core
       '@linaria/tags': link:../tags
       '@linaria/utils': link:../utils
@@ -2911,14 +2911,14 @@ packages:
     resolution: {integrity: sha512-kBJtf7PH6aWwZ6fka3zQ0p6SBYzx4fl1LoZXE2RrnYST9Xljm7WfKJrU4g/Xr3Beg72MLrp1AWNUmuYJTL7Cow==}
     dev: false
 
-  /@emotion/is-prop-valid/0.8.8:
-    resolution: {integrity: sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==}
+  /@emotion/is-prop-valid/1.2.0:
+    resolution: {integrity: sha512-3aDpDprjM0AwaxGE09bOPkNxHpBd+kA6jty3RnaEXdweX1DF1U3VQpPYb0g1IStAuK7SVQ1cy+bNBBKp4W3Fjg==}
     dependencies:
-      '@emotion/memoize': 0.7.4
+      '@emotion/memoize': 0.8.0
     dev: false
 
-  /@emotion/memoize/0.7.4:
-    resolution: {integrity: sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw==}
+  /@emotion/memoize/0.8.0:
+    resolution: {integrity: sha512-G/YwXTkv7Den9mXDO7AhLWkE3q+I92B+VqAE+dYG4NGPaHZGvt3G8Q0p9vmE+sq7rTGphUbAvmQ9YpbfMQGGlA==}
     dev: false
 
   /@esbuild/android-arm/0.15.11:
