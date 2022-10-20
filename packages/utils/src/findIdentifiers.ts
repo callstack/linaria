@@ -32,7 +32,8 @@ export function nonType(path: NodePath): boolean {
       p.isTSTypeReference() ||
       p.isTSTypeQuery() ||
       p.isFlowType() ||
-      p.isFlowDeclaration()
+      p.isFlowDeclaration() ||
+      p.isTSInterfaceDeclaration()
   );
 }
 

@@ -8,9 +8,10 @@ import type { Identifier } from '@babel/types';
 import { createCustomDebug } from '@linaria/logger';
 import type { StrictOptions } from '@linaria/utils';
 import {
+  JSXElementsRemover,
   getFileIdx,
   isUnnecessaryReactCall,
-  JSXElementsRemover,
+  nonType,
   removeWithRelated,
 } from '@linaria/utils';
 
@@ -24,6 +25,10 @@ export type PreevalOptions = Pick<
 >;
 
 const isGlobal = (id: NodePath<Identifier>): boolean => {
+  if (!nonType(id)) {
+    return false;
+  }
+
   const { scope } = id;
   const { name } = id.node;
   return !scope.hasBinding(name) && scope.hasGlobal(name);
@@ -141,6 +146,8 @@ export default function preeval(
               }
 
               removeWithRelated([p]);
+
+              return;
             }
 
             if (state.windowScoped.has(p.node.name)) {

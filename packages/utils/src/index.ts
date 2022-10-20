@@ -5,7 +5,7 @@ export {
 } from './asyncResolveFallback';
 export { default as collectExportsAndImports } from './collectExportsAndImports';
 export * from './collectExportsAndImports';
-export { default as findIdentifiers } from './findIdentifiers';
+export { default as findIdentifiers, nonType } from './findIdentifiers';
 export { default as getFileIdx } from './getFileIdx';
 export { default as isExports } from './isExports';
 export { default as isNotNull } from './isNotNull';

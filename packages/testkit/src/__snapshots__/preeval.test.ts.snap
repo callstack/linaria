@@ -6,8 +6,6 @@ exports[`preeval should keep getGlobal but remove window-related code 1`] = `
     return globalThis;
   }
 
-  if (typeof window !== \\"undefined\\") {}
-
   if (typeof global !== \\"undefined\\") {
     return global;
   }
@@ -17,6 +15,12 @@ exports[`preeval should keep getGlobal but remove window-related code 1`] = `
   }
 
   return mockGlobal;
+}"
+`;
+
+exports[`preeval should not remove "location" in types only because it looks like a global variable 1`] = `
+"interface IProps {
+  fn: (location: string) => void;
 }"
 `;
 

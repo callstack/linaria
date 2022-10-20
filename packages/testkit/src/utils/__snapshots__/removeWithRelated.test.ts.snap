@@ -15,6 +15,8 @@ exports[`removeWithRelated should remove export 1`] = `
 export { b };"
 `;
 
+exports[`removeWithRelated should remove node if it becomes invalid after removing its children 1`] = `""`;
+
 exports[`removeWithRelated should remove try/catch block 1`] = `"const a = 1;"`;
 
 exports[`removeWithRelated should shake try/catch 1`] = `""`;
