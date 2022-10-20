@@ -6,7 +6,7 @@ import dedent from 'dedent';
 import { preeval } from '@linaria/babel-preset';
 
 const run = (code: TemplateStringsArray) => {
-  const filename = join(__dirname, 'source.js');
+  const filename = join(__dirname, 'source.ts');
   const formattedCode = dedent(code);
 
   const transformed = transformSync(formattedCode, {
@@ -14,6 +14,7 @@ const run = (code: TemplateStringsArray) => {
     configFile: false,
     filename,
     plugins: [
+      '@babel/plugin-syntax-typescript',
       [
         preeval,
         {
@@ -68,6 +69,16 @@ describe('preeval', () => {
       }
 
       $RefreshReg$("Header");
+    `;
+
+    expect(code).toMatchSnapshot();
+  });
+
+  it('should not remove "location" in types only because it looks like a global variable', () => {
+    const { code } = run`
+      interface IProps {
+        fn: (location: string) => void;
+      }
     `;
 
     expect(code).toMatchSnapshot();

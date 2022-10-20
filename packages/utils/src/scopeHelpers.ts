@@ -2,12 +2,35 @@
 /* eslint @typescript-eslint/no-use-before-define: ["error", { "functions": false }] */
 
 import type { Binding, NodePath } from '@babel/traverse';
-import type { Identifier, JSXIdentifier, Program } from '@babel/types';
+import type {
+  Node,
+  Identifier,
+  JSXIdentifier,
+  Program,
+  FieldOptions,
+} from '@babel/types';
+import { NODE_FIELDS } from '@babel/types';
 
 import findIdentifiers, { nonType } from './findIdentifiers';
 import { getScope } from './getScope';
 import isNotNull from './isNotNull';
 import isRemoved from './isRemoved';
+
+function validateField(
+  node: Node,
+  key: string,
+  val: unknown,
+  field: FieldOptions
+) {
+  if (!(field != null && field.validate)) return true;
+  if (field.optional && val == null) return true;
+  try {
+    field.validate(node, key, val);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function getBinding(path: NodePath<Identifier | JSXIdentifier>) {
   const binding = getScope(path).getBinding(path.node.name);
@@ -199,28 +222,24 @@ export function findParentForDelete(path: NodePath): NodePath | null {
     return findParentForDelete(parent);
   }
 
-  if (parent.isExportDefaultDeclaration()) {
-    return findParentForDelete(parent);
-  }
-
-  if (parent.isTryStatement()) {
-    return findParentForDelete(parent);
-  }
-
-  if (parent.isExportSpecifier()) {
-    return findParentForDelete(parent);
-  }
-
-  if (parent.isConditionalExpression()) {
-    return findParentForDelete(parent);
-  }
-
   for (const key of ['body', 'declarations', 'specifiers']) {
     if (path.listKey === key && typeof path.key === 'number') {
       const list = parent.get(key) as NodePath[];
       if (list.length === 1) {
         return findParentForDelete(parent);
       }
+    }
+  }
+
+  if (parent.isTryStatement()) {
+    return findParentForDelete(parent);
+  }
+
+  if (!path.listKey) {
+    const field = NODE_FIELDS[parent.type][path.key];
+    if (!validateField(parent.node, path.key as string, null, field)) {
+      // The parent node isn't valid without this field, so we should remove it also.
+      return findParentForDelete(parent);
     }
   }
 

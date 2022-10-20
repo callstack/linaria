@@ -118,4 +118,14 @@ describe('removeWithRelated', () => {
 
     expect(code).toMatchSnapshot();
   });
+
+  it('should remove node if it becomes invalid after removing its children', () => {
+    const code = run`
+      /* remove */const mode = "DEV";
+
+      export { mode };
+    `;
+
+    expect(code).toMatchSnapshot();
+  });
 });
