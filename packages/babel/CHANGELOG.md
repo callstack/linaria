@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.2.4
+
+### Patch Changes
+
+- cc2f87a8: Get rid of "expected node to be of a type" errors
+- Updated dependencies [cc2f87a8]
+  - @linaria/utils@4.2.3
+  - @linaria/shaker@4.2.3
+  - @linaria/core@4.2.1
+  - @linaria/tags@4.1.5
+
 ## 4.2.3
 
 ### Patch Changes
