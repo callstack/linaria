@@ -285,3 +285,41 @@ test('does not match selectors in blockedClasses list', () => {
   expect(critical).toMatchInlineSnapshot(`".linaria.ltr {}.lily {}"`);
   expect(other).toMatchInlineSnapshot(`".linaria.rtl {}"`);
 });
+
+test('does not match child selectors in blockedClasses list for media queries', () => {
+  const code = dedent`
+    <div class="lily linaria ltr dir"></div>
+  `;
+
+  const css = dedent`
+  @media only screen and (max-width:561.5px) {
+    .dir-ltr.left_6_3_l9xil3s {
+      padding-left: 24px !important;
+    }
+
+    .dir-rtl.left_6_3_l9xil3s {
+      padding-right: 24px !important;
+    }
+  }
+  `;
+
+  const { critical, other } = collect(code, css, {
+    blockedClasses: ['dir-rtl'],
+  });
+
+  expect(critical).toMatchInlineSnapshot(`
+    "@media only screen and (max-width:561.5px) {
+      .dir-ltr.left_6_3_l9xil3s {
+        padding-left: 24px !important;
+      }
+    }"
+  `);
+  expect(other).toMatchInlineSnapshot(`
+    "@media only screen and (max-width:561.5px) {
+
+      .dir-rtl.left_6_3_l9xil3s {
+        padding-right: 24px !important;
+      }
+    }"
+  `);
+});

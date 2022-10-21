@@ -83,23 +83,30 @@ export default function collect(
   };
 
   const handleAtRule = (rule: AtRule) => {
-    let addedToCritical = false;
-
-    rule.each((childRule) => {
-      if (isCritical(childRule) && !addedToCritical) {
-        critical.append(rule.clone());
-        addedToCritical = true;
-      }
-    });
-
     if (rule.name === 'keyframes') {
       return;
     }
 
-    if (addedToCritical) {
-      rule.remove();
-    } else {
-      other.append(rule);
+    const criticalRule = rule.clone();
+    const otherRule = rule.clone();
+
+    let removedNodesFromOther = 0;
+    criticalRule.each((childRule: ChildNode, index: number) => {
+      if (isCritical(childRule)) {
+        otherRule.nodes[index - removedNodesFromOther]?.remove();
+        removedNodesFromOther += 1;
+      } else {
+        childRule.remove();
+      }
+    });
+
+    rule.remove();
+
+    if (criticalRule.nodes.length > 0) {
+      critical.append(criticalRule);
+    }
+    if (otherRule.nodes.length > 0) {
+      other.append(otherRule);
     }
   };
 
