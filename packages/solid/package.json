@@ -24,6 +24,7 @@
     "babel-preset-solid": "^1.6.0",
     "jest-environment-jsdom": "^28.1.0",
     "solid-js": "^1.6.0",
+    "solid-testing-library": "^0.3.0",
     "style-inject": "^0.3.0"
   },
   "engines": {

@@ -1,9 +1,9 @@
 import { styled } from '../../src';
 
 interface TagProps {
-  readonly background?: string;
+  readonly bg?: string;
 }
 export const Tag = styled.div<TagProps>`
   color: red;
-  background: ${(props) => props.background};
+  background: ${(props) => props.bg};
 `;

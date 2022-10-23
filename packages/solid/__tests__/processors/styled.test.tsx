@@ -298,12 +298,57 @@
 //     });
 //   });
 // });
+import type { JSX } from 'solid-js';
+import { render } from 'solid-testing-library';
 
 import { Tag } from './components.linaria';
 
-describe('foo', () => {
-  it('foo', () => {
+const renderComponent = (component: () => JSX.Element): HTMLElement => {
+  const child = render(component).container.firstElementChild;
+  if (child instanceof HTMLElement) return child;
+  throw new Error('Cannot render component');
+};
+
+describe('styled processor', () => {
+  it('renders primitive children', () => {
+    const result = renderComponent(() => <Tag>Text</Tag>);
+    expect(result.textContent).toEqual('Text');
+  });
+  it('renders complex children', () => {
+    const result = renderComponent(() => (
+      <Tag>
+        <span>Text</span>
+      </Tag>
+    ));
+    expect(Array.from(result.children)).toEqual([<span>Text</span>]);
+  });
+  it('sets static styles', () => {
+    const result = renderComponent(() => <Tag />);
+    expect(getComputedStyle(result).color).toEqual('red');
+  });
+  it('sets non-reactive dynamic styles', () => {
+    const component = () => {
+      return (
+        <div
+          class={'Tag_tlhry5p'}
+          style={{
+            // background: 'red',
+            '--tlhry5p-0': 'blue',
+          }}
+        ></div>
+      );
+    };
+    console.log(component.toString());
+    const result = renderComponent(component);
+    console.log(document.head.innerHTML);
+    console.log(Array.from(result.classList));
     console.log(Tag.toString());
-    // console.log('head', window.document.head.innerHTML);
+    const computed = getComputedStyle(result);
+    console.info({
+      color: computed.color,
+      background: computed.background,
+      backgroundColor: computed.backgroundColor,
+      t: result.style.getPropertyValue('--tlhry5p-0'),
+    });
   });
 });
