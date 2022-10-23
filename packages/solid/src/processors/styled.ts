@@ -62,6 +62,7 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
 
   public override addInterpolation(
     node: Expression,
+    precedingCss: string,
     source: string,
     unit = ''
   ): string {
