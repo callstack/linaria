@@ -17,6 +17,7 @@
   "devDependencies": {
     "@babel/core": "^7.18.9",
     "@babel/types": "^7.18.9",
+    "@jest/transform": "^28.1.0",
     "@linaria/babel-preset": "workspace:^",
     "@types/node": "^17.0.39",
     "babel-preset-solid": "^1.6.0",
