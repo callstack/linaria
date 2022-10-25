@@ -9,7 +9,8 @@ var _react = require("@linaria/react");
 
 const Container = /*#__PURE__*/(0, _react.styled)('div')({
   name: "Container",
-  class: "cvg8y9q"
+  class: "cvg8y9q",
+  propsAsIs: false
 });
 var _default = Container;
 exports.default = _default;

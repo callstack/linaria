@@ -37,17 +37,21 @@ const _exp = /*#__PURE__*/() => _Container.default;
 
 const NavBar = /*#__PURE__*/(0, _react.styled)(_exp())({
   name: "NavBar",
-  class: "n11jhqd8"
+  class: "n11jhqd8",
+  propsAsIs: true
 });
 const LogoImage = /*#__PURE__*/(0, _react.styled)('img')({
   name: "LogoImage",
-  class: "l2h01z2"
+  class: "l2h01z2",
+  propsAsIs: false
 });
 const Links = /*#__PURE__*/(0, _react.styled)('ul')({
   name: "Links",
-  class: "lkd2pf6"
+  class: "lkd2pf6",
+  propsAsIs: false
 });
 const LinkItem = /*#__PURE__*/(0, _react.styled)('a')({
   name: "LinkItem",
-  class: "l6fgol"
+  class: "l6fgol",
+  propsAsIs: false
 });
