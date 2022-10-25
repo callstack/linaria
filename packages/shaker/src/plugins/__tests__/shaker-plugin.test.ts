@@ -179,4 +179,21 @@ describe('shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata.imports.size).toBe(0);
   });
+
+  it('should delete import', () => {
+    const { code, metadata } = keep(['Alive'])`
+      import { A, B } from "ABC";
+      const AB = {
+        A,
+        B,
+      };
+
+      export const Alive = "";
+
+      export default AB;
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
+  });
 });

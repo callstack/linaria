@@ -17,8 +17,9 @@ import {
   removeWithRelated,
   sideEffectImport,
   reference,
-  findParentForDelete,
+  findActionForNode,
   dereference,
+  mutate,
 } from '@linaria/utils';
 
 type Core = typeof core;
@@ -257,7 +258,8 @@ export default function shakerPlugin(
           // eslint-disable-next-line no-restricted-syntax
           for (const path of forDeleting) {
             const binding = getBindingForExport(path);
-            const parent = findParentForDelete(path);
+            const action = findActionForNode(path);
+            const parent = action?.[1];
             const outerReferences = (binding?.referencePaths || []).filter(
               (ref) => ref !== parent && !parent?.isAncestor(ref)
             );
@@ -271,7 +273,20 @@ export default function shakerPlugin(
               !deleted.has(path) &&
               (!binding || outerReferences.length === 0)
             ) {
-              removeWithRelated([parent ?? path]);
+              if (action) {
+                mutate(action[1], (p) => {
+                  if (isRemoved(p)) return;
+
+                  if (action[0] === 'remove') {
+                    p.remove();
+                  } else if (action[0] === 'replace') {
+                    p.replaceWith(action[2]);
+                  }
+                });
+              } else {
+                removeWithRelated([path]);
+              }
+
               deleted.add(path);
               changed = true;
             }
