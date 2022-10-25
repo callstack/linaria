@@ -1,5 +1,22 @@
 # @linaria/testkit
 
+## 4.2.0
+
+### Minor Changes
+
+- 63f56d47: Do not filter properties if an unknown component is passed to `styled`. Fixes support of custom elements #968
+
+### Patch Changes
+
+- 963508a2: Shaker shouldn't remove parameters of functions if they aren't used.
+- Updated dependencies [63f56d47]
+- Updated dependencies [963508a2]
+- Updated dependencies [c26d4667]
+  - @linaria/babel-preset@4.3.0
+  - @linaria/react@4.3.0
+  - @linaria/tags@4.2.0
+  - @linaria/shaker@4.2.4
+
 ## 4.1.7
 
 ### Patch Changes

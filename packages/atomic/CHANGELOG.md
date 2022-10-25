@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.2.2
+
+### Patch Changes
+
+- Updated dependencies [63f56d47]
+- Updated dependencies [963508a2]
+- Updated dependencies [c26d4667]
+  - @linaria/react@4.3.0
+  - @linaria/tags@4.2.0
+  - @linaria/utils@4.2.4
+  - @linaria/core@4.2.2
+
 ## 4.2.1
 
 ### Patch Changes
