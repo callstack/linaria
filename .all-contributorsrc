@@ -1024,6 +1024,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "andparsons",
+      "name": "Andy Parsons",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1213447?v=4",
+      "profile": "https://evensix.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "repoType": "github",
