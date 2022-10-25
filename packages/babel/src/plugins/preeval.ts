@@ -6,6 +6,7 @@ import type { BabelFile, NodePath, PluginObj } from '@babel/core';
 import type { Identifier } from '@babel/types';
 
 import { createCustomDebug } from '@linaria/logger';
+import type { ExpressionValue } from '@linaria/tags';
 import type { StrictOptions } from '@linaria/utils';
 import {
   JSXElementsRemover,
@@ -181,8 +182,8 @@ export default function preeval(
         dependencies: [],
       };
 
-      const expressions: Identifier[] = this.processors.flatMap((processor) =>
-        processor.dependencies.map((dependency) => dependency.ex)
+      const expressions: ExpressionValue['ex'][] = this.processors.flatMap(
+        (processor) => processor.dependencies.map((dependency) => dependency.ex)
       );
 
       const linariaPreval = file.path.scope.getData('__linariaPreval');

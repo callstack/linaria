@@ -5,6 +5,7 @@ import type {
   SourceLocation,
   StringLiteral,
 } from '@babel/types';
+import html from 'react-html-attributes';
 
 import type {
   Params,
@@ -26,10 +27,13 @@ import { slugify } from '@linaria/utils';
 
 const isNotNull = <T>(x: T | null): x is T => x !== null;
 
+const allTagsSet = new Set([...html.elements.html, html.elements.svg]);
+
 export interface IProps {
   atomic?: boolean;
   class?: string;
   name: string;
+  propsAsIs: boolean;
   vars?: Record<string, Expression[]>;
 }
 
@@ -71,6 +75,8 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
       const value = tagOp[1];
       if (value.kind === ValueType.FUNCTION) {
         component = 'FunctionalComponent';
+      } else if (value.kind === ValueType.CONST) {
+        component = typeof value.value === 'string' ? value.value : undefined;
       } else {
         component = {
           node: value.ex,
@@ -240,6 +246,8 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
     const propsObj: IProps = {
       name: this.displayName,
       class: this.className,
+      propsAsIs:
+        typeof this.component !== 'string' || !allTagsSet.has(this.component),
     };
 
     // If we found any interpolations, also pass them, so they can be applied
@@ -264,11 +272,15 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
 
     const propExpressions = Object.entries(props)
       .map(([key, value]: [key: string, value: IProps[keyof IProps]]) => {
-        if (!value) {
+        if (value === undefined) {
           return null;
         }
 
         const keyNode = t.identifier(key);
+
+        if (value === null) {
+          return t.objectProperty(keyNode, t.nullLiteral());
+        }
 
         if (typeof value === 'string') {
           return t.objectProperty(keyNode, t.stringLiteral(value));

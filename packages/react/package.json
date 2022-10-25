@@ -8,6 +8,7 @@
     "@linaria/core": "workspace:^",
     "@linaria/tags": "workspace:^",
     "@linaria/utils": "workspace:^",
+    "react-html-attributes": "^1.4.6",
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
