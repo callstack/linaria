@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.2.4
+
+### Patch Changes
+
+- 963508a2: Shaker shouldn't remove parameters of functions if they aren't used.
+- Updated dependencies [963508a2]
+  - @linaria/utils@4.2.4
+
 ## 4.2.3
 
 ### Patch Changes

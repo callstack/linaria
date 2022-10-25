@@ -1,5 +1,18 @@
 # @linaria/griffel
 
+## 4.2.0
+
+### Minor Changes
+
+- 63f56d47: Do not filter properties if an unknown component is passed to `styled`. Fixes support of custom elements #968
+
+### Patch Changes
+
+- Updated dependencies [63f56d47]
+- Updated dependencies [963508a2]
+  - @linaria/tags@4.2.0
+  - @linaria/utils@4.2.4
+
 ## 4.1.5
 
 ### Patch Changes
