@@ -65,8 +65,15 @@ function filterProps<T extends Record<string, unknown>, TKeys extends keyof T>(
     component.indexOf('-') === -1 &&
     !isCapital(component[0])
   ) {
+    /**
+     * A failsafe check for esModule import issues
+     * if validAttr !== 'function' then it is an object of { default: Fn }
+     */
+    const interopValidAttr =
+      typeof validAttr === 'function' ? { default: validAttr } : validAttr;
+
     Object.keys(filteredProps).forEach((key) => {
-      if (!validAttr(key)) {
+      if (!interopValidAttr.default(key)) {
         // Don't pass through invalid attributes to HTML elements
         delete filteredProps[key];
       }
