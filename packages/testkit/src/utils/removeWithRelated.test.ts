@@ -57,6 +57,16 @@ describe('removeWithRelated', () => {
     expect(code).toMatchSnapshot();
   });
 
+  it('should remove the whole import', () => {
+    const code = run`
+      import { a } from './source';
+
+      /* remove */a;
+    `;
+
+    expect(code).toMatchSnapshot();
+  });
+
   it('should remove try/catch block', () => {
     const code = run`
       const a = 1;
@@ -65,26 +75,6 @@ describe('removeWithRelated', () => {
         /* remove */42;
       } catch (e) {
       }
-    `;
-
-    expect(code).toMatchSnapshot();
-  });
-
-  it('should remove export', () => {
-    const code = run`
-      function a() {
-        /* remove */42;
-      }
-
-      function checkIsBrowser() {
-        return /* remove */42;
-      }
-
-      const canUseDOM = checkIsBrowser();
-
-      const b = 1;
-
-      export { a, b, canUseDOM };
     `;
 
     expect(code).toMatchSnapshot();
@@ -123,7 +113,19 @@ describe('removeWithRelated', () => {
     const code = run`
       /* remove */const mode = "DEV";
 
-      export { mode };
+      if (mode !== "DEV") {
+      }
+    `;
+
+    expect(code).toMatchSnapshot();
+  });
+
+  it('should not delete params of functions', () => {
+    const code = run`
+      function test(arg) {
+        /* remove */console.log(arg);
+        return null;
+      }
     `;
 
     expect(code).toMatchSnapshot();
