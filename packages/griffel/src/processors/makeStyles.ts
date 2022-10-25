@@ -15,7 +15,7 @@ export default class MakeStylesProcessor extends BaseProcessor {
 
   #cssRulesByBucket: CSSRulesByBucket | undefined;
 
-  readonly #slotsExpName: string;
+  readonly #slotsExpName: string | number | boolean | null;
 
   public constructor(params: Params, ...args: TailProcessorParams) {
     validateParams(
@@ -27,7 +27,14 @@ export default class MakeStylesProcessor extends BaseProcessor {
 
     super([tag], ...args);
 
-    this.#slotsExpName = callParam[1].ex.name;
+    const { ex } = callParam[1];
+    if (ex.type === 'Identifier') {
+      this.#slotsExpName = ex.name;
+    } else if (ex.type === 'NullLiteral') {
+      this.#slotsExpName = null;
+    } else {
+      this.#slotsExpName = ex.value;
+    }
   }
 
   public override get asSelector(): string {

@@ -31,6 +31,15 @@ exports[`does not filter attributes for kebab cased custom elements 1`] = `
 </my-element>
 `;
 
+exports[`does not filter attributes for unknown tag 1`] = `
+<definitelyunknowntag
+  className="abcdefg"
+  hoverClass="voila"
+>
+  This is a test
+</definitelyunknowntag>
+`;
+
 exports[`does not filter attributes for upper camel cased custom elements 1`] = `
 <View
   className="abcdefg"

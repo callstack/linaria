@@ -145,6 +145,7 @@ const _exp3 = /*#__PURE__*/() => props => props.backgroundColor;
 const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
   class: \\"atm_7l_15g95l5 atm_4b_15g95l5 atm_2d_1en4k16 Component_c13jq05\\",
+  propsAsIs: false,
   vars: {
     \\"1p69eoh\\": [_exp2()],
     \\"l12cfn\\": [_exp3()]
@@ -159,6 +160,7 @@ const _exp5 = /*#__PURE__*/() => props => props.color || \\"black\\";
 const Component2 = /*#__PURE__*/styled('div')({
   name: \\"Component2\\",
   class: \\"atm_7l_15g95l5 atm_4b_1kgl01d Component2_c1vhermz\\",
+  propsAsIs: false,
   vars: {
     \\"1p69eoh\\": [_exp4()],
     \\"1n9iccq\\": [_exp5()]
@@ -190,6 +192,7 @@ const _exp2 = /*#__PURE__*/() => props => props.color;
 const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
   class: \\"atm_7l_13q2bts atm_e2_12xxubj atm_gi_12am3vd atm_2d_15g95l5 Component_c13jq05\\",
+  propsAsIs: false,
   vars: {
     \\"1p69eoh\\": [_exp2()]
   },
@@ -217,6 +220,7 @@ import { styled } from '@linaria/atomic';
 const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
   class: \\"atm_7l_13q2bts atm_e2_12xxubj Component_c13jq05\\",
+  propsAsIs: false,
   atomic: true
 });
 console.log(Component);"
@@ -239,11 +243,13 @@ import { styled } from '@linaria/atomic';
 export const Component = /*#__PURE__*/styled('ul')({
   name: \\"Component\\",
   class: \\"atm_9s_1txwivl atm_l8_idpfg4 Component_c13jq05\\",
+  propsAsIs: false,
   atomic: true
 });
 export const Component2 = /*#__PURE__*/styled('ul')({
   name: \\"Component2\\",
   class: \\"atm_9s_1ulexfb atm_l8_idpfg4 Component2_c1vhermz\\",
+  propsAsIs: false,
   atomic: true
 });"
 `;
@@ -266,6 +272,7 @@ import { styled } from '@linaria/atomic';
 const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
   class: \\"atm_2d_13q2bts atm_e2_12xxubj Component_c13jq05\\",
+  propsAsIs: false,
   atomic: true
 });
 
@@ -274,6 +281,7 @@ const _exp = /*#__PURE__*/() => Component;
 const ComponentCompositing = /*#__PURE__*/styled(_exp())({
   name: \\"ComponentCompositing\\",
   class: \\"atm_26_5scuol atm_e2_1nzxncv ComponentCompositing_c1vhermz\\",
+  propsAsIs: true,
   atomic: true
 });
 console.log(ComponentCompositing);"
@@ -302,6 +310,7 @@ const _exp2 = /*#__PURE__*/() => props => props.color;
 const Component = /*#__PURE__*/styled('div')({
   name: \\"Component\\",
   class: \\"atm_26_5scuol atm_e2_12xxubj atm_gi_19bvopo atm_7l_15g95l5 Component_c1vhermz\\",
+  propsAsIs: false,
   vars: {
     \\"1p69eoh\\": [_exp2()]
   },
@@ -355,7 +364,8 @@ exports[`strategy shaker derives display name from filename 1`] = `
 "import { styled } from '@linaria/react';
 export default /*#__PURE__*/styled('h1')({
   name: \\"FancyName0\\",
-  class: \\"FancyName0_f15w9xbr\\"
+  class: \\"FancyName0_f15w9xbr\\",
+  propsAsIs: false
 });"
 `;
 
@@ -375,7 +385,8 @@ exports[`strategy shaker derives display name from parent folder name 1`] = `
 "import { styled } from '@linaria/react';
 export default /*#__PURE__*/styled('h1')({
   name: \\"FancyName0\\",
-  class: \\"FancyName0_f13t8ham\\"
+  class: \\"FancyName0_f13t8ham\\",
+  propsAsIs: false
 });"
 `;
 
@@ -395,7 +406,8 @@ exports[`strategy shaker does not include styles if not referenced anywhere 1`] 
 "import { styled } from '@linaria/react';
 const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });
 const title = \\"title_t1vhermz\\";"
 `;
@@ -518,7 +530,8 @@ exports[`strategy shaker evaluates and inlines expressions in scope 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -539,7 +552,8 @@ exports[`strategy shaker evaluates babel helpers 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -561,7 +575,8 @@ exports[`strategy shaker evaluates chain of reexports 1`] = `
 "import { styled } from '@linaria/react';
 export const H1 = /*#__PURE__*/styled('h1')({
   name: \\"H1\\",
-  class: \\"H1_h13jq05\\"
+  class: \\"H1_h13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -602,11 +617,13 @@ exports[`strategy shaker evaluates component interpolations 1`] = `
 
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });
 export const Paragraph = /*#__PURE__*/styled('p')({
   name: \\"Paragraph\\",
-  class: \\"Paragraph_p1vhermz\\"
+  class: \\"Paragraph_p1vhermz\\",
+  propsAsIs: false
 });"
 `;
 
@@ -637,6 +654,7 @@ const _exp = /*#__PURE__*/() => color;
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t13jq05\\",
+  propsAsIs: false,
   vars: {
     \\"t13jq05-0\\": [_exp()]
   }
@@ -659,7 +677,8 @@ exports[`strategy shaker evaluates expressions with dependencies 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -681,7 +700,8 @@ exports[`strategy shaker evaluates expressions with expressions depending on sha
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -703,7 +723,8 @@ exports[`strategy shaker evaluates functions with nested identifiers 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -723,7 +744,8 @@ exports[`strategy shaker evaluates identifier in scope 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -745,7 +767,8 @@ exports[`strategy shaker evaluates imported typescript enums 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t9vkbjs\\"
+  class: \\"Title_t9vkbjs\\",
+  propsAsIs: false
 });"
 `;
 
@@ -769,6 +792,7 @@ const _exp = /*#__PURE__*/() => (0, () => \\"blue\\");
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t13jq05\\",
+  propsAsIs: false,
   vars: {
     \\"t13jq05-0\\": [_exp()]
   }
@@ -791,7 +815,8 @@ exports[`strategy shaker evaluates local expressions 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -813,7 +838,8 @@ exports[`strategy shaker evaluates multiple expressions with shared dependency 1
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -857,7 +883,8 @@ enum Colors {
 }
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t9vkbjs\\"
+  class: \\"Title_t9vkbjs\\",
+  propsAsIs: false
 });"
 `;
 
@@ -925,19 +952,23 @@ exports[`strategy shaker generates stable class names 1`] = `
 "import { styled } from '@linaria/react';
 export const T1 = /*#__PURE__*/styled('h1')({
   name: \\"T1\\",
-  class: \\"T1_t11kcpnd\\"
+  class: \\"T1_t11kcpnd\\",
+  propsAsIs: false
 });
 export const T2 = /*#__PURE__*/styled('h2')({
   name: \\"T2\\",
-  class: \\"T2_t1xdipzs\\"
+  class: \\"T2_t1xdipzs\\",
+  propsAsIs: false
 });
 export const T3 = /*#__PURE__*/styled('h3')({
   name: \\"T3\\",
-  class: \\"T3_tmgfls7\\"
+  class: \\"T3_tmgfls7\\",
+  propsAsIs: false
 });
 export default /*#__PURE__*/styled('p')({
   name: \\"components-library3\\",
-  class: \\"components-library3_c30gynh\\"
+  class: \\"components-library3_c30gynh\\",
+  propsAsIs: false
 });"
 `;
 
@@ -981,7 +1012,8 @@ objects.font.fontWeight = 'bold';
 export const whiteColor = '#fff';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t1us8k4s\\"
+  class: \\"Title_t1us8k4s\\",
+  propsAsIs: false
 });"
 `;
 
@@ -1032,7 +1064,8 @@ exports[`strategy shaker handles escapes properly 1`] = `
 "import { styled } from '@linaria/react';
 export const Block = /*#__PURE__*/styled('div')({
   name: \\"Block\\",
-  class: \\"Block_b3rflbm\\"
+  class: \\"Block_b3rflbm\\",
+  propsAsIs: false
 });"
 `;
 
@@ -1050,12 +1083,10 @@ Dependencies: NA
 
 exports[`strategy shaker handles fn passed in classNameSlug 1`] = `
 "import { styled } from '@linaria/react';
-
-const _exp = /*#__PURE__*/() => \\"h1\\";
-
-export const Title = /*#__PURE__*/styled(_exp())({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"t13jq05_Title_t13jq05_Title_src_source_js_source__js_src\\"
+  class: \\"t13jq05_Title_t13jq05_Title_src_source_js_source__js_src\\",
+  propsAsIs: false
 });"
 `;
 
@@ -1075,27 +1106,25 @@ exports[`strategy shaker handles fn passed in variableNameSlug 1`] = `
 "import { styled as atomicStyled } from '@linaria/atomic';
 import { styled } from '@linaria/react';
 
-const _exp = /*#__PURE__*/() => \\"h1\\";
+const _exp = /*#__PURE__*/() => props => props.size;
 
-const _exp2 = /*#__PURE__*/() => props => props.size;
-
-export const Title = /*#__PURE__*/styled(_exp())({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t13jq05\\",
+  propsAsIs: false,
   vars: {
-    \\"_qqvhyq__Title__font-size\\": [_exp2(), \\"px\\"]
+    \\"_qqvhyq__Title__font-size\\": [_exp(), \\"px\\"]
   }
 });
 
-const _exp3 = /*#__PURE__*/() => \\"h1\\";
+const _exp2 = /*#__PURE__*/() => props => props.size;
 
-const _exp4 = /*#__PURE__*/() => props => props.size;
-
-export const Body = /*#__PURE__*/atomicStyled(_exp3())({
+export const Body = /*#__PURE__*/atomicStyled('h1')({
   name: \\"Body\\",
   class: \\"atm_c8_f3y1j4 Body_b1vhermz\\",
+  propsAsIs: false,
   vars: {
-    \\"1qqvhyq__Body__font-size\\": [_exp4(), \\"px\\"]
+    \\"1qqvhyq__Body__font-size\\": [_exp2(), \\"px\\"]
   },
   atomic: true
 });"
@@ -1121,7 +1150,8 @@ exports[`strategy shaker handles indirect wrapping another styled component 1`] 
 
 const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });
 
 const hoc = Cmp => Cmp;
@@ -1130,7 +1160,8 @@ const _exp = /*#__PURE__*/() => hoc(Title);
 
 export const CustomTitle = /*#__PURE__*/styled(_exp())({
   name: \\"CustomTitle\\",
-  class: \\"CustomTitle_c1vhermz\\"
+  class: \\"CustomTitle_c1vhermz\\",
+  propsAsIs: true
 });"
 `;
 
@@ -1184,6 +1215,7 @@ const _exp8 = /*#__PURE__*/() => function (props) {
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t13jq05\\",
+  propsAsIs: false,
   vars: {
     \\"t13jq05-0\\": [_exp(), \\"em\\"],
     \\"t13jq05-1\\": [_exp2(), \\"px\\"],
@@ -1224,6 +1256,7 @@ const _exp = /*#__PURE__*/() => regular;
 export const Button = /*#__PURE__*/styled('button')({
   name: \\"Button\\",
   class: \\"Button_b13jq05\\",
+  propsAsIs: false,
   vars: {
     \\"b13jq05-0\\": [_exp()]
   }
@@ -1294,21 +1327,24 @@ exports[`strategy shaker handles wrapping another styled component 1`] = `
 
 const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });
 
 const _exp = /*#__PURE__*/() => Title;
 
 export const BlueTitle = /*#__PURE__*/styled(_exp())({
   name: \\"BlueTitle\\",
-  class: \\"BlueTitle_b1vhermz\\"
+  class: \\"BlueTitle_b1vhermz\\",
+  propsAsIs: true
 });
 
 const _exp2 = /*#__PURE__*/() => BlueTitle;
 
 export const GreenTitle = /*#__PURE__*/styled(_exp2())({
   name: \\"GreenTitle\\",
-  class: \\"GreenTitle_g1egpet8\\"
+  class: \\"GreenTitle_g1egpet8\\",
+  propsAsIs: true
 });"
 `;
 
@@ -1335,7 +1371,8 @@ exports[`strategy shaker hoistable identifiers 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -1363,6 +1400,7 @@ const _exp = /*#__PURE__*/() => generate;
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t13jq05\\",
+  propsAsIs: false,
   vars: {
     \\"t13jq05-0\\": [_exp()]
   }
@@ -1391,6 +1429,7 @@ const _exp = /*#__PURE__*/() => props => props.content;
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t13jq05\\",
+  propsAsIs: false,
   vars: {
     \\"t13jq05-0\\": [_exp()]
   }
@@ -1421,6 +1460,7 @@ const _exp = /*#__PURE__*/() => function (props) {
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t13jq05\\",
+  propsAsIs: false,
   vars: {
     \\"t13jq05-0\\": [_exp()]
   }
@@ -1446,7 +1486,8 @@ exports[`strategy shaker includes unreferenced styles for :global 1`] = `
 const a = \\"a_a13jq05\\";
 const B = /*#__PURE__*/styled('div')({
   name: \\"B\\",
-  class: \\"B_b1vhermz\\"
+  class: \\"B_b1vhermz\\",
+  propsAsIs: false
 });"
 `;
 
@@ -1475,7 +1516,8 @@ exports[`strategy shaker inlines array styles as CSS string 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -1495,7 +1537,8 @@ exports[`strategy shaker inlines array styles as CSS string 3`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -1515,7 +1558,8 @@ exports[`strategy shaker inlines object styles as CSS string 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -1535,7 +1579,8 @@ exports[`strategy shaker inlines object styles as CSS string 3`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -1613,7 +1658,8 @@ exports[`strategy shaker outputs valid CSS classname 1`] = `
 "import { styled } from '@linaria/react';
 export const ΩPage$Title = /*#__PURE__*/styled('h1')({
   name: \\"\\\\u03A9Page$Title\\",
-  class: \\"\\\\u03A9Page_Title_\\\\u03C913jq05\\"
+  class: \\"\\\\u03A9Page_Title_\\\\u03C913jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -1643,6 +1689,7 @@ const _exp2 = /*#__PURE__*/() => props => props.color;
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_twgemqq\\",
+  propsAsIs: false,
   vars: {
     \\"twgemqq-0\\": [_exp(), \\"px\\"],
     \\"twgemqq-1\\": [_exp2()]
@@ -1655,6 +1702,7 @@ export function Something() {
   const Title = /*#__PURE__*/styled('h1')({
     name: \\"Title\\",
     class: \\"Title_tjtmpns\\",
+    propsAsIs: false,
     vars: {
       \\"tjtmpns-0\\": [_exp3()]
     }
@@ -1681,12 +1729,10 @@ Dependencies: NA
 
 exports[`strategy shaker removes fake replacement patterns in string classNameSlug 1`] = `
 "import { styled } from '@linaria/react';
-
-const _exp = /*#__PURE__*/() => \\"h1\\";
-
-export const Title = /*#__PURE__*/styled(_exp())({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"__\\"
+  class: \\"__\\",
+  propsAsIs: false
 });"
 `;
 
@@ -1706,7 +1752,8 @@ exports[`strategy shaker respects module-resolver plugin 1`] = `
 "import { styled } from '@linaria/react';
 export const H1 = /*#__PURE__*/styled('h1')({
   name: \\"H1\\",
-  class: \\"H1_hlxjig5\\"
+  class: \\"H1_hlxjig5\\",
+  propsAsIs: false
 });"
 `;
 
@@ -1862,7 +1909,8 @@ import { styled } from '@linaria/react';
 export function Component() {
   const MyComponent = /*#__PURE__*/styled('h1')({
     name: \\"MyComponent\\",
-    class: \\"MyComponent_m13jq05\\"
+    class: \\"MyComponent_m13jq05\\",
+    propsAsIs: false
   });
   return React.createElement(MyComponent);
 }"
@@ -1886,7 +1934,8 @@ import { styled } from '@linaria/react';
 export function Component() {
   const MyComponent = /*#__PURE__*/styled('h1')({
     name: \\"MyComponent\\",
-    class: \\"MyComponent_m1egpet8\\"
+    class: \\"MyComponent_m1egpet8\\",
+    propsAsIs: false
   });
   return React.createElement(MyComponent);
 }"
@@ -2017,7 +2066,8 @@ const _exp = /*#__PURE__*/() => MyComponent;
 
 export default /*#__PURE__*/styled(_exp())({
   name: \\"source0\\",
-  class: \\"source0_swgemqq\\"
+  class: \\"source0_swgemqq\\",
+  propsAsIs: true
 });"
 `;
 
@@ -2063,14 +2113,16 @@ const _exp = /*#__PURE__*/() => FuncComponent;
 
 export const StyledFunc = /*#__PURE__*/styled(_exp())({
   name: \\"StyledFunc\\",
-  class: \\"StyledFunc_swgemqq\\"
+  class: \\"StyledFunc_swgemqq\\",
+  propsAsIs: true
 });
 
 const _exp2 = /*#__PURE__*/() => ClassComponent;
 
 export const StyledClass = /*#__PURE__*/styled(_exp2())({
   name: \\"StyledClass\\",
-  class: \\"StyledClass_sjtmpns\\"
+  class: \\"StyledClass_sjtmpns\\",
+  propsAsIs: true
 });"
 `;
 
@@ -2106,7 +2158,8 @@ const _exp = /*#__PURE__*/() => C;
 
 export const D = /*#__PURE__*/styled(_exp())({
   name: \\"D\\",
-  class: \\"D_dwgemqq\\"
+  class: \\"D_dwgemqq\\",
+  propsAsIs: true
 });"
 `;
 
@@ -2141,7 +2194,8 @@ const _exp = /*#__PURE__*/() => C;
 
 exports.D = /*#__PURE__*/styled(_exp())({
   name: \\"source0\\",
-  class: \\"source0_swgemqq\\"
+  class: \\"source0_swgemqq\\",
+  propsAsIs: true
 });"
 `;
 
@@ -2161,7 +2215,8 @@ exports[`strategy shaker supports both css and styled tags 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });
 export const title = \\"title_t1vhermz\\";"
 `;
@@ -2310,18 +2365,21 @@ import { styled as reactStyled } from '@linaria/react';
 import { styled as atomicStyled } from '@linaria/atomic';
 const StyledComponent = /*#__PURE__*/reactStyled('div')({
   name: \\"StyledComponent\\",
-  class: \\"StyledComponent_s13jq05\\"
+  class: \\"StyledComponent_s13jq05\\",
+  propsAsIs: false
 });
 
 const _exp = /*#__PURE__*/() => StyledComponent;
 
 const StyledComponent2 = /*#__PURE__*/reactStyled(_exp())({
   name: \\"StyledComponent2\\",
-  class: \\"StyledComponent2_s1vhermz\\"
+  class: \\"StyledComponent2_s1vhermz\\",
+  propsAsIs: true
 });
 const AtomicComponent = /*#__PURE__*/atomicStyled('div')({
   name: \\"AtomicComponent\\",
   class: \\"atm_26_5scuol AtomicComponent_a1egpet8\\",
+  propsAsIs: false,
   atomic: true
 });
 
@@ -2330,6 +2388,7 @@ const _exp2 = /*#__PURE__*/() => AtomicComponent;
 const AtomicComponent2 = /*#__PURE__*/atomicStyled(_exp2())({
   name: \\"AtomicComponent2\\",
   class: \\"atm_26_13q2bts AtomicComponent2_avc9xb3\\",
+  propsAsIs: true,
   atomic: true
 });
 console.log(StyledComponent, StyledComponent2, AtomicComponent, AtomicComponent2);"
@@ -2354,12 +2413,10 @@ Dependencies: NA
 
 exports[`strategy shaker transpiles renamed styled import 1`] = `
 "import { styled as custom } from '@linaria/react';
-
-const _exp = /*#__PURE__*/() => \\"h1\\";
-
-export const Title = /*#__PURE__*/custom(_exp())({
+export const Title = /*#__PURE__*/custom('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -2383,7 +2440,8 @@ type Props = {
 };
 export const Title = /*#__PURE__*/styled(() => {})({
   name: \\"Title\\",
-  class: \\"Title_t9vkbjs\\"
+  class: \\"Title_t9vkbjs\\",
+  propsAsIs: true
 });"
 `;
 
@@ -2408,7 +2466,8 @@ const _exp = /*#__PURE__*/() => Heading;
 
 export const Title = /*#__PURE__*/styled(_exp())({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: true
 });"
 `;
 
@@ -2426,12 +2485,10 @@ Dependencies: NA
 
 exports[`strategy shaker transpiles styled template literal with function and tag 1`] = `
 "import { styled } from '@linaria/react';
-
-const _exp = /*#__PURE__*/() => \\"h1\\";
-
-export const Title = /*#__PURE__*/styled(_exp())({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -2451,7 +2508,8 @@ exports[`strategy shaker transpiles styled template literal with object 1`] = `
 "import { styled } from '@linaria/react';
 export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"Title_t13jq05\\"
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false
 });"
 `;
 
@@ -2479,6 +2537,7 @@ const _exp = /*#__PURE__*/() => (props: Props) => props.className;
 export const Title = /*#__PURE__*/styled('div')({
   name: \\"Title\\",
   class: \\"Title_t9vkbjs\\",
+  propsAsIs: false,
   vars: {
     \\"t9vkbjs-0\\": [_exp()]
   }
@@ -2500,12 +2559,10 @@ Dependencies: NA
 
 exports[`strategy shaker uses string passed in classNameSlug 1`] = `
 "import { styled } from '@linaria/react';
-
-const _exp = /*#__PURE__*/() => \\"h1\\";
-
-export const Title = /*#__PURE__*/styled(_exp())({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
-  class: \\"t13jq05_Title_src_source_js_source__js_src\\"
+  class: \\"t13jq05_Title_src_source_js_source__js_src\\",
+  propsAsIs: false
 });"
 `;
 
@@ -2525,27 +2582,25 @@ exports[`strategy shaker uses string passed in variableNameSlug 1`] = `
 "import { styled as atomicStyled } from '@linaria/atomic';
 import { styled } from '@linaria/react';
 
-const _exp = /*#__PURE__*/() => \\"h1\\";
+const _exp = /*#__PURE__*/() => props => props.size;
 
-const _exp2 = /*#__PURE__*/() => props => props.size;
-
-export const Title = /*#__PURE__*/styled(_exp())({
+export const Title = /*#__PURE__*/styled('h1')({
   name: \\"Title\\",
   class: \\"Title_t13jq05\\",
+  propsAsIs: false,
   vars: {
-    \\"Title_t13jq05_StyledProcessor_1qqvhyq_0\\": [_exp2(), \\"px\\"]
+    \\"Title_t13jq05_StyledProcessor_1qqvhyq_0\\": [_exp(), \\"px\\"]
   }
 });
 
-const _exp3 = /*#__PURE__*/() => \\"h1\\";
+const _exp2 = /*#__PURE__*/() => props => props.size;
 
-const _exp4 = /*#__PURE__*/() => props => props.size;
-
-export const Body = /*#__PURE__*/atomicStyled(_exp3())({
+export const Body = /*#__PURE__*/atomicStyled('h1')({
   name: \\"Body\\",
   class: \\"atm_c8_1cjuufw Body_b1vhermz\\",
+  propsAsIs: false,
   vars: {
-    \\"Body_b1vhermz_AtomicStyledProcessor_1qqvhyq_0\\": [_exp4(), \\"px\\"]
+    \\"Body_b1vhermz_AtomicStyledProcessor_1qqvhyq_0\\": [_exp2(), \\"px\\"]
   },
   atomic: true
 });"
@@ -2572,6 +2627,7 @@ const _exp2 = /*#__PURE__*/() => props => props.size;
 export const Box = /*#__PURE__*/styled('div')({
   name: \\"Box\\",
   class: \\"Box_b13jq05\\",
+  propsAsIs: false,
   vars: {
     \\"b13jq05-0\\": [_exp2(), \\"px\\"]
   }
@@ -2601,6 +2657,7 @@ const _exp2 = /*#__PURE__*/() => size;
 export const Box = /*#__PURE__*/styled('div')({
   name: \\"Box\\",
   class: \\"Box_b13jq05\\",
+  propsAsIs: false,
   vars: {
     \\"b13jq05-0\\": [_exp2(), \\"px\\"]
   }

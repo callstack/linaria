@@ -3,6 +3,12 @@ import type {
   Identifier,
   TemplateElement,
   MemberExpression,
+  BigIntLiteral,
+  BooleanLiteral,
+  DecimalLiteral,
+  NullLiteral,
+  NumericLiteral,
+  StringLiteral,
 } from '@babel/types';
 
 export type StyledMeta = {
@@ -41,7 +47,7 @@ export type Serializable = JSONValue;
 
 export type Value = (() => void) | StyledMeta | CSSable;
 
-export type ValueCache = Map<string, unknown>;
+export type ValueCache = Map<string | number | boolean | null, unknown>;
 
 export type Artifact = [name: string, data: unknown];
 
@@ -88,6 +94,7 @@ export type BuildCodeFrameErrorFn = <TError extends Error>(
 export enum ValueType {
   LAZY,
   FUNCTION,
+  CONST,
 }
 
 export type LazyValue = {
@@ -104,7 +111,21 @@ export type FunctionValue = {
   source: string;
 };
 
-export type ExpressionValue = LazyValue | FunctionValue;
+export type ConstValue = {
+  buildCodeFrameError: BuildCodeFrameErrorFn;
+  ex:
+    | StringLiteral
+    | NumericLiteral
+    | NullLiteral
+    | BooleanLiteral
+    | BigIntLiteral
+    | DecimalLiteral;
+  kind: ValueType.CONST;
+  source: string;
+  value: string | number | boolean | null;
+};
+
+export type ExpressionValue = LazyValue | FunctionValue | ConstValue;
 
 export type Replacements = Array<{
   length: number;

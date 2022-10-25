@@ -21,9 +21,10 @@ type Component<TProps> =
 type Has<T, TObj> = [T] extends [TObj] ? T : T & TObj;
 
 type Options = {
-  name: string;
-  class: string;
   atomic?: boolean;
+  class: string;
+  name: string;
+  propsAsIs: boolean;
   vars?: {
     [key: string]: [
       string | number | ((props: unknown) => string | number),
@@ -53,18 +54,13 @@ export const omit = <T extends Record<string, unknown>, TKeys extends keyof T>(
 };
 
 function filterProps<T extends Record<string, unknown>, TKeys extends keyof T>(
-  component: string | unknown,
+  asIs: boolean,
   props: T,
   omitKeys: TKeys[]
 ): Partial<Omit<T, TKeys>> {
   const filteredProps = omit(props, omitKeys) as Partial<T>;
 
-  // Check if it's an HTML tag and not a custom element
-  if (
-    typeof component === 'string' &&
-    component.indexOf('-') === -1 &&
-    !isCapital(component[0])
-  ) {
+  if (!asIs) {
     /**
      * A failsafe check for esModule import issues
      * if validAttr !== 'function' then it is an object of { default: Fn }
@@ -144,7 +140,15 @@ function styled(tag: any): any {
 
     const render = (props: any, ref: any) => {
       const { as: component = tag, class: className } = props;
-      const filteredProps: IProps = filterProps(component, props, [
+      const shouldKeepProps =
+        options.propsAsIs === undefined
+          ? !(
+              typeof component === 'string' &&
+              component.indexOf('-') === -1 &&
+              !isCapital(component[0])
+            )
+          : options.propsAsIs;
+      const filteredProps: IProps = filterProps(shouldKeepProps, props, [
         'as',
         'class',
       ]);
@@ -157,7 +161,7 @@ function styled(tag: any): any {
       const { vars } = options;
 
       if (vars) {
-        const style: { [key: string]: string } = {};
+        const style: Record<string, string> = {};
 
         // eslint-disable-next-line guard-for-in,no-restricted-syntax
         for (const name in vars) {

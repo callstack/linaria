@@ -214,6 +214,18 @@ it('does not filter attributes for upper camel cased custom elements', () => {
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
+it('does not filter attributes for unknown tag', () => {
+  const Test = styled('definitelyunknowntag')({
+    name: 'TestComponent',
+    class: 'abcdefg',
+    propsAsIs: true,
+  });
+
+  const tree = renderer.create(<Test hoverClass="voila">This is a test</Test>);
+
+  expect(tree.toJSON()).toMatchSnapshot();
+});
+
 it('does not filter attributes for components', () => {
   const Custom: React.FC<{ unknownAttribute: string }> = (props) => (
     <div>{props.unknownAttribute}</div>
