@@ -38,6 +38,10 @@ export interface IMetadata {
   __linariaShaker: IShakerMetadata;
 }
 
+interface NodeWithName {
+  name: string;
+}
+
 export const hasShakerMetadata = (
   metadata: object | undefined
 ): metadata is IMetadata =>
@@ -196,8 +200,14 @@ export default function shakerPlugin(
 
       if (!onlyExports.includes('*')) {
         const aliveExports = new Set<IExport | IReexport>();
+        const importNames = collected.imports.map(({ imported }) => imported);
+
         exports.forEach((exp) => {
           if (onlyExports.includes(exp.exported)) {
+            aliveExports.add(exp);
+          } else if (
+            importNames.includes((exp.local.node as NodeWithName).name || '')
+          ) {
             aliveExports.add(exp);
           }
         });
