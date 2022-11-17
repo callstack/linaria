@@ -10,8 +10,6 @@
     "@rollup/pluginutils": "^4.1.0"
   },
   "devDependencies": {
-    "@types/estree": "^0.0.45",
-    "@types/node": "^17.0.39",
     "rollup": "1.20.0||^2.0.0"
   },
   "engines": {

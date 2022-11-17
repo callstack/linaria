@@ -4,8 +4,6 @@
  * returns transformed code without template literals and attaches generated source maps
  */
 
-import path from 'path';
-
 import { createFilter } from '@rollup/pluginutils';
 import type { Plugin } from 'rollup';
 
@@ -27,33 +25,21 @@ type RollupPluginOptions = {
   preprocessor?: Preprocessor;
 } & Partial<PluginOptions>;
 
-type ViteConfig = {
-  root: string;
-  command: 'serve' | 'build';
-};
-
 export default function linaria({
   include,
   exclude,
   sourceMap,
   preprocessor,
   ...rest
-}: RollupPluginOptions = {}): Plugin & {
-  configResolved: (config: ViteConfig) => void;
-} {
+}: RollupPluginOptions = {}): Plugin {
   const filter = createFilter(include, exclude);
   const cssLookup: { [key: string]: string } = {};
-  let config: ViteConfig;
-
   const codeCache: CodeCache = new Map();
   const resolveCache = new Map<string, string>();
   const evalCache = new Map<string, Module>();
 
   return {
     name: 'linaria',
-    configResolved(resolvedConfig: ViteConfig) {
-      config = resolvedConfig;
-    },
     load(id: string) {
       return cssLookup[id];
     },
@@ -119,9 +105,6 @@ export default function linaria({
       }
 
       cssLookup[filename] = cssText;
-      if (config?.command === 'serve' && config?.root) {
-        cssLookup[`/${path.posix.relative(config.root, filename)}`] = cssText;
-      }
 
       result.code += `\nimport ${JSON.stringify(filename)};\n`;
 
