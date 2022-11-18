@@ -53,7 +53,6 @@ export default function linaria({
 
   return {
     name: 'linaria',
-    // enforce: 'pre',
     configResolved(resolvedConfig: ResolvedConfig) {
       config = resolvedConfig;
     },
