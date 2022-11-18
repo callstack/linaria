@@ -1,0 +1,66 @@
+{
+  "name": "@linaria/vite",
+  "description": "Blazing fast zero-runtime CSS in JS library",
+  "version": "1.0.0",
+  "bugs": "https://github.com/callstack/linaria/issues",
+  "dependencies": {
+    "@linaria/babel-preset": "workspace:^",
+    "@linaria/logger": "workspace:^",
+    "@linaria/utils": "workspace:^",
+    "@rollup/pluginutils": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/estree": "^0.0.45",
+    "@types/node": "^17.0.39",
+    "vite": "^3.1.8"
+  },
+  "peerDependencies": {
+    "vite": "^3.1.8"
+  },
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.js",
+    "types": "./types/index.d.ts"
+  },
+  "files": [
+    "dist/",
+    "types/"
+  ],
+  "homepage": "https://github.com/callstack/linaria#readme",
+  "keywords": [
+    "babel",
+    "babel-plugin",
+    "css",
+    "css-in-js",
+    "linaria",
+    "react",
+    "vite",
+    "styled-components"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "git@github.com:callstack/linaria.git",
+  "scripts": {
+    "build": "npm run build:dist && npm run build:declarations",
+    "build:declarations": "tsc --emitDeclarationOnly --outDir types",
+    "build:dist": "tsup --format cjs,esm --watch",
+    "typecheck": "tsc --noEmit --composite false",
+    "watch": "npm run build --watch"
+  },
+  "tsup": {
+    "entry": [
+      "src/index.ts"
+    ],
+    "splitting": false,
+    "sourcemap": true,
+    "clean": true
+  },
+  "types": "types/index.d.ts"
+}
