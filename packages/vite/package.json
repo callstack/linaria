@@ -50,7 +50,7 @@
   "scripts": {
     "build": "npm run build:dist && npm run build:declarations",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
-    "build:dist": "tsup --format cjs,esm --watch",
+    "build:dist": "tsup --format cjs,esm",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "npm run build --watch"
   },
