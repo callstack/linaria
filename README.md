@@ -54,6 +54,7 @@ Linaria currently supports webpack and Rollup to extract the CSS at build time. 
 - [webpack](/docs/BUNDLERS_INTEGRATION.md#webpack)
 - [esbuild](/docs/BUNDLERS_INTEGRATION.md#esbuild)
 - [Rollup](/docs/BUNDLERS_INTEGRATION.md#rollup)
+- [Vite](/docs/BUNDLERS_INTEGRATION.md#vite)
 - [Svelte](/docs/BUNDLERS_INTEGRATION.md#svelte)
 
 Or configure Linaria with one of the following integrations:
