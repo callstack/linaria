@@ -24,6 +24,8 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "typeRoots": ["node_modules/@types", "typings"]
+    "typeRoots": ["node_modules/@types", "typings"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true
   }
 }
