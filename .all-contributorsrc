@@ -1033,6 +1033,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Platane",
+      "name": "Platane",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1659820?v=4",
+      "profile": "http://platane.github.io",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "repoType": "github",
