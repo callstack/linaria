@@ -2448,6 +2448,25 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should not drop exported vars of renamed imports', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { css } from "@linaria/core";
+      import { foo3 } from "./__fixtures__/reexports";
+
+      export const bar3 = foo3;
+
+      export const square = css\`
+        color: ${'${bar3("thing")}'};
+      \`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('should interpolate imported components', async () => {
     const { code, metadata } = await transform(
       dedent`

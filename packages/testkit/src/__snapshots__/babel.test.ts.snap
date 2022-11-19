@@ -1819,6 +1819,24 @@ Dependencies: ./__fixtures__/complex-component
 
 `;
 
+exports[`strategy shaker should not drop exported vars of renamed imports 1`] = `
+"import { foo3 } from \\"./__fixtures__/reexports\\";
+export const bar3 = foo3;
+export const square = \\"square_s13jq05\\";"
+`;
+
+exports[`strategy shaker should not drop exported vars of renamed imports 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  color: foo3;
+}
+
+Dependencies: ./__fixtures__/reexports
+
+`;
+
 exports[`strategy shaker should process \`css\` calls inside components 1`] = `
 "import React from 'react';
 export function Component() {
