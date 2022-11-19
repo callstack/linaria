@@ -46,15 +46,15 @@
   "main": "./src/index.jsx",
   "private": true,
   "scripts": {
-    "build": "yarn build:client && yarn build:server",
+    "build": "pnpm build:client && pnpm build:server",
     "build:client": "cross-env NODE_ENV=production webpack",
     "build:server": "cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build",
-    "clean": "yarn clean:client && yarn clean:server",
+    "clean": "pnpm clean:client && pnpm clean:server",
     "clean:client": "del dist",
     "clean:server": "del build",
     "lint:css": "stylelint src/**/*.jsx",
-    "prebuild": "yarn clean",
-    "prestart": "yarn --cwd .. prepare",
+    "prebuild": "pnpm clean",
+    "prestart": "pnpm -w prepare",
     "server": "node build/server",
     "start": "webpack serve"
   }
