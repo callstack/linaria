@@ -396,6 +396,9 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
       <td align="center"><a href="http://jneander.com"><img src="https://avatars.githubusercontent.com/u/880186?v=4?s=100" width="100px;" alt="Jeremy Neander"/><br /><sub><b>Jeremy Neander</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=jneander" title="Code">💻</a></td>
       <td align="center"><a href="https://evensix.com"><img src="https://avatars.githubusercontent.com/u/1213447?v=4?s=100" width="100px;" alt="Andy Parsons"/><br /><sub><b>Andy Parsons</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=andparsons" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center"><a href="http://platane.github.io"><img src="https://avatars.githubusercontent.com/u/1659820?v=4?s=100" width="100px;" alt="Platane"/><br /><sub><b>Platane</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=Platane" title="Documentation">📖</a></td>
+    </tr>
   </tbody>
 </table>
 
