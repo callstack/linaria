@@ -1042,6 +1042,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "kutnickclose",
+      "name": "Tim Kutnick",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6117662?v=4",
+      "profile": "https://github.com/kutnickclose",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "repoType": "github",
