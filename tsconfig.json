@@ -15,7 +15,7 @@
       "@linaria/*": ["./packages/*/src"]
     },
     "jsx": "react",
-    "lib": ["es6", "es2017", "es2018", "dom"],
+    "lib": ["ESNext", "dom"],
     "module": "es6",
     "moduleResolution": "node",
     "strict": true,
