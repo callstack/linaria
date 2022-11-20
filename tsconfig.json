@@ -26,6 +26,7 @@
     "declaration": true,
     "typeRoots": ["node_modules/@types", "typings"],
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true
+    "skipDefaultLibCheck": true,
+    "preserveWatchOutput": true,
   }
 }
