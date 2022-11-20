@@ -33,8 +33,7 @@
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "pnpm develop",
     "serve": "gatsby serve",
-    "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+    "clean": "gatsby clean"
   },
   "repository": {
     "type": "git",
