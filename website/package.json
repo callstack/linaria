@@ -41,6 +41,7 @@
     "webpack-dev-server": "^4.9.1"
   },
   "exports": {
+    ".": "./src/index.jsx",
     "./*": "./src/*.jsx"
   },
   "main": "./src/index.jsx",
