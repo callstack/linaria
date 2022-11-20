@@ -1,6 +1,6 @@
-const path = require('path'); // eslint-disable-line import/no-extraneous-dependencies
-const webpack = require('webpack'); // eslint-disable-line import/no-extraneous-dependencies
-const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // eslint-disable-line import/no-extraneous-dependencies
+const path = require('path');
+const webpack = require('webpack');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -11,9 +11,8 @@ module.exports = {
     app: './app',
   },
   output: {
-    path: path.resolve(__dirname, 'build'),
-    publicPath: '/build/',
-    filename: '[name].bundle.js',
+    path: path.resolve('./dist'),
+    filename: 'app.bundle.js',
   },
   optimization: {
     noEmitOnErrors: true,
@@ -25,17 +24,21 @@ module.exports = {
     new MiniCssExtractPlugin({ filename: 'styles.css' }),
   ],
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx', '.mjs'],
   },
   module: {
     rules: [
+      {
+        test: /\.mjs$/,
+        type: 'javascript/auto',
+      },
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         use: [
           { loader: 'babel-loader' },
           {
-            loader: require.resolve('@linaria/webpack4-loader'),
+            loader: '@linaria/webpack4-loader',
             options: { sourceMap: dev },
           },
         ],
