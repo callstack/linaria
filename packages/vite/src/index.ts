@@ -8,13 +8,7 @@ import path from 'path';
 
 import { createFilter } from '@rollup/pluginutils';
 import type { FilterPattern } from '@rollup/pluginutils';
-import type {
-  ModuleNode,
-  Plugin,
-  ResolvedConfig,
-  Update,
-  ViteDevServer,
-} from 'vite';
+import type { ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 
 import { transform, slugify } from '@linaria/babel-preset';
 import type {
@@ -150,16 +144,17 @@ export default function linaria({
       const slug = slugify(cssText);
 
       const cssFilename = `${id.replace(/\.[jt]sx?$/, '')}_${slug}.css`;
-      const cssId = `/${path.relative(config.root, cssFilename)}`;
+      const cssId = `/${path.posix.relative(config.root, cssFilename)}`;
 
       if (sourceMap && result.cssSourceMapText) {
         const map = Buffer.from(result.cssSourceMapText).toString('base64');
         cssText += `/*# sourceMappingURL=data:application/json;base64,${map}*/`;
       }
 
+      cssLookup[cssFilename] = cssText;
       cssLookup[cssId] = cssText;
 
-      result.code += `\nimport ${JSON.stringify(cssId)};\n`;
+      result.code += `\nimport ${JSON.stringify(cssFilename)};\n`;
       if (devServer?.moduleGraph) {
         const module = devServer.moduleGraph.getModuleById(cssId);
 
