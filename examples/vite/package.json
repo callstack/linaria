@@ -9,11 +9,10 @@
     "linaria-website": "workspace:^"
   },
   "devDependencies": {
-    "@linaria/rollup": "workspace:^",
     "@linaria/shaker": "workspace:^",
+    "@linaria/vite": "workspace:^1.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",
     "@vitejs/plugin-react": "^2.1.0",
-    "rollup": "^3.2.2",
     "vite": "^3.1.8"
   },
   "scripts": {
@@ -21,4 +20,3 @@
   },
   "author": "Anton Evzhakov"
 }
-

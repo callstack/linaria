@@ -10,7 +10,6 @@
     "@rollup/pluginutils": "^4.1.0"
   },
   "devDependencies": {
-    "@types/estree": "^0.0.45",
     "@types/node": "^17.0.39",
     "vite": "^3.1.8"
   },

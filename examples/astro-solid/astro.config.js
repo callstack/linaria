@@ -5,7 +5,6 @@ import vite_inspect from 'vite-plugin-inspect';
 
 export default defineConfig({
   output: 'static',
-  outDir: './build',
   srcDir: '.',
   root: '.',
   integrations: [astro_solid()],
