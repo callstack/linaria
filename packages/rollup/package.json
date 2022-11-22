@@ -7,6 +7,7 @@
     "@linaria/babel-preset": "workspace:^",
     "@linaria/logger": "workspace:^",
     "@linaria/utils": "workspace:^",
+    "@linaria/vite": "workspace:^",
     "@rollup/pluginutils": "^4.1.0"
   },
   "devDependencies": {
@@ -33,6 +34,7 @@
     "linaria",
     "react",
     "rollup",
+    "rollup-plugin",
     "styled-components"
   ],
   "license": "MIT",

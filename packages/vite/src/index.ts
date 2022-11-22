@@ -27,6 +27,8 @@ type VitePluginOptions = {
   preprocessor?: Preprocessor;
 } & Partial<PluginOptions>;
 
+export { Plugin };
+
 export default function linaria({
   include,
   exclude,

@@ -1,7 +1,7 @@
 {
   "name": "@linaria/vite",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "1.0.0",
+  "version": "4.2.2",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
     "@linaria/babel-preset": "workspace:^",
@@ -37,6 +37,7 @@
     "linaria",
     "react",
     "vite",
+    "vite-plugin",
     "styled-components"
   ],
   "license": "MIT",
