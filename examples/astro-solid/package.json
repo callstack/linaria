@@ -2,8 +2,13 @@
   "name": "astro-solid-example",
   "version": "0.0.1",
   "license": "MIT",
-  "main": "index.js",
+  "author": "Dmitriy Nikiforov",
   "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "astro build",
+    "dev": "astro dev --force"
+  },
   "devDependencies": {
     "@astrojs/solid-js": "^1.2.3",
     "@babel/core": "^7.18.6",
@@ -14,10 +19,5 @@
     "solid-js": "^1.6.2",
     "vite": "^3.2.4",
     "vite-plugin-inspect": "^0.7.8"
-  },
-  "scripts": {
-    "dev": "astro dev --force",
-    "build": "astro build"
-  },
-  "author": "Dmitriy Nikiforov"
+  }
 }

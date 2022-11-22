@@ -1,31 +1,7 @@
 {
   "name": "@linaria/vite",
-  "description": "Blazing fast zero-runtime CSS in JS library",
   "version": "4.2.2",
-  "bugs": "https://github.com/callstack/linaria/issues",
-  "dependencies": {
-    "@linaria/babel-preset": "workspace:^",
-    "@linaria/logger": "workspace:^",
-    "@linaria/utils": "workspace:^",
-    "@rollup/pluginutils": "^4.1.0"
-  },
-  "devDependencies": {
-    "@types/node": "^17.0.39",
-    "vite": "^3.1.8"
-  },
-  "engines": {
-    "node": "^12.16.0 || >=13.7.0"
-  },
-  "exports": {
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.js",
-    "types": "./types/index.d.ts"
-  },
-  "files": [
-    "dist/",
-    "types/"
-  ],
-  "homepage": "https://github.com/callstack/linaria#readme",
+  "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",
     "babel-plugin",
@@ -37,22 +13,47 @@
     "vite",
     "vite-plugin"
   ],
+  "homepage": "https://github.com/callstack/linaria#readme",
+  "bugs": "https://github.com/callstack/linaria/issues",
+  "repository": "git@github.com:callstack/linaria.git",
   "license": "MIT",
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.js",
+    "types": "./types/index.d.ts"
+  },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "peerDependencies": {
-    "vite": "^3.1.8"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": "git@github.com:callstack/linaria.git",
+  "types": "types/index.d.ts",
+  "files": [
+    "dist/",
+    "types/"
+  ],
   "scripts": {
     "build": "npm run build:dist && npm run build:declarations",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
     "build:dist": "tsup --format cjs,esm",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "npm run build --watch"
+  },
+  "dependencies": {
+    "@linaria/babel-preset": "workspace:^",
+    "@linaria/logger": "workspace:^",
+    "@linaria/utils": "workspace:^",
+    "@rollup/pluginutils": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.39",
+    "vite": "^3.1.8"
+  },
+  "peerDependencies": {
+    "vite": "^3.1.8"
+  },
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "tsup": {
     "entry": [
@@ -61,6 +62,5 @@
     "splitting": false,
     "sourcemap": true,
     "clean": true
-  },
-  "types": "types/index.d.ts"
+  }
 }

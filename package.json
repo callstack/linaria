@@ -1,7 +1,39 @@
 {
   "name": "umbrella",
   "version": "3.0.0-beta.19",
+  "private": true,
+  "homepage": "https://github.com/callstack/linaria#readme",
   "bugs": "https://github.com/callstack/linaria/issues",
+  "repository": "git@github.com:callstack/linaria.git",
+  "license": "MIT",
+  "workspaces": [
+    "./packages/*",
+    "./website"
+  ],
+  "scripts": {
+    "add-contributor": "all-contributors add",
+    "bootstrap": "pnpm install",
+    "check:all": "turbo run check:all --output-logs=new-only && pnpm lint && pnpm sp:check",
+    "clean": "del 'packages/*/{coverage,dist,esm,lib,types,tsconfig.tsbuildinfo}'",
+    "lint": "eslint --ext .js,.ts,.tsx .",
+    "prepare": "turbo run build --output-logs=new-only",
+    "release": "pnpm run prepare && pnpm changeset publish",
+    "sp:check": "syncpack",
+    "sp:fix": "syncpack format && syncpack fix-mismatches",
+    "sp:format": "syncpack format",
+    "sp:list": "syncpack list-mismatches",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test -- -- --coverage",
+    "test:dts": "turbo run test:dts",
+    "typecheck": "turbo run typecheck",
+    "website": "pnpm --filter=linaria-website"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pnpm check:all",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
   "dependencies": {
     "git-raw-commits": "^2.0.3"
   },
@@ -38,50 +70,19 @@
     "husky": "^1.3.1",
     "jest": "^28.1.0",
     "prettier": "^2.7.1",
+    "prettier-plugin-packagejson": "^2.3.0",
     "react": "^16.14.0",
     "syncpack": "^8.0.0",
     "tsup": "^6.3.0",
     "turbo": "^1.6.3",
     "typescript": "^4.7.4"
   },
-  "engines": {
-    "node": "^12.16.0 || >=13.7.0",
-    "pnpm": "^7.16.0"
-  },
-  "homepage": "https://github.com/callstack/linaria#readme",
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "pnpm check:all"
-    }
-  },
-  "license": "MIT",
-  "private": true,
-  "repository": "git@github.com:callstack/linaria.git",
   "resolutions": {
     "@typescript-eslint/experimental-utils": "^4.28.0",
     "git-raw-commits": "^2.0.3"
   },
-  "scripts": {
-    "add-contributor": "all-contributors add",
-    "bootstrap": "pnpm install",
-    "check:all": "turbo run check:all --output-logs=new-only && pnpm lint && pnpm sp:check",
-    "clean": "del 'packages/*/{coverage,dist,esm,lib,types,tsconfig.tsbuildinfo}'",
-    "lint": "eslint --ext .js,.ts,.tsx .",
-    "prepare": "turbo run build --output-logs=new-only",
-    "release": "pnpm run prepare && pnpm changeset publish",
-    "sp:check": "syncpack",
-    "sp:fix": "syncpack format && syncpack fix-mismatches",
-    "sp:format": "syncpack format",
-    "sp:list": "syncpack list-mismatches",
-    "test": "turbo run test",
-    "test:coverage": "turbo run test -- -- --coverage",
-    "test:dts": "turbo run test:dts",
-    "typecheck": "turbo run typecheck",
-    "website": "pnpm --filter=linaria-website"
-  },
-  "workspaces": [
-    "./packages/*",
-    "./website"
-  ]
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0",
+    "pnpm": "^7.16.0"
+  }
 }

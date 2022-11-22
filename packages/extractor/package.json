@@ -1,17 +1,7 @@
 {
   "name": "@linaria/extractor",
-  "description": "Blazing fast zero-runtime CSS in JS library",
   "version": "4.0.0",
-  "bugs": "https://github.com/callstack/linaria/issues",
-  "engines": {
-    "node": "^12.16.0 || >=13.7.0"
-  },
-  "files": [
-    "types/",
-    "lib/",
-    "esm/"
-  ],
-  "homepage": "https://github.com/callstack/linaria#readme",
+  "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",
     "babel-plugin",
@@ -21,13 +11,18 @@
     "react",
     "styled-components"
   ],
+  "homepage": "https://github.com/callstack/linaria#readme",
+  "bugs": "https://github.com/callstack/linaria/issues",
+  "repository": "git@github.com:callstack/linaria.git",
   "license": "MIT",
   "main": "lib/index.js",
   "module": "esm/index.js",
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": "git@github.com:callstack/linaria.git",
+  "types": "types",
+  "files": [
+    "types/",
+    "lib/",
+    "esm/"
+  ],
   "scripts": {
     "build": "pnpm build:lib && pnpm build:esm && pnpm build:declarations",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
@@ -36,5 +31,10 @@
     "typecheck": "tsc --noEmit --composite false",
     "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
-  "types": "types"
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }
