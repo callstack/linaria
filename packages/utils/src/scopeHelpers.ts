@@ -9,7 +9,7 @@ import type {
   Program,
   FieldOptions,
 } from '@babel/types';
-import { Function, NODE_FIELDS } from '@babel/types';
+import { NODE_FIELDS } from '@babel/types';
 
 import findIdentifiers, { nonType } from './findIdentifiers';
 import { getScope } from './getScope';

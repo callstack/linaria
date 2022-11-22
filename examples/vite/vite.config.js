@@ -1,4 +1,4 @@
-import linaria from '@linaria/rollup';
+import linaria from '@linaria/vite';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
@@ -9,21 +9,17 @@ export default defineConfig(({ command }) => ({
     nodeResolve({
       extensions: ['.jsx', '.js'],
     }),
-    {
-      ...linaria({
-        include: ['**/*.{js,jsx}'],
-        babelOptions: {
-          presets: ['@babel/preset-react'],
-        },
-      }),
-      enforce: 'pre',
-    },
+    linaria({
+      include: ['**/*.{js,jsx}'],
+      babelOptions: {
+        presets: ['@babel/preset-react'],
+      },
+    }),
     react({
       jsxRuntime: 'classic',
     }),
   ],
   build: {
-    outDir: 'build',
     target: command === 'serve' ? 'modules' : 'es2015',
   },
 }));
