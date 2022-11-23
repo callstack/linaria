@@ -3,9 +3,7 @@
   "compilerOptions": {
     "paths": {},
     "rootDir": "src/",
-    "types": [
-      "node"
-    ],
+    "types": ["node"]
   },
   "references": [{ "path": "../core" }]
 }

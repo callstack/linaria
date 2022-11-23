@@ -3,11 +3,7 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "esm/**", "lib/**", "types/**"]
-    },
-    "build:declarations": {
-      "dependsOn": ["^build:declarations"],
-      "outputs": ["types/**"]
+      "outputs": ["dist/**"]
     },
     "check:all": {
       "dependsOn": ["test:dts", "typecheck", "test"]
@@ -28,10 +24,10 @@
       "dependsOn": ["^build"]
     },
     "test:dts": {
-      "dependsOn": ["build:declarations", "^build:declarations"]
+      "dependsOn": ["build", "^build"]
     },
     "typecheck": {
-      "dependsOn": ["build:declarations", "^build:declarations"]
+      "dependsOn": ["build", "^build"]
     }
   }
 }

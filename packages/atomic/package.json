@@ -1,8 +1,44 @@
 {
   "name": "@linaria/atomic",
-  "description": "Blazing fast zero-runtime CSS in JS library",
   "version": "4.2.2",
+  "description": "Blazing fast zero-runtime CSS in JS library",
+  "keywords": [
+    "css",
+    "css-in-js",
+    "linaria",
+    "react",
+    "styled-components"
+  ],
+  "homepage": "https://github.com/callstack/linaria#readme",
   "bugs": "https://github.com/callstack/linaria/issues",
+  "repository": "git@github.com:callstack/linaria.git",
+  "license": "MIT",
+  "sideEffects": false,
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/cjs/index.js"
+    },
+    "./*": {
+      "types": "./dist/types/*.d.ts",
+      "import": "./dist/esm/*.js",
+      "default": "./dist/cjs/*.js"
+    }
+  },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist/",
+    "processors/"
+  ],
+  "scripts": {
+    "build": "linaria-scripts build --bundle",
+    "typecheck": "tsc --noEmit --composite false",
+    "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
+  },
   "dependencies": {
     "@linaria/core": "workspace:^",
     "@linaria/logger": "workspace:^",
@@ -15,67 +51,19 @@
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
-    "@babel/types": "^7.18.9"
+    "@babel/types": "^7.18.9",
+    "linaria-scripts": "workspace:^1.0.0"
   },
   "engines": {
     "node": "^12.16.0 || >=13.7.0"
   },
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./types/index.d.ts",
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.js"
-    },
-    "./*": {
-      "types": "./types/*.d.ts",
-      "import": "./dist/*.mjs",
-      "default": "./dist/*.js"
-    }
-  },
-  "files": [
-    "dist/",
-    "processors/",
-    "types/"
-  ],
-  "homepage": "https://github.com/callstack/linaria#readme",
-  "keywords": [
-    "css",
-    "css-in-js",
-    "linaria",
-    "react",
-    "styled-components"
-  ],
-  "license": "MIT",
-  "linaria": {
-    "tags": {
-      "css": "./dist/processors/css.js",
-      "styled": "./dist/processors/styled.js"
-    }
-  },
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "publishConfig": {
     "access": "public"
   },
-  "repository": "git@github.com:callstack/linaria.git",
-  "scripts": {
-    "build": "pnpm build:dist && pnpm build:declarations",
-    "build:declarations": "tsc --emitDeclarationOnly --outDir types",
-    "build:dist": "tsup --format cjs,esm",
-    "typecheck": "tsc --noEmit --composite false",
-    "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
-  },
-  "sideEffects": false,
-  "tsup": {
-    "entry": [
-      "src/index.ts",
-      "src/processors/css.ts",
-      "src/processors/styled.ts"
-    ],
-    "splitting": false,
-    "sourcemap": true,
-    "clean": true
-  },
-  "types": "types/index.d.ts"
+  "linaria": {
+    "tags": {
+      "css": "./dist/cjs/processors/css.js",
+      "styled": "./dist/cjs/processors/styled.js"
+    }
+  }
 }

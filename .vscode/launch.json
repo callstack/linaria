@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "command": "pnpm build",
+      "name": "Run npm start",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/website",
+      "type": "node-terminal"
+    }
+  ],
+  "compounds": []
+}

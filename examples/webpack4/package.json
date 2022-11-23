@@ -1,8 +1,13 @@
 {
-  "private": true,
   "name": "webpack4-example",
   "version": "0.0.0",
+  "private": true,
   "license": "MIT",
+  "author": "Anton Evzhakov",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack",
+    "preview": "pnpm build && pnpm dlx http-server ."
+  },
   "dependencies": {
     "linaria-website": "workspace:^4.1.8"
   },
@@ -17,10 +22,5 @@
     "mini-css-extract-plugin": "^0.5.0",
     "webpack": "^4.46.0",
     "webpack-cli": "4.7.0"
-  },
-  "scripts": {
-    "build": "cross-env NODE_ENV=production webpack",
-    "preview": "pnpm build && pnpm dlx http-server ."
-  },
-  "author": "Anton Evzhakov"
+  }
 }

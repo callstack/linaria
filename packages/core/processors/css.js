@@ -2,4 +2,4 @@ Object.defineProperty(exports, '__esModule', {
   value: true,
 });
 
-exports.default = require('../dist/processors/css').default;
+exports.default = require('../dist/cjs/processors/css').default;

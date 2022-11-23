@@ -63,9 +63,6 @@ jspm_packages/
 .env
 
 # generated files
-lib/
-esm/
-types/
 dist/
 build/
 tsconfig.tsbuildinfo

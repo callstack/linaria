@@ -38,6 +38,7 @@
     "husky": "^1.3.1",
     "jest": "^28.1.0",
     "prettier": "^2.7.1",
+    "prettier-plugin-packagejson": "^2.3.0",
     "react": "^16.14.0",
     "syncpack": "^8.0.0",
     "tsup": "^6.3.0",
@@ -66,7 +67,7 @@
     "add-contributor": "all-contributors add",
     "bootstrap": "pnpm install",
     "check:all": "turbo run check:all --output-logs=new-only && pnpm lint && pnpm sp:check",
-    "clean": "del 'packages/*/{coverage,dist,esm,lib,types,tsconfig.tsbuildinfo}'",
+    "clean": "del 'packages/*/{coverage,dist,esm,types,lib,tsconfig.tsbuildinfo}'",
     "lint": "eslint --ext .js,.ts,.tsx .",
     "prepare": "turbo run build --output-logs=new-only",
     "release": "pnpm run prepare && pnpm changeset publish",
@@ -82,6 +83,8 @@
   },
   "workspaces": [
     "./packages/*",
-    "./website"
+    "./website",
+    "./examples/*",
+    "./scripts"
   ]
 }

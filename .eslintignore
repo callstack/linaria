@@ -1,9 +1,6 @@
 __fixtures__/
 coverage/
-lib/
-esm/
 packages/*/bin/
-packages/*/types/
 dist/
 build/
 node_modules/

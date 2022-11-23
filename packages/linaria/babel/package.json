@@ -1,5 +1,5 @@
 {
-  "main": "../lib/babel.js",
-  "module": "../esm/babel.js",
-  "types": "../types/babel.d.ts"
+  "main": "../dist/cjs/babel.js",
+  "module": "../dist/esm/babel.js",
+  "types": "..dist/types/index.d.ts"
 }

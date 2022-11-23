@@ -1,5 +1,5 @@
 {
-  "main": "../lib/webpack4-loader.js",
-  "module": "../esm/webpack4-loader.js",
-  "types": "../types/webpack4-loader.d.ts"
+  "main": "../dist/cjs/webpack4-loader.js",
+  "module": "../dist/esm/webpack4-loader.js",
+  "types": "../dist/types/webpack4-loader.d.ts"
 }

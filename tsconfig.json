@@ -28,5 +28,6 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "preserveWatchOutput": true,
+
   }
 }

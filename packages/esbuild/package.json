@@ -1,30 +1,7 @@
 {
   "name": "@linaria/esbuild",
-  "description": "Blazing fast zero-runtime CSS in JS library",
   "version": "4.2.2",
-  "bugs": "https://github.com/callstack/linaria/issues",
-  "dependencies": {
-    "@babel/core": "^7.18.9",
-    "@linaria/babel-preset": "workspace:^",
-    "@linaria/utils": "workspace:^",
-    "esbuild": "^0.12.5"
-  },
-  "devDependencies": {
-    "@types/node": "^17.0.39"
-  },
-  "engines": {
-    "node": "^12.16.0 || >=13.7.0"
-  },
-  "exports": {
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.js",
-    "types": "./types/index.d.ts"
-  },
-  "files": [
-    "dist/",
-    "types/"
-  ],
-  "homepage": "https://github.com/callstack/linaria#readme",
+  "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",
     "babel-plugin",
@@ -35,19 +12,42 @@
     "react",
     "styled-components"
   ],
-  "license": "MIT",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "publishConfig": {
-    "access": "public"
-  },
+  "homepage": "https://github.com/callstack/linaria#readme",
+  "bugs": "https://github.com/callstack/linaria/issues",
   "repository": "git@github.com:callstack/linaria.git",
+  "license": "MIT",
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js",
+    "types": "./dist/types/index.d.ts"
+  },
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist/",
+    "types/"
+  ],
   "scripts": {
-    "build": "pnpm build:dist && pnpm build:declarations",
-    "build:declarations": "tsc --emitDeclarationOnly --outDir types",
-    "build:dist": "tsup --format cjs,esm",
+    "build": "linaria-scripts build",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
+  },
+  "dependencies": {
+    "@babel/core": "^7.18.9",
+    "@linaria/babel-preset": "workspace:^",
+    "@linaria/utils": "workspace:^",
+    "esbuild": "^0.12.5"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.39",
+    "linaria-scripts": "workspace:^1.0.0"
+  },
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "tsup": {
     "entry": [
@@ -56,6 +56,5 @@
     "splitting": false,
     "sourcemap": true,
     "clean": true
-  },
-  "types": "types"
+  }
 }
