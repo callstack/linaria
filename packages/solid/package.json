@@ -50,8 +50,13 @@
     "styled-components"
   ],
   "license": "MIT",
-  "main": "lib/index.js",
-  "module": "esm/index.js",
+  "linaria": {
+    "tags": {
+      "styled": "./dist/processors/styled.js"
+    }
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "peerDependencies": {
     "solid-js": "^1.6.0"
   },
@@ -60,16 +65,24 @@
   },
   "repository": "git@github.com:callstack/linaria.git",
   "scripts": {
-    "build": "npm run build:lib && npm run build:esm && npm run build:declarations",
+    "build": "pnpm build:dist && pnpm build:declarations",
     "build:corejs-test": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore \"src/processors/**/*\"",
     "build:declarations": "tsc -p tsconfig.lib.json --emitDeclarationOnly --noEmit false --outDir types",
-    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
-    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:dist": "tsup --format cjs,esm",
     "test": "jest --passWithNoTests --config ../../jest.config.js --rootDir .",
     "typecheck": "tsc -b tsconfig.spec.json",
-    "watch": "npm run build --watch"
+    "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
   },
   "sideEffects": false,
+  "tsup": {
+    "entry": [
+      "src/index.ts",
+      "src/processors/styled.ts"
+    ],
+    "splitting": false,
+    "sourcemap": true,
+    "clean": true
+  },
   "types": "types/index.d.ts",
   "typesVersions": {
     "*": {
