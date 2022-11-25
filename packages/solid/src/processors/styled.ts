@@ -18,6 +18,7 @@ import {
   validateParams,
   type ValueCache,
   type WrappedNode,
+  ValueType,
 } from '@linaria/tags';
 
 export default class StyledProcessor extends TaggedTemplateProcessor {
@@ -41,10 +42,14 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
     let component: WrappedNode | undefined;
     if (tagOp[0] === 'call' && tagOp.length === 2) {
       const value = tagOp[1];
-      component = {
-        node: value.ex,
-        source: value.source,
-      };
+      if (value.kind === ValueType.CONST) {
+        component = typeof value.value === 'string' ? value.value : undefined;
+      } else {
+        component = {
+          node: value.ex,
+          source: value.source,
+        };
+      }
 
       this.dependencies.push(value);
     }
