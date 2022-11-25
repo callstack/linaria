@@ -58,6 +58,16 @@
   },
   "repository": "git@github.com:callstack/linaria.git",
   "scripts": {
+    "_build": "npm run build:lib && npm run build:esm && npm run build:declarations",
+    "build:corejs-test": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore \"src/processors/**/*\"",
+    "build:declarations": "tsc -p tsconfig.lib.json --emitDeclarationOnly --noEmit false --outDir types",
+    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "test": "jest --config ./jest.config.js --rootDir . --verbose",
+    "test:dts": "dtslint --localTs ../../node_modules/typescript/lib __dtslint__",
+    "typecheck": "tsc -b tsconfig.spec.json",
+    "watch": "npm run build --watch",
+    "t": "jest --clearCache && npm run test"
   },
   "sideEffects": false,
   "types": "types/index.d.ts",
@@ -69,3 +79,4 @@
     }
   }
 }
+
