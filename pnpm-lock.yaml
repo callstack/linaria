@@ -147,18 +147,26 @@ importers:
 
   examples/solid:
     specifiers:
+      '@babel/core': ^7.20.2
+      '@linaria/core': workspace:^
       '@linaria/shaker': workspace:^
       '@linaria/solid': workspace:^
       '@linaria/vite': workspace:^
+      babel-preset-solid: ^1.6.2
+      babel-preset-typescript: 7.0.0-alpha.19
       solid-js: ^1.6.2
       vite: 3.1.8
       vite-plugin-solid: ^2.4.0
     dependencies:
+      '@linaria/core': link:../../packages/core
       '@linaria/solid': link:../../packages/solid
       solid-js: 1.6.2
     devDependencies:
+      '@babel/core': 7.20.2
       '@linaria/shaker': link:../../packages/shaker
       '@linaria/vite': link:../../packages/vite
+      babel-preset-solid: 1.6.2_@babel+core@7.20.2
+      babel-preset-typescript: 7.0.0-alpha.19
       vite: 3.1.8
       vite-plugin-solid: 2.4.0_solid-js@1.6.2+vite@3.1.8
 
@@ -5337,9 +5345,23 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
+  /babel-plugin-syntax-object-rest-spread/7.0.0-alpha.19:
+    resolution: {integrity: sha512-Jo9wXmU9AtufOFPdQpedc+j7Ck5okGYsK0zkk2NZNae61SAtuMF5M3aRUeZusrssPqWC32pOiBokbApIFHdlXw==}
+    dev: true
+
+  /babel-plugin-syntax-typescript/7.0.0-alpha.19:
+    resolution: {integrity: sha512-jLuaWfoQsVr8/hmZtWB+86tZ5jYmOYV6kq70EkSUT7RR+gfeYOExS0FjObbbp+WExZNpBaRZvlyikNk3hCQGeQ==}
+    dev: true
+
   /babel-plugin-transform-react-remove-prop-types/0.4.24:
     resolution: {integrity: sha512-eqj0hVcJUR57/Ug2zE1Yswsw4LhuqqHhD+8v120T1cl3kjg76QwtyBrdIk4WVwK+lAhBJVYCd/v+4nc4y+8JsA==}
     dev: false
+
+  /babel-plugin-transform-typescript/7.0.0-alpha.19:
+    resolution: {integrity: sha512-OtkOYcYRffmC38/UjDZn2cvM2qarqDT748TbSJtVpNb7EvDLQcfPn9+0adk8oqmhc0lk+Ldy/2daGMNMxW0vuQ==}
+    dependencies:
+      babel-plugin-syntax-typescript: 7.0.0-alpha.19
+    dev: true
 
   /babel-polyfill/6.26.0:
     resolution: {integrity: sha512-F2rZGQnAdaHWQ8YAoeRbukc7HS9QgdgeyJ0rQDd485v9opwuPvjpPFcOOT/WmkKTdgy9ESgSPXDcTNpzrGr6iQ==}
@@ -5418,6 +5440,13 @@ packages:
     dependencies:
       '@babel/core': 7.20.2
       babel-plugin-jsx-dom-expressions: 0.35.4_@babel+core@7.20.2
+    dev: true
+
+  /babel-preset-typescript/7.0.0-alpha.19:
+    resolution: {integrity: sha512-2VGIgn58ohmVXhc+qAx0OsihQHQm5R+Y1Mu7bu98HbCJtR/CzEdZs8qCtPb1XmYKF8XRNvZQge44dPTVimI2/w==}
+    dependencies:
+      babel-plugin-syntax-object-rest-spread: 7.0.0-alpha.19
+      babel-plugin-transform-typescript: 7.0.0-alpha.19
     dev: true
 
   /babel-runtime/6.26.0:

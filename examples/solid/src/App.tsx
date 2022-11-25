@@ -1,26 +1,75 @@
 import type { Component } from 'solid-js';
 
 import logo from './logo.svg';
-import styles from './App.module.css';
+import { styled } from '@linaria/solid';
+import {css} from '@linaria/core'
+
+const globals = css`
+  :global() {
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    code {
+      font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+    }
+  }
+`;
+
+const AppStyled = styled.div`
+  text-align: center;
+`
+
+const HeaderStyled = styled.header`
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+`
+
+const LogoStyled = styled.img`
+  animation: logo-spin infinite 20s linear;
+  height: 40vmin;
+  pointer-events: none;
+
+  @keyframes logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`
+
+const LinkStyled = styled.a`
+  color: #b318f0;
+`
 
 const App: Component = () => {
   return (
-    <div class={styles.App}>
-      <header class={styles.header}>
-        <img src={logo} class={styles.logo} alt="logo" />
+    <AppStyled class={globals}>
+      <HeaderStyled>
+        <LogoStyled src={logo} alt="logo" />
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
-        <a
-          class={styles.link}
+        <LinkStyled
           href="https://github.com/solidjs/solid"
           target="_blank"
           rel="noopener noreferrer"
         >
           Learn Solid
-        </a>
-      </header>
-    </div>
+        </LinkStyled>
+      </HeaderStyled>
+    </AppStyled>
   );
 };
 
