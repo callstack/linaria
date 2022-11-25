@@ -15,9 +15,9 @@
     "@linaria/tags": "workspace:^"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.9",
-    "@babel/preset-typescript": "7.18.6",
-    "@babel/types": "^7.18.9",
+    "@babel/core": "7.18.9",
+    "@babel/preset-typescript": "7.17.12",
+    "@babel/types": "7.18.9",
     "@jest/transform": "^28.1.0",
     "@linaria/babel-preset": "workspace:^",
     "@types/node": "^17.0.39",
