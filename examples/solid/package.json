@@ -12,11 +12,11 @@
   "devDependencies": {
     "@linaria/shaker": "workspace:^",
     "@linaria/vite": "workspace:^",
-    "vite": "^3.1.8",
+    "vite": "3.1.8",
     "vite-plugin-solid": "^2.4.0"
   },
   "dependencies": {
-    "solid-js": "^1.6.2",
-    "@linaria/solid": "workspace:^"
+    "@linaria/solid": "workspace:^",
+    "solid-js": "^1.6.2"
   }
 }
