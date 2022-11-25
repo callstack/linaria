@@ -1,0 +1,22 @@
+{
+  "name": "vite-template-solid",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@linaria/shaker": "workspace:^",
+    "@linaria/vite": "workspace:^",
+    "vite": "^3.1.8",
+    "vite-plugin-solid": "^2.4.0"
+  },
+  "dependencies": {
+    "solid-js": "^1.6.2",
+    "@linaria/solid": "workspace:^"
+  }
+}
