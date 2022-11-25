@@ -37,4 +37,8 @@ type StyledJSXIntrinsics = {
   >;
 };
 
-export declare const styled: Styled & StyledJSXIntrinsics;
+export const styled: Styled & StyledJSXIntrinsics = (() => {
+  throw new Error(
+    'Using the "styled" tag in runtime is not supported. Make sure you have set up the Babel plugin correctly. See https://github.com/callstack/linaria#setup'
+  );
+}) as never;

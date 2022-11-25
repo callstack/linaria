@@ -1,7 +1,7 @@
 {
   "name": "@linaria/solid",
   "description": "Blazing fast zero-runtime CSS in JS library for SolidJS",
-  "version": "4.0.0",
+  "version": "4.3.0",
   "bugs": "https://github.com/callstack/linaria/issues",
   "contributors": [
     {
@@ -25,13 +25,13 @@
     "./package.json": "./package.json",
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./esm/index.js",
-      "default": "./lib/index.js"
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
     },
     "./*": {
       "types": "./types/*.d.ts",
-      "import": "./esm/*.js",
-      "default": "./lib/*.js"
+      "import": "./dist/*.mjs",
+      "default": "./dist/*.js"
     }
   },
   "files": [
