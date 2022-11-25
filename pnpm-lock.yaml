@@ -538,11 +538,16 @@ importers:
 
   packages/solid:
     specifiers:
+      '@babel/types': ^7.18.9
       '@linaria/core': workspace:^
       '@linaria/tags': workspace:^
+      solid-js: ^1.6.2
     dependencies:
       '@linaria/core': link:../core
       '@linaria/tags': link:../tags
+    devDependencies:
+      '@babel/types': 7.18.9
+      solid-js: 1.6.2
 
   packages/stylelint:
     specifiers:
@@ -2826,7 +2831,7 @@ packages:
     resolution: {integrity: sha512-WwMLAg2MvJmt/rKEVQBBhIVffMmnilX4oe0sRe7iPOHIGsqpruFHHdrfj4O1CMMtgMtCU4oPafZjDPCRgO57Wg==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/helper-validator-identifier': 7.18.6
+      '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
 
   /@babel/types/7.19.4:
