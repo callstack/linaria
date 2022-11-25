@@ -41,17 +41,18 @@
     "react": "^16.14.0",
     "syncpack": "^8.0.0",
     "tsup": "^6.3.0",
-    "turbo": "^1.2.16",
+    "turbo": "^1.6.3",
     "typescript": "^4.7.4"
   },
   "engines": {
-    "node": "^12.16.0 || >=13.7.0"
+    "node": "^12.16.0 || >=13.7.0",
+    "pnpm": "^7.16.0"
   },
   "homepage": "https://github.com/callstack/linaria#readme",
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "npm run check:all"
+      "pre-commit": "pnpm check:all"
     }
   },
   "license": "MIT",
@@ -64,7 +65,7 @@
   "scripts": {
     "add-contributor": "all-contributors add",
     "bootstrap": "pnpm install",
-    "check:all": "turbo run check:all --output-logs=new-only && npm run lint && npm run sp:check",
+    "check:all": "turbo run check:all --output-logs=new-only && pnpm lint && pnpm sp:check",
     "clean": "del 'packages/*/{coverage,dist,esm,lib,types,tsconfig.tsbuildinfo}'",
     "lint": "eslint --ext .js,.ts,.tsx .",
     "prepare": "turbo run build --output-logs=new-only",
@@ -77,7 +78,6 @@
     "test:coverage": "turbo run test -- -- --coverage",
     "test:dts": "turbo run test:dts",
     "typecheck": "turbo run typecheck",
-    "watch": "turbo run --parallel watch",
     "website": "pnpm --filter=linaria-website"
   },
   "workspaces": [

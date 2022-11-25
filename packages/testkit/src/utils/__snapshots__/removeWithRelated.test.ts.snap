@@ -10,12 +10,15 @@ exports[`removeWithRelated should keep logical expression 1`] = `
 const res = false && c;"
 `;
 
-exports[`removeWithRelated should remove export 1`] = `
-"const b = 1;
-export { b };"
+exports[`removeWithRelated should not delete params of functions 1`] = `
+"function test(arg) {
+  return null;
+}"
 `;
 
 exports[`removeWithRelated should remove node if it becomes invalid after removing its children 1`] = `""`;
+
+exports[`removeWithRelated should remove the whole import 1`] = `""`;
 
 exports[`removeWithRelated should remove try/catch block 1`] = `"const a = 1;"`;
 

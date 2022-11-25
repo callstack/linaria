@@ -108,29 +108,54 @@ export function referenceAll(path: NodePath): void {
 
 const deletingNodes = new WeakSet<NodePath>();
 
-export function findParentForDelete(path: NodePath): NodePath | null {
+const isEmptyList = (list: NodePath[]) =>
+  list.length === 0 || list.every((i) => deletingNodes.has(i));
+
+type ReplaceAction = [action: 'replace', what: NodePath, by: Node];
+type RemoveAction = [action: 'remove', what: NodePath];
+
+const getPathFromAction = (action: RemoveAction | ReplaceAction) => {
+  if (!Array.isArray(action)) {
+    return action;
+  }
+
+  if (action[0] === 'replace' || action[0] === 'remove') {
+    return action[1];
+  }
+
+  throw new Error(`Unknown action type: ${action[0]}`);
+};
+
+export function findActionForNode(
+  path: NodePath
+): RemoveAction | ReplaceAction | null {
   if (isRemoved(path)) return null;
 
   deletingNodes.add(path);
 
   const parent = path.parentPath;
 
-  if (!parent) return path;
+  if (!parent) return ['remove', path];
 
   if (parent.isProgram()) {
     // Do not delete Program node
-    return path;
+    return ['remove', path];
+  }
+
+  if (parent.isFunction() && path.listKey === 'params') {
+    // Do not remove params of functions
+    return null;
   }
 
   if (parent.isLogicalExpression({ operator: '&&' })) {
-    mutate(parent, (p) => {
-      p.replaceWith({
+    return [
+      'replace',
+      parent,
+      {
         type: 'BooleanLiteral',
         value: false,
-      });
-    });
-
-    return null;
+      },
+    ];
   }
 
   if (parent.isObjectProperty()) {
@@ -144,33 +169,34 @@ export function findParentForDelete(path: NodePath): NodePath | null {
           .get('callee')
           .matchesPattern('Object.defineProperty')
       ) {
-        return findParentForDelete(maybeDefineProperty);
+        return findActionForNode(maybeDefineProperty);
       }
     }
 
-    return findParentForDelete(parent);
+    return findActionForNode(parent);
   }
 
   if (parent.isTemplateLiteral()) {
-    mutate(path, (p) => {
-      p.replaceWith({
+    return [
+      'replace',
+      path,
+      {
         type: 'StringLiteral',
         value: '',
-      });
-    });
-    return null;
+      },
+    ];
   }
 
   if (parent.isAssignmentExpression()) {
-    return findParentForDelete(parent);
+    return findActionForNode(parent);
   }
 
   if (parent.isCallExpression()) {
-    return findParentForDelete(parent);
+    return findActionForNode(parent);
   }
 
   if (parent.isForInStatement({ left: path.node })) {
-    return findParentForDelete(parent);
+    return findActionForNode(parent);
   }
 
   if (
@@ -179,13 +205,13 @@ export function findParentForDelete(path: NodePath): NodePath | null {
     parent.isObjectMethod() ||
     parent.isClassMethod()
   ) {
-    return findParentForDelete(parent);
+    return findActionForNode(parent);
   }
 
   if (parent.isBlockStatement()) {
     const body = parent.get('body');
-    if (body.length === 1) {
-      return findParentForDelete(parent);
+    if (isEmptyList(body)) {
+      return findActionForNode(parent);
     }
 
     if (path.listKey === 'body' && typeof path.key === 'number') {
@@ -197,49 +223,48 @@ export function findParentForDelete(path: NodePath): NodePath | null {
           prevStatement.get('consequent').isReturnStatement()
         ) {
           // It's `if (…) return …`, we can remove it.
-          return findParentForDelete(prevStatement);
+          return findActionForNode(prevStatement);
         }
       } else if (
         body.slice(1).every((statement) => deletingNodes.has(statement))
       ) {
         // If it is the first statement and all other statements
         // are marked for deletion, we can remove the whole block.
-        return findParentForDelete(parent);
+        return findActionForNode(parent);
       }
     }
   }
 
   if (parent.isVariableDeclarator()) {
-    return findParentForDelete(parent);
+    return findActionForNode(parent);
   }
 
   if (
     parent.isExportNamedDeclaration() &&
-    ((parent.node.specifiers.length === 1 &&
-      parent.node.specifiers[0] === path.node) ||
-      parent.node.declaration === path.node)
+    ((path.key === 'specifiers' && isEmptyList(parent.get('specifiers'))) ||
+      (path.key === 'declaration' && parent.node.declaration === path.node))
   ) {
-    return findParentForDelete(parent);
+    return findActionForNode(parent);
   }
 
   for (const key of ['body', 'declarations', 'specifiers']) {
     if (path.listKey === key && typeof path.key === 'number') {
       const list = parent.get(key) as NodePath[];
-      if (list.length === 1) {
-        return findParentForDelete(parent);
+      if (isEmptyList(list)) {
+        return findActionForNode(parent);
       }
     }
   }
 
   if (parent.isTryStatement()) {
-    return findParentForDelete(parent);
+    return findActionForNode(parent);
   }
 
   if (!path.listKey) {
     const field = NODE_FIELDS[parent.type][path.key];
     if (!validateField(parent.node, path.key as string, null, field)) {
       // The parent node isn't valid without this field, so we should remove it also.
-      return findParentForDelete(parent);
+      return findActionForNode(parent);
     }
   }
 
@@ -258,11 +283,11 @@ export function findParentForDelete(path: NodePath): NodePath | null {
     'test',
   ]) {
     if (path.key === key && parent.get(key) === path) {
-      return findParentForDelete(parent);
+      return findActionForNode(parent);
     }
   }
 
-  return path;
+  return ['remove', path];
 }
 
 // @babel/preset-typescript transpiles enums, but doesn't reference used identifiers.
@@ -305,8 +330,9 @@ function removeUnreferenced(items: NodePath<Identifier | JSXIdentifier>[]) {
     }
 
     const forDeleting = [binding.path, ...binding.constantViolations]
-      .map((i) => findParentForDelete(i))
-      .filter(isNotNull);
+      .map(findActionForNode)
+      .filter(isNotNull)
+      .map(getPathFromAction);
 
     if (forDeleting.length === 0) return;
 
@@ -336,41 +362,40 @@ function removeWithRelated(paths: NodePath[]) {
     fixed.add(rootPath);
   }
 
-  let clean = false;
-  let referencedIdentifiers: NodePath<Identifier | JSXIdentifier>[] = [];
-  const declared: Binding[] = [];
+  const actions: (ReplaceAction | RemoveAction)[] = paths
+    .map(findActionForNode)
+    .filter(isNotNull);
 
-  paths.forEach((path) => {
-    const deletingPath = findParentForDelete(path);
-    if (!deletingPath) return;
+  const affectedPaths = actions.map(getPathFromAction);
 
-    referencedIdentifiers.push(
-      ...findIdentifiers([deletingPath], 'referenced')
-    );
-    declared.push(
-      ...findIdentifiers([deletingPath], 'binding').map(
-        (i) => getScope(i).getBinding(i.node.name)!
-      )
+  let referencedIdentifiers = findIdentifiers(affectedPaths, 'referenced');
+  const referencesOfBinding = findIdentifiers(affectedPaths, 'binding')
+    .map((i) => (i.node && getScope(i).getBinding(i.node.name)) ?? null)
+    .filter(isNotNull)
+    .reduce(
+      (acc, i) => [...acc, ...i.referencePaths.filter(nonType)],
+      [] as NodePath[]
     );
 
-    mutate(deletingPath, (p) => {
-      if (!isRemoved(p)) p.remove();
+  actions.forEach((action) => {
+    mutate(action[1], (p) => {
+      if (isRemoved(p)) return;
+
+      if (action[0] === 'remove') {
+        p.remove();
+      } else if (action[0] === 'replace') {
+        p.replaceWith(action[2]);
+      }
     });
   });
 
-  if (declared.length > 0) {
-    removeWithRelated(
-      declared.reduce(
-        (acc, i) => [...acc, ...i.referencePaths.filter(nonType)],
-        [] as NodePath[]
-      )
-    );
-  }
+  removeWithRelated(referencesOfBinding);
 
   referencedIdentifiers.sort((a, b) =>
     a.node?.name.localeCompare(b.node?.name)
   );
 
+  let clean = false;
   while (!clean && referencedIdentifiers.length > 0) {
     const referenced = removeUnreferenced(referencedIdentifiers);
     clean =

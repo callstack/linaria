@@ -4,8 +4,6 @@
  * returns transformed code without template literals and attaches generated source maps
  */
 
-import path from 'path';
-
 import { createFilter } from '@rollup/pluginutils';
 import type { Plugin } from 'rollup';
 
@@ -19,6 +17,8 @@ import type {
 } from '@linaria/babel-preset';
 import { createCustomDebug } from '@linaria/logger';
 import { getFileIdx } from '@linaria/utils';
+import type { Plugin as VitePlugin } from '@linaria/vite';
+import vitePlugin from '@linaria/vite';
 
 type RollupPluginOptions = {
   include?: string | string[];
@@ -27,33 +27,21 @@ type RollupPluginOptions = {
   preprocessor?: Preprocessor;
 } & Partial<PluginOptions>;
 
-type ViteConfig = {
-  root: string;
-  command: 'serve' | 'build';
-};
-
 export default function linaria({
   include,
   exclude,
   sourceMap,
   preprocessor,
   ...rest
-}: RollupPluginOptions = {}): Plugin & {
-  configResolved: (config: ViteConfig) => void;
-} {
+}: RollupPluginOptions = {}): Plugin {
   const filter = createFilter(include, exclude);
   const cssLookup: { [key: string]: string } = {};
-  let config: ViteConfig;
-
   const codeCache: CodeCache = new Map();
   const resolveCache = new Map<string, string>();
   const evalCache = new Map<string, Module>();
 
-  return {
+  const plugin: Plugin = {
     name: 'linaria',
-    configResolved(resolvedConfig: ViteConfig) {
-      config = resolvedConfig;
-    },
     load(id: string) {
       return cssLookup[id];
     },
@@ -119,9 +107,6 @@ export default function linaria({
       }
 
       cssLookup[filename] = cssText;
-      if (config?.command === 'serve' && config?.root) {
-        cssLookup[`/${path.posix.relative(config.root, filename)}`] = cssText;
-      }
 
       result.code += `\nimport ${JSON.stringify(filename)};\n`;
 
@@ -129,4 +114,41 @@ export default function linaria({
       return { code: result.code, map: result.sourceMap };
     },
   };
+
+  let vite: VitePlugin | undefined;
+
+  return new Proxy<Plugin>(plugin, {
+    get(target, prop) {
+      return (vite || target)[prop as keyof Plugin];
+    },
+
+    getOwnPropertyDescriptor(target, prop) {
+      return Object.getOwnPropertyDescriptor(
+        vite || target,
+        prop as keyof Plugin
+      );
+    },
+
+    ownKeys() {
+      // Rollup doesn't ask config about its own keys, so it is Vite.
+      vite = vitePlugin({
+        include,
+        exclude,
+        sourceMap,
+        preprocessor,
+        ...rest,
+      });
+
+      vite = {
+        ...vite,
+        buildStart() {
+          this.warn(
+            'You are trying to use @linaria/rollup with Vite. The support for Vite in @linaria/rollup is deprecated and will be removed in the next major release. Please use @linaria/vite instead.'
+          );
+        },
+      };
+
+      return Reflect.ownKeys(vite);
+    },
+  });
 }

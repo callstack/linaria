@@ -13,7 +13,12 @@ import type {
 import findUp from 'find-up';
 
 import { BaseProcessor } from '@linaria/tags';
-import type { Param, Params, IFileContext } from '@linaria/tags';
+import type {
+  Param,
+  Params,
+  IFileContext,
+  ExpressionValue,
+} from '@linaria/tags';
 import type { IImport, StrictOptions } from '@linaria/utils';
 import {
   collectExportsAndImports,
@@ -266,7 +271,11 @@ function getBuilderForIdentifier(
           }
           const source = getSource(arg);
           const extracted = extractExpression(arg, options.evaluate);
-          return { ...extracted, source, buildCodeFrameError: buildError };
+          return {
+            ...extracted,
+            source,
+            buildCodeFrameError: buildError,
+          } as ExpressionValue;
         })
         .filter(isNotNull);
 

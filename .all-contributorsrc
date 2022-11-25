@@ -1024,6 +1024,33 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "andparsons",
+      "name": "Andy Parsons",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1213447?v=4",
+      "profile": "https://evensix.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Platane",
+      "name": "Platane",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1659820?v=4",
+      "profile": "http://platane.github.io",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "kutnickclose",
+      "name": "Tim Kutnick",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6117662?v=4",
+      "profile": "https://github.com/kutnickclose",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "repoType": "github",

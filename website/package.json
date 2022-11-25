@@ -1,7 +1,7 @@
 {
   "name": "linaria-website",
   "description": "Linaria website",
-  "version": "4.1.7",
+  "version": "4.1.8",
   "dependencies": {
     "@babel/runtime": "^7.18.3",
     "@linaria/atomic": "workspace:^",
@@ -41,20 +41,21 @@
     "webpack-dev-server": "^4.9.1"
   },
   "exports": {
+    ".": "./src/index.jsx",
     "./*": "./src/*.jsx"
   },
   "main": "./src/index.jsx",
   "private": true,
   "scripts": {
-    "build": "yarn build:client && yarn build:server",
+    "build": "pnpm build:client && pnpm build:server",
     "build:client": "cross-env NODE_ENV=production webpack",
     "build:server": "cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build",
-    "clean": "yarn clean:client && yarn clean:server",
+    "clean": "pnpm clean:client && pnpm clean:server",
     "clean:client": "del dist",
     "clean:server": "del build",
     "lint:css": "stylelint src/**/*.jsx",
-    "prebuild": "yarn clean",
-    "prestart": "yarn --cwd .. prepare",
+    "prebuild": "pnpm clean",
+    "prestart": "pnpm -w prepare",
     "server": "node build/server",
     "start": "webpack serve"
   }

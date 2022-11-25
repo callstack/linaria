@@ -1,7 +1,7 @@
 {
   "name": "@linaria/shaker",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "4.2.3",
+  "version": "4.2.4",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
     "@babel/core": "^7.18.9",
@@ -54,13 +54,13 @@
   },
   "repository": "git@github.com:callstack/linaria.git",
   "scripts": {
-    "build": "npm run build:lib && npm run build:esm && npm run build:declarations",
+    "build": "pnpm build:lib && pnpm build:esm && pnpm build:declarations",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
     "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
     "test": "jest --config ./jest.config.js --rootDir src",
     "typecheck": "tsc --noEmit --composite false",
-    "watch": "npm run build --watch"
+    "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
   "types": "types"
 }

@@ -311,6 +311,46 @@ export default {
 };
 ```
 
+### Vite
+
+Since Vite supports Rollup plugin, you can use `@linaria/rollup`. Vite handles CSS by itself, you don't need a css plugin.
+
+```sh
+yarn add --dev @linaria/rollup
+```
+
+Then add them to your `vite.config.js`:
+
+```js
+import { defineConfig } from 'vite';
+import linaria from '@linaria/rollup';
+
+export default defineConfig(() => ({
+  // ...
+  plugins: [linaria()],
+}));
+```
+
+If you are using language features that requires a babel transform (such as typescript), ensure the proper babel presets or plugins are passed to linaria.
+
+```js
+import { defineConfig } from 'vite';
+import linaria from '@linaria/rollup';
+
+// example to support typescript syntax:
+export default defineConfig(() => ({
+  // ...
+  plugins: [
+    linaria({
+      include: ['**/*.{ts,tsx}'],
+      babelOptions: {
+        presets: ['@babel/preset-typescript', '@babel/preset-react'],
+      },
+    }),
+  ],
+}));
+```
+
 ### Svelte
 
 #### Contents

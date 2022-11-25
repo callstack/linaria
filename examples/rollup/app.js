@@ -1,1 +1,1 @@
-import 'linaria-website/index';
+import 'linaria-website';

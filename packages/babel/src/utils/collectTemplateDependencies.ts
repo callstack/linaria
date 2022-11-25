@@ -11,21 +11,22 @@ import type {
   Expression,
   ExpressionStatement,
   Identifier,
+  JSXIdentifier,
   ObjectExpression,
   ObjectProperty,
   Program,
+  SourceLocation,
   Statement,
   TaggedTemplateExpression,
   TemplateElement,
   TSType,
   VariableDeclaration,
   VariableDeclarator,
-  SourceLocation,
-  JSXIdentifier,
 } from '@babel/types';
 import { cloneNode } from '@babel/types';
 
 import { debug } from '@linaria/logger';
+import type { ConstValue } from '@linaria/tags';
 import { hasMeta } from '@linaria/tags';
 import {
   findIdentifiers,
@@ -219,6 +220,17 @@ export function extractExpression(
   evaluate = false,
   addToExport = true
 ): Omit<ExpressionValue, 'buildCodeFrameError' | 'source'> {
+  if (
+    ex.isLiteral() &&
+    ('value' in ex.node || ex.node.type === 'NullLiteral')
+  ) {
+    return {
+      ex: ex.node,
+      kind: ValueType.CONST,
+      value: ex.node.type === 'NullLiteral' ? null : ex.node.value,
+    } as Omit<ConstValue, 'buildCodeFrameError' | 'source'>;
+  }
+
   const { loc } = ex.node;
 
   const rootScope = ex.scope.getProgramParent();
@@ -323,7 +335,7 @@ export default function collectTemplateDependencies(
         ...extracted,
         source,
         buildCodeFrameError,
-      };
+      } as ExpressionValue;
     }
   );
 

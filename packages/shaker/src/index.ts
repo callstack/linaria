@@ -1,5 +1,4 @@
 import type { TransformOptions } from '@babel/core';
-import { transformSync } from '@babel/core';
 
 import { buildOptions, loadBabelOptions } from '@linaria/utils';
 import type { Evaluator } from '@linaria/utils';
@@ -48,7 +47,7 @@ const shaker: Evaluator = (filename, options, text, only, babel) => {
     buildOptions(options?.babelOptions, getShakerConfig(only))
   );
 
-  const transformed = transformSync(text, {
+  const transformed = babel.transformSync(text, {
     ...transformOptions,
     filename,
   });

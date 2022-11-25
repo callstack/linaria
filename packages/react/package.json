@@ -1,13 +1,14 @@
 {
   "name": "@linaria/react",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "4.2.1",
+  "version": "4.3.0",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
     "@emotion/is-prop-valid": "^1.2.0",
     "@linaria/core": "workspace:^",
     "@linaria/tags": "workspace:^",
     "@linaria/utils": "workspace:^",
+    "react-html-attributes": "^1.4.6",
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
@@ -63,14 +64,14 @@
   },
   "repository": "git@github.com:callstack/linaria.git",
   "scripts": {
-    "build": "npm run build:dist && npm run build:declarations",
+    "build": "pnpm build:dist && pnpm build:declarations",
     "build:corejs-test": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore \"src/processors/**/*\"",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
     "build:dist": "tsup --format cjs,esm",
     "test": "jest --config ../../jest.config.js --rootDir .",
     "test:dts": "dtslint --localTs ../../node_modules/typescript/lib __dtslint__",
     "typecheck": "tsc --noEmit --composite false",
-    "watch": "npm run build --watch"
+    "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
   },
   "sideEffects": false,
   "tsup": {

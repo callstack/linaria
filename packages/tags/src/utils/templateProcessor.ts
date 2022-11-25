@@ -67,7 +67,7 @@ export default function templateProcessor(
         : { line: end.line, column: end.column + 1 },
     };
 
-    const value = valueCache.get(ex.name);
+    const value = 'value' in item ? item.value : valueCache.get(item.ex.name);
 
     throwIfInvalid(
       tagProcessor.isValidValue.bind(tagProcessor),
