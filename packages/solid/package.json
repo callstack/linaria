@@ -81,7 +81,8 @@
     ],
     "splitting": false,
     "sourcemap": true,
-    "clean": true
+    "clean": true,
+    "tsconfig": "./tsconfig.lib.json"
   },
   "types": "types/index.d.ts",
   "typesVersions": {
