@@ -5,5 +5,5 @@
     "types": ["node"]
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["__tests__", "types", "esm", "lib", ".turbo", "tmp"]
+  "exclude": ["__tests__", "__dtslint__", "types", "esm", "lib", ".turbo", "tmp"]
 }

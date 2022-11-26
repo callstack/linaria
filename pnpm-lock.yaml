@@ -32,6 +32,7 @@ importers:
       eslint-config-airbnb: ^19.0.4
       eslint-config-airbnb-typescript: ^17.0.0
       eslint-config-prettier: ^8.5.0
+      eslint-plugin-expect-type: ^0.2.1
       eslint-plugin-import: ^2.26.0
       eslint-plugin-jsx-a11y: ^6.5.1
       eslint-plugin-prettier: ^4.0.0
@@ -73,6 +74,7 @@ importers:
       eslint-config-airbnb: 19.0.4_dwfgiixbwetqupsqmiuv57rzoi
       eslint-config-airbnb-typescript: 17.0.0_2hiyrae7qweshky5h3gt7obpny
       eslint-config-prettier: 8.5.0_eslint@8.16.0
+      eslint-plugin-expect-type: 0.2.1_vjep2yp2sits3sqnodefgcbnfi
       eslint-plugin-import: 2.26.0_bkngvi3wcdllq54uhhavdagiee
       eslint-plugin-jsx-a11y: 6.5.1_eslint@8.16.0
       eslint-plugin-prettier: 4.0.0_6edyqcvmz3ta2ebn7rq2nny6ci
@@ -7413,6 +7415,21 @@ packages:
       debug: 3.2.7
       eslint-import-resolver-node: 0.3.6
       find-up: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /eslint-plugin-expect-type/0.2.1_vjep2yp2sits3sqnodefgcbnfi:
+    resolution: {integrity: sha512-NotHqw3eH4ne6/Q3D79PiFvtNZLRrQ2DczcPHmfPxhP3fEGZf843ganEXRbkIbR8CjitBv94oU2k52DM0Amo3g==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      eslint: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
+      typescript: '>=3.7.5'
+    dependencies:
+      '@typescript-eslint/utils': 5.30.7_vjep2yp2sits3sqnodefgcbnfi
+      eslint: 8.16.0
+      fs-extra: 10.1.0
+      typescript: 4.7.4
     transitivePeerDependencies:
       - supports-color
     dev: true

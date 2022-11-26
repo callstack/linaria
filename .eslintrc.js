@@ -1,3 +1,5 @@
+const path = require('path');
+
 // Workaround for https://github.com/import-js/eslint-plugin-import/issues/1810
 const noUnresolved = ['error', { ignore: ['@linaria/*'] }];
 
@@ -147,7 +149,7 @@ module.exports = {
         'plugin:import/typescript',
       ],
       parserOptions: {
-        project: './tsconfig.eslint.json',
+        project: path.resolve(__dirname, './tsconfig.eslint.json'),
       },
       rules: {
         'import/extensions': 0,
