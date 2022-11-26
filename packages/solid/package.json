@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@babel/types": "^7.18.9",
+    "@types/node": "^17.0.39",
     "solid-js": "^1.6.2"
   },
   "engines": {
