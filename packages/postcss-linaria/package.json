@@ -4,13 +4,13 @@
   "version": "4.1.4",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
-    "@babel/generator": "^7.18.9",
-    "@babel/parser": "^7.18.13",
-    "@babel/traverse": "^7.18.9",
+    "@babel/generator": "^7.20.4",
+    "@babel/parser": "^7.20.3",
+    "@babel/traverse": "^7.20.1",
     "stylelint": "^14.11.0"
   },
   "devDependencies": {
-    "@babel/types": "^7.18.9",
+    "@babel/types": "^7.20.2",
     "@types/babel__generator": "^7.6.4",
     "@types/babel__traverse": "^7.17.1",
     "postcss": "^8.3.11"

@@ -2523,6 +2523,32 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('understands satisfies keyword', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { css } from "@linaria/core"
+
+      interface ColorTokenMap {
+        primary: string
+        secondary: string
+      }
+
+      const lightTokens = {
+        primary: "#111",
+        secondary: "#09f",
+      } satisfies ColorTokenMap
+
+      export const text = css\`
+        color: ${'${lightTokens.primary}'};
+      \`;
+      `,
+      [evaluator, {}, 'ts']
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('evaluates chain of reexports', async () => {
     const { code, metadata } = await transform(
       dedent`
