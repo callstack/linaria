@@ -2,6 +2,7 @@
 
 exports[`removeWithRelated should keep alive used import specifier 1`] = `
 "import { b } from './source';
+
 /* remove */"
 `;
 

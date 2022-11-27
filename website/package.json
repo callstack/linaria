@@ -3,7 +3,7 @@
   "description": "Linaria website",
   "version": "4.1.8",
   "dependencies": {
-    "@babel/runtime": "^7.18.3",
+    "@babel/runtime": "^7.20.1",
     "@linaria/atomic": "workspace:^",
     "@linaria/core": "workspace:^",
     "@linaria/react": "workspace:^",
@@ -20,8 +20,8 @@
     "react-dom": "^16.14.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.18.9",
-    "@babel/core": "^7.18.9",
+    "@babel/cli": "^7.19.3",
+    "@babel/core": "^7.20.2",
     "@linaria/babel-preset": "workspace:^",
     "@linaria/shaker": "workspace:^",
     "@linaria/stylelint": "workspace:^",

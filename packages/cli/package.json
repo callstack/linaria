@@ -7,7 +7,7 @@
   },
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
-    "@babel/core": "^7.18.9",
+    "@babel/core": "^7.20.2",
     "@linaria/babel-preset": "workspace:^",
     "@linaria/utils": "workspace:^",
     "glob": "^7.1.3",
