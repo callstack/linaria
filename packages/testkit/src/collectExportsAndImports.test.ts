@@ -2,7 +2,9 @@
 import { join } from 'path';
 
 import * as babel from '@babel/core';
+import type { NodePath } from '@babel/core';
 import generator from '@babel/generator';
+import { transformSync as swcTransformSync } from '@swc/core';
 import dedent from 'dedent';
 import * as ts from 'typescript';
 
@@ -18,6 +20,27 @@ function typescriptCommonJS(source: string): string {
 
   return result.outputText;
 }
+
+const withoutLocal = <T extends { local: NodePath }>({
+  local,
+  ...obj
+}: T): Omit<T, 'local'> => obj;
+
+const swcCommonJS =
+  (target: 'es5' | 'es2015') =>
+  (source: string): string => {
+    const result = swcTransformSync(source, {
+      filename: join(__dirname, 'source.ts'),
+      jsc: {
+        target,
+      },
+      module: {
+        type: 'commonjs',
+      },
+    });
+
+    return result.code;
+  };
 
 function babelCommonJS(source: string): string {
   const result = babel.transformSync(source, {
@@ -59,6 +82,8 @@ function babelNode16(source: string): string {
 const compilers: [name: string, compiler: (code: string) => string][] = [
   ['as is', babelNode16],
   ['babelCommonJS', babelCommonJS],
+  ['swcCommonJSes5', swcCommonJS('es5')],
+  ['swcCommonJSes2015', swcCommonJS('es2015')],
   ['typescriptCommonJS', typescriptCommonJS],
 ];
 
@@ -542,7 +567,7 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
       `;
 
       if (reexports.length) {
-        expect(reexports).toMatchObject([
+        expect(reexports.map(withoutLocal)).toMatchObject([
           {
             imported: 'default',
             exported: 'default',
@@ -573,7 +598,7 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
       `;
 
       if (reexports.length) {
-        expect(reexports).toMatchObject([
+        expect(reexports.map(withoutLocal)).toMatchObject([
           {
             imported: 'token',
             exported: 'token',
@@ -604,7 +629,7 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
       `;
 
       if (reexports.length) {
-        expect(reexports).toMatchObject([
+        expect(reexports.map(withoutLocal)).toMatchObject([
           {
             imported: 'token',
             exported: 'renamed',
@@ -635,7 +660,7 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
       `;
 
       if (reexports.length) {
-        expect(reexports).toMatchObject([
+        expect(reexports.map(withoutLocal)).toMatchObject([
           {
             imported: '*',
             exported: 'ns',
@@ -666,7 +691,7 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
       `;
 
       if (reexports.length) {
-        expect(reexports).toMatchObject([
+        expect(reexports.map(withoutLocal)).toMatchObject([
           {
             imported: '*',
             exported: '*',
@@ -686,6 +711,111 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
           {
             source: 'unknown-package',
             imported: '*',
+          },
+        ]);
+      }
+    });
+
+    it('mixed exports', () => {
+      const { exports, imports, reexports } = run`
+        export { syncResolve } from './asyncResolveFallback';
+        export * from './collectExportsAndImports';
+        export { default as isUnnecessaryReactCall } from './isUnnecessaryReactCall';
+        export default 123;
+      `;
+
+      if (reexports.length === 3) {
+        // If all re-exports are supported
+        expect(reexports.map(withoutLocal)).toMatchObject([
+          {
+            imported: 'syncResolve',
+            exported: 'syncResolve',
+            source: './asyncResolveFallback',
+          },
+          {
+            imported: '*',
+            exported: '*',
+            source: './collectExportsAndImports',
+          },
+          {
+            imported: 'default',
+            exported: 'isUnnecessaryReactCall',
+            source: './isUnnecessaryReactCall',
+          },
+        ]);
+        expect(exports).toMatchObject([
+          {
+            exported: 'default',
+            local: '123',
+          },
+        ]);
+        expect(imports).toHaveLength(0);
+      } else if (reexports.length === 1) {
+        // If only wildcard re-export is supported
+        expect(reexports.map(withoutLocal)).toMatchObject([
+          {
+            imported: '*',
+            exported: '*',
+            source: './collectExportsAndImports',
+          },
+        ]);
+        expect(exports).toMatchObject([
+          {
+            exported: 'default',
+          },
+          {
+            exported: 'isUnnecessaryReactCall',
+          },
+          {
+            exported: 'syncResolve',
+          },
+        ]);
+        expect(imports).toMatchObject([
+          {
+            imported: 'default',
+            source: './isUnnecessaryReactCall',
+          },
+          {
+            imported: 'syncResolve',
+            source: './asyncResolveFallback',
+          },
+        ]);
+      } else {
+        // If all re-exports were transpiled to CommonJS (babel)
+        expect(reexports).toHaveLength(0);
+        expect(exports).toMatchObject([
+          {
+            exported: '*',
+            local: '_collectExportsAndImports[key]',
+          },
+          {
+            exported: 'default',
+            local: '_default',
+          },
+          {
+            exported: 'isUnnecessaryReactCall',
+            local: '_isUnnecessaryReactCall.default',
+          },
+          {
+            exported: 'syncResolve',
+            local: '_asyncResolveFallback.syncResolve',
+          },
+        ]);
+        expect(imports).toMatchObject([
+          {
+            imported: '*',
+            local: '_collectExportsAndImports',
+            source: './collectExportsAndImports',
+          },
+          {
+            imported: 'default',
+            local: '_isUnnecessaryReactCall',
+            source: './isUnnecessaryReactCall',
+          },
+          {
+            imported: 'syncResolve',
+            local: '_asyncResolveFallback.syncResolve',
+            source: './asyncResolveFallback',
           },
         ]);
       }
