@@ -105,6 +105,10 @@ interface IProps {
   [props: string]: unknown;
 }
 
+// Components with props are not allowed
+function styled(
+  componentWithStyle: () => any
+): (error: 'The target component should have a className prop') => void;
 // Property-based interpolation is allowed only if `style` property exists
 function styled<
   TProps extends Has<TMustHave, { style?: React.CSSProperties }>,

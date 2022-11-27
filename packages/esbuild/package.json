@@ -4,7 +4,7 @@
   "version": "4.2.2",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
-    "@babel/core": "^7.18.9",
+    "@babel/core": "^7.20.2",
     "@linaria/babel-preset": "workspace:^",
     "@linaria/utils": "workspace:^",
     "esbuild": "^0.12.5"

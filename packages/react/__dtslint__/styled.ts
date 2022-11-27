@@ -27,6 +27,17 @@ const StyledDiv = styled.div``;
 // $ExpectType "extends"
 isExtends<typeof StyledDiv, React.FC<React.DetailedHTMLProps<any, any>>>();
 
+const A = (): React.ReactElement => React.createElement('div', null);
+// $ExpectError
+styled(A)``;
+
+// foo is not a valid property of div
+// $ExpectError
+React.createElement(StyledDiv, { foo: 'foo' });
+
+const ReStyledDiv = styled(StyledDiv)<{ foo: string }>``;
+React.createElement(ReStyledDiv, { foo: 'foo' });
+
 // component should have className property
 // $ExpectError
 styled(Fabric<{ a: string }>())``;
