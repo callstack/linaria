@@ -2,7 +2,7 @@
   "extends": ["../../.eslintrc.js"],
   "overrides": [
     {
-      "files": ["__tests__/**/*.tsx", "__tests__/**/*.ts"],
+      "files": ["__dtslint__/**/*.tsx", "__dtslint__/**/*.ts"],
       "plugins": ["expect-type"],
       "extends": [
         "plugin:eslint-plugin-expect-type/recommended"

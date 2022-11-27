@@ -65,3 +65,25 @@ declare function isEqual<Source, Target>(): [Source, Target] extends [
     }
   `;
 }
+
+((/* Issue #872 */) => {
+  interface BaseProps {
+    readonly class?: string;
+    readonly style?: JSX.CSSProperties;
+  }
+
+  interface ResultProps extends BaseProps {
+    title: string;
+  }
+
+  const Flow = <TProps extends BaseProps>(Cmp: Component<TProps>) =>
+    styled(Cmp)`
+      display: flow;
+    `;
+
+  const Component: Component<ResultProps> = (props) => <div {...props}></div>;
+
+  const Implementation = Flow(Component);
+
+  (() => <Implementation title={'title'} />)();
+})();

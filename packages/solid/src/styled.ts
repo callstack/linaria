@@ -22,13 +22,14 @@ export interface StyledTag<Props> {
     ...expressions: readonly TagExpression<Props & AdditionalProps>[]
   ): StyledComponent<Props & AdditionalProps>;
 }
-
 export interface Styled {
-  <Props>(component: Component<Props>): StyledTag<Props>;
-  <TagName extends keyof JSX.IntrinsicElements>(tagName: TagName): StyledTag<
-    JSX.IntrinsicElements[TagName]
-  >;
-  (component: 'The target component must have a className prop'): never;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (componentWithStyle: () => any): (
+    error: 'The target component should have a class prop'
+  ) => void;
+  <Props extends { readonly class?: string }>(
+    component: Component<Props>
+  ): StyledTag<Props>;
 }
 
 type StyledJSXIntrinsics = {
