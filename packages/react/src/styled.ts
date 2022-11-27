@@ -225,7 +225,7 @@ type StyledComponent<T> = StyledMeta &
 type StaticPlaceholder = string | number | CSSProperties | StyledMeta;
 
 type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
-  TAdditionalProps = Record<string, unknown>
+  TAdditionalProps = Record<never, unknown>
 >(
   strings: TemplateStringsArray,
   ...exprs: Array<
