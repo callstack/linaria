@@ -8,7 +8,9 @@ type TagExpression<Props> =
   | number
   | CSSProperties
   | StyledMeta
-  | ((props: Props) => string | number | undefined);
+  | (Props extends { readonly style?: JSX.CSSProperties | string }
+      ? (props: Props) => string | number | undefined
+      : (props: 'The target component must have a style prop') => unknown);
 
 export interface StyledComponent<Props> extends StyledMeta, Component<Props> {}
 
@@ -23,9 +25,8 @@ export interface StyledTag<Props> {
   ): StyledComponent<Props & AdditionalProps>;
 }
 export interface Styled {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (componentWithStyle: () => any): (
-    error: 'The target component should have a class prop'
+  (componentWithStyle: () => unknown): (
+    error: 'The target component must have a class prop'
   ) => void;
   <Props extends { readonly class?: string }>(
     component: Component<Props>
