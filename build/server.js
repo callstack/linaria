@@ -1,52 +1,32 @@
 "use strict";
 
 require("ignore-styles");
-
 var _fs = _interopRequireDefault(require("fs"));
-
 var _path = _interopRequireDefault(require("path"));
-
 var _crypto = _interopRequireDefault(require("crypto"));
-
 var _server = require("@linaria/server");
-
 var _koa = _interopRequireDefault(require("koa"));
-
 var _koaRouter = _interopRequireDefault(require("koa-router"));
-
 var _koaCompress = _interopRequireDefault(require("koa-compress"));
-
 var _koaSend = _interopRequireDefault(require("koa-send"));
-
 var _dedent = _interopRequireDefault(require("dedent"));
-
 var _react = _interopRequireDefault(require("react"));
-
 var _server2 = _interopRequireDefault(require("react-dom/server"));
-
 var _serve = _interopRequireDefault(require("../serve.config"));
-
 var _App = _interopRequireDefault(require("./components/App"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const cache = {};
-
 const css = _fs.default.readFileSync(_path.default.join(__dirname, '../dist/styles.css'), 'utf8');
-
 const app = new _koa.default();
 const router = new _koaRouter.default();
 app.use((0, _koaCompress.default)());
 router.get('/', async ctx => {
   const html = _server2.default.renderToStaticMarkup( /*#__PURE__*/_react.default.createElement(_App.default, null));
-
   const {
     critical,
     other
   } = (0, _server.collect)(html, css);
-
   const slug = _crypto.default.createHash('md5').update(other).digest('hex');
-
   cache[slug] = other;
   ctx.type = 'html';
   ctx.body = (0, _dedent.default)`
@@ -80,6 +60,7 @@ router.get('/styles/:slug', async ctx => {
   ctx.body = cache[ctx.params.slug];
 });
 app.use(router.routes());
-app.listen(_serve.default.port); // eslint-disable-next-line no-console
+app.listen(_serve.default.port);
 
+// eslint-disable-next-line no-console
 console.log(`Listening on http://localhost:${_serve.default.port}`);
