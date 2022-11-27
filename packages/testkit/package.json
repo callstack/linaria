@@ -12,6 +12,7 @@
     "@linaria/react": "workspace:^",
     "@linaria/shaker": "workspace:^",
     "@linaria/tags": "workspace:^",
+    "@swc/core": "^1.3.20",
     "dedent": "^0.7.0",
     "strip-ansi": "^5.2.0",
     "typescript": "^4.7.4"

@@ -3,10 +3,17 @@
 
 import type { NodePath } from '@babel/traverse';
 import type {
+  AssignmentExpression,
+  BlockStatement,
   CallExpression,
+  ExportAllDeclaration,
   ExportDefaultDeclaration,
+  ExportDefaultSpecifier,
   ExportNamedDeclaration,
+  ExportNamespaceSpecifier,
   ExportSpecifier,
+  Expression,
+  Function as FunctionNode,
   Identifier,
   Import,
   ImportDeclaration,
@@ -14,15 +21,10 @@ import type {
   ImportNamespaceSpecifier,
   ImportSpecifier,
   MemberExpression,
+  ObjectExpression,
   ObjectPattern,
   StringLiteral,
   VariableDeclarator,
-  ExportDefaultSpecifier,
-  ExportNamespaceSpecifier,
-  AssignmentExpression,
-  ExportAllDeclaration,
-  ObjectExpression,
-  Expression,
 } from '@babel/types';
 
 import { warn } from '@linaria/logger';
@@ -331,7 +333,10 @@ function getImportTypeByInteropFunction(
     return '*';
   }
 
-  if (name.startsWith('__rest')) {
+  if (
+    name.startsWith('__rest') ||
+    name.startsWith('_objectDestructuringEmpty')
+  ) {
     return '*';
   }
 
@@ -372,7 +377,13 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
       return;
     }
 
-    const { parentPath: variableDeclarator } = container;
+    let { parentPath: variableDeclarator } = container;
+    if (variableDeclarator.isCallExpression()) {
+      if (variableDeclarator.get('callee').isIdentifier({ name: '_extends' })) {
+        variableDeclarator = variableDeclarator.parentPath!;
+      }
+    }
+
     if (!variableDeclarator.isVariableDeclarator()) {
       // TODO: Where else it can be?
       warn(
@@ -499,6 +510,29 @@ function isChainOfVoidAssignment(
   return false;
 }
 
+function getReturnValue(
+  path: NodePath<FunctionNode>
+): NodePath<Expression> | undefined {
+  if (path.node.params.length !== 0) return undefined;
+
+  const body = path.get('body') as
+    | NodePath<BlockStatement>
+    | NodePath<Expression>;
+  if (body.isExpression()) {
+    return body;
+  }
+
+  if (body.node.body.length === 1) {
+    const returnStatement = body.get('body')?.[0];
+    if (!returnStatement.isReturnStatement()) return undefined;
+    const argument = returnStatement.get('argument');
+    if (!argument.isExpression()) return undefined;
+    return argument;
+  }
+
+  return undefined;
+}
+
 function getGetterValueFromDescriptor(
   descriptor: NodePath<ObjectExpression>
 ): NodePath<Expression> | undefined {
@@ -507,14 +541,9 @@ function getGetterValueFromDescriptor(
     .filter(isTypedNode('ObjectProperty'))
     .find((p) => p.get('key').isIdentifier({ name: 'get' }));
   const value = getter?.get('value');
-  if (value?.isFunctionExpression()) {
-    const returnStatement = value.get('body').get('body')[0];
-    if (returnStatement?.isReturnStatement()) {
-      const local = returnStatement.get('argument');
-      if (local.isExpression()) {
-        return local;
-      }
-    }
+
+  if (value?.isFunctionExpression() || value?.isArrowFunctionExpression()) {
+    return getReturnValue(value);
   }
 
   return undefined;
@@ -868,18 +897,10 @@ function collectFromAssignmentExpression(
   path.skip();
 }
 
-function collectFromCallExpression(
+function collectFromExportStarCall(
   path: NodePath<CallExpression>,
   state: IState
 ) {
-  const maybeExportStart = path.get('callee');
-  if (
-    !maybeExportStart.isIdentifier() ||
-    !maybeExportStart.node.name.startsWith('__exportStar')
-  ) {
-    return;
-  }
-
   const [requireCall, exports] = path.get('arguments');
   if (!isExports(exports)) return;
   if (!requireCall.isCallExpression()) return;
@@ -898,6 +919,62 @@ function collectFromCallExpression(
   });
 
   path.skip();
+}
+
+function collectFromExportCall(path: NodePath<CallExpression>, state: IState) {
+  const [exports, map] = path.get('arguments');
+  if (!isExports(exports)) return;
+  if (!map.isObjectExpression()) return;
+
+  const properties = map.get('properties');
+  properties.forEach((property) => {
+    if (!property.isObjectProperty()) return;
+    const key = property.get('key');
+    const value = property.get('value');
+    if (!key.isIdentifier()) return;
+    const exported = key.node.name;
+
+    if (!value.isFunction()) return;
+    if (value.node.params.length !== 0) return;
+
+    const returnValue = getReturnValue(value);
+    if (!returnValue) return;
+
+    state.exports.push({
+      exported,
+      local: returnValue,
+    });
+  });
+
+  path.skip();
+}
+
+function collectFromCallExpression(
+  path: NodePath<CallExpression>,
+  state: IState
+) {
+  const maybeExportStart = path.get('callee');
+  if (!maybeExportStart.isIdentifier()) {
+    return;
+  }
+
+  const { name } = maybeExportStart.node;
+
+  // TypeScript
+  if (name.startsWith('__exportStar')) {
+    collectFromExportStarCall(path, state);
+    return;
+  }
+
+  // swc
+  if (name === '_exportStar') {
+    collectFromExportStarCall(path, state);
+  }
+
+  // swc
+  if (name === '_export') {
+    collectFromExportCall(path, state);
+  }
 }
 
 export default function collectExportsAndImports(
