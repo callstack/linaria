@@ -565,7 +565,7 @@ importers:
 
   packages/solid:
     specifiers:
-      '@babel/types': ^7.18.9
+      '@babel/types': ^7.20.2
       '@linaria/core': workspace:^
       '@linaria/tags': workspace:^
       '@types/node': ^17.0.39
