@@ -1,5 +1,5 @@
 ---
-'@linaria/vite': major
+'@linaria/vite': path
 ---
 
 Add Vite plugin with HMR support.
