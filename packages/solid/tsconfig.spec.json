@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["jest", "node"]
+  },
+  "include": ["__tests__", "__dtslint__"],
+  "exclude": ["types", "esm", "lib", ".turbo", "tmp"]
+}

@@ -2,8 +2,8 @@ module.exports = {
   extends: '../../babel.config',
   overrides: [
     {
-      test: ['__tests__/**/*.tsx'],
-      presets: ['@babel/preset-react'],
+      test: /\/(__tests__)\//,
+      presets: ['solid'],
     },
   ],
 };

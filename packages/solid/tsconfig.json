@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "paths": {},
+    "types": [],
+    "noEmit": true,
+    "composite": false,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js"
+  },
+  "files": [],
+  "include": [],
+  "exclude": [],
+  "references": [
+//    { "path": "../core" },
+    { "path": "./tsconfig.lib.json" },
+    { "path": "./tsconfig.spec.json" }
+  ]
+}

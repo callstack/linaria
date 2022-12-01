@@ -18,7 +18,7 @@ export * from './utils/collectTemplateDependencies';
 export { default as collectTemplateDependencies } from './utils/collectTemplateDependencies';
 export { default as withLinariaMetadata } from './utils/withLinariaMetadata';
 export { default as Module } from './module';
-export { default as transform } from './transform';
+export { default as transform, transformSync } from './transform';
 export * from './types';
 export { default as loadLinariaOptions } from './transform-stages/helpers/loadLinariaOptions';
 export type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';

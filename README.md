@@ -32,6 +32,7 @@ Zero-runtime CSS in JS library.
 - Use **JavaScript for logic**, no CSS preprocessor needed
 - Optionally use any **CSS preprocessor** such as Sass or PostCSS
 - Supports **atomic styles** with `@linaria/atomic`
+- Supports [solidjs](https://solidjs.com/) with `@linaria/sollid`
 
 **[Why use Linaria](/docs/BENEFITS.md)**
 

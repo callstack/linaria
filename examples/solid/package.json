@@ -1,0 +1,26 @@
+{
+  "name": "vite-template-solid",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.20.2",
+    "@linaria/shaker": "workspace:^",
+    "@linaria/vite": "workspace:^",
+    "babel-preset-solid": "^1.6.2",
+    "babel-preset-typescript": "7.0.0-alpha.19",
+    "vite": "3.1.8",
+    "vite-plugin-solid": "^2.4.0"
+  },
+  "dependencies": {
+    "@linaria/core": "workspace:^",
+    "@linaria/solid": "workspace:^",
+    "solid-js": "^1.6.2"
+  }
+}

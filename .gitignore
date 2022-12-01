@@ -68,6 +68,9 @@ esm/
 types/
 dist/
 build/
-tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 .linaria-cache
+
+# IntelliJ IDEA
+.idea

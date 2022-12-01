@@ -1,0 +1,96 @@
+{
+  "name": "@linaria/solid",
+  "description": "Blazing fast zero-runtime CSS in JS library for SolidJS",
+  "version": "4.3.0",
+  "bugs": "https://github.com/callstack/linaria/issues",
+  "contributors": [
+    {
+      "name": "Kirill Agalakov",
+      "email": "raveclassic@gmail.com",
+      "url": "https://github.com/raveclassic"
+    }
+  ],
+  "dependencies": {
+    "@linaria/core": "workspace:^",
+    "@linaria/tags": "workspace:^"
+  },
+  "devDependencies": {
+    "@babel/types": "^7.20.2",
+    "@types/node": "^17.0.39",
+    "solid-js": "^1.6.2"
+  },
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./types/*.d.ts",
+      "import": "./dist/*.mjs",
+      "default": "./dist/*.js"
+    }
+  },
+  "files": [
+    "esm/",
+    "lib/",
+    "processors/",
+    "types/",
+    "linaria.config.js"
+  ],
+  "homepage": "https://github.com/callstack/linaria#readme",
+  "keywords": [
+    "css",
+    "css-in-js",
+    "linaria",
+    "solid",
+    "styled-components"
+  ],
+  "license": "MIT",
+  "linaria": {
+    "tags": {
+      "styled": "./dist/processors/styled.js"
+    }
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "peerDependencies": {
+    "solid-js": "^1.6.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "git@github.com:callstack/linaria.git",
+  "scripts": {
+    "build": "pnpm build:dist && pnpm build:declarations",
+    "build:corejs-test": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore \"src/processors/**/*\"",
+    "build:declarations": "tsc -p tsconfig.lib.json --emitDeclarationOnly --noEmit false --outDir types",
+    "build:dist": "tsup --format cjs,esm",
+    "test": "jest --passWithNoTests --config ../../jest.config.js --rootDir .",
+    "typecheck": "tsc -b tsconfig.spec.json",
+    "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
+  },
+  "sideEffects": false,
+  "tsup": {
+    "entry": [
+      "src/index.ts",
+      "src/processors/styled.ts"
+    ],
+    "splitting": false,
+    "sourcemap": true,
+    "clean": true,
+    "tsconfig": "./tsconfig.lib.json"
+  },
+  "types": "types/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "processors/*": [
+        "./types/processors/*.d.ts"
+      ]
+    }
+  }
+}
