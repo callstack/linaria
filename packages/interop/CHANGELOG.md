@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.1
+
+### Patch Changes
+
+- 5edde648: Upgrade Babel to support TypeScript 4.9. Fixes #1133.
+
 ## 4.0.0
 
 ### Major Changes

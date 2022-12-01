@@ -1,7 +1,7 @@
 {
   "name": "@linaria/cli",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "4.1.8",
+  "version": "4.1.9",
   "bin": {
     "linaria": "bin/linaria.js"
   },

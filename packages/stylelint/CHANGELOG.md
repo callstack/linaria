@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.1.9
+
+### Patch Changes
+
+- e6420897: Update patch version so npm will pick up readme change
+- Updated dependencies [5edde648]
+- Updated dependencies [b9e49b74]
+  - @linaria/babel-preset@4.3.1
+  - @linaria/utils@4.2.5
+
 ## 4.1.8
 
 ### Patch Changes

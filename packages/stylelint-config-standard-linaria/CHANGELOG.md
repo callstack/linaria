@@ -1,5 +1,14 @@
 # @linaria/stylelint-config-standard-linaria
 
+## 4.1.5
+
+### Patch Changes
+
+- e6420897: Update patch version so npm will pick up readme change
+- Updated dependencies [5edde648]
+- Updated dependencies [e6420897]
+  - @linaria/postcss-linaria@4.1.5
+
 ## 4.1.4
 
 ### Patch Changes

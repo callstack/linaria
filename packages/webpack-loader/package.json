@@ -1,7 +1,7 @@
 {
   "name": "@linaria/webpack-loader",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "4.1.8",
+  "version": "4.1.9",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
     "@linaria/webpack4-loader": "workspace:^",

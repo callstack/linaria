@@ -1,5 +1,12 @@
 # @linaria/postcss-linaria
 
+## 4.1.5
+
+### Patch Changes
+
+- 5edde648: Upgrade Babel to support TypeScript 4.9. Fixes #1133.
+- e6420897: Update patch version so npm will pick up readme change
+
 ## 4.1.4
 
 ### Patch Changes
