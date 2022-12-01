@@ -1,5 +1,20 @@
 # Change Log
 
+## 4.3.0
+
+### Minor Changes
+
+- 655c4f2c: Make rollup standalone. The support for Vite in @linaria/rollup is deprecated and will be removed in the next major version.
+
+### Patch Changes
+
+- Updated dependencies [5edde648]
+- Updated dependencies [655c4f2c]
+- Updated dependencies [b9e49b74]
+  - @linaria/babel-preset@4.3.1
+  - @linaria/utils@4.2.5
+  - @linaria/vite@4.2.3
+
 ## 4.2.2
 
 ### Patch Changes

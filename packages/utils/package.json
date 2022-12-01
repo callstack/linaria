@@ -1,7 +1,7 @@
 {
   "name": "@linaria/utils",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "4.2.4",
+  "version": "4.2.5",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
     "@babel/core": "^7.20.2",

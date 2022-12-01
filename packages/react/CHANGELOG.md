@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.3.1
+
+### Patch Changes
+
+- 922f20d6: Do not allow to wrap components without props.
+- 5edde648: Upgrade Babel to support TypeScript 4.9. Fixes #1133.
+- Updated dependencies [5edde648]
+- Updated dependencies [b9e49b74]
+  - @linaria/core@4.2.3
+  - @linaria/tags@4.2.1
+  - @linaria/utils@4.2.5
+
 ## 4.3.0
 
 ### Minor Changes

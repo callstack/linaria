@@ -1,5 +1,18 @@
 # Change Log
 
+## 4.2.3
+
+### Patch Changes
+
+- 5edde648: Upgrade Babel to support TypeScript 4.9. Fixes #1133.
+- Updated dependencies [922f20d6]
+- Updated dependencies [5edde648]
+- Updated dependencies [b9e49b74]
+  - @linaria/react@4.3.1
+  - @linaria/core@4.2.3
+  - @linaria/tags@4.2.1
+  - @linaria/utils@4.2.5
+
 ## 4.2.2
 
 ### Patch Changes

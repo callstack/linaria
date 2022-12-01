@@ -1,6 +1,6 @@
 {
   "name": "@linaria/babel-plugin-interop",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "author": {
     "name": "Anton Evzhakov",
     "email": "anton@evz.name"

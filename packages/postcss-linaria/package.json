@@ -1,7 +1,7 @@
 {
   "name": "@linaria/postcss-linaria",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "4.1.4",
+  "version": "4.1.5",
   "bugs": "https://github.com/callstack/linaria/issues",
   "dependencies": {
     "@babel/generator": "^7.20.4",
