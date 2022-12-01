@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.1.9
+
+### Patch Changes
+
+- 6b8bff49: Switch website to pnpm
+- 5edde648: Upgrade Babel to support TypeScript 4.9. Fixes #1133.
+- Updated dependencies [922f20d6]
+- Updated dependencies [5edde648]
+  - @linaria/react@4.3.1
+  - @linaria/atomic@4.2.3
+  - @linaria/core@4.2.3
+
 ## 4.1.8
 
 ### Patch Changes
