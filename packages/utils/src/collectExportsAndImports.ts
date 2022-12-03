@@ -328,13 +328,15 @@ function getImportTypeByInteropFunction(
 
   if (
     name.startsWith('_interopRequireWildcard') ||
-    name.startsWith('__importStar')
+    name.startsWith('__importStar') ||
+    name.startsWith('__toESM')
   ) {
     return '*';
   }
 
   if (
     name.startsWith('__rest') ||
+    name.startsWith('__objRest') ||
     name.startsWith('_objectDestructuringEmpty')
   ) {
     return '*';
@@ -921,11 +923,7 @@ function collectFromExportStarCall(
   path.skip();
 }
 
-function collectFromExportCall(path: NodePath<CallExpression>, state: IState) {
-  const [exports, map] = path.get('arguments');
-  if (!isExports(exports)) return;
-  if (!map.isObjectExpression()) return;
-
+function collectFromMap(map: NodePath<ObjectExpression>, state: IState) {
   const properties = map.get('properties');
   properties.forEach((property) => {
     if (!property.isObjectProperty()) return;
@@ -945,6 +943,54 @@ function collectFromExportCall(path: NodePath<CallExpression>, state: IState) {
       local: returnValue,
     });
   });
+}
+
+function collectFromEsbuildExportCall(
+  path: NodePath<CallExpression>,
+  state: IState
+) {
+  const [sourceExports, map] = path.get('arguments');
+  if (!sourceExports.isIdentifier({ name: 'source_exports' })) return;
+  if (!map.isObjectExpression()) return;
+
+  collectFromMap(map, state);
+
+  path.skip();
+}
+
+function collectFromEsbuildReExportCall(
+  path: NodePath<CallExpression>,
+  state: IState
+) {
+  const [sourceExports, requireCall, exports] = path.get('arguments');
+  if (!sourceExports.isIdentifier({ name: 'source_exports' })) return;
+  if (!requireCall.isCallExpression()) return;
+  if (!isExports(exports)) return;
+
+  const callee = requireCall.get('callee');
+  if (!isRequire(callee)) return;
+  const sourcePath = requireCall.get('arguments')?.[0];
+  if (!sourcePath.isStringLiteral()) return;
+
+  state.reexports.push({
+    exported: '*',
+    imported: '*',
+    local: path,
+    source: sourcePath.node.value,
+  });
+
+  path.skip();
+}
+
+function collectFromSwcExportCall(
+  path: NodePath<CallExpression>,
+  state: IState
+) {
+  const [exports, map] = path.get('arguments');
+  if (!isExports(exports)) return;
+  if (!map.isObjectExpression()) return;
+
+  collectFromMap(map, state);
 
   path.skip();
 }
@@ -971,9 +1017,17 @@ function collectFromCallExpression(
     collectFromExportStarCall(path, state);
   }
 
-  // swc
   if (name === '_export') {
-    collectFromExportCall(path, state);
+    collectFromSwcExportCall(path, state);
+  }
+
+  // esbuild
+  if (name === '__export') {
+    collectFromEsbuildExportCall(path, state);
+  }
+
+  if (name === '__reExport') {
+    collectFromEsbuildReExportCall(path, state);
   }
 }
 

@@ -1,6 +1,6 @@
 import type { NodePath } from '@babel/traverse';
 
-import { getScope } from './getScope';
+import { isGlobal } from './isGlobal';
 
 /**
  * Checks that specified Identifier is a global `require`
@@ -11,9 +11,5 @@ export default function isRequire(id: NodePath | null | undefined) {
     return false;
   }
 
-  const scope = getScope(id);
-
-  return (
-    scope.getBinding('require') === undefined && scope.hasGlobal('require')
-  );
+  return isGlobal(id, 'require');
 }
