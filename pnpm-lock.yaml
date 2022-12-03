@@ -334,9 +334,9 @@ importers:
       '@babel/core': 7.20.2
       '@linaria/babel-preset': link:../babel
       '@linaria/utils': link:../utils
-      esbuild: 0.12.29
     devDependencies:
       '@types/node': 17.0.39
+      esbuild: 0.12.29
 
   packages/extractor:
     specifiers: {}
@@ -6915,7 +6915,7 @@ packages:
     resolution: {integrity: sha512-w/XuoBCSwepyiZtIRsKsetiLDUVGPVw1E/R3VTFSecIy8UR7Cq3SOtwKHJMFoVqqVG36aGkzh4e8BvpO1Fdc7g==}
     hasBin: true
     requiresBuild: true
-    dev: false
+    dev: true
 
   /esbuild/0.14.48:
     resolution: {integrity: sha512-w6N1Yn5MtqK2U1/WZTX9ZqUVb8IOLZkZ5AdHkT6x3cHDMVsYWC7WPdiLmx19w3i4Rwzy5LqsEMtVihG3e4rFzA==}
