@@ -1,19 +1,23 @@
 import type { NodePath } from '@babel/traverse';
 
-import { getScope } from './getScope';
+import { isGlobal } from './isGlobal';
 
 /**
- * Checks that specified Identifier is a global `exports`
- * @param id
+ * Checks that specified Identifier is a global `exports` or `module.exports`
+ * @param node
  */
-export default function isExports(id: NodePath | null | undefined) {
-  if (!id?.isIdentifier() || id.node.name !== 'exports') {
-    return false;
+export default function isExports(node: NodePath | null | undefined) {
+  if (node?.isIdentifier({ name: 'exports' })) {
+    return isGlobal(node, 'exports');
   }
 
-  const scope = getScope(id);
+  if (
+    node?.isMemberExpression() &&
+    node.get('object').isIdentifier({ name: 'module' }) &&
+    node.get('property').isIdentifier({ name: 'exports' })
+  ) {
+    return isGlobal(node, 'module');
+  }
 
-  return (
-    scope.getBinding('exports') === undefined && scope.hasGlobal('exports')
-  );
+  return false;
 }

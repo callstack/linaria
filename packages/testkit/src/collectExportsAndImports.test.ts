@@ -6,6 +6,7 @@ import type { NodePath } from '@babel/core';
 import generator from '@babel/generator';
 import { transformSync as swcTransformSync } from '@swc/core';
 import dedent from 'dedent';
+import { transformSync as esbuildTransformSync } from 'esbuild';
 import * as ts from 'typescript';
 
 import type { MissedBabelCoreTypes } from '@linaria/babel-preset';
@@ -41,6 +42,17 @@ const swcCommonJS =
 
     return result.code;
   };
+
+const esbuildCommonJS = (source: string): string => {
+  const result = esbuildTransformSync(source, {
+    format: 'cjs',
+    loader: 'ts',
+    sourcefile: join(__dirname, 'source.ts'),
+    target: 'es2015',
+  });
+
+  return result.code;
+};
 
 function babelCommonJS(source: string): string {
   const result = babel.transformSync(source, {
@@ -82,6 +94,7 @@ function babelNode16(source: string): string {
 const compilers: [name: string, compiler: (code: string) => string][] = [
   ['as is', babelNode16],
   ['babelCommonJS', babelCommonJS],
+  ['esbuildCommonJS', esbuildCommonJS],
   ['swcCommonJSes5', swcCommonJS('es5')],
   ['swcCommonJSes2015', swcCommonJS('es2015')],
   ['typescriptCommonJS', typescriptCommonJS],
@@ -548,7 +561,12 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
         export const { a, ...rest } = obj;
       `;
 
-      expect(exports).toMatchObject([
+      expect(
+        exports.filter((i) => {
+          // Esbuild, why?
+          return i.exported !== '_a';
+        })
+      ).toMatchObject([
         {
           exported: 'a',
         },
