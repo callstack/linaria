@@ -1,0 +1,24 @@
+{
+  "name": "vpssr-linaria-solid-example",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node ./server",
+    "build": "vite build",
+    "preview": "vite build && NODE_ENV=production node ./server"
+  },
+  "author": "mrfoxpro",
+  "license": "ISC",
+  "dependencies": {
+    "@linaria/core": "workspace:^",
+    "@linaria/vite": "workspace:^",
+    "babel-preset-solid": "^1.6.2",
+    "compression": "^1.7.4",
+    "express": "^4.18.2",
+    "sirv": "^2.0.2",
+    "solid-js": "^1.6.2",
+    "vite": "^3.2.4",
+    "vite-plugin-solid": "^2.4.0",
+    "vite-plugin-ssr": "^0.4.54"
+  }
+}
