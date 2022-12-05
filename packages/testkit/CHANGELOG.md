@@ -1,5 +1,16 @@
 # @linaria/testkit
 
+## 4.2.2
+
+### Patch Changes
+
+- 315f0366: Support for code transpiled with esbuild.
+- Updated dependencies [315f0366]
+  - @linaria/babel-preset@4.3.2
+  - @linaria/react@4.3.2
+  - @linaria/shaker@4.2.6
+  - @linaria/tags@4.2.2
+
 ## 4.2.1
 
 ### Patch Changes

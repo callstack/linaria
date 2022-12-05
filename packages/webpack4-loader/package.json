@@ -1,8 +1,36 @@
 {
   "name": "@linaria/webpack4-loader",
+  "version": "4.1.10",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "4.1.9",
+  "keywords": [
+    "babel",
+    "babel-plugin",
+    "css",
+    "css-in-js",
+    "linaria",
+    "react",
+    "styled-components"
+  ],
+  "homepage": "https://github.com/callstack/linaria#readme",
   "bugs": "https://github.com/callstack/linaria/issues",
+  "repository": "git@github.com:callstack/linaria.git",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "types": "types",
+  "files": [
+    "types/",
+    "lib/",
+    "esm/"
+  ],
+  "scripts": {
+    "build": "pnpm build:lib && pnpm build:esm && pnpm build:declarations",
+    "build:declarations": "tsc --emitDeclarationOnly --outDir types",
+    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
+    "typecheck": "tsc --noEmit --composite false",
+    "watch": "pnpm build:lib --watch & pnpm build:esm --watch & --watch & pnpm build:declarations --watch"
+  },
   "dependencies": {
     "@linaria/babel-preset": "workspace:^",
     "@linaria/logger": "workspace:^",
@@ -18,41 +46,13 @@
     "@types/webpack": "^4.41.33",
     "source-map": "^0.7.3"
   },
-  "engines": {
-    "node": "^12.16.0 || >=13.7.0"
-  },
-  "files": [
-    "types/",
-    "lib/",
-    "esm/"
-  ],
-  "homepage": "https://github.com/callstack/linaria#readme",
-  "keywords": [
-    "babel",
-    "babel-plugin",
-    "css",
-    "css-in-js",
-    "linaria",
-    "react",
-    "styled-components"
-  ],
-  "license": "MIT",
-  "main": "lib/index.js",
-  "module": "esm/index.js",
   "peerDependencies": {
     "webpack": ">=4.0.0 <5.0.0"
   },
+  "engines": {
+    "node": "^12.16.0 || >=13.7.0"
+  },
   "publishConfig": {
     "access": "public"
-  },
-  "repository": "git@github.com:callstack/linaria.git",
-  "scripts": {
-    "build": "pnpm build:lib && pnpm build:esm && pnpm build:declarations",
-    "build:declarations": "tsc --emitDeclarationOnly --outDir types",
-    "build:esm": "babel src --out-dir esm --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
-    "build:lib": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --source-maps --delete-dir-on-start",
-    "typecheck": "tsc --noEmit --composite false",
-    "watch": "pnpm build:lib --watch & pnpm build:esm --watch & --watch & pnpm build:declarations --watch"
-  },
-  "types": "types"
+  }
 }

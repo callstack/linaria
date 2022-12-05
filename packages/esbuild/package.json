@@ -1,8 +1,40 @@
 {
   "name": "@linaria/esbuild",
+  "version": "4.2.4",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "4.2.3",
+  "keywords": [
+    "babel",
+    "babel-plugin",
+    "css",
+    "css-in-js",
+    "esbuild",
+    "linaria",
+    "react",
+    "styled-components"
+  ],
+  "homepage": "https://github.com/callstack/linaria#readme",
   "bugs": "https://github.com/callstack/linaria/issues",
+  "repository": "git@github.com:callstack/linaria.git",
+  "license": "MIT",
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.js",
+    "types": "./types/index.d.ts"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "types",
+  "files": [
+    "dist/",
+    "types/"
+  ],
+  "scripts": {
+    "build": "pnpm build:dist && pnpm build:declarations",
+    "build:declarations": "tsc --emitDeclarationOnly --outDir types",
+    "build:dist": "tsup --format cjs,esm",
+    "typecheck": "tsc --noEmit --composite false",
+    "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
+  },
   "dependencies": {
     "@babel/core": "^7.20.2",
     "@linaria/babel-preset": "workspace:^",
@@ -18,39 +50,8 @@
   "engines": {
     "node": "^12.16.0 || >=13.7.0"
   },
-  "exports": {
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.js",
-    "types": "./types/index.d.ts"
-  },
-  "files": [
-    "dist/",
-    "types/"
-  ],
-  "homepage": "https://github.com/callstack/linaria#readme",
-  "keywords": [
-    "babel",
-    "babel-plugin",
-    "css",
-    "css-in-js",
-    "esbuild",
-    "linaria",
-    "react",
-    "styled-components"
-  ],
-  "license": "MIT",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "publishConfig": {
     "access": "public"
-  },
-  "repository": "git@github.com:callstack/linaria.git",
-  "scripts": {
-    "build": "pnpm build:dist && pnpm build:declarations",
-    "build:declarations": "tsc --emitDeclarationOnly --outDir types",
-    "build:dist": "tsup --format cjs,esm",
-    "typecheck": "tsc --noEmit --composite false",
-    "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
   },
   "tsup": {
     "entry": [
@@ -59,6 +60,5 @@
     "splitting": false,
     "sourcemap": true,
     "clean": true
-  },
-  "types": "types"
+  }
 }

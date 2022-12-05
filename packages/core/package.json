@@ -1,8 +1,62 @@
 {
   "name": "@linaria/core",
+  "version": "4.2.4",
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "4.2.3",
+  "keywords": [
+    "css",
+    "css-in-js",
+    "linaria",
+    "react",
+    "styled-components"
+  ],
+  "homepage": "https://github.com/callstack/linaria#readme",
   "bugs": "https://github.com/callstack/linaria/issues",
+  "repository": "git@github.com:callstack/linaria.git",
+  "license": "MIT",
+  "sideEffects": false,
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./types/*.d.ts",
+      "import": "./dist/*.mjs",
+      "default": "./dist/*.js"
+    }
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "types/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "processors/*": [
+        "./types/processors/*.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist/",
+    "processors/",
+    "types/"
+  ],
+  "linaria": {
+    "tags": {
+      "css": "./dist/processors/css.js"
+    }
+  },
+  "scripts": {
+    "build": "pnpm build:dist && pnpm build:declarations",
+    "build:corejs-test": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore \"src/processors/**/*\"",
+    "build:declarations": "tsc --emitDeclarationOnly --outDir types",
+    "build:dist": "tsup --format cjs,esm",
+    "test": "jest --config ../../jest.config.js --rootDir .",
+    "test:dts": "dtslint --localTs ../../node_modules/typescript/lib __dtslint__",
+    "typecheck": "tsc --noEmit --composite false",
+    "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
+  },
   "dependencies": {
     "@linaria/logger": "workspace:^",
     "@linaria/tags": "workspace:^",
@@ -18,55 +72,9 @@
   "engines": {
     "node": "^12.16.0 || >=13.7.0"
   },
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./types/index.d.ts",
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.js"
-    },
-    "./*": {
-      "types": "./types/*.d.ts",
-      "import": "./dist/*.mjs",
-      "default": "./dist/*.js"
-    }
-  },
-  "files": [
-    "dist/",
-    "processors/",
-    "types/"
-  ],
-  "homepage": "https://github.com/callstack/linaria#readme",
-  "keywords": [
-    "css",
-    "css-in-js",
-    "linaria",
-    "react",
-    "styled-components"
-  ],
-  "license": "MIT",
-  "linaria": {
-    "tags": {
-      "css": "./dist/processors/css.js"
-    }
-  },
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "publishConfig": {
     "access": "public"
   },
-  "repository": "git@github.com:callstack/linaria.git",
-  "scripts": {
-    "build": "pnpm build:dist && pnpm build:declarations",
-    "build:corejs-test": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore \"src/processors/**/*\"",
-    "build:declarations": "tsc --emitDeclarationOnly --outDir types",
-    "build:dist": "tsup --format cjs,esm",
-    "test": "jest --config ../../jest.config.js --rootDir .",
-    "test:dts": "dtslint --localTs ../../node_modules/typescript/lib __dtslint__",
-    "typecheck": "tsc --noEmit --composite false",
-    "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
-  },
-  "sideEffects": false,
   "tsup": {
     "entry": [
       "src/index.ts",
@@ -75,13 +83,5 @@
     "splitting": false,
     "sourcemap": true,
     "clean": true
-  },
-  "types": "types/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "processors/*": [
-        "./types/processors/*.d.ts"
-      ]
-    }
   }
 }

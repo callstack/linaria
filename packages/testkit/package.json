@@ -1,8 +1,25 @@
 {
   "name": "@linaria/testkit",
+  "version": "4.2.2",
+  "private": true,
   "description": "Blazing fast zero-runtime CSS in JS library",
-  "version": "4.2.1",
+  "keywords": [
+    "babel",
+    "babel-plugin",
+    "css",
+    "css-in-js",
+    "linaria",
+    "react",
+    "styled-components"
+  ],
+  "homepage": "https://github.com/callstack/linaria#readme",
   "bugs": "https://github.com/callstack/linaria/issues",
+  "repository": "git@github.com:callstack/linaria.git",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest --config ./jest.config.js --rootDir .",
+    "typecheck": "tsc --noEmit --composite false"
+  },
   "dependencies": {
     "@babel/core": "^7.20.2",
     "@babel/generator": "^7.20.4",
@@ -44,24 +61,7 @@
   "engines": {
     "node": "^12.16.0 || >=13.7.0"
   },
-  "homepage": "https://github.com/callstack/linaria#readme",
-  "keywords": [
-    "babel",
-    "babel-plugin",
-    "css",
-    "css-in-js",
-    "linaria",
-    "react",
-    "styled-components"
-  ],
-  "license": "MIT",
-  "private": true,
   "publishConfig": {
     "access": "public"
-  },
-  "repository": "git@github.com:callstack/linaria.git",
-  "scripts": {
-    "test": "jest --config ./jest.config.js --rootDir .",
-    "typecheck": "tsc --noEmit --composite false"
   }
 }
