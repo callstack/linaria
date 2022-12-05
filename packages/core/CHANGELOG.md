@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.2.4
+
+### Patch Changes
+
+- Updated dependencies [315f0366]
+  - @linaria/utils@4.2.6
+  - @linaria/tags@4.2.2
+
 ## 4.2.3
 
 ### Patch Changes

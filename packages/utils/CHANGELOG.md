@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.2.6
+
+### Patch Changes
+
+- 315f0366: Support for code transpiled with esbuild.
+
 ## 4.2.5
 
 ### Patch Changes
