@@ -41,7 +41,6 @@ export default function linaria({
           ? path.dirname(importer)
           : path.join(process.cwd(), path.dirname(importer));
 
-        // @ts-expect-error
         const result = await build.resolve(token, {
           resolveDir: context,
         });

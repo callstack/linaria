@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@types/node": "^17.0.39",
-    "esbuild": "^0.12.5"
+    "esbuild": "^0.15.16"
   },
   "peerDependencies": {
     "esbuild": ">=0.12.0"

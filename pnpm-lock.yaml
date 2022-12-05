@@ -112,13 +112,13 @@ importers:
   examples/esbuild:
     specifiers:
       '@linaria/esbuild': workspace:^
-      esbuild: ^0.14.48
+      esbuild: ^0.15.16
       linaria-website: workspace:^
     dependencies:
       linaria-website: link:../../website
     devDependencies:
       '@linaria/esbuild': link:../../packages/esbuild
-      esbuild: 0.14.48
+      esbuild: 0.15.16
 
   examples/rollup:
     specifiers:
@@ -329,14 +329,14 @@ importers:
       '@linaria/babel-preset': workspace:^
       '@linaria/utils': workspace:^
       '@types/node': ^17.0.39
-      esbuild: ^0.12.5
+      esbuild: ^0.15.16
     dependencies:
       '@babel/core': 7.20.2
       '@linaria/babel-preset': link:../babel
       '@linaria/utils': link:../utils
     devDependencies:
       '@types/node': 17.0.39
-      esbuild: 0.12.29
+      esbuild: 0.15.16
 
   packages/extractor:
     specifiers: {}
@@ -5003,13 +5003,13 @@ packages:
     resolution: {integrity: sha512-uYBjakWipfaO/bXI7E8rq6kpwHRZK5cNYrUv2OzZSI/FvmdMyXJ2tG9dKcjEC5YHmHpUAwsargWIZNWdxb/bnQ==}
     dev: true
 
-  /bundle-require/3.1.0_esbuild@0.15.12:
+  /bundle-require/3.1.0_esbuild@0.15.16:
     resolution: {integrity: sha512-IIXtAO7fKcwPHNPt9kY/WNVJqy7NDy6YqJvv6ENH0TOZoJ+yjpEsn1w40WKZbR2ibfu5g1rfgJTvmFHpm5aOMA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     peerDependencies:
       esbuild: '>=0.13'
     dependencies:
-      esbuild: 0.15.12
+      esbuild: 0.15.16
       load-tsconfig: 0.2.3
     dev: true
 
@@ -6910,12 +6910,6 @@ packages:
     os: [win32]
     requiresBuild: true
     optional: true
-
-  /esbuild/0.12.29:
-    resolution: {integrity: sha512-w/XuoBCSwepyiZtIRsKsetiLDUVGPVw1E/R3VTFSecIy8UR7Cq3SOtwKHJMFoVqqVG36aGkzh4e8BvpO1Fdc7g==}
-    hasBin: true
-    requiresBuild: true
-    dev: true
 
   /esbuild/0.14.48:
     resolution: {integrity: sha512-w6N1Yn5MtqK2U1/WZTX9ZqUVb8IOLZkZ5AdHkT6x3cHDMVsYWC7WPdiLmx19w3i4Rwzy5LqsEMtVihG3e4rFzA==}
@@ -13870,11 +13864,11 @@ packages:
       typescript:
         optional: true
     dependencies:
-      bundle-require: 3.1.0_esbuild@0.15.12
+      bundle-require: 3.1.0_esbuild@0.15.16
       cac: 6.7.14
       chokidar: 3.5.3
       debug: 4.3.4
-      esbuild: 0.15.12
+      esbuild: 0.15.16
       execa: 5.1.1
       globby: 11.1.0
       joycon: 3.1.1
