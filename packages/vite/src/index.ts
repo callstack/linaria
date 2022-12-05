@@ -55,12 +55,17 @@ export default function linaria({
     configureServer(_server) {
       devServer = _server;
     },
-    load(id: string) {
+    load(url: string) {
+      const [id] = url.split('?');
       return cssLookup[id];
     },
     /* eslint-disable-next-line consistent-return */
-    resolveId(importee: string) {
-      if (importee in cssLookup) return importee;
+    resolveId(importeeUrl: string) {
+      const [id, qsRaw] = importeeUrl.split('?');
+      if (id in cssLookup) {
+        if (qsRaw?.length) return importeeUrl;
+        return id;
+      }
     },
     handleHotUpdate(ctx) {
       // it's module, so just transform it
@@ -88,12 +93,14 @@ export default function linaria({
 
       return modules;
     },
-    async transform(code: string, id: string) {
+    async transform(code: string, url: string) {
+      const [id] = url.split('?');
       // Remove from cache if file has changed
       codeCache.delete(id);
 
       // Do not transform ignored and generated files
-      if (id.includes('node_modules') || !filter(id) || id in cssLookup) return;
+      if (url.includes('node_modules') || !filter(url) || id in cssLookup)
+        return;
 
       const log = createCustomDebug('rollup', getFileIdx(id));
 
@@ -169,7 +176,7 @@ export default function linaria({
 
       for (let i = 0, end = dependencies.length; i < end; i++) {
         // eslint-disable-next-line no-await-in-loop
-        const depModule = await this.resolve(dependencies[i], id, {
+        const depModule = await this.resolve(dependencies[i], url, {
           isEntry: false,
         });
         if (depModule) dependencies[i] = depModule.id;
