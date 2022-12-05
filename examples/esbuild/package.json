@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@linaria/esbuild": "workspace:^",
-    "esbuild": "^0.14.48"
+    "esbuild": "^0.15.16"
   },
   "scripts": {
     "build": "node build.js"
