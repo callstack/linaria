@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.2.4
+
+### Patch Changes
+
+- edbf3cf1: esbuild and rollup now are peer dependencies. Fixes #1139.
+- Updated dependencies [315f0366]
+  - @linaria/utils@4.2.6
+  - @linaria/babel-preset@4.3.2
+
 ## 4.2.3
 
 ### Patch Changes
