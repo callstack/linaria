@@ -5067,13 +5067,13 @@ packages:
     resolution: {integrity: sha512-uYBjakWipfaO/bXI7E8rq6kpwHRZK5cNYrUv2OzZSI/FvmdMyXJ2tG9dKcjEC5YHmHpUAwsargWIZNWdxb/bnQ==}
     dev: true
 
-  /bundle-require/3.1.0_esbuild@0.15.12:
+  /bundle-require/3.1.0_esbuild@0.15.16:
     resolution: {integrity: sha512-IIXtAO7fKcwPHNPt9kY/WNVJqy7NDy6YqJvv6ENH0TOZoJ+yjpEsn1w40WKZbR2ibfu5g1rfgJTvmFHpm5aOMA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     peerDependencies:
       esbuild: '>=0.13'
     dependencies:
-      esbuild: 0.15.12
+      esbuild: 0.15.16
       load-tsconfig: 0.2.3
     dev: true
 
@@ -13743,11 +13743,11 @@ packages:
       typescript:
         optional: true
     dependencies:
-      bundle-require: 3.1.0_esbuild@0.15.12
+      bundle-require: 3.1.0_esbuild@0.15.16
       cac: 6.7.14
       chokidar: 3.5.3
       debug: 4.3.4
-      esbuild: 0.15.12
+      esbuild: 0.15.16
       execa: 5.1.1
       globby: 11.1.0
       joycon: 3.1.1
