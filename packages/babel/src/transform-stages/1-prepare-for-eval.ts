@@ -8,8 +8,9 @@ import type { EvalRule, Evaluator } from '@linaria/utils';
 import { buildOptions, getFileIdx, loadBabelOptions } from '@linaria/utils';
 
 import type { Core } from '../babel';
+import type { TransformCacheCollection } from '../cache';
 import type Module from '../module';
-import type { CodeCache, ITransformFileResult, Options } from '../types';
+import type { ITransformFileResult, Options } from '../types';
 import withLinariaMetadata from '../utils/withLinariaMetadata';
 
 import cachedParseSync from './helpers/cachedParseSync';
@@ -179,7 +180,7 @@ function processQueueItem(
     code: string;
     only: string[];
   } | null,
-  codeCache: CodeCache,
+  cache: TransformCacheCollection,
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
 ):
   | {
@@ -191,7 +192,7 @@ function processQueueItem(
   if (!item) {
     return undefined;
   }
-
+  const { codeCache } = cache;
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
 
   const results = new Set<ITransformFileResult>();
@@ -272,14 +273,13 @@ function processQueueItem(
 
 export function prepareForEvalSync(
   babel: Core,
-  resolveCache: Map<string, string>,
-  codeCache: CodeCache,
+  cache: TransformCacheCollection,
   resolve: (what: string, importer: string, stack: string[]) => string,
   resolvedFile: FileInQueue,
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>,
   stack: string[] = []
 ): ITransformFileResult[] | undefined {
-  const processed = processQueueItem(babel, resolvedFile, codeCache, options);
+  const processed = processQueueItem(babel, resolvedFile, cache, options);
   if (!processed) return undefined;
 
   const { imports, name, results } = processed;
@@ -292,7 +292,7 @@ export function prepareForEvalSync(
     try {
       const resolved = resolve(importedFile, name, stack);
       log('stage-1:sync-resolve', `✅ ${importedFile} -> ${resolved}`);
-      resolveCache.set(
+      cache.resolveCache.set(
         `${name} -> ${importedFile}`,
         `${resolved}\0${importsOnly.join(',')}`
       );
@@ -308,10 +308,7 @@ export function prepareForEvalSync(
   });
 
   queue.forEach((item) => {
-    prepareForEvalSync(babel, resolveCache, codeCache, resolve, item, options, [
-      name,
-      ...stack,
-    ]);
+    prepareForEvalSync(babel, cache, resolve, item, options, [name, ...stack]);
   });
 
   return Array.from(results);
@@ -325,8 +322,7 @@ const mutexes = new Map<string, Promise<void>>();
  */
 export default async function prepareForEval(
   babel: Core,
-  resolveCache: Map<string, string>,
-  codeCache: CodeCache,
+  cache: TransformCacheCollection,
   resolve: (
     what: string,
     importer: string,
@@ -342,7 +338,7 @@ export default async function prepareForEval(
     await mutex;
   }
 
-  const processed = processQueueItem(babel, resolvedFile, codeCache, options);
+  const processed = processQueueItem(babel, resolvedFile, cache, options);
   if (!processed) return undefined;
 
   const { imports, name, results } = processed;
@@ -361,7 +357,7 @@ export default async function prepareForEval(
 
         log('stage-1:async-resolve', `✅ ${importedFile} -> ${resolved}`);
         const resolveCacheKey = `${name} -> ${importedFile}`;
-        const cached = resolveCache.get(resolveCacheKey);
+        const cached = cache.resolveCache.get(resolveCacheKey);
         const importsOnlySet = new Set(importsOnly);
         if (cached) {
           const [, cachedOnly] = cached.split('\0');
@@ -370,7 +366,7 @@ export default async function prepareForEval(
           });
         }
 
-        resolveCache.set(
+        cache.resolveCache.set(
           resolveCacheKey,
           `${resolved}\0${[...importsOnlySet].join(',')}`
         );
@@ -392,15 +388,7 @@ export default async function prepareForEval(
     );
 
     promises.push(
-      prepareForEval(
-        babel,
-        resolveCache,
-        codeCache,
-        resolve,
-        promise,
-        options,
-        [name, ...stack]
-      )
+      prepareForEval(babel, cache, resolve, promise, options, [name, ...stack])
     );
   });
 

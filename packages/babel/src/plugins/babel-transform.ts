@@ -6,10 +6,10 @@ import type { StrictOptions } from '@linaria/utils';
 import { removeWithRelated, syncResolve } from '@linaria/utils';
 
 import type { Core } from '../babel';
-import type Module from '../module';
+import { TransformCacheCollection } from '../cache';
 import { prepareForEvalSync } from '../transform-stages/1-prepare-for-eval';
 import evalStage from '../transform-stages/2-eval';
-import type { CodeCache, IPluginState } from '../types';
+import type { IPluginState } from '../types';
 import processTemplateExpression from '../utils/processTemplateExpression';
 import withLinariaMetadata from '../utils/withLinariaMetadata';
 
@@ -17,9 +17,7 @@ export default function collector(
   babel: Core,
   options: StrictOptions
 ): PluginObj<IPluginState> {
-  const codeCache: CodeCache = new Map();
-  const resolveCache = new Map<string, string>();
-  const evalCache = new Map<string, Module>();
+  const cache = new TransformCacheCollection();
 
   return {
     name: '@linaria/babel/babel-transform',
@@ -34,8 +32,7 @@ export default function collector(
 
       const prepareStageResults = prepareForEvalSync(
         babel,
-        resolveCache,
-        codeCache,
+        cache,
         syncResolve,
         entryPoint,
         {
@@ -52,9 +49,7 @@ export default function collector(
       }
 
       const evalStageResult = evalStage(
-        resolveCache,
-        codeCache,
-        evalCache,
+        cache,
         prepareStageResults.map((r) => r.code),
         {
           filename: file.opts.filename!,

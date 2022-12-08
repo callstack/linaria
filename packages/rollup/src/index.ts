@@ -7,13 +7,15 @@
 import { createFilter } from '@rollup/pluginutils';
 import type { Plugin } from 'rollup';
 
-import { transform, slugify } from '@linaria/babel-preset';
+import {
+  transform,
+  slugify,
+  TransformCacheCollection,
+} from '@linaria/babel-preset';
 import type {
   PluginOptions,
   Preprocessor,
   Result,
-  CodeCache,
-  Module,
 } from '@linaria/babel-preset';
 import { createCustomDebug } from '@linaria/logger';
 import { getFileIdx } from '@linaria/utils';
@@ -36,9 +38,7 @@ export default function linaria({
 }: RollupPluginOptions = {}): Plugin {
   const filter = createFilter(include, exclude);
   const cssLookup: { [key: string]: string } = {};
-  const codeCache: CodeCache = new Map();
-  const resolveCache = new Map<string, string>();
-  const evalCache = new Map<string, Module>();
+  const cache = new TransformCacheCollection();
 
   const plugin: Plugin = {
     name: 'linaria',
@@ -89,9 +89,7 @@ export default function linaria({
         },
         asyncResolve,
         {},
-        resolveCache,
-        codeCache,
-        evalCache
+        cache
       );
 
       if (!result.cssText) return;

@@ -10,13 +10,12 @@ import { createFilter } from '@rollup/pluginutils';
 import type { FilterPattern } from '@rollup/pluginutils';
 import type { ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 
-import { transform, slugify } from '@linaria/babel-preset';
-import type {
-  PluginOptions,
-  Preprocessor,
-  CodeCache,
-  Module,
+import {
+  transform,
+  slugify,
+  TransformCacheCollection,
 } from '@linaria/babel-preset';
+import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
 import { createCustomDebug } from '@linaria/logger';
 import { getFileIdx } from '@linaria/utils';
 
@@ -43,10 +42,8 @@ export default function linaria({
 
   // <dependency id, targets>
   const targets: { id: string; dependencies: string[] }[] = [];
-  const codeCache: CodeCache = new Map();
-  const resolveCache = new Map<string, string>();
-  const evalCache = new Map<string, Module>();
-
+  const cache = new TransformCacheCollection();
+  const { codeCache, resolveCache, evalCache } = cache;
   return {
     name: 'linaria',
     configResolved(resolvedConfig: ResolvedConfig) {
@@ -140,9 +137,7 @@ export default function linaria({
         },
         asyncResolve,
         {},
-        resolveCache,
-        codeCache,
-        evalCache
+        cache
       );
 
       let { cssText, dependencies } = result;
