@@ -22,6 +22,7 @@ type EsbuildPluginOptions = {
 const nodeModulesRegex = /^(?:.*[\\/])?node_modules(?:[\\/].*)?$/;
 
 export default function linaria({
+  filter = /\.(js|jsx|ts|tsx)$/,
   sourceMap,
   preprocessor,
   esbuildOptions,
@@ -67,7 +68,7 @@ export default function linaria({
         };
       });
 
-      build.onLoad({ filter: /\.(js|jsx|ts|tsx)$/ }, async (args) => {
+      build.onLoad({ filter }, async (args) => {
         const rawCode = fs.readFileSync(args.path, 'utf8');
         const { ext, name: filename } = path.parse(args.path);
         const loader = ext.replace(/^\./, '') as Loader;
