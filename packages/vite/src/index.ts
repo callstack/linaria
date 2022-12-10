@@ -49,6 +49,7 @@ export default function linaria({
 
   return {
     name: 'linaria',
+    enforce: 'post',
     configResolved(resolvedConfig: ResolvedConfig) {
       config = resolvedConfig;
     },
