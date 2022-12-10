@@ -12,7 +12,7 @@ import normalize from 'normalize-path';
 import yargs from 'yargs';
 
 import { TransformCacheCollection, transform } from '@linaria/babel-preset';
-import { asyncResolveFallback } from '@linaria/utils';
+import { asyncAcquire } from '@linaria/utils';
 
 const modulesOptions = [
   'commonjs',
@@ -174,7 +174,7 @@ async function processFiles(files: (number | string)[], options: Options) {
         },
         root: options.sourceRoot,
       },
-      asyncResolveFallback,
+      asyncAcquire,
       {},
       cache,
       onEvent

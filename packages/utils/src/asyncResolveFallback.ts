@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 
 const safeResolve = (name: string, where: string[]): string | Error => {
   try {

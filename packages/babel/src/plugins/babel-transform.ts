@@ -3,13 +3,14 @@ import type { NodePath } from '@babel/traverse';
 
 import { debug } from '@linaria/logger';
 import type { StrictOptions } from '@linaria/utils';
-import { removeWithRelated, syncResolve } from '@linaria/utils';
+import { removeWithRelated, syncAcquire } from '@linaria/utils';
 
 import type { Core } from '../babel';
 import { TransformCacheCollection } from '../cache';
 import { prepareForEvalSync } from '../transform-stages/1-prepare-for-eval';
 import evalStage from '../transform-stages/2-eval';
 import type { IPluginState } from '../types';
+import { createEntryPoint } from '../utils/createEntryPoint';
 import processTemplateExpression from '../utils/processTemplateExpression';
 import withLinariaMetadata from '../utils/withLinariaMetadata';
 
@@ -24,16 +25,12 @@ export default function collector(
     pre(file: BabelFile) {
       debug('babel-transform:start', file.opts.filename);
 
-      const entryPoint = {
-        name: file.opts.filename!,
-        code: file.code,
-        only: ['__linariaPreval'],
-      };
+      const entryPoint = createEntryPoint(file.opts.filename!, file.code);
 
       const prepareStageResults = prepareForEvalSync(
         babel,
         cache,
-        syncResolve,
+        syncAcquire,
         entryPoint,
         {
           root: file.opts.root ?? undefined,

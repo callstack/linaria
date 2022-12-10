@@ -96,3 +96,8 @@ export type MissedBabelCoreTypes = {
     file: { code: string; ast: File }
   ) => { path: NodePath<File> };
 };
+
+export type ExternalAcquireResult = {
+  id: string;
+  code: string;
+};

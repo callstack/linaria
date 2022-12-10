@@ -9,7 +9,7 @@ import path from 'path';
 import loaderUtils from 'loader-utils';
 import type { RawSourceMap } from 'source-map';
 
-import type { Result } from '@linaria/babel-preset';
+import type { ExternalAcquireResult, Result } from '@linaria/babel-preset';
 import { transform } from '@linaria/babel-preset';
 import { debug } from '@linaria/logger';
 
@@ -49,17 +49,23 @@ export default function webpack4Loader(
 
   const outputFileName = this.resourcePath.replace(/\.[^.]+$/, extension);
 
-  const asyncResolve = (token: string, importer: string): Promise<string> => {
+  const acquire = (
+    token: string,
+    importer: string
+  ): Promise<ExternalAcquireResult> => {
     const context = path.isAbsolute(importer)
       ? path.dirname(importer)
       : path.join(process.cwd(), path.dirname(importer));
     return new Promise((resolve, reject) => {
-      this.resolve(context, token, (err, result) => {
-        if (err) {
-          reject(err);
-        } else if (result) {
-          this.addDependency(result);
-          resolve(result);
+      this.resolve(context, token, (resolveError, id) => {
+        if (resolveError) {
+          reject(resolveError);
+        } else if (id) {
+          this.addDependency(id);
+          this.loadModule(id, (loadErr, code) => {
+            if (loadErr) reject(loadErr);
+            resolve({ id, code });
+          });
         } else {
           reject(new Error(`Cannot resolve ${token}`));
         }
@@ -75,7 +81,7 @@ export default function webpack4Loader(
       pluginOptions: rest,
       preprocessor,
     },
-    asyncResolve
+    acquire
   ).then(
     async (result: Result) => {
       if (result.cssText) {
@@ -88,9 +94,8 @@ export default function webpack4Loader(
         }
 
         await Promise.all(
-          result.dependencies?.map((dep) =>
-            asyncResolve(dep, this.resourcePath)
-          ) ?? []
+          result.dependencies?.map((dep) => acquire(dep, this.resourcePath)) ??
+            []
         );
 
         try {

@@ -131,7 +131,7 @@ class Module {
   constructor(
     filename: string,
     options: StrictOptions,
-    cache = new TransformCacheCollection(),
+    { codeCache, evalCache, resolveCache } = new TransformCacheCollection(),
     private debuggerDepth = 0,
     private parentModule?: Module
   ) {
@@ -145,9 +145,9 @@ class Module {
     this.transform = null;
     this.debug = createCustomDebug('module', this.idx);
 
-    this.resolveCache = cache.resolveCache;
-    this.codeCache = cache.codeCache;
-    this.evalCache = cache.evalCache;
+    this.resolveCache = resolveCache;
+    this.codeCache = codeCache;
+    this.evalCache = evalCache;
 
     Object.defineProperties(this, {
       id: {

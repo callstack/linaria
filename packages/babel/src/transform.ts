@@ -17,7 +17,13 @@ import prepareForEval, {
 import evalStage from './transform-stages/2-eval';
 import prepareForRuntime from './transform-stages/3-prepare-for-runtime';
 import extractStage from './transform-stages/4-extract';
-import type { Options, Result, ITransformFileResult } from './types';
+import type {
+  Options,
+  Result,
+  ITransformFileResult,
+  ExternalAcquireResult,
+} from './types';
+import { createEntryPoint } from './utils/createEntryPoint';
 import withLinariaMetadata from './utils/withLinariaMetadata';
 
 function syncStages(
@@ -110,7 +116,11 @@ function syncStages(
 export function transformSync(
   originalCode: string,
   options: Options,
-  syncResolve: (what: string, importer: string, stack: string[]) => string,
+  acquire: (
+    what: string,
+    importer: string,
+    stack: string[]
+  ) => ExternalAcquireResult,
   babelConfig: TransformOptions = {},
   cache = new TransformCacheCollection(),
   eventEmitter?: (ev: unknown) => void
@@ -120,16 +130,12 @@ export function transformSync(
 
   eventEmitter?.({ type: 'transform:stage-1:start', filename });
 
-  const entryPoint = {
-    name: options.filename,
-    code: originalCode,
-    only: ['__linariaPreval'],
-  };
+  const entryPoint = createEntryPoint(filename, originalCode);
 
   const prepareStageResults = prepareForEvalSync(
     babel,
     cache,
-    syncResolve,
+    acquire,
     entryPoint,
     options
   );
@@ -151,11 +157,11 @@ export function transformSync(
 export default async function transform(
   originalCode: string,
   options: Options,
-  asyncResolve: (
+  aqcuire: (
     what: string,
     importer: string,
     stack: string[]
-  ) => Promise<string | null>,
+  ) => Promise<ExternalAcquireResult | null>,
   babelConfig: TransformOptions = {},
   cache = new TransformCacheCollection(),
   eventEmitter?: (ev: unknown) => void
@@ -166,16 +172,12 @@ export default async function transform(
 
   eventEmitter?.({ type: 'transform:stage-1:start', filename });
 
-  const entryPoint = Promise.resolve({
-    name: filename,
-    code: originalCode,
-    only: ['__linariaPreval'],
-  });
+  const entryPoint = Promise.resolve(createEntryPoint(filename, originalCode));
 
   const prepareStageResults = await prepareForEval(
     babel,
     cache,
-    asyncResolve,
+    aqcuire,
     entryPoint,
     options
   );

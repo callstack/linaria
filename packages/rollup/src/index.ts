@@ -16,6 +16,7 @@ import type {
   PluginOptions,
   Preprocessor,
   Result,
+  ExternalAcquireResult,
 } from '@linaria/babel-preset';
 import { createCustomDebug } from '@linaria/logger';
 import { getFileIdx } from '@linaria/utils';
@@ -60,20 +61,25 @@ export default function linaria({
 
       log('rollup-init', id);
 
-      const asyncResolve = async (what: string, importer: string) => {
+      const acquire = async (
+        what: string,
+        importer: string
+      ): Promise<ExternalAcquireResult | null> => {
         const resolved = await this.resolve(what, importer);
         if (resolved) {
           log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
           // Vite adds param like `?v=667939b3` to cached modules
-          const resolvedId = resolved.id.split('?')[0];
+          const [acquiredId] = resolved.id.split('?');
 
-          if (resolvedId.startsWith('\0')) {
+          if (acquiredId.startsWith('\0')) {
             // \0 is a special character in Rollup that tells Rollup to not include this in the bundle
             // https://rollupjs.org/guide/en/#outputexports
             return null;
           }
 
-          return resolvedId;
+          const module = await this.load({ id: acquiredId });
+          if (module?.code == null) return null;
+          return { id: acquiredId, code: module.code };
         }
 
         log('resolve', "❌ '%s'@'%s", what, importer);
@@ -87,7 +93,7 @@ export default function linaria({
           preprocessor,
           pluginOptions: rest,
         },
-        asyncResolve,
+        acquire,
         {},
         cache
       );

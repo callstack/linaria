@@ -43,9 +43,10 @@ export default function linaria({
   // <dependency id, targets>
   const targets: { id: string; dependencies: string[] }[] = [];
   const cache = new TransformCacheCollection();
-  const { codeCache, resolveCache, evalCache } = cache;
+  const { codeCache, evalCache } = cache;
   return {
     name: 'linaria',
+    enforce: 'post',
     configResolved(resolvedConfig: ResolvedConfig) {
       config = resolvedConfig;
     },
@@ -103,31 +104,36 @@ export default function linaria({
 
       log('rollup-init', id);
 
-      const asyncResolve = async (what: string, importer: string) => {
+      const acquire = async (what: string, importer: string) => {
         const resolved = await this.resolve(what, importer);
         if (resolved) {
           log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
           // Vite adds param like `?v=667939b3` to cached modules
-          const resolvedId = resolved.id.split('?')[0];
+          const [acquiredId] = resolved.id.split('?');
 
-          if (resolvedId.startsWith('\0')) {
+          if (acquiredId.startsWith('\0')) {
             // \0 is a special character in Rollup that tells Rollup to not include this in the bundle
             // https://rollupjs.org/guide/en/#outputexports
             return null;
           }
 
-          return resolvedId;
+          if (devServer) {
+            const transformResult = await devServer.transformRequest(
+              acquiredId
+            );
+            if (transformResult?.code == null) return null;
+            return { id: acquiredId, code: transformResult.code };
+          }
+
+          const module = await this.load({ id: acquiredId });
+          if (module?.code == null) return null;
+          return { id: acquiredId, code: module.code };
         }
 
         log('resolve', "❌ '%s'@'%s", what, importer);
         throw new Error(`Could not resolve ${what}`);
       };
 
-      // TODO: Vite surely has some already transformed modules, solid
-      // why would we transform it again?
-      // We could provide some thing like `pretransform` and ask Vite to return transformed module
-      // (module.transformResult)
-      // So we don't need to duplicate babel plugins.
       const result = await transform(
         code,
         {
@@ -135,7 +141,7 @@ export default function linaria({
           preprocessor,
           pluginOptions: rest,
         },
-        asyncResolve,
+        acquire,
         {},
         cache
       );
