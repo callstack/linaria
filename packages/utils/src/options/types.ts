@@ -43,5 +43,6 @@ export type StrictOptions = {
   ignore?: RegExp;
   rules: EvalRule[];
   tagResolver?: (source: string, tag: string) => string | null;
+  variableNameConfig?: 'var' | 'dashes' | 'raw';
   variableNameSlug?: string | VariableNameFn;
 };
