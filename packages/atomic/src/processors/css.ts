@@ -10,7 +10,7 @@ export default class AtomicCssProcessor extends CssProcessor {
   #classes: string | undefined;
 
   private get classes(): string {
-    if (this.#classes) {
+    if (typeof this.#classes !== 'undefined') {
       return this.#classes;
     }
 
