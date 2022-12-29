@@ -10,24 +10,28 @@
 import type { TransformOptions } from '@babel/core';
 import * as babel from '@babel/core';
 
-import type Module from './module';
+import { TransformCacheCollection } from './cache';
 import prepareForEval, {
   prepareForEvalSync,
 } from './transform-stages/1-prepare-for-eval';
 import evalStage from './transform-stages/2-eval';
 import prepareForRuntime from './transform-stages/3-prepare-for-runtime';
 import extractStage from './transform-stages/4-extract';
-import type { Options, Result, CodeCache, ITransformFileResult } from './types';
+import type {
+  Options,
+  Result,
+  ITransformFileResult,
+  ExternalAcquireResult,
+} from './types';
+import { createEntryPoint } from './utils/createEntryPoint';
 import withLinariaMetadata from './utils/withLinariaMetadata';
 
 function syncStages(
   originalCode: string,
   options: Options,
   prepareStageResults: ITransformFileResult[] | undefined,
-  babelConfig: TransformOptions = {},
-  resolveCache = new Map<string, string>(),
-  codeCache: CodeCache = new Map(),
-  evalCache = new Map<string, Module>(),
+  babelConfig: TransformOptions,
+  cache: TransformCacheCollection,
   eventEmitter?: (ev: unknown) => void
 ) {
   const { filename } = options;
@@ -48,9 +52,7 @@ function syncStages(
   eventEmitter?.({ type: 'transform:stage-2:start', filename });
 
   const evalStageResult = evalStage(
-    resolveCache,
-    codeCache,
-    evalCache,
+    cache,
     prepareStageResults.map((r) => r.code),
     options
   );
@@ -114,30 +116,26 @@ function syncStages(
 export function transformSync(
   originalCode: string,
   options: Options,
-  syncResolve: (what: string, importer: string, stack: string[]) => string,
+  acquire: (
+    what: string,
+    importer: string,
+    stack: string[]
+  ) => ExternalAcquireResult,
   babelConfig: TransformOptions = {},
-  resolveCache = new Map<string, string>(),
-  codeCache: CodeCache = new Map(),
-  evalCache = new Map<string, Module>(),
+  cache = new TransformCacheCollection(),
   eventEmitter?: (ev: unknown) => void
 ): Result {
   const { filename } = options;
-
   // *** 1st stage ***
 
   eventEmitter?.({ type: 'transform:stage-1:start', filename });
 
-  const entryPoint = {
-    name: options.filename,
-    code: originalCode,
-    only: ['__linariaPreval'],
-  };
+  const entryPoint = createEntryPoint(filename, originalCode);
 
   const prepareStageResults = prepareForEvalSync(
     babel,
-    resolveCache,
-    codeCache,
-    syncResolve,
+    cache,
+    acquire,
     entryPoint,
     options
   );
@@ -151,9 +149,7 @@ export function transformSync(
     options,
     prepareStageResults,
     babelConfig,
-    resolveCache,
-    codeCache,
-    evalCache,
+    cache,
     eventEmitter
   );
 }
@@ -161,15 +157,13 @@ export function transformSync(
 export default async function transform(
   originalCode: string,
   options: Options,
-  asyncResolve: (
+  aqcuire: (
     what: string,
     importer: string,
     stack: string[]
-  ) => Promise<string | null>,
+  ) => Promise<ExternalAcquireResult | null>,
   babelConfig: TransformOptions = {},
-  resolveCache = new Map<string, string>(),
-  codeCache: CodeCache = new Map(),
-  evalCache = new Map<string, Module>(),
+  cache = new TransformCacheCollection(),
   eventEmitter?: (ev: unknown) => void
 ): Promise<Result> {
   const { filename } = options;
@@ -178,17 +172,12 @@ export default async function transform(
 
   eventEmitter?.({ type: 'transform:stage-1:start', filename });
 
-  const entryPoint = Promise.resolve({
-    name: filename,
-    code: originalCode,
-    only: ['__linariaPreval'],
-  });
+  const entryPoint = Promise.resolve(createEntryPoint(filename, originalCode));
 
   const prepareStageResults = await prepareForEval(
     babel,
-    resolveCache,
-    codeCache,
-    asyncResolve,
+    cache,
+    aqcuire,
     entryPoint,
     options
   );
@@ -202,9 +191,7 @@ export default async function transform(
     options,
     prepareStageResults,
     babelConfig,
-    resolveCache,
-    codeCache,
-    evalCache,
+    cache,
     eventEmitter
   );
 }

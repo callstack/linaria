@@ -1,4 +1,3 @@
-import { readFileSync } from 'fs';
 import { dirname, extname } from 'path';
 
 import type { BabelFileResult, TransformOptions } from '@babel/core';
@@ -8,8 +7,13 @@ import type { EvalRule, Evaluator } from '@linaria/utils';
 import { buildOptions, getFileIdx, loadBabelOptions } from '@linaria/utils';
 
 import type { Core } from '../babel';
+import type { TransformCacheCollection } from '../cache';
 import type Module from '../module';
-import type { CodeCache, ITransformFileResult, Options } from '../types';
+import type {
+  ExternalAcquireResult,
+  ITransformFileResult,
+  Options,
+} from '../types';
 import withLinariaMetadata from '../utils/withLinariaMetadata';
 
 import cachedParseSync from './helpers/cachedParseSync';
@@ -172,26 +176,22 @@ function prepareCode(
   return [...result, preevalStageResult.metadata];
 }
 
+type ProcessQueueItemResult = {
+  imports: Map<string, string[]> | null;
+  name: string;
+  results: ITransformFileResult[];
+};
+
 function processQueueItem(
   babel: Core,
-  item: {
-    name: string;
-    code: string;
-    only: string[];
-  } | null,
-  codeCache: CodeCache,
+  item: FileInQueue | null,
+  cache: TransformCacheCollection,
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
-):
-  | {
-      imports: Map<string, string[]> | null;
-      name: string;
-      results: ITransformFileResult[];
-    }
-  | undefined {
+): ProcessQueueItemResult | undefined {
   if (!item) {
     return undefined;
   }
-
+  const { codeCache } = cache;
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
 
   const results = new Set<ITransformFileResult>();
@@ -272,14 +272,17 @@ function processQueueItem(
 
 export function prepareForEvalSync(
   babel: Core,
-  resolveCache: Map<string, string>,
-  codeCache: CodeCache,
-  resolve: (what: string, importer: string, stack: string[]) => string,
+  cache: TransformCacheCollection,
+  acquire: (
+    what: string,
+    importer: string,
+    stack: string[]
+  ) => ExternalAcquireResult,
   resolvedFile: FileInQueue,
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>,
   stack: string[] = []
 ): ITransformFileResult[] | undefined {
-  const processed = processQueueItem(babel, resolvedFile, codeCache, options);
+  const processed = processQueueItem(babel, resolvedFile, cache, options);
   if (!processed) return undefined;
 
   const { imports, name, results } = processed;
@@ -290,28 +293,24 @@ export function prepareForEvalSync(
 
   imports?.forEach((importsOnly, importedFile) => {
     try {
-      const resolved = resolve(importedFile, name, stack);
-      log('stage-1:sync-resolve', `✅ ${importedFile} -> ${resolved}`);
-      resolveCache.set(
+      const { id, code } = acquire(importedFile, name, stack);
+      log('stage-1:sync-acquire', `✅ ${importedFile} -> ${id}`);
+      cache.resolveCache.set(
         `${name} -> ${importedFile}`,
-        `${resolved}\0${importsOnly.join(',')}`
+        `${id}\0${importsOnly.join(',')}`
       );
-      const fileContent = readFileSync(resolved, 'utf8');
       queue.push({
-        name: resolved,
+        name: id,
         only: importsOnly,
-        code: fileContent,
+        code,
       });
     } catch (err) {
-      log('stage-1:sync-resolve', `❌ cannot resolve ${importedFile}: %O`, err);
+      log('stage-1:sync-acquire', `❌ cannot acquire ${importedFile}: %O`, err);
     }
   });
 
   queue.forEach((item) => {
-    prepareForEvalSync(babel, resolveCache, codeCache, resolve, item, options, [
-      name,
-      ...stack,
-    ]);
+    prepareForEvalSync(babel, cache, acquire, item, options, [name, ...stack]);
   });
 
   return Array.from(results);
@@ -325,13 +324,12 @@ const mutexes = new Map<string, Promise<void>>();
  */
 export default async function prepareForEval(
   babel: Core,
-  resolveCache: Map<string, string>,
-  codeCache: CodeCache,
-  resolve: (
+  cache: TransformCacheCollection,
+  acquire: (
     what: string,
     importer: string,
     stack: string[]
-  ) => Promise<string | null>,
+  ) => Promise<ExternalAcquireResult | null>,
   file: Promise<FileInQueue>,
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>,
   stack: string[] = []
@@ -342,7 +340,7 @@ export default async function prepareForEval(
     await mutex;
   }
 
-  const processed = processQueueItem(babel, resolvedFile, codeCache, options);
+  const processed = processQueueItem(babel, resolvedFile, cache, options);
   if (!processed) return undefined;
 
   const { imports, name, results } = processed;
@@ -352,16 +350,17 @@ export default async function prepareForEval(
   const promises: Promise<ITransformFileResult[] | undefined>[] = [];
 
   imports?.forEach((importsOnly, importedFile) => {
-    const promise = resolve(importedFile, name, stack).then(
+    const promise = acquire(importedFile, name, stack).then(
       (resolved) => {
         if (resolved === null) {
-          log('stage-1:resolve', `✅ ${importedFile} is ignored`);
+          log('stage-1:acquire', `✅ ${importedFile} is ignored`);
           return null;
         }
+        const { code, id } = resolved;
 
-        log('stage-1:async-resolve', `✅ ${importedFile} -> ${resolved}`);
+        log('stage-1:acquire', `✅ ${importedFile} -> ${id}`);
         const resolveCacheKey = `${name} -> ${importedFile}`;
-        const cached = resolveCache.get(resolveCacheKey);
+        const cached = cache.resolveCache.get(resolveCacheKey);
         const importsOnlySet = new Set(importsOnly);
         if (cached) {
           const [, cachedOnly] = cached.split('\0');
@@ -370,37 +369,24 @@ export default async function prepareForEval(
           });
         }
 
-        resolveCache.set(
+        cache.resolveCache.set(
           resolveCacheKey,
-          `${resolved}\0${[...importsOnlySet].join(',')}`
+          `${id}\0${[...importsOnlySet].join(',')}`
         );
-        const fileContent = readFileSync(resolved, 'utf8');
         return {
-          name: resolved,
+          name: id,
           only: importsOnly,
-          code: fileContent,
+          code,
         };
       },
       (err: unknown) => {
-        log(
-          'stage-1:async-resolve',
-          `❌ cannot resolve ${importedFile}: %O`,
-          err
-        );
+        log('stage-1:acquire', `❌ cannot resolve ${importedFile}: %O`, err);
         return null;
       }
     );
 
     promises.push(
-      prepareForEval(
-        babel,
-        resolveCache,
-        codeCache,
-        resolve,
-        promise,
-        options,
-        [name, ...stack]
-      )
+      prepareForEval(babel, cache, acquire, promise, options, [name, ...stack])
     );
   });
 

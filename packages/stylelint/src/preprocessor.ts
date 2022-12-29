@@ -2,7 +2,7 @@ import stripAnsi from 'strip-ansi';
 
 import { transform } from '@linaria/babel-preset';
 import type { Replacement } from '@linaria/babel-preset';
-import { asyncResolveFallback } from '@linaria/utils';
+import { asyncAcquire } from '@linaria/utils';
 
 type Errors = {
   [key: string]:
@@ -63,7 +63,7 @@ function preprocessor() {
           {
             filename,
           },
-          asyncResolveFallback
+          asyncAcquire
         );
 
         cache[filename] = undefined;

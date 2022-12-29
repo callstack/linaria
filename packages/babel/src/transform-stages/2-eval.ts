@@ -2,9 +2,9 @@ import { createCustomDebug } from '@linaria/logger';
 import type { ValueCache } from '@linaria/tags';
 import { getFileIdx } from '@linaria/utils';
 
+import type { TransformCacheCollection } from '../cache';
 import evaluate from '../evaluators';
-import type Module from '../module';
-import type { CodeCache, Options } from '../types';
+import type { Options } from '../types';
 import hasLinariaPreval from '../utils/hasLinariaPreval';
 
 const wrap = <T>(fn: () => T): T | Error => {
@@ -19,9 +19,7 @@ const wrap = <T>(fn: () => T): T | Error => {
  * Evaluates template dependencies.
  */
 export default function evalStage(
-  resolveCache: Map<string, string>,
-  codeCache: CodeCache,
-  evalCache: Map<string, Module>,
+  cache: TransformCacheCollection,
   code: string[],
   options: Pick<Options, 'filename' | 'pluginOptions'>
 ): [ValueCache, string[]] | null {
@@ -29,7 +27,7 @@ export default function evalStage(
 
   log('stage-2', `>> evaluate __linariaPreval`);
 
-  const evaluated = evaluate(resolveCache, codeCache, evalCache, code, options);
+  const evaluated = evaluate(cache, code, options);
 
   const linariaPreval = hasLinariaPreval(evaluated.value)
     ? evaluated.value.__linariaPreval

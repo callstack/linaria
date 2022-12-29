@@ -56,8 +56,6 @@ export interface ITransformFileResult {
   code: string;
 }
 
-export type CodeCache = Map<string, Map<string, ITransformFileResult>>;
-
 export type Stage = 'preeval' | 'collect';
 
 export type Location = {
@@ -97,4 +95,9 @@ export type MissedBabelCoreTypes = {
     options: { filename: string },
     file: { code: string; ast: File }
   ) => { path: NodePath<File> };
+};
+
+export type ExternalAcquireResult = {
+  id: string;
+  code: string;
 };

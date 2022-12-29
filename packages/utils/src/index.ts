@@ -3,6 +3,7 @@ export {
   default as asyncResolveFallback,
   syncResolve,
 } from './asyncResolveFallback';
+export * from './acquireFallback';
 export { default as collectExportsAndImports } from './collectExportsAndImports';
 export * from './collectExportsAndImports';
 export { default as findIdentifiers, nonType } from './findIdentifiers';

@@ -20,9 +20,6 @@ export default defineConfig({
       vite_linaria({
         displayName: true,
         classNameSlug: (hash, title, args) => `${args.dir}_${title}_${hash}`,
-        babelOptions: {
-          presets: ['solid'],
-        },
       }),
       vite_inspect(),
     ],

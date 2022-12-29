@@ -29,6 +29,7 @@ export { default as getVisitorKeys } from './utils/getVisitorKeys';
 export type { VisitorKeys } from './utils/getVisitorKeys';
 export { default as peek } from './utils/peek';
 export { default as processTemplateExpression } from './utils/processTemplateExpression';
+export { TransformCacheCollection } from './cache';
 
 function isEnabled(caller?: TransformCaller & { evaluate?: true }) {
   return caller?.name !== 'linaria' || caller.evaluate === true;
