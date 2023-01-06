@@ -46,6 +46,7 @@ export default function linaria({
   const { codeCache, resolveCache, evalCache } = cache;
   return {
     name: 'linaria',
+    enforce: 'post',
     configResolved(resolvedConfig: ResolvedConfig) {
       config = resolvedConfig;
     },
