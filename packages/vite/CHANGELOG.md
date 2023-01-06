@@ -1,5 +1,16 @@
 # @linaria/vite
 
+## 4.2.5
+
+### Patch Changes
+
+- 7c309666: Add support for Vite 4
+- 017deab7: Vite should replace import aliases so resolve functions in bundlers should be able to correctly resolve imports.
+- Updated dependencies [3ce985e0]
+- Updated dependencies [d11174d0]
+  - @linaria/babel-preset@4.3.3
+  - @linaria/utils@4.3.0
+
 ## 4.2.4
 
 ### Patch Changes

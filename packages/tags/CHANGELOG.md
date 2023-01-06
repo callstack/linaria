@@ -1,5 +1,18 @@
 # @linaria/tags
 
+## 4.3.0
+
+### Minor Changes
+
+- d11174d0: Add option to remove var() wrapper around css variables
+
+### Patch Changes
+
+- 3ce985e0: Update tags processor to insert appropriate import/request for ESM/CommonJS.
+- Updated dependencies [3ce985e0]
+- Updated dependencies [d11174d0]
+  - @linaria/utils@4.3.0
+
 ## 4.2.2
 
 ### Patch Changes

@@ -1,5 +1,20 @@
 # @linaria/testkit
 
+## 4.3.0
+
+### Minor Changes
+
+- d11174d0: Add option to remove var() wrapper around css variables
+
+### Patch Changes
+
+- Updated dependencies [3ce985e0]
+- Updated dependencies [d11174d0]
+  - @linaria/babel-preset@4.3.3
+  - @linaria/tags@4.3.0
+  - @linaria/react@4.3.3
+  - @linaria/shaker@4.2.7
+
 ## 4.2.2
 
 ### Patch Changes
