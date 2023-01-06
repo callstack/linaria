@@ -45,6 +45,7 @@ export interface IImport {
   imported: string | 'default' | '*';
   local: NodePath<Identifier | MemberExpression>;
   source: string;
+  type: 'cjs' | 'dynamic' | 'esm';
 }
 
 export interface IExport {
@@ -97,7 +98,7 @@ const collectors: {
     if (isType(path)) return [];
     const imported = getValue(path.get('imported'));
     const local = path.get('local');
-    return [{ imported, local, source }];
+    return [{ imported, local, source, type: 'esm' }];
   },
 
   ImportDefaultSpecifier(
@@ -105,7 +106,7 @@ const collectors: {
     source
   ): IImport[] {
     const local = path.get('local');
-    return [{ imported: 'default', local, source }];
+    return [{ imported: 'default', local, source, type: 'esm' }];
   },
 
   ImportNamespaceSpecifier(
@@ -113,7 +114,7 @@ const collectors: {
     source
   ): IImport[] {
     const local = path.get('local');
-    return unfoldNamespaceImport({ imported: '*', local, source });
+    return unfoldNamespaceImport({ imported: '*', local, source, type: 'esm' });
   },
 };
 
@@ -305,7 +306,12 @@ function collectFromDynamicImport(path: NodePath<Import>, state: IState): void {
   // Is it `const something = await import("something")`?
   if (key === 'init' && container.isVariableDeclarator()) {
     importFromVariableDeclarator(container, isAwaited).map((prop) =>
-      state.imports.push({ imported: prop.what, local: prop.as, source })
+      state.imports.push({
+        imported: prop.what,
+        local: prop.as,
+        source,
+        type: 'dynamic',
+      })
     );
   }
 }
@@ -411,6 +417,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
         imported,
         local: id,
         source,
+        type: 'cjs',
       });
       state.imports.push(...unfolded);
     } else {
@@ -418,6 +425,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
         imported,
         local: id,
         source,
+        type: 'cjs',
       });
     }
   }
@@ -445,6 +453,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
           imported: getValue(property),
           local: id,
           source,
+          type: 'cjs',
         });
       } else {
         warn(
@@ -460,6 +469,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
         imported: getValue(property),
         local: container,
         source,
+        type: 'cjs',
       });
     }
 
@@ -474,6 +484,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
           imported: '*',
           local: prop.as,
           source,
+          type: 'cjs',
         });
 
         state.imports.push(...unfolded);
@@ -482,6 +493,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
           imported: prop.what,
           local: prop.as,
           source,
+          type: 'cjs',
         });
       }
     });

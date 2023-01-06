@@ -51,7 +51,12 @@ export default abstract class BaseProcessor {
   public constructor(
     params: Params,
     protected readonly astService: typeof t & {
-      addNamedImport: (name: string, source: string) => Identifier;
+      addDefaultImport: (source: string, nameHint?: string) => Identifier;
+      addNamedImport: (
+        name: string,
+        source: string,
+        nameHint?: string
+      ) => Identifier;
     },
     public readonly location: SourceLocation | null,
     protected readonly replacer: (
