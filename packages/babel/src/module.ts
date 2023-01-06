@@ -24,8 +24,9 @@ import type { BaseProcessor } from '@linaria/tags';
 import type { StrictOptions } from '@linaria/utils';
 import { getFileIdx } from '@linaria/utils';
 
+import { TransformCacheCollection } from './cache';
 import * as process from './process';
-import type { CodeCache } from './types';
+import type { ITransformFileResult } from './types';
 
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty
@@ -121,12 +122,16 @@ class Module {
 
   debug: CustomDebug;
 
+  resolveCache: Map<string, string>;
+
+  codeCache: Map<string, Map<string, ITransformFileResult>>;
+
+  evalCache: Map<string, Module>;
+
   constructor(
     filename: string,
     options: StrictOptions,
-    private resolveCache: Map<string, string>,
-    private codeCache: CodeCache,
-    private evalCache: Map<string, Module>,
+    cache = new TransformCacheCollection(),
     private debuggerDepth = 0,
     private parentModule?: Module
   ) {
@@ -139,6 +144,10 @@ class Module {
     this.dependencies = null;
     this.transform = null;
     this.debug = createCustomDebug('module', this.idx);
+
+    this.resolveCache = cache.resolveCache;
+    this.codeCache = cache.codeCache;
+    this.evalCache = cache.evalCache;
 
     Object.defineProperties(this, {
       id: {
@@ -338,9 +347,11 @@ class Module {
         m = new Module(
           filename,
           this.options,
-          this.resolveCache,
-          this.codeCache,
-          this.evalCache,
+          {
+            codeCache: this.codeCache,
+            evalCache: this.evalCache,
+            resolveCache: this.resolveCache,
+          },
           this.debuggerDepth + 1,
           this
         );

@@ -56,8 +56,6 @@ export interface ITransformFileResult {
   code: string;
 }
 
-export type CodeCache = Map<string, Map<string, ITransformFileResult>>;
-
 export type Stage = 'preeval' | 'collect';
 
 export type Location = {

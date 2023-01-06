@@ -10,24 +10,22 @@
 import type { TransformOptions } from '@babel/core';
 import * as babel from '@babel/core';
 
-import type Module from './module';
+import { TransformCacheCollection } from './cache';
 import prepareForEval, {
   prepareForEvalSync,
 } from './transform-stages/1-prepare-for-eval';
 import evalStage from './transform-stages/2-eval';
 import prepareForRuntime from './transform-stages/3-prepare-for-runtime';
 import extractStage from './transform-stages/4-extract';
-import type { Options, Result, CodeCache, ITransformFileResult } from './types';
+import type { Options, Result, ITransformFileResult } from './types';
 import withLinariaMetadata from './utils/withLinariaMetadata';
 
 function syncStages(
   originalCode: string,
   options: Options,
   prepareStageResults: ITransformFileResult[] | undefined,
-  babelConfig: TransformOptions = {},
-  resolveCache = new Map<string, string>(),
-  codeCache: CodeCache = new Map(),
-  evalCache = new Map<string, Module>(),
+  babelConfig: TransformOptions,
+  cache: TransformCacheCollection,
   eventEmitter?: (ev: unknown) => void
 ) {
   const { filename } = options;
@@ -48,9 +46,7 @@ function syncStages(
   eventEmitter?.({ type: 'transform:stage-2:start', filename });
 
   const evalStageResult = evalStage(
-    resolveCache,
-    codeCache,
-    evalCache,
+    cache,
     prepareStageResults.map((r) => r.code),
     options
   );
@@ -116,13 +112,10 @@ export function transformSync(
   options: Options,
   syncResolve: (what: string, importer: string, stack: string[]) => string,
   babelConfig: TransformOptions = {},
-  resolveCache = new Map<string, string>(),
-  codeCache: CodeCache = new Map(),
-  evalCache = new Map<string, Module>(),
+  cache = new TransformCacheCollection(),
   eventEmitter?: (ev: unknown) => void
 ): Result {
   const { filename } = options;
-
   // *** 1st stage ***
 
   eventEmitter?.({ type: 'transform:stage-1:start', filename });
@@ -135,8 +128,7 @@ export function transformSync(
 
   const prepareStageResults = prepareForEvalSync(
     babel,
-    resolveCache,
-    codeCache,
+    cache,
     syncResolve,
     entryPoint,
     options
@@ -151,9 +143,7 @@ export function transformSync(
     options,
     prepareStageResults,
     babelConfig,
-    resolveCache,
-    codeCache,
-    evalCache,
+    cache,
     eventEmitter
   );
 }
@@ -167,9 +157,7 @@ export default async function transform(
     stack: string[]
   ) => Promise<string | null>,
   babelConfig: TransformOptions = {},
-  resolveCache = new Map<string, string>(),
-  codeCache: CodeCache = new Map(),
-  evalCache = new Map<string, Module>(),
+  cache = new TransformCacheCollection(),
   eventEmitter?: (ev: unknown) => void
 ): Promise<Result> {
   const { filename } = options;
@@ -186,8 +174,7 @@ export default async function transform(
 
   const prepareStageResults = await prepareForEval(
     babel,
-    resolveCache,
-    codeCache,
+    cache,
     asyncResolve,
     entryPoint,
     options
@@ -202,9 +189,7 @@ export default async function transform(
     options,
     prepareStageResults,
     babelConfig,
-    resolveCache,
-    codeCache,
-    evalCache,
+    cache,
     eventEmitter
   );
 }
