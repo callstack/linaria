@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.2.5
+
+### Patch Changes
+
+- 61fe2560: Do not crash when no styles are extracted.
+- Updated dependencies [3ce985e0]
+- Updated dependencies [d11174d0]
+  - @linaria/tags@4.3.0
+  - @linaria/utils@4.3.0
+  - @linaria/core@4.2.5
+  - @linaria/react@4.3.3
+
 ## 4.2.4
 
 ### Patch Changes

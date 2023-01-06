@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.3.0
+
+### Minor Changes
+
+- d11174d0: Add option to remove var() wrapper around css variables
+
+### Patch Changes
+
+- 3ce985e0: Update tags processor to insert appropriate import/request for ESM/CommonJS.
+
 ## 4.2.6
 
 ### Patch Changes

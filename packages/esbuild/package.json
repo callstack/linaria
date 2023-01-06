@@ -1,6 +1,6 @@
 {
   "name": "@linaria/esbuild",
-  "version": "4.2.4",
+  "version": "4.2.5",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",

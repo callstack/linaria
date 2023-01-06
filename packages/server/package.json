@@ -1,6 +1,6 @@
 {
   "name": "@linaria/server",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "css",
