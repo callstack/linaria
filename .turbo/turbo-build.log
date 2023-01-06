@@ -1,37 +1,34 @@
 
-> linaria-website@4.1.10 build /home/runner/work/linaria/linaria/website
+> linaria-website@4.1.10 build /Users/anber/Sources/linaria/website
 > pnpm build:client && pnpm build:server
 
 
-> linaria-website@4.1.10 build:client /home/runner/work/linaria/linaria/website
+> linaria-website@4.1.10 build:client /Users/anber/Sources/linaria/website
 > cross-env NODE_ENV=production webpack
 
-assets by info 63.5 KiB [1m[32m[immutable][39m[22m
-  asset [1m[32mc9d5cf961634b7622bef.png[39m[22m 59.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/code-sample-v4.png] (auxiliary name: app)
-  asset [1m[32m62f658e6bb6e95783a3b.svg[39m[22m 2.88 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/linaria-logo.svg] (auxiliary name: app)
-  asset [1m[32mf5a906f902f5923432cc.svg[39m[22m 939 bytes [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/linaria-logomark.svg] (auxiliary name: app)
-assets by chunk 136 KiB (name: app)
-  asset [1m[32mapp.bundle.js[39m[22m 134 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: app) 2 related assets
-  asset [1m[32mstyles.css[39m[22m 2.63 KiB [1m[32m[emitted][39m[22m (name: app)
-Entrypoint [1mapp[39m[22m 136 KiB (390 KiB) = [1m[32mstyles.css[39m[22m 2.63 KiB [1m[32mapp.bundle.js[39m[22m 134 KiB 4 auxiliary assets
-orphan modules 22.5 KiB (javascript) 939 bytes (asset) 4.68 KiB (runtime) [1m[33m[orphan][39m[22m 40 modules
+assets by status 63.5 KiB [cached] 3 assets
+assets by status 136 KiB [compared for emit]
+  asset app.bundle.js 134 KiB [compared for emit] [minimized] (name: app) 2 related assets
+  asset styles.css 2.63 KiB [compared for emit] (name: app)
+Entrypoint app 136 KiB (390 KiB) = styles.css 2.63 KiB app.bundle.js 134 KiB 4 auxiliary assets
+orphan modules 22.5 KiB (javascript) 939 bytes (asset) 4.68 KiB (runtime) [orphan] 40 modules
 runtime modules 307 bytes 2 modules
 cacheable modules 147 KiB (javascript) 62.6 KiB (asset) 2.66 KiB (css/mini-extract)
   modules by layer 147 KiB (javascript) 62.6 KiB (asset)
     javascript modules 147 KiB 13 modules
     asset modules 84 bytes (javascript) 62.6 KiB (asset)
-      [1m./assets/linaria-logo.svg[39m[22m 42 bytes (javascript) 2.88 KiB (asset) [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-      [1m./assets/code-sample-v4.png[39m[22m 42 bytes (javascript) 59.7 KiB (asset) [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+      ./assets/linaria-logo.svg 42 bytes (javascript) 2.88 KiB (asset) [built] [code generated]
+      ./assets/code-sample-v4.png 42 bytes (javascript) 59.7 KiB (asset) [built] [code generated]
   css modules 2.66 KiB
-    modules by path [1m./src/components/*.jsx[39m[22m 2.3 KiB
-      css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/App.jsx[39m[22m 200 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-      css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Header.jsx[39m[22m 805 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-      css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Hero.jsx[39m[22m 1.32 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-    css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/index.jsx[39m[22m 311 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-    css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Container.js[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.73.0 compiled [1m[32msuccessfully[39m[22m in 8211 ms
+    modules by path ./src/components/*.jsx 2.3 KiB
+      css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/components/App.jsx 200 bytes [built] [code generated]
+      css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/components/Header.jsx 805 bytes [built] [code generated]
+      css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/components/Hero.jsx 1.32 KiB [built] [code generated]
+    css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/index.jsx 311 bytes [built] [code generated]
+    css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/components/Container.js 60 bytes [built] [code generated]
+webpack 5.73.0 compiled successfully in 1901 ms
 
-> linaria-website@4.1.10 build:server /home/runner/work/linaria/linaria/website
+> linaria-website@4.1.10 build:server /Users/anber/Sources/linaria/website
 > cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
 
-Successfully compiled 11 files with Babel (1520ms).
+Successfully compiled 11 files with Babel (418ms).
