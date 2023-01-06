@@ -1,6 +1,7 @@
 ### OS Junk ###
 .DS_Store
 *~
+.history
 
 ### Node ###
 # Logs

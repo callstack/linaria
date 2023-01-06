@@ -34,7 +34,12 @@ export default abstract class TaggedTemplateProcessor extends BaseProcessor {
       throw new Error('Tag is already built');
     }
 
-    const artifact = templateProcessor(this, this.#template, values);
+    const artifact = templateProcessor(
+      this,
+      this.#template,
+      values,
+      this.options.variableNameConfig
+    );
     if (artifact) {
       this.artifacts.push(['css', artifact]);
     }

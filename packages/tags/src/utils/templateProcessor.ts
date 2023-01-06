@@ -14,10 +14,12 @@ import type {
   Replacements,
 } from '../types';
 
+import { getVariableName } from './getVariableName';
 import hasMeta from './hasMeta';
 import stripLines from './stripLines';
 import throwIfInvalid from './throwIfInvalid';
 import toCSS, { isCSSable } from './toCSS';
+import type { IOptions } from './types';
 import { units } from './units';
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
@@ -26,10 +28,10 @@ const unitRegex = new RegExp(`^(?:${units.join('|')})\\b`);
 export default function templateProcessor(
   tagProcessor: TaggedTemplateProcessor,
   [...template]: (TemplateElement | ExpressionValue)[],
-  valueCache: ValueCache
+  valueCache: ValueCache,
+  variableNameConfig: IOptions['variableNameConfig'] | undefined
 ): [rules: Rules, sourceMapReplacements: Replacements] | null {
   const sourceMapReplacements: Replacements = [];
-
   // Check if the variable is referenced anywhere for basic DCE
   // Only works when it's assigned to a variable
   const { isReferenced } = tagProcessor;
@@ -121,7 +123,7 @@ export default function templateProcessor(
             item.source,
             unit
           );
-          cssText += `var(--${varId})`;
+          cssText += getVariableName(varId, variableNameConfig);
 
           cssText += next.value.cooked?.substring(unit?.length ?? 0) ?? '';
         } else {
@@ -130,7 +132,7 @@ export default function templateProcessor(
             cssText,
             item.source
           );
-          cssText += `var(--${varId})`;
+          cssText += getVariableName(varId, variableNameConfig);
         }
       } catch (e) {
         if (e instanceof Error) {
