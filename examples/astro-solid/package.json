@@ -12,8 +12,8 @@
     "@linaria/vite": "workspace:^",
     "astro": "^1.6.10",
     "solid-js": "^1.6.2",
-    "vite": "^3.2.4",
-    "vite-plugin-inspect": "^0.7.8"
+    "vite": "^4",
+    "vite-plugin-inspect": "^0.7.9"
   },
   "scripts": {
     "dev": "astro dev --force",

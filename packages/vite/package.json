@@ -44,10 +44,10 @@
   },
   "devDependencies": {
     "@types/node": "^17.0.39",
-    "vite": "^3.1.8"
+    "vite": ">=3.1.0"
   },
   "peerDependencies": {
-    "vite": "^3.1.8"
+    "vite": ">=3.1.0"
   },
   "engines": {
     "node": "^12.16.0 || >=13.7.0"
