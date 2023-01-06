@@ -1257,6 +1257,31 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker handles interpolation in css function followed by unit 1`] = `
+"import { styled } from '@linaria/atomic';
+const _exp = /*#__PURE__*/() => props => props.$rotateDeg;
+export const Container = /*#__PURE__*/styled('div')({
+  name: \\"Container\\",
+  class: \\"atm_tr_18309cv atm_vy_1783zgq Container_c13jq05\\",
+  propsAsIs: false,
+  vars: {
+    \\"y6125t\\": [_exp(), \\"deg\\"]
+  },
+  atomic: true
+});"
+`;
+
+exports[`strategy shaker handles interpolation in css function followed by unit 2`] = `
+
+CSS:
+
+.atm_tr_18309cv{transform:rotate(var(--y6125t));}
+.atm_vy_1783zgq{width:200;px;}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker handles nested blocks 1`] = `
 "import { styled } from '@linaria/react';
 const regular = () => \\"arial\\";

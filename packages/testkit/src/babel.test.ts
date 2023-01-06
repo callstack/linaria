@@ -721,6 +721,25 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('handles interpolation in css function followed by unit', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+    import { styled } from '@linaria/atomic';
+
+    const size = 200;
+
+    export const Container = styled.div\`
+      transform: rotate(${'${props => props.$rotateDeg}'}deg);
+      width: ${'${size}'}px;
+    \`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('uses the same custom property for the same identifier', async () => {
     const { code, metadata } = await transform(
       dedent`
