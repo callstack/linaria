@@ -313,7 +313,7 @@ export default {
 
 ### Vite
 
-Since Vite supports Rollup plugin, you can use `@linaria/vite`. Vite handles CSS by itself, you don't need a css plugin.
+~~Since Vite supports Rollup plugin~~ Since Vite provides more features and flexibility, Linaria has a separate plugin for it `@linaria/vite`. Vite handles CSS by itself, you don't need a css plugin.
 
 ```sh
 yarn add --dev @linaria/vite
