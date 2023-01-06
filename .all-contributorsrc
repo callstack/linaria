@@ -1051,6 +1051,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "aspirisen",
+      "name": "Dmitrii Pikulin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3620639?v=4",
+      "profile": "https://github.com/aspirisen",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "repoType": "github",
