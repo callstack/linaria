@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { basename, dirname, join } from 'path';
 
 import { types as t } from '@babel/core';
-import { addNamed } from '@babel/helper-module-imports';
+import { addDefault, addNamed } from '@babel/helper-module-imports';
 import type { NodePath } from '@babel/traverse';
 import type {
   Expression,
@@ -327,10 +327,16 @@ function getBuilderForIdentifier(
     });
   };
 
+  const importedType = imports.some((i) => i.type === 'esm')
+    ? 'es6'
+    : 'commonjs';
+
   const astService = {
     ...t,
-    addNamedImport: (name: string, importedSource: string) =>
-      addNamed(path, name, importedSource),
+    addDefaultImport: (importedSource: string, nameHint?: string) =>
+      addDefault(path, importedSource, { importedType, nameHint }),
+    addNamedImport: (name: string, importedSource: string, nameHint?: string) =>
+      addNamed(path, name, importedSource, { importedType, nameHint }),
   };
 
   return (...args: BuilderArgs) =>
