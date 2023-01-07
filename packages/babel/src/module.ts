@@ -184,7 +184,14 @@ class Module {
 
           return values;
         }
-        const value = this.#lazyValues.get(key)?.();
+        let value: unknown;
+        if (this.#lazyValues.has(key)) {
+          value = this.#lazyValues.get(key)?.();
+        } else {
+          // Support Object.prototype methods on `exports`
+          // e.g `exports.hasOwnProperty`
+          value = Reflect.get(target, key);
+        }
         this.debug('evaluated', 'get %s: %o', key, value);
         return value;
       },

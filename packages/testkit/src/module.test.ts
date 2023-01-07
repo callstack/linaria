@@ -139,6 +139,16 @@ it('has access to the global object', () => {
   ).not.toThrow();
 });
 
+it('has access to Object prototype methods on `exports`', () => {
+  const mod = new Module(getFileName(), options);
+
+  expect(() =>
+    mod.evaluate(dedent`
+    exports.hasOwnProperty('keyss');
+  `)
+  ).not.toThrow();
+});
+
 it("doesn't have access to the process object", () => {
   const mod = new Module(getFileName(), options);
 
