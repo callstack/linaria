@@ -197,7 +197,20 @@ export default function shakerPlugin(
 
         return;
       }
-
+      // Hackaround for packages which include a 'default' export without specifying __esModule; such packages cannot be
+      // shaken as they will break interopRequireDefault babel helper
+      // See example in shaker-plugin.test.ts
+      // Real-world example was found in preact/compat npm package
+      if (
+        onlyExports.includes('default') &&
+        exports.find(({ exported }) => exported === 'default') &&
+        !collected.isEsModule
+      ) {
+        this.imports = collected.imports;
+        this.exports = exports;
+        this.reexports = collected.reexports;
+        return;
+      }
       if (!onlyExports.includes('*')) {
         const aliveExports = new Set<IExport | IReexport>();
         const importNames = collected.imports.map(({ imported }) => imported);

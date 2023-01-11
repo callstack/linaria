@@ -65,6 +65,7 @@ export interface IState {
   exports: IExport[];
   imports: (IImport | ISideEffectImport)[];
   reexports: IReexport[];
+  isEsModule: boolean;
 }
 
 export const sideEffectImport = (
@@ -606,6 +607,8 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
 
     const { name } = property.node;
     if (name === '__esModule') {
+      // eslint-disable-next-line no-param-reassign
+      state.isEsModule = true;
       return;
     }
 
@@ -623,21 +626,25 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
     if (
       obj?.isIdentifier(path.node) &&
       prop?.isStringLiteral() &&
-      prop.node.value !== '__esModule' &&
       descriptor?.isObjectExpression()
     ) {
-      /**
-       *  Object.defineProperty(exports, "token", {
-       *    enumerable: true,
-       *    get: function get() {
-       *      return _unknownPackage.token;
-       *    }
-       *  });
-       */
-      const exported = prop.node.value;
-      const local = getGetterValueFromDescriptor(descriptor);
-      if (local) {
-        state.exports.push({ exported, local });
+      if (prop.node.value === '__esModule') {
+        // eslint-disable-next-line no-param-reassign
+        state.isEsModule = true;
+      } else {
+        /**
+         *  Object.defineProperty(exports, "token", {
+         *    enumerable: true,
+         *    get: function get() {
+         *      return _unknownPackage.token;
+         *    }
+         *  });
+         */
+        const exported = prop.node.value;
+        const local = getGetterValueFromDescriptor(descriptor);
+        if (local) {
+          state.exports.push({ exported, local });
+        }
       }
     } else if (
       obj?.isIdentifier(path.node) &&
@@ -1052,6 +1059,7 @@ export default function collectExportsAndImports(
     exports: [],
     imports: [],
     reexports: [],
+    isEsModule: false,
   };
 
   if (!force && cache.has(path)) {

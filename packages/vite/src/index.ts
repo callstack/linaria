@@ -43,7 +43,7 @@ export default function linaria({
   // <dependency id, targets>
   const targets: { id: string; dependencies: string[] }[] = [];
   const cache = new TransformCacheCollection();
-  const { codeCache, resolveCache, evalCache } = cache;
+  const { codeCache, evalCache } = cache;
   return {
     name: 'linaria',
     enforce: 'post',
