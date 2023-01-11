@@ -196,4 +196,19 @@ describe('shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata.imports.size).toBe(0);
   });
+  it('should handle object patterns in exports', () => {
+    const { code } = keep(['Alive'])`
+      import foo from "foo";
+
+      export const { Alive, Dead } = foo();
+    `;
+
+    expect(code).toMatchInlineSnapshot(`
+      "import foo from \\"foo\\";
+      export const {
+        Alive,
+        Dead
+      } = foo();"
+    `);
+  });
 });

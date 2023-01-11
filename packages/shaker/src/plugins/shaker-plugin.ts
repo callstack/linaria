@@ -209,6 +209,14 @@ export default function shakerPlugin(
             importNames.includes((exp.local.node as NodeWithName).name || '')
           ) {
             aliveExports.add(exp);
+          } else if (
+            [...aliveExports].some((liveExp) => liveExp.local === exp.local)
+          ) {
+            // It's possible to export multiple values from a single variable initializer, e.g
+            // export const { foo, bar } = baz();
+            // We need to treat all of them as used if any of them are used, since otherwise
+            // we'll attempt to delete the baz() call
+            aliveExports.add(exp);
           }
         });
 
