@@ -157,7 +157,7 @@ export default function preeval(
                 // ignore class property decls
                 return;
               }
-              if (p.parentPath.isMemberExpression()) {
+              if (p.parentPath.isMemberExpression() && p.key === 'property') {
                 // ignore e.g this.fetch()
                 // window.fetch will be handled by the windowScoped block below
                 return;
