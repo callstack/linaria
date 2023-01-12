@@ -1,5 +1,5 @@
-import dedent from 'dedent';
 import path from 'path';
+import dedent from 'dedent';
 
 import { Module, TransformCacheCollection } from '@linaria/babel-preset';
 import type { StrictOptions } from '@linaria/utils';

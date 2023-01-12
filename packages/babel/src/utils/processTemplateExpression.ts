@@ -17,6 +17,7 @@ const processTemplateExpression = (
   >,
   emit: (processor: BaseProcessor) => void
 ) => {
+  if (p.parentPath.isExportSpecifier()) return;
   if (processed.has(p.node)) return;
 
   const tagProcessor = getTagProcessor(p, fileContext, options);
