@@ -1,20 +1,10 @@
+import dedent from 'dedent';
 import path from 'path';
 
-import * as babel from '@babel/core';
-import dedent from 'dedent';
-
 import { Module, TransformCacheCollection } from '@linaria/babel-preset';
-import type { Evaluator, StrictOptions } from '@linaria/utils';
+import type { StrictOptions } from '@linaria/utils';
 
 beforeEach(() => Module.invalidate());
-
-const evaluator: Evaluator = (filename, options, text) => {
-  const { code } = babel.transformSync(text, {
-    filename,
-    presets: ['@babel/preset-env'],
-  })!;
-  return [code!, null];
-};
 
 function getFileName() {
   return path.resolve(__dirname, './__fixtures__/test.js');
@@ -23,16 +13,8 @@ function getFileName() {
 const options: StrictOptions = {
   displayName: false,
   evaluate: true,
-  extensions: ['.js', '.jsx', '.ts', '.tsx'],
-  rules: [
-    {
-      action: evaluator,
-    },
-    {
-      test: /\/node_modules\//,
-      action: 'ignore',
-    },
-  ],
+  extensions: ['.cjs', '.js', '.jsx', '.ts', '.tsx'],
+  rules: [],
   babelOptions: {},
 };
 
@@ -49,7 +31,7 @@ it('creates module for JS files', () => {
   expect(mod.filename).toBe(filename);
 });
 
-it('requires JS files', () => {
+it('requires .js files', () => {
   const mod = new Module(getFileName(), options);
 
   mod.evaluate(dedent`
@@ -61,7 +43,19 @@ it('requires JS files', () => {
   expect(mod.exports).toBe('The answer is 42');
 });
 
-it('requires JSON files', () => {
+it('requires .cjs files', () => {
+  const mod = new Module(getFileName(), options);
+
+  mod.evaluate(dedent`
+    const answer = require('./sample-script.cjs');
+
+    module.exports = 'The answer is ' + answer;
+  `);
+
+  expect(mod.exports).toBe('The answer is 42');
+});
+
+it('requires .json files', () => {
   const mod = new Module(getFileName(), options);
 
   mod.evaluate(dedent`
