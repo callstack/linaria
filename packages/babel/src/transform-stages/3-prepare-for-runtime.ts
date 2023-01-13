@@ -52,6 +52,7 @@ export default function prepareForRuntime(
     ast: true,
     babelrc: false,
     configFile: false,
+    sourceType: 'unambiguous',
   });
 
   const result = babel.transformFromAstSync(file, code, {
