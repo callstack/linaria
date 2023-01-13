@@ -30,7 +30,7 @@ export default function loadLinariaOptions(
   const options = {
     displayName: false,
     evaluate: true,
-    extensions: ['.json', '.js', '.jsx', '.ts', '.tsx'],
+    extensions: ['.cjs', '.json', '.js', '.jsx', '.mjs', '.ts', '.tsx'],
     rules: rules ?? [
       {
         action: require.resolve('@linaria/shaker'),
