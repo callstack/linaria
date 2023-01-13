@@ -335,8 +335,11 @@ function getBuilderForIdentifier(
     ...t,
     addDefaultImport: (importedSource: string, nameHint?: string) =>
       addDefault(path, importedSource, { importedType, nameHint }),
-    addNamedImport: (name: string, importedSource: string, nameHint?: string) =>
-      addNamed(path, name, importedSource, { importedType, nameHint }),
+    addNamedImport: (
+      name: string,
+      importedSource: string,
+      nameHint: string = name
+    ) => addNamed(path, name, importedSource, { importedType, nameHint }),
   };
 
   return (...args: BuilderArgs) =>
