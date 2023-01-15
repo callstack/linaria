@@ -52,6 +52,7 @@
   "devDependencies": {
     "@types/babel__core": "^7.1.19",
     "@types/babel__generator": "^7.6.4",
+    "@types/babel__helper-module-imports": "^7.18.0",
     "@types/babel__template": "^7.4.1",
     "@types/babel__traverse": "^7.17.1",
     "@types/cosmiconfig": "^5.0.3",
