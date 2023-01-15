@@ -32,7 +32,7 @@ const run = (code: string): BaseProcessor | null => {
   return result;
 };
 
-function tagSource(processor: BaseProcessor | null): string | undefined {
+function tagToString(processor: BaseProcessor | null): string | undefined {
   if (!processor) return undefined;
   return processor.toString();
 }
@@ -50,7 +50,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('renamedStyled(Cmp)`…`');
+    expect(tagToString(result)).toBe('renamedStyled(Cmp)`…`');
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/atomic',
+    });
   });
 
   it('imported component', () => {
@@ -63,7 +67,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(Layout)`…`');
+    expect(tagToString(result)).toBe('styled(Layout)`…`');
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
   });
 
   it('renamedStyled(Cmp)``', () => {
@@ -77,7 +85,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('renamedStyled(Cmp)`…`');
+    expect(tagToString(result)).toBe('renamedStyled(Cmp)`…`');
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
   });
 
   it('(0, react_1.styled)(Cmp)``', () => {
@@ -91,7 +103,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('react_1.styled(Cmp)`…`');
+    expect(tagToString(result)).toBe('react_1.styled(Cmp)`…`');
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
   });
 
   it('styled(Cmp)``', () => {
@@ -105,7 +121,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(Cmp)`…`');
+    expect(tagToString(result)).toBe('styled(Cmp)`…`');
   });
 
   it('styled(hoc(Title))``', () => {
@@ -126,7 +142,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(hoc(Title))`…`');
+    expect(tagToString(result)).toBe('styled(hoc(Title))`…`');
   });
 
   it('styled(() => { someLogic(); })``', () => {
@@ -143,7 +159,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(() => {…})`…`');
+    expect(tagToString(result)).toBe('styled(() => {…})`…`');
   });
 
   it('renamedStyled.div``', () => {
@@ -155,7 +171,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("renamedStyled('div')`…`");
+    expect(tagToString(result)).toBe("renamedStyled('div')`…`");
   });
 
   it('(0, react_1.styled.div)``', () => {
@@ -167,7 +183,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("react_1.styled('div')`…`");
+    expect(tagToString(result)).toBe("react_1.styled('div')`…`");
   });
 
   it('styled.div``', () => {
@@ -179,7 +195,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("styled('div')`…`");
+    expect(tagToString(result)).toBe("styled('div')`…`");
   });
 
   it('styled("div")``', () => {
@@ -191,7 +207,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("styled('div')`…`");
+    expect(tagToString(result)).toBe("styled('div')`…`");
   });
 
   it('(0, core_1.css)``', () => {
@@ -203,7 +219,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('core_1.css`…`');
+    expect(tagToString(result)).toBe('core_1.css`…`');
   });
 
   it('css``', () => {
@@ -215,7 +231,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('css`…`');
+    expect(tagToString(result)).toBe('css`…`');
   });
 
   it('atomic css``', () => {
@@ -227,7 +243,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('css`…`');
+    expect(tagToString(result)).toBe('css`…`');
+    expect(result?.tagSource).toEqual({
+      imported: 'css',
+      source: '@linaria/atomic',
+    });
   });
 
   it('re-imported css', () => {
@@ -239,7 +259,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('css`…`');
+    expect(tagToString(result)).toBe('css`…`');
+    expect(result?.tagSource).toEqual({
+      imported: 'css',
+      source: 'linaria',
+    });
   });
 
   it('re-imported styled', () => {
@@ -251,7 +275,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("styled('div')`…`");
+    expect(tagToString(result)).toBe("styled('div')`…`");
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: 'linaria/react',
+    });
   });
 
   it('import from unknown package', () => {
@@ -274,7 +302,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("renamedStyled('div')`…`");
+    expect(tagToString(result)).toBe("renamedStyled('div')`…`");
   });
 
   it('require and destructing', () => {
@@ -285,7 +313,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("styled('div')`…`");
+    expect(tagToString(result)).toBe("styled('div')`…`");
   });
 
   describe('invalid usage', () => {

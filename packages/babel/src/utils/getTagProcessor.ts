@@ -18,6 +18,7 @@ import type {
   Params,
   IFileContext,
   ExpressionValue,
+  TagSource,
 } from '@linaria/tags';
 import type { IImport, StrictOptions } from '@linaria/utils';
 import {
@@ -34,6 +35,7 @@ import getSource from './getSource';
 
 type BuilderArgs = ConstructorParameters<typeof BaseProcessor> extends [
   Params,
+  TagSource,
   typeof t,
   SourceLocation | null,
   (replacement: Expression, isPure: boolean) => void,
@@ -164,11 +166,13 @@ function getProcessorForIdentifier(
     StrictOptions,
     'classNameSlug' | 'displayName' | 'evaluate' | 'tagResolver'
   >
-): [ProcessorClass, NodePath<Identifier | MemberExpression>] | [null, null] {
+):
+  | [ProcessorClass, TagSource, NodePath<Identifier | MemberExpression>]
+  | [null, null, null] {
   const pathBinding = path.scope.getBinding(path.node.name);
   if (!pathBinding) {
     // It's not a binding, so it's not a tag
-    return [null, null];
+    return [null, null, null];
   }
 
   const tagResolver = options.tagResolver ?? (() => null);
@@ -203,28 +207,29 @@ function getProcessorForIdentifier(
     .filter((i) => i[1] === null || i[1].isExpression());
 
   if (relatedImports.length === 0) {
-    return [null, null];
+    return [null, null, null];
   }
 
-  const [Processor = null, tagPath = null] =
+  const [Processor = null, tagSource = null, tagPath = null] =
     relatedImports
       .map(
-        ([imp, p]): [
+        ([{ imported, source }, p]): [
           ProcessorClass | null,
+          TagSource,
           NodePath<Identifier | MemberExpression> | null
         ] => {
-          const source = tagResolver(imp.source, imp.imported);
-          const processor = source
-            ? getProcessorFromFile(source)
-            : getProcessorFromPackage(imp.source, imp.imported, filename);
-          return [processor, p];
+          const customFile = tagResolver(source, imported);
+          const processor = customFile
+            ? getProcessorFromFile(customFile)
+            : getProcessorFromPackage(source, imported, filename);
+          return [processor, { imported, source }, p];
         }
       )
       .find(([proc]) => proc) ?? [];
 
-  return Processor === null || tagPath === null
-    ? [null, null]
-    : [Processor, tagPath];
+  return Processor === null || tagSource === null || tagPath === null
+    ? [null, null, null]
+    : [Processor, tagSource, tagPath];
 }
 
 function getBuilderForIdentifier(
@@ -236,14 +241,14 @@ function getBuilderForIdentifier(
     'classNameSlug' | 'displayName' | 'evaluate' | 'tagResolver'
   >
 ): Builder | null {
-  const [Processor, tagPath] = getProcessorForIdentifier(
+  const [Processor, tagSource, tagPath] = getProcessorForIdentifier(
     path,
     imports,
     filename,
     options
   );
 
-  if (!Processor || !tagPath) {
+  if (!Processor || !tagSource || !tagPath) {
     return null;
   }
 
@@ -345,6 +350,7 @@ function getBuilderForIdentifier(
   return (...args: BuilderArgs) =>
     new Processor(
       params,
+      tagSource,
       astService,
       tagPath.node.loc ?? null,
       replacer,
