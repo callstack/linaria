@@ -29,6 +29,11 @@ export type TailProcessorParams = ProcessorParams extends [Params, ...infer T]
   ? T
   : never;
 
+export type TagSource = {
+  imported: string;
+  source: string;
+};
+
 export default abstract class BaseProcessor {
   public static SKIP = Symbol('skip');
 
@@ -50,6 +55,7 @@ export default abstract class BaseProcessor {
 
   public constructor(
     params: Params,
+    public tagSource: TagSource,
     protected readonly astService: typeof t & {
       addDefaultImport: (source: string, nameHint?: string) => Identifier;
       addNamedImport: (
