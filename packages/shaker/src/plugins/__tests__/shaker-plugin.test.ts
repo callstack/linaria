@@ -196,6 +196,7 @@ describe('shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata.imports.size).toBe(0);
   });
+
   it('should handle object patterns in exports', () => {
     const { code } = keep(['Alive'])`
       import foo from "foo";
@@ -209,6 +210,103 @@ describe('shaker', () => {
         Alive,
         Dead
       } = foo();"
+    `);
+  });
+
+  it('avoids deleting non-default exports when importing default export of a module without an __esModule: true property', () => {
+    /* without workaround, this will be transformed by shaker to:
+      const n = require('n');
+      const defaultExports = {
+        createContext: n.createContext
+      };
+      exports.default = defaultExports;
+
+      i.e, exports.createContext is deleted
+    */
+    const { code } = keep(['default'])`
+    const n = require('n');
+    const defaultExports = { createContext: n.createContext }
+    Object.defineProperty(exports, "createContext", {
+      enumerable: !0,
+      get: function() {
+          return n.createContext
+      }
+    })
+    exports.default = defaultExports;
+    `;
+
+    /*
+      this breaks babel's interopRequireDefault
+      without shaker, interopRequireDefault(<the test module>)
+      returns: {
+        default: {
+          default: { createContext: ... }
+          createContext: ...
+        }
+      }
+      The double-default is because the module does not define
+      __esModule: true, so interopRequireDefault assumes that it needs to wrap the exports in { default: ... }, so that subsequent code can access createContext via `<test module>.default.createContext`.
+
+      If shaker treats the createExport named export as unused (since it's not in onlyExports), it will delete it. interopRequireDefault(<shaker-processed test module>)
+      returns: {
+        default: {
+          default: { createContext: ... }
+        }
+      }
+
+      And `<test module>.default.createContext` will be undefined.
+
+      Therefore, we assert that createContext is not deleted in this case.
+    */
+    expect(code).toMatchInlineSnapshot(`
+      "const n = require('n');
+      const defaultExports = {
+        createContext: n.createContext
+      };
+      Object.defineProperty(exports, \\"createContext\\", {
+        enumerable: !0,
+        get: function () {
+          return n.createContext;
+        }
+      });
+      exports.default = defaultExports;"
+    `);
+  });
+
+  it('deletes non-default exports when importing default export of a module with an __esModule: true property', () => {
+    /* without workaround, this will be transformed by shaker to:
+      const n = require('n');
+      const defaultExports = {
+        createContext: n.createContext
+      };
+      exports.default = defaultExports;
+
+      i.e, exports.createContext is deleted
+    */
+    const { code } = keep(['default'])`
+    const n = require('n');
+    const defaultExports = { createContext: n.createContext }
+    Object.defineProperty(exports, "__esModule", {
+      value: true
+    });
+    Object.defineProperty(exports, "createContext", {
+      enumerable: !0,
+      get: function() {
+          return n.createContext
+      }
+    })
+    exports.default = defaultExports;
+    `;
+
+    expect(code).toMatchInlineSnapshot(`
+      "const n = require('n');
+      const defaultExports = {
+        createContext: n.createContext
+      };
+      Object.defineProperty(exports, \\"__esModule\\", {
+        value: true
+      });
+      exports.default = defaultExports;"
     `);
   });
 });
