@@ -332,19 +332,15 @@ function getBuilderForIdentifier(
     });
   };
 
-  const importedType = imports.some((i) => i.type === 'esm')
-    ? 'es6'
-    : 'commonjs';
-
   const astService = {
     ...t,
     addDefaultImport: (importedSource: string, nameHint?: string) =>
-      addDefault(path, importedSource, { importedType, nameHint }),
+      addDefault(path, importedSource, { nameHint }),
     addNamedImport: (
       name: string,
       importedSource: string,
       nameHint: string = name
-    ) => addNamed(path, name, importedSource, { importedType, nameHint }),
+    ) => addNamed(path, name, importedSource, { nameHint }),
   };
 
   return (...args: BuilderArgs) =>
