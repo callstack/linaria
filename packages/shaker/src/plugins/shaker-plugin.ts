@@ -22,6 +22,8 @@ import {
   mutate,
 } from '@linaria/utils';
 
+import shouldKeepSideEffect from './utils/shouldKeepSideEffect';
+
 type Core = typeof core;
 
 export interface IShakerOptions {
@@ -276,8 +278,12 @@ export default function shakerPlugin(
           .map((exp) => exp.local);
 
         if (!keepSideEffects && sideEffectImports.length > 0) {
-          // Remove all imports that don't import something explicitly
-          sideEffectImports.forEach((i) => forDeleting.push(i.local));
+          // Remove all imports that don't import something explicitly and should not be kept
+          sideEffectImports.forEach((i) => {
+            if (!shouldKeepSideEffect(i.source)) {
+              forDeleting.push(i.local);
+            }
+          });
         }
 
         const deleted = new Set<NodePath>();
