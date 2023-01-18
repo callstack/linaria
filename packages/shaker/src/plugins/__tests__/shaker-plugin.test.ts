@@ -309,4 +309,26 @@ describe('shaker', () => {
       exports.default = defaultExports;"
     `);
   });
+
+  it('should remove asset imports', () => {
+    const { code, metadata } = keep(['a'])`
+      import './asset.css';
+
+      export const a = 1;
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
+  });
+
+  it('should keep side-effects from modules', () => {
+    const { code, metadata } = keep(['a'])`
+      import 'regenerator-runtime/runtime.js';
+
+      export const a = 1;
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(1);
+  });
 });
