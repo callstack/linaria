@@ -1,4 +1,4 @@
-import cosmiconfig from 'cosmiconfig';
+import { cosmiconfigSync } from 'cosmiconfig';
 
 import type { StrictOptions } from '@linaria/utils';
 
@@ -9,7 +9,7 @@ export type PluginOptions = StrictOptions & {
   stage?: Stage;
 };
 
-const explorer = cosmiconfig('linaria');
+const explorerSync = cosmiconfigSync('linaria');
 
 const cache = new WeakMap<Partial<PluginOptions>, StrictOptions>();
 
@@ -24,8 +24,8 @@ export default function loadLinariaOptions(
 
   const result =
     configFile !== undefined
-      ? explorer.loadSync(configFile)
-      : explorer.searchSync();
+      ? explorerSync.load(configFile)
+      : explorerSync.search();
 
   const options = {
     displayName: false,

@@ -44,7 +44,7 @@
     "@linaria/shaker": "workspace:^",
     "@linaria/tags": "workspace:^",
     "@linaria/utils": "workspace:^",
-    "cosmiconfig": "^5.1.0",
+    "cosmiconfig": "^8.0.0",
     "find-up": "^5.0.0",
     "source-map": "^0.7.3",
     "stylis": "^3.5.4"
