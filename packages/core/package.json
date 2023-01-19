@@ -38,6 +38,6 @@
     "watch": "yarn build --watch"
   },
   "dependencies": {
-    "@linaria/utils": "^3.0.0-beta.18"
+    "@linaria/utils": "^3.0.0-airbnb.0"
   }
 }

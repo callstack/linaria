@@ -37,8 +37,8 @@
     "watch": "yarn build --watch"
   },
   "dependencies": {
-    "@linaria/utils": "^3.0.0-beta.18",
-    "@linaria/react": "^3.0.0-beta.18",
+    "@linaria/utils": "^3.0.0-airbnb.0",
+    "@linaria/react": "^3.0.0-airbnb.0",
     "known-css-properties": "^0.24.0",
     "postcss": "^8.3.11",
     "stylis": "^3.5.4"

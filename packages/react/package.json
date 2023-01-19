@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^0.8.8",
-    "@linaria/core": "^3.0.0-beta.18"
+    "@linaria/core": "^3.0.0-airbnb.0"
   },
   "peerDependencies": {
     "react": ">=16"

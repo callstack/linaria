@@ -38,7 +38,7 @@
     "watch": "yarn build --watch"
   },
   "dependencies": {
-    "@linaria/babel-preset": "^3.0.0-beta.18"
+    "@linaria/babel-preset": "^3.0.0-airbnb.0"
   },
   "peerDependencies": {
     "@babel/core": ">=7"
