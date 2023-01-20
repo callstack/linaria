@@ -24,17 +24,17 @@ export default function collector(
     pre(file: BabelFile) {
       debug('babel-transform:start', file.opts.filename);
 
-      const entryPoint = {
+      const entrypoint = {
         name: file.opts.filename!,
         code: file.code,
         only: ['__linariaPreval'],
       };
 
-      const prepareStageResults = prepareForEvalSync(
+      const prepareStageResult = prepareForEvalSync(
         babel,
         cache,
         syncResolve,
-        entryPoint,
+        entrypoint,
         {
           root: file.opts.root ?? undefined,
           pluginOptions: options,
@@ -42,20 +42,16 @@ export default function collector(
       );
 
       if (
-        !prepareStageResults ||
-        prepareStageResults.every((r) => !withLinariaMetadata(r.metadata))
+        !prepareStageResult ||
+        !withLinariaMetadata(prepareStageResult?.metadata)
       ) {
         return;
       }
 
-      const evalStageResult = evalStage(
-        cache,
-        prepareStageResults.map((r) => r.code),
-        {
-          filename: file.opts.filename!,
-          pluginOptions: options,
-        }
-      );
+      const evalStageResult = evalStage(cache, prepareStageResult.code, {
+        filename: file.opts.filename!,
+        pluginOptions: options,
+      });
 
       if (evalStageResult === null) {
         return;

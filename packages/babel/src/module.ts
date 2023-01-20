@@ -92,8 +92,6 @@ class Module {
 
   #isEvaluated = false;
 
-  #evaluatedFragments = new Set<string>();
-
   #exports: Record<string, unknown> | unknown;
 
   // #exportsProxy: Record<string, unknown>;
@@ -124,7 +122,7 @@ class Module {
 
   resolveCache: Map<string, string>;
 
-  codeCache: Map<string, Map<string, ITransformFileResult>>;
+  codeCache: Map<string, { only: string[]; result: ITransformFileResult }>;
 
   evalCache: Map<string, Module>;
 
@@ -371,46 +369,49 @@ class Module {
 
       const extension = path.extname(filename);
       if (extension === '.json' || this.extensions.includes(extension)) {
-        let code: string[] | undefined;
+        let code: string | undefined;
         // Requested file can be already prepared for evaluation on the stage 1
         if (this.codeCache.has(filename)) {
-          const perExportCache = this.codeCache.get(filename)!;
+          const cached = this.codeCache.get(filename);
           const only = onlyList
             ?.split(',')
             .filter((token) => !m.#lazyValues.has(token));
-          const codeSet = new Set<string>();
-          if (only && only.every((o) => perExportCache.has(o))) {
+          const cachedOnly = new Set(cached?.only ?? []);
+          const isMatched =
+            cachedOnly.has('*') ||
+            (only && only.every((token) => cachedOnly.has(token)));
+          if (cached && isMatched) {
             m.debug('code-cache', '✅');
-            only.forEach((o) => codeSet.add(perExportCache.get(o)!.code));
-          } else if (!only && perExportCache.has('*')) {
-            m.debug('code-cache', '✳️');
-            // The whole file is required
-            codeSet.add(perExportCache.get('*')!.code);
+            code = cached.result.code;
+          } else {
+            m.debug(
+              'code-cache',
+              '❌%o is missing (%o were cached]',
+              only?.filter((token) => !cachedOnly.has(token)) ?? [],
+              cachedOnly
+            );
           }
-
-          code = Array.from(codeSet);
         } else if (m.#isEvaluated) {
           m.debug(
             'code-cache',
             '✅ not in the code cache, but is already evaluated'
           );
-          code = [];
-        }
-
-        if (!code) {
+        } else {
           // If code wasn't extracted from cache, read it from the file system
           // TODO: transpile the file
           m.debug('code-cache', '❌');
-          code = [fs.readFileSync(filename, 'utf-8')];
+          code = fs.readFileSync(filename, 'utf-8');
         }
 
-        if (/\.json$/.test(filename) && code.length === 1) {
-          // For JSON files, parse it to a JS object similar to Node
-          m.exports = JSON.parse(code[0]);
-          m.#isEvaluated = true;
-        } else {
-          // For JS/TS files, evaluate the module
-          m.evaluate(code);
+        if (code) {
+          if (/\.json$/.test(filename)) {
+            // For JSON files, parse it to a JS object similar to Node
+            m.exports = JSON.parse(code);
+            m.#isEvaluated = true;
+          } else {
+            // For JS/TS files, evaluate the module
+            m.evaluate(code);
+          }
         }
       } else {
         // For non JS/JSON requires, just export the id
@@ -428,11 +429,10 @@ class Module {
     }
   );
 
-  evaluate(arg: string | string[]): void {
-    const code = Array.isArray(arg) ? arg : [arg];
+  evaluate(source: string): void {
     const { filename } = this;
 
-    if (code.length === 0) {
+    if (!source) {
       this.debug(`evaluate`, 'there is nothing to evaluate');
     }
 
@@ -452,49 +452,42 @@ class Module {
       __dirname: path.dirname(filename),
     });
 
-    code.forEach((source, idx) => {
-      if (this.#evaluatedFragments.has(source)) {
-        this.debug(
-          `evaluate:fragment-${padStart(idx + 1, 2)}`,
-          `is already evaluated`
-        );
-        return;
+    if (this.#isEvaluated) {
+      this.debug('evaluate', `is already evaluated`);
+      return;
+    }
+
+    this.debug('evaluate', `\n${source}`);
+
+    this.#isEvaluated = true;
+
+    try {
+      const script = new vm.Script(
+        `(function (exports) { ${source}\n})(exports);`,
+        {
+          filename,
+        }
+      );
+
+      script.runInContext(context);
+      return;
+    } catch (e) {
+      if (e instanceof EvalError) {
+        throw e;
       }
 
-      this.debug(`evaluate:fragment-${padStart(idx + 1, 2)}`, `\n${source}`);
-
-      this.#evaluatedFragments.add(source);
-
-      this.#isEvaluated = true;
-
-      try {
-        const script = new vm.Script(
-          `(function (exports) { ${source}\n})(exports);`,
-          {
-            filename,
-          }
-        );
-
-        script.runInContext(context);
-        return;
-      } catch (e) {
-        if (e instanceof EvalError) {
-          throw e;
-        }
-
-        const callstack: string[] = ['', this.filename];
-        let module = this.parentModule;
-        while (module) {
-          callstack.push(module.filename);
-          module = module.parentModule;
-        }
-
-        this.debug('evaluate:error', '%O\n%O', e, callstack);
-        throw new EvalError(
-          `${(e as Error).message} in${callstack.join('\n| ')}\n`
-        );
+      const callstack: string[] = ['', this.filename];
+      let module = this.parentModule;
+      while (module) {
+        callstack.push(module.filename);
+        module = module.parentModule;
       }
-    });
+
+      this.debug('evaluate:error', '%O\n%O', e, callstack);
+      throw new EvalError(
+        `${(e as Error).message} in${callstack.join('\n| ')}\n`
+      );
+    }
   }
 }
 

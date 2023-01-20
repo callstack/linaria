@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax,no-continue,no-await-in-loop */
 import { readFileSync } from 'fs';
 import { dirname, extname } from 'path';
 
@@ -13,14 +14,10 @@ import type Module from '../module';
 import type { ITransformFileResult, Options } from '../types';
 import withLinariaMetadata from '../utils/withLinariaMetadata';
 
+import type { IEntrypoint } from './helpers/ModuleQueue';
+import { ModuleQueue } from './helpers/ModuleQueue';
 import cachedParseSync from './helpers/cachedParseSync';
 import loadLinariaOptions from './helpers/loadLinariaOptions';
-
-export type FileInQueue = {
-  name: string;
-  code: string;
-  only: string[];
-} | null;
 
 const isModuleResolver = (i: unknown): i is { options: unknown } =>
   typeof i === 'object' &&
@@ -105,8 +102,8 @@ function prepareCode(
   filename: string,
   originalCode: string,
   only: string[],
-  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>,
-  fileCache: Map<string | symbol, ITransformFileResult>
+  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
+  // fileCache: Map<string | symbol, ITransformFileResult>
 ): [
   code: string,
   imports: Module['imports'],
@@ -124,9 +121,6 @@ function prepareCode(
 
   if (action === 'ignore') {
     log('stage-1:ignore', '');
-    fileCache.set('*', {
-      code: originalCode,
-    });
 
     return [originalCode, null];
   }
@@ -186,25 +180,19 @@ function processQueueItem(
   | {
       imports: Map<string, string[]> | null;
       name: string;
-      results: ITransformFileResult[];
+      result: ITransformFileResult;
     }
   | undefined {
   if (!item) {
     return undefined;
   }
-  const { codeCache } = cache;
+
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
-
-  const results = new Set<ITransformFileResult>();
-
   const { name, only, code } = item;
-  if (!codeCache.has(name)) {
-    codeCache.set(name, new Map());
-  }
-
+  const onlyAsStr = only.join(', ');
   const log = createCustomDebug('transform', getFileIdx(name));
-
   const extension = extname(name);
+
   if (!pluginOptions.extensions.includes(extension)) {
     log(
       'init',
@@ -213,108 +201,123 @@ function processQueueItem(
     return undefined;
   }
 
-  log('init', `${name} (${only.join(', ')})\n${code}`);
+  log('init', `${name} (${onlyAsStr})\n${code}`);
 
-  const uncachedExports = new Set(only);
-  const fileCache = codeCache.get(name)!;
-  uncachedExports.forEach((token) => {
-    if (fileCache.has(token)) {
-      uncachedExports.delete(token);
-      results.add(fileCache.get(token)!);
-    }
-  });
-
-  if (uncachedExports.size === 0) {
-    // Already processed
-    return {
-      imports: null,
-      name,
-      results: Array.from(results),
-    };
-  }
-
-  const remainExports = Array.from(uncachedExports);
-
-  log('stage-1', `>> (${remainExports.join(', ')})`);
+  log('stage-1', `>> (${onlyAsStr})`);
 
   const [preparedCode, imports, metadata] = prepareCode(
     babel,
     name,
     code,
-    remainExports,
-    options,
-    fileCache
+    only,
+    options
   );
 
   if (code === preparedCode) {
-    log('stage-1', `<< (${remainExports.join(', ')})\n === no changes ===`);
+    log('stage-1', `<< (${onlyAsStr})\n === no changes ===`);
   } else {
-    log('stage-1', `<< (${remainExports.join(', ')})\n${preparedCode}`);
+    log('stage-1', `<< (${onlyAsStr})\n${preparedCode}`);
   }
-
-  const result = {
-    metadata,
-    code: preparedCode,
-  };
-  results.add(result);
-
-  remainExports.forEach((token) => {
-    fileCache.set(token, result);
-  });
 
   if (preparedCode === '') return undefined;
 
   return {
     imports,
     name,
-    results: Array.from(results),
+    result: {
+      metadata,
+      code: preparedCode,
+    },
   };
 }
+
+const isEqual = ([...a]: string[], [...b]: string[]) => {
+  if (a.includes('*')) return true;
+  if (a.length !== b.length) return false;
+  a.sort();
+  b.sort();
+  return a.every((item, index) => item === b[index]);
+};
 
 export function prepareForEvalSync(
   babel: Core,
   cache: TransformCacheCollection,
   resolve: (what: string, importer: string, stack: string[]) => string,
-  resolvedFile: FileInQueue,
-  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>,
-  stack: string[] = []
-): ITransformFileResult[] | undefined {
-  const processed = processQueueItem(babel, resolvedFile, cache, options);
-  if (!processed) return undefined;
+  entrypoint: IEntrypoint,
+  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
+): ITransformFileResult | undefined {
+  const queue = new ModuleQueue(entrypoint);
 
-  const { imports, name, results } = processed;
-
-  const log = createCustomDebug('transform', getFileIdx(name));
-
-  const queue: FileInQueue[] = [];
-
-  imports?.forEach((importsOnly, importedFile) => {
-    try {
-      const resolved = resolve(importedFile, name, stack);
-      log('stage-1:sync-resolve', `✅ ${importedFile} -> ${resolved}`);
-      cache.resolveCache.set(
-        `${name} -> ${importedFile}`,
-        `${resolved}\0${importsOnly.join(',')}`
-      );
-      const fileContent = readFileSync(resolved, 'utf8');
-      queue.push({
-        name: resolved,
-        only: importsOnly,
-        code: fileContent,
-      });
-    } catch (err) {
-      log('stage-1:sync-resolve', `❌ cannot resolve ${importedFile}: %O`, err);
+  while (!queue.isEmpty()) {
+    const [nextItem, resolveStack] = queue.dequeue() ?? [];
+    if (!nextItem || !resolveStack) {
+      continue;
     }
-  });
 
-  queue.forEach((item) => {
-    prepareForEvalSync(babel, cache, resolve, item, options, [name, ...stack]);
-  });
+    const { name, only, code } = nextItem;
+    const log = createCustomDebug('transform', getFileIdx(name));
 
-  return Array.from(results);
+    const cached = cache.codeCache.get(name);
+    // If we already have a result for this file, we should get a result for merged `only`
+    const mergedOnly = cached?.only
+      ? Array.from(new Set([...cached.only, ...only]))
+      : only;
+
+    if (cached && isEqual(cached.only, mergedOnly)) {
+      log('stage-1', 'is already processed');
+      continue;
+    }
+
+    const processed = processQueueItem(
+      babel,
+      {
+        name,
+        code,
+        only: mergedOnly,
+      },
+      cache,
+      options
+    );
+
+    if (!processed) continue;
+
+    const { imports, result } = processed;
+    cache.codeCache.set(name, {
+      only: mergedOnly,
+      result,
+    });
+
+    if (imports) {
+      for (const [importedFile, importsOnly] of imports) {
+        try {
+          const resolved = resolve(importedFile, name, resolveStack);
+          log('stage-1:sync-resolve', `✅ ${importedFile} -> ${resolved}`);
+          cache.resolveCache.set(
+            `${name} -> ${importedFile}`,
+            `${resolved}\0${importsOnly.join(',')}`
+          );
+          const fileContent = readFileSync(resolved, 'utf8');
+          queue.enqueue([
+            {
+              name: resolved,
+              only: importsOnly,
+              code: fileContent,
+            },
+            [name, ...resolveStack],
+          ]);
+        } catch (err) {
+          log(
+            'stage-1:sync-resolve',
+            `❌ cannot resolve ${importedFile}: %O`,
+            err
+          );
+        }
+      }
+    }
+  }
+
+  return cache.codeCache.get(entrypoint.name)?.result;
 }
-
-const mutexes = new Map<string, Promise<void>>();
 
 /**
  * Parses the specified file and recursively all its dependencies,
@@ -328,77 +331,97 @@ export default async function prepareForEval(
     importer: string,
     stack: string[]
   ) => Promise<string | null>,
-  file: Promise<FileInQueue>,
-  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>,
-  stack: string[] = []
-): Promise<ITransformFileResult[] | undefined> {
-  const resolvedFile = await file;
-  const mutex = resolvedFile ? mutexes.get(resolvedFile.name) : null;
-  if (mutex) {
-    await mutex;
+  entrypoint: IEntrypoint,
+  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
+): Promise<ITransformFileResult | undefined> {
+  const queue = new ModuleQueue(entrypoint);
+
+  while (!queue.isEmpty()) {
+    const [nextItem, resolveStack] = queue.dequeue() ?? [];
+    if (!nextItem || !resolveStack) {
+      continue;
+    }
+
+    const { name, only, code } = nextItem;
+    const log = createCustomDebug('transform', getFileIdx(name));
+
+    const cached = cache.codeCache.get(name);
+    // If we already have a result for this file, we should get a result for merged `only`
+    const mergedOnly = cached?.only
+      ? Array.from(new Set([...cached.only, ...only]))
+      : only;
+    if (cached && isEqual(cached.only, mergedOnly)) {
+      log('stage-1', 'is already processed');
+      continue;
+    }
+
+    // If we already have a result for this file, we should invalidate it
+    cache.evalCache.delete(name);
+
+    const processed = processQueueItem(
+      babel,
+      {
+        name,
+        code,
+        only: mergedOnly,
+      },
+      cache,
+      options
+    );
+
+    if (!processed) continue;
+
+    const { imports, result } = processed;
+    cache.codeCache.set(name, {
+      only: mergedOnly,
+      result,
+    });
+
+    if (imports) {
+      for (const [importedFile, importsOnly] of imports) {
+        try {
+          const resolved = await resolve(importedFile, name, resolveStack);
+
+          if (resolved === null) {
+            log('stage-1:resolve', `✅ ${importedFile} is ignored`);
+            continue;
+          }
+
+          log('stage-1:async-resolve', `✅ ${importedFile} -> ${resolved}`);
+          const resolveCacheKey = `${name} -> ${importedFile}`;
+          const resolveCached = cache.resolveCache.get(resolveCacheKey);
+          const importsOnlySet = new Set(importsOnly);
+          if (resolveCached) {
+            const [, cachedOnly] = resolveCached.split('\0');
+            cachedOnly?.split(',').forEach((token) => {
+              importsOnlySet.add(token);
+            });
+          }
+
+          cache.resolveCache.set(
+            resolveCacheKey,
+            `${resolved}\0${[...importsOnlySet].join(',')}`
+          );
+
+          const fileContent = readFileSync(resolved, 'utf8');
+          queue.enqueue([
+            {
+              name: resolved,
+              only: importsOnly,
+              code: fileContent,
+            },
+            [name, ...resolveStack],
+          ]);
+        } catch (err) {
+          log(
+            'stage-1:async-resolve',
+            `❌ cannot resolve ${importedFile}: %O`,
+            err
+          );
+        }
+      }
+    }
   }
 
-  const processed = processQueueItem(babel, resolvedFile, cache, options);
-  if (!processed) return undefined;
-
-  const { imports, name, results } = processed;
-
-  const log = createCustomDebug('transform', getFileIdx(name));
-
-  const promises: Promise<ITransformFileResult[] | undefined>[] = [];
-
-  imports?.forEach((importsOnly, importedFile) => {
-    const promise = resolve(importedFile, name, stack).then(
-      (resolved) => {
-        if (resolved === null) {
-          log('stage-1:resolve', `✅ ${importedFile} is ignored`);
-          return null;
-        }
-
-        log('stage-1:async-resolve', `✅ ${importedFile} -> ${resolved}`);
-        const resolveCacheKey = `${name} -> ${importedFile}`;
-        const cached = cache.resolveCache.get(resolveCacheKey);
-        const importsOnlySet = new Set(importsOnly);
-        if (cached) {
-          const [, cachedOnly] = cached.split('\0');
-          cachedOnly?.split(',').forEach((token) => {
-            importsOnlySet.add(token);
-          });
-        }
-
-        cache.resolveCache.set(
-          resolveCacheKey,
-          `${resolved}\0${[...importsOnlySet].join(',')}`
-        );
-        const fileContent = readFileSync(resolved, 'utf8');
-        return {
-          name: resolved,
-          only: importsOnly,
-          code: fileContent,
-        };
-      },
-      (err: unknown) => {
-        log(
-          'stage-1:async-resolve',
-          `❌ cannot resolve ${importedFile}: %O`,
-          err
-        );
-        return null;
-      }
-    );
-
-    promises.push(
-      prepareForEval(babel, cache, resolve, promise, options, [name, ...stack])
-    );
-  });
-
-  const promise = Promise.all(promises).then(() => {});
-
-  mutexes.set(name, promise);
-
-  await promise;
-
-  mutexes.delete(name);
-
-  return Array.from(results);
+  return cache.codeCache.get(entrypoint.name)?.result;
 }

@@ -216,6 +216,16 @@ importers:
       webpack: 5.75.0_webpack-cli@5.0.0
       webpack-cli: 5.0.0_webpack@5.75.0
 
+  node_modules/.pnpm/@types+react@18.0.27/node_modules/@types/react:
+    specifiers:
+      '@types/prop-types': '*'
+      '@types/scheduler': '*'
+      csstype: ^3.0.2
+    dependencies:
+      '@types/prop-types': 15.7.5
+      '@types/scheduler': 0.16.2
+      csstype: 3.1.0
+
   packages/atomic:
     specifiers:
       '@babel/types': ^7.20.2
@@ -482,7 +492,7 @@ importers:
       '@babel/types': 7.20.2
       '@types/babel__core': 7.1.19
       '@types/node': 17.0.39
-      '@types/react': 18.0.15
+      '@types/react': 18.0.27
       react: 16.14.0
       react-test-renderer: 16.14.0_react@16.14.0
 
@@ -2600,22 +2610,22 @@ packages:
       postcss: 8.4.16
       postcss-selector-parser: 6.0.10
 
-  /@definitelytyped/header-parser/0.0.142:
-    resolution: {integrity: sha512-D5lnRKqe62ep7Sbqu83hMaKJW1pAK5vVrhCyRrMp2Pg+ouE5U2X/yVZIeWyDeJyKqifoP5sOYi6zcSC/4QehNw==}
+  /@definitelytyped/header-parser/0.0.143:
+    resolution: {integrity: sha512-UqE7UrnGnsS0+4/cdHi+D6olJ0GkXpDzrd9CcZA/bX8HDWHTkKABvoJkIcoSX80s4yJS8tmwKR1Zjzc/owxoeQ==}
     dependencies:
-      '@definitelytyped/typescript-versions': 0.0.142
+      '@definitelytyped/typescript-versions': 0.0.143
       '@types/parsimmon': 1.10.6
       parsimmon: 1.18.1
     dev: true
 
-  /@definitelytyped/typescript-versions/0.0.142:
-    resolution: {integrity: sha512-4WFGCg6WyKPPbIcMd1llRxXwhkKFMiv0pGPsMcOwXqrI+apK7pYDR8sVvgkRJHpdgAudOnHOK9UbAlaGzkuPbw==}
+  /@definitelytyped/typescript-versions/0.0.143:
+    resolution: {integrity: sha512-ME7KYlSRaDLjpm/TGfhgljiDWJlucWcRKp26lP7NAA3b4wOm8I6GO9Bw/ESYciM2trkwQzjQUNRRdsPGS6lUcQ==}
     dev: true
 
-  /@definitelytyped/utils/0.0.142:
-    resolution: {integrity: sha512-XIDhvqAwfK2NMEfMC96ldD1SnUif9KVnLrCvcYpaEu6BSQIvSSZXL7/ktRwn8tlYqRMVQWn4wNXSJ0goMjm+Cw==}
+  /@definitelytyped/utils/0.0.143:
+    resolution: {integrity: sha512-qdKtMmZo4se7aw5Zwp6L5Fl2pkI4Z9fL8LpgEQ0GNkJRHhwKFUCNO8QWH94NBqbvDGVajKVetIZ7fcyVVCK8iA==}
     dependencies:
-      '@definitelytyped/typescript-versions': 0.0.142
+      '@definitelytyped/typescript-versions': 0.0.143
       '@qiwi/npm-registry-client': 8.9.1
       '@types/node': 14.18.33
       charm: 1.0.2
@@ -3879,7 +3889,6 @@ packages:
 
   /@types/prop-types/15.7.5:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
-    dev: true
 
   /@types/qs/6.9.7:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==}
@@ -3889,8 +3898,8 @@ packages:
     resolution: {integrity: sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==}
     dev: true
 
-  /@types/react/18.0.15:
-    resolution: {integrity: sha512-iz3BtLuIYH1uWdsv6wXYdhozhqj20oD4/Hk2DNXIn1kFsmp9x8d9QB6FnPhfkbhd2PgEONt9Q1x/ebkwjfFLow==}
+  /@types/react/18.0.27:
+    resolution: {integrity: sha512-3vtRKHgVxu3Jp9t718R9BuzoD4NcQ8YJ5XRzsSKxNDiDonD2MXIT1TmSkenxuCycZJoQT5d2vE8LwWJxBC1gmA==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
@@ -3919,7 +3928,6 @@ packages:
 
   /@types/scheduler/0.16.2:
     resolution: {integrity: sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew==}
-    dev: true
 
   /@types/semver/6.2.3:
     resolution: {integrity: sha512-KQf+QAMWKMrtBMsB8/24w53tEsxllMj6TuA80TT/5igJalLI/zm0L3oXRbIAl4Ohfc85gyHX/jhMwsVkmhLU4A==}
@@ -6290,7 +6298,7 @@ packages:
     peerDependencies:
       typescript: '*'
     dependencies:
-      '@definitelytyped/header-parser': 0.0.142
+      '@definitelytyped/header-parser': 0.0.143
       command-exists: 1.2.9
       rimraf: 3.0.2
       semver: 6.3.0
@@ -6306,9 +6314,9 @@ packages:
     peerDependencies:
       typescript: '>= 3.0.0-dev || >= 3.1.0-dev || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.7.0-dev || >= 3.8.0-dev || >= 3.9.0-dev || >= 4.0.0-dev'
     dependencies:
-      '@definitelytyped/header-parser': 0.0.142
-      '@definitelytyped/typescript-versions': 0.0.142
-      '@definitelytyped/utils': 0.0.142
+      '@definitelytyped/header-parser': 0.0.143
+      '@definitelytyped/typescript-versions': 0.0.143
+      '@definitelytyped/utils': 0.0.143
       dts-critic: 3.3.11_typescript@4.7.4
       fs-extra: 6.0.1
       json-stable-stringify: 1.0.1
