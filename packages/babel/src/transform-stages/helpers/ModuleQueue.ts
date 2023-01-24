@@ -1,3 +1,5 @@
+import { posix } from 'path';
+
 import type { CustomDebug } from '@linaria/logger';
 import { createCustomDebug } from '@linaria/logger';
 import { getFileIdx } from '@linaria/utils';
@@ -10,7 +12,23 @@ export interface IEntrypoint {
 
 type Node = [entrypoint: IEntrypoint, stack: string[], refCount?: number];
 
-const compare = (a: Node, b: Node) => (a[2] ?? 0) > (b[2] ?? 0);
+const peek = <T>(arr: T[]) =>
+  arr.length > 0 ? arr[arr.length - 1] : undefined;
+
+const hasLessPriority = (
+  [{ name: nameA }, stackA, refCountA = 0]: Node,
+  [{ name: nameB }, stackB, refCountB = 0]: Node
+) => {
+  const firstA = peek(stackA);
+  const firstB = peek(stackB);
+  if (refCountA === refCountB && firstA && firstB) {
+    const distanceA = posix.relative(firstA, nameA).split('/').length;
+    const distanceB = posix.relative(firstB, nameB).split('/').length;
+    return distanceA > distanceB;
+  }
+
+  return refCountA > refCountB;
+};
 
 const keyOf = (el: Node) => el[0].name;
 
@@ -62,14 +80,14 @@ export class ModuleQueue {
 
     if (
       leftIdx <= this.size &&
-      compare(this.data[largestIdx - 1], this.data[leftIdx - 1])
+      hasLessPriority(this.data[largestIdx - 1], this.data[leftIdx - 1])
     ) {
       largestIdx = leftIdx;
     }
 
     if (
       rightIdx <= this.size &&
-      compare(this.data[largestIdx - 1], this.data[rightIdx - 1])
+      hasLessPriority(this.data[largestIdx - 1], this.data[rightIdx - 1])
     ) {
       largestIdx = rightIdx;
     }
@@ -84,7 +102,7 @@ export class ModuleQueue {
     let idx = i;
     while (
       idx > 1 &&
-      compare(this.data[Math.floor(idx / 2) - 1], this.data[idx - 1])
+      hasLessPriority(this.data[Math.floor(idx / 2) - 1], this.data[idx - 1])
     ) {
       this.swap(Math.floor(idx / 2), idx);
       idx = Math.floor(idx / 2);
@@ -116,7 +134,7 @@ export class ModuleQueue {
     if (this.size === 1) {
       this.data = [];
       this.keys.clear();
-      this.log('queue', 'Removed %s from the queue', keyOf(max));
+      this.log('queue', 'Dequeued %s from the queue', keyOf(max));
       return max;
     }
 
@@ -128,7 +146,7 @@ export class ModuleQueue {
     }
 
     this.keys.delete(keyOf(max));
-    this.log('queue', 'Removed %s from the queue', keyOf(max));
+    this.log('queue', 'Dequeued %s from the queue', keyOf(max));
     return max;
   }
 
@@ -138,13 +156,18 @@ export class ModuleQueue {
     if (idx !== undefined) {
       const [, , refCount = 0] = this.data[idx];
       this.delete(key);
-      this.increaseKey(idx + 1, [el[0], el[1], refCount + 1]);
-      this.log('queue', 'Increased refCount of %s to %d', key, refCount + 1);
+      this.log('queue', 'Increase refCount of %s to %d', key, refCount + 1);
+      this.enqueue([el[0], el[1], refCount + 1]);
       return;
     }
 
     this.increaseKey(this.size + 1, el);
-    this.log('queue', 'Added %s to the queue', key);
+    this.log(
+      'queue',
+      'Enqueued %s to the queue: %o',
+      key,
+      this.data.map((i) => i[0].name)
+    );
   }
 
   public isEmpty() {

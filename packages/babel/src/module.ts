@@ -305,8 +305,7 @@ class Module {
   };
 
   require: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (id: string): any;
+    (id: string): unknown;
     resolve: (id: string) => string;
     ensure: () => void;
   } = Object.assign(
@@ -345,7 +344,7 @@ class Module {
           namespace: `module:${padStart(m.idx, 5)}`,
         });
       } else {
-        this.debug('eval-cache', `❌ %r is going to be initialized`, {
+        this.debug('eval-cache', `➕ %r is going to be initialized`, {
           namespace: `module:${padStart(getFileIdx(filename), 5)}`,
         });
         // Create the module if cached module is not available
@@ -386,9 +385,9 @@ class Module {
           } else {
             m.debug(
               'code-cache',
-              '❌%o is missing (%o were cached]',
+              '%o is missing (%o were cached)',
               only?.filter((token) => !cachedOnly.has(token)) ?? [],
-              cachedOnly
+              [...cachedOnly.values()]
             );
           }
         } else if (m.#isEvaluated) {

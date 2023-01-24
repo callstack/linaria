@@ -287,31 +287,29 @@ export function prepareForEvalSync(
       result,
     });
 
-    if (imports) {
-      for (const [importedFile, importsOnly] of imports) {
-        try {
-          const resolved = resolve(importedFile, name, resolveStack);
-          log('stage-1:sync-resolve', `✅ ${importedFile} -> ${resolved}`);
-          cache.resolveCache.set(
-            `${name} -> ${importedFile}`,
-            `${resolved}\0${importsOnly.join(',')}`
-          );
-          const fileContent = readFileSync(resolved, 'utf8');
-          queue.enqueue([
-            {
-              name: resolved,
-              only: importsOnly,
-              code: fileContent,
-            },
-            [name, ...resolveStack],
-          ]);
-        } catch (err) {
-          log(
-            'stage-1:sync-resolve',
-            `❌ cannot resolve ${importedFile}: %O`,
-            err
-          );
-        }
+    for (const [importedFile, importsOnly] of imports ?? []) {
+      try {
+        const resolved = resolve(importedFile, name, resolveStack);
+        log('stage-1:sync-resolve', `✅ ${importedFile} -> ${resolved}`);
+        cache.resolveCache.set(
+          `${name} -> ${importedFile}`,
+          `${resolved}\0${importsOnly.join(',')}`
+        );
+        const fileContent = readFileSync(resolved, 'utf8');
+        queue.enqueue([
+          {
+            name: resolved,
+            only: importsOnly,
+            code: fileContent,
+          },
+          [name, ...resolveStack],
+        ]);
+      } catch (err) {
+        log(
+          'stage-1:sync-resolve',
+          `❌ cannot resolve ${importedFile}: %O`,
+          err
+        );
       }
     }
   }
@@ -335,6 +333,7 @@ export default async function prepareForEval(
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
 ): Promise<ITransformFileResult | undefined> {
   const queue = new ModuleQueue(entrypoint);
+  const log = createCustomDebug('transform', getFileIdx(entrypoint.name));
 
   while (!queue.isEmpty()) {
     const [nextItem, resolveStack] = queue.dequeue() ?? [];
@@ -343,7 +342,6 @@ export default async function prepareForEval(
     }
 
     const { name, only, code } = nextItem;
-    const log = createCustomDebug('transform', getFileIdx(name));
 
     const cached = cache.codeCache.get(name);
     // If we already have a result for this file, we should get a result for merged `only`
@@ -351,7 +349,7 @@ export default async function prepareForEval(
       ? Array.from(new Set([...cached.only, ...only]))
       : only;
     if (cached && isEqual(cached.only, mergedOnly)) {
-      log('stage-1', 'is already processed');
+      log('stage-1', '%s is already processed', name);
       continue;
     }
 
@@ -377,48 +375,55 @@ export default async function prepareForEval(
       result,
     });
 
-    if (imports) {
-      for (const [importedFile, importsOnly] of imports) {
-        try {
-          const resolved = await resolve(importedFile, name, resolveStack);
+    for (const [importedFile, importsOnly] of imports ?? []) {
+      try {
+        const resolved = await resolve(importedFile, name, resolveStack);
 
-          if (resolved === null) {
-            log('stage-1:resolve', `✅ ${importedFile} is ignored`);
-            continue;
-          }
-
-          log('stage-1:async-resolve', `✅ ${importedFile} -> ${resolved}`);
-          const resolveCacheKey = `${name} -> ${importedFile}`;
-          const resolveCached = cache.resolveCache.get(resolveCacheKey);
-          const importsOnlySet = new Set(importsOnly);
-          if (resolveCached) {
-            const [, cachedOnly] = resolveCached.split('\0');
-            cachedOnly?.split(',').forEach((token) => {
-              importsOnlySet.add(token);
-            });
-          }
-
-          cache.resolveCache.set(
-            resolveCacheKey,
-            `${resolved}\0${[...importsOnlySet].join(',')}`
-          );
-
-          const fileContent = readFileSync(resolved, 'utf8');
-          queue.enqueue([
-            {
-              name: resolved,
-              only: importsOnly,
-              code: fileContent,
-            },
-            [name, ...resolveStack],
-          ]);
-        } catch (err) {
-          log(
-            'stage-1:async-resolve',
-            `❌ cannot resolve ${importedFile}: %O`,
-            err
-          );
+        if (resolved === null) {
+          log('stage-1:resolve', `✅ %s in %s is ignored`, importedFile, name);
+          continue;
         }
+
+        log(
+          'stage-1:async-resolve',
+          `✅ %s (%o) in %s -> %s`,
+          importedFile,
+          importsOnly,
+          name,
+          resolved
+        );
+        const resolveCacheKey = `${name} -> ${importedFile}`;
+        const resolveCached = cache.resolveCache.get(resolveCacheKey);
+        const importsOnlySet = new Set(importsOnly);
+        if (resolveCached) {
+          const [, cachedOnly] = resolveCached.split('\0');
+          cachedOnly?.split(',').forEach((token) => {
+            importsOnlySet.add(token);
+          });
+        }
+
+        cache.resolveCache.set(
+          resolveCacheKey,
+          `${resolved}\0${[...importsOnlySet].join(',')}`
+        );
+
+        const fileContent = readFileSync(resolved, 'utf8');
+        queue.enqueue([
+          {
+            name: resolved,
+            only: importsOnly,
+            code: fileContent,
+          },
+          [name, ...resolveStack],
+        ]);
+      } catch (err) {
+        log(
+          'stage-1:async-resolve',
+          `❌ cannot resolve %s in %s: %O`,
+          importedFile,
+          name,
+          err
+        );
       }
     }
   }
