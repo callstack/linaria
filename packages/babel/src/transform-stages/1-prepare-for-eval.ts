@@ -103,7 +103,6 @@ function prepareCode(
   originalCode: string,
   only: string[],
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
-  // fileCache: Map<string | symbol, ITransformFileResult>
 ): [
   code: string,
   imports: Module['imports'],
@@ -264,7 +263,7 @@ export function prepareForEvalSync(
       : only;
 
     if (cached && isEqual(cached.only, mergedOnly)) {
-      log('stage-1', 'is already processed');
+      log('stage-1', '%s is already processed', name);
       continue;
     }
 
@@ -317,6 +316,8 @@ export function prepareForEvalSync(
   return cache.codeCache.get(entrypoint.name)?.result;
 }
 
+const readyPromises = new WeakMap<object, Promise<void>>();
+
 /**
  * Parses the specified file and recursively all its dependencies,
  * finds tags, applies eval-time replacements, removes dead code.
@@ -332,8 +333,30 @@ export default async function prepareForEval(
   entrypoint: IEntrypoint,
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
 ): Promise<ITransformFileResult | undefined> {
-  const queue = new ModuleQueue(entrypoint);
   const log = createCustomDebug('transform', getFileIdx(entrypoint.name));
+
+  let release: () => void = () => {};
+
+  const readyPromise = readyPromises.get(cache.codeCache);
+
+  if (readyPromises) {
+    log('stage-1', 'another transform is in progress, waiting…');
+  }
+
+  readyPromises.set(
+    cache.codeCache,
+    new Promise((r) => {
+      release = r;
+    })
+  );
+
+  if (readyPromise) {
+    await readyPromise;
+
+    log('stage-1', 'previous transform has been completed, starting…');
+  }
+
+  const queue = new ModuleQueue(entrypoint);
 
   while (!queue.isEmpty()) {
     const [nextItem, resolveStack] = queue.dequeue() ?? [];
@@ -351,6 +374,14 @@ export default async function prepareForEval(
     if (cached && isEqual(cached.only, mergedOnly)) {
       log('stage-1', '%s is already processed', name);
       continue;
+    } else if (cached) {
+      log(
+        'stage-1',
+        '%s is already processed, but with different `only` %o (the cached one %o)',
+        name,
+        only,
+        cached?.only
+      );
     }
 
     // If we already have a result for this file, we should invalidate it
@@ -367,9 +398,14 @@ export default async function prepareForEval(
       options
     );
 
-    if (!processed) continue;
+    if (!processed) {
+      log('stage-1', '%s is skipped', name);
+      continue;
+    }
 
     const { imports, result } = processed;
+    log('stage-1', '%s has been processed for only %o', name, mergedOnly);
+
     cache.codeCache.set(name, {
       only: mergedOnly,
       result,
@@ -427,6 +463,8 @@ export default async function prepareForEval(
       }
     }
   }
+
+  release();
 
   return cache.codeCache.get(entrypoint.name)?.result;
 }

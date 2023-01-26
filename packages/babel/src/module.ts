@@ -120,11 +120,14 @@ class Module {
 
   debug: CustomDebug;
 
-  resolveCache: Map<string, string>;
+  readonly #resolveCache: Map<string, string>;
 
-  codeCache: Map<string, { only: string[]; result: ITransformFileResult }>;
+  readonly #codeCache: Map<
+    string,
+    { only: string[]; result: ITransformFileResult }
+  >;
 
-  evalCache: Map<string, Module>;
+  readonly #evalCache: Map<string, Module>;
 
   constructor(
     filename: string,
@@ -143,9 +146,9 @@ class Module {
     this.transform = null;
     this.debug = createCustomDebug('module', this.idx);
 
-    this.resolveCache = cache.resolveCache;
-    this.codeCache = cache.codeCache;
-    this.evalCache = cache.evalCache;
+    this.#resolveCache = cache.resolveCache;
+    this.#codeCache = cache.codeCache;
+    this.#evalCache = cache.evalCache;
 
     Object.defineProperties(this, {
       id: {
@@ -272,8 +275,8 @@ class Module {
 
   resolve = (id: string) => {
     const resolveCacheKey = `${this.filename} -> ${id}`;
-    if (this.resolveCache.has(resolveCacheKey)) {
-      return this.resolveCache.get(resolveCacheKey)!;
+    if (this.#resolveCache.has(resolveCacheKey)) {
+      return this.#resolveCache.get(resolveCacheKey)!;
     }
 
     const extensions = (
@@ -338,8 +341,8 @@ class Module {
 
       this.debug('require', `${id} -> ${filename}`);
 
-      if (this.evalCache.has(filename)) {
-        m = this.evalCache.get(filename)!;
+      if (this.#evalCache.has(filename)) {
+        m = this.#evalCache.get(filename)!;
         this.debug('eval-cache', '✅ %r has been gotten from cache', {
           namespace: `module:${padStart(m.idx, 5)}`,
         });
@@ -352,9 +355,9 @@ class Module {
           filename,
           this.options,
           {
-            codeCache: this.codeCache,
-            evalCache: this.evalCache,
-            resolveCache: this.resolveCache,
+            codeCache: this.#codeCache,
+            evalCache: this.#evalCache,
+            resolveCache: this.#resolveCache,
           },
           this.debuggerDepth + 1,
           this
@@ -363,15 +366,15 @@ class Module {
 
         // Store it in cache at this point with, otherwise
         // we would end up in infinite loop with cyclic dependencies
-        this.evalCache.set(filename, m);
+        this.#evalCache.set(filename, m);
       }
 
       const extension = path.extname(filename);
       if (extension === '.json' || this.extensions.includes(extension)) {
         let code: string | undefined;
         // Requested file can be already prepared for evaluation on the stage 1
-        if (this.codeCache.has(filename)) {
-          const cached = this.codeCache.get(filename);
+        if (this.#codeCache.has(filename)) {
+          const cached = this.#codeCache.get(filename);
           const only = onlyList
             ?.split(',')
             .filter((token) => !m.#lazyValues.has(token));
