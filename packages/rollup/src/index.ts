@@ -117,7 +117,7 @@ export default function linaria({
 
   return new Proxy<Plugin>(plugin, {
     get(target, prop) {
-      return (vite || target)[prop as keyof Plugin];
+      return ((vite as Plugin) || target)[prop as keyof Plugin];
     },
 
     getOwnPropertyDescriptor(target, prop) {

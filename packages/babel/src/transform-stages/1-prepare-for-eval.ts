@@ -281,10 +281,6 @@ export function prepareForEvalSync(
     if (!processed) continue;
 
     const { imports, result } = processed;
-    cache.codeCache.set(name, {
-      only: mergedOnly,
-      result,
-    });
 
     for (const [importedFile, importsOnly] of imports ?? []) {
       try {
@@ -311,12 +307,16 @@ export function prepareForEvalSync(
         );
       }
     }
+
+    cache.codeCache.set(name, {
+      imports,
+      only: mergedOnly,
+      result,
+    });
   }
 
   return cache.codeCache.get(entrypoint.name)?.result;
 }
-
-const readyPromises = new WeakMap<object, Promise<void>>();
 
 /**
  * Parses the specified file and recursively all its dependencies,
@@ -333,28 +333,15 @@ export default async function prepareForEval(
   entrypoint: IEntrypoint,
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
 ): Promise<ITransformFileResult | undefined> {
+  /*
+   * This method can be run simultaneously for multiple files.
+   * A shared cache is accessible for all runs, but each run has its own queue
+   * to maintain the correct processing order. The cache stores the outcome
+   * of tree-shaking, and if the result is already stored in the cache
+   * but the "only" option has changed, the file will be re-processed using
+   * the combined "only" option.
+   */
   const log = createCustomDebug('transform', getFileIdx(entrypoint.name));
-
-  let release: () => void = () => {};
-
-  const readyPromise = readyPromises.get(cache.codeCache);
-
-  if (readyPromises) {
-    log('stage-1', 'another transform is in progress, waiting…');
-  }
-
-  readyPromises.set(
-    cache.codeCache,
-    new Promise((r) => {
-      release = r;
-    })
-  );
-
-  if (readyPromise) {
-    await readyPromise;
-
-    log('stage-1', 'previous transform has been completed, starting…');
-  }
 
   const queue = new ModuleQueue(entrypoint);
 
@@ -371,63 +358,117 @@ export default async function prepareForEval(
     const mergedOnly = cached?.only
       ? Array.from(new Set([...cached.only, ...only]))
       : only;
+
+    let imports: Map<string, string[]> | null = null;
+    let result: ITransformFileResult | undefined;
+
     if (cached && isEqual(cached.only, mergedOnly)) {
       log('stage-1', '%s is already processed', name);
-      continue;
-    } else if (cached) {
-      log(
-        'stage-1',
-        '%s is already processed, but with different `only` %o (the cached one %o)',
-        name,
-        only,
-        cached?.only
-      );
-    }
-
-    // If we already have a result for this file, we should invalidate it
-    cache.evalCache.delete(name);
-
-    const processed = processQueueItem(
-      babel,
-      {
-        name,
-        code,
-        only: mergedOnly,
-      },
-      cache,
-      options
-    );
-
-    if (!processed) {
-      log('stage-1', '%s is skipped', name);
-      continue;
-    }
-
-    const { imports, result } = processed;
-    log('stage-1', '%s has been processed for only %o', name, mergedOnly);
-
-    cache.codeCache.set(name, {
-      only: mergedOnly,
-      result,
-    });
-
-    for (const [importedFile, importsOnly] of imports ?? []) {
-      try {
-        const resolved = await resolve(importedFile, name, resolveStack);
-
-        if (resolved === null) {
-          log('stage-1:resolve', `✅ %s in %s is ignored`, importedFile, name);
-          continue;
-        }
-
+      imports = cached.imports;
+      result = cached.result;
+    } else {
+      if (cached) {
         log(
-          'stage-1:async-resolve',
-          `✅ %s (%o) in %s -> %s`,
-          importedFile,
-          importsOnly,
+          'stage-1',
+          '%s is already processed, but with different `only` %o (the cached one %o)',
           name,
-          resolved
+          only,
+          cached?.only
         );
+
+        // If we already have a result for this file, we should invalidate it
+        cache.evalCache.delete(name);
+      }
+
+      const processed = processQueueItem(
+        babel,
+        {
+          name,
+          code,
+          only: mergedOnly,
+        },
+        cache,
+        options
+      );
+
+      if (!processed) {
+        log('stage-1', '%s is skipped', name);
+        continue;
+      }
+
+      imports = processed.imports;
+      result = processed.result;
+    }
+
+    if (imports) {
+      const resolvedImports: {
+        resolved: string;
+        importedFile: string;
+        importsOnly: string[];
+      }[] = [];
+
+      const unresolved: {
+        importedFile: string;
+        importsOnly: string[];
+      }[] = [];
+
+      for (const [importedFile, importsOnly] of imports) {
+        const cachedResolve = cache.resolveCache.get(
+          `${name} -> ${importedFile}`
+        );
+        if (cachedResolve) {
+          const [resolved] = cachedResolve.split('\0');
+          log('stage-1', '%s is already resolved', importedFile);
+          resolvedImports.push({ resolved, importedFile, importsOnly });
+        } else {
+          unresolved.push({ importedFile, importsOnly });
+        }
+      }
+
+      await Promise.all(
+        unresolved.map(async ({ importedFile, importsOnly }) => {
+          await resolve(importedFile, name, resolveStack).then(
+            (resolved) => {
+              if (resolved === null) {
+                log(
+                  'stage-1:resolve',
+                  `✅ %s in %s is ignored`,
+                  importedFile,
+                  name
+                );
+                return;
+              }
+
+              log(
+                'stage-1:async-resolve',
+                `✅ %s (%o) in %s -> %s`,
+                importedFile,
+                importsOnly,
+                name,
+                resolved
+              );
+
+              resolvedImports.push({
+                resolved,
+                importedFile,
+                importsOnly,
+              });
+            },
+            (err) => {
+              log(
+                'stage-1:async-resolve',
+                `❌ cannot resolve %s in %s: %O`,
+                importedFile,
+                name,
+                err
+              );
+            }
+          );
+        })
+      );
+
+      for (const resolvedImport of resolvedImports) {
+        const { resolved, importedFile, importsOnly } = resolvedImport;
         const resolveCacheKey = `${name} -> ${importedFile}`;
         const resolveCached = cache.resolveCache.get(resolveCacheKey);
         const importsOnlySet = new Set(importsOnly);
@@ -452,19 +493,19 @@ export default async function prepareForEval(
           },
           [name, ...resolveStack],
         ]);
-      } catch (err) {
-        log(
-          'stage-1:async-resolve',
-          `❌ cannot resolve %s in %s: %O`,
-          importedFile,
-          name,
-          err
-        );
       }
+    } else {
+      log('stage-1', '%s has no imports', name);
     }
+
+    cache.codeCache.set(name, {
+      imports,
+      only: mergedOnly,
+      result,
+    });
   }
 
-  release();
+  log('stage-1', 'queue is empty, %s is ready', entrypoint.name);
 
   return cache.codeCache.get(entrypoint.name)?.result;
 }

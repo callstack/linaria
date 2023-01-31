@@ -124,7 +124,11 @@ class Module {
 
   readonly #codeCache: Map<
     string,
-    { only: string[]; result: ITransformFileResult }
+    {
+      imports: Map<string, string[]> | null;
+      only: string[];
+      result: ITransformFileResult;
+    }
   >;
 
   readonly #evalCache: Map<string, Module>;

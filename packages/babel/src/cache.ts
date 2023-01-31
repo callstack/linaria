@@ -6,7 +6,11 @@ export class TransformCacheCollection {
     public readonly resolveCache: Map<string, string> = new Map(),
     public readonly codeCache: Map<
       string,
-      { only: string[]; result: ITransformFileResult }
+      {
+        imports: Map<string, string[]> | null;
+        only: string[];
+        result: ITransformFileResult;
+      }
     > = new Map(),
     public readonly evalCache: Map<string, Module> = new Map()
   ) {}

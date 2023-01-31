@@ -1,12 +1,12 @@
-import { posix } from 'path';
+import { relative, sep } from 'path';
 
 import type { CustomDebug } from '@linaria/logger';
 import { createCustomDebug } from '@linaria/logger';
 import { getFileIdx } from '@linaria/utils';
 
 export interface IEntrypoint {
-  name: string;
   code: string;
+  name: string;
   only: string[];
 }
 
@@ -22,15 +22,19 @@ const hasLessPriority = (
   const firstA = peek(stackA);
   const firstB = peek(stackB);
   if (refCountA === refCountB && firstA && firstB) {
-    const distanceA = posix.relative(firstA, nameA).split('/').length;
-    const distanceB = posix.relative(firstB, nameB).split('/').length;
+    const distanceA = relative(firstA, nameA).split(sep).length;
+    const distanceB = relative(firstB, nameB).split(sep).length;
     return distanceA > distanceB;
   }
 
   return refCountA > refCountB;
 };
 
-const keyOf = (el: Node) => el[0].name;
+const nameOf = ([entrypoint]: Node): string => entrypoint.name;
+
+const keyOf = ([entrypoint]: Node): string => {
+  return entrypoint.name;
+};
 
 export class ModuleQueue {
   private data: Array<Node> = [];
@@ -134,7 +138,7 @@ export class ModuleQueue {
     if (this.size === 1) {
       this.data = [];
       this.keys.clear();
-      this.log('queue', 'Dequeued %s from the queue', keyOf(max));
+      this.log('queue', 'Dequeued %s', nameOf(max));
       return max;
     }
 
@@ -146,7 +150,7 @@ export class ModuleQueue {
     }
 
     this.keys.delete(keyOf(max));
-    this.log('queue', 'Dequeued %s from the queue', keyOf(max));
+    this.log('queue', 'Dequeued %s: %o', nameOf(max), this.data.map(nameOf));
     return max;
   }
 
@@ -154,20 +158,20 @@ export class ModuleQueue {
     const key = keyOf(el);
     const idx = this.keys.get(key);
     if (idx !== undefined) {
-      const [, , refCount = 0] = this.data[idx];
+      const [entrypoint, , refCount = 0] = this.data[idx];
       this.delete(key);
       this.log('queue', 'Increase refCount of %s to %d', key, refCount + 1);
-      this.enqueue([el[0], el[1], refCount + 1]);
+      const replacement = {
+        ...entrypoint,
+        only: [...new Set([...entrypoint.only, ...el[0].only])],
+      };
+
+      this.enqueue([replacement, el[1], refCount + 1]);
       return;
     }
 
     this.increaseKey(this.size + 1, el);
-    this.log(
-      'queue',
-      'Enqueued %s to the queue: %o',
-      key,
-      this.data.map((i) => i[0].name)
-    );
+    this.log('queue', 'Enqueued %s: %o', nameOf(el), this.data.map(nameOf));
   }
 
   public isEmpty() {
