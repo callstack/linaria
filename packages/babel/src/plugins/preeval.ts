@@ -146,7 +146,7 @@ export default function preeval(
                 p.find(
                   (parentPath) =>
                     parentPath.isUnaryExpression({ operator: 'typeof' }) ||
-                    p.parentPath.isTSTypeQuery()
+                    parentPath.isTSTypeQuery()
                 )
               ) {
                 // Ignore `typeof window` expressions
