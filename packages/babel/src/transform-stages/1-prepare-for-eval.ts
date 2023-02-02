@@ -362,12 +362,12 @@ export default async function prepareForEval(
     let imports: Map<string, string[]> | null = null;
     let result: ITransformFileResult | undefined;
 
-    if (cached && isEqual(cached.only, mergedOnly)) {
-      log('stage-1', '%s is already processed', name);
-      imports = cached.imports;
-      result = cached.result;
-    } else {
-      if (cached) {
+    if (cached) {
+      if (isEqual(cached.only, mergedOnly)) {
+        log('stage-1', '%s is already processed', name);
+        imports = cached.imports;
+        result = cached.result;
+      } else {
         log(
           'stage-1',
           '%s is already processed, but with different `only` %o (the cached one %o)',
@@ -379,7 +379,9 @@ export default async function prepareForEval(
         // If we already have a result for this file, we should invalidate it
         cache.evalCache.delete(name);
       }
+    }
 
+    if (!result) {
       const processed = processQueueItem(
         babel,
         {
@@ -401,74 +403,34 @@ export default async function prepareForEval(
     }
 
     if (imports) {
-      const resolvedImports: {
-        resolved: string;
-        importedFile: string;
-        importsOnly: string[];
-      }[] = [];
-
-      const unresolved: {
-        importedFile: string;
-        importsOnly: string[];
-      }[] = [];
-
       for (const [importedFile, importsOnly] of imports) {
-        const cachedResolve = cache.resolveCache.get(
-          `${name} -> ${importedFile}`
-        );
-        if (cachedResolve) {
-          const [resolved] = cachedResolve.split('\0');
-          log('stage-1', '%s is already resolved', importedFile);
-          resolvedImports.push({ resolved, importedFile, importsOnly });
-        } else {
-          unresolved.push({ importedFile, importsOnly });
-        }
-      }
-
-      await Promise.all(
-        unresolved.map(async ({ importedFile, importsOnly }) => {
-          await resolve(importedFile, name, resolveStack).then(
-            (resolved) => {
-              if (resolved === null) {
-                log(
-                  'stage-1:resolve',
-                  `✅ %s in %s is ignored`,
-                  importedFile,
-                  name
-                );
-                return;
-              }
-
-              log(
-                'stage-1:async-resolve',
-                `✅ %s (%o) in %s -> %s`,
-                importedFile,
-                importsOnly,
-                name,
-                resolved
-              );
-
-              resolvedImports.push({
-                resolved,
-                importedFile,
-                importsOnly,
-              });
-            },
-            (err) => {
-              log(
-                'stage-1:async-resolve',
-                `❌ cannot resolve %s in %s: %O`,
-                importedFile,
-                name,
-                err
-              );
-            }
+        let resolved: string | null = null;
+        try {
+          resolved = await resolve(importedFile, name, resolveStack);
+        } catch (err) {
+          log(
+            'stage-1:async-resolve',
+            `❌ cannot resolve %s in %s: %O`,
+            importedFile,
+            name,
+            err
           );
-        })
-      );
+        }
 
-      for (const resolvedImport of resolvedImports) {
-        const { resolved, importedFile, importsOnly } = resolvedImport;
+        if (resolved === null) {
+          log('stage-1:resolve', `✅ %s in %s is ignored`, importedFile, name);
+          continue;
+        }
+
+        log(
+          'stage-1:async-resolve',
+          `✅ %s (%o) in %s -> %s`,
+          importedFile,
+          importsOnly,
+          name,
+          resolved
+        );
+
         const resolveCacheKey = `${name} -> ${importedFile}`;
         const resolveCached = cache.resolveCache.get(resolveCacheKey);
         const importsOnlySet = new Set(importsOnly);
