@@ -93,8 +93,6 @@ export default function linaria({
     },
     async transform(code: string, url: string) {
       const [id] = url.split('?');
-      // Remove from cache if file has changed
-      codeCache.delete(id);
 
       // Do not transform ignored and generated files
       if (url.includes('node_modules') || !filter(url) || id in cssLookup)

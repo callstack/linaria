@@ -20,7 +20,7 @@ const wrap = <T>(fn: () => T): T | Error => {
  */
 export default function evalStage(
   cache: TransformCacheCollection,
-  code: string[],
+  code: string,
   options: Pick<Options, 'filename' | 'pluginOptions'>
 ): [ValueCache, string[]] | null {
   const log = createCustomDebug('transform', getFileIdx(options.filename));

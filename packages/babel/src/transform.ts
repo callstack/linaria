@@ -23,7 +23,7 @@ import withLinariaMetadata from './utils/withLinariaMetadata';
 function syncStages(
   originalCode: string,
   options: Options,
-  prepareStageResults: ITransformFileResult[] | undefined,
+  prepareStageResult: ITransformFileResult | undefined,
   babelConfig: TransformOptions,
   cache: TransformCacheCollection,
   eventEmitter?: (ev: unknown) => void
@@ -32,8 +32,8 @@ function syncStages(
 
   // File does not contain any tags. Return original code.
   if (
-    !prepareStageResults ||
-    prepareStageResults.every((r) => !withLinariaMetadata(r.metadata))
+    !prepareStageResult ||
+    !withLinariaMetadata(prepareStageResult.metadata)
   ) {
     return {
       code: originalCode,
@@ -45,11 +45,7 @@ function syncStages(
 
   eventEmitter?.({ type: 'transform:stage-2:start', filename });
 
-  const evalStageResult = evalStage(
-    cache,
-    prepareStageResults.map((r) => r.code),
-    options
-  );
+  const evalStageResult = evalStage(cache, prepareStageResult.code, options);
 
   eventEmitter?.({ type: 'transform:stage-2:finish', filename });
 
@@ -120,7 +116,7 @@ export function transformSync(
 
   eventEmitter?.({ type: 'transform:stage-1:start', filename });
 
-  const entryPoint = {
+  const entrypoint = {
     name: options.filename,
     code: originalCode,
     only: ['__linariaPreval'],
@@ -130,7 +126,7 @@ export function transformSync(
     babel,
     cache,
     syncResolve,
-    entryPoint,
+    entrypoint,
     options
   );
 
@@ -166,17 +162,17 @@ export default async function transform(
 
   eventEmitter?.({ type: 'transform:stage-1:start', filename });
 
-  const entryPoint = Promise.resolve({
+  const entrypoint = {
     name: filename,
     code: originalCode,
     only: ['__linariaPreval'],
-  });
+  };
 
   const prepareStageResults = await prepareForEval(
     babel,
     cache,
     asyncResolve,
-    entryPoint,
+    entrypoint,
     options
   );
 

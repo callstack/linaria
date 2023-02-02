@@ -9,7 +9,7 @@ import type { Options } from '../types';
 
 export default function evaluate(
   cache: TransformCacheCollection,
-  code: string[],
+  code: string,
   options: Pick<Options, 'filename' | 'pluginOptions'>
 ) {
   const filename = options?.filename ?? 'unknown';
