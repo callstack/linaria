@@ -520,6 +520,7 @@ importers:
     specifiers:
       '@babel/core': ^7.20.2
       '@babel/generator': ^7.20.4
+      '@babel/helper-plugin-utils': ^7.20.2
       '@babel/plugin-transform-modules-commonjs': ^7.19.6
       '@babel/plugin-transform-runtime': ^7.19.6
       '@babel/plugin-transform-template-literals': ^7.18.9
@@ -527,12 +528,15 @@ importers:
       '@babel/types': ^7.20.2
       '@linaria/logger': workspace:^
       '@linaria/utils': workspace:^
+      '@swc/core': ^1.3.32
       '@types/babel__core': ^7.1.19
       '@types/babel__generator': ^7.6.4
+      '@types/babel__helper-plugin-utils': ^7.10.0
       '@types/babel__traverse': ^7.17.1
       '@types/dedent': ^0.7.0
       '@types/jest': ^28.1.0
       '@types/node': ^17.0.39
+      acorn: ^8.8.2
       babel-plugin-transform-react-remove-prop-types: ^0.4.24
       dedent: ^0.7.0
       jest: ^28.1.0
@@ -542,18 +546,22 @@ importers:
     dependencies:
       '@babel/core': 7.20.2
       '@babel/generator': 7.20.4
+      '@babel/helper-plugin-utils': 7.20.2
       '@babel/plugin-transform-modules-commonjs': 7.19.6_@babel+core@7.20.2
       '@babel/plugin-transform-runtime': 7.19.6_@babel+core@7.20.2
       '@babel/plugin-transform-template-literals': 7.18.9_@babel+core@7.20.2
       '@babel/preset-env': 7.20.2_@babel+core@7.20.2
       '@linaria/logger': link:../logger
       '@linaria/utils': link:../utils
+      '@swc/core': 1.3.32
+      acorn: 8.8.2
       babel-plugin-transform-react-remove-prop-types: 0.4.24
       ts-invariant: 0.10.3
     devDependencies:
       '@babel/types': 7.20.2
       '@types/babel__core': 7.1.19
       '@types/babel__generator': 7.6.4
+      '@types/babel__helper-plugin-utils': 7.10.0
       '@types/babel__traverse': 7.17.1
       '@types/dedent': 0.7.0
       '@types/jest': 28.1.0
@@ -893,8 +901,8 @@ packages:
     dependencies:
       '@astrojs/micromark-extension-mdx-jsx': 1.0.3
       '@astrojs/prism': 1.0.2
-      acorn: 8.8.1
-      acorn-jsx: 5.3.2_acorn@8.8.1
+      acorn: 8.8.2
+      acorn-jsx: 5.3.2_acorn@8.8.2
       github-slugger: 1.5.0
       hast-util-to-html: 8.0.3
       import-meta-resolve: 2.1.0
@@ -1179,16 +1187,6 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       '@babel/types': 7.20.2
-
-  /@babel/helper-plugin-utils/7.17.12:
-    resolution: {integrity: sha512-JDkf04mqtN3y4iAbO1hv9U2ARpPyPL1zqyWs/2WG1pgSq9llHFjStX5jdxb84himgJm+8Ng+x0oiWF/nw/XQKA==}
-    engines: {node: '>=6.9.0'}
-    dev: true
-
-  /@babel/helper-plugin-utils/7.19.0:
-    resolution: {integrity: sha512-40Ryx7I8mT+0gaNxm8JGTZFUITNqdLAgdg0hXzeVZxVD6nFsdhQvip6v8dqkRHzsz1VFpFAaOCHNn0vKBL7Czw==}
-    engines: {node: '>=6.9.0'}
-    dev: true
 
   /@babel/helper-plugin-utils/7.20.2:
     resolution: {integrity: sha512-8RvlJG2mj4huQ4pZ+rU9lqKi9ZKiRmuvGuM2HlWmkmgOhbs6zEAw6IEiJ5cQqGbDzGZOhwuOQNtZMi/ENLjZoQ==}
@@ -1923,7 +1921,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.20.2
-      '@babel/helper-plugin-utils': 7.19.0
+      '@babel/helper-plugin-utils': 7.20.2
     dev: true
 
   /@babel/plugin-transform-react-jsx-source/7.18.6_@babel+core@7.20.2:
@@ -1933,7 +1931,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.20.2
-      '@babel/helper-plugin-utils': 7.19.0
+      '@babel/helper-plugin-utils': 7.20.2
     dev: true
 
   /@babel/plugin-transform-react-jsx/7.19.0_@babel+core@7.20.2:
@@ -2600,22 +2598,22 @@ packages:
       postcss: 8.4.16
       postcss-selector-parser: 6.0.10
 
-  /@definitelytyped/header-parser/0.0.144:
-    resolution: {integrity: sha512-uDgZcuDI6NCsz6uo28w6l7JKuDg7IrzeroMp/+OxfWyrTdnPFZdaHGzQlyzJXx4upkvJ1fWvYYRwhP36khqG+A==}
+  /@definitelytyped/header-parser/0.0.146:
+    resolution: {integrity: sha512-rmDRPRRVHLMQDf2cjGqmawNwEVP/4xqGOT9brt8rBi7IfFZgRXR93MJlAuUcRkFauNJgsgDNlJVdUT+z0zsmQw==}
     dependencies:
-      '@definitelytyped/typescript-versions': 0.0.144
+      '@definitelytyped/typescript-versions': 0.0.146
       '@types/parsimmon': 1.10.6
       parsimmon: 1.18.1
     dev: true
 
-  /@definitelytyped/typescript-versions/0.0.144:
-    resolution: {integrity: sha512-fDaG9Wf2CvBprEMZCacifOopQCKKDlCINfKHeI0sEtJlQDIpRoQeOHdMqe7Jm2J8HJeK6mrzVF3Q9oCr/Go0hw==}
+  /@definitelytyped/typescript-versions/0.0.146:
+    resolution: {integrity: sha512-o1E7hX3bu45AYVQM5qccdpde/T1IAHXmy6w7I0Fzca3wPg5d/RfSsRv2j+HAtzWlp+f6jRjhP+d8vgR6Ffwjsg==}
     dev: true
 
-  /@definitelytyped/utils/0.0.144:
-    resolution: {integrity: sha512-yB8XEF4O4gItnLz1MFcZtzNKXqWU4nE4Z3wfnZHcQWaJyZCjf/oONTt1Lw98bTjQsaRBDmcE9q8iFwpLYUuEVQ==}
+  /@definitelytyped/utils/0.0.146:
+    resolution: {integrity: sha512-THRFJlGlT2roR2/jVqPMsiouZX19vk/2/IDgB+YQyNc88nD9UsBV05qVFUHyhzCokztuefy4Y01c2WBDU2ojoQ==}
     dependencies:
-      '@definitelytyped/typescript-versions': 0.0.144
+      '@definitelytyped/typescript-versions': 0.0.146
       '@qiwi/npm-registry-client': 8.9.1
       '@types/node': 14.18.33
       charm: 1.0.2
@@ -3465,8 +3463,26 @@ packages:
     dev: false
     optional: true
 
+  /@swc/core-darwin-arm64/1.3.32:
+    resolution: {integrity: sha512-o19bhlxuUgjUElm6i+QhXgZ0vD6BebiB/gQpK3en5aAwhOvinwr4sah3GqFXsQzz/prKVDuMkj9SW6F/Ug5hgg==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
   /@swc/core-darwin-x64/1.3.20:
     resolution: {integrity: sha512-yM11/3n8PwougalAi9eWkz1r5QRDAg1qdXMSCn7sWlVGr0RvdPL20viKddm38yn+X3FzZzgdoajh7NGfEeqCIQ==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-darwin-x64/1.3.32:
+    resolution: {integrity: sha512-hVEGd+v5Afh+YekGADOGKwhuS4/AXk91nLuk7pmhWkk8ceQ1cfmah90kXjIXUlCe2G172MLRfHNWlZxr29E/Og==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [darwin]
@@ -3483,8 +3499,26 @@ packages:
     dev: false
     optional: true
 
+  /@swc/core-linux-arm-gnueabihf/1.3.32:
+    resolution: {integrity: sha512-5X01WqI9EbJ69oHAOGlI08YqvEIXMfT/mCJ1UWDQBb21xWRE2W1yFAAeuqOLtiagLrXjPv/UKQ0S2gyWQR5AXQ==}
+    engines: {node: '>=10'}
+    cpu: [arm]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
   /@swc/core-linux-arm64-gnu/1.3.20:
     resolution: {integrity: sha512-XCjQj4zo2T4QIqxVgzXkKxTLw4adqMgFG2iXBRRu1kOZXJor7Yzc0wH0B4rGtlkcZnh57MBbo+N1TNzH1leSFw==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-linux-arm64-gnu/1.3.32:
+    resolution: {integrity: sha512-PTJ6oPiutkNBg+m22bUUPa4tNuMmsgpSnsnv2wnWVOgK0lhvQT6bAPTUXDq/8peVAgR/SlpP2Ht8TRRqYMRjRQ==}
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux]
@@ -3501,8 +3535,26 @@ packages:
     dev: false
     optional: true
 
+  /@swc/core-linux-arm64-musl/1.3.32:
+    resolution: {integrity: sha512-lG0VOuYNPWOCJ99Aza69cTljjeft/wuRQeYFF8d+1xCQS/OT7gnbgi7BOz39uSHIPTBqfzdIsuvzdKlp9QydrQ==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
   /@swc/core-linux-x64-gnu/1.3.20:
     resolution: {integrity: sha512-F5TKwsZh3F7CzfYoTAiNwhZazQ02NCgFZSqSwO4lOYbT7RU+zXI3OfLoi2R8f0dzfqh26QSdeeMFPdMb3LpzXg==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-linux-x64-gnu/1.3.32:
+    resolution: {integrity: sha512-ecqtSWX4NBrs7Ji2VX3fDWeqUfrbLlYqBuufAziCM27xMxwlAVgmyGQk4FYgoQ3SAUAu3XFH87+3Q7uWm2X7xg==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux]
@@ -3519,8 +3571,26 @@ packages:
     dev: false
     optional: true
 
+  /@swc/core-linux-x64-musl/1.3.32:
+    resolution: {integrity: sha512-rl3dMcUuENVkpk5NGW/LXovjK0+JFm4GWPjy4NM3Q5cPvhBpGwSeLZlR+zAw9K0fdGoIXiayRTTfENrQwwsH+g==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
   /@swc/core-win32-arm64-msvc/1.3.20:
     resolution: {integrity: sha512-rFrC8JtVlnyfj5wTAIMvNWqPv0KXUA8/TmEKUlg7jgF/IweFPOFvF509tiAstz16Ui2JKL9xaA566/I+XLd+og==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-win32-arm64-msvc/1.3.32:
+    resolution: {integrity: sha512-VlybAZp8DcS66CH1LDnfp9zdwbPlnGXREtHDMHaBfK9+80AWVTg+zn0tCYz+HfcrRONqxbudwOUIPj+dwl/8jw==}
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [win32]
@@ -3537,8 +3607,26 @@ packages:
     dev: false
     optional: true
 
+  /@swc/core-win32-ia32-msvc/1.3.32:
+    resolution: {integrity: sha512-MEUMdpUFIQ+RD+K/iHhHKfu0TFNj9VXwIxT5hmPeqyboKo095CoFEFBJ0sHG04IGlnu8T9i+uE2Pi18qUEbFug==}
+    engines: {node: '>=10'}
+    cpu: [ia32]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
   /@swc/core-win32-x64-msvc/1.3.20:
     resolution: {integrity: sha512-1/vxiNasPvpCnVdMxGXEXYhRI65l7yNg/AQ9fYLQn3O5ouWJcd60+6ZoeVrnR5i/R87Fyu/A9fMhOJuOKLHXmA==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-win32-x64-msvc/1.3.32:
+    resolution: {integrity: sha512-DPMoneNFQco7SqmVVOUv1Vn53YmoImEfrAPMY9KrqQzgfzqNTuL2JvfxUqfAxwQ6pEKYAdyKJvZ483rIhgG9XQ==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [win32]
@@ -3562,6 +3650,23 @@ packages:
       '@swc/core-win32-arm64-msvc': 1.3.20
       '@swc/core-win32-ia32-msvc': 1.3.20
       '@swc/core-win32-x64-msvc': 1.3.20
+    dev: false
+
+  /@swc/core/1.3.32:
+    resolution: {integrity: sha512-Yx/n1j+uUkcqlJAW8IRg8Qymgkdow6NHJZPFShiR0YiaYq2sXY+JHmvh16O6GkL91Y+gTlDUS7uVgDz50czJUQ==}
+    engines: {node: '>=10'}
+    requiresBuild: true
+    optionalDependencies:
+      '@swc/core-darwin-arm64': 1.3.32
+      '@swc/core-darwin-x64': 1.3.32
+      '@swc/core-linux-arm-gnueabihf': 1.3.32
+      '@swc/core-linux-arm64-gnu': 1.3.32
+      '@swc/core-linux-arm64-musl': 1.3.32
+      '@swc/core-linux-x64-gnu': 1.3.32
+      '@swc/core-linux-x64-musl': 1.3.32
+      '@swc/core-win32-arm64-msvc': 1.3.32
+      '@swc/core-win32-ia32-msvc': 1.3.32
+      '@swc/core-win32-x64-msvc': 1.3.32
     dev: false
 
   /@tootallnate/once/1.1.2:
@@ -3596,6 +3701,12 @@ packages:
     dependencies:
       '@types/babel__core': 7.1.19
       '@types/babel__traverse': 7.17.1
+    dev: true
+
+  /@types/babel__helper-plugin-utils/7.10.0:
+    resolution: {integrity: sha512-60YtHzhQ9HAkToHVV+TB4VLzBn9lrfgrsOjiJMtbv/c1jPdekBxaByd6DMsGBzROXWoIL6U3lEFvvbu69RkUoA==}
+    dependencies:
+      '@types/babel__core': 7.1.19
     dev: true
 
   /@types/babel__template/7.4.1:
@@ -4365,14 +4476,6 @@ packages:
       mime-types: 2.1.35
       negotiator: 0.6.3
 
-  /acorn-import-assertions/1.8.0_acorn@8.7.1:
-    resolution: {integrity: sha512-m7VZ3jwz4eK6A4Vtt8Ew1/mNbP24u0FhdyfA7fSvnJR6LMdfOYnmuIrrJAgrYfYJ10F/otaHTtrtrtmHdMNzEw==}
-    peerDependencies:
-      acorn: ^8
-    dependencies:
-      acorn: 8.7.1
-    dev: true
-
   /acorn-import-assertions/1.8.0_acorn@8.8.1:
     resolution: {integrity: sha512-m7VZ3jwz4eK6A4Vtt8Ew1/mNbP24u0FhdyfA7fSvnJR6LMdfOYnmuIrrJAgrYfYJ10F/otaHTtrtrtmHdMNzEw==}
     peerDependencies:
@@ -4381,26 +4484,20 @@ packages:
       acorn: 8.8.1
     dev: true
 
-  /acorn-jsx/5.3.2_acorn@8.7.1:
+  /acorn-import-assertions/1.8.0_acorn@8.8.2:
+    resolution: {integrity: sha512-m7VZ3jwz4eK6A4Vtt8Ew1/mNbP24u0FhdyfA7fSvnJR6LMdfOYnmuIrrJAgrYfYJ10F/otaHTtrtrtmHdMNzEw==}
+    peerDependencies:
+      acorn: ^8
+    dependencies:
+      acorn: 8.8.2
+    dev: true
+
+  /acorn-jsx/5.3.2_acorn@8.8.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
     dependencies:
-      acorn: 8.7.1
-    dev: true
-
-  /acorn-jsx/5.3.2_acorn@8.8.1:
-    resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
-    peerDependencies:
-      acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
-    dependencies:
-      acorn: 8.8.1
-    dev: true
-
-  /acorn/8.7.1:
-    resolution: {integrity: sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==}
-    engines: {node: '>=0.4.0'}
-    hasBin: true
+      acorn: 8.8.2
     dev: true
 
   /acorn/8.8.1:
@@ -4408,6 +4505,11 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
     dev: true
+
+  /acorn/8.8.2:
+    resolution: {integrity: sha512-xjIYgE8HBrkpd/sJqOGNspf8uHG+NOHGOw6a/Urj8taM2EXfdNAH2oFcPeIFfsv3+kz/mJrS5VuMqbNLjCa2vw==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
 
   /agent-base/6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
@@ -4898,7 +5000,7 @@ packages:
     resolution: {integrity: sha512-Y1IQok9821cC9onCx5otgFfRm7Lm+I+wwxOx738M/WLPZ9Q42m4IG5W0FNX8WLL2gYMZo3JkuXIH2DOpWM+qwA==}
     engines: {node: '>=8'}
     dependencies:
-      '@babel/helper-plugin-utils': 7.17.12
+      '@babel/helper-plugin-utils': 7.20.2
       '@istanbuljs/load-nyc-config': 1.1.0
       '@istanbuljs/schema': 0.1.3
       istanbul-lib-instrument: 5.2.0
@@ -6290,7 +6392,7 @@ packages:
     peerDependencies:
       typescript: '*'
     dependencies:
-      '@definitelytyped/header-parser': 0.0.144
+      '@definitelytyped/header-parser': 0.0.146
       command-exists: 1.2.9
       rimraf: 3.0.2
       semver: 6.3.0
@@ -6306,9 +6408,9 @@ packages:
     peerDependencies:
       typescript: '>= 3.0.0-dev || >= 3.1.0-dev || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.7.0-dev || >= 3.8.0-dev || >= 3.9.0-dev || >= 4.0.0-dev'
     dependencies:
-      '@definitelytyped/header-parser': 0.0.144
-      '@definitelytyped/typescript-versions': 0.0.144
-      '@definitelytyped/utils': 0.0.144
+      '@definitelytyped/header-parser': 0.0.146
+      '@definitelytyped/typescript-versions': 0.0.146
+      '@definitelytyped/utils': 0.0.146
       dts-critic: 3.3.11_typescript@4.7.4
       fs-extra: 6.0.1
       json-stable-stringify: 1.0.1
@@ -7432,8 +7534,8 @@ packages:
     resolution: {integrity: sha512-D211tC7ZwouTIuY5x9XnS0E9sWNChB7IYKX/Xp5eQj3nFXhqmiUDB9q27y76oFl8jTg3pXcQx/bpxMfs3CIZbA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dependencies:
-      acorn: 8.7.1
-      acorn-jsx: 5.3.2_acorn@8.7.1
+      acorn: 8.8.2
+      acorn-jsx: 5.3.2_acorn@8.8.2
       eslint-visitor-keys: 3.3.0
     dev: true
 
@@ -13681,7 +13783,7 @@ packages:
       schema-utils: 3.1.1
       serialize-javascript: 6.0.0
       terser: 5.14.0
-      webpack: 5.73.0_webpack-cli@4.9.2
+      webpack: 5.73.0
     dev: true
 
   /terser-webpack-plugin/5.3.6_webpack@5.75.0:
@@ -13714,7 +13816,7 @@ packages:
     hasBin: true
     dependencies:
       '@jridgewell/source-map': 0.3.2
-      acorn: 8.7.1
+      acorn: 8.8.2
       commander: 2.20.3
       source-map-support: 0.5.21
     dev: true
@@ -13725,7 +13827,7 @@ packages:
     hasBin: true
     dependencies:
       '@jridgewell/source-map': 0.3.2
-      acorn: 8.8.1
+      acorn: 8.8.2
       commander: 2.20.3
       source-map-support: 0.5.21
     dev: true
@@ -14981,8 +15083,8 @@ packages:
       '@webassemblyjs/ast': 1.11.1
       '@webassemblyjs/wasm-edit': 1.11.1
       '@webassemblyjs/wasm-parser': 1.11.1
-      acorn: 8.7.1
-      acorn-import-assertions: 1.8.0_acorn@8.7.1
+      acorn: 8.8.2
+      acorn-import-assertions: 1.8.0_acorn@8.8.2
       browserslist: 4.20.3
       chrome-trace-event: 1.0.3
       enhanced-resolve: 5.9.3
@@ -15021,8 +15123,8 @@ packages:
       '@webassemblyjs/ast': 1.11.1
       '@webassemblyjs/wasm-edit': 1.11.1
       '@webassemblyjs/wasm-parser': 1.11.1
-      acorn: 8.7.1
-      acorn-import-assertions: 1.8.0_acorn@8.7.1
+      acorn: 8.8.2
+      acorn-import-assertions: 1.8.0_acorn@8.8.2
       browserslist: 4.20.3
       chrome-trace-event: 1.0.3
       enhanced-resolve: 5.9.3
