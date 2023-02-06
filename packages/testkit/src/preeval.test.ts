@@ -83,4 +83,24 @@ describe('preeval', () => {
 
     expect(code).toMatchSnapshot();
   });
+  it('should keep object members that look like window globals', () => {
+    const { code } = run`
+      class Test {
+        fetch: typeof global.fetch;
+        constructor(options) {
+          this.fetch = options.fetch;
+        }
+      }
+    `;
+
+    expect(code).toMatchSnapshot();
+  });
+  it('should keep type parameters that look like window globals', () => {
+    const { code } = run`
+      const blah = window.Foo;
+      type FooType = Generic<Foo>;
+    `;
+
+    expect(code).toMatchSnapshot();
+  });
 });

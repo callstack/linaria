@@ -137,12 +137,29 @@ export default function preeval(
             removeWithRelated([p]);
           },
           Identifier(p, state) {
+            if (p.find((parent) => parent.isTSTypeReference())) {
+              // don't mess with TS type references
+              return;
+            }
             if (isBrowserGlobal(p)) {
               if (
-                p.parentPath.isUnaryExpression({ operator: 'typeof' }) ||
-                p.parentPath.isTSTypeQuery()
+                p.find(
+                  (parentPath) =>
+                    parentPath.isUnaryExpression({ operator: 'typeof' }) ||
+                    parentPath.isTSTypeQuery()
+                )
               ) {
                 // Ignore `typeof window` expressions
+                return;
+              }
+
+              if (p.parentPath.isClassProperty()) {
+                // ignore class property decls
+                return;
+              }
+              if (p.parentPath.isMemberExpression() && p.key === 'property') {
+                // ignore e.g this.fetch()
+                // window.fetch will be handled by the windowScoped block below
                 return;
               }
 
