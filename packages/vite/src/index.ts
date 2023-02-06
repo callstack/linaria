@@ -146,8 +146,13 @@ export default function linaria({
 
       const slug = slugify(cssText);
 
-      const cssFilename = `${id.replace(/\.[jt]sx?$/, '')}_${slug}.css`;
-      const cssId = `/${path.posix.relative(config.root, cssFilename)}`;
+      const cssFilename = path.normalize(
+        `${id.replace(/\.[jt]sx?$/, '')}_${slug}.css`
+      );
+      const cssRelativePath = path
+        .relative(config.root, cssFilename)
+        .replace(/\\/g, path.posix.sep);
+      const cssId = `/${cssRelativePath}`;
 
       if (sourceMap && result.cssSourceMapText) {
         const map = Buffer.from(result.cssSourceMapText).toString('base64');
