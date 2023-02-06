@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.3.1
+
+### Patch Changes
+
+- 71a5b351: Workaround for weirdly packaged cjs modules.
+- 61d49a39: Fix for #1112 "Cannot read properties of undefined (reading 'localeCompare')"
+
 ## 4.3.0
 
 ### Minor Changes

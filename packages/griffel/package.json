@@ -1,6 +1,6 @@
 {
   "name": "@linaria/griffel",
-  "version": "4.2.3",
+  "version": "4.2.4",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "css",

@@ -1,6 +1,6 @@
 {
   "name": "@linaria/webpack4-loader",
-  "version": "4.1.11",
+  "version": "4.1.12",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",

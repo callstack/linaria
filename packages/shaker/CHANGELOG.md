@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.2.8
+
+### Patch Changes
+
+- b27f328f: Handle object patterns in exports.
+- 71a5b351: Workaround for weirdly packaged cjs modules.
+- cf1d6611: fix: keep side effects from modules
+- Updated dependencies [71a5b351]
+- Updated dependencies [61d49a39]
+  - @linaria/utils@4.3.1
+
 ## 4.2.7
 
 ### Patch Changes
