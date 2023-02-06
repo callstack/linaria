@@ -1,5 +1,14 @@
 # @linaria/tags
 
+## 4.3.1
+
+### Patch Changes
+
+- 28f3f93d: Add the tagSource property for processors, indicating the package and name of the imported processor.
+- Updated dependencies [71a5b351]
+- Updated dependencies [61d49a39]
+  - @linaria/utils@4.3.1
+
 ## 4.3.0
 
 ### Minor Changes

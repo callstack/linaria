@@ -1,6 +1,6 @@
 {
   "name": "@linaria/babel-preset",
-  "version": "4.3.3",
+  "version": "4.4.0",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",

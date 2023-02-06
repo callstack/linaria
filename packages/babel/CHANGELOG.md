@@ -1,5 +1,29 @@
 # Change Log
 
+## 4.4.0
+
+### Minor Changes
+
+- af783273: Fix circular dependencies-related errors and freezes (fixes #1193)
+
+### Patch Changes
+
+- 9cf41fae: chore: remove custom typings for @babel/helper-module-imports
+- 860b8d21: Ensure that the Proxy for this.#exports forwards unknown properties to the underlying Object instance.
+- 28f3f93d: Add the tagSource property for processors, indicating the package and name of the imported processor.
+- 1d4d6833: fix(babel): update cosmiconfig so linaria.config.cjs works
+- 2d3a741f: fix: handle .cjs & .mjs extensions
+- 61d49a39: Fix for #1112 "Cannot read properties of undefined (reading 'localeCompare')"
+- Updated dependencies [b27f328f]
+- Updated dependencies [28f3f93d]
+- Updated dependencies [71a5b351]
+- Updated dependencies [cf1d6611]
+- Updated dependencies [61d49a39]
+  - @linaria/shaker@4.2.8
+  - @linaria/tags@4.3.1
+  - @linaria/utils@4.3.1
+  - @linaria/core@4.2.6
+
 ## 4.3.3
 
 ### Patch Changes
