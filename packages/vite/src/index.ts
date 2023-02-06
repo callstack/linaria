@@ -151,7 +151,7 @@ export default function linaria({
       );
       const cssRelativePath = path
         .relative(config.root, cssFilename)
-        .replaceAll(path.win32.sep, path.posix.sep);
+        .replace(/\\/g, path.posix.sep);
       const cssId = `/${cssRelativePath}`;
 
       if (sourceMap && result.cssSourceMapText) {
