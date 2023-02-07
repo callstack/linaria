@@ -78,6 +78,14 @@ const NOOP = () => {};
 const padStart = (num: number, len: number) =>
   num.toString(10).padStart(len, '0');
 
+const hasKey = <TKey extends string | symbol>(
+  obj: unknown,
+  key: TKey
+): obj is Record<TKey, unknown> =>
+  (typeof obj === 'object' || typeof obj === 'function') &&
+  obj !== null &&
+  key in obj;
+
 class Module {
   static invalidate: () => void;
 
@@ -197,6 +205,20 @@ class Module {
           // e.g `exports.hasOwnProperty`
           value = Reflect.get(target, key);
         }
+
+        if (value === undefined && this.#lazyValues.has('default')) {
+          const defaultValue = this.#lazyValues.get('default')?.();
+          if (hasKey(defaultValue, key)) {
+            this.debug(
+              'evaluated',
+              '⚠️  %s has been found in `default`. It indicates that ESM to CJS conversion of %s went wrong.',
+              key,
+              filename
+            );
+            value = defaultValue[key];
+          }
+        }
+
         this.debug('evaluated', 'get %s: %o', key, value);
         return value;
       },
