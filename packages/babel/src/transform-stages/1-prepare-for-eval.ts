@@ -365,7 +365,10 @@ export default async function prepareForEval(
     if (cached) {
       if (isEqual(cached.only, mergedOnly)) {
         log('stage-1', '%s is already processed', name);
-        imports = cached.imports;
+        if (!resolveStack.includes(nextItem.name)) {
+          imports = cached.imports;
+        }
+
         result = cached.result;
       } else {
         log(
