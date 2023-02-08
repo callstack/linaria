@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.4.1
+
+### Patch Changes
+
+- 917db446: A workaround for an issue with Vite and imports from some third-party libs.
+- 57c0dc4f: Another fix for infinite loops. Fixes #1202
+
 ## 4.4.0
 
 ### Minor Changes
