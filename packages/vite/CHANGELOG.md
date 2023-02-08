@@ -1,5 +1,14 @@
 # @linaria/vite
 
+## 4.2.7
+
+### Patch Changes
+
+- 917db446: A workaround for an issue with Vite and imports from some third-party libs.
+- Updated dependencies [917db446]
+- Updated dependencies [57c0dc4f]
+  - @linaria/babel-preset@4.4.1
+
 ## 4.2.6
 
 ### Patch Changes

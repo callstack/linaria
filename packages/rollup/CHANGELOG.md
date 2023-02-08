@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.3.4
+
+### Patch Changes
+
+- Updated dependencies [917db446]
+- Updated dependencies [57c0dc4f]
+  - @linaria/babel-preset@4.4.1
+  - @linaria/vite@4.2.7
+
 ## 4.3.3
 
 ### Patch Changes
