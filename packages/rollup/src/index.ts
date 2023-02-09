@@ -64,6 +64,13 @@ export default function linaria({
         const resolved = await this.resolve(what, importer);
         if (resolved) {
           log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
+
+          if (resolved.external) {
+            // ignore external modules, they don't need to be processed
+            // because external modules shouldn't contain any CSS in JS
+            return null;
+          }
+
           // Vite adds param like `?v=667939b3` to cached modules
           const resolvedId = resolved.id.split('?')[0];
 
