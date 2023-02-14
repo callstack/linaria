@@ -458,11 +458,20 @@ class Module {
   );
 
   evaluate(source: string): void {
-    const { filename } = this;
-
     if (!source) {
       this.debug(`evaluate`, 'there is nothing to evaluate');
     }
+
+    if (this.#isEvaluated) {
+      this.debug('evaluate', `is already evaluated`);
+      return;
+    }
+
+    this.debug('evaluate', `\n${source}`);
+
+    this.#isEvaluated = true;
+
+    const { filename } = this;
 
     const context = vm.createContext({
       clearImmediate: NOOP,
@@ -480,15 +489,6 @@ class Module {
       __dirname: path.dirname(filename),
     });
 
-    if (this.#isEvaluated) {
-      this.debug('evaluate', `is already evaluated`);
-      return;
-    }
-
-    this.debug('evaluate', `\n${source}`);
-
-    this.#isEvaluated = true;
-
     try {
       const script = new vm.Script(
         `(function (exports) { ${source}\n})(exports);`,
@@ -504,7 +504,7 @@ class Module {
         throw e;
       }
 
-      const callstack: string[] = ['', this.filename];
+      const callstack: string[] = ['', filename];
       let module = this.parentModule;
       while (module) {
         callstack.push(module.filename);
