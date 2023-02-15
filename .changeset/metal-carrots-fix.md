@@ -1,5 +1,6 @@
 ---
 '@linaria/rollup': patch
+'@linaria/vite': patch
 ---
 
-Ignore external libraries when bundling with rollup
+Fallback resolver for external libraries when bundling with Rollup or Vite.
