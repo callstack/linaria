@@ -17,7 +17,7 @@ import {
 } from '@linaria/babel-preset';
 import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
 import { createCustomDebug } from '@linaria/logger';
-import { getFileIdx } from '@linaria/utils';
+import { getFileIdx, syncResolve } from '@linaria/utils';
 
 type VitePluginOptions = {
   include?: FilterPattern;
@@ -104,9 +104,21 @@ export default function linaria({
 
       log('rollup-init', id);
 
-      const asyncResolve = async (what: string, importer: string) => {
+      const asyncResolve = async (
+        what: string,
+        importer: string,
+        stack: string[]
+      ) => {
         const resolved = await this.resolve(what, importer);
         if (resolved) {
+          if (resolved.external) {
+            // If module is marked as external, Rollup will not resolve it,
+            // so we need to resolve it ourselves with default resolver
+            const resolvedId = syncResolve(what, importer, stack);
+            log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
+            return resolvedId;
+          }
+
           log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
           // Vite adds param like `?v=667939b3` to cached modules
           const resolvedId = resolved.id.split('?')[0];
