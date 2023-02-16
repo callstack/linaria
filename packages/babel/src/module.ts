@@ -28,6 +28,18 @@ import { TransformCacheCollection } from './cache';
 import * as process from './process';
 import type { ITransformFileResult } from './types';
 
+type HiddenModuleMembers = {
+  _extensions: { [key: string]: () => void };
+  _nodeModulePaths(filename: string): string[];
+  _resolveFilename: (
+    id: string,
+    options: { id: string; filename: string; paths: string[] }
+  ) => string;
+};
+
+export const DefaultModuleImplementation = NativeModule as typeof NativeModule &
+  HiddenModuleMembers;
+
 // Supported node builtins based on the modules polyfilled by webpack
 // `true` means module is polyfilled, `false` means module is empty
 const builtins = {
@@ -87,22 +99,9 @@ const hasKey = <TKey extends string | symbol>(
   key in obj;
 
 class Module {
-  static invalidate: () => void;
-
-  static invalidateEvalCache: () => void;
-
-  static _resolveFilename: (
-    id: string,
-    options: { id: string; filename: string; paths: string[] }
-  ) => string;
-
-  static _nodeModulePaths: (filename: string) => string[];
-
   #isEvaluated = false;
 
   #exports: Record<string, unknown> | unknown;
-
-  // #exportsProxy: Record<string, unknown>;
 
   #lazyValues: Map<string | symbol, () => unknown>;
 
@@ -116,7 +115,7 @@ class Module {
 
   imports: Map<string, string[]> | null;
 
-  paths: string[];
+  // paths: string[];
 
   extensions: string[];
 
@@ -146,14 +145,14 @@ class Module {
     options: StrictOptions,
     cache = new TransformCacheCollection(),
     private debuggerDepth = 0,
-    private parentModule?: Module
+    private parentModule?: Module,
+    private moduleImpl: HiddenModuleMembers = DefaultModuleImplementation
   ) {
     this.idx = getFileIdx(filename);
     this.id = filename;
     this.filename = filename;
     this.options = options;
     this.imports = null;
-    this.paths = [];
     this.dependencies = null;
     this.transform = null;
     this.debug = createCustomDebug('module', this.idx);
@@ -161,27 +160,6 @@ class Module {
     this.#resolveCache = cache.resolveCache;
     this.#codeCache = cache.codeCache;
     this.#evalCache = cache.evalCache;
-
-    Object.defineProperties(this, {
-      id: {
-        value: filename,
-        writable: false,
-      },
-      filename: {
-        value: filename,
-        writable: false,
-      },
-      paths: {
-        value: Object.freeze(
-          (
-            NativeModule as unknown as {
-              _nodeModulePaths(filename: string): string[];
-            }
-          )._nodeModulePaths(path.dirname(filename))
-        ),
-        writable: false,
-      },
-    });
 
     this.#lazyValues = new Map();
 
@@ -305,11 +283,7 @@ class Module {
       return this.#resolveCache.get(resolveCacheKey)!;
     }
 
-    const extensions = (
-      NativeModule as unknown as {
-        _extensions: { [key: string]: () => void };
-      }
-    )._extensions;
+    const extensions = this.moduleImpl._extensions;
     const added: string[] = [];
 
     try {
@@ -326,7 +300,13 @@ class Module {
         added.push(ext);
       });
 
-      return Module._resolveFilename(id, this);
+      const { filename } = this;
+
+      return this.moduleImpl._resolveFilename(id, {
+        id: filename,
+        filename,
+        paths: this.moduleImpl._nodeModulePaths(path.dirname(filename)),
+      });
     } finally {
       // Cleanup the extensions we added to restore previous behaviour
       added.forEach((ext) => delete extensions[ext]);
@@ -399,10 +379,10 @@ class Module {
       if (extension === '.json' || this.extensions.includes(extension)) {
         let code: string | undefined;
         // Requested file can be already prepared for evaluation on the stage 1
-        if (this.#codeCache.has(filename)) {
+        if (onlyList && this.#codeCache.has(filename)) {
           const cached = this.#codeCache.get(filename);
           const only = onlyList
-            ?.split(',')
+            .split(',')
             .filter((token) => !m.#lazyValues.has(token));
           const cachedOnly = new Set(cached?.only ?? []);
           const isMatched =
@@ -427,7 +407,10 @@ class Module {
         } else {
           // If code wasn't extracted from cache, read it from the file system
           // TODO: transpile the file
-          m.debug('code-cache', '❌');
+          m.debug(
+            'code-cache',
+            '❌ file has not been processed during prepare stage'
+          );
           code = fs.readFileSync(filename, 'utf-8');
         }
 
@@ -518,26 +501,5 @@ class Module {
     }
   }
 }
-
-Module.invalidate = () => {};
-
-Module.invalidateEvalCache = () => {};
-
-// Alias to resolve the module using node's resolve algorithm
-// This static property can be overriden by the webpack loader
-// This allows us to use webpack's module resolution algorithm
-Module._resolveFilename = (id, options) =>
-  (
-    NativeModule as unknown as {
-      _resolveFilename: typeof Module._resolveFilename;
-    }
-  )._resolveFilename(id, options);
-
-Module._nodeModulePaths = (filename: string) =>
-  (
-    NativeModule as unknown as {
-      _nodeModulePaths: (filename: string) => string[];
-    }
-  )._nodeModulePaths(filename);
 
 export default Module;

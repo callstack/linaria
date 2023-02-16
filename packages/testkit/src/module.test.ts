@@ -2,10 +2,12 @@ import path from 'path';
 
 import dedent from 'dedent';
 
-import { Module, TransformCacheCollection } from '@linaria/babel-preset';
+import {
+  DefaultModuleImplementation,
+  Module,
+  TransformCacheCollection,
+} from '@linaria/babel-preset';
 import type { StrictOptions } from '@linaria/utils';
-
-beforeEach(() => Module.invalidate());
 
 function getFileName() {
   return path.resolve(__dirname, './__fixtures__/test.js');
@@ -18,8 +20,6 @@ const options: StrictOptions = {
   rules: [],
   babelOptions: {},
 };
-
-beforeEach(() => Module.invalidateEvalCache());
 
 it('creates module for JS files', () => {
   const filename = '/foo/bar/test.js';
@@ -80,6 +80,61 @@ it('returns module from the cache', () => {
   const res2 = new Module(filename, options, cache).require(id);
 
   expect(res1).toBe(res2);
+});
+
+it('should use cached version from the codeCache', () => {
+  const filename = getFileName();
+  const cache = new TransformCacheCollection();
+  const mod = new Module(filename, options, cache);
+  const resolved = require.resolve('./__fixtures__/objectExport.js');
+
+  cache.resolveCache.set(
+    `${filename} -> ./objectExport`,
+    `${resolved}\0margin`
+  );
+
+  cache.codeCache.set(resolved, {
+    only: ['margin'],
+    imports: null,
+    result: {
+      code: 'module.exports = { margin: 1 };',
+    },
+  });
+
+  mod.evaluate(dedent`
+    const margin = require('./objectExport').margin;
+
+    module.exports = 'Imported value is ' + margin;
+  `);
+
+  expect(mod.exports).toBe('Imported value is 1');
+});
+
+it('should reread module from disk when it is in codeCache but not in resolveCache', () => {
+  // This may happen when the current importer was not processed, but required
+  // module was already required by another module, and its code was cached.
+  // In this case, we should not use the cached code, but reread the file.
+
+  const filename = getFileName();
+  const cache = new TransformCacheCollection();
+  const mod = new Module(filename, options, cache);
+  const resolved = require.resolve('./__fixtures__/objectExport.js');
+
+  cache.codeCache.set(resolved, {
+    only: ['margin'],
+    imports: null,
+    result: {
+      code: 'module.exports = { margin: 1 };',
+    },
+  });
+
+  mod.evaluate(dedent`
+    const margin = require('./objectExport').margin;
+
+    module.exports = 'Imported value is ' + margin;
+  `);
+
+  expect(mod.exports).toBe('Imported value is 5');
 });
 
 it('clears modules from the cache', () => {
@@ -259,9 +314,9 @@ it('has global objects available without referencing global', () => {
 });
 
 it('changes resolve behaviour on overriding _resolveFilename', () => {
-  const originalResolveFilename = Module._resolveFilename;
-
-  Module._resolveFilename = (id) => (id === 'foo' ? 'bar' : id);
+  const resolveFilename = jest
+    .spyOn(DefaultModuleImplementation, '_resolveFilename')
+    .mockImplementation((id) => (id === 'foo' ? 'bar' : id));
 
   const mod = new Module(getFileName(), options);
 
@@ -272,10 +327,37 @@ it('changes resolve behaviour on overriding _resolveFilename', () => {
   ];
   `);
 
-  // Restore old behavior
-  Module._resolveFilename = originalResolveFilename;
-
   expect(mod.exports).toEqual(['bar', 'test']);
+  expect(resolveFilename).toHaveBeenCalledTimes(2);
+
+  resolveFilename.mockRestore();
+});
+
+it('should resolve from the cache', () => {
+  const resolveFilename = jest.spyOn(
+    DefaultModuleImplementation,
+    '_resolveFilename'
+  );
+
+  const cache = new TransformCacheCollection();
+  const filename = getFileName();
+
+  cache.resolveCache.set(`${filename} -> foo`, 'resolved foo');
+  cache.resolveCache.set(`${filename} -> test`, 'resolved test');
+
+  const mod = new Module(filename, options, cache);
+
+  mod.evaluate(dedent`
+  module.exports = [
+    require.resolve('foo'),
+    require.resolve('test'),
+  ];
+  `);
+
+  expect(mod.exports).toEqual(['resolved foo', 'resolved test']);
+  expect(resolveFilename).toHaveBeenCalledTimes(0);
+
+  resolveFilename.mockRestore();
 });
 
 it('correctly processes export declarations in strict mode', () => {

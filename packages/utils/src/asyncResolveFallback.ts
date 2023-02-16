@@ -20,7 +20,7 @@ export const syncResolve = (
   what: string,
   importer: string,
   stack: string[]
-) => {
+): string => {
   const where = [importer, ...stack].map((p) => path.dirname(p));
   const resolved = safeResolve(what, where);
   if (!(resolved instanceof Error)) {
@@ -41,7 +41,11 @@ export const syncResolve = (
   throw resolved;
 };
 
-const asyncResolve = (what: string, importer: string, stack: string[]) => {
+const asyncResolve = (
+  what: string,
+  importer: string,
+  stack: string[]
+): Promise<string> => {
   const where = [importer, ...stack].map((p) => path.dirname(p));
   const resolved = safeResolve(what, where);
   if (!(resolved instanceof Error)) {

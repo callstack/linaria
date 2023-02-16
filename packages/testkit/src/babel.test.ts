@@ -8,7 +8,6 @@ import stripAnsi from 'strip-ansi';
 
 import type { PluginOptions, Stage } from '@linaria/babel-preset';
 import {
-  Module,
   transform as linariaTransform,
   loadLinariaOptions,
 } from '@linaria/babel-preset';
@@ -139,9 +138,6 @@ async function transformFile(filename: string, opts: Options) {
 
 describe('strategy shaker', () => {
   const evaluator = require('@linaria/shaker').default;
-  beforeEach(() => {
-    Module.invalidateEvalCache();
-  });
 
   it('transpiles styled template literal with object', async () => {
     const { code, metadata } = await transform(
