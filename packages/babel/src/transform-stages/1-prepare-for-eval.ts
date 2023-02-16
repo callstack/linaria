@@ -285,11 +285,27 @@ export function prepareForEvalSync(
     for (const [importedFile, importsOnly] of imports ?? []) {
       try {
         const resolved = resolve(importedFile, name, resolveStack);
-        log('stage-1:sync-resolve', `✅ ${importedFile} -> ${resolved}`);
-        cache.resolveCache.set(
-          `${name} -> ${importedFile}`,
-          `${resolved}\0${importsOnly.join(',')}`
+        log(
+          'stage-1:sync-resolve',
+          `✅ ${importedFile} -> ${resolved} (only: %o)`,
+          importsOnly
         );
+
+        const resolveCacheKey = `${name} -> ${importedFile}`;
+        const resolveCached = cache.resolveCache.get(resolveCacheKey);
+        const importsOnlySet = new Set(importsOnly);
+        if (resolveCached) {
+          const [, cachedOnly] = resolveCached.split('\0');
+          cachedOnly?.split(',').forEach((token) => {
+            importsOnlySet.add(token);
+          });
+        }
+
+        cache.resolveCache.set(
+          resolveCacheKey,
+          `${resolved}\0${[...importsOnlySet].join(',')}`
+        );
+
         const fileContent = readFileSync(resolved, 'utf8');
         queue.enqueue([
           {

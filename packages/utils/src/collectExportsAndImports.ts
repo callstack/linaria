@@ -317,15 +317,30 @@ function collectFromDynamicImport(path: NodePath<Import>, state: IState): void {
   }
 }
 
-function getImportTypeByInteropFunction(
+function getImportExportTypeByInteropFunction(
   path: NodePath<CallExpression>
-): '*' | 'default' | undefined {
+): 'import:*' | 're-export:*' | 'default' | undefined {
   const callee = path.get('callee');
-  if (!callee.isIdentifier()) {
+  let name: string | undefined;
+  if (callee.isIdentifier()) {
+    name = callee.node.name;
+  }
+
+  if (callee.isMemberExpression()) {
+    const property = callee.get('property');
+    if (property.isIdentifier()) {
+      name = property.node.name;
+    }
+  }
+
+  if (name === undefined) {
     return undefined;
   }
 
-  const { name } = callee.node;
+  if (name.startsWith('__exportStar')) {
+    return 're-export:*';
+  }
+
   if (
     name.startsWith('_interopRequireDefault') ||
     name.startsWith('__importDefault')
@@ -338,7 +353,7 @@ function getImportTypeByInteropFunction(
     name.startsWith('__importStar') ||
     name.startsWith('__toESM')
   ) {
-    return '*';
+    return 'import:*';
   }
 
   if (
@@ -346,7 +361,7 @@ function getImportTypeByInteropFunction(
     name.startsWith('__objRest') ||
     name.startsWith('_objectDestructuringEmpty')
   ) {
-    return '*';
+    return 'import:*';
   }
 
   return undefined;
@@ -374,7 +389,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
   if (container.isCallExpression() && key === 0) {
     // It may be transpiled import such as
     // `var _atomic = _interopRequireDefault(require("@linaria/atomic"));`
-    const imported = getImportTypeByInteropFunction(container);
+    const imported = getImportExportTypeByInteropFunction(container);
     if (!imported) {
       // It's not a transpiled import.
       // TODO: Can we guess that it's a namespace import?
@@ -383,6 +398,17 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
         'Unknown wrapper of require',
         container.node.callee
       );
+      return;
+    }
+
+    if (imported === 're-export:*') {
+      state.reexports.push({
+        exported: '*',
+        imported: '*',
+        local: path,
+        source,
+      });
+
       return;
     }
 
@@ -413,9 +439,9 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
       return;
     }
 
-    if (imported === '*') {
+    if (imported === 'import:*') {
       const unfolded = unfoldNamespaceImport({
-        imported,
+        imported: '*',
         local: id,
         source,
         type: 'cjs',

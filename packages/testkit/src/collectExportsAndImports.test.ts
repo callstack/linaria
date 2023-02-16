@@ -734,6 +734,28 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
       }
     });
 
+    it('__exportStar', () => {
+      const { exports, imports, reexports } = run`
+        const tslib_1 = require('tslib');
+        tslib_1.__exportStar(require('./moduleA1'), exports);
+      `;
+
+      expect(reexports.map(withoutLocal)).toMatchObject([
+        {
+          imported: '*',
+          exported: '*',
+          source: './moduleA1',
+        },
+      ]);
+      expect(exports).toHaveLength(0);
+      expect(imports).toMatchObject([
+        {
+          source: 'tslib',
+          imported: '__exportStar',
+        },
+      ]);
+    });
+
     it('mixed exports', () => {
       const { exports, imports, reexports } = run`
         export { syncResolve } from './asyncResolveFallback';
