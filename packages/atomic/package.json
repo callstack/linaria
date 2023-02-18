@@ -62,6 +62,14 @@
   "devDependencies": {
     "@babel/types": "^7.20.2"
   },
+  "peerDependencies": {
+    "react": ">=16"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
   "engines": {
     "node": "^12.16.0 || >=13.7.0"
   },
