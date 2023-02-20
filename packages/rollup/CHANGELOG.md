@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.3.5
+
+### Patch Changes
+
+- 13f0b416: Fallback resolver for external libraries when bundling with Rollup or Vite.
+- Updated dependencies [13f0b416]
+- Updated dependencies [f9df4ed8]
+  - @linaria/vite@4.2.8
+  - @linaria/babel-preset@4.4.2
+  - @linaria/utils@4.3.2
+
 ## 4.3.4
 
 ### Patch Changes

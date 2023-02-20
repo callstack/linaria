@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.2.7
+
+### Patch Changes
+
+- a2b618bc: add react as an optional peerDependency due to dependency on @atomic/react
+- Updated dependencies [f9df4ed8]
+  - @linaria/utils@4.3.2
+  - @linaria/core@4.2.7
+  - @linaria/react@4.3.5
+  - @linaria/tags@4.3.2
+
 ## 4.2.6
 
 ### Patch Changes

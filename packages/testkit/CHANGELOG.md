@@ -1,5 +1,16 @@
 # @linaria/testkit
 
+## 4.3.3
+
+### Patch Changes
+
+- f9df4ed8: Address the problem in which a module may be erroneously evaluated as an empty object (fixes #1209)
+- Updated dependencies [f9df4ed8]
+  - @linaria/babel-preset@4.4.2
+  - @linaria/react@4.3.5
+  - @linaria/shaker@4.2.9
+  - @linaria/tags@4.3.2
+
 ## 4.3.2
 
 ### Patch Changes

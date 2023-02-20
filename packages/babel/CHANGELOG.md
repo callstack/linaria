@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.4.2
+
+### Patch Changes
+
+- f9df4ed8: Address the problem in which a module may be erroneously evaluated as an empty object (fixes #1209)
+- Updated dependencies [f9df4ed8]
+  - @linaria/utils@4.3.2
+  - @linaria/core@4.2.7
+  - @linaria/shaker@4.2.9
+  - @linaria/tags@4.3.2
+
 ## 4.4.1
 
 ### Patch Changes
