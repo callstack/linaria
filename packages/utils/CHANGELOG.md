@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.3.2
+
+### Patch Changes
+
+- f9df4ed8: Address the problem in which a module may be erroneously evaluated as an empty object (fixes #1209)
+
 ## 4.3.1
 
 ### Patch Changes
