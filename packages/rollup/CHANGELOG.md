@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.3.6
+
+### Patch Changes
+
+- @linaria/babel-preset@4.4.3
+- @linaria/vite@4.2.9
+
 ## 4.3.5
 
 ### Patch Changes

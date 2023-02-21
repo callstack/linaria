@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.2.8
+
+### Patch Changes
+
+- Updated dependencies [a3ad617f]
+  - @linaria/react@4.3.6
+  - @linaria/tags@4.3.3
+  - @linaria/core@4.2.8
+
 ## 4.2.7
 
 ### Patch Changes
