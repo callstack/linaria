@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.3.6
+
+### Patch Changes
+
+- a3ad617f: Fix "Invalid usage of `styled` tag" when it's not really invalid. Fixes #1214.
+- Updated dependencies [a3ad617f]
+  - @linaria/tags@4.3.3
+  - @linaria/core@4.2.8
+
 ## 4.3.5
 
 ### Patch Changes

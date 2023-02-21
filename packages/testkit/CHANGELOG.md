@@ -1,5 +1,15 @@
 # @linaria/testkit
 
+## 4.3.4
+
+### Patch Changes
+
+- a3ad617f: Fix "Invalid usage of `styled` tag" when it's not really invalid. Fixes #1214.
+- Updated dependencies [a3ad617f]
+  - @linaria/react@4.3.6
+  - @linaria/tags@4.3.3
+  - @linaria/babel-preset@4.4.3
+
 ## 4.3.3
 
 ### Patch Changes
