@@ -335,6 +335,12 @@ describe('getTagProcessor', () => {
       expect(runner).toThrow('Invalid usage of template tag');
     });
 
+    it('do not throw if css is not a tag', () => {
+      const runner = () => run(dedent`export { css } from "@linaria/core";`);
+
+      expect(runner).not.toThrow();
+    });
+
     it('styled`` tag', () => {
       const runner = () =>
         run(
@@ -342,6 +348,13 @@ describe('getTagProcessor', () => {
         );
 
       expect(runner).toThrow('Invalid usage of `styled` tag');
+    });
+
+    it('do not throw if styled is not a tag', () => {
+      const runner = () =>
+        run(dedent`export { styled } from "@linaria/react";`);
+
+      expect(runner).not.toThrow();
     });
 
     it('styled.div.span`` tag', () => {
