@@ -53,9 +53,13 @@ export function isValidParams<T extends ParamConstraints>(
 export function validateParams<T extends ParamConstraints>(
   params: Params,
   constraints: T,
-  message: string
+  messageOrError: unknown
 ): asserts params is MapParams<T> {
   if (!isValidParams(params, constraints)) {
-    throw new Error(message);
+    if (typeof messageOrError === 'string') {
+      throw new Error(messageOrError);
+    }
+
+    throw messageOrError;
   }
 }

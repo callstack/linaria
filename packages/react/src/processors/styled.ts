@@ -54,6 +54,9 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
   #variablesCache = new Map<string, string>();
 
   constructor(params: Params, ...args: TailProcessorParams) {
+    // If the first param is not a tag, we should skip the expression.
+    validateParams(params, ['tag', '...'], TaggedTemplateProcessor.SKIP);
+
     validateParams(
       params,
       ['tag', ['call', 'member'], ['template', 'call']],

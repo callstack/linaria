@@ -10,6 +10,9 @@ export default abstract class TaggedTemplateProcessor extends BaseProcessor {
   #template: (TemplateElement | ExpressionValue)[];
 
   public constructor(params: Params, ...args: TailProcessorParams) {
+    // If the first param is not a tag, we should skip the expression.
+    validateParams(params, ['tag', '...'], TaggedTemplateProcessor.SKIP);
+
     validateParams(
       params,
       ['tag', 'template'],
