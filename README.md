@@ -35,6 +35,8 @@ Zero-runtime CSS in JS library.
 
 **[Why use Linaria](/docs/BENEFITS.md)**
 
+**[Learn how Linaria, Airbnb’s newest choice for web styling, improved both developer experience and web performance]**(https://medium.com/airbnb-engineering/airbnbs-trip-to-linaria-dc169230bd12)
+
 ## Installation
 
 ```sh
