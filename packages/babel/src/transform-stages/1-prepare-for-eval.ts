@@ -118,7 +118,7 @@ function prepareCode(
     originalCode
   );
 
-  if (action === 'ignore') {
+  if (action === 'ignore' || filename.endsWith('.json')) {
     log('stage-1:ignore', '');
 
     return [originalCode, null];
