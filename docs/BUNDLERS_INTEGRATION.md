@@ -5,6 +5,7 @@
 - [webpack](#webpack)
 - [esbuild](#esbuild)
 - [Rollup](#Rollup)
+- [Vite](#Vite)
 - [Svelte](#Svelte)
 
 ## Pre-requisites
