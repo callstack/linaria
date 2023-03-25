@@ -12,9 +12,11 @@ export type PluginOptions = StrictOptions & {
 const explorerSync = cosmiconfigSync('linaria');
 
 const cache = new WeakMap<Partial<PluginOptions>, StrictOptions>();
+const defaultOverrides = {};
+const nodeModulesRegExp = /[\\/]node_modules[\\/]/;
 
 export default function loadLinariaOptions(
-  overrides: Partial<PluginOptions> = {}
+  overrides: Partial<PluginOptions> = defaultOverrides
 ): StrictOptions {
   if (cache.has(overrides)) {
     return cache.get(overrides)!;
@@ -37,13 +39,13 @@ export default function loadLinariaOptions(
       },
       {
         // The old `ignore` option is used as a default value for `ignore` rule.
-        test: ignore ?? /[\\/]node_modules[\\/]/,
+        test: ignore ?? nodeModulesRegExp,
         action: 'ignore',
       },
       {
         // Do not ignore ES-modules
         test: (filename, code) => {
-          if (!/\/node_modules\//.test(filename)) {
+          if (!nodeModulesRegExp.test(filename)) {
             return false;
           }
 
