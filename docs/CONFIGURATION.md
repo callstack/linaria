@@ -196,7 +196,7 @@ module.exports = {
   ```js
   [
     {
-      action: require('@linaria/shaker').default,
+      action: require.resolve('@linaria/shaker'),
     },
     {
       test: /[\\/]node_modules[\\/]/,
