@@ -60,7 +60,8 @@
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
-    "@babel/types": "^7.20.2"
+    "@babel/types": "^7.20.2",
+    "@types/node": "^17.0.39"
   },
   "peerDependencies": {
     "react": ">=16"

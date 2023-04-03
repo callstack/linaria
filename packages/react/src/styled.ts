@@ -105,6 +105,8 @@ interface IProps {
   [props: string]: unknown;
 }
 
+let idx = 0;
+
 // Components with props are not allowed
 function styled(
   componentWithStyle: () => any
@@ -132,8 +134,17 @@ function styled(
   component: 'The target component should have a className prop'
 ): never;
 function styled(tag: any): any {
+  // eslint-disable-next-line no-plusplus
+  let mockedClass = `mocked-styled-${idx++}`;
+  if (tag?.__linaria?.className) {
+    mockedClass += ` ${tag.__linaria.className}`;
+  }
+
   return (options: Options) => {
-    if (process.env.NODE_ENV !== 'production') {
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      process.env.NODE_ENV !== 'test'
+    ) {
       if (Array.isArray(options)) {
         // We received a strings array since it's used as a tag
         throw new Error(
@@ -143,7 +154,7 @@ function styled(tag: any): any {
     }
 
     const render = (props: any, ref: any) => {
-      const { as: component = tag, class: className } = props;
+      const { as: component = tag, class: className = mockedClass } = props;
       const shouldKeepProps =
         options.propsAsIs === undefined
           ? !(
@@ -213,7 +224,7 @@ function styled(tag: any): any {
 
     // These properties will be read by the babel plugin for interpolation
     (Result as any).__linaria = {
-      className: options.class,
+      className: options.class ?? mockedClass,
       extends: tag,
     };
 

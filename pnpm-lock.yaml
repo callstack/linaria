@@ -224,6 +224,7 @@ importers:
       '@linaria/react': workspace:^
       '@linaria/tags': workspace:^
       '@linaria/utils': workspace:^
+      '@types/node': ^17.0.39
       known-css-properties: ^0.24.0
       postcss: ^8.3.11
       stylis: ^3.5.4
@@ -240,6 +241,7 @@ importers:
       ts-invariant: 0.10.3
     devDependencies:
       '@babel/types': 7.20.2
+      '@types/node': 17.0.39
 
   packages/babel:
     specifiers:
@@ -2600,22 +2602,22 @@ packages:
       postcss: 8.4.16
       postcss-selector-parser: 6.0.10
 
-  /@definitelytyped/header-parser/0.0.144:
-    resolution: {integrity: sha512-uDgZcuDI6NCsz6uo28w6l7JKuDg7IrzeroMp/+OxfWyrTdnPFZdaHGzQlyzJXx4upkvJ1fWvYYRwhP36khqG+A==}
+  /@definitelytyped/header-parser/0.0.159:
+    resolution: {integrity: sha512-y+zr9ahjiFz7BLW1HeMWrx7xNxfBTDU0loJqzRh9WPHVdSrMsk+JQBSlubed/EZ1hgFZ6m93FRzBRCGIj8kBYg==}
     dependencies:
-      '@definitelytyped/typescript-versions': 0.0.144
+      '@definitelytyped/typescript-versions': 0.0.159
       '@types/parsimmon': 1.10.6
       parsimmon: 1.18.1
     dev: true
 
-  /@definitelytyped/typescript-versions/0.0.144:
-    resolution: {integrity: sha512-fDaG9Wf2CvBprEMZCacifOopQCKKDlCINfKHeI0sEtJlQDIpRoQeOHdMqe7Jm2J8HJeK6mrzVF3Q9oCr/Go0hw==}
+  /@definitelytyped/typescript-versions/0.0.159:
+    resolution: {integrity: sha512-9TWRPpOo3CWYUyS3QCu8goJbAhS3qAE/LWFc+Qy6Wb8vsUAwMTioCtPPsYyqrPDbatXvPFrOr182hE1OFvEFSA==}
     dev: true
 
-  /@definitelytyped/utils/0.0.144:
-    resolution: {integrity: sha512-yB8XEF4O4gItnLz1MFcZtzNKXqWU4nE4Z3wfnZHcQWaJyZCjf/oONTt1Lw98bTjQsaRBDmcE9q8iFwpLYUuEVQ==}
+  /@definitelytyped/utils/0.0.159:
+    resolution: {integrity: sha512-zm+Gsw39sD2EANlJmmNXgtpIzXO3QmBq5nZx6Y95RD/s2AypDaBw0eauO1wWji6I45tJOAgPZEvfmjjaxfoyhA==}
     dependencies:
-      '@definitelytyped/typescript-versions': 0.0.144
+      '@definitelytyped/typescript-versions': 0.0.159
       '@qiwi/npm-registry-client': 8.9.1
       '@types/node': 14.18.33
       charm: 1.0.2
@@ -3727,7 +3729,7 @@ packages:
     resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
     dependencies:
       '@types/minimatch': 3.0.5
-      '@types/node': 17.0.39
+      '@types/node': 18.11.9
     dev: true
 
   /@types/graceful-fs/4.1.5:
@@ -3826,7 +3828,7 @@ packages:
   /@types/mkdirp/0.5.2:
     resolution: {integrity: sha512-U5icWpv7YnZYGsN4/cmh3WD2onMY0aJIiTE6+51TwJCttdHvtCYmkBNOobHlXwrJRL0nkH9jH4kD+1FAdMN4Tg==}
     dependencies:
-      '@types/node': 17.0.39
+      '@types/node': 18.11.9
     dev: true
 
   /@types/ms/0.7.31:
@@ -6290,7 +6292,7 @@ packages:
     peerDependencies:
       typescript: '*'
     dependencies:
-      '@definitelytyped/header-parser': 0.0.144
+      '@definitelytyped/header-parser': 0.0.159
       command-exists: 1.2.9
       rimraf: 3.0.2
       semver: 6.3.0
@@ -6306,9 +6308,9 @@ packages:
     peerDependencies:
       typescript: '>= 3.0.0-dev || >= 3.1.0-dev || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.7.0-dev || >= 3.8.0-dev || >= 3.9.0-dev || >= 4.0.0-dev'
     dependencies:
-      '@definitelytyped/header-parser': 0.0.144
-      '@definitelytyped/typescript-versions': 0.0.144
-      '@definitelytyped/utils': 0.0.144
+      '@definitelytyped/header-parser': 0.0.159
+      '@definitelytyped/typescript-versions': 0.0.159
+      '@definitelytyped/utils': 0.0.159
       dts-critic: 3.3.11_typescript@4.7.4
       fs-extra: 6.0.1
       json-stable-stringify: 1.0.1
@@ -13681,7 +13683,7 @@ packages:
       schema-utils: 3.1.1
       serialize-javascript: 6.0.0
       terser: 5.14.0
-      webpack: 5.73.0_webpack-cli@4.9.2
+      webpack: 5.73.0
     dev: true
 
   /terser-webpack-plugin/5.3.6_webpack@5.75.0:
