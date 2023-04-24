@@ -252,7 +252,7 @@ function getBuilderForIdentifier(
     return null;
   }
 
-  const params: Param[] = [['tag', tagPath.node]];
+  const params: Param[] = [['callee', tagPath.node]];
   let prev: NodePath = tagPath;
   let current: NodePath | null = tagPath.parentPath;
   while (current && current !== path) {

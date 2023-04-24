@@ -54,12 +54,16 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
   #variablesCache = new Map<string, string>();
 
   constructor(params: Params, ...args: TailProcessorParams) {
-    // If the first param is not a tag, we should skip the expression.
-    validateParams(params, ['tag', '...'], TaggedTemplateProcessor.SKIP);
+    // Should have at least two params and the first one should be a callee.
+    validateParams(
+      params,
+      ['callee', '*', '...'],
+      TaggedTemplateProcessor.SKIP
+    );
 
     validateParams(
       params,
-      ['tag', ['call', 'member'], ['template', 'call']],
+      ['callee', ['call', 'member'], ['template', 'call']],
       'Invalid usage of `styled` tag'
     );
 
@@ -184,7 +188,7 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
 
   protected get tagExpression(): CallExpression {
     const t = this.astService;
-    return t.callExpression(this.tag, [this.tagExpressionArgument]);
+    return t.callExpression(this.callee, [this.tagExpressionArgument]);
   }
 
   public override get value(): ObjectExpression {

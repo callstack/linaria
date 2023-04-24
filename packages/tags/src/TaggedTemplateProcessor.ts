@@ -10,12 +10,16 @@ export default abstract class TaggedTemplateProcessor extends BaseProcessor {
   #template: (TemplateElement | ExpressionValue)[];
 
   public constructor(params: Params, ...args: TailProcessorParams) {
-    // If the first param is not a tag, we should skip the expression.
-    validateParams(params, ['tag', '...'], TaggedTemplateProcessor.SKIP);
+    // Should have at least two params and the first one should be a callee.
+    validateParams(
+      params,
+      ['callee', '*', '...'],
+      TaggedTemplateProcessor.SKIP
+    );
 
     validateParams(
       params,
-      ['tag', 'template'],
+      ['callee', 'template'],
       'Invalid usage of template tag'
     );
     const [tag, [, template]] = params;

@@ -20,12 +20,12 @@ export default class MakeStylesProcessor extends BaseProcessor {
   public constructor(params: Params, ...args: TailProcessorParams) {
     validateParams(
       params,
-      ['tag', 'call'],
+      ['callee', 'call'],
       'Invalid usage of `makeStyles` tag'
     );
-    const [tag, callParam] = params;
+    const [callee, callParam] = params;
 
-    super([tag], ...args);
+    super([callee], ...args);
 
     const { ex } = callParam[1];
     if (ex.type === 'Identifier') {
