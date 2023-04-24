@@ -94,14 +94,16 @@ describe('removeWithRelated', () => {
 
   it('should shake try/catch', () => {
     const code = run`
-      const a = 1;
-      /* remove */const b = 2;
+      {
+        const a = 1;
+        /* remove */const b = 2;
 
-      function c() {
-        try {
-          return a;
-        } catch(e) {
-          return b;
+        function c() {
+          try {
+            return a;
+          } catch(e) {
+            return b;
+          }
         }
       }
     `;
@@ -125,6 +127,44 @@ describe('removeWithRelated', () => {
       function test(arg) {
         /* remove */console.log(arg);
         return null;
+      }
+    `;
+
+    expect(code).toMatchSnapshot();
+  });
+
+  it('should remove functions with empty bodies', () => {
+    const code = run`
+      function container() {
+        function testFn(arg) {
+          /* remove */console.log(arg);
+        }
+
+        const testArrow = (arg) => {
+          /* remove */console.log(arg);
+        }
+      }
+    `;
+
+    expect(code).toBe('function container() {}');
+  });
+
+  it('should not remove top-level functions with empty bodies', () => {
+    const code = run`
+      function testFn(arg) {
+        /* remove */console.log(arg);
+      }
+
+      export const testArrow1 = (arg) => {
+        /* remove */console.log(arg);
+      }
+
+      const testArrow2 = (arg) => (
+        /* remove */testFn = arg
+      )
+
+      export default function testDefaultFn(arg) {
+        /* remove */console.log(arg);
       }
     `;
 

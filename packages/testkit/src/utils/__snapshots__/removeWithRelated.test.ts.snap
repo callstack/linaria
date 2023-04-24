@@ -17,6 +17,12 @@ exports[`removeWithRelated should not delete params of functions 1`] = `
 }"
 `;
 
+exports[`removeWithRelated should not remove top-level functions with empty bodies 1`] = `
+"function testFn() {}
+export const testArrow1 = () => {};
+const testArrow2 = () => {};"
+`;
+
 exports[`removeWithRelated should remove node if it becomes invalid after removing its children 1`] = `""`;
 
 exports[`removeWithRelated should remove the whole import 1`] = `""`;
