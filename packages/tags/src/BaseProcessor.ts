@@ -47,7 +47,7 @@ export default abstract class BaseProcessor {
 
   public readonly slug: string;
 
-  protected tag: Identifier | MemberExpression;
+  protected callee: Identifier | MemberExpression;
 
   protected evaluated:
     | Record<'dependencies' | 'expression', Value[]>
@@ -77,8 +77,8 @@ export default abstract class BaseProcessor {
   ) {
     validateParams(
       params,
-      ['tag'],
-      'Unknown error: a tag param is not specified'
+      ['callee'],
+      'Unknown error: a callee param is not specified'
     );
 
     const { className, slug } = getClassNameAndSlug(
@@ -91,7 +91,7 @@ export default abstract class BaseProcessor {
     this.className = className;
     this.slug = slug;
 
-    [[, this.tag]] = params;
+    [[, this.callee]] = params;
   }
 
   public abstract build(values: ValueCache): void;
@@ -129,11 +129,11 @@ export default abstract class BaseProcessor {
   public abstract get value(): Expression;
 
   protected tagSourceCode(): string {
-    if (this.tag.type === 'Identifier') {
-      return this.tag.name;
+    if (this.callee.type === 'Identifier') {
+      return this.callee.name;
     }
 
-    return generator(this.tag).code;
+    return generator(this.callee).code;
   }
 
   public toString(): string {

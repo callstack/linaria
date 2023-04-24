@@ -7,12 +7,17 @@ import dedent from 'dedent';
 import { getTagProcessor } from '@linaria/babel-preset';
 import type { BaseProcessor } from '@linaria/tags';
 
-const run = (code: string): BaseProcessor | null => {
+interface IRunOptions {
+  ts?: boolean;
+}
+
+const run = (code: string, options: IRunOptions = {}): BaseProcessor | null => {
   const opts = {
-    filename: join(__dirname, 'test.js'),
+    filename: join(__dirname, options.ts ? 'test.ts' : 'test.js'),
     root: '.',
     code: true,
     ast: true,
+    presets: options.ts ? ['@babel/preset-typescript'] : [],
   };
   const rootNode = parseSync(code, opts)!;
   let result: BaseProcessor | null = null;
@@ -352,7 +357,14 @@ describe('getTagProcessor', () => {
 
     it('do not throw if styled is not a tag', () => {
       const runner = () =>
-        run(dedent`export { styled } from "@linaria/react";`);
+        run(
+          dedent`
+          import { styled } from '@linaria/react';
+
+          export type StyledReturn = ReturnType<typeof styled>;
+        `,
+          { ts: true }
+        );
 
       expect(runner).not.toThrow();
     });
