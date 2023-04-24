@@ -3,11 +3,12 @@
 
 import type { Binding, NodePath } from '@babel/traverse';
 import type {
-  Node,
+  FieldOptions,
+  Function as FunctionNode,
   Identifier,
   JSXIdentifier,
+  Node,
   Program,
-  FieldOptions,
 } from '@babel/types';
 import { NODE_FIELDS } from '@babel/types';
 
@@ -126,6 +127,22 @@ const getPathFromAction = (action: RemoveAction | ReplaceAction) => {
   throw new Error(`Unknown action type: ${action[0]}`);
 };
 
+function canFunctionBeDelete(fnPath: NodePath<FunctionNode>) {
+  const fnScope = fnPath.scope;
+  const parentScope = fnScope.parent;
+  if (parentScope.parent) {
+    // It isn't a top-level function, so we can't delete it
+    return true;
+  }
+
+  if (fnPath.listKey === 'arguments') {
+    // It is passed as an argument to another function, we can't delete it
+    return true;
+  }
+
+  return false;
+}
+
 export function findActionForNode(
   path: NodePath
 ): RemoveAction | ReplaceAction | null {
@@ -142,9 +159,34 @@ export function findActionForNode(
     return ['remove', path];
   }
 
-  if (parent.isFunction() && path.listKey === 'params') {
-    // Do not remove params of functions
-    return null;
+  if (parent.isFunction()) {
+    if (path.listKey === 'params') {
+      // Do not remove params of functions
+      return null;
+    }
+
+    if (
+      (path.isBlockStatement() && isEmptyList(path.get('body'))) ||
+      path === parent.get('body')
+    ) {
+      if (!canFunctionBeDelete(parent)) {
+        return [
+          'replace',
+          parent,
+          {
+            ...parent.node,
+            async: false,
+            body: {
+              type: 'BlockStatement',
+              body: [],
+              directives: [],
+            },
+            generator: false,
+            params: [],
+          },
+        ];
+      }
+    }
   }
 
   if (parent.isLogicalExpression({ operator: '&&' })) {
@@ -349,6 +391,20 @@ function removeUnreferenced(items: NodePath<Identifier | JSXIdentifier>[]) {
   return result;
 }
 
+function applyAction(action: ReplaceAction | RemoveAction) {
+  mutate(action[1], (p) => {
+    if (isRemoved(p)) return;
+
+    if (action[0] === 'remove') {
+      p.remove();
+    }
+
+    if (action[0] === 'replace') {
+      p.replaceWith(action[2]);
+    }
+  });
+}
+
 function removeWithRelated(paths: NodePath[]) {
   if (paths.length === 0) return;
 
@@ -381,17 +437,7 @@ function removeWithRelated(paths: NodePath[]) {
       [] as NodePath[]
     );
 
-  actions.forEach((action) => {
-    mutate(action[1], (p) => {
-      if (isRemoved(p)) return;
-
-      if (action[0] === 'remove') {
-        p.remove();
-      } else if (action[0] === 'replace') {
-        p.replaceWith(action[2]);
-      }
-    });
-  });
+  actions.forEach(applyAction);
 
   removeWithRelated(referencesOfBinding);
 
@@ -468,4 +514,4 @@ function mutate<T extends NodePath>(path: T, fn: (p: T) => NodePath[] | void) {
   removeWithRelated(forDeleting);
 }
 
-export { mutate, removeWithRelated };
+export { applyAction, mutate, removeWithRelated };

@@ -306,6 +306,10 @@ describe('shaker', () => {
       Object.defineProperty(exports, \\"__esModule\\", {
         value: true
       });
+      Object.defineProperty(exports, \\"createContext\\", {
+        enumerable: !0,
+        get: function () {}
+      });
       exports.default = defaultExports;"
     `);
   });

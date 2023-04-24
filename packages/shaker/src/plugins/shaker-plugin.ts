@@ -2,24 +2,24 @@ import type core from '@babel/core';
 import type { BabelFile, PluginObj, NodePath } from '@babel/core';
 import type { Binding } from '@babel/traverse';
 import type {
-  VariableDeclarator,
-  Program,
   Identifier,
   MemberExpression,
+  Program,
+  VariableDeclarator,
 } from '@babel/types';
 
 import { createCustomDebug } from '@linaria/logger';
 import type { IExport, IReexport, IState } from '@linaria/utils';
 import {
+  applyAction,
   collectExportsAndImports,
+  dereference,
+  findActionForNode,
   getFileIdx,
   isRemoved,
+  reference,
   removeWithRelated,
   sideEffectImport,
-  reference,
-  findActionForNode,
-  dereference,
-  mutate,
 } from '@linaria/utils';
 
 import shouldKeepSideEffect from './utils/shouldKeepSideEffect';
@@ -311,15 +311,7 @@ export default function shakerPlugin(
               (!binding || outerReferences.length === 0)
             ) {
               if (action) {
-                mutate(action[1], (p) => {
-                  if (isRemoved(p)) return;
-
-                  if (action[0] === 'remove') {
-                    p.remove();
-                  } else if (action[0] === 'replace') {
-                    p.replaceWith(action[2]);
-                  }
-                });
+                applyAction(action);
               } else {
                 removeWithRelated([path]);
               }
