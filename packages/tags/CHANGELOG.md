@@ -1,5 +1,14 @@
 # @linaria/tags
 
+## 4.3.4
+
+### Patch Changes
+
+- 2e966f23: Fix TypeScript < 4.7 compatibility (fixes #1227)
+- 1c3f309d: Fix tags usage validation (fixes #1224)
+- Updated dependencies [dbe250b5]
+  - @linaria/utils@4.3.3
+
 ## 4.3.3
 
 ### Patch Changes

@@ -1,5 +1,21 @@
 # @linaria/testkit
 
+## 4.3.5
+
+### Patch Changes
+
+- 1c3f309d: Fix tags usage validation (fixes #1224)
+- dbe250b5: Fix module function deletion when containing restricted code (fixes #1226)
+- Updated dependencies [2e966f23]
+- Updated dependencies [1c3f309d]
+- Updated dependencies [dbe250b5]
+- Updated dependencies [34029088]
+- Updated dependencies [a62e7ba6]
+  - @linaria/tags@4.3.4
+  - @linaria/babel-preset@4.4.4
+  - @linaria/react@4.3.7
+  - @linaria/shaker@4.2.10
+
 ## 4.3.4
 
 ### Patch Changes

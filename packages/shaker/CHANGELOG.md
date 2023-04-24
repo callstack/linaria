@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.2.10
+
+### Patch Changes
+
+- dbe250b5: Fix module function deletion when containing restricted code (fixes #1226)
+- Updated dependencies [dbe250b5]
+  - @linaria/utils@4.3.3
+
 ## 4.2.9
 
 ### Patch Changes

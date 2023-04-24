@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.4.4
+
+### Patch Changes
+
+- 1c3f309d: Fix tags usage validation (fixes #1224)
+- dbe250b5: Fix module function deletion when containing restricted code (fixes #1226)
+- a62e7ba6: Avoid parsing json as js
+- Updated dependencies [2e966f23]
+- Updated dependencies [1c3f309d]
+- Updated dependencies [dbe250b5]
+- Updated dependencies [34029088]
+  - @linaria/tags@4.3.4
+  - @linaria/shaker@4.2.10
+  - @linaria/utils@4.3.3
+  - @linaria/core@4.2.9
+
 ## 4.4.3
 
 ### Patch Changes

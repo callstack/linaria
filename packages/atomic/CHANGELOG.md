@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.2.9
+
+### Patch Changes
+
+- 34029088: Usages of `styled` and `css` in Jest no longer trigger the "Using the … tag in runtime is not supported" exception.
+- Updated dependencies [2e966f23]
+- Updated dependencies [1c3f309d]
+- Updated dependencies [dbe250b5]
+- Updated dependencies [34029088]
+  - @linaria/tags@4.3.4
+  - @linaria/react@4.3.7
+  - @linaria/utils@4.3.3
+  - @linaria/core@4.2.9
+
 ## 4.2.8
 
 ### Patch Changes

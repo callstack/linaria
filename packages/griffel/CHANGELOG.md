@@ -1,5 +1,16 @@
 # @linaria/griffel
 
+## 4.2.7
+
+### Patch Changes
+
+- 1c3f309d: Fix tags usage validation (fixes #1224)
+- Updated dependencies [2e966f23]
+- Updated dependencies [1c3f309d]
+- Updated dependencies [dbe250b5]
+  - @linaria/tags@4.3.4
+  - @linaria/utils@4.3.3
+
 ## 4.2.6
 
 ### Patch Changes

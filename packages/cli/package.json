@@ -1,6 +1,6 @@
 {
   "name": "@linaria/cli",
-  "version": "4.1.15",
+  "version": "4.1.16",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",
