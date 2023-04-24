@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.1.16
+
+### Patch Changes
+
+- Updated dependencies [1c3f309d]
+- Updated dependencies [dbe250b5]
+- Updated dependencies [34029088]
+- Updated dependencies [a62e7ba6]
+  - @linaria/babel-preset@4.4.4
+  - @linaria/react@4.3.7
+  - @linaria/shaker@4.2.10
+  - @linaria/core@4.2.9
+  - @linaria/rollup@4.3.7
+  - @linaria/stylelint@4.1.16
+  - @linaria/webpack4-loader@4.1.16
+
 ## 4.1.15
 
 ### Patch Changes

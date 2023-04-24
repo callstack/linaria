@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.3.3
+
+### Patch Changes
+
+- dbe250b5: Fix module function deletion when containing restricted code (fixes #1226)
+
 ## 4.3.2
 
 ### Patch Changes
