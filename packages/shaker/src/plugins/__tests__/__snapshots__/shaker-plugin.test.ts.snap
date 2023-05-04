@@ -2,11 +2,31 @@
 
 exports[`shaker should delete import 1`] = `"export const Alive = \\"\\";"`;
 
+exports[`shaker should handle __importDefault 1`] = `
+"var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    default: mod
+  };
+};
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+var Input_1 = require('./Input');
+Object.defineProperty(exports, 'Input', {
+  enumerable: true,
+  get: function () {
+    return __importDefault(Input_1).default;
+  }
+});"
+`;
+
 exports[`shaker should keep assigment even if export is marked for removing 1`] = `
 "let _a;
 exports.a = _a = {};
 exports.b = _a;"
 `;
+
+exports[`shaker should keep only side-effects 1`] = `"import 'regenerator-runtime/runtime.js';"`;
 
 exports[`shaker should keep referenced exports 1`] = `
 "var _foo;
@@ -69,6 +89,11 @@ exports[`shaker should respect implicit references 1`] = `
 "let _a;
 exports.a = _a = {};
 exports.b = _a;"
+`;
+
+exports[`shaker should shake if __linariaPreval required but not exported 1`] = `
+"import 'regenerator-runtime/runtime.js';
+export { Input } from \\"./Input\\";"
 `;
 
 exports[`shaker should throw out unused referenced exports 1`] = `"exports.defaultValue = 20;"`;

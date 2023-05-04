@@ -224,7 +224,7 @@ function styled(tag: any): any {
 
     // These properties will be read by the babel plugin for interpolation
     (Result as any).__linaria = {
-      className: options.class ?? mockedClass,
+      className: options.class || mockedClass,
       extends: tag,
     };
 
