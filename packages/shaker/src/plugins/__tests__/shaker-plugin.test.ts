@@ -335,4 +335,54 @@ describe('shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata.imports.size).toBe(1);
   });
+
+  it('should keep only side-effects', () => {
+    const { code, metadata } = keep(['side-effect'])`
+      import 'regenerator-runtime/runtime.js';
+
+      export const a = 1;
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(1);
+  });
+
+  it('should handle __importDefault', () => {
+    const { code, metadata } = keep(['Input'])`
+      var __importDefault =
+        (this && this.__importDefault) ||
+        function (mod) {
+          return mod && mod.__esModule ? mod : { default: mod };
+        };
+      Object.defineProperty(exports, '__esModule', { value: true });
+
+      var Input_1 = require('./Input');
+      Object.defineProperty(exports, 'Input', {
+        enumerable: true,
+        get: function () {
+          return __importDefault(Input_1).default;
+        },
+      });
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(1);
+    expect(metadata.imports.get('./Input')).toEqual(['default']);
+  });
+
+  it('should shake if __linariaPreval required but not exported', () => {
+    const { code, metadata } = keep(['__linariaPreval', 'Input'])`
+      import 'regenerator-runtime/runtime.js';
+
+      export { Button } from "./Button";
+      export { Input } from "./Input";
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(2);
+    expect([...metadata.imports.keys()]).toEqual([
+      'regenerator-runtime/runtime.js',
+      './Input',
+    ]);
+  });
 });

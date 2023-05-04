@@ -150,6 +150,7 @@ export default function shakerPlugin(
       const log = createCustomDebug('shaker', getFileIdx(this.filename));
 
       log('start', `${this.filename}, onlyExports: ${onlyExports.join(',')}`);
+      const onlyExportsSet = new Set(onlyExports);
 
       const collected = collectExportsAndImports(file.path);
       const sideEffectImports = collected.imports.filter(sideEffectImport);
@@ -171,6 +172,9 @@ export default function shakerPlugin(
         collected.exports
       );
 
+      const findExport = (name: string) =>
+        exports.find((i) => i.exported === name);
+
       collected.exports.forEach(({ local }) => {
         if (local.isAssignmentExpression()) {
           const left = local.get('left');
@@ -182,13 +186,16 @@ export default function shakerPlugin(
         }
       });
 
-      if (
-        onlyExports.length === 1 &&
-        onlyExports[0] === '__linariaPreval' &&
-        !exports.find((i) => i.exported === '__linariaPreval')
-      ) {
-        // Fast-lane: if only __linariaPreval is requested, and it's not exported,
-        // we can just shake out the whole file
+      const hasLinariaPreval = findExport('__linariaPreval') !== undefined;
+      const hasDefault = findExport('default') !== undefined;
+
+      // If __linariaPreval is not exported, we can remove it from onlyExports
+      if (onlyExportsSet.has('__linariaPreval') && !hasLinariaPreval) {
+        onlyExportsSet.delete('__linariaPreval');
+      }
+
+      if (onlyExportsSet.size === 0) {
+        // Fast-lane: if there are no exports to keep, we can just shake out the whole file
         this.imports = [];
         this.exports = [];
         this.reexports = [];
@@ -199,13 +206,17 @@ export default function shakerPlugin(
 
         return;
       }
+
+      const importedAsSideEffect = onlyExportsSet.has('side-effect');
+      onlyExportsSet.delete('side-effect');
+
       // Hackaround for packages which include a 'default' export without specifying __esModule; such packages cannot be
       // shaken as they will break interopRequireDefault babel helper
       // See example in shaker-plugin.test.ts
       // Real-world example was found in preact/compat npm package
       if (
-        onlyExports.includes('default') &&
-        exports.find(({ exported }) => exported === 'default') &&
+        onlyExportsSet.has('default') &&
+        hasDefault &&
         !collected.isEsModule
       ) {
         this.imports = collected.imports;
@@ -213,12 +224,13 @@ export default function shakerPlugin(
         this.reexports = collected.reexports;
         return;
       }
-      if (!onlyExports.includes('*')) {
+
+      if (!onlyExportsSet.has('*')) {
         const aliveExports = new Set<IExport | IReexport>();
         const importNames = collected.imports.map(({ imported }) => imported);
 
         exports.forEach((exp) => {
-          if (onlyExports.includes(exp.exported)) {
+          if (onlyExportsSet.has(exp.exported)) {
             aliveExports.add(exp);
           } else if (
             importNames.includes((exp.local.node as NodeWithName).name || '')
@@ -236,12 +248,12 @@ export default function shakerPlugin(
         });
 
         collected.reexports.forEach((exp) => {
-          if (onlyExports.includes(exp.exported)) {
+          if (onlyExportsSet.has(exp.exported)) {
             aliveExports.add(exp);
           }
         });
 
-        const isAllExportsFound = aliveExports.size === onlyExports.length;
+        const isAllExportsFound = aliveExports.size === onlyExportsSet.size;
         if (!isAllExportsFound && ifUnknownExport !== 'ignore') {
           if (ifUnknownExport === 'error') {
             throw new Error(
@@ -277,7 +289,7 @@ export default function shakerPlugin(
           .filter((exp) => !aliveExports.has(exp))
           .map((exp) => exp.local);
 
-        if (!keepSideEffects && sideEffectImports.length > 0) {
+        if (!keepSideEffects && !importedAsSideEffect) {
           // Remove all imports that don't import something explicitly and should not be kept
           sideEffectImports.forEach((i) => {
             if (!shouldKeepSideEffect(i.source)) {

@@ -9,7 +9,7 @@ import { validateParams } from './utils/validateParams';
 export default abstract class TaggedTemplateProcessor extends BaseProcessor {
   #template: (TemplateElement | ExpressionValue)[];
 
-  public constructor(params: Params, ...args: TailProcessorParams) {
+  protected constructor(params: Params, ...args: TailProcessorParams) {
     // Should have at least two params and the first one should be a callee.
     validateParams(
       params,

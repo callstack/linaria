@@ -36,7 +36,7 @@ import isRequire from './isRequire';
 import isTypedNode from './isTypedNode';
 
 export interface ISideEffectImport {
-  imported: null;
+  imported: 'side-effect';
   local: NodePath;
   source: string;
 }
@@ -70,11 +70,11 @@ export interface IState {
 
 export const sideEffectImport = (
   item: IImport | ISideEffectImport
-): item is ISideEffectImport => item.imported === null;
+): item is ISideEffectImport => item.imported === 'side-effect';
 
 export const explicitImport = (
   item: IImport | ISideEffectImport
-): item is IImport => item.imported !== null;
+): item is IImport => item.imported !== 'side-effect';
 
 function getValue({ node }: { node: Identifier | StringLiteral }): string {
   return node.type === 'Identifier' ? node.name : node.value;
@@ -130,7 +130,7 @@ function collectFromImportDeclaration(
   const specifiers = path.get('specifiers');
 
   if (specifiers.length === 0) {
-    state.imports.push({ imported: null, local: path, source });
+    state.imports.push({ imported: 'side-effect', local: path, source });
   }
 
   specifiers.forEach(<T extends SpecifierTypes>(specifier: NodePath<T>) => {
@@ -317,21 +317,26 @@ function collectFromDynamicImport(path: NodePath<Import>, state: IState): void {
   }
 }
 
-function getImportExportTypeByInteropFunction(
-  path: NodePath<CallExpression>
-): 'import:*' | 're-export:*' | 'default' | undefined {
+function getCalleeName(path: NodePath<CallExpression>): string | undefined {
   const callee = path.get('callee');
-  let name: string | undefined;
   if (callee.isIdentifier()) {
-    name = callee.node.name;
+    return callee.node.name;
   }
 
   if (callee.isMemberExpression()) {
     const property = callee.get('property');
     if (property.isIdentifier()) {
-      name = property.node.name;
+      return property.node.name;
     }
   }
+
+  return undefined;
+}
+
+function getImportExportTypeByInteropFunction(
+  path: NodePath<CallExpression>
+): 'import:*' | 're-export:*' | 'default' | undefined {
+  const name = getCalleeName(path);
 
   if (name === undefined) {
     return undefined;
@@ -529,7 +534,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
   if (container.isExpressionStatement()) {
     // Looks like standalone require
     state.imports.push({
-      imported: null,
+      imported: 'side-effect',
       local: container,
       source,
     });
@@ -765,7 +770,49 @@ function unfoldNamespaceImport(
       continue;
     }
 
-    if (parentPath?.isExportSpecifier()) {
+    if (
+      parentPath?.isCallExpression() &&
+      referencePath.listKey === 'arguments'
+    ) {
+      // The defined variable is used as a function argument. Let's try to figure out what is imported.
+      const importType = getImportExportTypeByInteropFunction(parentPath);
+
+      if (!importType) {
+        // Imported value is used as an unknown function argument,
+        // so we can't predict usage and import it as is.
+        result.push(importItem);
+        break;
+      }
+
+      if (importType === 'default') {
+        result.push({
+          ...importItem,
+          imported: 'default',
+          local: parentPath.get('id') as NodePath<Identifier>,
+        });
+
+        continue;
+      }
+
+      if (importType === 'import:*') {
+        result.push(importItem);
+        break;
+      }
+
+      warn(
+        'evaluator:collectExportsAndImports:unfoldNamespaceImports',
+        'Unknown import type',
+        importType
+      );
+
+      result.push(importItem);
+      continue;
+    }
+
+    if (
+      parentPath?.isExportSpecifier() ||
+      parentPath?.isExportDefaultDeclaration()
+    ) {
       // The whole namespace is re-exported
       result.push(importItem);
       break;
