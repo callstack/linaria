@@ -1,6 +1,6 @@
 {
   "name": "@linaria/rollup",
-  "version": "4.3.7",
+  "version": "4.3.8",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",
