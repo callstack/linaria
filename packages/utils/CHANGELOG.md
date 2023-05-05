@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.3.4
+
+### Patch Changes
+
+- 54ab61b2: Enhance @linaria/shaker strategy: better search in namespace imports, add support for side effect imports, fix file skipping.
+
 ## 4.3.3
 
 ### Patch Changes

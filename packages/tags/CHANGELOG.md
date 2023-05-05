@@ -1,5 +1,13 @@
 # @linaria/tags
 
+## 4.3.5
+
+### Patch Changes
+
+- 54ab61b2: Enhance @linaria/shaker strategy: better search in namespace imports, add support for side effect imports, fix file skipping.
+- Updated dependencies [54ab61b2]
+  - @linaria/utils@4.3.4
+
 ## 4.3.4
 
 ### Patch Changes
