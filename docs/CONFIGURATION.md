@@ -208,7 +208,7 @@ module.exports = {
           return false;
         }
         
-        return /(?:^|\n|;)\s*(?:export|import)\s+/.test(code);
+        return /\b(?:export|import)\b/.test(code);
       },
       action: require.resolve('@linaria/shaker'),
     }
