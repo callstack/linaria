@@ -410,7 +410,7 @@ Now, you have two options. You can use `gatsby-plugin-linaria` or create a custo
 
 ### gatsby-plugin-linaria
 
-This is an easier and more straightforward way of integrating Linaria with Gatsby. Check [plugin docs](https://github.com/silvenon/gatsby-plugin-linaria) for instructions.
+This is an easier and more straightforward way of integrating Linaria with Gatsby. Check [plugin docs](https://github.com/cometkim/gatsby-plugin-linaria) for instructions.
 
 You can also take a look at the example [here](../examples/gatsby/plugin)
 
