@@ -134,10 +134,14 @@ function styled(
   component: 'The target component should have a className prop'
 ): never;
 function styled(tag: any): any {
-  // eslint-disable-next-line no-plusplus
-  let mockedClass = `mocked-styled-${idx++}`;
-  if (tag?.__linaria?.className) {
-    mockedClass += ` ${tag.__linaria.className}`;
+  let mockedClass = '';
+
+  if (process.env.NODE_ENV === 'test') {
+    // eslint-disable-next-line no-plusplus
+    mockedClass += `mocked-styled-${idx++}`;
+    if (tag?.__linaria?.className) {
+      mockedClass += ` ${tag.__linaria.className}`;
+    }
   }
 
   return (options: Options) => {
