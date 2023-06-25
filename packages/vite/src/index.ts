@@ -37,6 +37,7 @@ export default function linaria({
 }: VitePluginOptions = {}): Plugin {
   const filter = createFilter(include, exclude);
   const cssLookup: { [key: string]: string } = {};
+  const cssFileLookup: { [key: string]: string } = {};
   let config: ResolvedConfig;
   let devServer: ViteDevServer;
 
@@ -54,16 +55,13 @@ export default function linaria({
       devServer = _server;
     },
     load(url: string) {
-      const [id] = url.split('?');
+      const [id] = url.split('?', 1);
       return cssLookup[id];
     },
     /* eslint-disable-next-line consistent-return */
     resolveId(importeeUrl: string) {
-      const [id, qsRaw] = importeeUrl.split('?');
-      if (id in cssLookup) {
-        if (qsRaw?.length) return importeeUrl;
-        return id;
-      }
+      const [id] = importeeUrl.split('?', 1);
+      return cssFileLookup[id];
     },
     handleHotUpdate(ctx) {
       // it's module, so just transform it
@@ -92,7 +90,7 @@ export default function linaria({
       return modules;
     },
     async transform(code: string, url: string) {
-      const [id] = url.split('?');
+      const [id] = url.split('?', 1);
 
       // Do not transform ignored and generated files
       if (url.includes('node_modules') || !filter(url) || id in cssLookup)
@@ -119,7 +117,7 @@ export default function linaria({
 
           log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
           // Vite adds param like `?v=667939b3` to cached modules
-          const resolvedId = resolved.id.split('?')[0];
+          const resolvedId = resolved.id.split('?', 1)[0];
 
           if (resolvedId.startsWith('\0')) {
             // \0 is a special character in Rollup that tells Rollup to not include this in the bundle
@@ -172,7 +170,7 @@ export default function linaria({
       }
 
       cssLookup[cssFilename] = cssText;
-      cssLookup[cssId] = cssText;
+      cssFileLookup[cssId] = cssFilename;
 
       result.code += `\nimport ${JSON.stringify(cssFilename)};\n`;
       if (devServer?.moduleGraph) {
