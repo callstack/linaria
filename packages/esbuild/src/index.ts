@@ -43,6 +43,7 @@ export default function linaria({
 
         const result = await build.resolve(token, {
           resolveDir: context,
+          kind: "import-statement"
         });
 
         if (result.errors.length > 0) {
