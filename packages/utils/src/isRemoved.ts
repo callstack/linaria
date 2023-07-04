@@ -16,7 +16,7 @@ export default function isRemoved(path: NodePath): boolean {
 
     if (parent) {
       // If the parent path has been removed, return true
-      if (parent.removed) {
+      if (parent.removed || parent.node === null) {
         return true;
       }
 
