@@ -61,6 +61,7 @@ export default function linaria({
     /* eslint-disable-next-line consistent-return */
     resolveId(importeeUrl: string) {
       const [id] = importeeUrl.split('?', 1);
+      if (cssLookup[id]) return id;
       return cssFileLookup[id];
     },
     handleHotUpdate(ctx) {
