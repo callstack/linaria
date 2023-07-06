@@ -385,4 +385,38 @@ describe('shaker', () => {
       './Input',
     ]);
   });
+
+  it('should keep setBatch', () => {
+    // A real-world example from react-redux
+    const { code, metadata } = keep(['setBatch'])`
+      function defaultNoopBatch(callback) {
+        callback();
+      }
+
+      var batch = defaultNoopBatch;
+
+      export var setBatch = function setBatch(newBatch) {
+        return (batch = newBatch);
+      };
+
+      export var getBatch = function getBatch() {
+        return batch;
+      };
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
+  });
+
+  it('should process constant violations inside binding paths', () => {
+    // Function `a` should be removed because it's only used in removed function `b`
+    const { code, metadata } = keep(['c'])`
+      function a(flag) { return (a = function(flag) { flag ? 1 : 2 }) }
+      export function b() { return a(1) }
+      export function c() {};
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
+  });
 });
