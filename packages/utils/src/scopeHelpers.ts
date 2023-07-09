@@ -61,21 +61,47 @@ export function reference(
   binding.referencePaths.push(referencePath ?? path);
 }
 
-function isReferenced(binding: Binding) {
-  if (!binding.referenced) {
+function isReferenced({ kind, referenced, referencePaths }: Binding) {
+  if (!referenced) {
     return false;
   }
 
   // If it's a param binding, we can't just remove it
   // because it brakes the function signature. Keep it alive for now.
-  if ((binding.kind as string) === 'param') {
+  if ((kind as string) === 'param') {
     return true;
   }
 
   // If all remaining references are in TS/Flow types, binding is unreferenced
-  return binding.referencePaths.some(
-    (i) => !i.find((ancestor) => ancestor.isTSType() || ancestor.isFlowType())
+  return (
+    referencePaths.length > 0 ||
+    referencePaths.every((i) =>
+      i.find((ancestor) => ancestor.isTSType() || ancestor.isFlowType())
+    )
   );
+}
+
+function isReferencedConstantViolation(path: NodePath, binding: Binding) {
+  if (path.find((p) => p === binding.path)) {
+    // function a(flag) { return (a = function(flag) { flag ? 1 : 2 }) }
+    // ^ Looks crazy, yeh? Welcome to the wonderful world of transpilers!
+    // `a = …` here isn't a reference.
+    return false;
+  }
+
+  if (!path.isReferenced()) {
+    return false;
+  }
+
+  if (
+    path.isAssignmentExpression() &&
+    path.parentPath.isExpressionStatement()
+  ) {
+    // A root assignment without a parent expression statement is not a reference
+    return false;
+  }
+
+  return true;
 }
 
 export function dereference(
@@ -84,13 +110,28 @@ export function dereference(
   const binding = getBinding(path);
   if (!binding) return null;
 
-  if (!binding.referencePaths.includes(path)) {
+  const isReference = binding.referencePaths.includes(path);
+  let referencesInConstantViolations = binding.constantViolations.filter((i) =>
+    isReferencedConstantViolation(i, binding)
+  );
+
+  const isConstantViolation = referencesInConstantViolations.includes(path);
+
+  if (!isReference && !isConstantViolation) {
     return null;
   }
 
-  binding.references -= 1;
-  binding.referencePaths = binding.referencePaths.filter((i) => i !== path);
-  binding.referenced = binding.referencePaths.length > 0;
+  if (isReference) {
+    binding.referencePaths = binding.referencePaths.filter((i) => i !== path);
+    binding.references -= 1;
+  } else {
+    referencesInConstantViolations = referencesInConstantViolations.filter(
+      (i) => i !== path
+    );
+  }
+
+  binding.referenced =
+    binding.referencePaths.length + referencesInConstantViolations.length > 0;
 
   return binding;
 }

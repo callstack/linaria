@@ -35,6 +35,16 @@ exports.defaultValue = Math.random() * _foo;
 exports.foo = _foo;"
 `;
 
+exports[`shaker should keep setBatch 1`] = `
+"function defaultNoopBatch(callback) {
+  callback();
+}
+var batch = defaultNoopBatch;
+export var setBatch = function setBatch(newBatch) {
+  return batch = newBatch;
+};"
+`;
+
 exports[`shaker should keep side-effects from modules 1`] = `
 "import 'regenerator-runtime/runtime.js';
 export const a = 1;"
@@ -43,6 +53,11 @@ export const a = 1;"
 exports[`shaker should process array patterns 1`] = `
 "const [,, c] = array;
 export { c };"
+`;
+
+exports[`shaker should process constant violations inside binding paths 1`] = `
+"export function c() {}
+;"
 `;
 
 exports[`shaker should process identifiers in void expressions as references 1`] = `
