@@ -6,7 +6,6 @@ import type { BabelFile, NodePath, PluginObj } from '@babel/core';
 import type { Identifier } from '@babel/types';
 
 import { createCustomDebug } from '@linaria/logger';
-import type { ExpressionValue } from '@linaria/tags';
 import type { StrictOptions } from '@linaria/utils';
 import {
   JSXElementsRemover,
