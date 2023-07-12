@@ -387,4 +387,58 @@ describe('getTagProcessor', () => {
       expect(runner).toThrow('Invalid usage of `styled` tag');
     });
   });
+
+  it('imported from a non-linaria library', () => {
+    const result = run(
+      dedent`
+      import { Title } from "../__fixtures__/non-linaria-ui-library/index";
+      import { styled } from "@linaria/react";
+
+      export const StyledLayout = styled(Title)\`\`;
+    `
+    );
+
+    expect(tagToString(result)).toBe('styled(Title)`…`');
+    expect(result?.dependencies).toHaveLength(0);
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
+  });
+
+  it('imported from a linaria library', () => {
+    const result = run(
+      dedent`
+      import { Title } from "../__fixtures__/linaria-ui-library/components/index";
+      import { styled } from "@linaria/react";
+
+      export const StyledLayout = styled(Title)\`\`;
+    `
+    );
+
+    expect(tagToString(result)).toBe('styled(Title)`…`');
+    expect(result?.dependencies).toMatchObject([{ source: 'Title' }]);
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
+  });
+
+  it('imported a non-linaria component from a linaria library', () => {
+    const result = run(
+      dedent`
+      import { Title } from "../__fixtures__/linaria-ui-library/non-linaria-components";
+      import { styled } from "@linaria/react";
+
+      export const StyledLayout = styled(Title)\`\`;
+    `
+    );
+
+    expect(tagToString(result)).toBe('styled(Title)`…`');
+    expect(result?.dependencies).toHaveLength(0);
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
+  });
 });

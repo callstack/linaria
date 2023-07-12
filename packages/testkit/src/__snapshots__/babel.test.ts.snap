@@ -1857,6 +1857,27 @@ Dependencies: ../re-exports
 
 `;
 
+exports[`strategy shaker should eval component from a linaria library 1`] = `
+"import { styled } from \\"@linaria/react\\";
+import { Title } from \\"./__fixtures__/linaria-ui-library/components/index\\";
+const _exp = /*#__PURE__*/() => Title;
+export const StyledTitle = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledTitle\\",
+  class: \\"StyledTitle_s13jq05\\",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should eval component from a linaria library 2`] = `
+
+CSS:
+
+.StyledTitle_s13jq05 {}
+
+Dependencies: ./__fixtures__/linaria-ui-library/components/index
+
+`;
+
 exports[`strategy shaker should handle shadowed identifier inside components 1`] = `
 "import React from 'react';
 const color = 'red';
@@ -1922,6 +1943,48 @@ CSS:
 }
 
 Dependencies: ./__fixtures__/reexports
+
+`;
+
+exports[`strategy shaker should not eval components from a non-linaria library 1`] = `
+"import { styled } from \\"@linaria/react\\";
+import { Title } from \\"./__fixtures__/non-linaria-ui-library/index\\";
+const _exp = /*#__PURE__*/() => Title;
+export const StyledTitle = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledTitle\\",
+  class: \\"StyledTitle_s13jq05\\",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should not eval components from a non-linaria library 2`] = `
+
+CSS:
+
+.StyledTitle_s13jq05 {}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker should not eval non-linaria component from a linaria library 1`] = `
+"import { styled } from \\"@linaria/react\\";
+import { Title } from \\"./__fixtures__/linaria-ui-library/non-linaria-components\\";
+const _exp = /*#__PURE__*/() => Title;
+export const StyledTitle = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledTitle\\",
+  class: \\"StyledTitle_s13jq05\\",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should not eval non-linaria component from a linaria library 2`] = `
+
+CSS:
+
+.StyledTitle_s13jq05 {}
+
+Dependencies: NA
 
 `;
 

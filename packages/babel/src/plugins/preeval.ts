@@ -14,6 +14,7 @@ import {
   isUnnecessaryReactCall,
   nonType,
   removeWithRelated,
+  addIdentifierToLinariaPreval,
 } from '@linaria/utils';
 
 import type { Core } from '../babel';
@@ -80,11 +81,18 @@ export default function preeval(
 
       log('start', 'Looking for template literals…');
 
+      const rootScope = file.scope;
       this.processors = [];
 
       file.path.traverse({
         Identifier: (p) => {
           processTemplateExpression(p, file.opts, options, (processor) => {
+            processor.dependencies.forEach((dependency) => {
+              if (dependency.ex.type === 'Identifier') {
+                addIdentifierToLinariaPreval(rootScope, dependency.ex.name);
+              }
+            });
+
             processor.doEvaltimeReplacement();
             this.processors.push(processor);
           });
@@ -199,12 +207,9 @@ export default function preeval(
         dependencies: [],
       };
 
-      const expressions: ExpressionValue['ex'][] = this.processors.flatMap(
-        (processor) => processor.dependencies.map((dependency) => dependency.ex)
-      );
-
       const linariaPreval = file.path.scope.getData('__linariaPreval');
       if (!linariaPreval) {
+        // Event if there is no dependencies, we still need to add __linariaPreval
         const linariaExport = t.expressionStatement(
           t.assignmentExpression(
             '=',
@@ -212,9 +217,7 @@ export default function preeval(
               t.identifier('exports'),
               t.identifier('__linariaPreval')
             ),
-            t.objectExpression(
-              expressions.map((ex) => t.objectProperty(ex, ex, false, true))
-            )
+            t.objectExpression([])
           )
         );
 
