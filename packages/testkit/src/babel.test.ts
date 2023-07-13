@@ -2748,4 +2748,36 @@ describe('strategy shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
+
+  it('should eval wrapped component from a linaria library', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import { connect } from "./__fixtures__/linaria-ui-library/hocs";
+      import { Title } from "./__fixtures__/linaria-ui-library/components/index";
+
+      export const StyledTitle = styled(connect(Title))\`\`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should not eval wrapped component from a non-linaria library', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import { connect } from "./__fixtures__/linaria-ui-library/hocs";
+      import { Title } from "./__fixtures__/non-linaria-ui-library/index";
+
+      export const StyledTitle = styled(connect(Title))\`\`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 });

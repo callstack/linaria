@@ -228,11 +228,25 @@ export function extractExpression(
   referenceAll(inserted);
   rootScope.registerDeclaration(inserted);
 
-  const exImport = ex.isIdentifier()
-    ? imports.find(
-        (i) => i.local.node === ex.scope.getBinding(ex.node.name)?.identifier
-      ) ?? null
-    : null;
+  const importedFrom: string[] = [];
+  function findImportSourceOfIdentifier(idPath: NodePath<Identifier>) {
+    const exBindingIdentifier = idPath.scope.getBinding(
+      idPath.node.name
+    )?.identifier;
+    const exImport =
+      imports.find((i) => i.local.node === exBindingIdentifier) ?? null;
+    if (exImport) {
+      importedFrom.push(exImport.source);
+    }
+  }
+
+  if (ex.isIdentifier()) {
+    findImportSourceOfIdentifier(ex);
+  } else {
+    ex.traverse({
+      Identifier: findImportSourceOfIdentifier,
+    });
+  }
 
   // Replace the expression with the _expN() call
   mutate(ex, (p) => {
@@ -257,7 +271,7 @@ export function extractExpression(
   > = {
     kind,
     ex: createId(expUid, loc),
-    importedFrom: exImport?.source,
+    importedFrom,
   };
 
   return result;
