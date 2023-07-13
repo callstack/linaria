@@ -159,10 +159,12 @@ export default function linaria({
 
       const cssFilename = path.normalize(
         `${id.replace(/\.[jt]sx?$/, '')}_${slug}.css`
-      );
+      ).replace(/\\/g, path.posix.sep);
+
       const cssRelativePath = path
         .relative(config.root, cssFilename)
         .replace(/\\/g, path.posix.sep);
+
       const cssId = `/${cssRelativePath}`;
 
       if (sourceMap && result.cssSourceMapText) {
