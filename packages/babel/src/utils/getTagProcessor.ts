@@ -255,12 +255,7 @@ function getBuilderForIdentifier(
             throw buildError(`Unexpected type of an argument ${arg.type}`);
           }
           const source = getSource(arg);
-          const extracted = extractExpression(
-            arg,
-            options.evaluate,
-            false,
-            imports
-          );
+          const extracted = extractExpression(arg, options.evaluate, imports);
           return {
             ...extracted,
             source,

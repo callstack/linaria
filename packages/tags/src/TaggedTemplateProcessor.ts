@@ -3,6 +3,7 @@ import type { TemplateElement, Expression, SourceLocation } from '@babel/types';
 import type { TailProcessorParams } from './BaseProcessor';
 import BaseProcessor from './BaseProcessor';
 import type { ExpressionValue, ValueCache, Rules, Params } from './types';
+import { ValueType } from './types';
 import templateProcessor from './utils/templateProcessor';
 import { validateParams } from './utils/validateParams';
 
@@ -27,7 +28,7 @@ export default abstract class TaggedTemplateProcessor extends BaseProcessor {
     super([tag], ...args);
 
     template.forEach((element) => {
-      if ('kind' in element) {
+      if ('kind' in element && element.kind !== ValueType.FUNCTION) {
         this.dependencies.push(element);
       }
     });
