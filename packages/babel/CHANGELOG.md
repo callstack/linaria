@@ -26,11 +26,11 @@
 - Updated dependencies [05ad266c]
 - Updated dependencies [16c057df]
 - Updated dependencies [af5bb92d]
-  - @linaria/utils@4.4.0
-  - @linaria/shaker@4.3.0
-  - @linaria/tags@4.4.0
-  - @linaria/core@4.3.0
-  - @linaria/logger@4.1.0
+  - @linaria/utils@4.5.0
+  - @linaria/shaker@4.5.0
+  - @linaria/tags@4.5.0
+  - @linaria/core@4.5.0
+  - @linaria/logger@4.5.0
 
 ## 4.4.5
 

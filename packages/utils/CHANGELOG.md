@@ -1,6 +1,6 @@
 # Change Log
 
-## 4.4.0
+## 4.5.0
 
 ### Minor Changes
 
@@ -25,7 +25,7 @@
 - af5bb92d: The end of support for Node.js 14. Migration to pnpm 8.
 - Updated dependencies [16c057df]
 - Updated dependencies [af5bb92d]
-  - @linaria/logger@4.1.0
+  - @linaria/logger@4.5.0
 
 ## 4.3.4
 

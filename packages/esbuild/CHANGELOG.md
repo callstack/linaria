@@ -1,6 +1,6 @@
 # Change Log
 
-## 4.3.0
+## 4.5.0
 
 ### Minor Changes
 
@@ -27,7 +27,7 @@
 - Updated dependencies [05ad266c]
 - Updated dependencies [16c057df]
 - Updated dependencies [af5bb92d]
-  - @linaria/utils@4.4.0
+  - @linaria/utils@4.5.0
   - @linaria/babel-preset@4.5.0
 
 ## 4.2.11

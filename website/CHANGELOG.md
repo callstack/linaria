@@ -1,6 +1,6 @@
 # Change Log
 
-## 4.2.0
+## 4.5.0
 
 ### Minor Changes
 
@@ -24,10 +24,10 @@
 - Updated dependencies [16c057df]
 - Updated dependencies [af5bb92d]
 - Updated dependencies [10859924]
-  - @linaria/react@4.4.0
-  - @linaria/atomic@4.3.0
-  - @linaria/core@4.3.0
-  - @linaria/server@4.2.0
+  - @linaria/react@4.5.0
+  - @linaria/atomic@4.5.0
+  - @linaria/core@4.5.0
+  - @linaria/server@4.5.0
 
 ## 4.1.16
 

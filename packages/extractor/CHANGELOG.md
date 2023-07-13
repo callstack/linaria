@@ -1,6 +1,6 @@
 # Change Log
 
-## 4.1.0
+## 4.5.0
 
 ### Minor Changes
 

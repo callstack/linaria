@@ -1,6 +1,6 @@
 # Change Log
 
-## 4.2.0
+## 4.5.0
 
 ### Minor Changes
 
@@ -27,14 +27,14 @@
 - Updated dependencies [af5bb92d]
 - Updated dependencies [10859924]
   - @linaria/babel-preset@4.5.0
-  - @linaria/shaker@4.3.0
-  - @linaria/react@4.4.0
-  - @linaria/core@4.3.0
-  - @linaria/extractor@4.1.0
-  - @linaria/rollup@4.4.0
-  - @linaria/server@4.2.0
-  - @linaria/stylelint@4.2.0
-  - @linaria/webpack4-loader@4.2.0
+  - @linaria/shaker@4.5.0
+  - @linaria/react@4.5.0
+  - @linaria/core@4.5.0
+  - @linaria/extractor@4.5.0
+  - @linaria/rollup@4.5.0
+  - @linaria/server@4.5.0
+  - @linaria/stylelint@4.5.0
+  - @linaria/webpack4-loader@4.5.0
 
 ## 4.1.17
 

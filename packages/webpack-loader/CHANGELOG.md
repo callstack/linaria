@@ -1,6 +1,6 @@
 # Change Log
 
-## 4.2.0
+## 4.5.0
 
 ### Minor Changes
 
@@ -23,8 +23,8 @@
 - af5bb92d: The end of support for Node.js 14. Migration to pnpm 8.
 - Updated dependencies [16c057df]
 - Updated dependencies [af5bb92d]
-  - @linaria/webpack4-loader@4.2.0
-  - @linaria/webpack5-loader@4.2.0
+  - @linaria/webpack4-loader@4.5.0
+  - @linaria/webpack5-loader@4.5.0
 
 ## 4.1.17
 

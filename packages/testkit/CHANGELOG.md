@@ -1,6 +1,6 @@
-# @linaria/testkit
+# Change Log
 
-## 4.4.0
+## 4.5.0
 
 ### Minor Changes
 
@@ -27,10 +27,10 @@
 - Updated dependencies [af5bb92d]
 - Updated dependencies [10859924]
   - @linaria/babel-preset@4.5.0
-  - @linaria/shaker@4.3.0
-  - @linaria/react@4.4.0
-  - @linaria/tags@4.4.0
-  - @linaria/extractor@4.1.0
+  - @linaria/shaker@4.5.0
+  - @linaria/react@4.5.0
+  - @linaria/tags@4.5.0
+  - @linaria/extractor@4.5.0
 
 ## 4.3.6
 
