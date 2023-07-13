@@ -35,7 +35,7 @@ const run = (rawCode: TemplateStringsArray, evaluate: boolean) => {
       // eslint-disable-next-line no-param-reassign
       path.node.leadingComments = [];
 
-      extractExpression(path, evaluate, false);
+      extractExpression(path, evaluate);
     },
   });
 

@@ -13,6 +13,7 @@ import type {
   Rules,
   Replacements,
 } from '../types';
+import { ValueType } from '../types';
 
 import { getVariableName } from './getVariableName';
 import hasMeta from './hasMeta';
@@ -71,39 +72,8 @@ export default function templateProcessor(
 
     const value = 'value' in item ? item.value : valueCache.get(item.ex.name);
 
-    throwIfInvalid(
-      tagProcessor.isValidValue.bind(tagProcessor),
-      value,
-      item,
-      item.source
-    );
-
-    if (value !== undefined && typeof value !== 'function') {
-      // Skip the blank string instead of throw ing an error
-      if (value === '') {
-        continue;
-      }
-
-      if (hasMeta(value)) {
-        // If it's a React component wrapped in styled, get the class name
-        // Useful for interpolating components
-        cssText += `.${value.__linaria.className}`;
-      } else if (isCSSable(value)) {
-        // If it's a plain object or an array, convert it to a CSS string
-        cssText += stripLines(loc, toCSS(value));
-      } else {
-        // For anything else, assume it'll be stringified
-        cssText += stripLines(loc, value);
-      }
-
-      sourceMapReplacements.push({
-        original: loc,
-        length: cssText.length - beforeLength,
-      });
-    }
-
     // Is it props based interpolation?
-    if (typeof value === 'function') {
+    if (item.kind === ValueType.FUNCTION || typeof value === 'function') {
       // Check if previous expression was a CSS variable that we replaced
       // If it has a unit after it, we need to move the unit into the interpolation
       // e.g. `var(--size)px` should actually be `var(--size)`
@@ -140,6 +110,37 @@ export default function templateProcessor(
         }
 
         throw e;
+      }
+    } else {
+      throwIfInvalid(
+        tagProcessor.isValidValue.bind(tagProcessor),
+        value,
+        item,
+        item.source
+      );
+
+      if (value !== undefined && typeof value !== 'function') {
+        // Skip the blank string instead of throw ing an error
+        if (value === '') {
+          continue;
+        }
+
+        if (hasMeta(value)) {
+          // If it's a React component wrapped in styled, get the class name
+          // Useful for interpolating components
+          cssText += `.${value.__linaria.className}`;
+        } else if (isCSSable(value)) {
+          // If it's a plain object or an array, convert it to a CSS string
+          cssText += stripLines(loc, toCSS(value));
+        } else {
+          // For anything else, assume it'll be stringified
+          cssText += stripLines(loc, value);
+        }
+
+        sourceMapReplacements.push({
+          original: loc,
+          length: cssText.length - beforeLength,
+        });
       }
     }
   }

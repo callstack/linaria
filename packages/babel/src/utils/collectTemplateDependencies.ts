@@ -25,7 +25,6 @@ import type { ConstValue, FunctionValue, LazyValue } from '@linaria/tags';
 import { hasMeta } from '@linaria/tags';
 import type { IImport } from '@linaria/utils';
 import {
-  addIdentifierToLinariaPreval,
   createId,
   findIdentifiers,
   mutate,
@@ -157,13 +156,11 @@ function hoistIdentifier(idPath: NodePath<Identifier>): void {
  * used in a Linaria template. This function tries to hoist the expression.
  * @param ex The expression to hoist.
  * @param evaluate If true, we try to statically evaluate the expression.
- * @param addToExport If true, we add the expression to the __linariaPreval.
  * @param imports All the imports of the file.
  */
 export function extractExpression(
   ex: NodePath<Expression>,
   evaluate = false,
-  addToExport = true,
   imports: IImport[] = []
 ): Omit<ExpressionValue, 'buildCodeFrameError' | 'source'> {
   if (
@@ -256,10 +253,6 @@ export function extractExpression(
       arguments: [],
     });
   });
-
-  if (addToExport) {
-    addIdentifierToLinariaPreval(rootScope, expUid);
-  }
 
   // eslint-disable-next-line no-param-reassign
   ex.node.loc = loc;

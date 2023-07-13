@@ -772,6 +772,25 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('do not include in dependencies expressions from interpolation functions bodies', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+    import { styled } from '@linaria/react';
+    import constant from './broken-dependency-1';
+    import modifier from './broken-dependency-2';
+
+    export const Box = styled.div\`
+      height: ${'${props => props.size + constant}'}px;
+      width: ${'${props => modifier(props.size)}'}px;
+    \`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('handles nested blocks', async () => {
     const { code, metadata } = await transform(
       dedent`
