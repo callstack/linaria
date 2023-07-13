@@ -89,41 +89,45 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
       } else if (value.kind === ValueType.CONST) {
         component = typeof value.value === 'string' ? value.value : undefined;
       } else {
-        if (value.importedFrom) {
+        if (value.importedFrom?.length) {
           const selfPkg = findPackageJSON('.', this.context.filename);
-          const importedPkg = findPackageJSON(
-            value.importedFrom,
-            this.context.filename
-          );
 
-          if (importedPkg) {
-            const packageJSON = JSON.parse(readFileSync(importedPkg, 'utf8'));
-            let isMatched = false;
-            let mask: string | undefined = packageJSON?.linaria?.components;
-            if (importedPkg === selfPkg && mask === undefined) {
-              // If mask is not specified for the local package, all components are treated as styled.
-              mask = '**/*';
+          // Check if at least one used identifier is a Linaria component.
+          const isSomeMatched = value.importedFrom.some((importedFrom) => {
+            const importedPkg = findPackageJSON(
+              importedFrom,
+              this.context.filename
+            );
+
+            if (importedPkg) {
+              const packageJSON = JSON.parse(readFileSync(importedPkg, 'utf8'));
+              let mask: string | undefined = packageJSON?.linaria?.components;
+              if (importedPkg === selfPkg && mask === undefined) {
+                // If mask is not specified for the local package, all components are treated as styled.
+                mask = '**/*';
+              }
+
+              if (mask) {
+                const packageDir = dirname(importedPkg);
+                const normalizedMask = mask.replace(/\//g, sep);
+                const fullMask = join(packageDir, normalizedMask);
+                const fileWithComponent = require.resolve(importedFrom, {
+                  paths: [dirname(this.context.filename!)],
+                });
+
+                return minimatch(fileWithComponent, fullMask);
+              }
             }
 
-            if (mask) {
-              const packageDir = dirname(importedPkg);
-              const normalizedMask = mask.replace(/\//g, sep);
-              const fullMask = join(packageDir, normalizedMask);
-              const fileWithComponent = require.resolve(value.importedFrom, {
-                paths: [dirname(this.context.filename!)],
-              });
-              isMatched = minimatch(fileWithComponent, fullMask);
-            }
+            return false;
+          });
 
-            if (!isMatched) {
-              // If a wrapped component is not imported from a package with
-              // Linaria-styled components, we can treat it as a simple component.
-              component = {
-                node: value.ex,
-                nonLinaria: true,
-                source: value.source,
-              };
-            }
+          if (!isSomeMatched) {
+            component = {
+              node: value.ex,
+              nonLinaria: true,
+              source: value.source,
+            };
           }
         }
 

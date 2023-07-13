@@ -102,7 +102,7 @@ export enum ValueType {
 export type LazyValue = {
   buildCodeFrameError: BuildCodeFrameErrorFn;
   ex: Identifier;
-  importedFrom?: string;
+  importedFrom?: string[];
   kind: ValueType.LAZY;
   source: string;
 };
@@ -110,7 +110,7 @@ export type LazyValue = {
 export type FunctionValue = {
   buildCodeFrameError: BuildCodeFrameErrorFn;
   ex: Identifier;
-  importedFrom?: string;
+  importedFrom?: string[];
   kind: ValueType.FUNCTION;
   source: string;
 };
