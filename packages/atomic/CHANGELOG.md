@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.5.1
+
+### Patch Changes
+
+- Updated dependencies [ceca1611]
+- Updated dependencies [13258306]
+  - @linaria/react@4.5.1
+  - @linaria/tags@4.5.1
+  - @linaria/core@4.5.1
+
 ## 4.5.0
 
 ### Minor Changes
