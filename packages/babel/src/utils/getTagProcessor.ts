@@ -10,7 +10,6 @@ import type {
   Identifier,
   MemberExpression,
 } from '@babel/types';
-import findUp from 'find-up';
 
 import { BaseProcessor } from '@linaria/tags';
 import type {
@@ -24,6 +23,7 @@ import type { IImport, StrictOptions } from '@linaria/utils';
 import {
   collectExportsAndImports,
   explicitImport,
+  findPackageJSON,
   isNotNull,
   mutate,
 } from '@linaria/utils';
@@ -67,26 +67,6 @@ function buildCodeFrameError(path: NodePath, message: string): Error {
     return path.buildCodeFrameError(message);
   } catch {
     return new Error(message);
-  }
-}
-
-function findPackageJSON(pkgName: string, filename: string | null | undefined) {
-  try {
-    const pkgPath = require.resolve(
-      pkgName,
-      filename ? { paths: [dirname(filename)] } : {}
-    );
-    return findUp.sync('package.json', { cwd: pkgPath });
-  } catch (er: unknown) {
-    if (
-      typeof er === 'object' &&
-      er !== null &&
-      (er as { code?: unknown }).code === 'MODULE_NOT_FOUND'
-    ) {
-      return undefined;
-    }
-
-    throw er;
   }
 }
 
@@ -275,7 +255,12 @@ function getBuilderForIdentifier(
             throw buildError(`Unexpected type of an argument ${arg.type}`);
           }
           const source = getSource(arg);
-          const extracted = extractExpression(arg, options.evaluate);
+          const extracted = extractExpression(
+            arg,
+            options.evaluate,
+            false,
+            imports
+          );
           return {
             ...extracted,
             source,

@@ -29,6 +29,7 @@ export default class MakeStylesProcessor extends BaseProcessor {
 
     const { ex } = callParam[1];
     if (ex.type === 'Identifier') {
+      this.dependencies.push(callParam[1]);
       this.#slotsExpName = ex.name;
     } else if (ex.type === 'NullLiteral') {
       this.#slotsExpName = null;

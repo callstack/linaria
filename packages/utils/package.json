@@ -38,7 +38,8 @@
     "@babel/traverse": "^7.20.1",
     "@babel/types": "^7.20.2",
     "@linaria/logger": "workspace:^",
-    "babel-merge": "^3.0.0"
+    "babel-merge": "^3.0.0",
+    "find-up": "^5.0.0"
   },
   "devDependencies": {
     "@types/babel__core": "^7.1.19",

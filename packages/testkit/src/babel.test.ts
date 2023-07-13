@@ -2703,4 +2703,49 @@ describe('strategy shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
+
+  it('should eval component from a linaria library', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import { Title } from "./__fixtures__/linaria-ui-library/components/index";
+
+      export const StyledTitle = styled(Title)\`\`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should not eval components from a non-linaria library', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import { Title } from "./__fixtures__/non-linaria-ui-library/index";
+
+      export const StyledTitle = styled(Title)\`\`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should not eval non-linaria component from a linaria library', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import { Title } from "./__fixtures__/linaria-ui-library/non-linaria-components";
+
+      export const StyledTitle = styled(Title)\`\`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 });

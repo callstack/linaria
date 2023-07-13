@@ -71,7 +71,9 @@ export interface IInterpolation {
   unit: string;
 }
 
-export type WrappedNode = string | { node: Identifier; source: string };
+export type WrappedNode =
+  | string
+  | { node: Identifier; nonLinaria?: true; source: string };
 
 export type Rules = Record<string, ICSSRule>;
 
@@ -100,6 +102,7 @@ export enum ValueType {
 export type LazyValue = {
   buildCodeFrameError: BuildCodeFrameErrorFn;
   ex: Identifier;
+  importedFrom?: string;
   kind: ValueType.LAZY;
   source: string;
 };
@@ -107,6 +110,7 @@ export type LazyValue = {
 export type FunctionValue = {
   buildCodeFrameError: BuildCodeFrameErrorFn;
   ex: Identifier;
+  importedFrom?: string;
   kind: ValueType.FUNCTION;
   source: string;
 };
