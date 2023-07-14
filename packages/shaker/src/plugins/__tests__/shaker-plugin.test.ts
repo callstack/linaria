@@ -1,41 +1,61 @@
 import { join } from 'path';
 
+import type { PluginItem } from '@babel/core';
 import { transformSync } from '@babel/core';
 import dedent from 'dedent';
 
 import shakerPlugin, { hasShakerMetadata } from '../shaker-plugin';
 
-const keep = (only: string[]) => (code: TemplateStringsArray) => {
-  const filename = join(__dirname, 'source.js');
-  const formattedCode = dedent(code);
+type Extension = 'js' | 'ts' | 'jsx' | 'tsx';
 
-  const transformed = transformSync(formattedCode, {
-    babelrc: false,
-    configFile: false,
-    filename,
-    plugins: [
-      [
-        shakerPlugin,
-        {
-          onlyExports: only,
-        },
-      ],
-    ],
-  });
-
-  if (
-    !transformed ||
-    !transformed.code ||
-    !hasShakerMetadata(transformed.metadata)
-  ) {
-    throw new Error(`${filename} has no shaker metadata`);
+const getPresets = (extension: Extension) => {
+  const presets: PluginItem[] = [];
+  if (extension === 'ts' || extension === 'tsx') {
+    presets.push(require.resolve('@babel/preset-typescript'));
   }
 
-  return {
-    code: transformed.code,
-    metadata: transformed.metadata.__linariaShaker,
-  };
+  if (extension === 'jsx' || extension === 'tsx') {
+    presets.push(require.resolve('@babel/preset-react'));
+  }
+
+  return presets;
 };
+
+const keep =
+  (only: string[], extension: Extension = 'js') =>
+  (code: TemplateStringsArray) => {
+    const presets = getPresets(extension);
+    const filename = join(__dirname, `source.${extension}`);
+    const formattedCode = dedent(code);
+
+    const transformed = transformSync(formattedCode, {
+      babelrc: false,
+      configFile: false,
+      filename,
+      presets,
+      plugins: [
+        [
+          shakerPlugin,
+          {
+            onlyExports: only,
+          },
+        ],
+      ],
+    });
+
+    if (
+      !transformed ||
+      !transformed.code ||
+      !hasShakerMetadata(transformed.metadata)
+    ) {
+      throw new Error(`${filename} has no shaker metadata`);
+    }
+
+    return {
+      code: transformed.code,
+      metadata: transformed.metadata.__linariaShaker,
+    };
+  };
 
 describe('shaker', () => {
   it('should remove unused export', () => {

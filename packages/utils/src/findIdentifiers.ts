@@ -49,11 +49,6 @@ export default function findIdentifiers(
         return;
       }
 
-      if (!nonType(path)) {
-        // If skip in TSTypeAnnotation visitor doesn't work
-        return;
-      }
-
       // TODO: Is there a better way to check that it's a local variable?
 
       const binding = getScope(path).getBinding(path.node.name);
@@ -73,11 +68,6 @@ export default function findIdentifiers(
       emit(ex);
     } else {
       ex.traverse({
-        TSTypeAnnotation(path) {
-          // We ignore identifiers in type annotations
-          // It will produce broken TS code, but we don't care
-          path.skip();
-        },
         Identifier(path: NodePath<Identifier>) {
           emit(path);
         },
