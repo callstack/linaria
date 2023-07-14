@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`prepareCode Testing transformation for for-debug: code 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+Object.defineProperty(exports, 'asyncResolveFallback', {
+  enumerable: true,
+  get: function get() {}
+});
+Object.defineProperty(exports, 'collectExportsAndImports', {
+  enumerable: true,
+  get: function get() {}
+});
+Object.defineProperty(exports, 'slugify', {
+  enumerable: true,
+  get: function get() {
+    return _slugify.default;
+  }
+});
+var _slugify = _interopRequireDefault(require('./slugify'));
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
+}"
+`;
+
+exports[`prepareCode Testing transformation for for-debug: imports 1`] = `
+Map {
+  "./slugify" => Array [
+    "default",
+  ],
+}
+`;
+
+exports[`prepareCode Testing transformation for for-debug: metadata 1`] = `Object {}`;

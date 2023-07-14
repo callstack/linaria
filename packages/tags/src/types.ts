@@ -71,11 +71,13 @@ export interface IInterpolation {
   unit: string;
 }
 
-export type WrappedNode = string | { node: Identifier; source: string };
+export type WrappedNode =
+  | string
+  | { node: Identifier; nonLinaria?: true; source: string };
 
 export type Rules = Record<string, ICSSRule>;
 
-export type TagParam = readonly ['tag', Identifier | MemberExpression];
+export type CalleeParam = readonly ['callee', Identifier | MemberExpression];
 export type CallParam = readonly ['call', ...ExpressionValue[]];
 export type MemberParam = readonly ['member', string];
 export type TemplateParam = readonly [
@@ -83,7 +85,7 @@ export type TemplateParam = readonly [
   (TemplateElement | ExpressionValue)[]
 ];
 
-export type Param = TagParam | CallParam | MemberParam | TemplateParam;
+export type Param = CalleeParam | CallParam | MemberParam | TemplateParam;
 export type Params = readonly Param[];
 
 export type BuildCodeFrameErrorFn = <TError extends Error>(
@@ -100,6 +102,7 @@ export enum ValueType {
 export type LazyValue = {
   buildCodeFrameError: BuildCodeFrameErrorFn;
   ex: Identifier;
+  importedFrom?: string[];
   kind: ValueType.LAZY;
   source: string;
 };
@@ -107,6 +110,7 @@ export type LazyValue = {
 export type FunctionValue = {
   buildCodeFrameError: BuildCodeFrameErrorFn;
   ex: Identifier;
+  importedFrom?: string[];
   kind: ValueType.FUNCTION;
   source: string;
 };

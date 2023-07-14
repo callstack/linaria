@@ -1,41 +1,61 @@
 import { join } from 'path';
 
+import type { PluginItem } from '@babel/core';
 import { transformSync } from '@babel/core';
 import dedent from 'dedent';
 
 import shakerPlugin, { hasShakerMetadata } from '../shaker-plugin';
 
-const keep = (only: string[]) => (code: TemplateStringsArray) => {
-  const filename = join(__dirname, 'source.js');
-  const formattedCode = dedent(code);
+type Extension = 'js' | 'ts' | 'jsx' | 'tsx';
 
-  const transformed = transformSync(formattedCode, {
-    babelrc: false,
-    configFile: false,
-    filename,
-    plugins: [
-      [
-        shakerPlugin,
-        {
-          onlyExports: only,
-        },
-      ],
-    ],
-  });
-
-  if (
-    !transformed ||
-    !transformed.code ||
-    !hasShakerMetadata(transformed.metadata)
-  ) {
-    throw new Error(`${filename} has no shaker metadata`);
+const getPresets = (extension: Extension) => {
+  const presets: PluginItem[] = [];
+  if (extension === 'ts' || extension === 'tsx') {
+    presets.push(require.resolve('@babel/preset-typescript'));
   }
 
-  return {
-    code: transformed.code,
-    metadata: transformed.metadata.__linariaShaker,
-  };
+  if (extension === 'jsx' || extension === 'tsx') {
+    presets.push(require.resolve('@babel/preset-react'));
+  }
+
+  return presets;
 };
+
+const keep =
+  (only: string[], extension: Extension = 'js') =>
+  (code: TemplateStringsArray) => {
+    const presets = getPresets(extension);
+    const filename = join(__dirname, `source.${extension}`);
+    const formattedCode = dedent(code);
+
+    const transformed = transformSync(formattedCode, {
+      babelrc: false,
+      configFile: false,
+      filename,
+      presets,
+      plugins: [
+        [
+          shakerPlugin,
+          {
+            onlyExports: only,
+          },
+        ],
+      ],
+    });
+
+    if (
+      !transformed ||
+      !transformed.code ||
+      !hasShakerMetadata(transformed.metadata)
+    ) {
+      throw new Error(`${filename} has no shaker metadata`);
+    }
+
+    return {
+      code: transformed.code,
+      metadata: transformed.metadata.__linariaShaker,
+    };
+  };
 
 describe('shaker', () => {
   it('should remove unused export', () => {
@@ -306,6 +326,10 @@ describe('shaker', () => {
       Object.defineProperty(exports, \\"__esModule\\", {
         value: true
       });
+      Object.defineProperty(exports, \\"createContext\\", {
+        enumerable: !0,
+        get: function () {}
+      });
       exports.default = defaultExports;"
     `);
   });
@@ -330,5 +354,89 @@ describe('shaker', () => {
 
     expect(code).toMatchSnapshot();
     expect(metadata.imports.size).toBe(1);
+  });
+
+  it('should keep only side-effects', () => {
+    const { code, metadata } = keep(['side-effect'])`
+      import 'regenerator-runtime/runtime.js';
+
+      export const a = 1;
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(1);
+  });
+
+  it('should handle __importDefault', () => {
+    const { code, metadata } = keep(['Input'])`
+      var __importDefault =
+        (this && this.__importDefault) ||
+        function (mod) {
+          return mod && mod.__esModule ? mod : { default: mod };
+        };
+      Object.defineProperty(exports, '__esModule', { value: true });
+
+      var Input_1 = require('./Input');
+      Object.defineProperty(exports, 'Input', {
+        enumerable: true,
+        get: function () {
+          return __importDefault(Input_1).default;
+        },
+      });
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(1);
+    expect(metadata.imports.get('./Input')).toEqual(['default']);
+  });
+
+  it('should shake if __linariaPreval required but not exported', () => {
+    const { code, metadata } = keep(['__linariaPreval', 'Input'])`
+      import 'regenerator-runtime/runtime.js';
+
+      export { Button } from "./Button";
+      export { Input } from "./Input";
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(2);
+    expect([...metadata.imports.keys()]).toEqual([
+      'regenerator-runtime/runtime.js',
+      './Input',
+    ]);
+  });
+
+  it('should keep setBatch', () => {
+    // A real-world example from react-redux
+    const { code, metadata } = keep(['setBatch'])`
+      function defaultNoopBatch(callback) {
+        callback();
+      }
+
+      var batch = defaultNoopBatch;
+
+      export var setBatch = function setBatch(newBatch) {
+        return (batch = newBatch);
+      };
+
+      export var getBatch = function getBatch() {
+        return batch;
+      };
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
+  });
+
+  it('should process constant violations inside binding paths', () => {
+    // Function `a` should be removed because it's only used in removed function `b`
+    const { code, metadata } = keep(['c'])`
+      function a(flag) { return (a = function(flag) { flag ? 1 : 2 }) }
+      export function b() { return a(1) }
+      export function c() {};
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
   });
 });

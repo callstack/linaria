@@ -3,19 +3,24 @@ import type { TemplateElement, Expression, SourceLocation } from '@babel/types';
 import type { TailProcessorParams } from './BaseProcessor';
 import BaseProcessor from './BaseProcessor';
 import type { ExpressionValue, ValueCache, Rules, Params } from './types';
+import { ValueType } from './types';
 import templateProcessor from './utils/templateProcessor';
 import { validateParams } from './utils/validateParams';
 
 export default abstract class TaggedTemplateProcessor extends BaseProcessor {
   #template: (TemplateElement | ExpressionValue)[];
 
-  public constructor(params: Params, ...args: TailProcessorParams) {
-    // If the first param is not a tag, we should skip the expression.
-    validateParams(params, ['tag', '...'], TaggedTemplateProcessor.SKIP);
+  protected constructor(params: Params, ...args: TailProcessorParams) {
+    // Should have at least two params and the first one should be a callee.
+    validateParams(
+      params,
+      ['callee', '*', '...'],
+      TaggedTemplateProcessor.SKIP
+    );
 
     validateParams(
       params,
-      ['tag', 'template'],
+      ['callee', 'template'],
       'Invalid usage of template tag'
     );
     const [tag, [, template]] = params;
@@ -23,7 +28,7 @@ export default abstract class TaggedTemplateProcessor extends BaseProcessor {
     super([tag], ...args);
 
     template.forEach((element) => {
-      if ('kind' in element) {
+      if ('kind' in element && element.kind !== ValueType.FUNCTION) {
         this.dependencies.push(element);
       }
     });

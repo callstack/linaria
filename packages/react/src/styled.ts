@@ -134,10 +134,14 @@ function styled(
   component: 'The target component should have a className prop'
 ): never;
 function styled(tag: any): any {
-  // eslint-disable-next-line no-plusplus
-  let mockedClass = `mocked-styled-${idx++}`;
-  if (tag?.__linaria?.className) {
-    mockedClass += ` ${tag.__linaria.className}`;
+  let mockedClass = '';
+
+  if (process.env.NODE_ENV === 'test') {
+    // eslint-disable-next-line no-plusplus
+    mockedClass += `mocked-styled-${idx++}`;
+    if (tag?.__linaria?.className) {
+      mockedClass += ` ${tag.__linaria.className}`;
+    }
   }
 
   return (options: Options) => {
@@ -224,7 +228,7 @@ function styled(tag: any): any {
 
     // These properties will be read by the babel plugin for interpolation
     (Result as any).__linaria = {
-      className: options.class ?? mockedClass,
+      className: options.class || mockedClass,
       extends: tag,
     };
 
@@ -232,14 +236,14 @@ function styled(tag: any): any {
   };
 }
 
-type StyledComponent<T> = StyledMeta &
+export type StyledComponent<T> = StyledMeta &
   ([T] extends [React.FunctionComponent<any>]
     ? T
     : React.FunctionComponent<T & { as?: React.ElementType }>);
 
 type StaticPlaceholder = string | number | CSSProperties | StyledMeta;
 
-type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
+export type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
   TAdditionalProps = Record<never, unknown>
 >(
   strings: TemplateStringsArray,

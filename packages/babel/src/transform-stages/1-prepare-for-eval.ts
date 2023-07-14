@@ -97,7 +97,7 @@ function getMatchedRule(
   return { action: 'ignore' };
 }
 
-function prepareCode(
+export function prepareCode(
   babel: Core,
   filename: string,
   originalCode: string,

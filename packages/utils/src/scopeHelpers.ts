@@ -3,11 +3,12 @@
 
 import type { Binding, NodePath } from '@babel/traverse';
 import type {
-  Node,
+  FieldOptions,
+  Function as FunctionNode,
   Identifier,
   JSXIdentifier,
+  Node,
   Program,
-  FieldOptions,
 } from '@babel/types';
 import { NODE_FIELDS } from '@babel/types';
 
@@ -60,21 +61,47 @@ export function reference(
   binding.referencePaths.push(referencePath ?? path);
 }
 
-function isReferenced(binding: Binding) {
-  if (!binding.referenced) {
+function isReferenced({ kind, referenced, referencePaths }: Binding) {
+  if (!referenced) {
     return false;
   }
 
   // If it's a param binding, we can't just remove it
   // because it brakes the function signature. Keep it alive for now.
-  if ((binding.kind as string) === 'param') {
+  if ((kind as string) === 'param') {
     return true;
   }
 
   // If all remaining references are in TS/Flow types, binding is unreferenced
-  return binding.referencePaths.some(
-    (i) => !i.find((ancestor) => ancestor.isTSType() || ancestor.isFlowType())
+  return (
+    referencePaths.length > 0 ||
+    referencePaths.every((i) =>
+      i.find((ancestor) => ancestor.isTSType() || ancestor.isFlowType())
+    )
   );
+}
+
+function isReferencedConstantViolation(path: NodePath, binding: Binding) {
+  if (path.find((p) => p === binding.path)) {
+    // function a(flag) { return (a = function(flag) { flag ? 1 : 2 }) }
+    // ^ Looks crazy, yeh? Welcome to the wonderful world of transpilers!
+    // `a = …` here isn't a reference.
+    return false;
+  }
+
+  if (!path.isReferenced()) {
+    return false;
+  }
+
+  if (
+    path.isAssignmentExpression() &&
+    path.parentPath.isExpressionStatement()
+  ) {
+    // A root assignment without a parent expression statement is not a reference
+    return false;
+  }
+
+  return true;
 }
 
 export function dereference(
@@ -83,13 +110,28 @@ export function dereference(
   const binding = getBinding(path);
   if (!binding) return null;
 
-  if (!binding.referencePaths.includes(path)) {
+  const isReference = binding.referencePaths.includes(path);
+  let referencesInConstantViolations = binding.constantViolations.filter((i) =>
+    isReferencedConstantViolation(i, binding)
+  );
+
+  const isConstantViolation = referencesInConstantViolations.includes(path);
+
+  if (!isReference && !isConstantViolation) {
     return null;
   }
 
-  binding.references -= 1;
-  binding.referencePaths = binding.referencePaths.filter((i) => i !== path);
-  binding.referenced = binding.referencePaths.length > 0;
+  if (isReference) {
+    binding.referencePaths = binding.referencePaths.filter((i) => i !== path);
+    binding.references -= 1;
+  } else {
+    referencesInConstantViolations = referencesInConstantViolations.filter(
+      (i) => i !== path
+    );
+  }
+
+  binding.referenced =
+    binding.referencePaths.length + referencesInConstantViolations.length > 0;
 
   return binding;
 }
@@ -126,6 +168,22 @@ const getPathFromAction = (action: RemoveAction | ReplaceAction) => {
   throw new Error(`Unknown action type: ${action[0]}`);
 };
 
+function canFunctionBeDelete(fnPath: NodePath<FunctionNode>) {
+  const fnScope = fnPath.scope;
+  const parentScope = fnScope.parent;
+  if (parentScope.parent) {
+    // It isn't a top-level function, so we can't delete it
+    return true;
+  }
+
+  if (fnPath.listKey === 'arguments') {
+    // It is passed as an argument to another function, we can't delete it
+    return true;
+  }
+
+  return false;
+}
+
 export function findActionForNode(
   path: NodePath
 ): RemoveAction | ReplaceAction | null {
@@ -142,9 +200,34 @@ export function findActionForNode(
     return ['remove', path];
   }
 
-  if (parent.isFunction() && path.listKey === 'params') {
-    // Do not remove params of functions
-    return null;
+  if (parent.isFunction()) {
+    if (path.listKey === 'params') {
+      // Do not remove params of functions
+      return null;
+    }
+
+    if (
+      (path.isBlockStatement() && isEmptyList(path.get('body'))) ||
+      path === parent.get('body')
+    ) {
+      if (!canFunctionBeDelete(parent)) {
+        return [
+          'replace',
+          parent,
+          {
+            ...parent.node,
+            async: false,
+            body: {
+              type: 'BlockStatement',
+              body: [],
+              directives: [],
+            },
+            generator: false,
+            params: [],
+          },
+        ];
+      }
+    }
   }
 
   if (parent.isLogicalExpression({ operator: '&&' })) {
@@ -349,6 +432,20 @@ function removeUnreferenced(items: NodePath<Identifier | JSXIdentifier>[]) {
   return result;
 }
 
+function applyAction(action: ReplaceAction | RemoveAction) {
+  mutate(action[1], (p) => {
+    if (isRemoved(p)) return;
+
+    if (action[0] === 'remove') {
+      p.remove();
+    }
+
+    if (action[0] === 'replace') {
+      p.replaceWith(action[2]);
+    }
+  });
+}
+
 function removeWithRelated(paths: NodePath[]) {
   if (paths.length === 0) return;
 
@@ -381,17 +478,7 @@ function removeWithRelated(paths: NodePath[]) {
       [] as NodePath[]
     );
 
-  actions.forEach((action) => {
-    mutate(action[1], (p) => {
-      if (isRemoved(p)) return;
-
-      if (action[0] === 'remove') {
-        p.remove();
-      } else if (action[0] === 'replace') {
-        p.replaceWith(action[2]);
-      }
-    });
-  });
+  actions.forEach(applyAction);
 
   removeWithRelated(referencesOfBinding);
 
@@ -468,4 +555,4 @@ function mutate<T extends NodePath>(path: T, fn: (p: T) => NodePath[] | void) {
   removeWithRelated(forDeleting);
 }
 
-export { mutate, removeWithRelated };
+export { applyAction, mutate, removeWithRelated };

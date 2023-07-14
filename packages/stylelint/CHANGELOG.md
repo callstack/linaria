@@ -1,5 +1,45 @@
 # Change Log
 
+## 4.5.1
+
+### Patch Changes
+
+- Updated dependencies [ceca1611]
+- Updated dependencies [13258306]
+  - @linaria/babel-preset@4.5.1
+
+## 4.5.0
+
+### Patch Changes
+
+- af5bb92d: The end of support for Node.js 14. Migration to pnpm 8.
+- Updated dependencies [890b4aca]
+- Updated dependencies [418e40af]
+- Updated dependencies [05ad266c]
+- Updated dependencies [16c057df]
+- Updated dependencies [af5bb92d]
+  - @linaria/utils@4.5.0
+  - @linaria/babel-preset@4.5.0
+
+## 4.1.17
+
+### Patch Changes
+
+- Updated dependencies [821a6819]
+- Updated dependencies [54ab61b2]
+  - @linaria/babel-preset@4.4.5
+  - @linaria/utils@4.3.4
+
+## 4.1.16
+
+### Patch Changes
+
+- Updated dependencies [1c3f309d]
+- Updated dependencies [dbe250b5]
+- Updated dependencies [a62e7ba6]
+  - @linaria/babel-preset@4.4.4
+  - @linaria/utils@4.3.3
+
 ## 4.1.15
 
 ### Patch Changes

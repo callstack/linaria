@@ -1,3 +1,6 @@
+import { readFileSync } from 'fs';
+import { dirname, join, sep } from 'path';
+
 import type {
   CallExpression,
   Expression,
@@ -5,6 +8,7 @@ import type {
   SourceLocation,
   StringLiteral,
 } from '@babel/types';
+import { minimatch } from 'minimatch';
 import html from 'react-html-attributes';
 
 import type {
@@ -23,7 +27,7 @@ import {
   toValidCSSIdentifier,
 } from '@linaria/tags';
 import type { IVariableContext } from '@linaria/utils';
-import { slugify } from '@linaria/utils';
+import { findPackageJSON, slugify } from '@linaria/utils';
 
 const isNotNull = <T>(x: T | null): x is T => x !== null;
 
@@ -54,12 +58,16 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
   #variablesCache = new Map<string, string>();
 
   constructor(params: Params, ...args: TailProcessorParams) {
-    // If the first param is not a tag, we should skip the expression.
-    validateParams(params, ['tag', '...'], TaggedTemplateProcessor.SKIP);
+    // Should have at least two params and the first one should be a callee.
+    validateParams(
+      params,
+      ['callee', '*', '...'],
+      TaggedTemplateProcessor.SKIP
+    );
 
     validateParams(
       params,
-      ['tag', ['call', 'member'], ['template', 'call']],
+      ['callee', ['call', 'member'], ['template', 'call']],
       'Invalid usage of `styled` tag'
     );
 
@@ -81,12 +89,56 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
       } else if (value.kind === ValueType.CONST) {
         component = typeof value.value === 'string' ? value.value : undefined;
       } else {
-        component = {
-          node: value.ex,
-          source: value.source,
-        };
+        if (value.importedFrom?.length) {
+          const selfPkg = findPackageJSON('.', this.context.filename);
 
-        this.dependencies.push(value);
+          // Check if at least one used identifier is a Linaria component.
+          const isSomeMatched = value.importedFrom.some((importedFrom) => {
+            const importedPkg = findPackageJSON(
+              importedFrom,
+              this.context.filename
+            );
+
+            if (importedPkg) {
+              const packageJSON = JSON.parse(readFileSync(importedPkg, 'utf8'));
+              let mask: string | undefined = packageJSON?.linaria?.components;
+              if (importedPkg === selfPkg && mask === undefined) {
+                // If mask is not specified for the local package, all components are treated as styled.
+                mask = '**/*';
+              }
+
+              if (mask) {
+                const packageDir = dirname(importedPkg);
+                const normalizedMask = mask.replace(/\//g, sep);
+                const fullMask = join(packageDir, normalizedMask);
+                const fileWithComponent = require.resolve(importedFrom, {
+                  paths: [dirname(this.context.filename!)],
+                });
+
+                return minimatch(fileWithComponent, fullMask);
+              }
+            }
+
+            return false;
+          });
+
+          if (!isSomeMatched) {
+            component = {
+              node: value.ex,
+              nonLinaria: true,
+              source: value.source,
+            };
+          }
+        }
+
+        if (component === undefined) {
+          component = {
+            node: value.ex,
+            source: value.source,
+          };
+
+          this.dependencies.push(value);
+        }
       }
     }
 
@@ -147,7 +199,7 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
     // get its class name to create a more specific selector
     // it'll ensure that styles are overridden properly
     let value =
-      typeof this.component === 'string'
+      typeof this.component === 'string' || this.component.nonLinaria
         ? null
         : valueCache.get(this.component.node.name);
     while (hasMeta(value)) {
@@ -184,13 +236,15 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
 
   protected get tagExpression(): CallExpression {
     const t = this.astService;
-    return t.callExpression(this.tag, [this.tagExpressionArgument]);
+    return t.callExpression(this.callee, [this.tagExpressionArgument]);
   }
 
   public override get value(): ObjectExpression {
     const t = this.astService;
     const extendsNode =
-      typeof this.component === 'string' ? null : this.component.node.name;
+      typeof this.component === 'string' || this.component.nonLinaria
+        ? null
+        : this.component.node.name;
 
     return t.objectExpression([
       t.objectProperty(

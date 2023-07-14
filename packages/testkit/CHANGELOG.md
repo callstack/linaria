@@ -1,4 +1,87 @@
-# @linaria/testkit
+# Change Log
+
+## 4.5.1
+
+### Patch Changes
+
+- ceca1611: Enable optimisation from #1276 for complex expressions such as `styled(Component as unknow)` or `styled(connect(Component))`.
+- 13258306: Variables in props-based interpolation functions are no longer required for the evaluation stage.
+  Here's an example:
+
+  ```
+  import { getColor } from "very-big-library";
+
+  export const Box = styled.div\`
+    color: ${props => getColor(props.kind)};
+  \`;
+  ```
+
+  In versions prior to and including 4.5.0, the evaluator would attempt to import `getColor` from `very-big-library`, despite it having no relevance to style generation. However, in versions greater than 4.5.0, `very-big-library` will be ignored.
+
+- Updated dependencies [ceca1611]
+- Updated dependencies [13258306]
+  - @linaria/babel-preset@4.5.1
+  - @linaria/react@4.5.1
+  - @linaria/tags@4.5.1
+
+## 4.5.0
+
+### Minor Changes
+
+- 16c057df: Breaking Change: Performance Optimization for `styled`
+
+  When a component is wrapped in `styled`, Linaria needs to determine if that component is already a styled component. To accomplish this, the wrapped component is included in the list of variables for evaluation, along with the interpolated values used in styles. The issue arises when a wrapped component, even if it is not styled, brings along a substantial dependency tree. This situation is particularly evident when using `styled` to style components from third-party UI libraries.
+
+  To address this problem, Linaria will now examine the import location of the component and check if there is an annotation in the `package.json` file of the package containing the components. This annotation indicates whether the package includes other Linaria components. If there is no such annotation, Linaria will refrain from evaluating the component.
+
+  Please note that this Breaking Change solely affects developers of component libraries. In order for users to style components from your library, you must include the `linaria.components` property in the library's `package.json` file. This property should have a mask that covers all imported files with components. Here's an example of how to specify it:
+
+  ```json
+  "linaria": {
+    "components": "**/*"
+  }
+  ```
+
+### Patch Changes
+
+- af5bb92d: The end of support for Node.js 14. Migration to pnpm 8.
+- Updated dependencies [418e40af]
+- Updated dependencies [05ad266c]
+- Updated dependencies [16c057df]
+- Updated dependencies [af5bb92d]
+- Updated dependencies [10859924]
+  - @linaria/babel-preset@4.5.0
+  - @linaria/shaker@4.5.0
+  - @linaria/react@4.5.0
+  - @linaria/tags@4.5.0
+  - @linaria/extractor@4.5.0
+
+## 4.3.6
+
+### Patch Changes
+
+- Updated dependencies [821a6819]
+- Updated dependencies [54ab61b2]
+  - @linaria/babel-preset@4.4.5
+  - @linaria/react@4.3.8
+  - @linaria/shaker@4.2.11
+  - @linaria/tags@4.3.5
+
+## 4.3.5
+
+### Patch Changes
+
+- 1c3f309d: Fix tags usage validation (fixes #1224)
+- dbe250b5: Fix module function deletion when containing restricted code (fixes #1226)
+- Updated dependencies [2e966f23]
+- Updated dependencies [1c3f309d]
+- Updated dependencies [dbe250b5]
+- Updated dependencies [34029088]
+- Updated dependencies [a62e7ba6]
+  - @linaria/tags@4.3.4
+  - @linaria/babel-preset@4.4.4
+  - @linaria/react@4.3.7
+  - @linaria/shaker@4.2.10
 
 ## 4.3.4
 
