@@ -20,22 +20,18 @@ export default function isRemoved(path: NodePath): boolean {
         return true;
       }
 
-      const { listKey, key } = currentPath;
+      const { listKey, key, node } = currentPath;
       if (listKey) {
-        // If the current path is part of a list and its node is not the same
-        // as the node in the parent list at the same index, return true
-        if (
-          (parent.get(listKey) as NodePath[])[key as number].node !==
-          currentPath.node
-        ) {
+        // If the current path is part of a list and the current node
+        // is not presented in this list, return true
+        const found = parent.get(listKey).find((p) => p.node === node);
+        if (!found) {
           return true;
         }
       }
       // If the current path is not part of a list and its node is not the same
       // as the node in the parent object at the same key, return true
-      else if (
-        (parent.get(key as string) as NodePath).node !== currentPath.node
-      ) {
+      else if ((parent.get(key as string) as NodePath).node !== node) {
         return true;
       }
     }

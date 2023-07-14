@@ -2062,6 +2062,40 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker should not import types 1`] = `
+"import { styled } from \\"@linaria/react\\";
+import { Title } from \\"./__fixtures__/linaria-ui-library/components/index\\";
+import { ComponentType } from \\"./__fixtures__/linaria-ui-library/types\\";
+const map = new Map<string, ComponentType>().set('Title', Title);
+const Gate = (props: {
+  type: ComponentType;
+  className: string;
+}) => {
+  const {
+    className,
+    type
+  } = props;
+  const Component = map.get(type);
+  return <Component className={className} />;
+};
+const _exp = /*#__PURE__*/() => Gate;
+export const StyledTitle = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledTitle\\",
+  class: \\"StyledTitle_s18alru3\\",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should not import types 2`] = `
+
+CSS:
+
+.StyledTitle_s18alru3 {}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker should process \`css\` calls inside components 1`] = `
 "import React from 'react';
 export function Component() {

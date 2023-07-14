@@ -2799,4 +2799,29 @@ describe('strategy shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
+
+  it('should not import types', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import { Title } from "./__fixtures__/linaria-ui-library/components/index";
+      import { ComponentType } from "./__fixtures__/linaria-ui-library/types";
+
+      const map = new Map<string, ComponentType>()
+        .set('Title', Title);
+
+      const Gate = (props: { type: ComponentType, className: string }) => {
+        const { className, type } = props;
+        const Component = map.get(type);
+        return <Component className={className}/>;
+      };
+
+      export const StyledTitle = styled(Gate)\`\`;
+    `,
+      [evaluator, {}, 'tsx']
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 });
