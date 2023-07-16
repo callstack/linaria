@@ -10,7 +10,7 @@ import type { RawSourceMap } from 'source-map';
 import type { RawLoaderDefinitionFunction } from 'webpack';
 
 import type { Result, Preprocessor } from '@linaria/babel-preset';
-import { transform } from '@linaria/babel-preset';
+import { transform, TransformCacheCollection } from '@linaria/babel-preset';
 import { debug } from '@linaria/logger';
 
 import type { ICache } from './cache';
@@ -24,6 +24,9 @@ type Loader = RawLoaderDefinitionFunction<{
   extension?: string;
   cacheProvider?: string | ICache;
 }>;
+
+const emptyConfig = {};
+const cache = new TransformCacheCollection();
 
 const webpack5Loader: Loader = function webpack5LoaderPlugin(
   content,
@@ -88,7 +91,9 @@ const webpack5Loader: Loader = function webpack5LoaderPlugin(
       pluginOptions: rest,
       preprocessor,
     },
-    asyncResolve
+    asyncResolve,
+    emptyConfig,
+    cache
   ).then(
     async (result: Result) => {
       if (result.cssText) {

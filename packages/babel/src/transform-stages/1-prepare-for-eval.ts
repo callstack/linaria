@@ -3,9 +3,10 @@ import { readFileSync } from 'fs';
 import { dirname, extname } from 'path';
 
 import type { BabelFileResult, TransformOptions } from '@babel/core';
+import type { File } from '@babel/types';
 
 import { createCustomDebug } from '@linaria/logger';
-import type { EvalRule, Evaluator } from '@linaria/utils';
+import type { Evaluator } from '@linaria/utils';
 import { buildOptions, getFileIdx, loadBabelOptions } from '@linaria/utils';
 
 import type { Core } from '../babel';
@@ -16,8 +17,8 @@ import withLinariaMetadata from '../utils/withLinariaMetadata';
 
 import type { IEntrypoint } from './helpers/ModuleQueue';
 import { ModuleQueue } from './helpers/ModuleQueue';
-import cachedParseSync from './helpers/cachedParseSync';
 import loadLinariaOptions from './helpers/loadLinariaOptions';
+import { getMatchedRule, parseFile } from './helpers/parseFile';
 
 const isModuleResolver = (i: unknown): i is { options: unknown } =>
   typeof i === 'object' &&
@@ -27,6 +28,7 @@ const isModuleResolver = (i: unknown): i is { options: unknown } =>
 function runPreevalStage(
   babel: Core,
   filename: string,
+  ast: File,
   code: string,
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>,
   perFileBabelConfig?: TransformOptions
@@ -38,7 +40,6 @@ function runPreevalStage(
   );
 
   const fullParserOptions = loadBabelOptions(babel, filename, parseConfig);
-  const file = cachedParseSync(babel, code, fullParserOptions);
 
   const transformPlugins: babel.PluginItem[] = [
     [require.resolve('../plugins/preeval'), pluginOptions],
@@ -62,7 +63,7 @@ function runPreevalStage(
     configFile: false,
   });
 
-  const result = babel.transformFromAstSync(file, code, {
+  const result = babel.transformFromAstSync(ast, code, {
     ...transformConfig,
     filename,
   });
@@ -74,38 +75,17 @@ function runPreevalStage(
   return result;
 }
 
-function getMatchedRule(
-  rules: EvalRule[],
-  filename: string,
-  code: string
-): EvalRule {
-  for (let i = rules.length - 1; i >= 0; i--) {
-    const rule = rules[i];
-    if (!rule.test) {
-      return rule;
-    }
-
-    if (typeof rule.test === 'function' && rule.test(filename, code)) {
-      return rule;
-    }
-
-    if (rule.test instanceof RegExp && rule.test.test(filename)) {
-      return rule;
-    }
-  }
-
-  return { action: 'ignore' };
-}
-
 export function prepareCode(
   babel: Core,
   filename: string,
+  originalAst: File,
   originalCode: string,
   only: string[],
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
 ): [
   code: string,
   imports: Module['imports'],
+  exports: string[] | null,
   metadata?: babel.BabelFileMetadata
 ] {
   const log = createCustomDebug('transform', getFileIdx(filename));
@@ -121,12 +101,13 @@ export function prepareCode(
   if (action === 'ignore' || filename.endsWith('.json')) {
     log('stage-1:ignore', '');
 
-    return [originalCode, null];
+    return [originalCode, null, null];
   }
 
   const preevalStageResult = runPreevalStage(
     babel,
     filename,
+    originalAst,
     originalCode,
     options,
     babelOptions
@@ -138,7 +119,7 @@ export function prepareCode(
     !withLinariaMetadata(preevalStageResult.metadata)
   ) {
     log('stage-1:evaluator:end', 'no metadata');
-    return [preevalStageResult.code!, null, preevalStageResult.metadata];
+    return [preevalStageResult.code!, null, null, preevalStageResult.metadata];
   }
 
   log('stage-1:preeval', 'metadata %O', preevalStageResult.metadata);
@@ -153,26 +134,22 @@ export function prepareCode(
 
   log('stage-1:evaluator:start', 'using %s', evaluator.name);
 
-  const result = evaluator(
+  const [code, imports, exports] = evaluator(
     filename,
     pluginOptions,
-    preevalStageResult.code!,
+    [preevalStageResult.ast!, preevalStageResult.code!],
     only,
     babel
   );
 
   log('stage-1:evaluator:end', '');
 
-  return [...result, preevalStageResult.metadata];
+  return [code, imports, exports ?? null, preevalStageResult.metadata];
 }
 
 function processQueueItem(
   babel: Core,
-  item: {
-    name: string;
-    code: string;
-    only: string[];
-  } | null,
+  item: IEntrypoint | null,
   cache: TransformCacheCollection,
   options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
 ):
@@ -188,6 +165,8 @@ function processQueueItem(
 
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
   const { name, only, code } = item;
+
+  let ast: File | 'ignored' | undefined = cache.originalASTCache.get(name);
   const onlyAsStr = only.join(', ');
   const log = createCustomDebug('transform', getFileIdx(name));
   const extension = extname(name);
@@ -200,13 +179,31 @@ function processQueueItem(
     return undefined;
   }
 
+  if (!ast) {
+    [ast] = parseFile(babel, name, code, options);
+  }
+
+  cache.originalASTCache.set(name, ast);
+
+  if (ast === 'ignored') {
+    return {
+      imports: null,
+      name,
+      result: {
+        metadata: undefined,
+        code,
+      },
+    };
+  }
+
   log('init', `${name} (${onlyAsStr})\n${code}`);
 
   log('stage-1', `>> (${onlyAsStr})`);
 
-  const [preparedCode, imports, metadata] = prepareCode(
+  const [preparedCode, imports, , metadata] = prepareCode(
     babel,
     name,
+    ast,
     code,
     only,
     options
@@ -255,6 +252,8 @@ export function prepareForEvalSync(
 
     const { name, only, code } = nextItem;
     const log = createCustomDebug('transform', getFileIdx(name));
+
+    cache.invalidateIfChanged(name, code);
 
     const cached = cache.codeCache.get(name);
     // If we already have a result for this file, we should get a result for merged `only`
@@ -369,6 +368,8 @@ export default async function prepareForEval(
 
     const { name, only, code } = nextItem;
 
+    cache.invalidateIfChanged(name, code);
+
     const cached = cache.codeCache.get(name);
     // If we already have a result for this file, we should get a result for merged `only`
     const mergedOnly = cached?.only
@@ -478,6 +479,9 @@ export default async function prepareForEval(
     } else {
       log('stage-1', '%s has no imports', name);
     }
+
+    // Here we have all imports resolved and processed, so we know what else we can remove
+    // TODO: Do it!
 
     cache.codeCache.set(name, {
       imports,

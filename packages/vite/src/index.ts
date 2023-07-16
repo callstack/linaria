@@ -28,6 +28,8 @@ type VitePluginOptions = {
 
 export { Plugin };
 
+const emptyConfig = {};
+
 export default function linaria({
   include,
   exclude,
@@ -44,7 +46,6 @@ export default function linaria({
   // <dependency id, targets>
   const targets: { id: string; dependencies: string[] }[] = [];
   const cache = new TransformCacheCollection();
-  const { codeCache, evalCache } = cache;
   return {
     name: 'linaria',
     enforce: 'post',
@@ -80,9 +81,9 @@ export default function linaria({
 
       // eslint-disable-next-line no-restricted-syntax
       for (const depId of deps) {
-        codeCache.delete(depId);
-        evalCache.delete(depId);
+        cache.invalidateForFile(depId);
       }
+
       const modules = affected
         .map((target) => devServer.moduleGraph.getModuleById(target.id))
         .concat(ctx.modules)
@@ -133,11 +134,6 @@ export default function linaria({
         throw new Error(`Could not resolve ${what}`);
       };
 
-      // TODO: Vite surely has some already transformed modules, solid
-      // why would we transform it again?
-      // We could provide some thing like `pretransform` and ask Vite to return transformed module
-      // (module.transformResult)
-      // So we don't need to duplicate babel plugins.
       const result = await transform(
         code,
         {
@@ -146,7 +142,7 @@ export default function linaria({
           pluginOptions: rest,
         },
         asyncResolve,
-        {},
+        emptyConfig,
         cache
       );
 
