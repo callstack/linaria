@@ -26,7 +26,6 @@ import { getFileIdx } from '@linaria/utils';
 
 import { TransformCacheCollection } from './cache';
 import * as process from './process';
-import type { ITransformFileResult } from './types';
 
 type HiddenModuleMembers = {
   _extensions: { [key: string]: () => void };
@@ -111,8 +110,6 @@ class Module {
 
   filename: string;
 
-  options: StrictOptions;
-
   imports: Map<string, string[]> | null;
 
   // paths: string[];
@@ -127,23 +124,10 @@ class Module {
 
   debug: CustomDebug;
 
-  readonly #resolveCache: Map<string, string>;
-
-  readonly #codeCache: Map<
-    string,
-    {
-      imports: Map<string, string[]> | null;
-      only: string[];
-      result: ITransformFileResult;
-    }
-  >;
-
-  readonly #evalCache: Map<string, Module>;
-
   constructor(
     filename: string,
-    options: StrictOptions,
-    cache = new TransformCacheCollection(),
+    public options: Pick<StrictOptions, 'extensions'>,
+    private cache = new TransformCacheCollection(),
     private debuggerDepth = 0,
     private parentModule?: Module,
     private moduleImpl: HiddenModuleMembers = DefaultModuleImplementation
@@ -151,15 +135,10 @@ class Module {
     this.idx = getFileIdx(filename);
     this.id = filename;
     this.filename = filename;
-    this.options = options;
     this.imports = null;
     this.dependencies = null;
     this.transform = null;
     this.debug = createCustomDebug('module', this.idx);
-
-    this.#resolveCache = cache.resolveCache;
-    this.#codeCache = cache.codeCache;
-    this.#evalCache = cache.evalCache;
 
     this.#lazyValues = new Map();
 
@@ -279,8 +258,8 @@ class Module {
 
   resolve = (id: string) => {
     const resolveCacheKey = `${this.filename} -> ${id}`;
-    if (this.#resolveCache.has(resolveCacheKey)) {
-      return this.#resolveCache.get(resolveCacheKey)!;
+    if (this.cache.resolveCache.has(resolveCacheKey)) {
+      return this.cache.resolveCache.get(resolveCacheKey)!;
     }
 
     const extensions = this.moduleImpl._extensions;
@@ -347,8 +326,8 @@ class Module {
 
       this.debug('require', `${id} -> ${filename}`);
 
-      if (this.#evalCache.has(filename)) {
-        m = this.#evalCache.get(filename)!;
+      if (this.cache.evalCache.has(filename)) {
+        m = this.cache.evalCache.get(filename)!;
         this.debug('eval-cache', '✅ %r has been gotten from cache', {
           namespace: `module:${padStart(m.idx, 5)}`,
         });
@@ -360,11 +339,7 @@ class Module {
         m = new Module(
           filename,
           this.options,
-          {
-            codeCache: this.#codeCache,
-            evalCache: this.#evalCache,
-            resolveCache: this.#resolveCache,
-          },
+          this.cache,
           this.debuggerDepth + 1,
           this
         );
@@ -372,15 +347,15 @@ class Module {
 
         // Store it in cache at this point with, otherwise
         // we would end up in infinite loop with cyclic dependencies
-        this.#evalCache.set(filename, m);
+        this.cache.evalCache.set(filename, m);
       }
 
       const extension = path.extname(filename);
       if (extension === '.json' || this.extensions.includes(extension)) {
         let code: string | undefined;
         // Requested file can be already prepared for evaluation on the stage 1
-        if (onlyList && this.#codeCache.has(filename)) {
-          const cached = this.#codeCache.get(filename);
+        if (onlyList && this.cache.codeCache.has(filename)) {
+          const cached = this.cache.codeCache.get(filename);
           const only = onlyList
             .split(',')
             .filter((token) => !m.#lazyValues.has(token));

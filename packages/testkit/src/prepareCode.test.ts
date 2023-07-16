@@ -3,7 +3,7 @@ import { join } from 'path';
 
 import * as babel from '@babel/core';
 
-import { prepareCode } from '@linaria/babel-preset';
+import { parseFile, prepareCode } from '@linaria/babel-preset';
 
 const testCasesDir = join(__dirname, '__fixtures__', 'prepare-code-test-cases');
 
@@ -49,10 +49,20 @@ describe('prepareCode', () => {
         .split(',')
         .map((s) => s.trim());
 
-      const [transformedCode, imports, metadata] = prepareCode(
+      const sourceCode = restLines.join('\n');
+      const [ast] = parseFile(babel, inputFilePath, sourceCode, {
+        root,
+        pluginOptions,
+      });
+      if (ast === 'ignored') {
+        throw new Error('Ignored');
+      }
+
+      const [transformedCode, imports, , metadata] = prepareCode(
         babel,
         inputFilePath,
-        restLines.join('\n'),
+        ast,
+        sourceCode,
         only,
         {
           root,

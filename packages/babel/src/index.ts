@@ -20,6 +20,7 @@ export { default as withLinariaMetadata } from './utils/withLinariaMetadata';
 export { default as Module, DefaultModuleImplementation } from './module';
 export { default as transform } from './transform';
 export * from './types';
+export { parseFile } from './transform-stages/helpers/parseFile';
 export { default as loadLinariaOptions } from './transform-stages/helpers/loadLinariaOptions';
 export type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
 export { prepareCode } from './transform-stages/1-prepare-for-eval';

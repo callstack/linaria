@@ -1,4 +1,5 @@
 import type { TransformOptions } from '@babel/core';
+import type { File } from '@babel/types';
 
 import type { IVariableContext } from '../IVariableContext';
 import type { Core } from '../babel';
@@ -23,10 +24,14 @@ export type VariableNameFn = (context: IVariableContext) => string;
 export type Evaluator = (
   filename: string,
   options: StrictOptions,
-  text: string,
+  code: string | [ast: File, text: string],
   only: string[] | null,
   babel: Core
-) => [string, Map<string, string[]> | null];
+) => [
+  code: string,
+  imports: Map<string, string[]> | null,
+  exports?: string[] | null
+];
 
 export type EvalRule = {
   action: Evaluator | 'ignore' | string;

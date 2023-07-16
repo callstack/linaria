@@ -29,9 +29,11 @@ function syncStages(
   eventEmitter?: (ev: unknown) => void
 ) {
   const { filename } = options;
+  const ast = cache.originalASTCache.get(filename) ?? 'ignored';
 
-  // File does not contain any tags. Return original code.
+  // File is ignored or does not contain any tags. Return original code.
   if (
+    ast === 'ignored' ||
     !prepareStageResult ||
     !withLinariaMetadata(prepareStageResult.metadata)
   ) {
@@ -64,6 +66,7 @@ function syncStages(
 
   const collectStageResult = prepareForRuntime(
     babel,
+    ast,
     originalCode,
     valueCache,
     options,
@@ -157,6 +160,10 @@ export default async function transform(
   eventEmitter?: (ev: unknown) => void
 ): Promise<Result> {
   const { filename } = options;
+
+  // Cache may contain a code that was loaded from disk, but transform
+  // is called with a code that already processed by another loaders
+  cache.invalidateIfChanged(filename, originalCode);
 
   // *** 1st stage ***
 

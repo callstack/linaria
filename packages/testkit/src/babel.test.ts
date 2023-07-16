@@ -2824,4 +2824,23 @@ describe('strategy shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
+
+  xit('should shake out side effect because its definition uses DOM API', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { css } from "@linaria/core";
+        import { runNearFramePaint } from "./__fixtures__/runNearFramePaint";
+
+        runNearFramePaint(() => {
+          // Do something
+        });
+
+        export const text = css\`\`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
 });

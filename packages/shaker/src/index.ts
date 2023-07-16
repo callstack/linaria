@@ -40,17 +40,21 @@ const getShakerConfig = (only: string[] | null): TransformOptions => {
   return config;
 };
 
-const shaker: Evaluator = (filename, options, text, only, babel) => {
+const shaker: Evaluator = (filename, options, code, only, babel) => {
   const transformOptions = loadBabelOptions(
     babel,
     filename,
     buildOptions(options?.babelOptions, getShakerConfig(only))
   );
 
-  const transformed = babel.transformSync(text, {
-    ...transformOptions,
-    filename,
-  });
+  if (typeof code === 'string') {
+    throw new Error('shaker does not support string code');
+  }
+
+  const transformed =
+    typeof code === 'string'
+      ? babel.transformSync(code, transformOptions)
+      : babel.transformFromAstSync(...code, transformOptions);
 
   if (!transformed || !hasShakerMetadata(transformed.metadata)) {
     throw new Error(`${filename} has no shaker metadata`);

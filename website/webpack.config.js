@@ -1,5 +1,6 @@
-const webpack = require('webpack'); // eslint-disable-line import/no-extraneous-dependencies
-const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // eslint-disable-line import/no-extraneous-dependencies
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { join } = require('path'); // eslint-disable-line import/no-extraneous-dependencies
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -10,17 +11,28 @@ module.exports = {
     app: './src/index',
   },
   output: {
-    publicPath: '/dist/',
+    path: join(__dirname, 'dist'),
     filename: '[name].bundle.js',
   },
   optimization: {
     emitOnErrors: false,
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env': { NODE_ENV: JSON.stringify(process.env.NODE_ENV) },
-    }),
     new MiniCssExtractPlugin({ filename: 'styles.css' }),
+    new HtmlWebpackPlugin({
+      title: 'Linaria – zero-runtime CSS in JS library',
+      templateContent: `
+        <html>
+        <head>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+        </head>
+          <body>
+            <div id="root"></div>
+          </body>
+        </html>
+      `,
+    }),
   ],
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -54,5 +66,14 @@ module.exports = {
         type: 'asset/resource',
       },
     ],
+  },
+  devServer: {
+    static: {
+      directory: join(__dirname, 'dist'),
+    },
+    hot: true,
+    historyApiFallback: {
+      index: 'index.html',
+    },
   },
 };

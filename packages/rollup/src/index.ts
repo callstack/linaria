@@ -39,6 +39,7 @@ export default function linaria({
   const filter = createFilter(include, exclude);
   const cssLookup: { [key: string]: string } = {};
   const cache = new TransformCacheCollection();
+  const emptyConfig = {};
 
   const plugin: Plugin = {
     name: 'linaria',
@@ -101,7 +102,7 @@ export default function linaria({
           pluginOptions: rest,
         },
         asyncResolve,
-        {},
+        emptyConfig,
         cache
       );
 

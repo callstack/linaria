@@ -13,7 +13,7 @@
     "astro": "^1.6.10",
     "solid-js": "^1.6.2",
     "vite": "^4",
-    "vite-plugin-inspect": "^0.7.9"
+    "vite-plugin-inspect": "^0.7.33"
   },
   "scripts": {
     "dev": "astro dev --force",
