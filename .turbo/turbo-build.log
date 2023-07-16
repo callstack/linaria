@@ -10,28 +10,29 @@ assets by info 63.5 KiB [1m[32m[immutable][39m[22m
   asset [1m[32mc9d5cf961634b7622bef.png[39m[22m 59.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/code-sample-v4.png] (auxiliary name: app)
   asset [1m[32m62f658e6bb6e95783a3b.svg[39m[22m 2.88 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/linaria-logo.svg] (auxiliary name: app)
   asset [1m[32mf5a906f902f5923432cc.svg[39m[22m 939 bytes [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/linaria-logomark.svg] (auxiliary name: app)
-assets by chunk 136 KiB (name: app)
+assets by chunk 137 KiB (name: app)
   asset [1m[32mapp.bundle.js[39m[22m 134 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: app) 2 related assets
   asset [1m[32mstyles.css[39m[22m 2.63 KiB [1m[32m[emitted][39m[22m (name: app)
-Entrypoint [1mapp[39m[22m 136 KiB (390 KiB) = [1m[32mstyles.css[39m[22m 2.63 KiB [1m[32mapp.bundle.js[39m[22m 134 KiB 4 auxiliary assets
-orphan modules 23 KiB (javascript) 939 bytes (asset) 4.68 KiB (runtime) [1m[33m[orphan][39m[22m 40 modules
-runtime modules 307 bytes 2 modules
-cacheable modules 147 KiB (javascript) 62.6 KiB (asset) 2.66 KiB (css/mini-extract)
+asset [1m[32mindex.html[39m[22m 242 bytes [1m[32m[emitted][39m[22m
+Entrypoint [1mapp[39m[22m 137 KiB (392 KiB) = [1m[32mstyles.css[39m[22m 2.63 KiB [1m[32mapp.bundle.js[39m[22m 134 KiB 4 auxiliary assets
+orphan modules 23 KiB (javascript) 939 bytes (asset) 4.72 KiB (runtime) [1m[33m[orphan][39m[22m 40 modules
+runtime modules 1.33 KiB 3 modules
+cacheable modules 147 KiB (javascript) 62.6 KiB (asset) 2.7 KiB (css/mini-extract)
   modules by layer 147 KiB (javascript) 62.6 KiB (asset)
     javascript modules 147 KiB 13 modules
     asset modules 84 bytes (javascript) 62.6 KiB (asset)
       [1m./assets/linaria-logo.svg[39m[22m 42 bytes (javascript) 2.88 KiB (asset) [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
       [1m./assets/code-sample-v4.png[39m[22m 42 bytes (javascript) 59.7 KiB (asset) [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-  css modules 2.66 KiB
-    modules by path [1m./src/components/*.jsx[39m[22m 2.3 KiB
+  css modules 2.7 KiB
+    modules by path [1m./src/components/*.jsx[39m[22m 2.34 KiB
       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/App.jsx[39m[22m 200 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Header.jsx[39m[22m 805 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-      css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Hero.jsx[39m[22m 1.32 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+      css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Hero.jsx[39m[22m 1.35 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/index.jsx[39m[22m 311 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.73.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Container.js[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.73.0 compiled [1m[32msuccessfully[39m[22m in 9096 ms
+webpack 5.73.0 compiled [1m[32msuccessfully[39m[22m in 4080 ms
 
 > linaria-website@4.5.1 build:server /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
 
-Successfully compiled 11 files with Babel (1964ms).
+Successfully compiled 11 files with Babel (960ms).
