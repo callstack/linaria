@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.5.1
+
+### Patch Changes
+
+- 85e74df6: Fix: type imports without `type` annotation may lead to an unexpected increase in the evaluated codebase.
+- 1bf5c5b8: The cache has been improved, which should address the build time issues for Webpack 4/5 and resolve HMR-related problems for Vite. Fixes #1199, #1265 and maybe some more.
+- Updated dependencies [85e74df6]
+- Updated dependencies [1bf5c5b8]
+  - @linaria/utils@4.5.1
+
 ## 4.5.0
 
 ### Minor Changes

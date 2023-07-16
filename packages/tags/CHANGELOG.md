@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.5.2
+
+### Patch Changes
+
+- Updated dependencies [85e74df6]
+- Updated dependencies [1bf5c5b8]
+  - @linaria/utils@4.5.1
+
 ## 4.5.1
 
 ### Patch Changes
