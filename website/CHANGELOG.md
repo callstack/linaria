@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.5.2
+
+### Patch Changes
+
+- 1bf5c5b8: The cache has been improved, which should address the build time issues for Webpack 4/5 and resolve HMR-related problems for Vite. Fixes #1199, #1265 and maybe some more.
+  - @linaria/atomic@4.5.2
+  - @linaria/core@4.5.2
+  - @linaria/react@4.5.2
+
 ## 4.5.1
 
 ### Patch Changes
