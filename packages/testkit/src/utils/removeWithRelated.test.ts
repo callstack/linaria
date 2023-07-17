@@ -32,8 +32,19 @@ const run = (rawCode: TemplateStringsArray) => {
       return;
     }
 
+    const comment = path.node.leadingComments[0];
+    if (path.listKey && typeof path.key === 'number' && path.key > 0) {
+      const prevNode = path.getSibling(path.key - 1);
+      if (prevNode.node.trailingComments?.includes(comment)) {
+        // eslint-disable-next-line no-param-reassign
+        prevNode.node.trailingComments = prevNode.node.trailingComments?.filter(
+          (c) => c !== comment
+        );
+      }
+    }
+
     // eslint-disable-next-line no-param-reassign
-    path.node.leadingComments = [];
+    path.node.leadingComments = null;
 
     removeWithRelated([path]);
   };

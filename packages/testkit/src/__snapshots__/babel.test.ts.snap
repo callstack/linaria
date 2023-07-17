@@ -2269,6 +2269,34 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker should shake out identifiers that are referenced only in types 1`] = `
+"import { styled } from \\"@linaria/react\\";
+import * as yup from \\"yup\\";
+import { Form } from \\"./__fixtures__/linaria-ui-library/components/index\\";
+const validationSchema = yup.object();
+type IModel = yup.InferType<typeof validationSchema>;
+const Editor = () => {
+  const initial: IModel = {};
+  return <Form schema={validationSchema} data={initial} />;
+};
+const _exp = /*#__PURE__*/() => Editor;
+export const StyledEditor = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledEditor\\",
+  class: \\"StyledEditor_s18alru3\\",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should shake out identifiers that are referenced only in types 2`] = `
+
+CSS:
+
+.StyledEditor_s18alru3 {}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker should work with String and Number object 1`] = `"export const style = \\"style_s13jq05\\";"`;
 
 exports[`strategy shaker should work with String and Number object 2`] = `

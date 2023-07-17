@@ -1,10 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`removeWithRelated should keep alive used import specifier 1`] = `
-"import { b } from './source';
-
-/* remove */"
-`;
+exports[`removeWithRelated should keep alive used import specifier 1`] = `"import { b } from './source';"`;
 
 exports[`removeWithRelated should keep logical expression 1`] = `
 "const c = 3;

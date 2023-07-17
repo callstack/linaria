@@ -57,8 +57,8 @@ export function reference(
   }
 
   binding.referenced = true;
-  binding.references += 1;
   binding.referencePaths.push(referencePath ?? path);
+  binding.references = binding.referencePaths.length;
 }
 
 function isReferenced({ kind, referenced, referencePaths }: Binding) {
@@ -130,8 +130,9 @@ export function dereference(
     );
   }
 
+  const nonTypeReferences = binding.referencePaths.filter(nonType);
   binding.referenced =
-    binding.referencePaths.length + referencesInConstantViolations.length > 0;
+    nonTypeReferences.length + referencesInConstantViolations.length > 0;
 
   return binding;
 }
