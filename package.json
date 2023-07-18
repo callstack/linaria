@@ -22,7 +22,7 @@
     "start": "webpack serve"
   },
   "dependencies": {
-    "@babel/runtime": "^7.20.1",
+    "@babel/runtime": "^7.22.6",
     "@linaria/atomic": "workspace:^",
     "@linaria/core": "workspace:^",
     "@linaria/react": "workspace:^",
@@ -39,8 +39,8 @@
     "react-dom": "^16.14.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.19.3",
-    "@babel/core": "^7.20.2",
+    "@babel/cli": "^7.22.9",
+    "@babel/core": "^7.22.9",
     "@linaria/babel-preset": "workspace:^",
     "@linaria/shaker": "workspace:^",
     "@linaria/stylelint": "workspace:^",
