@@ -9,7 +9,12 @@ import type {
 } from '@babel/types';
 
 import { createCustomDebug } from '@linaria/logger';
-import type { IExport, IMetadata, IReexport, IState } from '@linaria/utils';
+import type {
+  EvaluatorConfig,
+  IExport,
+  IReexport,
+  IState,
+} from '@linaria/utils';
 import {
   applyAction,
   collectExportsAndImports,
@@ -26,15 +31,28 @@ import shouldKeepSideEffect from './utils/shouldKeepSideEffect';
 
 type Core = typeof core;
 
-export interface IShakerOptions {
+export interface IShakerOptions extends EvaluatorConfig {
   keepSideEffects?: boolean;
   ifUnknownExport?: 'error' | 'ignore' | 'reexport-all' | 'skip-shaking';
-  onlyExports: string[];
+}
+
+export interface IShakerMetadata {
+  exports: string[];
+  imports: Map<string, string[]>;
+}
+
+export interface IMetadata {
+  __linariaShaker: IShakerMetadata;
 }
 
 interface NodeWithName {
   name: string;
 }
+
+export const hasShakerMetadata = (
+  metadata: object | undefined
+): metadata is IMetadata =>
+  metadata !== undefined && '__linariaShaker' in metadata;
 
 function getBindingForExport(exportPath: NodePath): Binding | undefined {
   if (exportPath.isIdentifier()) {
@@ -127,6 +145,7 @@ export default function shakerPlugin(
   {
     keepSideEffects = false,
     ifUnknownExport = 'skip-shaking',
+    deadImports = [],
     onlyExports,
   }: IShakerOptions
 ): PluginObj<IState & { filename: string }> {
@@ -285,6 +304,29 @@ export default function shakerPlugin(
           });
         }
 
+        if (deadImports.length > 0) {
+          collected.imports.forEach((i) => {
+            if (i.imported === 'side-effect') {
+              return;
+            }
+
+            if (
+              deadImports.some(
+                (deadImport) =>
+                  i.imported === deadImport.what && i.source === deadImport.from
+              )
+            ) {
+              const binding = getBindingForExport(i.local);
+              if (!binding) {
+                forDeleting.push(i.local);
+                return;
+              }
+
+              forDeleting.push(...binding.referencePaths);
+            }
+          });
+        }
+
         const deleted = new Set<NodePath>();
 
         const dereferenced: NodePath<Identifier>[] = [];
@@ -356,10 +398,13 @@ export default function shakerPlugin(
         imports.get(source)!.push(imported);
       });
 
-      log('end', `remaining imports: %O`, imports);
+      const exports = this.exports.map(({ exported }) => exported);
+
+      log('end', `remaining exports: %o, imports: %O`, exports, imports);
 
       // eslint-disable-next-line no-param-reassign
-      (file.metadata as IMetadata).linariaEvaluator = {
+      (file.metadata as IMetadata).__linariaShaker = {
+        exports,
         imports,
       };
     },

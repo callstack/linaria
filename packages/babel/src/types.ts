@@ -36,7 +36,9 @@ export interface IPluginState extends PluginPass {
 
 export interface ITransformFileResult {
   metadata?: BabelFileMetadata;
+  ast: File;
   code: string;
+  exports: string[] | null;
 }
 
 export type Stage = 'preeval' | 'collect';

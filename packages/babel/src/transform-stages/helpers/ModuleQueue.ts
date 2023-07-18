@@ -7,13 +7,21 @@ import { createCustomDebug } from '@linaria/logger';
 import type { Evaluator } from '@linaria/utils';
 import { getFileIdx } from '@linaria/utils';
 
+import type { ITransformFileResult } from '../../types';
+
 export interface IEntrypoint {
   code: string;
+  deadImports?: { what: string; from: string }[];
   evaluator: Evaluator;
   name: string;
   only: string[];
   parseConfig: TransformOptions;
 }
+
+export type OnSuccess = (
+  entrypoint: IEntrypoint,
+  result: ITransformFileResult
+) => void;
 
 type Node = [entrypoint: IEntrypoint, stack: string[], refCount?: number];
 
@@ -21,6 +29,7 @@ export type NextItem = {
   entrypoint: IEntrypoint;
   stack: string[];
   refCount?: number;
+  onSuccess: OnSuccess;
 };
 
 const peek = <T>(arr: T[]) =>
@@ -48,6 +57,8 @@ const keyOf = ([entrypoint]: Node): string => {
 };
 
 export class ModuleQueue {
+  private callbacks: Map<string, OnSuccess[]> = new Map();
+
   private data: Array<Node> = [];
 
   private keys: Map<string, number> = new Map();
@@ -146,10 +157,20 @@ export class ModuleQueue {
   public dequeue(): NextItem | undefined {
     if (this.size === 0) return undefined;
     const max = this.data[0];
+    const key = keyOf(max);
+    const onSuccess: OnSuccess = (...args) => {
+      const callbacks = this.callbacks.get(key);
+      if (callbacks !== undefined) {
+        this.callbacks.delete(key);
+        callbacks.forEach((cb) => cb(...args));
+      }
+    };
+
     const result: NextItem = {
       entrypoint: max[0],
       stack: max[1],
       refCount: max[2],
+      onSuccess,
     };
 
     if (this.size === 1) {
@@ -171,7 +192,7 @@ export class ModuleQueue {
     return result;
   }
 
-  public enqueue(el: Node) {
+  public enqueue(el: Node, onSuccess: OnSuccess) {
     const key = keyOf(el);
     const idx = this.keys.get(key);
     if (idx !== undefined) {
@@ -183,10 +204,15 @@ export class ModuleQueue {
         only: [...new Set([...entrypoint.only, ...el[0].only])],
       };
 
-      this.enqueue([replacement, el[1], refCount + 1]);
+      this.enqueue([replacement, el[1], refCount + 1], onSuccess);
       return;
     }
 
+    if (!this.callbacks.has(key)) {
+      this.callbacks.set(key, []);
+    }
+
+    this.callbacks.get(key)!.push(onSuccess);
     this.increaseKey(this.size + 1, el);
     this.log('queue', 'Enqueued %s: %o', nameOf(el), this.data.map(nameOf));
   }

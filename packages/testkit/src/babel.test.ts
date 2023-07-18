@@ -2867,7 +2867,7 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
-  xit('should shake out side effect because its definition uses DOM API', async () => {
+  it('should shake out side effect because its definition uses DOM API', async () => {
     const { code, metadata } = await transform(
       dedent`
         import { css } from "@linaria/core";

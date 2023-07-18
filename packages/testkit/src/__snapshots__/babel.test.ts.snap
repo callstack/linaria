@@ -2313,6 +2313,24 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker should shake out side effect because its definition uses DOM API 1`] = `
+"import { runNearFramePaint } from \\"./__fixtures__/runNearFramePaint\\";
+runNearFramePaint(() => {
+  // Do something
+});
+export const text = \\"text_t13jq05\\";"
+`;
+
+exports[`strategy shaker should shake out side effect because its definition uses DOM API 2`] = `
+
+CSS:
+
+.text_t13jq05 {}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker should work with String and Number object 1`] = `"export const style = \\"style_s13jq05\\";"`;
 
 exports[`strategy shaker should work with String and Number object 2`] = `

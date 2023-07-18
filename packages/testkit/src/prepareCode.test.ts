@@ -5,7 +5,6 @@ import * as babel from '@babel/core';
 
 import {
   createEntrypoint,
-  loadLinariaOptions,
   parseFile,
   prepareCode,
 } from '@linaria/babel-preset';
@@ -23,8 +22,7 @@ const rules = [
   },
 ];
 
-const pluginOptions = loadLinariaOptions({
-  configFile: false,
+const pluginOptions = {
   rules,
   babelOptions: {
     babelrc: false,
@@ -35,7 +33,7 @@ const pluginOptions = loadLinariaOptions({
       '@babel/preset-typescript',
     ],
   },
-});
+};
 
 const extensions = ['ts', 'tsx', 'js', 'jsx'];
 
@@ -61,24 +59,31 @@ describe('prepareCode', () => {
         inputFilePath,
         only,
         sourceCode,
-        pluginOptions,
         {
           root,
+          pluginOptions,
         }
       );
 
       if (entrypoint === 'ignored') {
         throw new Error('Ignored');
       }
-      const ast = parseFile(babel, inputFilePath, sourceCode, {
-        root,
-      });
 
-      const [transformedCode, imports, metadata] = prepareCode(
+      const ast = parseFile(
+        babel,
+        entrypoint.name,
+        entrypoint.code,
+        entrypoint.parseConfig
+      );
+
+      const [, transformedCode, imports, , metadata] = prepareCode(
         babel,
         entrypoint,
         ast,
-        pluginOptions
+        {
+          root,
+          pluginOptions,
+        }
       );
 
       expect(transformedCode).toMatchSnapshot('code');
