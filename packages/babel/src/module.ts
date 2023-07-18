@@ -187,11 +187,11 @@ class Module {
         return Array.from(this.#lazyValues.keys());
       },
       set: (target, key, value) => {
-        if (value !== undefined) {
-          if (key !== '__esModule') {
-            this.debug('evaluated', 'set %s: %o', key, value);
-          }
+        if (key !== '__esModule') {
+          this.debug('evaluated', 'set %s: %o', key, value);
+        }
 
+        if (value !== undefined) {
           this.#lazyValues.set(key, () => value);
         }
 
@@ -459,6 +459,8 @@ class Module {
       return;
     } catch (e) {
       if (e instanceof EvalError) {
+        this.debug('evaluate:error', '%O', e);
+
         throw e;
       }
 

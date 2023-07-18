@@ -63,8 +63,8 @@
     "@linaria/utils": "workspace:^"
   },
   "devDependencies": {
-    "@babel/traverse": "^7.20.1",
-    "@babel/types": "^7.20.2",
+    "@babel/traverse": "^7.22.8",
+    "@babel/types": "^7.22.5",
     "@types/babel__core": "^7.1.19",
     "@types/babel__traverse": "^7.17.1",
     "@types/node": "^17.0.39"

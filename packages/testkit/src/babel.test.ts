@@ -2825,6 +2825,30 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should shake out identifiers that are referenced only in types', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import * as yup from "yup";
+      import { Form } from "./__fixtures__/linaria-ui-library/components/index";
+
+      const validationSchema = yup.object();
+      type IModel = yup.InferType<typeof validationSchema>;
+
+      const Editor = () => {
+        const initial: IModel = {};
+        return <Form schema={validationSchema} data={initial} />;
+      };
+
+      export const StyledEditor = styled(Editor)\`\`;
+    `,
+      [evaluator, {}, 'tsx']
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   xit('should shake out side effect because its definition uses DOM API', async () => {
     const { code, metadata } = await transform(
       dedent`
