@@ -48,10 +48,7 @@ export interface IImport {
   type: 'cjs' | 'dynamic' | 'esm';
 }
 
-export interface IExport {
-  exported: string | 'default' | '*'; // '*' means re-export all
-  local: NodePath;
-}
+export type Exports = Record<string | 'default' | '*', NodePath>; // '*' means re-export all
 
 export interface IReexport {
   exported: string | 'default' | '*';
@@ -61,8 +58,9 @@ export interface IReexport {
 }
 
 export interface IState {
+  deadExports: string[];
   exportRefs: Map<string, NodePath<MemberExpression>[]>;
-  exports: IExport[];
+  exports: Exports;
   imports: (IImport | ISideEffectImport)[];
   reexports: IReexport[];
   isEsModule: boolean;
@@ -244,29 +242,29 @@ function importFromVariableDeclarator(
 
 function exportFromVariableDeclarator(
   path: NodePath<VariableDeclarator>
-): IExport[] {
+): Exports {
   const id = path.get('id');
   const init = path.get('init');
 
   // If there is no init expression, we can ignore this export
-  if (!init || !init.isExpression()) return [];
+  if (!init || !init.isExpression()) return {};
 
   if (id.isIdentifier()) {
     // It is `export const a = 1;`
-    return [
-      {
-        local: init,
-        exported: id.node.name,
-      },
-    ];
+    return {
+      [id.node.name]: init,
+    };
   }
 
   if (id.isObjectPattern()) {
     // It is `export const { a, ...rest } = obj;`
-    return whatIsDestructed(id).map((destructed) => ({
-      local: init,
-      exported: destructed.as.node.name,
-    }));
+    return whatIsDestructed(id).reduce<Exports>(
+      (acc, destructed) => ({
+        ...acc,
+        [destructed.as.node.name]: init,
+      }),
+      {}
+    );
   }
 
   // What else it can be?
@@ -276,7 +274,7 @@ function exportFromVariableDeclarator(
     id.node.type
   );
 
-  return [];
+  return {};
 }
 
 function collectFromDynamicImport(path: NodePath<Import>, state: IState): void {
@@ -372,8 +370,27 @@ function getImportExportTypeByInteropFunction(
   return undefined;
 }
 
+function isAlreadyProcessed(path: NodePath): boolean {
+  if (
+    path.isCallExpression() &&
+    path.get('callee').isIdentifier({ name: '__toCommonJS' })
+  ) {
+    // because its esbuild and we already processed all exports
+    return true;
+  }
+
+  return false;
+}
+
+const processedRequires = new WeakSet<NodePath>();
+
 function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
   if (!isRequire(path)) return;
+
+  // This method can be reached many times from multiple visitors for the same path
+  // So we need to check if we already processed it
+  if (processedRequires.has(path)) return;
+  processedRequires.add(path);
 
   const { parentPath: callExpression } = path;
   if (!callExpression.isCallExpression()) {
@@ -541,6 +558,25 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
   }
 }
 
+function collectFromVariableDeclarator(
+  path: NodePath<VariableDeclarator>,
+  state: IState
+): void {
+  let found = false;
+  path.traverse({
+    Identifier(identifierPath) {
+      if (isRequire(identifierPath)) {
+        collectFromRequire(identifierPath, state);
+        found = true;
+      }
+    },
+  });
+
+  if (found) {
+    path.skip();
+  }
+}
+
 function isChainOfVoidAssignment(
   path: NodePath<AssignmentExpression>
 ): boolean {
@@ -595,6 +631,65 @@ function getGetterValueFromDescriptor(
   return undefined;
 }
 
+function addExport(path: NodePath, exported: string, state: IState): void {
+  function getRelatedImport() {
+    if (path.isMemberExpression()) {
+      const object = path.get('object');
+      if (!object.isIdentifier()) {
+        return undefined;
+      }
+
+      const objectBinding = object.scope.getBinding(object.node.name);
+      if (!objectBinding) {
+        return undefined;
+      }
+
+      if (objectBinding.path.isVariableDeclarator()) {
+        collectFromVariableDeclarator(objectBinding.path, state);
+      }
+
+      const found = state.imports.find(
+        (i) =>
+          objectBinding.identifier === i.local.node ||
+          objectBinding.referencePaths.some((p) => i.local.isAncestor(p))
+      );
+
+      if (!found) {
+        return undefined;
+      }
+
+      const property = path.get('property');
+      let what = '*';
+      if (path.node.computed && property.isStringLiteral()) {
+        what = property.node.value;
+      } else if (!path.node.computed && property.isIdentifier()) {
+        what = property.node.name;
+      }
+
+      return {
+        import: found,
+        what,
+      };
+    }
+
+    return undefined;
+  }
+
+  const relatedImport = getRelatedImport();
+  if (relatedImport) {
+    // eslint-disable-next-line no-param-reassign
+    state.reexports.push({
+      local: relatedImport.import.local,
+      imported: relatedImport.import.imported,
+      source: relatedImport.import.source,
+      exported,
+    });
+  } else {
+    // eslint-disable-next-line no-param-reassign
+    state.exports[exported] = path;
+  }
+}
+
 function collectFromExports(path: NodePath<Identifier>, state: IState): void {
   if (!isExports(path)) return;
 
@@ -602,7 +697,7 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
     // It is `exports.prop = …`
     const memberExpression = path.parentPath;
     const property = memberExpression.get('property');
-    if (!property.isIdentifier()) {
+    if (!property.isIdentifier() || memberExpression.node.computed) {
       return;
     }
 
@@ -644,7 +739,8 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
     }
 
     saveRef();
-    state.exports.push({ exported: property.node.name, local: right });
+    // eslint-disable-next-line no-param-reassign
+    state.exports[property.node.name] = right;
 
     return;
   }
@@ -674,7 +770,7 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
         const exported = prop.node.value;
         const local = getGetterValueFromDescriptor(descriptor);
         if (local) {
-          state.exports.push({ exported, local });
+          addExport(local, exported, state);
         }
       }
     } else if (
@@ -692,7 +788,7 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
        */
       const local = getGetterValueFromDescriptor(descriptor);
       if (local) {
-        state.exports.push({ exported: '*', local });
+        addExport(local, '*', state);
       }
     }
   }
@@ -869,7 +965,8 @@ function collectFromExportSpecifier(
       });
     } else {
       const local = path.get('local');
-      state.exports.push({ local, exported });
+      // eslint-disable-next-line no-param-reassign
+      state.exports[exported] = local;
     }
 
     return;
@@ -921,20 +1018,24 @@ function collectFromExportNamedDeclaration(
   const declaration = path.get('declaration');
   if (declaration.isVariableDeclaration()) {
     declaration.get('declarations').forEach((declarator) => {
-      exportFromVariableDeclarator(declarator).forEach((prop) => {
-        // What is defined
-        state.exports.push(prop);
-      });
+      // eslint-disable-next-line no-param-reassign
+      state.exports = {
+        ...state.exports,
+        ...exportFromVariableDeclarator(declarator),
+      };
     });
+  }
+
+  if (declaration.isTSEnumDeclaration()) {
+    // eslint-disable-next-line no-param-reassign
+    state.exports[declaration.get('id').node.name] = declaration;
   }
 
   if (declaration.isFunctionDeclaration()) {
     const id = declaration.get('id');
     if (id.isIdentifier()) {
-      state.exports.push({
-        exported: id.node.name,
-        local: id,
-      });
+      // eslint-disable-next-line no-param-reassign
+      state.exports[id.node.name] = id;
     }
   }
 }
@@ -945,8 +1046,8 @@ function collectFromExportDefaultDeclaration(
 ): void {
   if (isType(path)) return;
 
-  const declaration = path.get('declaration');
-  state.exports.push({ exported: 'default', local: declaration });
+  // eslint-disable-next-line no-param-reassign
+  state.exports.default = path.get('declaration');
 }
 
 const cache = new WeakMap<NodePath, IState>();
@@ -955,6 +1056,10 @@ function collectFromAssignmentExpression(
   path: NodePath<AssignmentExpression>,
   state: IState
 ): void {
+  if (isChainOfVoidAssignment(path)) {
+    return;
+  }
+
   const left = path.get('left');
   const right = path.get('right');
 
@@ -966,12 +1071,19 @@ function collectFromAssignmentExpression(
       exported = property.node.name;
     }
   } else if (isExports(left)) {
-    exported = '*'; // maybe
+    // module.exports = ...
+    if (!isAlreadyProcessed(right)) {
+      exported = 'default';
+    }
   }
 
   if (!exported) return;
 
-  if (!right.isCallExpression() || !isRequire(right.get('callee'))) return;
+  if (!right.isCallExpression() || !isRequire(right.get('callee'))) {
+    // eslint-disable-next-line no-param-reassign
+    state.exports[exported] = right;
+    return;
+  }
 
   const sourcePath = right.get('arguments')?.[0];
   const source = sourcePath.isStringLiteral()
@@ -980,6 +1092,11 @@ function collectFromAssignmentExpression(
   if (!source) return;
 
   // It is `exports.foo = require('./css');`
+
+  if (state.exports[exported]) {
+    // eslint-disable-next-line no-param-reassign
+    delete state.exports[exported];
+  }
 
   state.reexports.push({
     exported,
@@ -1030,10 +1147,7 @@ function collectFromMap(map: NodePath<ObjectExpression>, state: IState) {
     const returnValue = getReturnValue(value);
     if (!returnValue) return;
 
-    state.exports.push({
-      exported,
-      local: returnValue,
-    });
+    addExport(returnValue, exported, state);
   });
 }
 
@@ -1128,8 +1242,9 @@ export function collectExportsAndImports(
   force = false
 ): IState {
   const state: IState = {
+    deadExports: [],
     exportRefs: new Map(),
-    exports: [],
+    exports: {},
     imports: [],
     reexports: [],
     isEsModule: false,
@@ -1149,6 +1264,7 @@ export function collectExportsAndImports(
       ImportDeclaration: collectFromImportDeclaration,
       Import: collectFromDynamicImport,
       Identifier: collectFromRequireOrExports,
+      VariableDeclarator: collectFromVariableDeclarator,
     },
     state
   );

@@ -79,6 +79,7 @@ export function prepareCode(
   code: string,
   imports: Module['imports'],
   exports: string[] | null,
+  deadExports: string[],
   metadata?: babel.BabelFileMetadata
 ] {
   const { evaluator, name: filename, only, deadImports = [] } = item;
@@ -100,6 +101,7 @@ export function prepareCode(
       preevalStageResult.code!,
       null,
       null,
+      [],
       preevalStageResult.metadata,
     ];
   }
@@ -113,7 +115,7 @@ export function prepareCode(
     deadImports,
   };
 
-  const [ast, code, imports, exports] = evaluator(
+  const [ast, code, imports, exports, deadExports] = evaluator(
     filename,
     pluginOptions,
     [preevalStageResult.ast!, preevalStageResult.code!],
@@ -123,7 +125,14 @@ export function prepareCode(
 
   log('stage-1:evaluator:end', '');
 
-  return [ast, code, imports, exports ?? null, preevalStageResult.metadata];
+  return [
+    ast,
+    code,
+    imports,
+    exports ?? null,
+    deadExports ?? [],
+    preevalStageResult.metadata,
+  ];
 }
 
 function processQueueItem(
@@ -155,12 +164,8 @@ function processQueueItem(
   const onlyAsStr = only.join(', ');
   log('stage-1', `>> (${onlyAsStr})`);
 
-  const [preparedAst, preparedCode, imports, exports, metadata] = prepareCode(
-    babel,
-    item,
-    ast,
-    options
-  );
+  const [preparedAst, preparedCode, imports, exports, deadExports, metadata] =
+    prepareCode(babel, item, ast, options);
 
   if (code === preparedCode) {
     log('stage-1', `<< (${onlyAsStr})\n === no changes ===`);
@@ -178,6 +183,7 @@ function processQueueItem(
       code: preparedCode,
       metadata,
       exports,
+      deadExports,
     },
   };
 }
@@ -270,34 +276,26 @@ function processImports(
       file: i.resolved,
     }))
   );
-  const aliveImports: typeof allImports = [];
+  const deadImports: typeof allImports = [];
   const remaining = new Set(allImports.map((i) => i.file));
 
   const onEveryImport: OnSuccess = (entrypoint, result) => {
     remaining.delete(entrypoint.name);
-    if ((result.exports?.length ?? 0) > 0) {
-      const file = entrypoint.name;
-      const exports = new Set(result.exports);
+    result.deadExports.forEach((deadExport) => {
       // FIXME: handle cases with `export * from './foo'`
-      allImports.forEach((imported) => {
-        if (imported.file === file && exports.has(imported.what)) {
-          aliveImports.push(imported);
-        }
-      });
-    }
+      const relatedImport = allImports.find(
+        (i) => i.from === entrypoint.name && i.what === deadExport
+      );
+
+      if (relatedImport) {
+        deadImports.push(relatedImport);
+      }
+    });
 
     if (remaining.size === 0) {
-      const hasDeadImports = allImports.length !== aliveImports.length;
-      if (!hasDeadImports) {
+      if (deadImports.length === 0) {
         return;
       }
-
-      const deadImports = allImports.filter(
-        (i) =>
-          !aliveImports.some(
-            (alive) => alive.from === i.from && alive.what === i.what
-          )
-      );
 
       log(
         'stage-1:resolve',

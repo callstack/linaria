@@ -39,6 +39,7 @@ export interface ITransformFileResult {
   ast: File;
   code: string;
   exports: string[] | null;
+  deadExports: string[];
 }
 
 export type Stage = 'preeval' | 'collect';

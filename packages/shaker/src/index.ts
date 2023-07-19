@@ -81,6 +81,7 @@ const shaker: Evaluator = (filename, options, code, config, babel) => {
     transformed.code ?? '',
     transformed.metadata.__linariaShaker.imports,
     transformed.metadata.__linariaShaker.exports,
+    transformed.metadata.__linariaShaker.deadExports,
   ];
 };
 
