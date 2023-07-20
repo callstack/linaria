@@ -5,21 +5,21 @@ import { getScope } from './getScope';
 
 type FindType = 'binding' | 'both' | 'referenced';
 
-function isInVoid(path: NodePath): boolean {
-  return path.parentPath?.isUnaryExpression({ operator: 'void' }) ?? false;
+function isInUnary(path: NodePath): boolean {
+  return path.parentPath?.isUnaryExpression() ?? false;
 }
 
 function isBindingIdentifier(path: NodePath): path is NodePath<Identifier> {
-  return path.isBindingIdentifier() && !isInVoid(path);
+  return path.isBindingIdentifier() && !isInUnary(path);
 }
 
 function isReferencedIdentifier(
   path: NodePath
 ): path is NodePath<Identifier | JSXIdentifier> {
-  return path.isReferencedIdentifier() || isInVoid(path);
+  return path.isReferencedIdentifier() || isInUnary(path);
 }
 
-// For some reasons, `isBindingIdentifier` returns true for identifiers inside `void` expressions.
+// For some reasons, `isBindingIdentifier` returns true for identifiers inside unary expressions.
 const checkers: Record<FindType, (ex: NodePath) => boolean> = {
   binding: (ex) => isBindingIdentifier(ex),
   both: (ex) => isBindingIdentifier(ex) || isReferencedIdentifier(ex),
