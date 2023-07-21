@@ -2,144 +2,143 @@
 import { readFileSync } from 'fs';
 import { dirname, extname } from 'path';
 
-import type { BabelFileResult } from '@babel/core';
 import type { File } from '@babel/types';
 
 import type { CustomDebug } from '@linaria/logger';
 import { createCustomDebug } from '@linaria/logger';
-import type { Evaluator, EvaluatorConfig } from '@linaria/utils';
-import { buildOptions, getFileIdx, loadBabelOptions } from '@linaria/utils';
+import type {
+  Evaluator,
+  EvaluatorConfig,
+  IMetadata,
+  StrictOptions,
+} from '@linaria/utils';
+import {
+  buildOptions,
+  getFileIdx,
+  isFeatureEnabled,
+  loadBabelOptions,
+} from '@linaria/utils';
 
 import type { Core } from '../babel';
 import type { TransformCacheCollection } from '../cache';
-import type Module from '../module';
+import preeval from '../plugins/preeval';
 import type { ITransformFileResult, Options } from '../types';
-import withLinariaMetadata from '../utils/withLinariaMetadata';
 
 import type { IEntrypoint, NextItem, OnSuccess } from './helpers/ModuleQueue';
 import { ModuleQueue } from './helpers/ModuleQueue';
-import loadLinariaOptions from './helpers/loadLinariaOptions';
 import { getMatchedRule, parseFile } from './helpers/parseFile';
 
-const isModuleResolver = (i: unknown): i is { options: unknown } =>
-  typeof i === 'object' &&
-  i !== null &&
-  (i as { key?: string }).key === 'module-resolver';
+// const isModuleResolver = (i: unknown): i is { options: unknown } =>
+//   typeof i === 'object' &&
+//   i !== null &&
+//   (i as { key?: string }).key === 'module-resolver';
 
-function runPreevalStage(
-  babel: Core,
-  item: IEntrypoint,
-  ast: File,
-  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
-): BabelFileResult {
-  const { code, name: filename, parseConfig } = item;
-
-  const pluginOptions = loadLinariaOptions(options.pluginOptions);
-
-  const transformPlugins: babel.PluginItem[] = [
-    [require.resolve('../plugins/preeval'), pluginOptions],
-  ];
-
-  const moduleResolverPlugin = parseConfig.plugins?.find(isModuleResolver);
-  if (moduleResolverPlugin) {
-    transformPlugins.unshift(moduleResolverPlugin);
-  }
-
-  const transformConfig = buildOptions({
-    envName: 'linaria',
-    plugins: transformPlugins,
-    sourceMaps: true,
-    sourceFileName: filename,
-    inputSourceMap: options.inputSourceMap,
-    root: options.root,
-    ast: true,
-    babelrc: false,
-    configFile: false,
-  });
-
-  const result = babel.transformFromAstSync(ast, code, {
-    ...transformConfig,
-    filename,
-  });
-
-  if (!result || !result.ast?.program) {
-    throw new Error('Babel transform failed');
-  }
-
-  return result;
-}
+// function runPreevalStage(
+//   babel: Core,
+//   item: IEntrypoint,
+//   ast: File,
+//   pluginOptions: StrictOptions,
+//   options: Pick<Options, 'root' | 'inputSourceMap'>
+// ): BabelFileResult {
+//   const { code, name: filename, parseConfig } = item;
+//
+//   const transformPlugins: babel.PluginItem[] = [
+//     [require.resolve('../plugins/preeval'), pluginOptions],
+//   ];
+//
+//   const moduleResolverPlugin = parseConfig.plugins?.find(isModuleResolver);
+//   if (moduleResolverPlugin) {
+//     transformPlugins.unshift(moduleResolverPlugin);
+//   }
+//
+//   const transformConfig = buildOptions({
+//     ast: true,
+//     babelrc: false,
+//     configFile: false,
+//     envName: 'linaria',
+//     inputSourceMap: options.inputSourceMap,
+//     plugins: transformPlugins,
+//     root: options.root,
+//     sourceFileName: filename,
+//     sourceMaps: true,
+//   });
+//
+//   const result = babel.transformFromAstSync(ast, code, {
+//     ...transformConfig,
+//     filename,
+//   });
+//
+//   if (!result || !result.ast?.program) {
+//     throw new Error('Babel transform failed');
+//   }
+//
+//   return result;
+// }
 
 export function prepareCode(
   babel: Core,
   item: IEntrypoint,
   originalAst: File,
-  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
-): [
-  ast: File,
-  code: string,
-  imports: Module['imports'],
-  exports: string[] | null,
-  deadExports: string[],
-  metadata?: babel.BabelFileMetadata
-] {
+  pluginOptions: StrictOptions
+): [ast: File, code: string, metadata: IMetadata] {
   const { evaluator, name: filename, only, deadImports = [] } = item;
 
   const log = createCustomDebug('transform', getFileIdx(filename));
 
-  const pluginOptions = loadLinariaOptions(options.pluginOptions);
-
-  const preevalStageResult = runPreevalStage(babel, item, originalAst, options);
-
-  if (
-    only.length === 1 &&
-    only[0] === '__linariaPreval' &&
-    !withLinariaMetadata(preevalStageResult.metadata)
-  ) {
-    log('stage-1:evaluator:end', 'no metadata');
-    return [
-      preevalStageResult.ast!,
-      preevalStageResult.code!,
-      null,
-      null,
-      [],
-      preevalStageResult.metadata,
-    ];
-  }
-
-  log('stage-1:preeval', 'metadata %O', preevalStageResult.metadata);
+  // const preevalStageResult = runPreevalStage(
+  //   babel,
+  //   item,
+  //   originalAst,
+  //   pluginOptions,
+  //   options
+  // );
+  //
+  // if (
+  //   only.length === 1 &&
+  //   only[0] === '__linariaPreval' &&
+  //   !withLinariaMetadata(preevalStageResult.metadata)
+  // ) {
+  //   log('stage-1:evaluator:end', 'no metadata');
+  //   return [
+  //     preevalStageResult.ast!,
+  //     preevalStageResult.code!,
+  //     null,
+  //     null,
+  //     [],
+  //     preevalStageResult.metadata,
+  //   ];
+  // }
+  //
+  // log('stage-1:preeval', 'metadata %O', preevalStageResult.metadata);
 
   log('stage-1:evaluator:start', 'using %s', evaluator.name);
 
   const evaluatorConfig: EvaluatorConfig = {
     onlyExports: only,
     deadImports,
+    preeval: (babelCore, file) => preeval(babelCore, pluginOptions, file),
+    highPriorityPlugins: pluginOptions.highPriorityPlugins,
+    features: pluginOptions.features,
   };
 
-  const [ast, code, imports, exports, deadExports] = evaluator(
-    filename,
-    pluginOptions,
-    [preevalStageResult.ast!, preevalStageResult.code!],
+  const { ast, code, metadata } = evaluator(
+    item.parseConfig,
+    originalAst,
+    item.code,
     evaluatorConfig,
     babel
   );
 
   log('stage-1:evaluator:end', '');
 
-  return [
-    ast,
-    code,
-    imports,
-    exports ?? null,
-    deadExports ?? [],
-    preevalStageResult.metadata,
-  ];
+  return [ast, code, metadata];
 }
 
 function processQueueItem(
   babel: Core,
   item: IEntrypoint | null,
   cache: TransformCacheCollection,
-  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
+  pluginOptions: StrictOptions
 ):
   | {
       imports: Map<string, string[]> | null;
@@ -164,8 +163,12 @@ function processQueueItem(
   const onlyAsStr = only.join(', ');
   log('stage-1', `>> (${onlyAsStr})`);
 
-  const [preparedAst, preparedCode, imports, exports, deadExports, metadata] =
-    prepareCode(babel, item, ast, options);
+  const [preparedAst, preparedCode, metadata] = prepareCode(
+    babel,
+    item,
+    ast,
+    pluginOptions
+  );
 
   if (code === preparedCode) {
     log('stage-1', `<< (${onlyAsStr})\n === no changes ===`);
@@ -176,14 +179,12 @@ function processQueueItem(
   if (preparedCode === '') return undefined;
 
   return {
-    imports,
+    imports: metadata.linariaEvaluator.imports ?? [],
     name,
     result: {
       ast: preparedAst,
       code: preparedCode,
       metadata,
-      exports,
-      deadExports,
     },
   };
 }
@@ -201,12 +202,12 @@ export function createEntrypoint(
   name: string,
   only: string[],
   code: string,
-  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
+  pluginOptions: StrictOptions,
+  options: Pick<Options, 'root' | 'inputSourceMap'>
 ): IEntrypoint | 'ignored' {
   const log = createCustomDebug('transform', getFileIdx(name));
   const extension = extname(name);
 
-  const pluginOptions = loadLinariaOptions(options.pluginOptions);
   if (!pluginOptions.extensions.includes(extension)) {
     log(
       'createEntrypoint',
@@ -234,16 +235,16 @@ export function createEntrypoint(
           paths: [dirname(name)],
         })).default;
 
-  const parseConfig = buildOptions(pluginOptions?.babelOptions, babelOptions);
-  const fullParserOptions = loadBabelOptions(babel, name, {
-    ...parseConfig,
+  const parseConfig = buildOptions(pluginOptions?.babelOptions, babelOptions, {
     ast: true,
-    root: options.root,
+    filename: name,
     inputSourceMap: options.inputSourceMap,
+    root: options.root,
     sourceFileName: name,
     sourceMaps: true,
-    filename: name,
   });
+
+  const fullParserOptions = loadBabelOptions(babel, name, parseConfig);
 
   log('createEntrypoint', `${name} (${only.join(', ')})\n${code}`);
 
@@ -261,7 +262,8 @@ function processImports(
   log: CustomDebug,
   cache: TransformCacheCollection,
   queue: ModuleQueue,
-  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>,
+  pluginOptions: StrictOptions,
+  options: Pick<Options, 'root' | 'inputSourceMap'>,
   parent: NextItem,
   resolvedImports: {
     importsOnly: string[];
@@ -279,12 +281,25 @@ function processImports(
   const deadImports: typeof allImports = [];
   const remaining = new Set(allImports.map((i) => i.file));
 
-  const onEveryImport: OnSuccess = (entrypoint, result) => {
-    remaining.delete(entrypoint.name);
-    result.deadExports.forEach((deadExport) => {
+  const deleteDeadImports = (
+    entrypoint: IEntrypoint,
+    result: ITransformFileResult,
+    isLast: boolean
+  ) => {
+    if (
+      !isFeatureEnabled(
+        pluginOptions.features,
+        'deadImportsRemover',
+        parent.entrypoint.name
+      )
+    ) {
+      return;
+    }
+
+    result.metadata?.linariaEvaluator.deadExports.forEach((deadExport) => {
       // FIXME: handle cases with `export * from './foo'`
       const relatedImport = allImports.find(
-        (i) => i.from === entrypoint.name && i.what === deadExport
+        (i) => i.file === entrypoint.name && i.what === deadExport
       );
 
       if (relatedImport) {
@@ -292,7 +307,7 @@ function processImports(
       }
     });
 
-    if (remaining.size === 0) {
+    if (isLast) {
       if (deadImports.length === 0) {
         return;
       }
@@ -316,6 +331,11 @@ function processImports(
         parent.onSuccess
       );
     }
+  };
+
+  const onEveryImport: OnSuccess = (entrypoint, result) => {
+    remaining.delete(entrypoint.name);
+    deleteDeadImports(entrypoint, result, remaining.size === 0);
   };
 
   for (const { importedFile, importsOnly, resolved } of resolvedImports) {
@@ -350,6 +370,7 @@ function processImports(
       resolved,
       importsOnly,
       fileContent,
+      pluginOptions,
       options
     );
     if (next === 'ignored') {
@@ -368,7 +389,8 @@ function processEntrypoint(
   babel: Core,
   log: CustomDebug,
   cache: TransformCacheCollection,
-  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>,
+  pluginOptions: StrictOptions,
+  options: Pick<Options, 'root' | 'inputSourceMap'>,
   nextItem: NextItem
 ):
   | {
@@ -420,7 +442,7 @@ function processEntrypoint(
         only: mergedOnly,
       },
       cache,
-      options
+      pluginOptions
     );
 
     if (!processed) {
@@ -444,7 +466,8 @@ export function prepareForEvalSync(
   cache: TransformCacheCollection,
   resolve: (what: string, importer: string, stack: string[]) => string,
   partialEntrypoint: Pick<IEntrypoint, 'code' | 'name' | 'only'>,
-  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
+  pluginOptions: StrictOptions,
+  options: Pick<Options, 'root' | 'inputSourceMap'>
 ): ITransformFileResult | undefined {
   const log = createCustomDebug(
     'transform',
@@ -456,6 +479,7 @@ export function prepareForEvalSync(
     partialEntrypoint.name,
     partialEntrypoint.only,
     partialEntrypoint.code,
+    pluginOptions,
     options
   );
 
@@ -471,7 +495,14 @@ export function prepareForEvalSync(
       continue;
     }
 
-    const processResult = processEntrypoint(babel, log, cache, options, item);
+    const processResult = processEntrypoint(
+      babel,
+      log,
+      cache,
+      pluginOptions,
+      options,
+      item
+    );
     if (processResult === 'skip') {
       continue;
     }
@@ -505,7 +536,16 @@ export function prepareForEvalSync(
         }
       );
 
-      processImports(babel, log, cache, queue, options, item, resolvedImports);
+      processImports(
+        babel,
+        log,
+        cache,
+        queue,
+        pluginOptions,
+        options,
+        item,
+        resolvedImports
+      );
     } else {
       log('stage-1', '%s has no imports', item.entrypoint.name);
     }
@@ -535,7 +575,8 @@ export default async function prepareForEval(
     stack: string[]
   ) => Promise<string | null>,
   partialEntrypoint: Pick<IEntrypoint, 'code' | 'name' | 'only'>,
-  options: Pick<Options, 'root' | 'pluginOptions' | 'inputSourceMap'>
+  pluginOptions: StrictOptions,
+  options: Pick<Options, 'root' | 'inputSourceMap'>
 ): Promise<ITransformFileResult | undefined> {
   /*
    * This method can be run simultaneously for multiple files.
@@ -555,6 +596,7 @@ export default async function prepareForEval(
     partialEntrypoint.name,
     partialEntrypoint.only,
     partialEntrypoint.code,
+    pluginOptions,
     options
   );
 
@@ -570,14 +612,21 @@ export default async function prepareForEval(
       continue;
     }
 
-    const processResult = processEntrypoint(babel, log, cache, options, item);
+    const processResult = processEntrypoint(
+      babel,
+      log,
+      cache,
+      pluginOptions,
+      options,
+      item
+    );
     if (processResult === 'skip') {
       continue;
     }
 
     const { imports, result, only: mergedOnly } = processResult;
 
-    if (imports) {
+    if (imports && imports.size > 0) {
       const resolvedImports = await Promise.all(
         Array.from(imports?.entries() ?? []).map(
           async ([importedFile, importsOnly]) => {
@@ -618,7 +667,16 @@ export default async function prepareForEval(
         )
       );
 
-      processImports(babel, log, cache, queue, options, item, resolvedImports);
+      processImports(
+        babel,
+        log,
+        cache,
+        queue,
+        pluginOptions,
+        options,
+        item,
+        resolvedImports
+      );
     } else {
       log('stage-1', '%s has no imports', item.entrypoint.name);
     }

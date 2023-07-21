@@ -1,10 +1,9 @@
-import type { BabelFile, BabelFileMetadata, PluginPass } from '@babel/core';
+import type { BabelFile, PluginPass } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import type { File } from '@babel/types';
 import type { RawSourceMap } from 'source-map';
 
-import type { BaseProcessor } from '@linaria/tags';
-import type { LinariaMetadata, Replacement, Rules } from '@linaria/utils';
+import type { IMetadata, Replacement, Rules } from '@linaria/utils';
 
 import type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
 
@@ -25,21 +24,16 @@ export { ValueType } from '@linaria/utils';
 export type Dependencies = string[];
 
 export interface IPluginState extends PluginPass {
-  processors: BaseProcessor[];
   dependencies: Dependencies;
   file: BabelFile & {
-    metadata: {
-      linaria?: LinariaMetadata;
-    };
+    metadata: IMetadata;
   };
 }
 
 export interface ITransformFileResult {
-  metadata?: BabelFileMetadata;
+  metadata?: IMetadata;
   ast: File;
   code: string;
-  exports: string[] | null;
-  deadExports: string[];
 }
 
 export type Stage = 'preeval' | 'collect';

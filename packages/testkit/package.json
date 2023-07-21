@@ -54,8 +54,10 @@
     "@types/node": "^17.0.39",
     "babel-plugin-istanbul": "^6.1.1",
     "babel-plugin-module-resolver": "^4.1.0",
+    "babel-plugin-import": "^1.13.6",
     "jest": "^28.1.0",
     "linaria": "workspace:^",
+    "lodash": "^4.17.21",
     "ts-jest": "^28.0.4"
   },
   "engines": {

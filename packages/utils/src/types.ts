@@ -107,9 +107,12 @@ export type Replacement = {
 export type Replacements = Array<Replacement>;
 
 export interface IEvaluatorMetadata {
+  deadExports: string[];
+  exports: string[];
   imports: Map<string, string[]>;
 }
 
 export interface IMetadata {
+  linaria: LinariaMetadata | undefined;
   linariaEvaluator: IEvaluatorMetadata;
 }

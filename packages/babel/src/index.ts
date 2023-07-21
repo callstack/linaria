@@ -30,7 +30,10 @@ export { default as getTagProcessor } from './utils/getTagProcessor';
 export { default as getVisitorKeys } from './utils/getVisitorKeys';
 export type { VisitorKeys } from './utils/getVisitorKeys';
 export { default as peek } from './utils/peek';
-export { processTemplateExpression } from './utils/processTemplateExpression';
+export {
+  findAndProcessTemplateExpressions,
+  processTemplateExpression,
+} from './utils/processTemplateExpression';
 export { TransformCacheCollection } from './cache';
 
 function isEnabled(caller?: TransformCaller & { evaluate?: true }) {

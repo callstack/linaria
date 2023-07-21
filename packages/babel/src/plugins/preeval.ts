@@ -1,101 +1,46 @@
 /**
- * This file is a babel preset used to transform files inside evaluators.
- * It works the same as main `babel/extract` preset, but do not evaluate lazy dependencies.
+ * Preeval finds all template literals, applies corresponding template processors,
+ * and adds metadata to the file.
  */
-import type { BabelFile, PluginObj } from '@babel/core';
+import type { BabelFile } from '@babel/core';
 
 import { createCustomDebug } from '@linaria/logger';
-import type { StrictOptions } from '@linaria/utils';
-import {
-  getFileIdx,
-  addIdentifierToLinariaPreval,
-  removeDangerousCode,
-  isFeatureEnabled,
-} from '@linaria/utils';
+import type { LinariaMetadata, StrictOptions } from '@linaria/utils';
+import { getFileIdx, getOrAddLinariaPreval } from '@linaria/utils';
 
 import type { Core } from '../babel';
-import type { IPluginState } from '../types';
-import { processTemplateExpression } from '../utils/processTemplateExpression';
+import { findAndProcessTemplateExpressions } from '../utils/processTemplateExpression';
 
 export type PreevalOptions = Pick<
   StrictOptions,
-  'classNameSlug' | 'displayName' | 'evaluate' | 'features'
+  'classNameSlug' | 'displayName' | 'evaluate' | 'tagResolver'
 >;
 
 export default function preeval(
-  babel: Core,
-  options: PreevalOptions
-): PluginObj<IPluginState> {
-  const { types: t } = babel;
+  { types: t }: Core,
+  options: PreevalOptions,
+  file: BabelFile
+): LinariaMetadata | undefined {
+  const log = createCustomDebug('preeval', getFileIdx(file.opts.filename!));
+
+  log('start', 'Looking for template literals…');
+
+  const processors = findAndProcessTemplateExpressions(file, options);
+
+  if (processors.length === 0) {
+    log('end', "We didn't find any Linaria template literals");
+
+    // We didn't find any Linaria template literals.
+    return undefined;
+  }
+
+  getOrAddLinariaPreval(file.path.scope);
+  log('end', '__linariaPreval has been added');
+
   return {
-    name: '@linaria/babel/preeval',
-    pre(file: BabelFile) {
-      const filename = file.opts.filename!;
-      const log = createCustomDebug('preeval', getFileIdx(filename));
-
-      log('start', 'Looking for template literals…');
-
-      const rootScope = file.scope;
-      this.processors = [];
-
-      file.path.traverse({
-        Identifier: (p) => {
-          processTemplateExpression(p, file.opts, options, (processor) => {
-            processor.dependencies.forEach((dependency) => {
-              if (dependency.ex.type === 'Identifier') {
-                addIdentifierToLinariaPreval(rootScope, dependency.ex.name);
-              }
-            });
-
-            processor.doEvaltimeReplacement();
-            this.processors.push(processor);
-          });
-        },
-      });
-
-      if (
-        isFeatureEnabled(options.features, 'dangerousCodeRemover', filename)
-      ) {
-        log('start', 'Strip all JSX and browser related stuff');
-        removeDangerousCode(file.path);
-      }
-    },
-    visitor: {},
-    post(file: BabelFile) {
-      const log = createCustomDebug('preeval', getFileIdx(file.opts.filename!));
-
-      if (this.processors.length === 0) {
-        log('end', "We didn't find any Linaria template literals");
-
-        // We didn't find any Linaria template literals.
-        return;
-      }
-
-      this.file.metadata.linaria = {
-        processors: this.processors,
-        replacements: [],
-        rules: {},
-        dependencies: [],
-      };
-
-      const linariaPreval = file.path.scope.getData('__linariaPreval');
-      if (!linariaPreval) {
-        // Event if there is no dependencies, we still need to add __linariaPreval
-        const linariaExport = t.expressionStatement(
-          t.assignmentExpression(
-            '=',
-            t.memberExpression(
-              t.identifier('exports'),
-              t.identifier('__linariaPreval')
-            ),
-            t.objectExpression([])
-          )
-        );
-
-        file.path.pushContainer('body', linariaExport);
-      }
-
-      log('end', '__linariaPreval has been added');
-    },
+    processors,
+    replacements: [],
+    rules: {},
+    dependencies: [],
   };
 }

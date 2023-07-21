@@ -1,7 +1,8 @@
 import { styled } from '@linaria/react';
-import { fooStyles } from "_/re-exports";
+import { capitalize } from 'lodash';
+import { fooStyles } from '_/re-exports';
 
-const value = fooStyles.foo;
+const value = capitalize(fooStyles.foo);
 
 export const H1 = styled.h1`
   color: ${value};

@@ -2698,7 +2698,7 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
-  it('respects module-resolver plugin', async () => {
+  it('respects module-resolver and import plugins', async () => {
     const { code, metadata } = await transformFile(
       resolve(__dirname, './__fixtures__/with-babelrc/index.js'),
       [evaluator]
@@ -2867,9 +2867,10 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
-  it('should shake out side effect because its definition uses DOM API', async () => {
-    const { code, metadata } = await transform(
-      dedent`
+  describe('deadImportsRemover', () => {
+    const run = (enabled: boolean) =>
+      transform(
+        dedent`
         import { css } from "@linaria/core";
         import { runNearFramePaint } from "./__fixtures__/runNearFramePaint";
 
@@ -2879,10 +2880,25 @@ describe('strategy shaker', () => {
 
         export const text = css\`\`;
       `,
-      [evaluator]
-    );
+        [
+          evaluator,
+          {
+            features: {
+              deadImportsRemover: enabled,
+            },
+          },
+        ]
+      );
 
-    expect(code).toMatchSnapshot();
-    expect(metadata).toMatchSnapshot();
+    it('should shake out side effect because its definition uses DOM API', async () => {
+      const { code, metadata } = await run(true);
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+
+    it('should fail because deadImportsRemover is disabled', async () => {
+      await expect(() => run(false)).rejects.toThrowErrorMatchingSnapshot();
+    });
   });
 });

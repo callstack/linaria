@@ -47,11 +47,11 @@ export { valueToLiteral } from './valueToLiteral';
 export { default as JSXElementsRemover } from './visitors/JSXElementsRemover';
 
 export type {
-  IExport,
-  IImport,
-  IReexport,
-  ISideEffectImport,
   IState,
+  Exports,
+  IImport,
+  ISideEffectImport,
+  IReexport,
 } from './collectExportsAndImports';
 export type { IVariableContext } from './IVariableContext';
 export type {

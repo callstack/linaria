@@ -23,6 +23,7 @@ import type {
   MemberExpression,
   ObjectExpression,
   ObjectPattern,
+  Program,
   StringLiteral,
   VariableDeclarator,
 } from '@babel/types';
@@ -64,6 +65,10 @@ export interface IState {
   imports: (IImport | ISideEffectImport)[];
   reexports: IReexport[];
   isEsModule: boolean;
+}
+
+interface ILocalState extends IState {
+  processedRequires: WeakSet<NodePath>;
 }
 
 export const sideEffectImport = (
@@ -119,7 +124,7 @@ const collectors: {
 
 function collectFromImportDeclaration(
   path: NodePath<ImportDeclaration>,
-  state: IState
+  state: ILocalState
 ): void {
   // If importKind is specified, and it's not a value, ignore that import
   if (isType(path)) return;
@@ -277,7 +282,10 @@ function exportFromVariableDeclarator(
   return {};
 }
 
-function collectFromDynamicImport(path: NodePath<Import>, state: IState): void {
+function collectFromDynamicImport(
+  path: NodePath<Import>,
+  state: ILocalState
+): void {
   const { parentPath: callExpression } = path;
   if (!callExpression.isCallExpression()) {
     // It's wrong `import`
@@ -382,15 +390,16 @@ function isAlreadyProcessed(path: NodePath): boolean {
   return false;
 }
 
-const processedRequires = new WeakSet<NodePath>();
-
-function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
+function collectFromRequire(
+  path: NodePath<Identifier>,
+  state: ILocalState
+): void {
   if (!isRequire(path)) return;
 
   // This method can be reached many times from multiple visitors for the same path
   // So we need to check if we already processed it
-  if (processedRequires.has(path)) return;
-  processedRequires.add(path);
+  if (state.processedRequires.has(path)) return;
+  state.processedRequires.add(path);
 
   const { parentPath: callExpression } = path;
   if (!callExpression.isCallExpression()) {
@@ -560,7 +569,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
 
 function collectFromVariableDeclarator(
   path: NodePath<VariableDeclarator>,
-  state: IState
+  state: ILocalState
 ): void {
   let found = false;
   path.traverse({
@@ -631,7 +640,7 @@ function getGetterValueFromDescriptor(
   return undefined;
 }
 
-function addExport(path: NodePath, exported: string, state: IState): void {
+function addExport(path: NodePath, exported: string, state: ILocalState): void {
   function getRelatedImport() {
     if (path.isMemberExpression()) {
       const object = path.get('object');
@@ -690,7 +699,10 @@ function addExport(path: NodePath, exported: string, state: IState): void {
   }
 }
 
-function collectFromExports(path: NodePath<Identifier>, state: IState): void {
+function collectFromExports(
+  path: NodePath<Identifier>,
+  state: ILocalState
+): void {
   if (!isExports(path)) return;
 
   if (path.parentPath.isMemberExpression({ object: path.node })) {
@@ -796,7 +808,7 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
 
 function collectFromRequireOrExports(
   path: NodePath<Identifier>,
-  state: IState
+  state: ILocalState
 ): void {
   if (isRequire(path)) {
     collectFromRequire(path, state);
@@ -930,7 +942,7 @@ function unfoldNamespaceImport(
 
 function collectFromExportAllDeclaration(
   path: NodePath<ExportAllDeclaration>,
-  state: IState
+  state: ILocalState
 ): void {
   if (isType(path)) return;
   const source = path.get('source')?.node?.value;
@@ -950,7 +962,7 @@ function collectFromExportSpecifier(
     ExportSpecifier | ExportDefaultSpecifier | ExportNamespaceSpecifier
   >,
   source: string | undefined,
-  state: IState
+  state: ILocalState
 ): void {
   if (path.isExportSpecifier()) {
     const exported = getValue(path.get('exported'));
@@ -1003,7 +1015,7 @@ function collectFromExportSpecifier(
 
 function collectFromExportNamedDeclaration(
   path: NodePath<ExportNamedDeclaration>,
-  state: IState
+  state: ILocalState
 ): void {
   if (isType(path)) return;
 
@@ -1042,7 +1054,7 @@ function collectFromExportNamedDeclaration(
 
 function collectFromExportDefaultDeclaration(
   path: NodePath<ExportDefaultDeclaration>,
-  state: IState
+  state: ILocalState
 ): void {
   if (isType(path)) return;
 
@@ -1050,11 +1062,9 @@ function collectFromExportDefaultDeclaration(
   state.exports.default = path.get('declaration');
 }
 
-const cache = new WeakMap<NodePath, IState>();
-
 function collectFromAssignmentExpression(
   path: NodePath<AssignmentExpression>,
-  state: IState
+  state: ILocalState
 ): void {
   if (isChainOfVoidAssignment(path)) {
     return;
@@ -1110,7 +1120,7 @@ function collectFromAssignmentExpression(
 
 function collectFromExportStarCall(
   path: NodePath<CallExpression>,
-  state: IState
+  state: ILocalState
 ) {
   const [requireCall, exports] = path.get('arguments');
   if (!isExports(exports)) return;
@@ -1132,7 +1142,7 @@ function collectFromExportStarCall(
   path.skip();
 }
 
-function collectFromMap(map: NodePath<ObjectExpression>, state: IState) {
+function collectFromMap(map: NodePath<ObjectExpression>, state: ILocalState) {
   const properties = map.get('properties');
   properties.forEach((property) => {
     if (!property.isObjectProperty()) return;
@@ -1153,7 +1163,7 @@ function collectFromMap(map: NodePath<ObjectExpression>, state: IState) {
 
 function collectFromEsbuildExportCall(
   path: NodePath<CallExpression>,
-  state: IState
+  state: ILocalState
 ) {
   const [sourceExports, map] = path.get('arguments');
   if (!sourceExports.isIdentifier({ name: 'source_exports' })) return;
@@ -1166,7 +1176,7 @@ function collectFromEsbuildExportCall(
 
 function collectFromEsbuildReExportCall(
   path: NodePath<CallExpression>,
-  state: IState
+  state: ILocalState
 ) {
   const [sourceExports, requireCall, exports] = path.get('arguments');
   if (!sourceExports.isIdentifier({ name: 'source_exports' })) return;
@@ -1190,7 +1200,7 @@ function collectFromEsbuildReExportCall(
 
 function collectFromSwcExportCall(
   path: NodePath<CallExpression>,
-  state: IState
+  state: ILocalState
 ) {
   const [exports, map] = path.get('arguments');
   if (!isExports(exports)) return;
@@ -1203,7 +1213,7 @@ function collectFromSwcExportCall(
 
 function collectFromCallExpression(
   path: NodePath<CallExpression>,
-  state: IState
+  state: ILocalState
 ) {
   const maybeExportStart = path.get('callee');
   if (!maybeExportStart.isIdentifier()) {
@@ -1237,22 +1247,25 @@ function collectFromCallExpression(
   }
 }
 
+const cache = new WeakMap<NodePath, IState>();
+
 export function collectExportsAndImports(
-  path: NodePath,
+  path: NodePath<Program>,
   force = false
 ): IState {
-  const state: IState = {
+  if (!force && cache.has(path)) {
+    return cache.get(path)!;
+  }
+
+  const localState: ILocalState = {
     deadExports: [],
     exportRefs: new Map(),
     exports: {},
     imports: [],
     reexports: [],
-    isEsModule: false,
+    isEsModule: path.node.sourceType === 'module',
+    processedRequires: new WeakSet(),
   };
-
-  if (!force && cache.has(path)) {
-    return cache.get(path) ?? state;
-  }
 
   path.traverse(
     {
@@ -1266,8 +1279,10 @@ export function collectExportsAndImports(
       Identifier: collectFromRequireOrExports,
       VariableDeclarator: collectFromVariableDeclarator,
     },
-    state
+    localState
   );
+
+  const { processedRequires, ...state } = localState;
 
   cache.set(path, state);
 

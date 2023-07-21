@@ -360,6 +360,30 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker deadImportsRemover should fail because deadImportsRemover is disabled 1`] = `
+"(0 , _runNearFramePaint.runNearFramePaint) is not a function in
+| /Users/anber/Sources/linaria/packages/testkit/src/source.js
+"
+`;
+
+exports[`strategy shaker deadImportsRemover should shake out side effect because its definition uses DOM API 1`] = `
+"import { runNearFramePaint } from \\"./__fixtures__/runNearFramePaint\\";
+runNearFramePaint(() => {
+  // Do something
+});
+export const text = \\"text_t13jq05\\";"
+`;
+
+exports[`strategy shaker deadImportsRemover should shake out side effect because its definition uses DOM API 2`] = `
+
+CSS:
+
+.text_t13jq05 {}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker derives display name from filename 1`] = `
 "import { styled } from '@linaria/react';
 export default /*#__PURE__*/styled('h1')({
@@ -1863,6 +1887,27 @@ CSS:
 }
 
 Dependencies: NA
+
+`;
+
+exports[`strategy shaker respects module-resolver and import plugins 1`] = `
+"import { styled } from '@linaria/react';
+export const H1 = /*#__PURE__*/styled('h1')({
+  name: \\"H1\\",
+  class: \\"H1_hlxjig5\\",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker respects module-resolver and import plugins 2`] = `
+
+CSS:
+
+.H1_hlxjig5 {
+  color: Foo;
+}
+
+Dependencies: lodash/capitalize, ../re-exports
 
 `;
 

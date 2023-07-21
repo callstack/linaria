@@ -1,8 +1,9 @@
-import type { TransformOptions } from '@babel/core';
+import type { TransformOptions, BabelFile } from '@babel/core';
 import type { File } from '@babel/types';
 
 import type { IVariableContext } from '../IVariableContext';
 import type { Core } from '../babel';
+import type { LinariaMetadata, IMetadata } from '../types';
 
 export type ClassNameSlugVars = {
   dir: string;
@@ -23,22 +24,23 @@ export type VariableNameFn = (context: IVariableContext) => string;
 
 export type EvaluatorConfig = {
   deadImports: { from: string; what: string }[];
+  features: StrictOptions['features'];
+  highPriorityPlugins: string[];
   onlyExports: string[];
+  preeval: ({ types: t }: Core, file: BabelFile) => LinariaMetadata | undefined;
 };
 
 export type Evaluator = (
-  filename: string,
-  pluginOptions: StrictOptions,
-  code: string | [ast: File, text: string],
-  config: EvaluatorConfig | string[] | null,
-  babel: Core
-) => [
+  babelOptions: TransformOptions,
   ast: File,
   code: string,
-  imports: Map<string, string[]> | null,
-  exports?: string[] | null,
-  deadExports?: string[]
-];
+  config: EvaluatorConfig,
+  babel: Core
+) => {
+  ast: File;
+  code: string;
+  metadata: IMetadata;
+};
 
 export type EvalRule = {
   action: Evaluator | 'ignore' | string;
@@ -47,13 +49,15 @@ export type EvalRule = {
 };
 
 export type FeatureFlag = boolean | string | string[];
+type Features = 'dangerousCodeRemover' | 'deadImportsRemover';
 
 export type FeatureFlags = {
-  dangerousCodeRemover: FeatureFlag;
+  [key in Features]?: FeatureFlag;
 };
 
 export type StrictOptions = {
   babelOptions: TransformOptions;
+  highPriorityPlugins: string[];
   classNameSlug?: string | ClassNameFn;
   displayName: boolean;
   evaluate: boolean;
