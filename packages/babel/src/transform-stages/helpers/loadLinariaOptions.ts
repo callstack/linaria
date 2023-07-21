@@ -9,7 +9,24 @@ export type PluginOptions = StrictOptions & {
   stage?: Stage;
 };
 
-const explorerSync = cosmiconfigSync('linaria');
+const searchPlaces = [
+  `.linariarc`,
+  `.linariarc.json`,
+  `.linariarc.yaml`,
+  `.linariarc.yml`,
+  `.linariarc.js`,
+  `.linariarc.cjs`,
+  `.config/linariarc`,
+  `.config/linariarc.json`,
+  `.config/linariarc.yaml`,
+  `.config/linariarc.yml`,
+  `.config/linariarc.js`,
+  `.config/linariarc.cjs`,
+  `linaria.config.js`,
+  `linaria.config.cjs`,
+];
+
+const explorerSync = cosmiconfigSync('linaria', { searchPlaces });
 
 const cache = new WeakMap<Partial<PluginOptions>, StrictOptions>();
 const defaultOverrides = {};
@@ -32,17 +49,7 @@ export default function loadLinariaOptions(
   const options = {
     displayName: false,
     evaluate: true,
-    extensions: [
-      '.cjs',
-      '.cts',
-      '.json',
-      '.js',
-      '.jsx',
-      '.mjs',
-      '.mts',
-      '.ts',
-      '.tsx',
-    ],
+    extensions: ['.cjs', '.cts', '.js', '.jsx', '.mjs', '.mts', '.ts', '.tsx'],
     rules: rules ?? [
       {
         action: require.resolve('@linaria/shaker'),

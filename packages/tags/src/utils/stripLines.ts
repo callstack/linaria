@@ -1,4 +1,4 @@
-import type { Location } from '../types';
+import type { Location } from '@linaria/utils';
 
 // Stripping away the new lines ensures that we preserve line numbers
 // This is useful in case of tools such as the stylelint pre-processor

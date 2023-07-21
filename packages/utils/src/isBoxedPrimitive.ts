@@ -2,7 +2,7 @@
 // so we cannot just use `instanceof` here
 
 const constructors = ['Number', 'String'];
-export default function isBoxedPrimitive(o: unknown): o is number | string {
+export function isBoxedPrimitive(o: unknown): o is number | string {
   if (typeof o !== 'object' || o === null) return false;
   return (
     constructors.includes(o.constructor.name) &&

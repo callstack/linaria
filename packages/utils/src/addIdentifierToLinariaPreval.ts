@@ -1,5 +1,6 @@
 import type { NodePath, Scope } from '@babel/traverse';
 import type {
+  ExportNamedDeclaration,
   ExpressionStatement,
   Identifier,
   ObjectExpression,
@@ -10,34 +11,66 @@ import type {
 import { createId } from './createId';
 import { reference } from './scopeHelpers';
 
-function getOrAddLinariaPreval(scope: Scope): NodePath<ObjectExpression> {
+export function getOrAddLinariaPreval(
+  scope: Scope
+): NodePath<ObjectExpression> {
   const rootScope = scope.getProgramParent();
   let object = rootScope.getData('__linariaPreval');
   if (object) {
     return object;
   }
 
-  const prevalExport: ExpressionStatement = {
-    type: 'ExpressionStatement',
-    expression: {
-      type: 'AssignmentExpression',
-      operator: '=',
-      left: {
-        type: 'MemberExpression',
-        object: createId('exports'),
-        property: createId('__linariaPreval'),
-        computed: false,
-      },
-      right: {
-        type: 'ObjectExpression',
-        properties: [],
-      },
-    },
-  };
-
   const programPath = rootScope.path as NodePath<Program>;
-  const [inserted] = programPath.pushContainer('body', [prevalExport]);
-  object = inserted.get('expression.right') as NodePath<ObjectExpression>;
+
+  if (programPath.node.sourceType === 'script') {
+    // CJS exports.__linariaPreval = {};
+    const prevalExport: ExpressionStatement = {
+      expression: {
+        type: 'AssignmentExpression',
+        operator: '=',
+        left: {
+          computed: false,
+          object: createId('exports'),
+          property: createId('__linariaPreval'),
+          type: 'MemberExpression',
+        },
+        right: {
+          properties: [],
+          type: 'ObjectExpression',
+        },
+      },
+      type: 'ExpressionStatement',
+    };
+
+    const [inserted] = programPath.pushContainer('body', [prevalExport]);
+    object = inserted.get('expression.right') as NodePath<ObjectExpression>;
+  } else {
+    // ESM export const __linariaPreval = {};
+    const prevalExport: ExportNamedDeclaration = {
+      declaration: {
+        declarations: [
+          {
+            id: createId('__linariaPreval'),
+            init: {
+              properties: [],
+              type: 'ObjectExpression',
+            },
+            type: 'VariableDeclarator',
+          },
+        ],
+        kind: 'const',
+        type: 'VariableDeclaration',
+      },
+      specifiers: [],
+      type: 'ExportNamedDeclaration',
+    };
+
+    const [inserted] = programPath.pushContainer('body', [prevalExport]);
+    object = inserted.get(
+      'declaration.declarations.0.init'
+    ) as NodePath<ObjectExpression>;
+  }
+
   rootScope.setData('__linariaPreval', object);
   return object;
 }

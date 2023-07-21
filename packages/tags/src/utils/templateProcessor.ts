@@ -6,17 +6,13 @@
 
 import type { TemplateElement, SourceLocation } from '@babel/types';
 
+import type { ExpressionValue, Replacements } from '@linaria/utils';
+import { hasMeta, ValueType } from '@linaria/utils';
+
 import type TaggedTemplateProcessor from '../TaggedTemplateProcessor';
-import type {
-  ExpressionValue,
-  ValueCache,
-  Rules,
-  Replacements,
-} from '../types';
-import { ValueType } from '../types';
+import type { ValueCache, Rules } from '../types';
 
 import { getVariableName } from './getVariableName';
-import hasMeta from './hasMeta';
 import stripLines from './stripLines';
 import throwIfInvalid from './throwIfInvalid';
 import toCSS, { isCSSable } from './toCSS';

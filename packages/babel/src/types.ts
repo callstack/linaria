@@ -4,8 +4,11 @@ import type { File } from '@babel/types';
 import type { RawSourceMap } from 'source-map';
 
 import type { BaseProcessor } from '@linaria/tags';
+import type { LinariaMetadata, Replacement, Rules } from '@linaria/utils';
 
 import type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
+
+export type { Value, ValueCache } from '@linaria/tags';
 
 export type {
   ExpressionValue,
@@ -15,31 +18,11 @@ export type {
   JSONValue,
   LazyValue,
   Serializable,
-  Value,
-  ValueCache,
-} from '@linaria/tags';
+} from '@linaria/utils';
 
-export { ValueType } from '@linaria/tags';
-
-export interface ICSSRule {
-  className: string;
-  displayName: string;
-  cssText: string;
-  start: Location | null | undefined;
-  atom?: boolean;
-}
-
-export type Rules = Record<string, ICSSRule>;
+export { ValueType } from '@linaria/utils';
 
 export type Dependencies = string[];
-
-export type LinariaMetadata = {
-  processors: BaseProcessor[];
-
-  rules: Rules;
-  replacements: Replacement[];
-  dependencies: string[];
-};
 
 export interface IPluginState extends PluginPass {
   processors: BaseProcessor[];
@@ -57,16 +40,6 @@ export interface ITransformFileResult {
 }
 
 export type Stage = 'preeval' | 'collect';
-
-export type Location = {
-  line: number;
-  column: number;
-};
-
-export type Replacement = {
-  original: { start: Location; end: Location };
-  length: number;
-};
 
 export type Result = {
   code: string;

@@ -1,5 +1,5 @@
 /**
- * File defines babel prest for Linaria.
+ * File defines babel preset for Linaria.
  * It uses ./extract function that is an entry point for styles extraction.
  * It also bypass babel options defined in Linaria config file with it's defaults (see ./utils/loadOptions).
  */
@@ -14,8 +14,6 @@ import loadLinariaOptions from './transform-stages/helpers/loadLinariaOptions';
 export { slugify } from '@linaria/utils';
 
 export { default as preeval } from './plugins/preeval';
-export * from './utils/collectTemplateDependencies';
-export { default as collectTemplateDependencies } from './utils/collectTemplateDependencies';
 export { default as withLinariaMetadata } from './utils/withLinariaMetadata';
 export { default as Module, DefaultModuleImplementation } from './module';
 export { default as transform } from './transform';

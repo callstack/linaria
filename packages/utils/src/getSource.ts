@@ -1,7 +1,7 @@
 import generator from '@babel/generator';
 import type { NodePath } from '@babel/traverse';
 
-const getSource = (path: NodePath, force = false): string => {
+export const getSource = (path: NodePath, force = false): string => {
   if (path.isIdentifier()) {
     // Fast-lane for identifiers
     return path.node.name;
@@ -17,5 +17,3 @@ const getSource = (path: NodePath, force = false): string => {
 
   return path.node.extra?.parenthesized ? `(${source})` : source;
 };
-
-export default getSource;
