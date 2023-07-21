@@ -1,8 +1,7 @@
-import type { Serializable } from '../types';
+import { isBoxedPrimitive } from './isBoxedPrimitive';
+import type { Serializable } from './types';
 
-import isBoxedPrimitive from './isBoxedPrimitive';
-
-export default function isSerializable(o: unknown): o is Serializable {
+export function isSerializable(o: unknown): o is Serializable {
   if (Array.isArray(o)) {
     return o.every(isSerializable);
   }

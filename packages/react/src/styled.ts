@@ -10,7 +10,7 @@ import React from 'react';
 
 import { cx } from '@linaria/core';
 import type { CSSProperties } from '@linaria/core';
-import type { StyledMeta } from '@linaria/tags';
+import type { StyledMeta } from '@linaria/utils';
 
 export type NoInfer<A> = [A][A extends any ? 0 : never];
 

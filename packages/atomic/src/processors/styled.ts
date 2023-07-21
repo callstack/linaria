@@ -3,8 +3,8 @@ import type { SourceLocation } from '@babel/types';
 import { debug } from '@linaria/logger';
 import type { IProps } from '@linaria/react/processors/styled';
 import StyledProcessor from '@linaria/react/processors/styled';
-import { hasMeta } from '@linaria/tags';
 import type { Rules, ValueCache } from '@linaria/tags';
+import { hasMeta } from '@linaria/utils';
 
 import atomize from './helpers/atomize';
 

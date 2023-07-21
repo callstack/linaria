@@ -1,4 +1,4 @@
-import type { StyledMeta } from '@linaria/tags';
+import type { StyledMeta } from '@linaria/utils';
 
 import type { CSSProperties } from './CSSProperties';
 import type { LinariaClassName } from './cx';

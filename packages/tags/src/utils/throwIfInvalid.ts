@@ -1,4 +1,4 @@
-import type { BuildCodeFrameErrorFn } from '../types';
+import type { BuildCodeFrameErrorFn } from '@linaria/utils';
 
 const isLikeError = (value: unknown): value is Error =>
   typeof value === 'object' &&

@@ -20,14 +20,12 @@ import type {
 } from '@linaria/tags';
 import {
   buildSlug,
-  hasMeta,
   TaggedTemplateProcessor,
   validateParams,
-  ValueType,
   toValidCSSIdentifier,
 } from '@linaria/tags';
 import type { IVariableContext } from '@linaria/utils';
-import { findPackageJSON, slugify } from '@linaria/utils';
+import { findPackageJSON, hasMeta, slugify, ValueType } from '@linaria/utils';
 
 const isNotNull = <T>(x: T | null): x is T => x !== null;
 

@@ -1,4 +1,4 @@
-import type { LinariaMetadata } from '../types';
+import type { LinariaMetadata } from '@linaria/utils';
 
 const withLinariaMetadata = (
   value: unknown

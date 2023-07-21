@@ -1123,7 +1123,7 @@ function collectFromCallExpression(
   }
 }
 
-export default function collectExportsAndImports(
+export function collectExportsAndImports(
   path: NodePath,
   force = false
 ): IState {

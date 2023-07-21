@@ -8,16 +8,11 @@ import type {
   MemberExpression,
 } from '@babel/types';
 
-import type {
-  ExpressionValue,
-  IInterpolation,
-  Params,
-  Value,
-  ValueCache,
-  Artifact,
-} from './types';
+import type { Artifact, ExpressionValue } from '@linaria/utils';
+import { hasMeta } from '@linaria/utils';
+
+import type { IInterpolation, Params, Value, ValueCache } from './types';
 import getClassNameAndSlug from './utils/getClassNameAndSlug';
-import hasMeta from './utils/hasMeta';
 import { isCSSable } from './utils/toCSS';
 import type { IFileContext, IOptions } from './utils/types';
 import { validateParams } from './utils/validateParams';
@@ -34,7 +29,7 @@ export type TagSource = {
   source: string;
 };
 
-export default abstract class BaseProcessor {
+export abstract class BaseProcessor {
   public static SKIP = Symbol('skip');
 
   public readonly artifacts: Artifact[] = [];

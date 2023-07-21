@@ -1,6 +1,7 @@
+import { isBoxedPrimitive } from '@linaria/utils';
+
 import type { CSSPropertyValue, CSSable } from '../types';
 
-import isBoxedPrimitive from './isBoxedPrimitive';
 import { unitless } from './units';
 
 const isCSSPropertyValue = (o: unknown): o is CSSPropertyValue => {

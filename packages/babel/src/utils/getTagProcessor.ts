@@ -9,29 +9,22 @@ import type {
   SourceLocation,
   Identifier,
   MemberExpression,
+  Program,
 } from '@babel/types';
 
 import { BaseProcessor } from '@linaria/tags';
-import type {
-  Param,
-  Params,
-  IFileContext,
-  ExpressionValue,
-  TagSource,
-} from '@linaria/tags';
-import type { IImport, StrictOptions } from '@linaria/utils';
+import type { Param, Params, IFileContext, TagSource } from '@linaria/tags';
+import type { ExpressionValue, IImport, StrictOptions } from '@linaria/utils';
 import {
   collectExportsAndImports,
+  collectTemplateDependencies,
   explicitImport,
+  extractExpression,
   findPackageJSON,
+  getSource,
   isNotNull,
   mutate,
 } from '@linaria/utils';
-
-import collectTemplateDependencies, {
-  extractExpression,
-} from './collectTemplateDependencies';
-import getSource from './getSource';
 
 type BuilderArgs = ConstructorParameters<typeof BaseProcessor> extends [
   Params,
@@ -337,7 +330,7 @@ function getBuilderForIdentifier(
 function getDisplayName(
   path: NodePath<Identifier>,
   idx: number,
-  fileContext: IFileContext
+  filename?: string | null
 ): string {
   let displayName: string | undefined;
 
@@ -372,11 +365,10 @@ function getDisplayName(
   }
 
   if (!displayName) {
-    const filename = fileContext.filename ?? 'unknown';
     // Try to derive the path from the filename
-    displayName = basename(filename);
+    displayName = basename(filename ?? 'unknown');
 
-    if (/^index\.[a-z\d]+$/.test(displayName)) {
+    if (filename && /^index\.[a-z\d]+$/.test(displayName)) {
       // If the file name is 'index', better to get name from parent folder
       displayName = basename(dirname(filename));
     }
@@ -446,7 +438,7 @@ export default function getTagProcessor(
   >
 ): BaseProcessor | null {
   if (!cache.has(path.node)) {
-    const root = path.scope.getProgramParent().path;
+    const root = path.scope.getProgramParent().path as NodePath<Program>;
     const { imports } = collectExportsAndImports(root);
     try {
       const builder = getBuilderForIdentifier(
@@ -461,7 +453,7 @@ export default function getTagProcessor(
         // Also used for display name if it couldn't be determined
         const idx = getNextIndex(fileContext);
 
-        const displayName = getDisplayName(path, idx, fileContext);
+        const displayName = getDisplayName(path, idx, fileContext.filename);
 
         const processor = builder(
           displayName,

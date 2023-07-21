@@ -21,21 +21,21 @@ import type {
 import { cloneNode } from '@babel/types';
 
 import { debug } from '@linaria/logger';
-import type { ConstValue, FunctionValue, LazyValue } from '@linaria/tags';
-import { hasMeta } from '@linaria/tags';
-import type { IImport } from '@linaria/utils';
-import {
-  createId,
-  findIdentifiers,
-  mutate,
-  referenceAll,
-} from '@linaria/utils';
 
-import type { ExpressionValue } from '../types';
-import { ValueType } from '../types';
-
-import getSource from './getSource';
-import valueToLiteral from './vlueToLiteral';
+import type { IImport } from './collectExportsAndImports';
+import { createId } from './createId';
+import findIdentifiers from './findIdentifiers';
+import { getSource } from './getSource';
+import { hasMeta } from './hasMeta';
+import { mutate, referenceAll } from './scopeHelpers';
+import type {
+  ConstValue,
+  ExpressionValue,
+  FunctionValue,
+  LazyValue,
+} from './types';
+import { ValueType } from './types';
+import { valueToLiteral } from './valueToLiteral';
 
 function staticEval(
   ex: NodePath<Expression>,
@@ -274,7 +274,7 @@ export function extractExpression(
  * Collects, hoists, and makes lazy all expressions in the given template
  * If evaluate is true, it will try to evaluate the expressions
  */
-export default function collectTemplateDependencies(
+export function collectTemplateDependencies(
   path: NodePath<TaggedTemplateExpression>,
   evaluate = false
 ): [quasis: TemplateElement[], expressionValues: ExpressionValue[]] {

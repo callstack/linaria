@@ -4,9 +4,11 @@ import type { Mapping } from 'source-map';
 import { SourceMapGenerator } from 'source-map';
 import stylis from 'stylis';
 
-import type { BaseProcessor, Replacements } from '@linaria/tags';
+import type { Rules } from '@linaria/tags';
+import type { Replacements } from '@linaria/utils';
+import type { Artifact } from '@linaria/utils/types/types';
 
-import type { Rules, Options, PreprocessorFn } from '../types';
+import type { Options, PreprocessorFn } from '../types';
 
 const STYLIS_DECLARATION = 1;
 const posixSep = path.posix.sep;
@@ -118,7 +120,9 @@ function extractCssFromAst(
  * Extract artifacts (e.g. CSS) from processors
  */
 export default function extractStage(
-  processors: BaseProcessor[],
+  processors: {
+    artifacts: Artifact[];
+  }[],
   originalCode: string,
   options: Options
 ) {
