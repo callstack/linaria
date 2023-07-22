@@ -10,6 +10,8 @@
 import type { TransformOptions } from '@babel/core';
 import * as babel from '@babel/core';
 
+import type { StrictOptions } from '@linaria/utils';
+
 import { TransformCacheCollection } from './cache';
 import prepareForEval, {
   prepareForEvalSync,
@@ -17,12 +19,17 @@ import prepareForEval, {
 import evalStage from './transform-stages/2-eval';
 import prepareForRuntime from './transform-stages/3-prepare-for-runtime';
 import extractStage from './transform-stages/4-extract';
+import loadLinariaOptions from './transform-stages/helpers/loadLinariaOptions';
 import type { Options, Result, ITransformFileResult } from './types';
 import withLinariaMetadata from './utils/withLinariaMetadata';
 
 function syncStages(
   originalCode: string,
-  options: Options,
+  pluginOptions: StrictOptions,
+  options: Pick<
+    Options,
+    'filename' | 'inputSourceMap' | 'root' | 'preprocessor' | 'outputFilename'
+  >,
   prepareStageResult: ITransformFileResult | undefined,
   babelConfig: TransformOptions,
   cache: TransformCacheCollection,
@@ -47,7 +54,12 @@ function syncStages(
 
   eventEmitter?.({ type: 'transform:stage-2:start', filename });
 
-  const evalStageResult = evalStage(cache, prepareStageResult.code, options);
+  const evalStageResult = evalStage(
+    cache,
+    prepareStageResult.code,
+    pluginOptions,
+    filename
+  );
 
   eventEmitter?.({ type: 'transform:stage-2:finish', filename });
 
@@ -69,6 +81,7 @@ function syncStages(
     ast,
     originalCode,
     valueCache,
+    pluginOptions,
     options,
     babelConfig
   );
@@ -125,11 +138,13 @@ export function transformSync(
     only: ['__linariaPreval'],
   };
 
+  const pluginOptions = loadLinariaOptions(options.pluginOptions);
   const prepareStageResults = prepareForEvalSync(
     babel,
     cache,
     syncResolve,
     entrypoint,
+    pluginOptions,
     options
   );
 
@@ -139,6 +154,7 @@ export function transformSync(
 
   return syncStages(
     originalCode,
+    pluginOptions,
     options,
     prepareStageResults,
     babelConfig,
@@ -175,11 +191,13 @@ export default async function transform(
     only: ['__linariaPreval'],
   };
 
+  const pluginOptions = loadLinariaOptions(options.pluginOptions);
   const prepareStageResults = await prepareForEval(
     babel,
     cache,
     asyncResolve,
     entrypoint,
+    pluginOptions,
     options
   );
 
@@ -189,6 +207,7 @@ export default async function transform(
 
   return syncStages(
     originalCode,
+    pluginOptions,
     options,
     prepareStageResults,
     babelConfig,

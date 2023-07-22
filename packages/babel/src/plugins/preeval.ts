@@ -15,7 +15,7 @@ import {
 
 import type { Core } from '../babel';
 import type { IPluginState } from '../types';
-import processTemplateExpression from '../utils/processTemplateExpression';
+import { processTemplateExpression } from '../utils/processTemplateExpression';
 
 export type PreevalOptions = Pick<
   StrictOptions,

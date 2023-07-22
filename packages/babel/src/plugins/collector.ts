@@ -5,14 +5,15 @@
 
 import type { BabelFile, PluginObj } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
+import type { Identifier } from '@babel/types';
 
 import { debug } from '@linaria/logger';
-import type { StrictOptions } from '@linaria/utils';
+import type { StrictOptions, LinariaMetadata } from '@linaria/utils';
 import { removeWithRelated } from '@linaria/utils';
 
 import type { Core } from '../babel';
 import type { IPluginState, ValueCache } from '../types';
-import processTemplateExpression from '../utils/processTemplateExpression';
+import { processTemplateExpression } from '../utils/processTemplateExpression';
 
 export default function collector(
   babel: Core,
@@ -24,29 +25,31 @@ export default function collector(
     pre(file: BabelFile) {
       debug('collect:start', file.opts.filename);
 
-      this.processors = [];
+      const processors: LinariaMetadata['processors'] = [];
 
+      const identifiers: NodePath<Identifier>[] = [];
       file.path.traverse({
-        // TODO: process transformed literals
         Identifier: (p) => {
-          processTemplateExpression(p, file.opts, options, (processor) => {
-            processor.build(values);
-
-            processor.doRuntimeReplacement();
-            this.processors.push(processor);
-          });
+          identifiers.push(p);
         },
       });
-    },
-    visitor: {},
-    post(file: BabelFile) {
-      if (this.processors.length === 0) {
+
+      // TODO: process transformed literals
+      identifiers.forEach((p) => {
+        processTemplateExpression(p, file.opts, options, (processor) => {
+          processor.build(values);
+          processor.doRuntimeReplacement();
+          processors.push(processor);
+        });
+      });
+
+      if (processors.length === 0) {
         // We didn't find any Linaria template literals.
         return;
       }
 
       this.file.metadata.linaria = {
-        processors: this.processors,
+        processors,
         replacements: [],
         rules: {},
         dependencies: [],
@@ -62,5 +65,6 @@ export default function collector(
 
       debug('collect:end', file.opts.filename);
     },
+    visitor: {},
   };
 }

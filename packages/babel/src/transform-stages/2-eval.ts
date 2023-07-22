@@ -1,10 +1,10 @@
 import { createCustomDebug } from '@linaria/logger';
 import type { ValueCache } from '@linaria/tags';
+import type { StrictOptions } from '@linaria/utils';
 import { getFileIdx } from '@linaria/utils';
 
 import type { TransformCacheCollection } from '../cache';
 import evaluate from '../evaluators';
-import type { Options } from '../types';
 import hasLinariaPreval from '../utils/hasLinariaPreval';
 
 const wrap = <T>(fn: () => T): T | Error => {
@@ -21,13 +21,14 @@ const wrap = <T>(fn: () => T): T | Error => {
 export default function evalStage(
   cache: TransformCacheCollection,
   code: string,
-  options: Pick<Options, 'filename' | 'pluginOptions'>
+  pluginOptions: StrictOptions,
+  filename: string
 ): [ValueCache, string[]] | null {
-  const log = createCustomDebug('transform', getFileIdx(options.filename));
+  const log = createCustomDebug('transform', getFileIdx(filename));
 
   log('stage-2', `>> evaluate __linariaPreval`);
 
-  const evaluated = evaluate(cache, code, options);
+  const evaluated = evaluate(cache, code, pluginOptions, filename);
 
   const linariaPreval = hasLinariaPreval(evaluated.value)
     ? evaluated.value.__linariaPreval

@@ -23,7 +23,7 @@ export class TransformCacheCollection {
       }
     > = new Map(),
     public readonly evalCache: Map<string, Module> = new Map(),
-    public readonly originalASTCache: Map<string, File | 'ignored'> = new Map()
+    public readonly originalASTCache: Map<string, File> = new Map()
   ) {}
 
   public invalidateForFile(filename: string) {
