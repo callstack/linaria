@@ -6,18 +6,17 @@
 
 import type { TemplateElement, SourceLocation } from '@babel/types';
 
-import type TaggedTemplateProcessor from '../TaggedTemplateProcessor';
-import type {
-  ExpressionValue,
-  ValueCache,
-  Rules,
-  Replacements,
-} from '../types';
+import type { ExpressionValue, Replacements } from '@linaria/utils';
+import { hasMeta, ValueType } from '@linaria/utils';
 
-import hasMeta from './hasMeta';
+import type TaggedTemplateProcessor from '../TaggedTemplateProcessor';
+import type { ValueCache, Rules } from '../types';
+
+import { getVariableName } from './getVariableName';
 import stripLines from './stripLines';
 import throwIfInvalid from './throwIfInvalid';
 import toCSS, { isCSSable } from './toCSS';
+import type { IOptions } from './types';
 import { units } from './units';
 
 // Match any valid CSS units followed by a separator such as ;, newline etc.
@@ -26,10 +25,10 @@ const unitRegex = new RegExp(`^(?:${units.join('|')})\\b`);
 export default function templateProcessor(
   tagProcessor: TaggedTemplateProcessor,
   [...template]: (TemplateElement | ExpressionValue)[],
-  valueCache: ValueCache
+  valueCache: ValueCache,
+  variableNameConfig: IOptions['variableNameConfig'] | undefined
 ): [rules: Rules, sourceMapReplacements: Replacements] | null {
   const sourceMapReplacements: Replacements = [];
-
   // Check if the variable is referenced anywhere for basic DCE
   // Only works when it's assigned to a variable
   const { isReferenced } = tagProcessor;
@@ -69,39 +68,8 @@ export default function templateProcessor(
 
     const value = 'value' in item ? item.value : valueCache.get(item.ex.name);
 
-    throwIfInvalid(
-      tagProcessor.isValidValue.bind(tagProcessor),
-      value,
-      item,
-      item.source
-    );
-
-    if (value !== undefined && typeof value !== 'function') {
-      // Skip the blank string instead of throw ing an error
-      if (value === '') {
-        continue;
-      }
-
-      if (hasMeta(value)) {
-        // If it's a React component wrapped in styled, get the class name
-        // Useful for interpolating components
-        cssText += `.${value.__linaria.className}`;
-      } else if (isCSSable(value)) {
-        // If it's a plain object or an array, convert it to a CSS string
-        cssText += stripLines(loc, toCSS(value));
-      } else {
-        // For anything else, assume it'll be stringified
-        cssText += stripLines(loc, value);
-      }
-
-      sourceMapReplacements.push({
-        original: loc,
-        length: cssText.length - beforeLength,
-      });
-    }
-
     // Is it props based interpolation?
-    if (typeof value === 'function') {
+    if (item.kind === ValueType.FUNCTION || typeof value === 'function') {
       // Check if previous expression was a CSS variable that we replaced
       // If it has a unit after it, we need to move the unit into the interpolation
       // e.g. `var(--size)px` should actually be `var(--size)`
@@ -121,7 +89,7 @@ export default function templateProcessor(
             item.source,
             unit
           );
-          cssText += `var(--${varId})`;
+          cssText += getVariableName(varId, variableNameConfig);
 
           cssText += next.value.cooked?.substring(unit?.length ?? 0) ?? '';
         } else {
@@ -130,7 +98,7 @@ export default function templateProcessor(
             cssText,
             item.source
           );
-          cssText += `var(--${varId})`;
+          cssText += getVariableName(varId, variableNameConfig);
         }
       } catch (e) {
         if (e instanceof Error) {
@@ -138,6 +106,37 @@ export default function templateProcessor(
         }
 
         throw e;
+      }
+    } else {
+      throwIfInvalid(
+        tagProcessor.isValidValue.bind(tagProcessor),
+        value,
+        item,
+        item.source
+      );
+
+      if (value !== undefined && typeof value !== 'function') {
+        // Skip the blank string instead of throw ing an error
+        if (value === '') {
+          continue;
+        }
+
+        if (hasMeta(value)) {
+          // If it's a React component wrapped in styled, get the class name
+          // Useful for interpolating components
+          cssText += `.${value.__linaria.className}`;
+        } else if (isCSSable(value)) {
+          // If it's a plain object or an array, convert it to a CSS string
+          cssText += stripLines(loc, toCSS(value));
+        } else {
+          // For anything else, assume it'll be stringified
+          cssText += stripLines(loc, value);
+        }
+
+        sourceMapReplacements.push({
+          original: loc,
+          length: cssText.length - beforeLength,
+        });
       }
     }
   }

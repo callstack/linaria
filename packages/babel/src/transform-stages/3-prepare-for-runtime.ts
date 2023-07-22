@@ -3,13 +3,13 @@ import type {
   PluginItem,
   TransformOptions,
 } from '@babel/core';
+import type { File } from '@babel/types';
 
-import { buildOptions, loadBabelOptions } from '@linaria/utils';
+import { buildOptions } from '@linaria/utils';
 
 import type { Core } from '../babel';
 import type { Options, ValueCache } from '../types';
 
-import cachedParseSync from './helpers/cachedParseSync';
 import loadLinariaOptions from './helpers/loadLinariaOptions';
 
 /**
@@ -18,20 +18,13 @@ import loadLinariaOptions from './helpers/loadLinariaOptions';
  */
 export default function prepareForRuntime(
   babel: Core,
+  ast: File,
   code: string,
   valueCache: ValueCache,
   options: Options,
   babelConfig: TransformOptions
 ): BabelFileResult {
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
-  const babelOptions = loadBabelOptions(
-    babel,
-    options.filename,
-    pluginOptions?.babelOptions
-  );
-
-  const file = cachedParseSync(babel, code, babelOptions);
-
   const transformPlugins: PluginItem[] = [
     [
       require.resolve('../plugins/collector'),
@@ -52,9 +45,10 @@ export default function prepareForRuntime(
     ast: true,
     babelrc: false,
     configFile: false,
+    sourceType: 'unambiguous',
   });
 
-  const result = babel.transformFromAstSync(file, code, {
+  const result = babel.transformFromAstSync(ast, code, {
     ...transformConfig,
     cwd: babelConfig.cwd,
     filename: babelConfig.filename ?? options.filename,

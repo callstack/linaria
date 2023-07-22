@@ -10,15 +10,14 @@ import { createFilter } from '@rollup/pluginutils';
 import type { FilterPattern } from '@rollup/pluginutils';
 import type { ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 
-import { transform, slugify } from '@linaria/babel-preset';
-import type {
-  PluginOptions,
-  Preprocessor,
-  CodeCache,
-  Module,
+import {
+  transform,
+  slugify,
+  TransformCacheCollection,
 } from '@linaria/babel-preset';
+import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
 import { createCustomDebug } from '@linaria/logger';
-import { getFileIdx } from '@linaria/utils';
+import { getFileIdx, syncResolve } from '@linaria/utils';
 
 type VitePluginOptions = {
   include?: FilterPattern;
@@ -29,6 +28,8 @@ type VitePluginOptions = {
 
 export { Plugin };
 
+const emptyConfig = {};
+
 export default function linaria({
   include,
   exclude,
@@ -38,17 +39,16 @@ export default function linaria({
 }: VitePluginOptions = {}): Plugin {
   const filter = createFilter(include, exclude);
   const cssLookup: { [key: string]: string } = {};
+  const cssFileLookup: { [key: string]: string } = {};
   let config: ResolvedConfig;
   let devServer: ViteDevServer;
 
   // <dependency id, targets>
   const targets: { id: string; dependencies: string[] }[] = [];
-  const codeCache: CodeCache = new Map();
-  const resolveCache = new Map<string, string>();
-  const evalCache = new Map<string, Module>();
-
+  const cache = new TransformCacheCollection();
   return {
     name: 'linaria',
+    enforce: 'post',
     configResolved(resolvedConfig: ResolvedConfig) {
       config = resolvedConfig;
     },
@@ -56,16 +56,14 @@ export default function linaria({
       devServer = _server;
     },
     load(url: string) {
-      const [id] = url.split('?');
+      const [id] = url.split('?', 1);
       return cssLookup[id];
     },
     /* eslint-disable-next-line consistent-return */
     resolveId(importeeUrl: string) {
-      const [id, qsRaw] = importeeUrl.split('?');
-      if (id in cssLookup) {
-        if (qsRaw?.length) return importeeUrl;
-        return id;
-      }
+      const [id] = importeeUrl.split('?', 1);
+      if (cssLookup[id]) return id;
+      return cssFileLookup[id];
     },
     handleHotUpdate(ctx) {
       // it's module, so just transform it
@@ -83,9 +81,9 @@ export default function linaria({
 
       // eslint-disable-next-line no-restricted-syntax
       for (const depId of deps) {
-        codeCache.delete(depId);
-        evalCache.delete(depId);
+        cache.invalidateForFile(depId);
       }
+
       const modules = affected
         .map((target) => devServer.moduleGraph.getModuleById(target.id))
         .concat(ctx.modules)
@@ -94,9 +92,7 @@ export default function linaria({
       return modules;
     },
     async transform(code: string, url: string) {
-      const [id] = url.split('?');
-      // Remove from cache if file has changed
-      codeCache.delete(id);
+      const [id] = url.split('?', 1);
 
       // Do not transform ignored and generated files
       if (url.includes('node_modules') || !filter(url) || id in cssLookup)
@@ -106,12 +102,24 @@ export default function linaria({
 
       log('rollup-init', id);
 
-      const asyncResolve = async (what: string, importer: string) => {
+      const asyncResolve = async (
+        what: string,
+        importer: string,
+        stack: string[]
+      ) => {
         const resolved = await this.resolve(what, importer);
         if (resolved) {
+          if (resolved.external) {
+            // If module is marked as external, Rollup will not resolve it,
+            // so we need to resolve it ourselves with default resolver
+            const resolvedId = syncResolve(what, importer, stack);
+            log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
+            return resolvedId;
+          }
+
           log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
           // Vite adds param like `?v=667939b3` to cached modules
-          const resolvedId = resolved.id.split('?')[0];
+          const resolvedId = resolved.id.split('?', 1)[0];
 
           if (resolvedId.startsWith('\0')) {
             // \0 is a special character in Rollup that tells Rollup to not include this in the bundle
@@ -126,11 +134,6 @@ export default function linaria({
         throw new Error(`Could not resolve ${what}`);
       };
 
-      // TODO: Vite surely has some already transformed modules, solid
-      // why would we transform it again?
-      // We could provide some thing like `pretransform` and ask Vite to return transformed module
-      // (module.transformResult)
-      // So we don't need to duplicate babel plugins.
       const result = await transform(
         code,
         {
@@ -139,10 +142,8 @@ export default function linaria({
           pluginOptions: rest,
         },
         asyncResolve,
-        {},
-        resolveCache,
-        codeCache,
-        evalCache
+        emptyConfig,
+        cache
       );
 
       let { cssText, dependencies } = result;
@@ -152,8 +153,15 @@ export default function linaria({
 
       const slug = slugify(cssText);
 
-      const cssFilename = `${id.replace(/\.[jt]sx?$/, '')}_${slug}.css`;
-      const cssId = `/${path.posix.relative(config.root, cssFilename)}`;
+      const cssFilename = path
+        .normalize(`${id.replace(/\.[jt]sx?$/, '')}_${slug}.css`)
+        .replace(/\\/g, path.posix.sep);
+
+      const cssRelativePath = path
+        .relative(config.root, cssFilename)
+        .replace(/\\/g, path.posix.sep);
+
+      const cssId = `/${cssRelativePath}`;
 
       if (sourceMap && result.cssSourceMapText) {
         const map = Buffer.from(result.cssSourceMapText).toString('base64');
@@ -161,7 +169,7 @@ export default function linaria({
       }
 
       cssLookup[cssFilename] = cssText;
-      cssLookup[cssId] = cssText;
+      cssFileLookup[cssId] = cssFilename;
 
       result.code += `\nimport ${JSON.stringify(cssFilename)};\n`;
       if (devServer?.moduleGraph) {

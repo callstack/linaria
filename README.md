@@ -35,6 +35,8 @@ Zero-runtime CSS in JS library.
 
 **[Why use Linaria](/docs/BENEFITS.md)**
 
+**[Learn how Airbnb improved both developer experience and web performance with Linaria](https://medium.com/airbnb-engineering/airbnbs-trip-to-linaria-dc169230bd12)**
+
 ## Installation
 
 ```sh
@@ -400,6 +402,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <tr>
       <td align="center"><a href="http://platane.github.io"><img src="https://avatars.githubusercontent.com/u/1659820?v=4?s=100" width="100px;" alt="Platane"/><br /><sub><b>Platane</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=Platane" title="Documentation">📖</a></td>
       <td align="center"><a href="https://github.com/kutnickclose"><img src="https://avatars.githubusercontent.com/u/6117662?v=4?s=100" width="100px;" alt="Tim Kutnick"/><br /><sub><b>Tim Kutnick</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=kutnickclose" title="Documentation">📖</a></td>
+      <td align="center"><a href="https://github.com/aspirisen"><img src="https://avatars.githubusercontent.com/u/3620639?v=4?s=100" width="100px;" alt="Dmitrii Pikulin"/><br /><sub><b>Dmitrii Pikulin</b></sub></a><br /><a href="https://github.com/callstack/linaria/commits?author=aspirisen" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

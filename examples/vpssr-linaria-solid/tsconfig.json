@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+       "baseUrl": ".",
+       "target": "ESNext",
+       "module": "ESNext",
+       "jsx": "preserve",
+       "noEmit": true,
+       "allowSyntheticDefaultImports": true,
+       "moduleResolution": "node",
+       // Misc
+       "esModuleInterop": true,
+       "types": [
+          "vite/client"
+       ],
+       "skipDefaultLibCheck": true,
+       "skipLibCheck": true,
+    },
+    "exclude": ["node_modules"]
+ }

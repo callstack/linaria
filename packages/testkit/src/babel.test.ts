@@ -8,7 +8,6 @@ import stripAnsi from 'strip-ansi';
 
 import type { PluginOptions, Stage } from '@linaria/babel-preset';
 import {
-  Module,
   transform as linariaTransform,
   loadLinariaOptions,
 } from '@linaria/babel-preset';
@@ -139,9 +138,6 @@ async function transformFile(filename: string, opts: Options) {
 
 describe('strategy shaker', () => {
   const evaluator = require('@linaria/shaker').default;
-  beforeEach(() => {
-    Module.invalidateEvalCache();
-  });
 
   it('transpiles styled template literal with object', async () => {
     const { code, metadata } = await transform(
@@ -289,6 +285,84 @@ describe('strategy shaker', () => {
             `${context.valueSlug}__${context.componentName}__${
               context.precedingCss.match(/([\w-]+)\s*:\s*$/)?.[1] ?? 'unknown'
             }`,
+        },
+      ]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('handles val in variableNameConfig', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+    import { styled as atomicStyled } from '@linaria/atomic';
+    import { styled } from '@linaria/react';
+
+    export const Title = styled('h1')\`
+      font-size: ${'${props => props.size}px'};
+    \`;
+
+    export const Body = atomicStyled('h1')\`
+      font-size: ${'${props => props.size}px'};
+    \`;
+`,
+      [
+        evaluator,
+        {
+          variableNameConfig: 'var',
+        },
+      ]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('handles dashes in variableNameConfig', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+    import { styled as atomicStyled } from '@linaria/atomic';
+    import { styled } from '@linaria/react';
+
+    export const Title = styled('h1')\`
+      font-size: ${'${props => props.size}px'};
+    \`;
+
+    export const Body = atomicStyled('h1')\`
+      font-size: ${'${props => props.size}px'};
+    \`;
+`,
+      [
+        evaluator,
+        {
+          variableNameConfig: 'dashes',
+        },
+      ]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('handles raw in variableNameConfig', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+    import { styled as atomicStyled } from '@linaria/atomic';
+    import { styled } from '@linaria/react';
+
+    export const Title = styled('h1')\`
+      font-size: ${'${props => props.size}px'};
+    \`;
+
+    export const Body = atomicStyled('h1')\`
+      font-size: ${'${props => props.size}px'};
+    \`;
+`,
+      [
+        evaluator,
+        {
+          variableNameConfig: 'raw',
         },
       ]
     );
@@ -643,6 +717,25 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('handles interpolation in css function followed by unit', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+    import { styled } from '@linaria/atomic';
+
+    const size = 200;
+
+    export const Container = styled.div\`
+      transform: rotate(${'${props => props.$rotateDeg}'}deg);
+      width: ${'${size}'}px;
+    \`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('uses the same custom property for the same identifier', async () => {
     const { code, metadata } = await transform(
       dedent`
@@ -670,6 +763,25 @@ describe('strategy shaker', () => {
     export const Box = styled.div\`
       height: ${'${props => props.size}'}px;
       width: ${'${props => props.size}'}px;
+    \`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('do not include in dependencies expressions from interpolation functions bodies', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+    import { styled } from '@linaria/react';
+    import constant from './broken-dependency-1';
+    import modifier from './broken-dependency-2';
+
+    export const Box = styled.div\`
+      height: ${'${props => props.size + constant}'}px;
+      width: ${'${props => modifier(props.size)}'}px;
     \`;
     `,
       [evaluator]
@@ -2621,6 +2733,151 @@ describe('strategy shaker', () => {
             '& .foo': { ':hover': { color: 'green' } },
           },
         });
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should eval component from a linaria library', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import { Title } from "./__fixtures__/linaria-ui-library/components/index";
+
+      export const StyledTitle = styled(Title)\`\`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should not eval components from a non-linaria library', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import { Title } from "./__fixtures__/non-linaria-ui-library/index";
+
+      export const StyledTitle = styled(Title)\`\`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should not eval non-linaria component from a linaria library', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import { Title } from "./__fixtures__/linaria-ui-library/non-linaria-components";
+
+      export const StyledTitle = styled(Title)\`\`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should eval wrapped component from a linaria library', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import { connect } from "./__fixtures__/linaria-ui-library/hocs";
+      import { Title } from "./__fixtures__/linaria-ui-library/components/index";
+
+      export const StyledTitle = styled(connect(Title))\`\`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should not eval wrapped component from a non-linaria library', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import { connect } from "./__fixtures__/linaria-ui-library/hocs";
+      import { Title } from "./__fixtures__/non-linaria-ui-library/index";
+
+      export const StyledTitle = styled(connect(Title))\`\`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should not import types', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import { Title } from "./__fixtures__/linaria-ui-library/components/index";
+      import { ComponentType } from "./__fixtures__/linaria-ui-library/types";
+
+      const map = new Map<string, ComponentType>()
+        .set('Title', Title);
+
+      const Gate = (props: { type: ComponentType, className: string }) => {
+        const { className, type } = props;
+        const Component = map.get(type);
+        return <Component className={className}/>;
+      };
+
+      export const StyledTitle = styled(Gate)\`\`;
+    `,
+      [evaluator, {}, 'tsx']
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should shake out identifiers that are referenced only in types', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from "@linaria/react";
+      import * as yup from "yup";
+      import { Form } from "./__fixtures__/linaria-ui-library/components/index";
+
+      const validationSchema = yup.object();
+      type IModel = yup.InferType<typeof validationSchema>;
+
+      const Editor = () => {
+        const initial: IModel = {};
+        return <Form schema={validationSchema} data={initial} />;
+      };
+
+      export const StyledEditor = styled(Editor)\`\`;
+    `,
+      [evaluator, {}, 'tsx']
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  xit('should shake out side effect because its definition uses DOM API', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { css } from "@linaria/core";
+        import { runNearFramePaint } from "./__fixtures__/runNearFramePaint";
+
+        runNearFramePaint(() => {
+          // Do something
+        });
+
+        export const text = css\`\`;
       `,
       [evaluator]
     );

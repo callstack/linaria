@@ -1,5 +1,109 @@
 # Change Log
 
+## 4.5.2
+
+### Patch Changes
+
+- 1bf5c5b8: The cache has been improved, which should address the build time issues for Webpack 4/5 and resolve HMR-related problems for Vite. Fixes #1199, #1265 and maybe some more.
+  - @linaria/atomic@4.5.2
+  - @linaria/core@4.5.2
+  - @linaria/react@4.5.2
+
+## 4.5.1
+
+### Patch Changes
+
+- Updated dependencies [ceca1611]
+- Updated dependencies [13258306]
+  - @linaria/react@4.5.1
+  - @linaria/atomic@4.5.1
+  - @linaria/core@4.5.1
+
+## 4.5.0
+
+### Minor Changes
+
+- 16c057df: Breaking Change: Performance Optimization for `styled`
+
+  When a component is wrapped in `styled`, Linaria needs to determine if that component is already a styled component. To accomplish this, the wrapped component is included in the list of variables for evaluation, along with the interpolated values used in styles. The issue arises when a wrapped component, even if it is not styled, brings along a substantial dependency tree. This situation is particularly evident when using `styled` to style components from third-party UI libraries.
+
+  To address this problem, Linaria will now examine the import location of the component and check if there is an annotation in the `package.json` file of the package containing the components. This annotation indicates whether the package includes other Linaria components. If there is no such annotation, Linaria will refrain from evaluating the component.
+
+  Please note that this Breaking Change solely affects developers of component libraries. In order for users to style components from your library, you must include the `linaria.components` property in the library's `package.json` file. This property should have a mask that covers all imported files with components. Here's an example of how to specify it:
+
+  ```json
+  "linaria": {
+    "components": "**/*"
+  }
+  ```
+
+### Patch Changes
+
+- af5bb92d: The end of support for Node.js 14. Migration to pnpm 8.
+- Updated dependencies [16c057df]
+- Updated dependencies [af5bb92d]
+- Updated dependencies [10859924]
+  - @linaria/react@4.5.0
+  - @linaria/atomic@4.5.0
+  - @linaria/core@4.5.0
+  - @linaria/server@4.5.0
+
+## 4.1.16
+
+### Patch Changes
+
+- Updated dependencies [54ab61b2]
+  - @linaria/react@4.3.8
+  - @linaria/atomic@4.2.10
+  - @linaria/core@4.2.10
+
+## 4.1.15
+
+### Patch Changes
+
+- Updated dependencies [1c3f309d]
+- Updated dependencies [34029088]
+  - @linaria/react@4.3.7
+  - @linaria/atomic@4.2.9
+  - @linaria/core@4.2.9
+
+## 4.1.14
+
+### Patch Changes
+
+- Updated dependencies [a3ad617f]
+  - @linaria/react@4.3.6
+  - @linaria/atomic@4.2.8
+  - @linaria/core@4.2.8
+
+## 4.1.13
+
+### Patch Changes
+
+- Updated dependencies [a2b618bc]
+  - @linaria/atomic@4.2.7
+  - @linaria/core@4.2.7
+  - @linaria/react@4.3.5
+
+## 4.1.12
+
+### Patch Changes
+
+- @linaria/atomic@4.2.6
+- @linaria/core@4.2.6
+- @linaria/react@4.3.4
+
+## 4.1.11
+
+### Patch Changes
+
+- Updated dependencies [61fe2560]
+- Updated dependencies [77bcf2e7]
+  - @linaria/atomic@4.2.5
+  - @linaria/server@4.1.0
+  - @linaria/core@4.2.5
+  - @linaria/react@4.3.3
+
 ## 4.1.10
 
 ### Patch Changes

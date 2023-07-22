@@ -1,5 +1,172 @@
 # Change Log
 
+## 4.5.2
+
+### Patch Changes
+
+- Updated dependencies [85e74df6]
+- Updated dependencies [1bf5c5b8]
+  - @linaria/shaker@4.5.1
+  - @linaria/babel-preset@4.5.2
+  - @linaria/rollup@4.5.2
+  - @linaria/webpack4-loader@4.5.2
+  - @linaria/core@4.5.2
+  - @linaria/react@4.5.2
+  - @linaria/stylelint@4.5.2
+
+## 4.5.1
+
+### Patch Changes
+
+- Updated dependencies [ceca1611]
+- Updated dependencies [13258306]
+  - @linaria/babel-preset@4.5.1
+  - @linaria/react@4.5.1
+  - @linaria/rollup@4.5.1
+  - @linaria/stylelint@4.5.1
+  - @linaria/webpack4-loader@4.5.1
+  - @linaria/core@4.5.1
+
+## 4.5.0
+
+### Minor Changes
+
+- 16c057df: Breaking Change: Performance Optimization for `styled`
+
+  When a component is wrapped in `styled`, Linaria needs to determine if that component is already a styled component. To accomplish this, the wrapped component is included in the list of variables for evaluation, along with the interpolated values used in styles. The issue arises when a wrapped component, even if it is not styled, brings along a substantial dependency tree. This situation is particularly evident when using `styled` to style components from third-party UI libraries.
+
+  To address this problem, Linaria will now examine the import location of the component and check if there is an annotation in the `package.json` file of the package containing the components. This annotation indicates whether the package includes other Linaria components. If there is no such annotation, Linaria will refrain from evaluating the component.
+
+  Please note that this Breaking Change solely affects developers of component libraries. In order for users to style components from your library, you must include the `linaria.components` property in the library's `package.json` file. This property should have a mask that covers all imported files with components. Here's an example of how to specify it:
+
+  ```json
+  "linaria": {
+    "components": "**/*"
+  }
+  ```
+
+### Patch Changes
+
+- af5bb92d: The end of support for Node.js 14. Migration to pnpm 8.
+- Updated dependencies [418e40af]
+- Updated dependencies [05ad266c]
+- Updated dependencies [16c057df]
+- Updated dependencies [af5bb92d]
+- Updated dependencies [10859924]
+  - @linaria/babel-preset@4.5.0
+  - @linaria/shaker@4.5.0
+  - @linaria/react@4.5.0
+  - @linaria/core@4.5.0
+  - @linaria/extractor@4.5.0
+  - @linaria/rollup@4.5.0
+  - @linaria/server@4.5.0
+  - @linaria/stylelint@4.5.0
+  - @linaria/webpack4-loader@4.5.0
+
+## 4.1.17
+
+### Patch Changes
+
+- Updated dependencies [821a6819]
+- Updated dependencies [54ab61b2]
+  - @linaria/babel-preset@4.4.5
+  - @linaria/react@4.3.8
+  - @linaria/shaker@4.2.11
+  - @linaria/rollup@4.3.8
+  - @linaria/stylelint@4.1.17
+  - @linaria/webpack4-loader@4.1.17
+  - @linaria/core@4.2.10
+
+## 4.1.16
+
+### Patch Changes
+
+- Updated dependencies [1c3f309d]
+- Updated dependencies [dbe250b5]
+- Updated dependencies [34029088]
+- Updated dependencies [a62e7ba6]
+  - @linaria/babel-preset@4.4.4
+  - @linaria/react@4.3.7
+  - @linaria/shaker@4.2.10
+  - @linaria/core@4.2.9
+  - @linaria/rollup@4.3.7
+  - @linaria/stylelint@4.1.16
+  - @linaria/webpack4-loader@4.1.16
+
+## 4.1.15
+
+### Patch Changes
+
+- Updated dependencies [a3ad617f]
+  - @linaria/react@4.3.6
+  - @linaria/babel-preset@4.4.3
+  - @linaria/core@4.2.8
+  - @linaria/rollup@4.3.6
+  - @linaria/stylelint@4.1.15
+  - @linaria/webpack4-loader@4.1.15
+
+## 4.1.14
+
+### Patch Changes
+
+- Updated dependencies [13f0b416]
+- Updated dependencies [f9df4ed8]
+  - @linaria/rollup@4.3.5
+  - @linaria/babel-preset@4.4.2
+  - @linaria/stylelint@4.1.14
+  - @linaria/webpack4-loader@4.1.14
+  - @linaria/core@4.2.7
+  - @linaria/react@4.3.5
+  - @linaria/shaker@4.2.9
+
+## 4.1.13
+
+### Patch Changes
+
+- Updated dependencies [917db446]
+- Updated dependencies [57c0dc4f]
+  - @linaria/babel-preset@4.4.1
+  - @linaria/rollup@4.3.4
+  - @linaria/stylelint@4.1.13
+  - @linaria/webpack4-loader@4.1.13
+
+## 4.1.12
+
+### Patch Changes
+
+- Updated dependencies [b27f328f]
+- Updated dependencies [9cf41fae]
+- Updated dependencies [860b8d21]
+- Updated dependencies [af783273]
+- Updated dependencies [28f3f93d]
+- Updated dependencies [1d4d6833]
+- Updated dependencies [71a5b351]
+- Updated dependencies [cf1d6611]
+- Updated dependencies [2d3a741f]
+- Updated dependencies [61d49a39]
+  - @linaria/shaker@4.2.8
+  - @linaria/babel-preset@4.4.0
+  - @linaria/rollup@4.3.3
+  - @linaria/stylelint@4.1.12
+  - @linaria/webpack4-loader@4.1.12
+  - @linaria/core@4.2.6
+  - @linaria/react@4.3.4
+
+## 4.1.11
+
+### Patch Changes
+
+- Updated dependencies [3ce985e0]
+- Updated dependencies [77bcf2e7]
+  - @linaria/babel-preset@4.3.3
+  - @linaria/server@4.1.0
+  - @linaria/rollup@4.3.2
+  - @linaria/stylelint@4.1.11
+  - @linaria/webpack4-loader@4.1.11
+  - @linaria/core@4.2.5
+  - @linaria/react@4.3.3
+  - @linaria/shaker@4.2.7
+
 ## 4.1.10
 
 ### Patch Changes

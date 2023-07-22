@@ -8,16 +8,11 @@ import type {
   MemberExpression,
 } from '@babel/types';
 
-import type {
-  ExpressionValue,
-  IInterpolation,
-  Params,
-  Value,
-  ValueCache,
-  Artifact,
-} from './types';
+import type { Artifact, ExpressionValue } from '@linaria/utils';
+import { hasMeta } from '@linaria/utils';
+
+import type { IInterpolation, Params, Value, ValueCache } from './types';
 import getClassNameAndSlug from './utils/getClassNameAndSlug';
-import hasMeta from './utils/hasMeta';
 import { isCSSable } from './utils/toCSS';
 import type { IFileContext, IOptions } from './utils/types';
 import { validateParams } from './utils/validateParams';
@@ -29,7 +24,12 @@ export type TailProcessorParams = ProcessorParams extends [Params, ...infer T]
   ? T
   : never;
 
-export default abstract class BaseProcessor {
+export type TagSource = {
+  imported: string;
+  source: string;
+};
+
+export abstract class BaseProcessor {
   public static SKIP = Symbol('skip');
 
   public readonly artifacts: Artifact[] = [];
@@ -42,7 +42,7 @@ export default abstract class BaseProcessor {
 
   public readonly slug: string;
 
-  protected tag: Identifier | MemberExpression;
+  protected callee: Identifier | MemberExpression;
 
   protected evaluated:
     | Record<'dependencies' | 'expression', Value[]>
@@ -50,8 +50,14 @@ export default abstract class BaseProcessor {
 
   public constructor(
     params: Params,
+    public tagSource: TagSource,
     protected readonly astService: typeof t & {
-      addNamedImport: (name: string, source: string) => Identifier;
+      addDefaultImport: (source: string, nameHint?: string) => Identifier;
+      addNamedImport: (
+        name: string,
+        source: string,
+        nameHint?: string
+      ) => Identifier;
     },
     public readonly location: SourceLocation | null,
     protected readonly replacer: (
@@ -66,8 +72,8 @@ export default abstract class BaseProcessor {
   ) {
     validateParams(
       params,
-      ['tag'],
-      'Unknown error: a tag param is not specified'
+      ['callee'],
+      'Unknown error: a callee param is not specified'
     );
 
     const { className, slug } = getClassNameAndSlug(
@@ -80,7 +86,7 @@ export default abstract class BaseProcessor {
     this.className = className;
     this.slug = slug;
 
-    [[, this.tag]] = params;
+    [[, this.callee]] = params;
   }
 
   public abstract build(values: ValueCache): void;
@@ -118,11 +124,11 @@ export default abstract class BaseProcessor {
   public abstract get value(): Expression;
 
   protected tagSourceCode(): string {
-    if (this.tag.type === 'Identifier') {
-      return this.tag.name;
+    if (this.callee.type === 'Identifier') {
+      return this.callee.name;
     }
 
-    return generator(this.tag).code;
+    return generator(this.callee).code;
   }
 
   public toString(): string {

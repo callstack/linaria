@@ -10,32 +10,32 @@
 import type { TransformOptions } from '@babel/core';
 import * as babel from '@babel/core';
 
-import type Module from './module';
+import { TransformCacheCollection } from './cache';
 import prepareForEval, {
   prepareForEvalSync,
 } from './transform-stages/1-prepare-for-eval';
 import evalStage from './transform-stages/2-eval';
 import prepareForRuntime from './transform-stages/3-prepare-for-runtime';
 import extractStage from './transform-stages/4-extract';
-import type { Options, Result, CodeCache, ITransformFileResult } from './types';
+import type { Options, Result, ITransformFileResult } from './types';
 import withLinariaMetadata from './utils/withLinariaMetadata';
 
 function syncStages(
   originalCode: string,
   options: Options,
-  prepareStageResults: ITransformFileResult[] | undefined,
-  babelConfig: TransformOptions = {},
-  resolveCache = new Map<string, string>(),
-  codeCache: CodeCache = new Map(),
-  evalCache = new Map<string, Module>(),
+  prepareStageResult: ITransformFileResult | undefined,
+  babelConfig: TransformOptions,
+  cache: TransformCacheCollection,
   eventEmitter?: (ev: unknown) => void
 ) {
   const { filename } = options;
+  const ast = cache.originalASTCache.get(filename) ?? 'ignored';
 
-  // File does not contain any tags. Return original code.
+  // File is ignored or does not contain any tags. Return original code.
   if (
-    !prepareStageResults ||
-    prepareStageResults.every((r) => !withLinariaMetadata(r.metadata))
+    ast === 'ignored' ||
+    !prepareStageResult ||
+    !withLinariaMetadata(prepareStageResult.metadata)
   ) {
     return {
       code: originalCode,
@@ -47,13 +47,7 @@ function syncStages(
 
   eventEmitter?.({ type: 'transform:stage-2:start', filename });
 
-  const evalStageResult = evalStage(
-    resolveCache,
-    codeCache,
-    evalCache,
-    prepareStageResults.map((r) => r.code),
-    options
-  );
+  const evalStageResult = evalStage(cache, prepareStageResult.code, options);
 
   eventEmitter?.({ type: 'transform:stage-2:finish', filename });
 
@@ -72,6 +66,7 @@ function syncStages(
 
   const collectStageResult = prepareForRuntime(
     babel,
+    ast,
     originalCode,
     valueCache,
     options,
@@ -116,18 +111,15 @@ export function transformSync(
   options: Options,
   syncResolve: (what: string, importer: string, stack: string[]) => string,
   babelConfig: TransformOptions = {},
-  resolveCache = new Map<string, string>(),
-  codeCache: CodeCache = new Map(),
-  evalCache = new Map<string, Module>(),
+  cache = new TransformCacheCollection(),
   eventEmitter?: (ev: unknown) => void
 ): Result {
   const { filename } = options;
-
   // *** 1st stage ***
 
   eventEmitter?.({ type: 'transform:stage-1:start', filename });
 
-  const entryPoint = {
+  const entrypoint = {
     name: options.filename,
     code: originalCode,
     only: ['__linariaPreval'],
@@ -135,10 +127,9 @@ export function transformSync(
 
   const prepareStageResults = prepareForEvalSync(
     babel,
-    resolveCache,
-    codeCache,
+    cache,
     syncResolve,
-    entryPoint,
+    entrypoint,
     options
   );
 
@@ -151,9 +142,7 @@ export function transformSync(
     options,
     prepareStageResults,
     babelConfig,
-    resolveCache,
-    codeCache,
-    evalCache,
+    cache,
     eventEmitter
   );
 }
@@ -167,29 +156,30 @@ export default async function transform(
     stack: string[]
   ) => Promise<string | null>,
   babelConfig: TransformOptions = {},
-  resolveCache = new Map<string, string>(),
-  codeCache: CodeCache = new Map(),
-  evalCache = new Map<string, Module>(),
+  cache = new TransformCacheCollection(),
   eventEmitter?: (ev: unknown) => void
 ): Promise<Result> {
   const { filename } = options;
+
+  // Cache may contain a code that was loaded from disk, but transform
+  // is called with a code that already processed by another loaders
+  cache.invalidateIfChanged(filename, originalCode);
 
   // *** 1st stage ***
 
   eventEmitter?.({ type: 'transform:stage-1:start', filename });
 
-  const entryPoint = Promise.resolve({
+  const entrypoint = {
     name: filename,
     code: originalCode,
     only: ['__linariaPreval'],
-  });
+  };
 
   const prepareStageResults = await prepareForEval(
     babel,
-    resolveCache,
-    codeCache,
+    cache,
     asyncResolve,
-    entryPoint,
+    entrypoint,
     options
   );
 
@@ -202,9 +192,7 @@ export default async function transform(
     options,
     prepareStageResults,
     babelConfig,
-    resolveCache,
-    codeCache,
-    evalCache,
+    cache,
     eventEmitter
   );
 }

@@ -11,8 +11,7 @@ import mkdirp from 'mkdirp';
 import normalize from 'normalize-path';
 import yargs from 'yargs';
 
-import type { CodeCache, Module } from '@linaria/babel-preset';
-import { transform } from '@linaria/babel-preset';
+import { TransformCacheCollection, transform } from '@linaria/babel-preset';
 import { asyncResolveFallback } from '@linaria/utils';
 
 const modulesOptions = [
@@ -124,10 +123,7 @@ async function processFiles(files: (number | string)[], options: Options) {
     ],
     [] as string[]
   );
-
-  const codeCache: CodeCache = new Map();
-  const resolveCache = new Map<string, string>();
-  const evalCache = new Map<string, Module>();
+  const cache = new TransformCacheCollection();
 
   const timings = new Map<string, number>();
   const addTiming = (key: string, value: number) => {
@@ -180,9 +176,7 @@ async function processFiles(files: (number | string)[], options: Options) {
       },
       asyncResolveFallback,
       {},
-      resolveCache,
-      codeCache,
-      evalCache,
+      cache,
       onEvent
     );
 

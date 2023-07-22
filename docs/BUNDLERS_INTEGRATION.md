@@ -5,6 +5,7 @@
 - [webpack](#webpack)
 - [esbuild](#esbuild)
 - [Rollup](#Rollup)
+- [Vite](#Vite)
 - [Svelte](#Svelte)
 
 ## Pre-requisites
@@ -313,17 +314,17 @@ export default {
 
 ### Vite
 
-Since Vite supports Rollup plugin, you can use `@linaria/rollup`. Vite handles CSS by itself, you don't need a css plugin.
+~~Since Vite supports Rollup plugin~~ Since Vite provides more features and flexibility, Linaria has a separate plugin for it `@linaria/vite`. Vite handles CSS by itself, you don't need a css plugin.
 
 ```sh
-yarn add --dev @linaria/rollup
+yarn add --dev @linaria/vite
 ```
 
 Then add them to your `vite.config.js`:
 
 ```js
 import { defineConfig } from 'vite';
-import linaria from '@linaria/rollup';
+import linaria from '@linaria/vite';
 
 export default defineConfig(() => ({
   // ...
@@ -335,7 +336,7 @@ If you are using language features that requires a babel transform (such as type
 
 ```js
 import { defineConfig } from 'vite';
-import linaria from '@linaria/rollup';
+import linaria from '@linaria/vite';
 
 // example to support typescript syntax:
 export default defineConfig(() => ({

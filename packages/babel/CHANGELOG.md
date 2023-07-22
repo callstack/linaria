@@ -1,5 +1,161 @@
 # Change Log
 
+## 4.5.2
+
+### Patch Changes
+
+- 1bf5c5b8: The cache has been improved, which should address the build time issues for Webpack 4/5 and resolve HMR-related problems for Vite. Fixes #1199, #1265 and maybe some more.
+- Updated dependencies [85e74df6]
+- Updated dependencies [1bf5c5b8]
+  - @linaria/shaker@4.5.1
+  - @linaria/utils@4.5.1
+  - @linaria/core@4.5.2
+  - @linaria/tags@4.5.2
+
+## 4.5.1
+
+### Patch Changes
+
+- ceca1611: Enable optimisation from #1276 for complex expressions such as `styled(Component as unknow)` or `styled(connect(Component))`.
+- 13258306: Variables in props-based interpolation functions are no longer required for the evaluation stage.
+  Here's an example:
+
+  ```
+  import { getColor } from "very-big-library";
+
+  export const Box = styled.div\`
+    color: ${props => getColor(props.kind)};
+  \`;
+  ```
+
+  In versions prior to and including 4.5.0, the evaluator would attempt to import `getColor` from `very-big-library`, despite it having no relevance to style generation. However, in versions greater than 4.5.0, `very-big-library` will be ignored.
+
+- Updated dependencies [ceca1611]
+- Updated dependencies [13258306]
+  - @linaria/tags@4.5.1
+  - @linaria/core@4.5.1
+
+## 4.5.0
+
+### Minor Changes
+
+- 16c057df: Breaking Change: Performance Optimization for `styled`
+
+  When a component is wrapped in `styled`, Linaria needs to determine if that component is already a styled component. To accomplish this, the wrapped component is included in the list of variables for evaluation, along with the interpolated values used in styles. The issue arises when a wrapped component, even if it is not styled, brings along a substantial dependency tree. This situation is particularly evident when using `styled` to style components from third-party UI libraries.
+
+  To address this problem, Linaria will now examine the import location of the component and check if there is an annotation in the `package.json` file of the package containing the components. This annotation indicates whether the package includes other Linaria components. If there is no such annotation, Linaria will refrain from evaluating the component.
+
+  Please note that this Breaking Change solely affects developers of component libraries. In order for users to style components from your library, you must include the `linaria.components` property in the library's `package.json` file. This property should have a mask that covers all imported files with components. Here's an example of how to specify it:
+
+  ```json
+  "linaria": {
+    "components": "**/*"
+  }
+  ```
+
+### Patch Changes
+
+- 418e40af: Support for .cts/.mts files
+- af5bb92d: The end of support for Node.js 14. Migration to pnpm 8.
+- Updated dependencies [890b4aca]
+- Updated dependencies [05ad266c]
+- Updated dependencies [16c057df]
+- Updated dependencies [af5bb92d]
+  - @linaria/utils@4.5.0
+  - @linaria/shaker@4.5.0
+  - @linaria/tags@4.5.0
+  - @linaria/core@4.5.0
+  - @linaria/logger@4.5.0
+
+## 4.4.5
+
+### Patch Changes
+
+- 821a6819: Better support for ES-modules in node_modules (fixes #1242)
+- Updated dependencies [54ab61b2]
+  - @linaria/shaker@4.2.11
+  - @linaria/tags@4.3.5
+  - @linaria/utils@4.3.4
+  - @linaria/core@4.2.10
+
+## 4.4.4
+
+### Patch Changes
+
+- 1c3f309d: Fix tags usage validation (fixes #1224)
+- dbe250b5: Fix module function deletion when containing restricted code (fixes #1226)
+- a62e7ba6: Avoid parsing json as js
+- Updated dependencies [2e966f23]
+- Updated dependencies [1c3f309d]
+- Updated dependencies [dbe250b5]
+- Updated dependencies [34029088]
+  - @linaria/tags@4.3.4
+  - @linaria/shaker@4.2.10
+  - @linaria/utils@4.3.3
+  - @linaria/core@4.2.9
+
+## 4.4.3
+
+### Patch Changes
+
+- Updated dependencies [a3ad617f]
+  - @linaria/tags@4.3.3
+  - @linaria/core@4.2.8
+
+## 4.4.2
+
+### Patch Changes
+
+- f9df4ed8: Address the problem in which a module may be erroneously evaluated as an empty object (fixes #1209)
+- Updated dependencies [f9df4ed8]
+  - @linaria/utils@4.3.2
+  - @linaria/core@4.2.7
+  - @linaria/shaker@4.2.9
+  - @linaria/tags@4.3.2
+
+## 4.4.1
+
+### Patch Changes
+
+- 917db446: A workaround for an issue with Vite and imports from some third-party libs.
+- 57c0dc4f: Another fix for infinite loops. Fixes #1202
+
+## 4.4.0
+
+### Minor Changes
+
+- af783273: Fix circular dependencies-related errors and freezes (fixes #1193)
+
+### Patch Changes
+
+- 9cf41fae: chore: remove custom typings for @babel/helper-module-imports
+- 860b8d21: Ensure that the Proxy for this.#exports forwards unknown properties to the underlying Object instance.
+- 28f3f93d: Add the tagSource property for processors, indicating the package and name of the imported processor.
+- 1d4d6833: fix(babel): update cosmiconfig so linaria.config.cjs works
+- 2d3a741f: fix: handle .cjs & .mjs extensions
+- 61d49a39: Fix for #1112 "Cannot read properties of undefined (reading 'localeCompare')"
+- Updated dependencies [b27f328f]
+- Updated dependencies [28f3f93d]
+- Updated dependencies [71a5b351]
+- Updated dependencies [cf1d6611]
+- Updated dependencies [61d49a39]
+  - @linaria/shaker@4.2.8
+  - @linaria/tags@4.3.1
+  - @linaria/utils@4.3.1
+  - @linaria/core@4.2.6
+
+## 4.3.3
+
+### Patch Changes
+
+- 3ce985e0: Update tags processor to insert appropriate import/request for ESM/CommonJS.
+- Updated dependencies [3ce985e0]
+- Updated dependencies [d11174d0]
+  - @linaria/tags@4.3.0
+  - @linaria/utils@4.3.0
+  - @linaria/core@4.2.5
+  - @linaria/shaker@4.2.7
+
 ## 4.3.2
 
 ### Patch Changes

@@ -1,5 +1,5 @@
-import type { LinariaMetadata } from '@linaria/babel-preset';
 import { withLinariaMetadata } from '@linaria/babel-preset';
+import type { LinariaMetadata } from '@linaria/utils';
 
 type Serializer<T> = {
   test: (value: unknown) => value is T;

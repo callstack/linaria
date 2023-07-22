@@ -1,10 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`removeWithRelated should keep alive used import specifier 1`] = `
-"import { b } from './source';
-
-/* remove */"
-`;
+exports[`removeWithRelated should keep alive used import specifier 1`] = `"import { b } from './source';"`;
 
 exports[`removeWithRelated should keep logical expression 1`] = `
 "const c = 3;
@@ -15,6 +11,12 @@ exports[`removeWithRelated should not delete params of functions 1`] = `
 "function test(arg) {
   return null;
 }"
+`;
+
+exports[`removeWithRelated should not remove top-level functions with empty bodies 1`] = `
+"function testFn() {}
+export const testArrow1 = () => {};
+const testArrow2 = () => {};"
 `;
 
 exports[`removeWithRelated should remove node if it becomes invalid after removing its children 1`] = `""`;

@@ -15,6 +15,17 @@ exports[`preeval should keep getGlobal but remove window-related code 1`] = `
 }"
 `;
 
+exports[`preeval should keep object members that look like window globals 1`] = `
+"class Test {
+  fetch: typeof global.fetch;
+  constructor(options) {
+    this.fetch = options.fetch;
+  }
+}"
+`;
+
+exports[`preeval should keep type parameters that look like window globals 1`] = `"type FooType = Generic<Foo>;"`;
+
 exports[`preeval should not remove "location" in types only because it looks like a global variable 1`] = `
 "interface IProps {
   fn: (location: string) => void;

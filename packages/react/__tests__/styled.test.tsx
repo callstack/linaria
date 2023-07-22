@@ -273,6 +273,10 @@ it('provides linaria component className for composition as last item in props.c
 });
 
 it('throws when using as tag for template literal', () => {
+  // styled uses process.env.NODE_ENV to determine if it's running in a test environment
+  const nodeEnv = process.env.NODE_ENV;
+  delete process.env.NODE_ENV;
+
   expect(
     () =>
       styled('div')`
@@ -286,6 +290,8 @@ it('throws when using as tag for template literal', () => {
         color: blue;
       `
   ).toThrow('Using the "styled" tag in runtime is not supported');
+
+  process.env.NODE_ENV = nodeEnv;
 });
 
 it('can get rest keys from object', () => {

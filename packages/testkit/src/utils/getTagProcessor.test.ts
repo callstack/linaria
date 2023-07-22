@@ -7,12 +7,17 @@ import dedent from 'dedent';
 import { getTagProcessor } from '@linaria/babel-preset';
 import type { BaseProcessor } from '@linaria/tags';
 
-const run = (code: string): BaseProcessor | null => {
+interface IRunOptions {
+  ts?: boolean;
+}
+
+const run = (code: string, options: IRunOptions = {}): BaseProcessor | null => {
   const opts = {
-    filename: join(__dirname, 'test.js'),
+    filename: join(__dirname, options.ts ? 'test.ts' : 'test.js'),
     root: '.',
     code: true,
     ast: true,
+    presets: options.ts ? ['@babel/preset-typescript'] : [],
   };
   const rootNode = parseSync(code, opts)!;
   let result: BaseProcessor | null = null;
@@ -32,7 +37,7 @@ const run = (code: string): BaseProcessor | null => {
   return result;
 };
 
-function tagSource(processor: BaseProcessor | null): string | undefined {
+function tagToString(processor: BaseProcessor | null): string | undefined {
   if (!processor) return undefined;
   return processor.toString();
 }
@@ -50,7 +55,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('renamedStyled(Cmp)`…`');
+    expect(tagToString(result)).toBe('renamedStyled(Cmp)`…`');
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/atomic',
+    });
   });
 
   it('imported component', () => {
@@ -63,7 +72,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(Layout)`…`');
+    expect(tagToString(result)).toBe('styled(Layout)`…`');
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
   });
 
   it('renamedStyled(Cmp)``', () => {
@@ -77,7 +90,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('renamedStyled(Cmp)`…`');
+    expect(tagToString(result)).toBe('renamedStyled(Cmp)`…`');
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
   });
 
   it('(0, react_1.styled)(Cmp)``', () => {
@@ -91,7 +108,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('react_1.styled(Cmp)`…`');
+    expect(tagToString(result)).toBe('react_1.styled(Cmp)`…`');
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
   });
 
   it('styled(Cmp)``', () => {
@@ -105,7 +126,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(Cmp)`…`');
+    expect(tagToString(result)).toBe('styled(Cmp)`…`');
   });
 
   it('styled(hoc(Title))``', () => {
@@ -126,7 +147,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(hoc(Title))`…`');
+    expect(tagToString(result)).toBe('styled(hoc(Title))`…`');
   });
 
   it('styled(() => { someLogic(); })``', () => {
@@ -143,7 +164,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('styled(() => {…})`…`');
+    expect(tagToString(result)).toBe('styled(() => {…})`…`');
   });
 
   it('renamedStyled.div``', () => {
@@ -155,7 +176,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("renamedStyled('div')`…`");
+    expect(tagToString(result)).toBe("renamedStyled('div')`…`");
   });
 
   it('(0, react_1.styled.div)``', () => {
@@ -167,7 +188,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("react_1.styled('div')`…`");
+    expect(tagToString(result)).toBe("react_1.styled('div')`…`");
   });
 
   it('styled.div``', () => {
@@ -179,7 +200,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("styled('div')`…`");
+    expect(tagToString(result)).toBe("styled('div')`…`");
   });
 
   it('styled("div")``', () => {
@@ -191,7 +212,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("styled('div')`…`");
+    expect(tagToString(result)).toBe("styled('div')`…`");
   });
 
   it('(0, core_1.css)``', () => {
@@ -203,7 +224,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('core_1.css`…`');
+    expect(tagToString(result)).toBe('core_1.css`…`');
   });
 
   it('css``', () => {
@@ -215,7 +236,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('css`…`');
+    expect(tagToString(result)).toBe('css`…`');
   });
 
   it('atomic css``', () => {
@@ -227,7 +248,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('css`…`');
+    expect(tagToString(result)).toBe('css`…`');
+    expect(result?.tagSource).toEqual({
+      imported: 'css',
+      source: '@linaria/atomic',
+    });
   });
 
   it('re-imported css', () => {
@@ -239,7 +264,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe('css`…`');
+    expect(tagToString(result)).toBe('css`…`');
+    expect(result?.tagSource).toEqual({
+      imported: 'css',
+      source: 'linaria',
+    });
   });
 
   it('re-imported styled', () => {
@@ -251,7 +280,11 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("styled('div')`…`");
+    expect(tagToString(result)).toBe("styled('div')`…`");
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: 'linaria/react',
+    });
   });
 
   it('import from unknown package', () => {
@@ -274,7 +307,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("renamedStyled('div')`…`");
+    expect(tagToString(result)).toBe("renamedStyled('div')`…`");
   });
 
   it('require and destructing', () => {
@@ -285,7 +318,7 @@ describe('getTagProcessor', () => {
     `
     );
 
-    expect(tagSource(result)).toBe("styled('div')`…`");
+    expect(tagToString(result)).toBe("styled('div')`…`");
   });
 
   describe('invalid usage', () => {
@@ -307,6 +340,12 @@ describe('getTagProcessor', () => {
       expect(runner).toThrow('Invalid usage of template tag');
     });
 
+    it('do not throw if css is not a tag', () => {
+      const runner = () => run(dedent`export { css } from "@linaria/core";`);
+
+      expect(runner).not.toThrow();
+    });
+
     it('styled`` tag', () => {
       const runner = () =>
         run(
@@ -314,6 +353,20 @@ describe('getTagProcessor', () => {
         );
 
       expect(runner).toThrow('Invalid usage of `styled` tag');
+    });
+
+    it('do not throw if styled is not a tag', () => {
+      const runner = () =>
+        run(
+          dedent`
+          import { styled } from '@linaria/react';
+
+          export type StyledReturn = ReturnType<typeof styled>;
+        `,
+          { ts: true }
+        );
+
+      expect(runner).not.toThrow();
     });
 
     it('styled.div.span`` tag', () => {
@@ -332,6 +385,118 @@ describe('getTagProcessor', () => {
         );
 
       expect(runner).toThrow('Invalid usage of `styled` tag');
+    });
+  });
+
+  it('imported from a non-linaria library', () => {
+    const result = run(
+      dedent`
+      import { Title } from "../__fixtures__/non-linaria-ui-library/index";
+      import { styled } from "@linaria/react";
+
+      export const StyledLayout = styled(Title)\`\`;
+    `
+    );
+
+    expect(tagToString(result)).toBe('styled(Title)`…`');
+    expect(result?.dependencies).toHaveLength(0);
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
+  });
+
+  it('imported from a linaria library', () => {
+    const result = run(
+      dedent`
+      import { Title } from "../__fixtures__/linaria-ui-library/components/index";
+      import { styled } from "@linaria/react";
+
+      export const StyledTitle = styled(Title)\`\`;
+    `
+    );
+
+    expect(tagToString(result)).toBe('styled(Title)`…`');
+    expect(result?.dependencies).toMatchObject([{ source: 'Title' }]);
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
+  });
+
+  it('imported a non-linaria component from a linaria library', () => {
+    const result = run(
+      dedent`
+      import { Title } from "../__fixtures__/linaria-ui-library/non-linaria-components";
+      import { styled } from "@linaria/react";
+
+      export const StyledTitle = styled(Title)\`\`;
+    `
+    );
+
+    expect(tagToString(result)).toBe('styled(Title)`…`');
+    expect(result?.dependencies).toHaveLength(0);
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
+  });
+
+  it('imported a non-linaria component from a linaria library (and casted with as)', () => {
+    const result = run(
+      dedent`
+      import { Title } from "../__fixtures__/linaria-ui-library/non-linaria-components";
+      import { styled } from "@linaria/react";
+
+      export const StyledTitle = styled(Title as unknown)\`\`;
+    `,
+      { ts: true }
+    );
+
+    expect(tagToString(result)).toBe('styled(Title as unknown)`…`');
+    expect(result?.dependencies).toHaveLength(0);
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
+  });
+
+  it('imported a non-linaria component from a linaria library (and used with connect)', () => {
+    const result = run(
+      dedent`
+      import { Title } from "../__fixtures__/linaria-ui-library/non-linaria-components";
+      import { styled } from "@linaria/react";
+      import { connect } from "react-redux";
+
+      export const StyledTitle = styled(connect(Title))\`\`;
+    `,
+      { ts: true }
+    );
+
+    expect(tagToString(result)).toBe('styled(connect(Title))`…`');
+    expect(result?.dependencies).toHaveLength(0);
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
+    });
+  });
+
+  it('imported from a linaria library (and used with connect)', () => {
+    const result = run(
+      dedent`
+      import { Title } from "../__fixtures__/linaria-ui-library/components/index";
+      import { connect } from "./__fixtures__/linaria-ui-library/hocs";
+      import { styled } from "@linaria/react";
+
+      export const StyledTitle = styled(connect(Title))\`\`;
+    `
+    );
+
+    expect(tagToString(result)).toBe('styled(connect(Title))`…`');
+    expect(result?.dependencies).toMatchObject([{ source: 'connect(Title)' }]);
+    expect(result?.tagSource).toEqual({
+      imported: 'styled',
+      source: '@linaria/react',
     });
   });
 });

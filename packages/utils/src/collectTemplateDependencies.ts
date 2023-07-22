@@ -6,16 +6,11 @@
  */
 
 import { statement } from '@babel/template';
-import type { NodePath, Scope } from '@babel/traverse';
+import type { NodePath } from '@babel/traverse';
 import type {
   Expression,
-  ExpressionStatement,
   Identifier,
   JSXIdentifier,
-  ObjectExpression,
-  ObjectProperty,
-  Program,
-  SourceLocation,
   Statement,
   TaggedTemplateExpression,
   TemplateElement,
@@ -26,26 +21,21 @@ import type {
 import { cloneNode } from '@babel/types';
 
 import { debug } from '@linaria/logger';
-import type { ConstValue } from '@linaria/tags';
-import { hasMeta } from '@linaria/tags';
-import {
-  findIdentifiers,
-  mutate,
-  reference,
-  referenceAll,
-} from '@linaria/utils';
 
-import type { ExpressionValue } from '../types';
-import { ValueType } from '../types';
-
-import getSource from './getSource';
-import valueToLiteral from './vlueToLiteral';
-
-const createId = (name: string, loc?: SourceLocation | null): Identifier => ({
-  type: 'Identifier',
-  name,
-  loc,
-});
+import type { IImport } from './collectExportsAndImports';
+import { createId } from './createId';
+import findIdentifiers from './findIdentifiers';
+import { getSource } from './getSource';
+import { hasMeta } from './hasMeta';
+import { mutate, referenceAll } from './scopeHelpers';
+import type {
+  ConstValue,
+  ExpressionValue,
+  FunctionValue,
+  LazyValue,
+} from './types';
+import { ValueType } from './types';
+import { valueToLiteral } from './valueToLiteral';
 
 function staticEval(
   ex: NodePath<Expression>,
@@ -161,64 +151,17 @@ function hoistIdentifier(idPath: NodePath<Identifier>): void {
   throw unsupported(idPath);
 }
 
-function getOrAddLinariaPreval(scope: Scope): NodePath<ObjectExpression> {
-  const rootScope = scope.getProgramParent();
-  let object = rootScope.getData('__linariaPreval');
-  if (object) {
-    return object;
-  }
-
-  const prevalExport: ExpressionStatement = {
-    type: 'ExpressionStatement',
-    expression: {
-      type: 'AssignmentExpression',
-      operator: '=',
-      left: {
-        type: 'MemberExpression',
-        object: createId('exports'),
-        property: createId('__linariaPreval'),
-        computed: false,
-      },
-      right: {
-        type: 'ObjectExpression',
-        properties: [],
-      },
-    },
-  };
-
-  const programPath = rootScope.path as NodePath<Program>;
-  const [inserted] = programPath.pushContainer('body', [prevalExport]);
-  object = inserted.get('expression.right') as NodePath<ObjectExpression>;
-  rootScope.setData('__linariaPreval', object);
-  return object;
-}
-
-function addIdentifierToLinariaPreval(scope: Scope, name: string) {
-  const rootScope = scope.getProgramParent();
-  const object = getOrAddLinariaPreval(rootScope);
-  const newProperty: ObjectProperty = {
-    type: 'ObjectProperty',
-    key: createId(name),
-    value: createId(name),
-    computed: false,
-    shorthand: false,
-  };
-
-  const [inserted] = object.pushContainer('properties', [newProperty]);
-  reference(inserted.get('value') as NodePath<Identifier>);
-}
-
 /**
  * Only an expression that can be evaluated in the root scope can be
  * used in a Linaria template. This function tries to hoist the expression.
  * @param ex The expression to hoist.
  * @param evaluate If true, we try to statically evaluate the expression.
- * @param addToExport If true, we add the expression to the __linariaPreval.
+ * @param imports All the imports of the file.
  */
 export function extractExpression(
   ex: NodePath<Expression>,
   evaluate = false,
-  addToExport = true
+  imports: IImport[] = []
 ): Omit<ExpressionValue, 'buildCodeFrameError' | 'source'> {
   if (
     ex.isLiteral() &&
@@ -282,6 +225,26 @@ export function extractExpression(
   referenceAll(inserted);
   rootScope.registerDeclaration(inserted);
 
+  const importedFrom: string[] = [];
+  function findImportSourceOfIdentifier(idPath: NodePath<Identifier>) {
+    const exBindingIdentifier = idPath.scope.getBinding(
+      idPath.node.name
+    )?.identifier;
+    const exImport =
+      imports.find((i) => i.local.node === exBindingIdentifier) ?? null;
+    if (exImport) {
+      importedFrom.push(exImport.source);
+    }
+  }
+
+  if (ex.isIdentifier()) {
+    findImportSourceOfIdentifier(ex);
+  } else {
+    ex.traverse({
+      Identifier: findImportSourceOfIdentifier,
+    });
+  }
+
   // Replace the expression with the _expN() call
   mutate(ex, (p) => {
     p.replaceWith({
@@ -291,24 +254,27 @@ export function extractExpression(
     });
   });
 
-  if (addToExport) {
-    addIdentifierToLinariaPreval(rootScope, expUid);
-  }
-
   // eslint-disable-next-line no-param-reassign
   ex.node.loc = loc;
 
-  return {
+  // noinspection UnnecessaryLocalVariableJS
+  const result: Omit<
+    LazyValue | FunctionValue,
+    'buildCodeFrameError' | 'source'
+  > = {
     kind,
     ex: createId(expUid, loc),
+    importedFrom,
   };
+
+  return result;
 }
 
 /**
  * Collects, hoists, and makes lazy all expressions in the given template
  * If evaluate is true, it will try to evaluate the expressions
  */
-export default function collectTemplateDependencies(
+export function collectTemplateDependencies(
   path: NodePath<TaggedTemplateExpression>,
   evaluate = false
 ): [quasis: TemplateElement[], expressionValues: ExpressionValue[]] {

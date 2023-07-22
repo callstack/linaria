@@ -1,6 +1,6 @@
 {
   "name": "@linaria/shaker",
-  "version": "4.2.6",
+  "version": "4.5.1",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",
@@ -33,19 +33,19 @@
     "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
-    "@babel/core": "^7.20.2",
-    "@babel/generator": "^7.20.4",
-    "@babel/plugin-transform-modules-commonjs": "^7.19.6",
-    "@babel/plugin-transform-runtime": "^7.19.6",
-    "@babel/plugin-transform-template-literals": "^7.18.9",
-    "@babel/preset-env": "^7.20.2",
+    "@babel/core": "^7.22.9",
+    "@babel/generator": "^7.22.9",
+    "@babel/plugin-transform-modules-commonjs": "^7.22.5",
+    "@babel/plugin-transform-runtime": "^7.22.9",
+    "@babel/plugin-transform-template-literals": "^7.22.5",
+    "@babel/preset-env": "^7.22.9",
     "@linaria/logger": "workspace:^",
     "@linaria/utils": "workspace:^",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
-    "@babel/types": "^7.20.2",
+    "@babel/types": "^7.22.5",
     "@types/babel__core": "^7.1.19",
     "@types/babel__generator": "^7.6.4",
     "@types/babel__traverse": "^7.17.1",

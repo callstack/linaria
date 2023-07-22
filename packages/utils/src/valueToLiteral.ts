@@ -1,14 +1,10 @@
 import type { NodePath } from '@babel/traverse';
 import type { Expression } from '@babel/types';
 
-import { isSerializable } from '@linaria/tags';
+import { getSource } from './getSource';
+import { isSerializable } from './isSerializable';
 
-import getSource from './getSource';
-
-export default function valueToLiteral(
-  value: unknown,
-  ex: NodePath
-): Expression {
+export function valueToLiteral(value: unknown, ex: NodePath): Expression {
   if (value === undefined) {
     return {
       type: 'Identifier',

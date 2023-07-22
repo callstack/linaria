@@ -402,6 +402,36 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker do not include in dependencies expressions from interpolation functions bodies 1`] = `
+"import { styled } from '@linaria/react';
+import constant from './broken-dependency-1';
+import modifier from './broken-dependency-2';
+const _exp = /*#__PURE__*/() => props => props.size + constant;
+const _exp2 = /*#__PURE__*/() => props => modifier(props.size);
+export const Box = /*#__PURE__*/styled('div')({
+  name: \\"Box\\",
+  class: \\"Box_b13jq05\\",
+  propsAsIs: false,
+  vars: {
+    \\"b13jq05-0\\": [_exp(), \\"px\\"],
+    \\"b13jq05-1\\": [_exp2(), \\"px\\"]
+  }
+});"
+`;
+
+exports[`strategy shaker do not include in dependencies expressions from interpolation functions bodies 2`] = `
+
+CSS:
+
+.Box_b13jq05 {
+  height: var(--b13jq05-0);
+  width: var(--b13jq05-1);
+}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker does not include styles if not referenced anywhere 1`] = `
 "import { styled } from '@linaria/react';
 const Title = /*#__PURE__*/styled('h1')({
@@ -1053,6 +1083,43 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker handles dashes in variableNameConfig 1`] = `
+"import { styled as atomicStyled } from '@linaria/atomic';
+import { styled } from '@linaria/react';
+const _exp = /*#__PURE__*/() => props => props.size;
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false,
+  vars: {
+    \\"t13jq05-0\\": [_exp(), \\"px\\"]
+  }
+});
+const _exp2 = /*#__PURE__*/() => props => props.size;
+export const Body = /*#__PURE__*/atomicStyled('h1')({
+  name: \\"Body\\",
+  class: \\"atm_c8_trva6l Body_b1vhermz\\",
+  propsAsIs: false,
+  vars: {
+    \\"1qqvhyq\\": [_exp2(), \\"px\\"]
+  },
+  atomic: true
+});"
+`;
+
+exports[`strategy shaker handles dashes in variableNameConfig 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  font-size: --t13jq05-0;
+}
+.atm_c8_trva6l.atm_c8_trva6l{font-size:--1qqvhyq;}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker handles escapes properly 1`] = `
 "import { styled } from '@linaria/react';
 export const Block = /*#__PURE__*/styled('div')({
@@ -1220,6 +1287,31 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker handles interpolation in css function followed by unit 1`] = `
+"import { styled } from '@linaria/atomic';
+const _exp = /*#__PURE__*/() => props => props.$rotateDeg;
+export const Container = /*#__PURE__*/styled('div')({
+  name: \\"Container\\",
+  class: \\"atm_tr_18309cv atm_vy_1783zgq Container_c13jq05\\",
+  propsAsIs: false,
+  vars: {
+    \\"y6125t\\": [_exp(), \\"deg\\"]
+  },
+  atomic: true
+});"
+`;
+
+exports[`strategy shaker handles interpolation in css function followed by unit 2`] = `
+
+CSS:
+
+.atm_tr_18309cv{transform:rotate(var(--y6125t));}
+.atm_vy_1783zgq{width:200;px;}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker handles nested blocks 1`] = `
 "import { styled } from '@linaria/react';
 const regular = () => \\"arial\\";
@@ -1286,6 +1378,80 @@ CSS:
 
 .stringKey_s13jq05 {}
 ._2__1vhermz {}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker handles raw in variableNameConfig 1`] = `
+"import { styled as atomicStyled } from '@linaria/atomic';
+import { styled } from '@linaria/react';
+const _exp = /*#__PURE__*/() => props => props.size;
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false,
+  vars: {
+    \\"t13jq05-0\\": [_exp(), \\"px\\"]
+  }
+});
+const _exp2 = /*#__PURE__*/() => props => props.size;
+export const Body = /*#__PURE__*/atomicStyled('h1')({
+  name: \\"Body\\",
+  class: \\"atm_c8_1s69o7d Body_b1vhermz\\",
+  propsAsIs: false,
+  vars: {
+    \\"1qqvhyq\\": [_exp2(), \\"px\\"]
+  },
+  atomic: true
+});"
+`;
+
+exports[`strategy shaker handles raw in variableNameConfig 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  font-size: t13jq05-0;
+}
+.atm_c8_1s69o7d.atm_c8_1s69o7d{font-size:1qqvhyq;}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker handles val in variableNameConfig 1`] = `
+"import { styled as atomicStyled } from '@linaria/atomic';
+import { styled } from '@linaria/react';
+const _exp = /*#__PURE__*/() => props => props.size;
+export const Title = /*#__PURE__*/styled('h1')({
+  name: \\"Title\\",
+  class: \\"Title_t13jq05\\",
+  propsAsIs: false,
+  vars: {
+    \\"t13jq05-0\\": [_exp(), \\"px\\"]
+  }
+});
+const _exp2 = /*#__PURE__*/() => props => props.size;
+export const Body = /*#__PURE__*/atomicStyled('h1')({
+  name: \\"Body\\",
+  class: \\"atm_c8_1g7eom2 Body_b1vhermz\\",
+  propsAsIs: false,
+  vars: {
+    \\"1qqvhyq\\": [_exp2(), \\"px\\"]
+  },
+  atomic: true
+});"
+`;
+
+exports[`strategy shaker handles val in variableNameConfig 2`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  font-size: var(--t13jq05-0);
+}
+.atm_c8_1g7eom2.atm_c8_1g7eom2{font-size:var(--1qqvhyq);}
 
 Dependencies: NA
 
@@ -1721,6 +1887,49 @@ Dependencies: ../re-exports
 
 `;
 
+exports[`strategy shaker should eval component from a linaria library 1`] = `
+"import { styled } from \\"@linaria/react\\";
+import { Title } from \\"./__fixtures__/linaria-ui-library/components/index\\";
+const _exp = /*#__PURE__*/() => Title;
+export const StyledTitle = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledTitle\\",
+  class: \\"StyledTitle_s13jq05\\",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should eval component from a linaria library 2`] = `
+
+CSS:
+
+.StyledTitle_s13jq05 {}
+
+Dependencies: ./__fixtures__/linaria-ui-library/components/index
+
+`;
+
+exports[`strategy shaker should eval wrapped component from a linaria library 1`] = `
+"import { styled } from \\"@linaria/react\\";
+import { connect } from \\"./__fixtures__/linaria-ui-library/hocs\\";
+import { Title } from \\"./__fixtures__/linaria-ui-library/components/index\\";
+const _exp = /*#__PURE__*/() => connect(Title);
+export const StyledTitle = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledTitle\\",
+  class: \\"StyledTitle_s13jq05\\",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should eval wrapped component from a linaria library 2`] = `
+
+CSS:
+
+.StyledTitle_s13jq05 {}
+
+Dependencies: ./__fixtures__/linaria-ui-library/hocs, ./__fixtures__/linaria-ui-library/components/index
+
+`;
+
 exports[`strategy shaker should handle shadowed identifier inside components 1`] = `
 "import React from 'react';
 const color = 'red';
@@ -1786,6 +1995,104 @@ CSS:
 }
 
 Dependencies: ./__fixtures__/reexports
+
+`;
+
+exports[`strategy shaker should not eval components from a non-linaria library 1`] = `
+"import { styled } from \\"@linaria/react\\";
+import { Title } from \\"./__fixtures__/non-linaria-ui-library/index\\";
+const _exp = /*#__PURE__*/() => Title;
+export const StyledTitle = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledTitle\\",
+  class: \\"StyledTitle_s13jq05\\",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should not eval components from a non-linaria library 2`] = `
+
+CSS:
+
+.StyledTitle_s13jq05 {}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker should not eval non-linaria component from a linaria library 1`] = `
+"import { styled } from \\"@linaria/react\\";
+import { Title } from \\"./__fixtures__/linaria-ui-library/non-linaria-components\\";
+const _exp = /*#__PURE__*/() => Title;
+export const StyledTitle = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledTitle\\",
+  class: \\"StyledTitle_s13jq05\\",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should not eval non-linaria component from a linaria library 2`] = `
+
+CSS:
+
+.StyledTitle_s13jq05 {}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker should not eval wrapped component from a non-linaria library 1`] = `
+"import { styled } from \\"@linaria/react\\";
+import { connect } from \\"./__fixtures__/linaria-ui-library/hocs\\";
+import { Title } from \\"./__fixtures__/non-linaria-ui-library/index\\";
+const _exp = /*#__PURE__*/() => connect(Title);
+export const StyledTitle = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledTitle\\",
+  class: \\"StyledTitle_s13jq05\\",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should not eval wrapped component from a non-linaria library 2`] = `
+
+CSS:
+
+.StyledTitle_s13jq05 {}
+
+Dependencies: NA
+
+`;
+
+exports[`strategy shaker should not import types 1`] = `
+"import { styled } from \\"@linaria/react\\";
+import { Title } from \\"./__fixtures__/linaria-ui-library/components/index\\";
+import { ComponentType } from \\"./__fixtures__/linaria-ui-library/types\\";
+const map = new Map<string, ComponentType>().set('Title', Title);
+const Gate = (props: {
+  type: ComponentType;
+  className: string;
+}) => {
+  const {
+    className,
+    type
+  } = props;
+  const Component = map.get(type);
+  return <Component className={className} />;
+};
+const _exp = /*#__PURE__*/() => Gate;
+export const StyledTitle = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledTitle\\",
+  class: \\"StyledTitle_s18alru3\\",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should not import types 2`] = `
+
+CSS:
+
+.StyledTitle_s18alru3 {}
+
+Dependencies: NA
 
 `;
 
@@ -1973,6 +2280,30 @@ CSS:
 
 .class1_c13jq05 {width:1337px;}
 .class2_c1vhermz {width:1337px;}
+
+exports[`strategy shaker should shake out identifiers that are referenced only in types 1`] = `
+"import { styled } from \\"@linaria/react\\";
+import * as yup from \\"yup\\";
+import { Form } from \\"./__fixtures__/linaria-ui-library/components/index\\";
+const validationSchema = yup.object();
+type IModel = yup.InferType<typeof validationSchema>;
+const Editor = () => {
+  const initial: IModel = {};
+  return <Form schema={validationSchema} data={initial} />;
+};
+const _exp = /*#__PURE__*/() => Editor;
+export const StyledEditor = /*#__PURE__*/styled(_exp())({
+  name: \\"StyledEditor\\",
+  class: \\"StyledEditor_s18alru3\\",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should shake out identifiers that are referenced only in types 2`] = `
+
+CSS:
+
+.StyledEditor_s18alru3 {}
 
 Dependencies: NA
 

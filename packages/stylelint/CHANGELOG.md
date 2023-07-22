@@ -1,5 +1,100 @@
 # Change Log
 
+## 4.5.2
+
+### Patch Changes
+
+- Updated dependencies [85e74df6]
+- Updated dependencies [1bf5c5b8]
+  - @linaria/utils@4.5.1
+  - @linaria/babel-preset@4.5.2
+
+## 4.5.1
+
+### Patch Changes
+
+- Updated dependencies [ceca1611]
+- Updated dependencies [13258306]
+  - @linaria/babel-preset@4.5.1
+
+## 4.5.0
+
+### Patch Changes
+
+- af5bb92d: The end of support for Node.js 14. Migration to pnpm 8.
+- Updated dependencies [890b4aca]
+- Updated dependencies [418e40af]
+- Updated dependencies [05ad266c]
+- Updated dependencies [16c057df]
+- Updated dependencies [af5bb92d]
+  - @linaria/utils@4.5.0
+  - @linaria/babel-preset@4.5.0
+
+## 4.1.17
+
+### Patch Changes
+
+- Updated dependencies [821a6819]
+- Updated dependencies [54ab61b2]
+  - @linaria/babel-preset@4.4.5
+  - @linaria/utils@4.3.4
+
+## 4.1.16
+
+### Patch Changes
+
+- Updated dependencies [1c3f309d]
+- Updated dependencies [dbe250b5]
+- Updated dependencies [a62e7ba6]
+  - @linaria/babel-preset@4.4.4
+  - @linaria/utils@4.3.3
+
+## 4.1.15
+
+### Patch Changes
+
+- @linaria/babel-preset@4.4.3
+
+## 4.1.14
+
+### Patch Changes
+
+- Updated dependencies [f9df4ed8]
+  - @linaria/babel-preset@4.4.2
+  - @linaria/utils@4.3.2
+
+## 4.1.13
+
+### Patch Changes
+
+- Updated dependencies [917db446]
+- Updated dependencies [57c0dc4f]
+  - @linaria/babel-preset@4.4.1
+
+## 4.1.12
+
+### Patch Changes
+
+- Updated dependencies [9cf41fae]
+- Updated dependencies [860b8d21]
+- Updated dependencies [af783273]
+- Updated dependencies [28f3f93d]
+- Updated dependencies [1d4d6833]
+- Updated dependencies [71a5b351]
+- Updated dependencies [2d3a741f]
+- Updated dependencies [61d49a39]
+  - @linaria/babel-preset@4.4.0
+  - @linaria/utils@4.3.1
+
+## 4.1.11
+
+### Patch Changes
+
+- Updated dependencies [3ce985e0]
+- Updated dependencies [d11174d0]
+  - @linaria/babel-preset@4.3.3
+  - @linaria/utils@4.3.0
+
 ## 4.1.10
 
 ### Patch Changes

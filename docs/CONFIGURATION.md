@@ -26,6 +26,96 @@ module.exports = {
 
   Enabling this will add a display name to generated class names, e.g. `.Title_abcdef` instead of `.abcdef'. It is disabled by default to generate smaller CSS files.
 
+- `variableNameConfig: "var" | "dashes" | "raw"` (default: `var`):
+
+  Configures how the variable will be formatted in final CSS.
+
+  ### Possible values
+
+  #### `var`
+  Use full css variable structure. This is default behavior.
+
+  ```js
+  import { styled } from "@linaria/react";
+
+  export const MyComponent = styled.div`
+    color: ${(props) => props.color};
+  `;
+  ```
+
+  In CSS you will see full variable declaration
+
+  ```css
+  .MyComponent_m1cus5as {
+    color: var(--m1cus5as-0);
+  }
+  ```
+
+  #### `dashes`
+  Removes `var()` around the variable name. It is useful when you want to control the variable on your own. For example you can set default value for CSS variable.
+
+  ```js
+  import { styled } from "@linaria/react";
+
+  export const Theme = styled.div`
+    --font-color: red;
+  `;
+
+  export const MyComponent = styled.div`
+    // Returning empty string is mandatory
+    // Otherwise you will have "undefined" in css variable value
+    color: var(${(props) => props.color ?? ""}, var(--font-color));
+  `;
+
+  function App() {
+    return (
+      <Theme>
+        <MyComponent>Text with red color</MyComponent>
+        <MyComponent color="blue">Text with blue color</MyComponent>
+      </Theme>
+    );
+  }
+  ```
+
+  In CSS you will see generated variable name and your default value.
+
+  ```css
+  .Theme_t1cus5as {
+    --font-color: red;
+  }
+
+  .MyComponent_mc195ga {
+    color: var(--mc195ga-0, var(--font-color));
+  }
+  ```
+
+  #### `raw`
+  Use only variable name without dashes and `var()` wrapper.
+
+  ```js
+  import { styled } from "@linaria/react";
+
+  export const MyComponent = styled.div`
+    color: ${(props) => props.color};
+  `;
+  ```
+
+  In CSS you will see just the variable name. This is not valid value for css property.
+
+  ```css
+  .MyComponent_mc195ga {
+    color: mc195ga-0;
+  }
+  ```
+
+  You will have to make it valid:
+
+  ```js
+  export const MyComponent = styled.div`
+    color: var(--${(props) => props.color});
+  `;
+  ```
+
 - `classNameSlug: string | ((hash: string, title: string, args: ClassNameSlugVars) => string)` (default: `default`):
 
   Using this will provide an interface to customize the output of the CSS class name. Example:
@@ -106,12 +196,22 @@ module.exports = {
   ```js
   [
     {
-      action: require('@linaria/shaker').default,
+      action: require.resolve('@linaria/shaker'),
     },
     {
-      test: /\/node_modules\//,
+      test: /[\\/]node_modules[\\/]/,
       action: 'ignore',
     },
+    {
+      test: (filename, code) => {
+        if (!/[\\/]node_modules[\\/]/.test(filename)) {
+          return false;
+        }
+        
+        return /\b(?:export|import)\b/.test(code);
+      },
+      action: require.resolve('@linaria/shaker'),
+    }
   ];
   ```
 
@@ -167,6 +267,10 @@ module.exports = {
 - `babelOptions: Object`
 
   If you need to specify custom babel configuration, you can pass them here. These babel options will be used by Linaria when parsing and evaluating modules.
+
+- `features: Record<string, FeatureFlag>`
+
+  A map of feature flags to enable/disable. See [Feature Flags](./FEATURE_FLAGS.md##feature-flags) for more information.
 
 ## `@linaria/babel-preset`
 
@@ -310,7 +414,7 @@ Now, you have two options. You can use `gatsby-plugin-linaria` or create a custo
 
 ### gatsby-plugin-linaria
 
-This is an easier and more straightforward way of integrating Linaria with Gatsby. Check [plugin docs](https://github.com/silvenon/gatsby-plugin-linaria) for instructions.
+This is an easier and more straightforward way of integrating Linaria with Gatsby. Check [plugin docs](https://github.com/cometkim/gatsby-plugin-linaria) for instructions.
 
 You can also take a look at the example [here](../examples/gatsby/plugin)
 

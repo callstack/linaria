@@ -121,7 +121,7 @@ These can also be combined for further nesting.
 
 ### Property priorities
 
-Using atomic CSS, longhand properties such as `padding-top` have a _higher_ priority than their shorthand equivalents like `padding-top`. For example:
+Using atomic CSS, longhand properties such as `padding-top` have a _higher_ priority than their shorthand equivalents like `padding`. For example:
 
 ```ts
 import { css } from '@linaria/atomic';

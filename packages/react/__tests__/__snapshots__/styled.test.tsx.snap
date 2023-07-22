@@ -2,7 +2,7 @@
 
 exports[`applies CSS variables in style prop 1`] = `
 <div
-  className="abcdefg"
+  className="mocked-styled-2 abcdefg"
   size={24}
   style={
     Object {
@@ -24,7 +24,7 @@ exports[`does not filter attributes for components 1`] = `
 
 exports[`does not filter attributes for kebab cased custom elements 1`] = `
 <my-element
-  className="abcdefg"
+  className="mocked-styled-14 abcdefg"
   unknownAttribute="voila"
 >
   This is a test
@@ -33,7 +33,7 @@ exports[`does not filter attributes for kebab cased custom elements 1`] = `
 
 exports[`does not filter attributes for unknown tag 1`] = `
 <definitelyunknowntag
-  className="abcdefg"
+  className="mocked-styled-16 abcdefg"
   hoverClass="voila"
 >
   This is a test
@@ -42,7 +42,7 @@ exports[`does not filter attributes for unknown tag 1`] = `
 
 exports[`does not filter attributes for upper camel cased custom elements 1`] = `
 <View
-  className="abcdefg"
+  className="mocked-styled-15 abcdefg"
   hoverClass="voila"
 >
   This is a test
@@ -51,7 +51,7 @@ exports[`does not filter attributes for upper camel cased custom elements 1`] = 
 
 exports[`filters unknown html attributes for HTML tag 1`] = `
 <div
-  className="abcdefg"
+  className="mocked-styled-13 abcdefg"
 >
   This is a test
 </div>
@@ -59,7 +59,7 @@ exports[`filters unknown html attributes for HTML tag 1`] = `
 
 exports[`forwards as prop when wrapping another styled component 1`] = `
 <a
-  className="hijklmn abcdefg"
+  className="mocked-styled-12 abcdefg hijklmn abcdefg"
 >
   This is a test
 </a>
@@ -67,7 +67,7 @@ exports[`forwards as prop when wrapping another styled component 1`] = `
 
 exports[`handles wrapping another styled component 1`] = `
 <div
-  className="hijklmn abcdefg"
+  className="mocked-styled-10 abcdefg hijklmn abcdefg"
 >
   This is a test
 </div>
@@ -75,7 +75,7 @@ exports[`handles wrapping another styled component 1`] = `
 
 exports[`merges CSS variables with custom style prop 1`] = `
 <div
-  className="abcdefg"
+  className="mocked-styled-3 abcdefg"
   style={
     Object {
       "--foo": "tomato",
@@ -97,7 +97,7 @@ exports[`provides linaria component className for composition as last item in pr
 
 exports[`renders component with display name and class name 1`] = `
 <div
-  className="abcdefg"
+  className="mocked-styled-1 abcdefg"
 >
   This is a test
 </div>
@@ -105,7 +105,7 @@ exports[`renders component with display name and class name 1`] = `
 
 exports[`renders tag with display name and class name 1`] = `
 <h1
-  className="abcdefg"
+  className="mocked-styled-0 abcdefg"
 >
   This is a test
 </h1>
@@ -113,7 +113,7 @@ exports[`renders tag with display name and class name 1`] = `
 
 exports[`replaces custom component with as prop for primitive 1`] = `
 <a
-  className="abcdefg"
+  className="mocked-styled-7 abcdefg"
   id="test"
 >
   This is a test
@@ -122,7 +122,7 @@ exports[`replaces custom component with as prop for primitive 1`] = `
 
 exports[`replaces primitive with as prop for custom component 1`] = `
 <div
-  className="abcdefg"
+  className="mocked-styled-8 abcdefg"
   foo="bar"
   id="test"
   style={
@@ -137,7 +137,7 @@ exports[`replaces primitive with as prop for custom component 1`] = `
 
 exports[`replaces simple component with as prop 1`] = `
 <a
-  className="abcdefg"
+  className="mocked-styled-6 abcdefg"
   id="test"
 >
   This is a test

@@ -1,5 +1,126 @@
 # Change Log
 
+## 4.5.2
+
+### Patch Changes
+
+- Updated dependencies [85e74df6]
+- Updated dependencies [1bf5c5b8]
+  - @linaria/utils@4.5.1
+  - @linaria/core@4.5.2
+  - @linaria/react@4.5.2
+  - @linaria/tags@4.5.2
+
+## 4.5.1
+
+### Patch Changes
+
+- Updated dependencies [ceca1611]
+- Updated dependencies [13258306]
+  - @linaria/react@4.5.1
+  - @linaria/tags@4.5.1
+  - @linaria/core@4.5.1
+
+## 4.5.0
+
+### Minor Changes
+
+- 16c057df: Breaking Change: Performance Optimization for `styled`
+
+  When a component is wrapped in `styled`, Linaria needs to determine if that component is already a styled component. To accomplish this, the wrapped component is included in the list of variables for evaluation, along with the interpolated values used in styles. The issue arises when a wrapped component, even if it is not styled, brings along a substantial dependency tree. This situation is particularly evident when using `styled` to style components from third-party UI libraries.
+
+  To address this problem, Linaria will now examine the import location of the component and check if there is an annotation in the `package.json` file of the package containing the components. This annotation indicates whether the package includes other Linaria components. If there is no such annotation, Linaria will refrain from evaluating the component.
+
+  Please note that this Breaking Change solely affects developers of component libraries. In order for users to style components from your library, you must include the `linaria.components` property in the library's `package.json` file. This property should have a mask that covers all imported files with components. Here's an example of how to specify it:
+
+  ```json
+  "linaria": {
+    "components": "**/*"
+  }
+  ```
+
+### Patch Changes
+
+- af5bb92d: The end of support for Node.js 14. Migration to pnpm 8.
+- Updated dependencies [890b4aca]
+- Updated dependencies [05ad266c]
+- Updated dependencies [16c057df]
+- Updated dependencies [af5bb92d]
+- Updated dependencies [10859924]
+  - @linaria/utils@4.5.0
+  - @linaria/react@4.5.0
+  - @linaria/tags@4.5.0
+  - @linaria/core@4.5.0
+  - @linaria/logger@4.5.0
+
+## 4.2.10
+
+### Patch Changes
+
+- Updated dependencies [54ab61b2]
+  - @linaria/react@4.3.8
+  - @linaria/tags@4.3.5
+  - @linaria/utils@4.3.4
+  - @linaria/core@4.2.10
+
+## 4.2.9
+
+### Patch Changes
+
+- 34029088: Usages of `styled` and `css` in Jest no longer trigger the "Using the … tag in runtime is not supported" exception.
+- Updated dependencies [2e966f23]
+- Updated dependencies [1c3f309d]
+- Updated dependencies [dbe250b5]
+- Updated dependencies [34029088]
+  - @linaria/tags@4.3.4
+  - @linaria/react@4.3.7
+  - @linaria/utils@4.3.3
+  - @linaria/core@4.2.9
+
+## 4.2.8
+
+### Patch Changes
+
+- Updated dependencies [a3ad617f]
+  - @linaria/react@4.3.6
+  - @linaria/tags@4.3.3
+  - @linaria/core@4.2.8
+
+## 4.2.7
+
+### Patch Changes
+
+- a2b618bc: add react as an optional peerDependency due to dependency on @atomic/react
+- Updated dependencies [f9df4ed8]
+  - @linaria/utils@4.3.2
+  - @linaria/core@4.2.7
+  - @linaria/react@4.3.5
+  - @linaria/tags@4.3.2
+
+## 4.2.6
+
+### Patch Changes
+
+- Updated dependencies [28f3f93d]
+- Updated dependencies [71a5b351]
+- Updated dependencies [61d49a39]
+  - @linaria/tags@4.3.1
+  - @linaria/utils@4.3.1
+  - @linaria/core@4.2.6
+  - @linaria/react@4.3.4
+
+## 4.2.5
+
+### Patch Changes
+
+- 61fe2560: Do not crash when no styles are extracted.
+- Updated dependencies [3ce985e0]
+- Updated dependencies [d11174d0]
+  - @linaria/tags@4.3.0
+  - @linaria/utils@4.3.0
+  - @linaria/core@4.2.5
+  - @linaria/react@4.3.3
+
 ## 4.2.4
 
 ### Patch Changes

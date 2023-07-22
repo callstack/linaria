@@ -6,7 +6,7 @@ import generator from '@babel/generator';
 import dedent from 'dedent';
 
 import type { MissedBabelCoreTypes } from '@linaria/babel-preset';
-import { extractExpression } from '@linaria/babel-preset';
+import { extractExpression } from '@linaria/utils';
 
 const { File } = babel as typeof babel & MissedBabelCoreTypes;
 
@@ -35,7 +35,7 @@ const run = (rawCode: TemplateStringsArray, evaluate: boolean) => {
       // eslint-disable-next-line no-param-reassign
       path.node.leadingComments = [];
 
-      extractExpression(path, evaluate, false);
+      extractExpression(path, evaluate);
     },
   });
 

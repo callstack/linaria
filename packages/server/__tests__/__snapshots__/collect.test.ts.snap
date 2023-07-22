@@ -213,14 +213,18 @@ exports[`include atrule once critical 1`] = `
   h1 {
     font-size: 20px;
   }
+}
+"
+`;
+
+exports[`include atrule once other 1`] = `
+"@media screen {
   .class {
     font-size: 15px;
   }
 }
 "
 `;
-
-exports[`include atrule once other 1`] = `""`;
 
 exports[`simple class name critical 1`] = `
 ".linaria {

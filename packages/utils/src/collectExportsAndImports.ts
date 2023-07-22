@@ -36,7 +36,7 @@ import isRequire from './isRequire';
 import isTypedNode from './isTypedNode';
 
 export interface ISideEffectImport {
-  imported: null;
+  imported: 'side-effect';
   local: NodePath;
   source: string;
 }
@@ -45,6 +45,7 @@ export interface IImport {
   imported: string | 'default' | '*';
   local: NodePath<Identifier | MemberExpression>;
   source: string;
+  type: 'cjs' | 'dynamic' | 'esm';
 }
 
 export interface IExport {
@@ -64,15 +65,16 @@ export interface IState {
   exports: IExport[];
   imports: (IImport | ISideEffectImport)[];
   reexports: IReexport[];
+  isEsModule: boolean;
 }
 
 export const sideEffectImport = (
   item: IImport | ISideEffectImport
-): item is ISideEffectImport => item.imported === null;
+): item is ISideEffectImport => item.imported === 'side-effect';
 
 export const explicitImport = (
   item: IImport | ISideEffectImport
-): item is IImport => item.imported !== null;
+): item is IImport => item.imported !== 'side-effect';
 
 function getValue({ node }: { node: Identifier | StringLiteral }): string {
   return node.type === 'Identifier' ? node.name : node.value;
@@ -97,7 +99,7 @@ const collectors: {
     if (isType(path)) return [];
     const imported = getValue(path.get('imported'));
     const local = path.get('local');
-    return [{ imported, local, source }];
+    return [{ imported, local, source, type: 'esm' }];
   },
 
   ImportDefaultSpecifier(
@@ -105,7 +107,7 @@ const collectors: {
     source
   ): IImport[] {
     const local = path.get('local');
-    return [{ imported: 'default', local, source }];
+    return [{ imported: 'default', local, source, type: 'esm' }];
   },
 
   ImportNamespaceSpecifier(
@@ -113,7 +115,7 @@ const collectors: {
     source
   ): IImport[] {
     const local = path.get('local');
-    return unfoldNamespaceImport({ imported: '*', local, source });
+    return unfoldNamespaceImport({ imported: '*', local, source, type: 'esm' });
   },
 };
 
@@ -128,7 +130,7 @@ function collectFromImportDeclaration(
   const specifiers = path.get('specifiers');
 
   if (specifiers.length === 0) {
-    state.imports.push({ imported: null, local: path, source });
+    state.imports.push({ imported: 'side-effect', local: path, source });
   }
 
   specifiers.forEach(<T extends SpecifierTypes>(specifier: NodePath<T>) => {
@@ -305,20 +307,45 @@ function collectFromDynamicImport(path: NodePath<Import>, state: IState): void {
   // Is it `const something = await import("something")`?
   if (key === 'init' && container.isVariableDeclarator()) {
     importFromVariableDeclarator(container, isAwaited).map((prop) =>
-      state.imports.push({ imported: prop.what, local: prop.as, source })
+      state.imports.push({
+        imported: prop.what,
+        local: prop.as,
+        source,
+        type: 'dynamic',
+      })
     );
   }
 }
 
-function getImportTypeByInteropFunction(
-  path: NodePath<CallExpression>
-): '*' | 'default' | undefined {
+function getCalleeName(path: NodePath<CallExpression>): string | undefined {
   const callee = path.get('callee');
-  if (!callee.isIdentifier()) {
+  if (callee.isIdentifier()) {
+    return callee.node.name;
+  }
+
+  if (callee.isMemberExpression()) {
+    const property = callee.get('property');
+    if (property.isIdentifier()) {
+      return property.node.name;
+    }
+  }
+
+  return undefined;
+}
+
+function getImportExportTypeByInteropFunction(
+  path: NodePath<CallExpression>
+): 'import:*' | 're-export:*' | 'default' | undefined {
+  const name = getCalleeName(path);
+
+  if (name === undefined) {
     return undefined;
   }
 
-  const { name } = callee.node;
+  if (name.startsWith('__exportStar')) {
+    return 're-export:*';
+  }
+
   if (
     name.startsWith('_interopRequireDefault') ||
     name.startsWith('__importDefault')
@@ -331,7 +358,7 @@ function getImportTypeByInteropFunction(
     name.startsWith('__importStar') ||
     name.startsWith('__toESM')
   ) {
-    return '*';
+    return 'import:*';
   }
 
   if (
@@ -339,7 +366,7 @@ function getImportTypeByInteropFunction(
     name.startsWith('__objRest') ||
     name.startsWith('_objectDestructuringEmpty')
   ) {
-    return '*';
+    return 'import:*';
   }
 
   return undefined;
@@ -367,7 +394,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
   if (container.isCallExpression() && key === 0) {
     // It may be transpiled import such as
     // `var _atomic = _interopRequireDefault(require("@linaria/atomic"));`
-    const imported = getImportTypeByInteropFunction(container);
+    const imported = getImportExportTypeByInteropFunction(container);
     if (!imported) {
       // It's not a transpiled import.
       // TODO: Can we guess that it's a namespace import?
@@ -376,6 +403,17 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
         'Unknown wrapper of require',
         container.node.callee
       );
+      return;
+    }
+
+    if (imported === 're-export:*') {
+      state.reexports.push({
+        exported: '*',
+        imported: '*',
+        local: path,
+        source,
+      });
+
       return;
     }
 
@@ -406,11 +444,12 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
       return;
     }
 
-    if (imported === '*') {
+    if (imported === 'import:*') {
       const unfolded = unfoldNamespaceImport({
-        imported,
+        imported: '*',
         local: id,
         source,
+        type: 'cjs',
       });
       state.imports.push(...unfolded);
     } else {
@@ -418,6 +457,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
         imported,
         local: id,
         source,
+        type: 'cjs',
       });
     }
   }
@@ -445,6 +485,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
           imported: getValue(property),
           local: id,
           source,
+          type: 'cjs',
         });
       } else {
         warn(
@@ -460,6 +501,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
         imported: getValue(property),
         local: container,
         source,
+        type: 'cjs',
       });
     }
 
@@ -474,6 +516,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
           imported: '*',
           local: prop.as,
           source,
+          type: 'cjs',
         });
 
         state.imports.push(...unfolded);
@@ -482,6 +525,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
           imported: prop.what,
           local: prop.as,
           source,
+          type: 'cjs',
         });
       }
     });
@@ -490,7 +534,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
   if (container.isExpressionStatement()) {
     // Looks like standalone require
     state.imports.push({
-      imported: null,
+      imported: 'side-effect',
       local: container,
       source,
     });
@@ -594,6 +638,8 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
 
     const { name } = property.node;
     if (name === '__esModule') {
+      // eslint-disable-next-line no-param-reassign
+      state.isEsModule = true;
       return;
     }
 
@@ -611,21 +657,25 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
     if (
       obj?.isIdentifier(path.node) &&
       prop?.isStringLiteral() &&
-      prop.node.value !== '__esModule' &&
       descriptor?.isObjectExpression()
     ) {
-      /**
-       *  Object.defineProperty(exports, "token", {
-       *    enumerable: true,
-       *    get: function get() {
-       *      return _unknownPackage.token;
-       *    }
-       *  });
-       */
-      const exported = prop.node.value;
-      const local = getGetterValueFromDescriptor(descriptor);
-      if (local) {
-        state.exports.push({ exported, local });
+      if (prop.node.value === '__esModule') {
+        // eslint-disable-next-line no-param-reassign
+        state.isEsModule = true;
+      } else {
+        /**
+         *  Object.defineProperty(exports, "token", {
+         *    enumerable: true,
+         *    get: function get() {
+         *      return _unknownPackage.token;
+         *    }
+         *  });
+         */
+        const exported = prop.node.value;
+        const local = getGetterValueFromDescriptor(descriptor);
+        if (local) {
+          state.exports.push({ exported, local });
+        }
       }
     } else if (
       obj?.isIdentifier(path.node) &&
@@ -720,7 +770,49 @@ function unfoldNamespaceImport(
       continue;
     }
 
-    if (parentPath?.isExportSpecifier()) {
+    if (
+      parentPath?.isCallExpression() &&
+      referencePath.listKey === 'arguments'
+    ) {
+      // The defined variable is used as a function argument. Let's try to figure out what is imported.
+      const importType = getImportExportTypeByInteropFunction(parentPath);
+
+      if (!importType) {
+        // Imported value is used as an unknown function argument,
+        // so we can't predict usage and import it as is.
+        result.push(importItem);
+        break;
+      }
+
+      if (importType === 'default') {
+        result.push({
+          ...importItem,
+          imported: 'default',
+          local: parentPath.get('id') as NodePath<Identifier>,
+        });
+
+        continue;
+      }
+
+      if (importType === 'import:*') {
+        result.push(importItem);
+        break;
+      }
+
+      warn(
+        'evaluator:collectExportsAndImports:unfoldNamespaceImports',
+        'Unknown import type',
+        importType
+      );
+
+      result.push(importItem);
+      continue;
+    }
+
+    if (
+      parentPath?.isExportSpecifier() ||
+      parentPath?.isExportDefaultDeclaration()
+    ) {
       // The whole namespace is re-exported
       result.push(importItem);
       break;
@@ -1031,7 +1123,7 @@ function collectFromCallExpression(
   }
 }
 
-export default function collectExportsAndImports(
+export function collectExportsAndImports(
   path: NodePath,
   force = false
 ): IState {
@@ -1040,6 +1132,7 @@ export default function collectExportsAndImports(
     exports: [],
     imports: [],
     reexports: [],
+    isEsModule: false,
   };
 
   if (!force && cache.has(path)) {

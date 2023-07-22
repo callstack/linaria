@@ -1,5 +1,117 @@
 # Change Log
 
+## 4.5.2
+
+### Patch Changes
+
+- Updated dependencies [85e74df6]
+- Updated dependencies [1bf5c5b8]
+  - @linaria/utils@4.5.1
+  - @linaria/babel-preset@4.5.2
+
+## 4.5.1
+
+### Patch Changes
+
+- Updated dependencies [ceca1611]
+- Updated dependencies [13258306]
+  - @linaria/babel-preset@4.5.1
+
+## 4.5.0
+
+### Minor Changes
+
+- 16c057df: Breaking Change: Performance Optimization for `styled`
+
+  When a component is wrapped in `styled`, Linaria needs to determine if that component is already a styled component. To accomplish this, the wrapped component is included in the list of variables for evaluation, along with the interpolated values used in styles. The issue arises when a wrapped component, even if it is not styled, brings along a substantial dependency tree. This situation is particularly evident when using `styled` to style components from third-party UI libraries.
+
+  To address this problem, Linaria will now examine the import location of the component and check if there is an annotation in the `package.json` file of the package containing the components. This annotation indicates whether the package includes other Linaria components. If there is no such annotation, Linaria will refrain from evaluating the component.
+
+  Please note that this Breaking Change solely affects developers of component libraries. In order for users to style components from your library, you must include the `linaria.components` property in the library's `package.json` file. This property should have a mask that covers all imported files with components. Here's an example of how to specify it:
+
+  ```json
+  "linaria": {
+    "components": "**/*"
+  }
+  ```
+
+### Patch Changes
+
+- 00b43a6b: Cannot find module 'xxx' with esbuild 0.17 and linaria 4.2
+- af5bb92d: The end of support for Node.js 14. Migration to pnpm 8.
+- Updated dependencies [890b4aca]
+- Updated dependencies [418e40af]
+- Updated dependencies [05ad266c]
+- Updated dependencies [16c057df]
+- Updated dependencies [af5bb92d]
+  - @linaria/utils@4.5.0
+  - @linaria/babel-preset@4.5.0
+
+## 4.2.11
+
+### Patch Changes
+
+- Updated dependencies [821a6819]
+- Updated dependencies [54ab61b2]
+  - @linaria/babel-preset@4.4.5
+  - @linaria/utils@4.3.4
+
+## 4.2.10
+
+### Patch Changes
+
+- Updated dependencies [1c3f309d]
+- Updated dependencies [dbe250b5]
+- Updated dependencies [a62e7ba6]
+  - @linaria/babel-preset@4.4.4
+  - @linaria/utils@4.3.3
+
+## 4.2.9
+
+### Patch Changes
+
+- @linaria/babel-preset@4.4.3
+
+## 4.2.8
+
+### Patch Changes
+
+- Updated dependencies [f9df4ed8]
+  - @linaria/babel-preset@4.4.2
+  - @linaria/utils@4.3.2
+
+## 4.2.7
+
+### Patch Changes
+
+- Updated dependencies [917db446]
+- Updated dependencies [57c0dc4f]
+  - @linaria/babel-preset@4.4.1
+
+## 4.2.6
+
+### Patch Changes
+
+- Updated dependencies [9cf41fae]
+- Updated dependencies [860b8d21]
+- Updated dependencies [af783273]
+- Updated dependencies [28f3f93d]
+- Updated dependencies [1d4d6833]
+- Updated dependencies [71a5b351]
+- Updated dependencies [2d3a741f]
+- Updated dependencies [61d49a39]
+  - @linaria/babel-preset@4.4.0
+  - @linaria/utils@4.3.1
+
+## 4.2.5
+
+### Patch Changes
+
+- Updated dependencies [3ce985e0]
+- Updated dependencies [d11174d0]
+  - @linaria/babel-preset@4.3.3
+  - @linaria/utils@4.3.0
+
 ## 4.2.4
 
 ### Patch Changes

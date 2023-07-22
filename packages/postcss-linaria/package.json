@@ -1,6 +1,6 @@
 {
   "name": "@linaria/postcss-linaria",
-  "version": "4.1.5",
+  "version": "4.5.0",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "css",
@@ -38,13 +38,13 @@
     "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
-    "@babel/generator": "^7.20.4",
-    "@babel/parser": "^7.20.3",
-    "@babel/traverse": "^7.20.1",
+    "@babel/generator": "^7.22.9",
+    "@babel/parser": "^7.22.7",
+    "@babel/traverse": "^7.22.8",
     "stylelint": "^14.11.0"
   },
   "devDependencies": {
-    "@babel/types": "^7.20.2",
+    "@babel/types": "^7.22.5",
     "@types/babel__generator": "^7.6.4",
     "@types/babel__traverse": "^7.17.1",
     "postcss": "^8.3.11"

@@ -1,6 +1,6 @@
 {
   "name": "@linaria/esbuild",
-  "version": "4.2.4",
+  "version": "4.5.2",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",
@@ -36,7 +36,7 @@
     "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
-    "@babel/core": "^7.20.2",
+    "@babel/core": "^7.22.9",
     "@linaria/babel-preset": "workspace:^",
     "@linaria/utils": "workspace:^"
   },

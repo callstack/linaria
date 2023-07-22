@@ -1,6 +1,6 @@
 {
   "name": "@linaria/testkit",
-  "version": "4.2.2",
+  "version": "4.5.2",
   "private": true,
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
@@ -21,9 +21,9 @@
     "typecheck": "tsc --noEmit --composite false"
   },
   "dependencies": {
-    "@babel/core": "^7.20.2",
-    "@babel/generator": "^7.20.4",
-    "@babel/traverse": "^7.20.1",
+    "@babel/core": "^7.22.9",
+    "@babel/generator": "^7.22.9",
+    "@babel/traverse": "^7.22.8",
     "@linaria/babel-preset": "workspace:^",
     "@linaria/extractor": "workspace:^",
     "@linaria/react": "workspace:^",
@@ -36,11 +36,11 @@
     "typescript": "^4.7.4"
   },
   "devDependencies": {
-    "@babel/plugin-syntax-jsx": "^7.18.6",
-    "@babel/plugin-syntax-typescript": "^7.20.0",
-    "@babel/plugin-transform-modules-commonjs": "^7.19.6",
-    "@babel/runtime": "^7.20.1",
-    "@babel/types": "^7.20.2",
+    "@babel/plugin-syntax-jsx": "^7.22.5",
+    "@babel/plugin-syntax-typescript": "^7.22.5",
+    "@babel/plugin-transform-modules-commonjs": "^7.22.5",
+    "@babel/runtime": "^7.22.6",
+    "@babel/types": "^7.22.5",
     "@linaria/atomic": "workspace:^",
     "@linaria/core": "workspace:^",
     "@linaria/griffel": "workspace:^",

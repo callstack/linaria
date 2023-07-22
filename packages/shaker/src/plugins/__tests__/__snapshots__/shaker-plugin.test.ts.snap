@@ -2,11 +2,31 @@
 
 exports[`shaker should delete import 1`] = `"export const Alive = \\"\\";"`;
 
+exports[`shaker should handle __importDefault 1`] = `
+"var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    default: mod
+  };
+};
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+var Input_1 = require('./Input');
+Object.defineProperty(exports, 'Input', {
+  enumerable: true,
+  get: function () {
+    return __importDefault(Input_1).default;
+  }
+});"
+`;
+
 exports[`shaker should keep assigment even if export is marked for removing 1`] = `
 "let _a;
 exports.a = _a = {};
 exports.b = _a;"
 `;
+
+exports[`shaker should keep only side-effects 1`] = `"import 'regenerator-runtime/runtime.js';"`;
 
 exports[`shaker should keep referenced exports 1`] = `
 "var _foo;
@@ -15,9 +35,29 @@ exports.defaultValue = Math.random() * _foo;
 exports.foo = _foo;"
 `;
 
+exports[`shaker should keep setBatch 1`] = `
+"function defaultNoopBatch(callback) {
+  callback();
+}
+var batch = defaultNoopBatch;
+export var setBatch = function setBatch(newBatch) {
+  return batch = newBatch;
+};"
+`;
+
+exports[`shaker should keep side-effects from modules 1`] = `
+"import 'regenerator-runtime/runtime.js';
+export const a = 1;"
+`;
+
 exports[`shaker should process array patterns 1`] = `
 "const [,, c] = array;
 export { c };"
+`;
+
+exports[`shaker should process constant violations inside binding paths 1`] = `
+"export function c() {}
+;"
 `;
 
 exports[`shaker should process identifiers in void expressions as references 1`] = `
@@ -51,6 +91,8 @@ exports.Kind = _Kind;"
 
 exports[`shaker should remove all references of \`a\` 1`] = `"exports.b = 10;"`;
 
+exports[`shaker should remove asset imports 1`] = `"export const a = 1;"`;
+
 exports[`shaker should remove related code 1`] = `
 "const a = 1;
 export { a };"
@@ -62,6 +104,11 @@ exports[`shaker should respect implicit references 1`] = `
 "let _a;
 exports.a = _a = {};
 exports.b = _a;"
+`;
+
+exports[`shaker should shake if __linariaPreval required but not exported 1`] = `
+"import 'regenerator-runtime/runtime.js';
+export { Input } from \\"./Input\\";"
 `;
 
 exports[`shaker should throw out unused referenced exports 1`] = `"exports.defaultValue = 20;"`;

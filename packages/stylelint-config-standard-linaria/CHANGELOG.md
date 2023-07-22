@@ -1,4 +1,13 @@
-# @linaria/stylelint-config-standard-linaria
+# Change Log
+
+## 4.5.0
+
+### Patch Changes
+
+- af5bb92d: The end of support for Node.js 14. Migration to pnpm 8.
+- Updated dependencies [16c057df]
+- Updated dependencies [af5bb92d]
+  - @linaria/postcss-linaria@4.5.0
 
 ## 4.1.5
 

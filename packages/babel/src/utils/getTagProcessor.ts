@@ -2,38 +2,33 @@ import { readFileSync } from 'fs';
 import { basename, dirname, join } from 'path';
 
 import { types as t } from '@babel/core';
-import { addNamed } from '@babel/helper-module-imports';
+import { addDefault, addNamed } from '@babel/helper-module-imports';
 import type { NodePath } from '@babel/traverse';
 import type {
   Expression,
   SourceLocation,
   Identifier,
   MemberExpression,
+  Program,
 } from '@babel/types';
-import findUp from 'find-up';
 
 import { BaseProcessor } from '@linaria/tags';
-import type {
-  Param,
-  Params,
-  IFileContext,
-  ExpressionValue,
-} from '@linaria/tags';
-import type { IImport, StrictOptions } from '@linaria/utils';
+import type { Param, Params, IFileContext, TagSource } from '@linaria/tags';
+import type { ExpressionValue, IImport, StrictOptions } from '@linaria/utils';
 import {
   collectExportsAndImports,
+  collectTemplateDependencies,
   explicitImport,
+  extractExpression,
+  findPackageJSON,
+  getSource,
   isNotNull,
   mutate,
 } from '@linaria/utils';
 
-import collectTemplateDependencies, {
-  extractExpression,
-} from './collectTemplateDependencies';
-import getSource from './getSource';
-
 type BuilderArgs = ConstructorParameters<typeof BaseProcessor> extends [
   Params,
+  TagSource,
   typeof t,
   SourceLocation | null,
   (replacement: Expression, isPure: boolean) => void,
@@ -65,26 +60,6 @@ function buildCodeFrameError(path: NodePath, message: string): Error {
     return path.buildCodeFrameError(message);
   } catch {
     return new Error(message);
-  }
-}
-
-function findPackageJSON(pkgName: string, filename: string | null | undefined) {
-  try {
-    const pkgPath = require.resolve(
-      pkgName,
-      filename ? { paths: [dirname(filename)] } : {}
-    );
-    return findUp.sync('package.json', { cwd: pkgPath });
-  } catch (er: unknown) {
-    if (
-      typeof er === 'object' &&
-      er !== null &&
-      (er as { code?: unknown }).code === 'MODULE_NOT_FOUND'
-    ) {
-      return undefined;
-    }
-
-    throw er;
   }
 }
 
@@ -164,11 +139,13 @@ function getProcessorForIdentifier(
     StrictOptions,
     'classNameSlug' | 'displayName' | 'evaluate' | 'tagResolver'
   >
-): [ProcessorClass, NodePath<Identifier | MemberExpression>] | [null, null] {
+):
+  | [ProcessorClass, TagSource, NodePath<Identifier | MemberExpression>]
+  | [null, null, null] {
   const pathBinding = path.scope.getBinding(path.node.name);
   if (!pathBinding) {
     // It's not a binding, so it's not a tag
-    return [null, null];
+    return [null, null, null];
   }
 
   const tagResolver = options.tagResolver ?? (() => null);
@@ -203,28 +180,29 @@ function getProcessorForIdentifier(
     .filter((i) => i[1] === null || i[1].isExpression());
 
   if (relatedImports.length === 0) {
-    return [null, null];
+    return [null, null, null];
   }
 
-  const [Processor = null, tagPath = null] =
+  const [Processor = null, tagSource = null, tagPath = null] =
     relatedImports
       .map(
-        ([imp, p]): [
+        ([{ imported, source }, p]): [
           ProcessorClass | null,
+          TagSource,
           NodePath<Identifier | MemberExpression> | null
         ] => {
-          const source = tagResolver(imp.source, imp.imported);
-          const processor = source
-            ? getProcessorFromFile(source)
-            : getProcessorFromPackage(imp.source, imp.imported, filename);
-          return [processor, p];
+          const customFile = tagResolver(source, imported);
+          const processor = customFile
+            ? getProcessorFromFile(customFile)
+            : getProcessorFromPackage(source, imported, filename);
+          return [processor, { imported, source }, p];
         }
       )
       .find(([proc]) => proc) ?? [];
 
-  return Processor === null || tagPath === null
-    ? [null, null]
-    : [Processor, tagPath];
+  return Processor === null || tagSource === null || tagPath === null
+    ? [null, null, null]
+    : [Processor, tagSource, tagPath];
 }
 
 function getBuilderForIdentifier(
@@ -236,18 +214,18 @@ function getBuilderForIdentifier(
     'classNameSlug' | 'displayName' | 'evaluate' | 'tagResolver'
   >
 ): Builder | null {
-  const [Processor, tagPath] = getProcessorForIdentifier(
+  const [Processor, tagSource, tagPath] = getProcessorForIdentifier(
     path,
     imports,
     filename,
     options
   );
 
-  if (!Processor || !tagPath) {
+  if (!Processor || !tagSource || !tagPath) {
     return null;
   }
 
-  const params: Param[] = [['tag', tagPath.node]];
+  const params: Param[] = [['callee', tagPath.node]];
   let prev: NodePath = tagPath;
   let current: NodePath | null = tagPath.parentPath;
   while (current && current !== path) {
@@ -270,7 +248,7 @@ function getBuilderForIdentifier(
             throw buildError(`Unexpected type of an argument ${arg.type}`);
           }
           const source = getSource(arg);
-          const extracted = extractExpression(arg, options.evaluate);
+          const extracted = extractExpression(arg, options.evaluate, imports);
           return {
             ...extracted,
             source,
@@ -329,13 +307,19 @@ function getBuilderForIdentifier(
 
   const astService = {
     ...t,
-    addNamedImport: (name: string, importedSource: string) =>
-      addNamed(path, name, importedSource),
+    addDefaultImport: (importedSource: string, nameHint?: string) =>
+      addDefault(path, importedSource, { nameHint }),
+    addNamedImport: (
+      name: string,
+      importedSource: string,
+      nameHint: string = name
+    ) => addNamed(path, name, importedSource, { nameHint }),
   };
 
   return (...args: BuilderArgs) =>
     new Processor(
       params,
+      tagSource,
       astService,
       tagPath.node.loc ?? null,
       replacer,
@@ -346,7 +330,7 @@ function getBuilderForIdentifier(
 function getDisplayName(
   path: NodePath<Identifier>,
   idx: number,
-  fileContext: IFileContext
+  filename?: string | null
 ): string {
   let displayName: string | undefined;
 
@@ -381,11 +365,10 @@ function getDisplayName(
   }
 
   if (!displayName) {
-    const filename = fileContext.filename ?? 'unknown';
     // Try to derive the path from the filename
-    displayName = basename(filename);
+    displayName = basename(filename ?? 'unknown');
 
-    if (/^index\.[a-z\d]+$/.test(displayName)) {
+    if (filename && /^index\.[a-z\d]+$/.test(displayName)) {
       // If the file name is 'index', better to get name from parent folder
       displayName = basename(dirname(filename));
     }
@@ -455,7 +438,7 @@ export default function getTagProcessor(
   >
 ): BaseProcessor | null {
   if (!cache.has(path.node)) {
-    const root = path.scope.getProgramParent().path;
+    const root = path.scope.getProgramParent().path as NodePath<Program>;
     const { imports } = collectExportsAndImports(root);
     try {
       const builder = getBuilderForIdentifier(
@@ -470,7 +453,7 @@ export default function getTagProcessor(
         // Also used for display name if it couldn't be determined
         const idx = getNextIndex(fileContext);
 
-        const displayName = getDisplayName(path, idx, fileContext);
+        const displayName = getDisplayName(path, idx, fileContext.filename);
 
         const processor = builder(
           displayName,

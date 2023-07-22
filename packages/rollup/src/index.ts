@@ -7,16 +7,18 @@
 import { createFilter } from '@rollup/pluginutils';
 import type { Plugin } from 'rollup';
 
-import { transform, slugify } from '@linaria/babel-preset';
+import {
+  transform,
+  slugify,
+  TransformCacheCollection,
+} from '@linaria/babel-preset';
 import type {
   PluginOptions,
   Preprocessor,
   Result,
-  CodeCache,
-  Module,
 } from '@linaria/babel-preset';
 import { createCustomDebug } from '@linaria/logger';
-import { getFileIdx } from '@linaria/utils';
+import { getFileIdx, syncResolve } from '@linaria/utils';
 import type { Plugin as VitePlugin } from '@linaria/vite';
 import vitePlugin from '@linaria/vite';
 
@@ -36,9 +38,8 @@ export default function linaria({
 }: RollupPluginOptions = {}): Plugin {
   const filter = createFilter(include, exclude);
   const cssLookup: { [key: string]: string } = {};
-  const codeCache: CodeCache = new Map();
-  const resolveCache = new Map<string, string>();
-  const evalCache = new Map<string, Module>();
+  const cache = new TransformCacheCollection();
+  const emptyConfig = {};
 
   const plugin: Plugin = {
     name: 'linaria',
@@ -60,10 +61,23 @@ export default function linaria({
 
       log('rollup-init', id);
 
-      const asyncResolve = async (what: string, importer: string) => {
+      const asyncResolve = async (
+        what: string,
+        importer: string,
+        stack: string[]
+      ) => {
         const resolved = await this.resolve(what, importer);
         if (resolved) {
+          if (resolved.external) {
+            // If module is marked as external, Rollup will not resolve it,
+            // so we need to resolve it ourselves with default resolver
+            const resolvedId = syncResolve(what, importer, stack);
+            log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
+            return resolvedId;
+          }
+
           log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
+
           // Vite adds param like `?v=667939b3` to cached modules
           const resolvedId = resolved.id.split('?')[0];
 
@@ -88,10 +102,8 @@ export default function linaria({
           pluginOptions: rest,
         },
         asyncResolve,
-        {},
-        resolveCache,
-        codeCache,
-        evalCache
+        emptyConfig,
+        cache
       );
 
       if (!result.cssText) return;
@@ -119,7 +131,7 @@ export default function linaria({
 
   return new Proxy<Plugin>(plugin, {
     get(target, prop) {
-      return (vite || target)[prop as keyof Plugin];
+      return ((vite as Plugin) || target)[prop as keyof Plugin];
     },
 
     getOwnPropertyDescriptor(target, prop) {

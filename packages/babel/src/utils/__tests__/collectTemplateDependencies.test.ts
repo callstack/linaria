@@ -4,8 +4,9 @@ import generate from '@babel/generator';
 import dedent from 'dedent';
 import stripAnsi from 'strip-ansi';
 
+import { extractExpression } from '@linaria/utils';
+
 import type { MissedBabelCoreTypes } from '../../types';
-import { extractExpression } from '../collectTemplateDependencies';
 
 const { File } = babel as typeof babel & MissedBabelCoreTypes;
 
@@ -21,7 +22,7 @@ async function go(code: string): Promise<string> {
       const expressions = path.get('expressions');
       expressions.forEach((exp) => {
         if (exp.isExpression()) {
-          extractExpression(exp, true, false);
+          extractExpression(exp, true);
         }
       });
     },

@@ -10,7 +10,7 @@ import React from 'react';
 
 import { cx } from '@linaria/core';
 import type { CSSProperties } from '@linaria/core';
-import type { StyledMeta } from '@linaria/tags';
+import type { StyledMeta } from '@linaria/utils';
 
 export type NoInfer<A> = [A][A extends any ? 0 : never];
 
@@ -105,6 +105,8 @@ interface IProps {
   [props: string]: unknown;
 }
 
+let idx = 0;
+
 // Components with props are not allowed
 function styled(
   componentWithStyle: () => any
@@ -132,8 +134,21 @@ function styled(
   component: 'The target component should have a className prop'
 ): never;
 function styled(tag: any): any {
+  let mockedClass = '';
+
+  if (process.env.NODE_ENV === 'test') {
+    // eslint-disable-next-line no-plusplus
+    mockedClass += `mocked-styled-${idx++}`;
+    if (tag?.__linaria?.className) {
+      mockedClass += ` ${tag.__linaria.className}`;
+    }
+  }
+
   return (options: Options) => {
-    if (process.env.NODE_ENV !== 'production') {
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      process.env.NODE_ENV !== 'test'
+    ) {
       if (Array.isArray(options)) {
         // We received a strings array since it's used as a tag
         throw new Error(
@@ -143,7 +158,7 @@ function styled(tag: any): any {
     }
 
     const render = (props: any, ref: any) => {
-      const { as: component = tag, class: className } = props;
+      const { as: component = tag, class: className = mockedClass } = props;
       const shouldKeepProps =
         options.propsAsIs === undefined
           ? !(
@@ -213,7 +228,7 @@ function styled(tag: any): any {
 
     // These properties will be read by the babel plugin for interpolation
     (Result as any).__linaria = {
-      className: options.class,
+      className: options.class || mockedClass,
       extends: tag,
     };
 
@@ -221,14 +236,14 @@ function styled(tag: any): any {
   };
 }
 
-type StyledComponent<T> = StyledMeta &
+export type StyledComponent<T> = StyledMeta &
   ([T] extends [React.FunctionComponent<any>]
     ? T
     : React.FunctionComponent<T & { as?: React.ElementType }>);
 
 type StaticPlaceholder = string | number | CSSProperties | StyledMeta;
 
-type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
+export type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
   TAdditionalProps = Record<never, unknown>
 >(
   strings: TemplateStringsArray,

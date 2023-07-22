@@ -2,25 +2,27 @@ import type core from '@babel/core';
 import type { BabelFile, PluginObj, NodePath } from '@babel/core';
 import type { Binding } from '@babel/traverse';
 import type {
-  VariableDeclarator,
-  Program,
   Identifier,
   MemberExpression,
+  Program,
+  VariableDeclarator,
 } from '@babel/types';
 
 import { createCustomDebug } from '@linaria/logger';
 import type { IExport, IReexport, IState } from '@linaria/utils';
 import {
+  applyAction,
   collectExportsAndImports,
+  dereference,
+  findActionForNode,
   getFileIdx,
   isRemoved,
+  reference,
   removeWithRelated,
   sideEffectImport,
-  reference,
-  findActionForNode,
-  dereference,
-  mutate,
 } from '@linaria/utils';
+
+import shouldKeepSideEffect from './utils/shouldKeepSideEffect';
 
 type Core = typeof core;
 
@@ -148,6 +150,7 @@ export default function shakerPlugin(
       const log = createCustomDebug('shaker', getFileIdx(this.filename));
 
       log('start', `${this.filename}, onlyExports: ${onlyExports.join(',')}`);
+      const onlyExportsSet = new Set(onlyExports);
 
       const collected = collectExportsAndImports(file.path);
       const sideEffectImports = collected.imports.filter(sideEffectImport);
@@ -169,6 +172,9 @@ export default function shakerPlugin(
         collected.exports
       );
 
+      const findExport = (name: string) =>
+        exports.find((i) => i.exported === name);
+
       collected.exports.forEach(({ local }) => {
         if (local.isAssignmentExpression()) {
           const left = local.get('left');
@@ -180,13 +186,16 @@ export default function shakerPlugin(
         }
       });
 
-      if (
-        onlyExports.length === 1 &&
-        onlyExports[0] === '__linariaPreval' &&
-        !exports.find((i) => i.exported === '__linariaPreval')
-      ) {
-        // Fast-lane: if only __linariaPreval is requested, and it's not exported,
-        // we can just shake out the whole file
+      const hasLinariaPreval = findExport('__linariaPreval') !== undefined;
+      const hasDefault = findExport('default') !== undefined;
+
+      // If __linariaPreval is not exported, we can remove it from onlyExports
+      if (onlyExportsSet.has('__linariaPreval') && !hasLinariaPreval) {
+        onlyExportsSet.delete('__linariaPreval');
+      }
+
+      if (onlyExportsSet.size === 0) {
+        // Fast-lane: if there are no exports to keep, we can just shake out the whole file
         this.imports = [];
         this.exports = [];
         this.reexports = [];
@@ -198,27 +207,53 @@ export default function shakerPlugin(
         return;
       }
 
-      if (!onlyExports.includes('*')) {
+      const importedAsSideEffect = onlyExportsSet.has('side-effect');
+      onlyExportsSet.delete('side-effect');
+
+      // Hackaround for packages which include a 'default' export without specifying __esModule; such packages cannot be
+      // shaken as they will break interopRequireDefault babel helper
+      // See example in shaker-plugin.test.ts
+      // Real-world example was found in preact/compat npm package
+      if (
+        onlyExportsSet.has('default') &&
+        hasDefault &&
+        !collected.isEsModule
+      ) {
+        this.imports = collected.imports;
+        this.exports = exports;
+        this.reexports = collected.reexports;
+        return;
+      }
+
+      if (!onlyExportsSet.has('*')) {
         const aliveExports = new Set<IExport | IReexport>();
         const importNames = collected.imports.map(({ imported }) => imported);
 
         exports.forEach((exp) => {
-          if (onlyExports.includes(exp.exported)) {
+          if (onlyExportsSet.has(exp.exported)) {
             aliveExports.add(exp);
           } else if (
             importNames.includes((exp.local.node as NodeWithName).name || '')
           ) {
             aliveExports.add(exp);
-          }
-        });
-
-        collected.reexports.forEach((exp) => {
-          if (onlyExports.includes(exp.exported)) {
+          } else if (
+            [...aliveExports].some((liveExp) => liveExp.local === exp.local)
+          ) {
+            // It's possible to export multiple values from a single variable initializer, e.g
+            // export const { foo, bar } = baz();
+            // We need to treat all of them as used if any of them are used, since otherwise
+            // we'll attempt to delete the baz() call
             aliveExports.add(exp);
           }
         });
 
-        const isAllExportsFound = aliveExports.size === onlyExports.length;
+        collected.reexports.forEach((exp) => {
+          if (onlyExportsSet.has(exp.exported)) {
+            aliveExports.add(exp);
+          }
+        });
+
+        const isAllExportsFound = aliveExports.size === onlyExportsSet.size;
         if (!isAllExportsFound && ifUnknownExport !== 'ignore') {
           if (ifUnknownExport === 'error') {
             throw new Error(
@@ -254,9 +289,13 @@ export default function shakerPlugin(
           .filter((exp) => !aliveExports.has(exp))
           .map((exp) => exp.local);
 
-        if (!keepSideEffects && sideEffectImports.length > 0) {
-          // Remove all imports that don't import something explicitly
-          sideEffectImports.forEach((i) => forDeleting.push(i.local));
+        if (!keepSideEffects && !importedAsSideEffect) {
+          // Remove all imports that don't import something explicitly and should not be kept
+          sideEffectImports.forEach((i) => {
+            if (!shouldKeepSideEffect(i.source)) {
+              forDeleting.push(i.local);
+            }
+          });
         }
 
         const deleted = new Set<NodePath>();
@@ -284,15 +323,7 @@ export default function shakerPlugin(
               (!binding || outerReferences.length === 0)
             ) {
               if (action) {
-                mutate(action[1], (p) => {
-                  if (isRemoved(p)) return;
-
-                  if (action[0] === 'remove') {
-                    p.remove();
-                  } else if (action[0] === 'replace') {
-                    p.replaceWith(action[2]);
-                  }
-                });
+                applyAction(action);
               } else {
                 removeWithRelated([path]);
               }

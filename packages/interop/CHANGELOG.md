@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.5.0
+
+### Patch Changes
+
+- af5bb92d: The end of support for Node.js 14. Migration to pnpm 8.
+
 ## 4.0.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@linaria/rollup",
-  "version": "4.3.1",
+  "version": "4.5.2",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",
@@ -44,10 +44,10 @@
     "@rollup/pluginutils": "^4.1.0"
   },
   "devDependencies": {
-    "rollup": "1.20.0||^2.0.0"
+    "rollup": "^3.11.0"
   },
   "peerDependencies": {
-    "rollup": "1.20.0||^2.0.0"
+    "rollup": "1.20.0||^2.0.0||^3.0.0"
   },
   "engines": {
     "node": "^12.16.0 || >=13.7.0"

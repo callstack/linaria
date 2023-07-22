@@ -6,10 +6,10 @@ import type { StrictOptions } from '@linaria/utils';
 import { removeWithRelated, syncResolve } from '@linaria/utils';
 
 import type { Core } from '../babel';
-import type Module from '../module';
+import { TransformCacheCollection } from '../cache';
 import { prepareForEvalSync } from '../transform-stages/1-prepare-for-eval';
 import evalStage from '../transform-stages/2-eval';
-import type { CodeCache, IPluginState } from '../types';
+import type { IPluginState } from '../types';
 import processTemplateExpression from '../utils/processTemplateExpression';
 import withLinariaMetadata from '../utils/withLinariaMetadata';
 
@@ -17,27 +17,24 @@ export default function collector(
   babel: Core,
   options: StrictOptions
 ): PluginObj<IPluginState> {
-  const codeCache: CodeCache = new Map();
-  const resolveCache = new Map<string, string>();
-  const evalCache = new Map<string, Module>();
+  const cache = new TransformCacheCollection();
 
   return {
     name: '@linaria/babel/babel-transform',
     pre(file: BabelFile) {
       debug('babel-transform:start', file.opts.filename);
 
-      const entryPoint = {
+      const entrypoint = {
         name: file.opts.filename!,
         code: file.code,
         only: ['__linariaPreval'],
       };
 
-      const prepareStageResults = prepareForEvalSync(
+      const prepareStageResult = prepareForEvalSync(
         babel,
-        resolveCache,
-        codeCache,
+        cache,
         syncResolve,
-        entryPoint,
+        entrypoint,
         {
           root: file.opts.root ?? undefined,
           pluginOptions: options,
@@ -45,22 +42,16 @@ export default function collector(
       );
 
       if (
-        !prepareStageResults ||
-        prepareStageResults.every((r) => !withLinariaMetadata(r.metadata))
+        !prepareStageResult ||
+        !withLinariaMetadata(prepareStageResult?.metadata)
       ) {
         return;
       }
 
-      const evalStageResult = evalStage(
-        resolveCache,
-        codeCache,
-        evalCache,
-        prepareStageResults.map((r) => r.code),
-        {
-          filename: file.opts.filename!,
-          pluginOptions: options,
-        }
-      );
+      const evalStageResult = evalStage(cache, prepareStageResult.code, {
+        filename: file.opts.filename!,
+        pluginOptions: options,
+      });
 
       if (evalStageResult === null) {
         return;

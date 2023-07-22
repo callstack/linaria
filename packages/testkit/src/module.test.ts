@@ -1,20 +1,13 @@
 import path from 'path';
 
-import * as babel from '@babel/core';
 import dedent from 'dedent';
 
-import { Module } from '@linaria/babel-preset';
-import type { Evaluator, StrictOptions } from '@linaria/utils';
-
-beforeEach(() => Module.invalidate());
-
-const evaluator: Evaluator = (filename, options, text) => {
-  const { code } = babel.transformSync(text, {
-    filename,
-    presets: ['@babel/preset-env'],
-  })!;
-  return [code!, null];
-};
+import {
+  DefaultModuleImplementation,
+  Module,
+  TransformCacheCollection,
+} from '@linaria/babel-preset';
+import type { StrictOptions } from '@linaria/utils';
 
 function getFileName() {
   return path.resolve(__dirname, './__fixtures__/test.js');
@@ -23,32 +16,14 @@ function getFileName() {
 const options: StrictOptions = {
   displayName: false,
   evaluate: true,
-  extensions: ['.js', '.jsx', '.ts', '.tsx'],
-  rules: [
-    {
-      action: evaluator,
-    },
-    {
-      test: /\/node_modules\//,
-      action: 'ignore',
-    },
-  ],
+  extensions: ['.cjs', '.js', '.jsx', '.ts', '.tsx'],
+  rules: [],
   babelOptions: {},
 };
 
-beforeEach(() => Module.invalidateEvalCache());
-
-function createModule(
-  filename: string,
-  opts: StrictOptions,
-  evalCache: Map<string, Module> = new Map()
-) {
-  return new Module(filename, opts, new Map(), new Map(), evalCache);
-}
-
 it('creates module for JS files', () => {
   const filename = '/foo/bar/test.js';
-  const mod = createModule(filename, options);
+  const mod = new Module(filename, options);
 
   mod.evaluate('module.exports = () => 42');
 
@@ -57,8 +32,8 @@ it('creates module for JS files', () => {
   expect(mod.filename).toBe(filename);
 });
 
-it('requires JS files', () => {
-  const mod = createModule(getFileName(), options);
+it('requires .js files', () => {
+  const mod = new Module(getFileName(), options);
 
   mod.evaluate(dedent`
     const answer = require('./sample-script');
@@ -69,8 +44,20 @@ it('requires JS files', () => {
   expect(mod.exports).toBe('The answer is 42');
 });
 
-it('requires JSON files', () => {
-  const mod = createModule(getFileName(), options);
+it('requires .cjs files', () => {
+  const mod = new Module(getFileName(), options);
+
+  mod.evaluate(dedent`
+    const answer = require('./sample-script.cjs');
+
+    module.exports = 'The answer is ' + answer;
+  `);
+
+  expect(mod.exports).toBe('The answer is 42');
+});
+
+it('requires .json files', () => {
+  const mod = new Module(getFileName(), options);
 
   mod.evaluate(dedent`
     const data = require('./sample-data.json');
@@ -83,34 +70,89 @@ it('requires JSON files', () => {
 
 it('returns module from the cache', () => {
   const filename = getFileName();
-  const cache = new Map<string, Module>();
-  const mod = createModule(filename, options, cache);
+  const cache = new TransformCacheCollection();
+  const mod = new Module(filename, options, cache);
   const id = './sample-data.json';
 
   expect(mod.require(id)).toBe(mod.require(id));
 
-  const res1 = createModule(filename, options, cache).require(id);
-  const res2 = createModule(filename, options, cache).require(id);
+  const res1 = new Module(filename, options, cache).require(id);
+  const res2 = new Module(filename, options, cache).require(id);
 
   expect(res1).toBe(res2);
 });
 
+it('should use cached version from the codeCache', () => {
+  const filename = getFileName();
+  const cache = new TransformCacheCollection();
+  const mod = new Module(filename, options, cache);
+  const resolved = require.resolve('./__fixtures__/objectExport.js');
+
+  cache.resolveCache.set(
+    `${filename} -> ./objectExport`,
+    `${resolved}\0margin`
+  );
+
+  cache.codeCache.set(resolved, {
+    only: ['margin'],
+    imports: null,
+    result: {
+      code: 'module.exports = { margin: 1 };',
+    },
+  });
+
+  mod.evaluate(dedent`
+    const margin = require('./objectExport').margin;
+
+    module.exports = 'Imported value is ' + margin;
+  `);
+
+  expect(mod.exports).toBe('Imported value is 1');
+});
+
+it('should reread module from disk when it is in codeCache but not in resolveCache', () => {
+  // This may happen when the current importer was not processed, but required
+  // module was already required by another module, and its code was cached.
+  // In this case, we should not use the cached code, but reread the file.
+
+  const filename = getFileName();
+  const cache = new TransformCacheCollection();
+  const mod = new Module(filename, options, cache);
+  const resolved = require.resolve('./__fixtures__/objectExport.js');
+
+  cache.codeCache.set(resolved, {
+    only: ['margin'],
+    imports: null,
+    result: {
+      code: 'module.exports = { margin: 1 };',
+    },
+  });
+
+  mod.evaluate(dedent`
+    const margin = require('./objectExport').margin;
+
+    module.exports = 'Imported value is ' + margin;
+  `);
+
+  expect(mod.exports).toBe('Imported value is 5');
+});
+
 it('clears modules from the cache', () => {
   const filename = getFileName();
-  const cache = new Map<string, Module>();
+  const cache = new TransformCacheCollection();
   const id = './sample-data.json';
 
-  const result = createModule(filename, options, cache).require(id);
+  const result = new Module(filename, options, cache).require(id);
 
-  expect(createModule(filename, options, cache).require(id)).toBe(result);
+  expect(new Module(filename, options, cache).require(id)).toBe(result);
 
-  cache.clear();
+  cache.evalCache.clear();
 
-  expect(createModule(filename, options, cache).require(id)).not.toBe(result);
+  expect(new Module(filename, options, cache).require(id)).not.toBe(result);
 });
 
 it('exports the path for non JS/JSON files', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   expect(mod.require('./sample-asset.png')).toBe(
     path.join(__dirname, '__fixtures__', 'sample-asset.png')
@@ -118,19 +160,19 @@ it('exports the path for non JS/JSON files', () => {
 });
 
 it('returns module when requiring mocked builtin node modules', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   expect(mod.require('path')).toBe(require('path'));
 });
 
 it('returns null when requiring empty builtin node modules', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   expect(mod.require('fs')).toBe(null);
 });
 
 it('throws when requiring unmocked builtin node modules', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   expect(() => mod.require('perf_hooks')).toThrow(
     'Unable to import "perf_hooks". Importing Node builtins is not supported in the sandbox.'
@@ -138,7 +180,7 @@ it('throws when requiring unmocked builtin node modules', () => {
 });
 
 it('has access to the global object', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -147,8 +189,18 @@ it('has access to the global object', () => {
   ).not.toThrow();
 });
 
+it('has access to Object prototype methods on `exports`', () => {
+  const mod = new Module(getFileName(), options);
+
+  expect(() =>
+    mod.evaluate(dedent`
+    exports.hasOwnProperty('keyss');
+  `)
+  ).not.toThrow();
+});
+
 it("doesn't have access to the process object", () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -158,7 +210,7 @@ it("doesn't have access to the process object", () => {
 });
 
 it('has access to NODE_ENV', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   mod.evaluate(dedent`
   module.exports = process.env.NODE_ENV;
@@ -168,7 +220,7 @@ it('has access to NODE_ENV', () => {
 });
 
 it('has require.resolve available', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   mod.evaluate(dedent`
   module.exports = require.resolve('./sample-script');
@@ -180,7 +232,7 @@ it('has require.resolve available', () => {
 });
 
 it('has require.ensure available', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -190,7 +242,7 @@ it('has require.ensure available', () => {
 });
 
 it('has __filename available', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   mod.evaluate(dedent`
   module.exports = __filename;
@@ -200,7 +252,7 @@ it('has __filename available', () => {
 });
 
 it('has __dirname available', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   mod.evaluate(dedent`
   module.exports = __dirname;
@@ -210,7 +262,7 @@ it('has __dirname available', () => {
 });
 
 it('has setTimeout, clearTimeout available', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -224,7 +276,7 @@ it('has setTimeout, clearTimeout available', () => {
 });
 
 it('has setInterval, clearInterval available', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -238,7 +290,7 @@ it('has setInterval, clearInterval available', () => {
 });
 
 it('has setImmediate, clearImmediate available', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -252,7 +304,7 @@ it('has setImmediate, clearImmediate available', () => {
 });
 
 it('has global objects available without referencing global', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   expect(() =>
     mod.evaluate(dedent`
@@ -262,11 +314,11 @@ it('has global objects available without referencing global', () => {
 });
 
 it('changes resolve behaviour on overriding _resolveFilename', () => {
-  const originalResolveFilename = Module._resolveFilename;
+  const resolveFilename = jest
+    .spyOn(DefaultModuleImplementation, '_resolveFilename')
+    .mockImplementation((id) => (id === 'foo' ? 'bar' : id));
 
-  Module._resolveFilename = (id) => (id === 'foo' ? 'bar' : id);
-
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   mod.evaluate(dedent`
   module.exports = [
@@ -275,15 +327,42 @@ it('changes resolve behaviour on overriding _resolveFilename', () => {
   ];
   `);
 
-  // Restore old behavior
-  Module._resolveFilename = originalResolveFilename;
-
   expect(mod.exports).toEqual(['bar', 'test']);
+  expect(resolveFilename).toHaveBeenCalledTimes(2);
+
+  resolveFilename.mockRestore();
+});
+
+it('should resolve from the cache', () => {
+  const resolveFilename = jest.spyOn(
+    DefaultModuleImplementation,
+    '_resolveFilename'
+  );
+
+  const cache = new TransformCacheCollection();
+  const filename = getFileName();
+
+  cache.resolveCache.set(`${filename} -> foo`, 'resolved foo');
+  cache.resolveCache.set(`${filename} -> test`, 'resolved test');
+
+  const mod = new Module(filename, options, cache);
+
+  mod.evaluate(dedent`
+  module.exports = [
+    require.resolve('foo'),
+    require.resolve('test'),
+  ];
+  `);
+
+  expect(mod.exports).toEqual(['resolved foo', 'resolved test']);
+  expect(resolveFilename).toHaveBeenCalledTimes(0);
+
+  resolveFilename.mockRestore();
 });
 
 it('correctly processes export declarations in strict mode', () => {
   const filename = '/foo/bar/test.js';
-  const mod = createModule(filename, options);
+  const mod = new Module(filename, options);
 
   mod.evaluate('"use strict"; exports = module.exports = () => 42');
 
@@ -293,7 +372,7 @@ it('correctly processes export declarations in strict mode', () => {
 });
 
 it('export * compiled by typescript to commonjs works', () => {
-  const mod = createModule(getFileName(), options);
+  const mod = new Module(getFileName(), options);
 
   mod.evaluate(dedent`
     const { foo } = require('./ts-compiled-re-exports');
