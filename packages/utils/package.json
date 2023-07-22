@@ -41,7 +41,8 @@
     "@babel/types": "^7.22.5",
     "@linaria/logger": "workspace:^",
     "babel-merge": "^3.0.0",
-    "find-up": "^5.0.0"
+    "find-up": "^5.0.0",
+    "minimatch": "^9.0.3"
   },
   "devDependencies": {
     "@types/babel__core": "^7.1.19",

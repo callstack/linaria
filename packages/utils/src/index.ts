@@ -31,6 +31,7 @@ export { isSerializable } from './isSerializable';
 export { default as isTypedNode } from './isTypedNode';
 export { default as isUnnecessaryReactCall } from './isUnnecessaryReactCall';
 export * from './options';
+export { removeDangerousCode } from './removeDangerousCode';
 export {
   applyAction,
   mutate,
