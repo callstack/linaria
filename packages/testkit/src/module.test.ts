@@ -19,6 +19,9 @@ const options: StrictOptions = {
   extensions: ['.cjs', '.js', '.jsx', '.ts', '.tsx'],
   rules: [],
   babelOptions: {},
+  features: {
+    dangerousCodeRemover: true,
+  },
 };
 
 it('creates module for JS files', () => {
