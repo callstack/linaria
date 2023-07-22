@@ -1,22 +1,36 @@
 import type { NodePath } from '@babel/traverse';
-import type { Node, Identifier, JSXIdentifier } from '@babel/types';
+import type {
+  Node,
+  Identifier,
+  JSXIdentifier,
+  UnaryExpression,
+} from '@babel/types';
 
 import { getScope } from './getScope';
 
 type FindType = 'binding' | 'both' | 'referenced';
 
-function isInUnary(path: NodePath): boolean {
+function isInUnary<T extends NodePath>(
+  path: T
+): path is T & { parentPath: NodePath<UnaryExpression> } {
   return path.parentPath?.isUnaryExpression() ?? false;
 }
 
+// It's possible for non-strict mode code to have variable deletions.
+function isInDelete(path: { parentPath: NodePath<UnaryExpression> }): boolean {
+  return path.parentPath.node.operator === 'delete';
+}
+
 function isBindingIdentifier(path: NodePath): path is NodePath<Identifier> {
-  return path.isBindingIdentifier() && !isInUnary(path);
+  return path.isBindingIdentifier() && (!isInUnary(path) || isInDelete(path));
 }
 
 function isReferencedIdentifier(
   path: NodePath
 ): path is NodePath<Identifier | JSXIdentifier> {
-  return path.isReferencedIdentifier() || isInUnary(path);
+  return (
+    path.isReferencedIdentifier() || (isInUnary(path) && !isInDelete(path))
+  );
 }
 
 // For some reasons, `isBindingIdentifier` returns true for identifiers inside unary expressions.

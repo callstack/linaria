@@ -2467,6 +2467,24 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should process unary expressions in interpolation', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { css } from "@linaria/core";
+
+      let size = 1337;
+      size += 0;
+
+      export const class1 = css\`width:${'${+size}'}px;\`;
+      export const class2 = css\`width:${'${size}'}px;\`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('should interpolate imported components', async () => {
     const { code, metadata } = await transform(
       dedent`
