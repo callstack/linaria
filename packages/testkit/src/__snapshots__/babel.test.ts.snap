@@ -2269,6 +2269,22 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker should process unary expressions in interpolation 1`] = `
+"export const class1 = \\"class1_c13jq05\\";
+export const class2 = \\"class2_c1vhermz\\";"
+`;
+
+exports[`strategy shaker should process unary expressions in interpolation 2`] = `
+
+CSS:
+
+.class1_c13jq05 {width:1337px;}
+.class2_c1vhermz {width:1337px;}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker should shake out identifiers that are referenced only in types 1`] = `
 "import { styled } from \\"@linaria/react\\";
 import * as yup from \\"yup\\";
