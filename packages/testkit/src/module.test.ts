@@ -22,6 +22,7 @@ const options: StrictOptions = {
   features: {
     dangerousCodeRemover: true,
   },
+  highPriorityPlugins: [],
 };
 
 it('creates module for JS files', () => {

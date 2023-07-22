@@ -4,9 +4,7 @@ import type { Mapping } from 'source-map';
 import { SourceMapGenerator } from 'source-map';
 import stylis from 'stylis';
 
-import type { Rules } from '@linaria/tags';
-import type { Replacements } from '@linaria/utils';
-import type { Artifact } from '@linaria/utils/types/types';
+import type { Artifact, Replacements, Rules } from '@linaria/utils';
 
 import type { Options, PreprocessorFn } from '../types';
 
@@ -36,7 +34,7 @@ export function transformUrl(
 function extractCssFromAst(
   rules: Rules,
   originalCode: string,
-  options: Options
+  options: Pick<Options, 'preprocessor' | 'filename' | 'outputFilename'>
 ) {
   const mappings: Mapping[] = [];
 
@@ -120,11 +118,9 @@ function extractCssFromAst(
  * Extract artifacts (e.g. CSS) from processors
  */
 export default function extractStage(
-  processors: {
-    artifacts: Artifact[];
-  }[],
+  processors: { artifacts: Artifact[] }[],
   originalCode: string,
-  options: Options
+  options: Pick<Options, 'preprocessor' | 'filename' | 'outputFilename'>
 ) {
   let allRules: Rules = {};
   const allReplacements: Replacements = [];

@@ -1,21 +1,23 @@
 import type { BabelFile, PluginObj } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
+import type { Identifier } from '@babel/types';
 
 import { debug } from '@linaria/logger';
-import type { StrictOptions } from '@linaria/utils';
 import { removeWithRelated, syncResolve } from '@linaria/utils';
 
 import type { Core } from '../babel';
 import { TransformCacheCollection } from '../cache';
 import { prepareForEvalSync } from '../transform-stages/1-prepare-for-eval';
 import evalStage from '../transform-stages/2-eval';
+import type { PluginOptions } from '../transform-stages/helpers/loadLinariaOptions';
+import loadLinariaOptions from '../transform-stages/helpers/loadLinariaOptions';
 import type { IPluginState } from '../types';
-import processTemplateExpression from '../utils/processTemplateExpression';
+import { processTemplateExpression } from '../utils/processTemplateExpression';
 import withLinariaMetadata from '../utils/withLinariaMetadata';
 
 export default function collector(
   babel: Core,
-  options: StrictOptions
+  options: Partial<PluginOptions>
 ): PluginObj<IPluginState> {
   const cache = new TransformCacheCollection();
 
@@ -30,14 +32,17 @@ export default function collector(
         only: ['__linariaPreval'],
       };
 
+      const pluginOptions = loadLinariaOptions(options);
+
       const prepareStageResult = prepareForEvalSync(
         babel,
         cache,
         syncResolve,
         entrypoint,
+        pluginOptions,
         {
           root: file.opts.root ?? undefined,
-          pluginOptions: options,
+          inputSourceMap: file.opts.inputSourceMap ?? undefined,
         }
       );
 
@@ -48,10 +53,12 @@ export default function collector(
         return;
       }
 
-      const evalStageResult = evalStage(cache, prepareStageResult.code, {
-        filename: file.opts.filename!,
-        pluginOptions: options,
-      });
+      const evalStageResult = evalStage(
+        cache,
+        prepareStageResult.code,
+        pluginOptions,
+        file.opts.filename!
+      );
 
       if (evalStageResult === null) {
         return;
@@ -59,15 +66,17 @@ export default function collector(
 
       const [valueCache] = evalStageResult;
 
+      const identifiers: NodePath<Identifier>[] = [];
       file.path.traverse({
-        // TODO: process transformed literals
         Identifier: (p) => {
-          processTemplateExpression(p, file.opts, options, (processor) => {
-            processor.build(valueCache);
-
-            processor.doRuntimeReplacement();
-          });
+          identifiers.push(p);
         },
+      });
+      identifiers.forEach((p) => {
+        processTemplateExpression(p, file.opts, pluginOptions, (processor) => {
+          processor.build(valueCache);
+          processor.doRuntimeReplacement();
+        });
       });
 
       // We can remove __linariaPreval export and all related code

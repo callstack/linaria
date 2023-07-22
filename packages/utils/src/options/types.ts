@@ -21,13 +21,20 @@ export type ClassNameFn = (
 
 export type VariableNameFn = (context: IVariableContext) => string;
 
+export type EvaluatorConfig = {
+  features: StrictOptions['features'];
+  highPriorityPlugins: string[];
+  onlyExports: string[];
+};
+
 export type Evaluator = (
-  filename: string,
-  options: StrictOptions,
-  code: string | [ast: File, text: string],
-  only: string[] | null,
+  babelOptions: TransformOptions,
+  ast: File,
+  code: string,
+  config: EvaluatorConfig,
   babel: Core
 ) => [
+  ast: File,
   code: string,
   imports: Map<string, string[]> | null,
   exports?: string[] | null
@@ -47,6 +54,7 @@ export type FeatureFlags = {
 
 export type StrictOptions = {
   babelOptions: TransformOptions;
+  highPriorityPlugins: string[];
   classNameSlug?: string | ClassNameFn;
   displayName: boolean;
   evaluate: boolean;

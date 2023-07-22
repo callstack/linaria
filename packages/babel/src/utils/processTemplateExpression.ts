@@ -8,7 +8,7 @@ import getTagProcessor from './getTagProcessor';
 
 const processed = new WeakSet<Identifier>();
 
-const processTemplateExpression = (
+export const processTemplateExpression = (
   p: NodePath<Identifier>,
   fileContext: IFileContext,
   options: Pick<
@@ -28,5 +28,3 @@ const processTemplateExpression = (
 
   emit(tagProcessor);
 };
-
-export default processTemplateExpression;

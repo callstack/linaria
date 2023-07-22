@@ -17,13 +17,13 @@ Object.defineProperty(exports, 'collectExportsAndImports', {
 Object.defineProperty(exports, 'slugify', {
   enumerable: true,
   get: function get() {
-    return _slugify.default;
+    return _slugify[\\"default\\"];
   }
 });
 var _slugify = _interopRequireDefault(require('./slugify'));
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {
-    default: obj
+    \\"default\\": obj
   };
 }"
 `;

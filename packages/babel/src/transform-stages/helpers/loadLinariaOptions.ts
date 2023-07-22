@@ -80,6 +80,7 @@ export default function loadLinariaOptions(
       },
     ],
     babelOptions,
+    highPriorityPlugins: ['module-resolver'],
     ...(result ? result.config : {}),
     ...rest,
     features: {

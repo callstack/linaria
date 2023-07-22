@@ -1,16 +1,27 @@
 import { relative, sep } from 'path';
 
+import type { TransformOptions } from '@babel/core';
+
 import type { CustomDebug } from '@linaria/logger';
 import { createCustomDebug } from '@linaria/logger';
+import type { Evaluator } from '@linaria/utils';
 import { getFileIdx } from '@linaria/utils';
 
 export interface IEntrypoint {
   code: string;
+  evaluator: Evaluator;
   name: string;
   only: string[];
+  parseConfig: TransformOptions;
 }
 
 type Node = [entrypoint: IEntrypoint, stack: string[], refCount?: number];
+
+export type NextItem = {
+  entrypoint: IEntrypoint;
+  stack: string[];
+  refCount?: number;
+};
 
 const peek = <T>(arr: T[]) =>
   arr.length > 0 ? arr[arr.length - 1] : undefined;
@@ -132,14 +143,20 @@ export class ModuleQueue {
     this.keys.set(keyOf(this.data[i - 1]), i - 1);
   }
 
-  public dequeue(): Node | undefined {
+  public dequeue(): NextItem | undefined {
     if (this.size === 0) return undefined;
     const max = this.data[0];
+    const result: NextItem = {
+      entrypoint: max[0],
+      stack: max[1],
+      refCount: max[2],
+    };
+
     if (this.size === 1) {
       this.data = [];
       this.keys.clear();
       this.log('queue', 'Dequeued %s', nameOf(max));
-      return max;
+      return result;
     }
 
     const last = this.data.pop();
@@ -151,7 +168,7 @@ export class ModuleQueue {
 
     this.keys.delete(keyOf(max));
     this.log('queue', 'Dequeued %s: %o', nameOf(max), this.data.map(nameOf));
-    return max;
+    return result;
   }
 
   public enqueue(el: Node) {

@@ -5,12 +5,11 @@ import type {
 } from '@babel/core';
 import type { File } from '@babel/types';
 
+import type { StrictOptions } from '@linaria/utils';
 import { buildOptions } from '@linaria/utils';
 
 import type { Core } from '../babel';
 import type { Options, ValueCache } from '../types';
-
-import loadLinariaOptions from './helpers/loadLinariaOptions';
 
 /**
  * Parses the specified file, finds tags, applies run-time replacements,
@@ -21,10 +20,10 @@ export default function prepareForRuntime(
   ast: File,
   code: string,
   valueCache: ValueCache,
-  options: Options,
+  pluginOptions: StrictOptions,
+  options: Pick<Options, 'filename' | 'inputSourceMap' | 'root'>,
   babelConfig: TransformOptions
 ): BabelFileResult {
-  const pluginOptions = loadLinariaOptions(options.pluginOptions);
   const transformPlugins: PluginItem[] = [
     [
       require.resolve('../plugins/collector'),

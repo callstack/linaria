@@ -9,7 +9,7 @@ import type {
 } from '@babel/types';
 
 import { createCustomDebug } from '@linaria/logger';
-import type { IExport, IReexport, IState } from '@linaria/utils';
+import type { IExport, IMetadata, IReexport, IState } from '@linaria/utils';
 import {
   applyAction,
   collectExportsAndImports,
@@ -32,22 +32,9 @@ export interface IShakerOptions {
   onlyExports: string[];
 }
 
-export interface IShakerMetadata {
-  imports: Map<string, string[]>;
-}
-
-export interface IMetadata {
-  __linariaShaker: IShakerMetadata;
-}
-
 interface NodeWithName {
   name: string;
 }
-
-export const hasShakerMetadata = (
-  metadata: object | undefined
-): metadata is IMetadata =>
-  metadata !== undefined && '__linariaShaker' in metadata;
 
 function getBindingForExport(exportPath: NodePath): Binding | undefined {
   if (exportPath.isIdentifier()) {
@@ -372,7 +359,7 @@ export default function shakerPlugin(
       log('end', `remaining imports: %O`, imports);
 
       // eslint-disable-next-line no-param-reassign
-      (file.metadata as IMetadata).__linariaShaker = {
+      (file.metadata as IMetadata).linariaEvaluator = {
         imports,
       };
     },

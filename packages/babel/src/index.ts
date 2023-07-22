@@ -9,7 +9,6 @@ import { debug } from '@linaria/logger';
 
 import transform from './plugins/babel-transform';
 import type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
-import loadLinariaOptions from './transform-stages/helpers/loadLinariaOptions';
 
 export { slugify } from '@linaria/utils';
 
@@ -21,14 +20,17 @@ export * from './types';
 export { parseFile } from './transform-stages/helpers/parseFile';
 export { default as loadLinariaOptions } from './transform-stages/helpers/loadLinariaOptions';
 export type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
-export { prepareCode } from './transform-stages/1-prepare-for-eval';
+export {
+  createEntrypoint,
+  prepareCode,
+} from './transform-stages/1-prepare-for-eval';
 export { transformUrl } from './transform-stages/4-extract';
 export { default as isNode } from './utils/isNode';
 export { default as getTagProcessor } from './utils/getTagProcessor';
 export { default as getVisitorKeys } from './utils/getVisitorKeys';
 export type { VisitorKeys } from './utils/getVisitorKeys';
 export { default as peek } from './utils/peek';
-export { default as processTemplateExpression } from './utils/processTemplateExpression';
+export { processTemplateExpression } from './utils/processTemplateExpression';
 export { TransformCacheCollection } from './cache';
 
 function isEnabled(caller?: TransformCaller & { evaluate?: true }) {
@@ -41,6 +43,6 @@ export default function linaria(babel: ConfigAPI, options: PluginOptions) {
   }
   debug('options', JSON.stringify(options));
   return {
-    plugins: [[transform, loadLinariaOptions(options)]],
+    plugins: [[transform, options]],
   };
 }

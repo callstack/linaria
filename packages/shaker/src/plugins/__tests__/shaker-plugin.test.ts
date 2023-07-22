@@ -4,7 +4,9 @@ import type { PluginItem } from '@babel/core';
 import { transformSync } from '@babel/core';
 import dedent from 'dedent';
 
-import shakerPlugin, { hasShakerMetadata } from '../shaker-plugin';
+import { hasEvaluatorMetadata } from '@linaria/utils';
+
+import shakerPlugin from '../shaker-plugin';
 
 type Extension = 'js' | 'ts' | 'jsx' | 'tsx';
 
@@ -46,14 +48,14 @@ const keep =
     if (
       !transformed ||
       !transformed.code ||
-      !hasShakerMetadata(transformed.metadata)
+      !hasEvaluatorMetadata(transformed.metadata)
     ) {
       throw new Error(`${filename} has no shaker metadata`);
     }
 
     return {
       code: transformed.code,
-      metadata: transformed.metadata.__linariaShaker,
+      metadata: transformed.metadata.linariaEvaluator,
     };
   };
 
