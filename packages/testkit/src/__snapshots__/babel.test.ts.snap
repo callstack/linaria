@@ -2281,6 +2281,10 @@ CSS:
 .class1_c13jq05 {width:1337px;}
 .class2_c1vhermz {width:1337px;}
 
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker should shake out identifiers that are referenced only in types 1`] = `
 "import { styled } from \\"@linaria/react\\";
 import * as yup from \\"yup\\";
