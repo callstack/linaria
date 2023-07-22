@@ -975,6 +975,9 @@ importers:
       find-up:
         specifier: ^5.0.0
         version: 5.0.0
+      minimatch:
+        specifier: ^9.0.3
+        version: 9.0.3
     devDependencies:
       '@types/babel__core':
         specifier: ^7.1.19

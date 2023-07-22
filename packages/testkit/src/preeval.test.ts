@@ -19,6 +19,9 @@ const run = (code: TemplateStringsArray) => {
         preeval,
         {
           evaluate: true,
+          features: {
+            dangerousCodeRemover: true,
+          },
         },
       ],
     ],

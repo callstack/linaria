@@ -5,7 +5,7 @@ import type { StrictOptions } from '@linaria/utils';
 import type { Stage } from '../../types';
 
 export type PluginOptions = StrictOptions & {
-  configFile?: string;
+  configFile?: string | false;
   stage?: Stage;
 };
 
@@ -42,11 +42,18 @@ export default function loadLinariaOptions(
   const { configFile, ignore, rules, babelOptions = {}, ...rest } = overrides;
 
   const result =
-    configFile !== undefined
+    // eslint-disable-next-line no-nested-ternary
+    configFile === false
+      ? undefined
+      : configFile !== undefined
       ? explorerSync.load(configFile)
       : explorerSync.search();
 
-  const options = {
+  const defaultFeatures = {
+    dangerousCodeRemover: true,
+  };
+
+  const options: StrictOptions = {
     displayName: false,
     evaluate: true,
     extensions: ['.cjs', '.cts', '.js', '.jsx', '.mjs', '.mts', '.ts', '.tsx'],
@@ -73,8 +80,13 @@ export default function loadLinariaOptions(
       },
     ],
     babelOptions,
-    ...(result ? result.config : null),
+    ...(result ? result.config : {}),
     ...rest,
+    features: {
+      ...defaultFeatures,
+      ...(result ? result.config.features : {}),
+      ...rest.features,
+    },
   };
 
   cache.set(overrides, options);

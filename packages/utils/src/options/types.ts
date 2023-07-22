@@ -39,12 +39,19 @@ export type EvalRule = {
   test?: RegExp | ((path: string, code: string) => boolean);
 };
 
+export type FeatureFlag = boolean | string | string[];
+
+export type FeatureFlags = {
+  dangerousCodeRemover: FeatureFlag;
+};
+
 export type StrictOptions = {
   babelOptions: TransformOptions;
   classNameSlug?: string | ClassNameFn;
   displayName: boolean;
   evaluate: boolean;
   extensions: string[];
+  features: FeatureFlags;
   ignore?: RegExp;
   rules: EvalRule[];
   tagResolver?: (source: string, tag: string) => string | null;
