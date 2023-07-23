@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.5.1
+
+### Patch Changes
+
+- Updated dependencies [e59bf809]
+  - @linaria/postcss-linaria@4.5.1
+
 ## 4.5.0
 
 ### Patch Changes

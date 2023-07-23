@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.5.3
+
+### Patch Changes
+
+- e59bf809: Shaker mistakenly counts references in types as valuable and keeps referenced variables alive.
+- 520ba8da: Debug mode for CLI, Webpack 5 and Vite. When enabled, prints brief perf report to console and information about processed dependency tree to the specified file.
+- Updated dependencies [79557248]
+- Updated dependencies [e59bf809]
+  - @linaria/atomic@4.5.3
+  - @linaria/core@4.5.3
+  - @linaria/react@4.5.3
+
 ## 4.5.2
 
 ### Patch Changes

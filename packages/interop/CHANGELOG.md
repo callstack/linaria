@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.5.1
+
+### Patch Changes
+
+- e59bf809: Shaker mistakenly counts references in types as valuable and keeps referenced variables alive.
+
 ## 4.5.0
 
 ### Patch Changes
