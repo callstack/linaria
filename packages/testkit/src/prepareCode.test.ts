@@ -9,6 +9,7 @@ import {
   parseFile,
   prepareCode,
 } from '@linaria/babel-preset';
+import { EventEmitter } from '@linaria/utils';
 
 const testCasesDir = join(__dirname, '__fixtures__', 'prepare-code-test-cases');
 
@@ -64,7 +65,8 @@ describe('prepareCode', () => {
         pluginOptions,
         {
           root,
-        }
+        },
+        EventEmitter.dummy
       );
 
       if (entrypoint === 'ignored') {
@@ -78,7 +80,8 @@ describe('prepareCode', () => {
         babel,
         entrypoint,
         ast,
-        pluginOptions
+        pluginOptions,
+        EventEmitter.dummy
       );
 
       expect(transformedCode).toMatchSnapshot('code');

@@ -7,6 +7,7 @@ import type { BabelFile, PluginObj } from '@babel/core';
 import { createCustomDebug } from '@linaria/logger';
 import type { StrictOptions } from '@linaria/utils';
 import {
+  EventEmitter,
   getFileIdx,
   addIdentifierToLinariaPreval,
   removeDangerousCode,
@@ -20,12 +21,14 @@ import { processTemplateExpression } from '../utils/processTemplateExpression';
 export type PreevalOptions = Pick<
   StrictOptions,
   'classNameSlug' | 'displayName' | 'evaluate' | 'features'
->;
+> & { eventEmitter: EventEmitter };
+
+const onFinishCallbacks = new WeakMap<object, () => void>();
 
 export default function preeval(
   babel: Core,
-  options: PreevalOptions
-): PluginObj<IPluginState> {
+  { eventEmitter = EventEmitter.dummy, ...options }: PreevalOptions
+): PluginObj<IPluginState & { onFinish: () => void }> {
   const { types: t } = babel;
   return {
     name: '@linaria/babel/preeval',
@@ -37,6 +40,10 @@ export default function preeval(
 
       const rootScope = file.scope;
       this.processors = [];
+
+      const onProcessTemplateFinished = eventEmitter.pair({
+        method: 'preeval:processTemplate',
+      });
 
       file.path.traverse({
         Identifier: (p) => {
@@ -53,15 +60,28 @@ export default function preeval(
         },
       });
 
+      onProcessTemplateFinished();
+
       if (
         isFeatureEnabled(options.features, 'dangerousCodeRemover', filename)
       ) {
         log('start', 'Strip all JSX and browser related stuff');
+        const onCodeRemovingFinished = eventEmitter.pair({
+          method: 'preeval:removeDangerousCode',
+        });
         removeDangerousCode(file.path);
+        onCodeRemovingFinished();
       }
+
+      onFinishCallbacks.set(
+        this,
+        eventEmitter.pair({ method: 'preeval:rest-transformations' })
+      );
     },
     visitor: {},
     post(file: BabelFile) {
+      onFinishCallbacks.get(this)?.();
+
       const log = createCustomDebug('preeval', getFileIdx(file.opts.filename!));
 
       if (this.processors.length === 0) {

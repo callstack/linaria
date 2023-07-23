@@ -34,6 +34,7 @@
   "dependencies": {
     "@linaria/babel-preset": "workspace:^",
     "@linaria/logger": "workspace:^",
+    "@linaria/utils": "workspace:^",
     "enhanced-resolve": "^5.3.1",
     "mkdirp": "^0.5.1"
   },

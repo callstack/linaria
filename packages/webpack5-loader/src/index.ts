@@ -13,8 +13,11 @@ import type { Result, Preprocessor } from '@linaria/babel-preset';
 import { transform, TransformCacheCollection } from '@linaria/babel-preset';
 import { debug } from '@linaria/logger';
 
+import { sharedState } from './LinariaDebugPlugin';
 import type { ICache } from './cache';
 import { getCacheInstance } from './cache';
+
+export { LinariaDebugPlugin } from './LinariaDebugPlugin';
 
 const outputCssLoader = require.resolve('./outputCssLoader');
 
@@ -93,7 +96,8 @@ const webpack5Loader: Loader = function webpack5LoaderPlugin(
     },
     asyncResolve,
     emptyConfig,
-    cache
+    cache,
+    sharedState.emitter
   ).then(
     async (result: Result) => {
       if (result.cssText) {

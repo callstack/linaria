@@ -17,9 +17,11 @@ import {
 } from '@linaria/babel-preset';
 import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
 import { createCustomDebug } from '@linaria/logger';
-import { getFileIdx, syncResolve } from '@linaria/utils';
+import type { IPerfMeterOptions } from '@linaria/utils';
+import { createPerfMeter, getFileIdx, syncResolve } from '@linaria/utils';
 
 type VitePluginOptions = {
+  debug?: IPerfMeterOptions | false | null | undefined;
   include?: FilterPattern;
   exclude?: FilterPattern;
   sourceMap?: boolean;
@@ -31,6 +33,7 @@ export { Plugin };
 const emptyConfig = {};
 
 export default function linaria({
+  debug,
   include,
   exclude,
   sourceMap,
@@ -43,12 +46,17 @@ export default function linaria({
   let config: ResolvedConfig;
   let devServer: ViteDevServer;
 
+  const { emitter, onDone } = createPerfMeter(debug ?? false);
+
   // <dependency id, targets>
   const targets: { id: string; dependencies: string[] }[] = [];
   const cache = new TransformCacheCollection();
   return {
     name: 'linaria',
     enforce: 'post',
+    buildEnd() {
+      onDone(process.cwd());
+    },
     configResolved(resolvedConfig: ResolvedConfig) {
       config = resolvedConfig;
     },
@@ -143,7 +151,8 @@ export default function linaria({
         },
         asyncResolve,
         emptyConfig,
-        cache
+        cache,
+        emitter
       );
 
       let { cssText, dependencies } = result;

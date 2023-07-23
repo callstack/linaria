@@ -12,7 +12,7 @@ import normalize from 'normalize-path';
 import yargs from 'yargs';
 
 import { TransformCacheCollection, transform } from '@linaria/babel-preset';
-import { asyncResolveFallback } from '@linaria/utils';
+import { asyncResolveFallback, createPerfMeter } from '@linaria/utils';
 
 const modulesOptions = [
   'commonjs',
@@ -29,6 +29,7 @@ const argv = yargs
     type: 'string',
     description: 'Path to a config file',
     requiresArg: true,
+    coerce: path.resolve,
   })
   .option('out-dir', {
     alias: 'o',
@@ -36,6 +37,7 @@ const argv = yargs
     description: 'Output directory for the extracted CSS files',
     demandOption: true,
     requiresArg: true,
+    coerce: path.resolve,
   })
   .option('source-maps', {
     alias: 's',
@@ -49,6 +51,7 @@ const argv = yargs
     description: 'Directory containing the source JS files',
     demandOption: true,
     requiresArg: true,
+    coerce: path.resolve,
   })
   .option('insert-css-requires', {
     alias: 'i',
@@ -56,6 +59,7 @@ const argv = yargs
     description:
       'Directory containing JS files to insert require statements for the CSS files',
     requiresArg: true,
+    coerce: path.resolve,
   })
   .option('transform', {
     alias: 't',
@@ -110,7 +114,8 @@ function resolveOutputFilename(
 }
 
 async function processFiles(files: (number | string)[], options: Options) {
-  const startedAt = performance.now();
+  const { emitter, onDone } = createPerfMeter();
+
   let count = 0;
 
   const resolvedFiles = files.reduce(
@@ -124,30 +129,6 @@ async function processFiles(files: (number | string)[], options: Options) {
     [] as string[]
   );
   const cache = new TransformCacheCollection();
-
-  const timings = new Map<string, number>();
-  const addTiming = (key: string, value: number) => {
-    timings.set(key, Math.round((timings.get(key) || 0) + value));
-  };
-
-  const startTimes = new Map<string, number>();
-  const onEvent = (unknownEvent: unknown) => {
-    const ev = unknownEvent as { type: string; filename: string };
-    const [, stage, type] = ev.type.split(':');
-    if (type === 'start') {
-      startTimes.set(ev.filename, performance.now());
-      startTimes.set(stage, performance.now());
-    } else {
-      const startTime = startTimes.get(ev.filename);
-      if (startTime) {
-        addTiming(ev.filename, performance.now() - startTime);
-      }
-      const stageStartTime = startTimes.get(stage);
-      if (stageStartTime) {
-        addTiming(stage, performance.now() - stageStartTime);
-      }
-    }
-  };
 
   const modifiedFiles: { name: string; content: string }[] = [];
 
@@ -177,7 +158,7 @@ async function processFiles(files: (number | string)[], options: Options) {
       asyncResolveFallback,
       {},
       cache,
-      onEvent
+      emitter
     );
 
     if (cssText) {
@@ -242,27 +223,7 @@ async function processFiles(files: (number | string)[], options: Options) {
 
   console.log(`Successfully extracted ${count} CSS files.`);
 
-  console.log(`\nTimings:`);
-  console.log(`  Total: ${(performance.now() - startedAt).toFixed()}ms`);
-  console.log(`\n  By stages:`);
-  let stage = 1;
-  while (timings.has(`stage-${stage}`)) {
-    console.log(`    Stage ${stage}: ${timings.get(`stage-${stage}`)}ms`);
-    timings.delete(`stage-${stage}`);
-    stage += 1;
-  }
-
-  console.log('\n  By files:');
-
-  const byFiles = Array.from(timings.entries());
-  byFiles.sort(([, a], [, b]) => b - a);
-  byFiles.forEach(([filename, time]) => {
-    const relativeFilename = path.relative(
-      options.sourceRoot ?? process.cwd(),
-      filename
-    );
-    console.log(`    ${relativeFilename}: ${time}ms`);
-  });
+  onDone(options.sourceRoot ?? process.cwd());
 }
 
 processFiles(argv._, {
