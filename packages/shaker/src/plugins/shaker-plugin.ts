@@ -337,8 +337,19 @@ export default function shakerPlugin(
     post(file: BabelFile) {
       const log = createCustomDebug('shaker', getFileIdx(file.opts.filename!));
 
+      const processedImports = new Set<string>();
       const imports = new Map<string, string[]>();
-      this.imports.forEach(({ imported, source }) => {
+      const addImport = ({
+        imported,
+        source,
+      }: {
+        imported: string;
+        source: string;
+      }) => {
+        if (processedImports.has(`${source}:${imported}`)) {
+          return;
+        }
+
         if (!imports.has(source)) {
           imports.set(source, []);
         }
@@ -346,15 +357,12 @@ export default function shakerPlugin(
         if (imported) {
           imports.get(source)!.push(imported);
         }
-      });
 
-      this.reexports.forEach(({ imported, source }) => {
-        if (!imports.has(source)) {
-          imports.set(source, []);
-        }
+        processedImports.add(`${source}:${imported}`);
+      };
 
-        imports.get(source)!.push(imported);
-      });
+      this.imports.forEach(addImport);
+      this.reexports.forEach(addImport);
 
       log('end', `remaining imports: %O`, imports);
 

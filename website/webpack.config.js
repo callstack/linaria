@@ -1,6 +1,7 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { join } = require('path'); // eslint-disable-line import/no-extraneous-dependencies
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { LinariaDebugPlugin } = require('@linaria/webpack5-loader');
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -18,6 +19,10 @@ module.exports = {
     emitOnErrors: false,
   },
   plugins: [
+    new LinariaDebugPlugin({
+      filename: 'linaria-debug.json',
+      print: true,
+    }),
     new MiniCssExtractPlugin({ filename: 'styles.css' }),
     new HtmlWebpackPlugin({
       title: 'Linaria – zero-runtime CSS in JS library',

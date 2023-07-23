@@ -10,6 +10,7 @@
 import type { TransformOptions } from '@babel/core';
 import * as babel from '@babel/core';
 
+import { EventEmitter } from '@linaria/utils';
 import type { StrictOptions } from '@linaria/utils';
 
 import { TransformCacheCollection } from './cache';
@@ -33,7 +34,7 @@ function syncStages(
   prepareStageResult: ITransformFileResult | undefined,
   babelConfig: TransformOptions,
   cache: TransformCacheCollection,
-  eventEmitter?: (ev: unknown) => void
+  eventEmitter = EventEmitter.dummy
 ) {
   const { filename } = options;
   const ast = cache.originalASTCache.get(filename) ?? 'ignored';
@@ -52,7 +53,7 @@ function syncStages(
 
   // *** 2nd stage ***
 
-  eventEmitter?.({ type: 'transform:stage-2:start', filename });
+  const finishStage2Event = eventEmitter.pair({ stage: 'stage-2', filename });
 
   const evalStageResult = evalStage(
     cache,
@@ -61,7 +62,7 @@ function syncStages(
     filename
   );
 
-  eventEmitter?.({ type: 'transform:stage-2:finish', filename });
+  finishStage2Event();
 
   if (evalStageResult === null) {
     return {
@@ -74,7 +75,7 @@ function syncStages(
 
   // *** 3rd stage ***
 
-  eventEmitter?.({ type: 'transform:stage-3:start', filename });
+  const finishStage3Event = eventEmitter.pair({ stage: 'stage-3', filename });
 
   const collectStageResult = prepareForRuntime(
     babel,
@@ -86,7 +87,7 @@ function syncStages(
     babelConfig
   );
 
-  eventEmitter?.({ type: 'transform:stage-3:finish', filename });
+  finishStage3Event();
 
   if (!withLinariaMetadata(collectStageResult.metadata)) {
     return {
@@ -97,7 +98,7 @@ function syncStages(
 
   // *** 4th stage
 
-  eventEmitter?.({ type: 'transform:stage-4:start', filename });
+  const finishStage4Event = eventEmitter.pair({ stage: 'stage-4', filename });
 
   const extractStageResult = extractStage(
     collectStageResult.metadata.linaria.processors,
@@ -105,7 +106,7 @@ function syncStages(
     options
   );
 
-  eventEmitter?.({ type: 'transform:stage-4:finish', filename });
+  finishStage4Event();
 
   return {
     ...extractStageResult,
@@ -125,12 +126,12 @@ export function transformSync(
   syncResolve: (what: string, importer: string, stack: string[]) => string,
   babelConfig: TransformOptions = {},
   cache = new TransformCacheCollection(),
-  eventEmitter?: (ev: unknown) => void
+  eventEmitter = EventEmitter.dummy
 ): Result {
   const { filename } = options;
   // *** 1st stage ***
 
-  eventEmitter?.({ type: 'transform:stage-1:start', filename });
+  const finishEvent = eventEmitter.pair({ stage: 'stage-1', filename });
 
   const entrypoint = {
     name: options.filename,
@@ -148,7 +149,7 @@ export function transformSync(
     options
   );
 
-  eventEmitter?.({ type: 'transform:stage-1:finish', filename });
+  finishEvent();
 
   // *** The rest of the stages are synchronous ***
 
@@ -173,7 +174,7 @@ export default async function transform(
   ) => Promise<string | null>,
   babelConfig: TransformOptions = {},
   cache = new TransformCacheCollection(),
-  eventEmitter?: (ev: unknown) => void
+  eventEmitter = EventEmitter.dummy
 ): Promise<Result> {
   const { filename } = options;
 
@@ -183,7 +184,7 @@ export default async function transform(
 
   // *** 1st stage ***
 
-  eventEmitter?.({ type: 'transform:stage-1:start', filename });
+  const finishEvent = eventEmitter.pair({ stage: 'stage-1', filename });
 
   const entrypoint = {
     name: filename,
@@ -198,10 +199,11 @@ export default async function transform(
     asyncResolve,
     entrypoint,
     pluginOptions,
-    options
+    options,
+    eventEmitter
   );
 
-  eventEmitter?.({ type: 'transform:stage-1:finish', filename });
+  finishEvent();
 
   // *** The rest of the stages are synchronous ***
 

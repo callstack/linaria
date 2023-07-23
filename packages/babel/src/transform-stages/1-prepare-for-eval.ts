@@ -12,7 +12,12 @@ import type { File } from '@babel/types';
 import type { CustomDebug } from '@linaria/logger';
 import { createCustomDebug } from '@linaria/logger';
 import type { Evaluator, EvaluatorConfig, StrictOptions } from '@linaria/utils';
-import { buildOptions, getFileIdx, loadBabelOptions } from '@linaria/utils';
+import {
+  buildOptions,
+  EventEmitter,
+  getFileIdx,
+  loadBabelOptions,
+} from '@linaria/utils';
 
 import type { Core } from '../babel';
 import type { TransformCacheCollection } from '../cache';
@@ -49,7 +54,8 @@ function runPreevalStage(
   babel: Core,
   item: IEntrypoint,
   originalAst: File,
-  pluginOptions: StrictOptions
+  pluginOptions: StrictOptions,
+  eventEmitter: EventEmitter
 ): BabelFileResult {
   const babelOptions = item.parseConfig;
 
@@ -60,7 +66,7 @@ function runPreevalStage(
 
   const plugins = [
     ...preShakePlugins,
-    [require.resolve('../plugins/preeval'), pluginOptions],
+    [require.resolve('../plugins/preeval'), { ...pluginOptions, eventEmitter }],
     ...(babelOptions.plugins ?? []).filter(
       (i) => !hasKeyInList(i, pluginOptions.highPriorityPlugins)
     ),
@@ -89,18 +95,22 @@ export function prepareCode(
   babel: Core,
   item: IEntrypoint,
   originalAst: File,
-  pluginOptions: StrictOptions
+  pluginOptions: StrictOptions,
+  eventEmitter: EventEmitter
 ): [code: string, imports: Module['imports'], metadata?: BabelFileMetadata] {
   const { evaluator, name: filename, parseConfig, only } = item;
 
   const log = createCustomDebug('transform', getFileIdx(filename));
 
+  const onPreevalFinished = eventEmitter.pair({ method: 'preeval' });
   const preevalStageResult = runPreevalStage(
     babel,
     item,
     originalAst,
-    pluginOptions
+    pluginOptions,
+    eventEmitter
   );
+  onPreevalFinished();
 
   if (
     only.length === 1 &&
@@ -120,6 +130,7 @@ export function prepareCode(
     features: pluginOptions.features,
   };
 
+  const onEvaluatorFinished = eventEmitter.pair({ method: 'evaluator' });
   const [, code, imports] = evaluator(
     parseConfig,
     preevalStageResult.ast!,
@@ -127,6 +138,7 @@ export function prepareCode(
     evaluatorConfig,
     babel
   );
+  onEvaluatorFinished();
 
   log('stage-1:evaluator:end', '');
 
@@ -137,7 +149,8 @@ function processQueueItem(
   babel: Core,
   item: IEntrypoint | null,
   cache: TransformCacheCollection,
-  pluginOptions: StrictOptions
+  pluginOptions: StrictOptions,
+  eventEmitter: EventEmitter
 ):
   | {
       imports: Map<string, string[]> | null;
@@ -151,9 +164,11 @@ function processQueueItem(
 
   const { parseConfig, name, only, code } = item;
 
+  const onParseFinished = eventEmitter.pair({ method: 'parseFile' });
   const ast: File =
     cache.originalASTCache.get(name) ??
     parseFile(babel, name, code, parseConfig);
+  onParseFinished();
 
   const log = createCustomDebug('transform', getFileIdx(name));
 
@@ -166,7 +181,8 @@ function processQueueItem(
     babel,
     item,
     ast,
-    pluginOptions
+    pluginOptions,
+    eventEmitter
   );
 
   if (code === preparedCode) {
@@ -199,10 +215,13 @@ export function createEntrypoint(
   babel: Core,
   name: string,
   only: string[],
-  code: string,
+  maybeCode: string | undefined,
   pluginOptions: StrictOptions,
-  options: Pick<Options, 'root' | 'inputSourceMap'>
+  options: Pick<Options, 'root' | 'inputSourceMap'>,
+  eventEmitter: EventEmitter
 ): IEntrypoint | 'ignored' {
+  const finishEvent = eventEmitter.pair({ method: 'createEntrypoint' });
+
   const log = createCustomDebug('transform', getFileIdx(name));
   const extension = extname(name);
 
@@ -212,8 +231,11 @@ export function createEntrypoint(
       `${name} is ignored. If you want it to be processed, you should add '${extension}' to the "extensions" option.`
     );
 
+    finishEvent();
     return 'ignored';
   }
+
+  const code = maybeCode ?? readFileSync(name, 'utf-8');
 
   const { action, babelOptions } = getMatchedRule(
     pluginOptions.rules,
@@ -223,6 +245,7 @@ export function createEntrypoint(
 
   if (action === 'ignore') {
     log('createEntrypoint', `${name} is ignored by rule`);
+    finishEvent();
     return 'ignored';
   }
 
@@ -246,6 +269,7 @@ export function createEntrypoint(
 
   log('createEntrypoint', `${name} (${only.join(', ')})\n${code}`);
 
+  finishEvent();
   return {
     code,
     evaluator,
@@ -267,7 +291,8 @@ function processImports(
     importsOnly: string[];
     importedFile: string;
     resolved: string | null;
-  }[]
+  }[],
+  eventEmitter: EventEmitter
 ) {
   for (const { importedFile, importsOnly, resolved } of resolvedImports) {
     if (resolved === null) {
@@ -295,14 +320,14 @@ function processImports(
       `${resolved}\0${[...importsOnlySet].join(',')}`
     );
 
-    const fileContent = readFileSync(resolved, 'utf8');
     const next = createEntrypoint(
       babel,
       resolved,
-      importsOnly,
-      fileContent,
+      [...importsOnlySet],
+      undefined,
       pluginOptions,
-      options
+      options,
+      eventEmitter
     );
     if (next === 'ignored') {
       continue;
@@ -319,7 +344,8 @@ function processEntrypoint(
   cache: TransformCacheCollection,
   pluginOptions: StrictOptions,
   options: Pick<Options, 'root' | 'inputSourceMap'>,
-  nextItem: NextItem
+  nextItem: NextItem,
+  eventEmitter: EventEmitter
 ):
   | {
       imports: Map<string, string[]> | null;
@@ -370,7 +396,8 @@ function processEntrypoint(
         only: mergedOnly,
       },
       cache,
-      pluginOptions
+      pluginOptions,
+      eventEmitter
     );
 
     if (!processed) {
@@ -395,7 +422,8 @@ export function prepareForEvalSync(
   resolve: (what: string, importer: string, stack: string[]) => string,
   partialEntrypoint: Pick<IEntrypoint, 'code' | 'name' | 'only'>,
   pluginOptions: StrictOptions,
-  options: Pick<Options, 'root' | 'inputSourceMap'>
+  options: Pick<Options, 'root' | 'inputSourceMap'>,
+  eventEmitter = EventEmitter.dummy
 ): ITransformFileResult | undefined {
   const log = createCustomDebug(
     'transform',
@@ -408,7 +436,8 @@ export function prepareForEvalSync(
     partialEntrypoint.only,
     partialEntrypoint.code,
     pluginOptions,
-    options
+    options,
+    eventEmitter
   );
 
   if (entrypoint === 'ignored') {
@@ -429,16 +458,19 @@ export function prepareForEvalSync(
       cache,
       pluginOptions,
       options,
-      item
+      item,
+      eventEmitter
     );
     if (processResult === 'skip') {
       continue;
     }
 
     const { imports, result, only: mergedOnly } = processResult;
+    const listOfImports = Array.from(imports?.entries() ?? []);
 
-    if (imports) {
-      const resolvedImports = Array.from(imports?.entries() ?? []).map(
+    if (listOfImports.length > 0) {
+      const onResolveFinished = eventEmitter.pair({ method: 'resolve' });
+      const resolvedImports = listOfImports.map(
         ([importedFile, importsOnly]) => {
           let resolved: string | null = null;
           try {
@@ -463,6 +495,17 @@ export function prepareForEvalSync(
           };
         }
       );
+      onResolveFinished();
+
+      eventEmitter.single({
+        type: 'dependency',
+        file: item.entrypoint.name,
+        only: item.entrypoint.only,
+        imports: resolvedImports.map(({ resolved, importsOnly }) => ({
+          from: resolved,
+          what: importsOnly,
+        })),
+      });
 
       processImports(
         babel,
@@ -472,9 +515,17 @@ export function prepareForEvalSync(
         pluginOptions,
         options,
         item,
-        resolvedImports
+        resolvedImports,
+        eventEmitter
       );
     } else {
+      eventEmitter.single({
+        type: 'dependency',
+        file: item.entrypoint.name,
+        only: item.entrypoint.only,
+        imports: [],
+      });
+
       log('stage-1', '%s has no imports', item.entrypoint.name);
     }
 
@@ -502,7 +553,8 @@ export default async function prepareForEval(
   ) => Promise<string | null>,
   partialEntrypoint: Pick<IEntrypoint, 'code' | 'name' | 'only'>,
   pluginOptions: StrictOptions,
-  options: Pick<Options, 'root' | 'inputSourceMap'>
+  options: Pick<Options, 'root' | 'inputSourceMap'>,
+  eventEmitter = EventEmitter.dummy
 ): Promise<ITransformFileResult | undefined> {
   /*
    * This method can be run simultaneously for multiple files.
@@ -523,7 +575,8 @@ export default async function prepareForEval(
     partialEntrypoint.only,
     partialEntrypoint.code,
     pluginOptions,
-    options
+    options,
+    eventEmitter
   );
 
   if (entrypoint === 'ignored') {
@@ -544,7 +597,8 @@ export default async function prepareForEval(
       cache,
       pluginOptions,
       options,
-      item
+      item,
+      eventEmitter
     );
     if (processResult === 'skip') {
       continue;
@@ -552,46 +606,57 @@ export default async function prepareForEval(
 
     const { imports, result, only: mergedOnly } = processResult;
 
-    if (imports && imports.size > 0) {
+    const listOfImports = Array.from(imports?.entries() ?? []);
+    if (listOfImports.length > 0) {
+      const onResolveFinished = eventEmitter.pair({ method: 'resolve' });
       const resolvedImports = await Promise.all(
-        Array.from(imports?.entries() ?? []).map(
-          async ([importedFile, importsOnly]) => {
-            let resolved: string | null = null;
-            try {
-              resolved = await resolve(
-                importedFile,
-                item.entrypoint.name,
-                item.stack
-              );
-            } catch (err) {
-              log(
-                'stage-1:async-resolve',
-                `❌ cannot resolve %s in %s: %O`,
-                importedFile,
-                item.entrypoint.name,
-                err
-              );
-            }
+        listOfImports.map(async ([importedFile, importsOnly]) => {
+          let resolved: string | null = null;
+          try {
+            resolved = await resolve(
+              importedFile,
+              item.entrypoint.name,
+              item.stack
+            );
+          } catch (err) {
+            log(
+              'stage-1:async-resolve',
+              `❌ cannot resolve %s in %s: %O`,
+              importedFile,
+              item.entrypoint.name,
+              err
+            );
+          }
 
-            if (resolved !== null) {
-              log(
-                'stage-1:async-resolve',
-                `✅ %s (%o) in %s -> %s`,
-                importedFile,
-                importsOnly,
-                item.entrypoint.name,
-                resolved
-              );
-            }
-
-            return {
+          if (resolved !== null) {
+            log(
+              'stage-1:async-resolve',
+              `✅ %s (%o) in %s -> %s`,
               importedFile,
               importsOnly,
-              resolved,
-            };
+              item.entrypoint.name,
+              resolved
+            );
           }
-        )
+
+          return {
+            importedFile,
+            importsOnly,
+            resolved,
+          };
+        })
       );
+      onResolveFinished();
+
+      eventEmitter.single({
+        type: 'dependency',
+        file: item.entrypoint.name,
+        only: item.entrypoint.only,
+        imports: resolvedImports.map(({ resolved, importsOnly }) => ({
+          from: resolved,
+          what: importsOnly,
+        })),
+      });
 
       processImports(
         babel,
@@ -601,9 +666,17 @@ export default async function prepareForEval(
         pluginOptions,
         options,
         item,
-        resolvedImports
+        resolvedImports,
+        eventEmitter
       );
     } else {
+      eventEmitter.single({
+        type: 'dependency',
+        file: item.entrypoint.name,
+        only: item.entrypoint.only,
+        imports: [],
+      });
+
       log('stage-1', '%s has no imports', item.entrypoint.name);
     }
 
