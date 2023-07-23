@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.5.2
+
+### Patch Changes
+
+- 79557248: Nothing has changed. Just moved some utils and types from babel to utils package.
+- b191f543: New option `features` for fine-tuning the build and evaluation process.
+- e59bf809: Shaker mistakenly counts references in types as valuable and keeps referenced variables alive.
+- 520ba8da: Debug mode for CLI, Webpack 5 and Vite. When enabled, prints brief perf report to console and information about processed dependency tree to the specified file.
+- ae3727f9: Fix the issues with processing files that are supposed to be parsed with their respective Babel config.
+- dca076ef: All references in unary operators should be treated as references, not as bindings. That fixes usages of `+exp` in interpolations.
+
 ## 4.5.1
 
 ### Patch Changes

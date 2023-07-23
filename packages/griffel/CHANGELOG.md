@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.5.3
+
+### Patch Changes
+
+- e59bf809: Shaker mistakenly counts references in types as valuable and keeps referenced variables alive.
+- Updated dependencies [79557248]
+- Updated dependencies [b191f543]
+- Updated dependencies [e59bf809]
+- Updated dependencies [520ba8da]
+- Updated dependencies [ae3727f9]
+- Updated dependencies [dca076ef]
+  - @linaria/tags@4.5.3
+  - @linaria/utils@4.5.2
+
 ## 4.5.2
 
 ### Patch Changes
