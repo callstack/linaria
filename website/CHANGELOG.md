@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.5.4
+
+### Patch Changes
+
+- @linaria/atomic@4.5.4
+- @linaria/core@4.5.4
+- @linaria/react@4.5.4
+
 ## 4.5.3
 
 ### Patch Changes

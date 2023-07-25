@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.5.4
+
+### Patch Changes
+
+- 10bcd241: Fix for "The expression evaluated to 'undefined'" in Webpack (fixes #1300 and #1287)
+- Updated dependencies [10bcd241]
+  - @linaria/utils@4.5.3
+  - @linaria/core@4.5.4
+  - @linaria/shaker@4.5.3
+  - @linaria/tags@4.5.4
+
 ## 4.5.3
 
 ### Patch Changes
