@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.5.4
+
+### Patch Changes
+
+- Updated dependencies [10bcd241]
+  - @linaria/babel-preset@4.5.4
+  - @linaria/react@4.5.4
+  - @linaria/shaker@4.5.3
+  - @linaria/tags@4.5.4
+
 ## 4.5.3
 
 ### Patch Changes

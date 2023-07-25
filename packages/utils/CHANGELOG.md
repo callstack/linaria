@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.5.3
+
+### Patch Changes
+
+- 10bcd241: Fix for "The expression evaluated to 'undefined'" in Webpack (fixes #1300 and #1287)
+
 ## 4.5.2
 
 ### Patch Changes
