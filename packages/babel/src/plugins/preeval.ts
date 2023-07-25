@@ -98,7 +98,7 @@ export default function preeval(
         dependencies: [],
       };
 
-      const linariaPreval = file.path.scope.getData('__linariaPreval');
+      const linariaPreval = file.path.getData('__linariaPreval');
       if (!linariaPreval) {
         // Event if there is no dependencies, we still need to add __linariaPreval
         const linariaExport = t.expressionStatement(

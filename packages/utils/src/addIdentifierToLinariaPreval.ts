@@ -15,12 +15,12 @@ export function getOrAddLinariaPreval(
   scope: Scope
 ): NodePath<ObjectExpression> {
   const rootScope = scope.getProgramParent();
-  let object = rootScope.getData('__linariaPreval');
+  const programPath = rootScope.path as NodePath<Program>;
+
+  let object = programPath.getData('__linariaPreval');
   if (object) {
     return object;
   }
-
-  const programPath = rootScope.path as NodePath<Program>;
 
   if (programPath.node.sourceType === 'script') {
     // CJS exports.__linariaPreval = {};
@@ -71,7 +71,7 @@ export function getOrAddLinariaPreval(
     ) as NodePath<ObjectExpression>;
   }
 
-  rootScope.setData('__linariaPreval', object);
+  programPath.setData('__linariaPreval', object);
   return object;
 }
 
