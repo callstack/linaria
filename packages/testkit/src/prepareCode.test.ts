@@ -9,6 +9,7 @@ import {
   parseFile,
   prepareCode,
 } from '@linaria/babel-preset';
+import { linariaLogger } from '@linaria/logger';
 import { EventEmitter } from '@linaria/utils';
 
 const testCasesDir = join(__dirname, '__fixtures__', 'prepare-code-test-cases');
@@ -59,6 +60,7 @@ describe('prepareCode', () => {
       const sourceCode = restLines.join('\n');
       const entrypoint = createEntrypoint(
         babel,
+        linariaLogger,
         inputFilePath,
         only,
         sourceCode,

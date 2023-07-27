@@ -37,7 +37,7 @@ function syncStages(
   eventEmitter = EventEmitter.dummy
 ) {
   const { filename } = options;
-  const ast = cache.originalASTCache.get(filename) ?? 'ignored';
+  const ast = cache.get('originalAST', filename) ?? 'ignored';
 
   // File is ignored or does not contain any tags. Return original code.
   if (
@@ -177,10 +177,6 @@ export default async function transform(
   eventEmitter = EventEmitter.dummy
 ): Promise<Result> {
   const { filename } = options;
-
-  // Cache may contain a code that was loaded from disk, but transform
-  // is called with a code that already processed by another loaders
-  cache.invalidateIfChanged(filename, originalCode);
 
   // *** 1st stage ***
 

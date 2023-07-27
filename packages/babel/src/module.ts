@@ -86,9 +86,6 @@ const isProxy = (
 
 const NOOP = () => {};
 
-const padStart = (num: number, len: number) =>
-  num.toString(10).padStart(len, '0');
-
 const hasKey = <TKey extends string | symbol>(
   obj: unknown,
   key: TKey
@@ -96,6 +93,30 @@ const hasKey = <TKey extends string | symbol>(
   (typeof obj === 'object' || typeof obj === 'function') &&
   obj !== null &&
   key in obj;
+
+export interface IModule {
+  debug: CustomDebug;
+  readonly exports: unknown;
+  readonly idx: number;
+  readonly isEvaluated: boolean;
+  readonly only: string;
+}
+
+function getUncached(cached: string | string[], test: string): string[] {
+  if (cached === test) {
+    return [];
+  }
+
+  const cachedSet = new Set(
+    typeof cached === 'string' ? cached.split(',') : cached
+  );
+
+  if (cachedSet.has('*')) {
+    return [];
+  }
+
+  return test.split(',').filter((t) => !cachedSet.has(t));
+}
 
 class Module {
   #isEvaluated = false;
@@ -126,6 +147,7 @@ class Module {
 
   constructor(
     filename: string,
+    public only: string,
     public options: Pick<StrictOptions, 'extensions'>,
     private cache = new TransformCacheCollection(),
     private debuggerDepth = 0,
@@ -137,7 +159,7 @@ class Module {
     this.filename = filename;
     this.imports = null;
     this.dependencies = null;
-    this.transform = null;
+    this.transform = parentModule?.transform ?? null;
     this.debug = createCustomDebug('module', this.idx);
 
     this.#lazyValues = new Map();
@@ -256,10 +278,14 @@ class Module {
     );
   }
 
+  public get isEvaluated() {
+    return this.#isEvaluated;
+  }
+
   resolve = (id: string) => {
     const resolveCacheKey = `${this.filename} -> ${id}`;
-    if (this.cache.resolveCache.has(resolveCacheKey)) {
-      return this.cache.resolveCache.get(resolveCacheKey)!;
+    if (this.cache.has('resolve', resolveCacheKey)) {
+      return this.cache.get('resolve', resolveCacheKey)!;
     }
 
     const extensions = this.moduleImpl._extensions;
@@ -292,6 +318,51 @@ class Module {
     }
   };
 
+  getCachedModule(filename: string, onlyAsString: string): IModule | null {
+    if (!this.cache.has('eval', filename)) {
+      return null;
+    }
+
+    const m = this.cache.get('eval', filename)!;
+    const uncachedExports = getUncached(m.only, onlyAsString);
+    if (uncachedExports.length > 0 || !m.isEvaluated) {
+      m.debug(
+        'eval-cache',
+        'is going to be invalidated because %o is not evaluated yet',
+        uncachedExports
+      );
+
+      this.cache.invalidate('eval', filename);
+
+      return null;
+    }
+
+    return m;
+  }
+
+  getCachedCode(filename: string, onlyAsString: string, log: CustomDebug) {
+    const extension = path.extname(filename);
+    if (extension !== '.json' && !this.extensions.includes(extension)) {
+      return null;
+    }
+
+    // Requested file can be already prepared for evaluation on the stage 1
+    if (onlyAsString && this.cache.has('code', filename)) {
+      const cached = this.cache.get('code', filename);
+      const uncachedExports = getUncached(cached?.only ?? [], onlyAsString);
+      if (uncachedExports.length === 0) {
+        log('code-cache', '✅ ready for evaluation');
+        return cached?.result.code ?? '';
+      }
+    }
+
+    // If code wasn't extracted from cache, read it from the file system.
+    // It indicates that we were unable to process some of the imports on stage1
+    // TODO: transpile the file
+    log('code-cache', '❌ file has not been processed during prepare stage');
+    return fs.readFileSync(filename, 'utf-8');
+  }
+
   require: {
     (id: string): unknown;
     resolve: (id: string) => string;
@@ -312,7 +383,7 @@ class Module {
 
       // Resolve module id (and filename) relatively to parent module
       const resolved = this.resolve(id);
-      const [filename, onlyList] = resolved.split('\0');
+      const [filename, onlyAsString] = resolved.split('\0');
       if (filename === id && !path.isAbsolute(id)) {
         // The module is a builtin node modules, but not in the allowed list
         throw new Error(
@@ -322,89 +393,30 @@ class Module {
 
       this.dependencies?.push(id);
 
-      let m: Module;
-
       this.debug('require', `${id} -> ${filename}`);
 
-      if (this.cache.evalCache.has(filename)) {
-        m = this.cache.evalCache.get(filename)!;
-        this.debug('eval-cache', '✅ %r has been gotten from cache', {
-          namespace: `module:${padStart(m.idx, 5)}`,
-        });
-      } else {
-        this.debug('eval-cache', `➕ %r is going to be initialized`, {
-          namespace: `module:${padStart(getFileIdx(filename), 5)}`,
-        });
-        // Create the module if cached module is not available
-        m = new Module(
-          filename,
-          this.options,
-          this.cache,
-          this.debuggerDepth + 1,
-          this
-        );
-        m.transform = this.transform;
-
-        // Store it in cache at this point with, otherwise
-        // we would end up in infinite loop with cyclic dependencies
-        this.cache.evalCache.set(filename, m);
+      const cached = this.getCachedModule(filename, onlyAsString);
+      if (cached) {
+        return cached.exports;
       }
 
-      const extension = path.extname(filename);
-      if (extension === '.json' || this.extensions.includes(extension)) {
-        let code: string | undefined;
-        // Requested file can be already prepared for evaluation on the stage 1
-        if (onlyList && this.cache.codeCache.has(filename)) {
-          const cached = this.cache.codeCache.get(filename);
-          const only = onlyList
-            .split(',')
-            .filter((token) => !m.#lazyValues.has(token));
-          const cachedOnly = new Set(cached?.only ?? []);
-          const isMatched =
-            cachedOnly.has('*') ||
-            (only && only.every((token) => cachedOnly.has(token)));
-          if (cached && isMatched) {
-            m.debug('code-cache', '✅');
-            code = cached.result.code;
-          } else {
-            m.debug(
-              'code-cache',
-              '%o is missing (%o were cached)',
-              only?.filter((token) => !cachedOnly.has(token)) ?? [],
-              [...cachedOnly.values()]
-            );
-          }
-        } else if (m.#isEvaluated) {
-          m.debug(
-            'code-cache',
-            '✅ not in the code cache, but is already evaluated'
-          );
-        } else {
-          // If code wasn't extracted from cache, read it from the file system
-          // TODO: transpile the file
-          m.debug(
-            'code-cache',
-            '❌ file has not been processed during prepare stage'
-          );
-          code = fs.readFileSync(filename, 'utf-8');
-        }
+      const m = new Module(
+        filename,
+        onlyAsString,
+        this.options,
+        this.cache,
+        this.debuggerDepth + 1,
+        this
+      );
 
-        if (code) {
-          if (/\.json$/.test(filename)) {
-            // For JSON files, parse it to a JS object similar to Node
-            m.exports = JSON.parse(code);
-            m.#isEvaluated = true;
-          } else {
-            // For JS/TS files, evaluate the module
-            m.evaluate(code);
-          }
-        }
-      } else {
-        // For non JS/JSON requires, just export the id
-        // This is to support importing assets in webpack
-        // The module will be resolved by css-loader
+      this.cache.add('eval', filename, m);
+
+      const code = this.getCachedCode(filename, onlyAsString, this.debug);
+      if (code === null) {
         m.exports = filename;
         m.#isEvaluated = true;
+      } else {
+        m.evaluate(code);
       }
 
       return m.exports;
@@ -420,7 +432,7 @@ class Module {
       this.debug(`evaluate`, 'there is nothing to evaluate');
     }
 
-    if (this.#isEvaluated) {
+    if (this.isEvaluated) {
       this.debug('evaluate', `is already evaluated`);
       return;
     }
@@ -430,6 +442,12 @@ class Module {
     this.#isEvaluated = true;
 
     const { filename } = this;
+
+    if (/\.json$/.test(filename)) {
+      // For JSON files, parse it to a JS object similar to Node
+      this.exports = JSON.parse(source);
+      return;
+    }
 
     const context = vm.createContext({
       clearImmediate: NOOP,

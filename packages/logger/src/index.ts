@@ -7,7 +7,9 @@ type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 const levels = ['error', 'warn', 'info', 'debug'];
 const currentLevel = levels.indexOf(process.env.LINARIA_LOG || 'warn');
 
-const linariaLogger = genericDebug('linaria');
+export type { Debugger };
+
+export const linariaLogger = genericDebug('linaria');
 
 const loggers = new Map<string, Debugger>();
 

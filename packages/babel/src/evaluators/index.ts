@@ -13,7 +13,12 @@ export default function evaluate(
   pluginOptions: StrictOptions,
   filename: string
 ) {
-  const m = new Module(filename ?? 'unknown', pluginOptions, cache);
+  const m = new Module(
+    filename ?? 'unknown',
+    '__linariaPreval',
+    pluginOptions,
+    cache
+  );
 
   m.dependencies = [];
   m.evaluate(code);
