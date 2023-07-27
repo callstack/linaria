@@ -15,6 +15,7 @@ export { slugify } from '@linaria/utils';
 export { default as preeval } from './plugins/preeval';
 export { default as withLinariaMetadata } from './utils/withLinariaMetadata';
 export { default as Module, DefaultModuleImplementation } from './module';
+export type { IModule } from './module';
 export { default as transform } from './transform';
 export * from './types';
 export { parseFile } from './transform-stages/helpers/parseFile';

@@ -9,8 +9,8 @@ import type {
 } from '@babel/core';
 import type { File } from '@babel/types';
 
-import type { CustomDebug } from '@linaria/logger';
-import { createCustomDebug } from '@linaria/logger';
+import type { Debugger } from '@linaria/logger';
+import { linariaLogger } from '@linaria/logger';
 import type { Evaluator, EvaluatorConfig, StrictOptions } from '@linaria/utils';
 import {
   buildOptions,
@@ -49,6 +49,11 @@ const hasKeyInList = (plugin: PluginItem, list: string[]): boolean => {
   const pluginKey = getKey(plugin);
   return pluginKey ? list.some((i) => pluginKey.includes(i)) : false;
 };
+
+const rootLog = linariaLogger.extend('transform');
+
+const getLogIdx = (filename: string) =>
+  getFileIdx(filename).toString().padStart(5, '0');
 
 function runPreevalStage(
   babel: Core,
@@ -98,9 +103,7 @@ export function prepareCode(
   pluginOptions: StrictOptions,
   eventEmitter: EventEmitter
 ): [code: string, imports: Module['imports'], metadata?: BabelFileMetadata] {
-  const { evaluator, name: filename, parseConfig, only } = item;
-
-  const log = createCustomDebug('transform', getFileIdx(filename));
+  const { evaluator, log, parseConfig, only } = item;
 
   const onPreevalFinished = eventEmitter.pair({ method: 'preeval' });
   const preevalStageResult = runPreevalStage(
@@ -117,12 +120,12 @@ export function prepareCode(
     only[0] === '__linariaPreval' &&
     !withLinariaMetadata(preevalStageResult.metadata)
   ) {
-    log('stage-1:evaluator:end', 'no metadata');
+    log('[evaluator:end] no metadata');
     return [preevalStageResult.code!, null, preevalStageResult.metadata];
   }
 
-  log('stage-1:preeval', 'metadata %O', preevalStageResult.metadata);
-  log('stage-1:evaluator:start', 'using %s', evaluator.name);
+  log('[preeval] metadata %O', preevalStageResult.metadata);
+  log('[evaluator:start] using %s', evaluator.name);
 
   const evaluatorConfig: EvaluatorConfig = {
     onlyExports: only,
@@ -140,10 +143,12 @@ export function prepareCode(
   );
   onEvaluatorFinished();
 
-  log('stage-1:evaluator:end', '');
+  log('[evaluator:end]');
 
   return [code, imports, preevalStageResult.metadata];
 }
+
+const EMPTY_FILE = '=== empty file ===';
 
 function processQueueItem(
   babel: Core,
@@ -162,20 +167,16 @@ function processQueueItem(
     return undefined;
   }
 
-  const { parseConfig, name, only, code } = item;
+  const { parseConfig, name, only, code, log } = item;
 
   const onParseFinished = eventEmitter.pair({ method: 'parseFile' });
   const ast: File =
-    cache.originalASTCache.get(name) ??
-    parseFile(babel, name, code, parseConfig);
+    cache.get('originalAST', name) ?? parseFile(babel, name, code, parseConfig);
   onParseFinished();
 
-  const log = createCustomDebug('transform', getFileIdx(name));
+  cache.add('originalAST', name, ast);
 
-  cache.originalASTCache.set(name, ast);
-
-  const onlyAsStr = only.join(', ');
-  log('stage-1', `>> (${onlyAsStr})`);
+  log('>> (%o)', only);
 
   const [preparedCode, imports, metadata] = prepareCode(
     babel,
@@ -186,9 +187,9 @@ function processQueueItem(
   );
 
   if (code === preparedCode) {
-    log('stage-1', `<< (${onlyAsStr})\n === no changes ===`);
+    log('<< (%o)\n === no changes ===', only);
   } else {
-    log('stage-1', `<< (${onlyAsStr})\n${preparedCode}`);
+    log('<< (%o)\n%s', only, preparedCode || EMPTY_FILE);
   }
 
   if (preparedCode === '') return undefined;
@@ -211,8 +212,15 @@ const isEqual = ([...a]: string[], [...b]: string[]) => {
   return a.every((item, index) => item === b[index]);
 };
 
+const mergeImports = (a: string[], b: string[]) => {
+  const result = new Set(a);
+  b.forEach((item) => result.add(item));
+  return [...result].sort();
+};
+
 export function createEntrypoint(
   babel: Core,
+  parentLog: Debugger,
   name: string,
   only: string[],
   maybeCode: string | undefined,
@@ -222,13 +230,17 @@ export function createEntrypoint(
 ): IEntrypoint | 'ignored' {
   const finishEvent = eventEmitter.pair({ method: 'createEntrypoint' });
 
-  const log = createCustomDebug('transform', getFileIdx(name));
+  const log = parentLog.extend(
+    getLogIdx(name),
+    parentLog === rootLog ? ':' : '->'
+  );
   const extension = extname(name);
 
   if (!pluginOptions.extensions.includes(extension)) {
     log(
-      'createEntrypoint',
-      `${name} is ignored. If you want it to be processed, you should add '${extension}' to the "extensions" option.`
+      '[createEntrypoint] %s is ignored. If you want it to be processed, you should add \'%s\' to the "extensions" option.',
+      name,
+      extension
     );
 
     finishEvent();
@@ -244,7 +256,7 @@ export function createEntrypoint(
   );
 
   if (action === 'ignore') {
-    log('createEntrypoint', `${name} is ignored by rule`);
+    log('[createEntrypoint] %s is ignored by rule', name);
     finishEvent();
     return 'ignored';
   }
@@ -267,7 +279,7 @@ export function createEntrypoint(
 
   const fullParserOptions = loadBabelOptions(babel, name, parseConfig);
 
-  log('createEntrypoint', `${name} (${only.join(', ')})\n${code}`);
+  log('[createEntrypoint] %s (%o)\n%s', name, only, code || EMPTY_FILE);
 
   finishEvent();
   return {
@@ -276,12 +288,13 @@ export function createEntrypoint(
     name,
     only,
     parseConfig: fullParserOptions,
+    log,
   };
 }
 
 function processImports(
   babel: Core,
-  log: CustomDebug,
+  log: Debugger,
   cache: TransformCacheCollection,
   queue: ModuleQueue,
   pluginOptions: StrictOptions,
@@ -297,8 +310,7 @@ function processImports(
   for (const { importedFile, importsOnly, resolved } of resolvedImports) {
     if (resolved === null) {
       log(
-        'stage-1:resolve',
-        `✅ %s in %s is ignored`,
+        `[resolve] ✅ %s in %s is ignored`,
         importedFile,
         parent.entrypoint.name
       );
@@ -306,7 +318,7 @@ function processImports(
     }
 
     const resolveCacheKey = `${parent.entrypoint.name} -> ${importedFile}`;
-    const resolveCached = cache.resolveCache.get(resolveCacheKey);
+    const resolveCached = cache.get('resolve', resolveCacheKey);
     const importsOnlySet = new Set(importsOnly);
     if (resolveCached) {
       const [, cachedOnly] = resolveCached.split('\0');
@@ -315,13 +327,15 @@ function processImports(
       });
     }
 
-    cache.resolveCache.set(
+    cache.add(
+      'resolve',
       resolveCacheKey,
       `${resolved}\0${[...importsOnlySet].join(',')}`
     );
 
     const next = createEntrypoint(
       babel,
+      log,
       resolved,
       [...importsOnlySet],
       undefined,
@@ -340,7 +354,6 @@ function processImports(
 // FIXME: naming
 function processEntrypoint(
   babel: Core,
-  log: CustomDebug,
   cache: TransformCacheCollection,
   pluginOptions: StrictOptions,
   options: Pick<Options, 'root' | 'inputSourceMap'>,
@@ -353,11 +366,17 @@ function processEntrypoint(
       only: string[];
     }
   | 'skip' {
-  const { code, name, only } = nextItem.entrypoint;
+  const { code, name, only, log } = nextItem.entrypoint;
+  log(
+    'start processing %s (only: %s, refs: %d)',
+    name,
+    only,
+    nextItem.refCount ?? 0
+  );
 
   cache.invalidateIfChanged(name, code);
 
-  const cached = cache.codeCache.get(name);
+  const cached = cache.get('code', name);
   // If we already have a result for this file, we should get a result for merged `only`
   const mergedOnly = cached?.only
     ? Array.from(new Set([...cached.only, ...only]))
@@ -368,7 +387,7 @@ function processEntrypoint(
 
   if (cached) {
     if (isEqual(cached.only, mergedOnly)) {
-      log('stage-1', '%s is already processed', name);
+      log('%s is already processed', name);
       if (!nextItem.stack.includes(nextItem.entrypoint.name)) {
         imports = cached.imports;
       }
@@ -376,7 +395,6 @@ function processEntrypoint(
       result = cached.result;
     } else {
       log(
-        'stage-1',
         '%s is already processed, but with different `only` %o (the cached one %o)',
         name,
         only,
@@ -384,7 +402,7 @@ function processEntrypoint(
       );
 
       // If we already have a result for this file, we should invalidate it
-      cache.evalCache.delete(name);
+      cache.invalidate('eval', name);
     }
   }
 
@@ -401,7 +419,7 @@ function processEntrypoint(
     );
 
     if (!processed) {
-      log('stage-1', '%s is skipped', name);
+      log('%s is skipped', name);
       return 'skip';
     }
 
@@ -425,13 +443,9 @@ export function prepareForEvalSync(
   options: Pick<Options, 'root' | 'inputSourceMap'>,
   eventEmitter = EventEmitter.dummy
 ): ITransformFileResult | undefined {
-  const log = createCustomDebug(
-    'transform',
-    getFileIdx(partialEntrypoint.name)
-  );
-
   const entrypoint = createEntrypoint(
     babel,
+    rootLog,
     partialEntrypoint.name,
     partialEntrypoint.only,
     partialEntrypoint.code,
@@ -454,7 +468,6 @@ export function prepareForEvalSync(
 
     const processResult = processEntrypoint(
       babel,
-      log,
       cache,
       pluginOptions,
       options,
@@ -467,6 +480,7 @@ export function prepareForEvalSync(
 
     const { imports, result, only: mergedOnly } = processResult;
     const listOfImports = Array.from(imports?.entries() ?? []);
+    const { log } = item.entrypoint;
 
     if (listOfImports.length > 0) {
       const onResolveFinished = eventEmitter.pair({ method: 'resolve' });
@@ -476,16 +490,13 @@ export function prepareForEvalSync(
           try {
             resolved = resolve(importedFile, item.entrypoint.name, item.stack);
             log(
-              'stage-1:sync-resolve',
-              `✅ ${importedFile} -> ${resolved} (only: %o)`,
+              '[sync-resolve] ✅ %s -> %s (only: %o)',
+              importedFile,
+              resolved,
               importsOnly
             );
           } catch (err) {
-            log(
-              'stage-1:sync-resolve',
-              `❌ cannot resolve ${importedFile}: %O`,
-              err
-            );
+            log('[sync-resolve] ❌ cannot resolve %s: %O', importedFile, err);
           }
 
           return {
@@ -526,17 +537,17 @@ export function prepareForEvalSync(
         imports: [],
       });
 
-      log('stage-1', '%s has no imports', item.entrypoint.name);
+      log('%s has no imports', item.entrypoint.name);
     }
 
-    cache.codeCache.set(item.entrypoint.name, {
+    cache.add('code', item.entrypoint.name, {
       imports,
       only: mergedOnly,
       result,
     });
   }
 
-  return cache.codeCache.get(entrypoint.name)?.result;
+  return cache.get('code', entrypoint.name)?.result;
 }
 
 /**
@@ -564,13 +575,9 @@ export default async function prepareForEval(
    * but the "only" option has changed, the file will be re-processed using
    * the combined "only" option.
    */
-  const log = createCustomDebug(
-    'transform',
-    getFileIdx(partialEntrypoint.name)
-  );
-
   const entrypoint = createEntrypoint(
     babel,
+    rootLog,
     partialEntrypoint.name,
     partialEntrypoint.only,
     partialEntrypoint.code,
@@ -593,7 +600,6 @@ export default async function prepareForEval(
 
     const processResult = processEntrypoint(
       babel,
-      log,
       cache,
       pluginOptions,
       options,
@@ -605,48 +611,114 @@ export default async function prepareForEval(
     }
 
     const { imports, result, only: mergedOnly } = processResult;
+    const { log } = item.entrypoint;
 
     const listOfImports = Array.from(imports?.entries() ?? []);
     if (listOfImports.length > 0) {
       const onResolveFinished = eventEmitter.pair({ method: 'resolve' });
-      const resolvedImports = await Promise.all(
-        listOfImports.map(async ([importedFile, importsOnly]) => {
-          let resolved: string | null = null;
-          try {
-            resolved = await resolve(
-              importedFile,
-              item.entrypoint.name,
-              item.stack
-            );
-          } catch (err) {
-            log(
-              'stage-1:async-resolve',
-              `❌ cannot resolve %s in %s: %O`,
-              importedFile,
-              item.entrypoint.name,
-              err
-            );
-          }
+      log('resolving %d imports', listOfImports.length);
 
-          if (resolved !== null) {
-            log(
-              'stage-1:async-resolve',
-              `✅ %s (%o) in %s -> %s`,
-              importedFile,
-              importsOnly,
-              item.entrypoint.name,
-              resolved
-            );
-          }
+      const getResolveTask = async (
+        importedFile: string,
+        importsOnly: string[]
+      ) => {
+        let resolved: string | null = null;
+        try {
+          resolved = await resolve(
+            importedFile,
+            item.entrypoint.name,
+            item.stack
+          );
+        } catch (err) {
+          log(
+            '[async-resolve] ❌ cannot resolve %s in %s: %O',
+            importedFile,
+            item.entrypoint.name,
+            err
+          );
+        }
 
-          return {
+        if (resolved !== null) {
+          log(
+            '[async-resolve] ✅ %s (%o) in %s -> %s',
             importedFile,
             importsOnly,
-            resolved,
-          };
+            item.entrypoint.name,
+            resolved
+          );
+        }
+
+        return {
+          importedFile,
+          importsOnly,
+          resolved,
+        };
+      };
+
+      const resolvedImports = await Promise.all(
+        listOfImports.map(([importedFile, importsOnly]) => {
+          const resolveCacheKey = `${item.entrypoint.name} -> ${importedFile}`;
+
+          const cached = cache.get('resolve', resolveCacheKey);
+          if (cached) {
+            const [cachedResolved, cachedOnly] = cached.split('\0');
+            return {
+              importedFile,
+              importsOnly: mergeImports(importsOnly, cachedOnly.split(',')),
+              resolved: cachedResolved,
+            };
+          }
+
+          const cachedTask = cache.get('resolveTask', resolveCacheKey);
+          if (cachedTask) {
+            // If we have cached task, we need to merge importsOnly…
+            const newTask = cachedTask.then((res) => {
+              if (isEqual(res.importsOnly, importsOnly)) {
+                return res;
+              }
+
+              const merged = mergeImports(res.importsOnly, importsOnly);
+
+              log(
+                'merging imports %o and %o: %o',
+                importsOnly,
+                res.importsOnly,
+                merged
+              );
+
+              cache.add(
+                'resolve',
+                resolveCacheKey,
+                `${res.resolved}\0${merged.join(',')}`
+              );
+
+              return { ...res, importsOnly: merged };
+            });
+
+            // … and update the cache
+            cache.add('resolveTask', resolveCacheKey, newTask);
+            return newTask;
+          }
+
+          const resolveTask = getResolveTask(importedFile, importsOnly).then(
+            (res) => {
+              cache.add(
+                'resolve',
+                resolveCacheKey,
+                `${res.resolved}\0${importsOnly.join(',')}`
+              );
+
+              return res;
+            }
+          );
+
+          cache.add('resolveTask', resolveCacheKey, resolveTask);
+
+          return resolveTask;
         })
       );
       onResolveFinished();
+      log('resolved %d imports', resolvedImports.length);
 
       eventEmitter.single({
         type: 'dependency',
@@ -677,17 +749,17 @@ export default async function prepareForEval(
         imports: [],
       });
 
-      log('stage-1', '%s has no imports', item.entrypoint.name);
+      log('%s has no imports', item.entrypoint.name);
     }
 
-    cache.codeCache.set(item.entrypoint.name, {
+    cache.add('code', item.entrypoint.name, {
       imports,
       only: mergedOnly,
       result,
     });
   }
 
-  log('stage-1', 'queue is empty, %s is ready', entrypoint.name);
+  entrypoint.log('queue is empty, %s is ready', entrypoint.name);
 
-  return cache.codeCache.get(entrypoint.name)?.result;
+  return cache.get('code', entrypoint.name)?.result;
 }

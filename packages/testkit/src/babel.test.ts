@@ -10,6 +10,7 @@ import type { PluginOptions, Stage } from '@linaria/babel-preset';
 import {
   transform as linariaTransform,
   loadLinariaOptions,
+  TransformCacheCollection,
 } from '@linaria/babel-preset';
 import type { Evaluator, StrictOptions } from '@linaria/utils';
 
@@ -78,7 +79,11 @@ const getLinariaConfig = (
     ...linariaConfig,
   });
 
-async function transform(originalCode: string, opts: Options) {
+async function transform(
+  originalCode: string,
+  opts: Options,
+  cache?: TransformCacheCollection
+) {
   const [
     evaluator,
     linariaPartialConfig = {},
@@ -103,7 +108,8 @@ async function transform(originalCode: string, opts: Options) {
       pluginOptions: linariaConfig,
     },
     asyncResolve,
-    babelPartialConfig
+    babelPartialConfig,
+    cache
   );
 
   return {
@@ -2901,5 +2907,125 @@ describe('strategy shaker', () => {
 
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
+  });
+
+  describe('cache', () => {
+    const getCachedExports = (
+      cache: TransformCacheCollection,
+      filename: string
+    ) => {
+      const cachedFoo = cache.get('eval', filename);
+      return (
+        typeof cachedFoo?.exports === 'object' ? cachedFoo.exports ?? {} : {}
+      ) as Record<string, unknown>;
+    };
+
+    it('should cache evaluation', async () => {
+      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+      const cache = new TransformCacheCollection();
+      const { code, metadata } = await transform(
+        dedent`
+          import { css } from "@linaria/core";
+          import { foo1, foo2 } from "./__fixtures__/foo";
+
+          export const text = css\`font-size: ${'${foo1}'}\`;
+          `,
+        [evaluator],
+        cache
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+
+      const exports = getCachedExports(cache, filename);
+      expect(exports.foo1).toBe('foo1');
+      expect(exports.foo2).toBe(undefined); // foo2 is not used and should not be evaluated
+    });
+
+    const createCacheFor = (
+      filename: string,
+      exports: Record<string, string>
+    ) => {
+      const fooContent = readFileSync(filename, 'utf-8');
+      const cache = new TransformCacheCollection();
+      cache.invalidateIfChanged(filename, fooContent);
+      const keys = Object.keys(exports);
+      cache.add('code', filename, {
+        imports: null,
+        only: keys,
+        result: {
+          code: fooContent,
+        },
+      });
+      cache.add('eval', filename, {
+        debug: () => {},
+        idx: 1,
+        isEvaluated: true,
+        only: keys.join(','),
+        exports,
+      });
+
+      return cache;
+    };
+
+    it('should use cached value', async () => {
+      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+      const cache = createCacheFor(filename, { foo1: 'cached-foo1' });
+
+      const { code, metadata } = await transform(
+        dedent`
+          import { css } from "@linaria/core";
+          import { foo1 } from "./__fixtures__/foo";
+
+          export const text = css\`font-size: ${'${foo1}'}\`;
+          `,
+        [evaluator],
+        cache
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+
+    it('should ignore uncompleted cached value', async () => {
+      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+      const cache = createCacheFor(filename, { foo1: 'cached-foo1' });
+
+      const { code, metadata } = await transform(
+        dedent`
+          import { css } from "@linaria/core";
+          import { foo1, foo2 } from "./__fixtures__/foo";
+
+          export const text = css\`font-size: ${'${foo1 + foo2}'}\`;
+          `,
+        [evaluator],
+        cache
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+
+    it('should use cached value even if only part is required', async () => {
+      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+      const cache = createCacheFor(filename, {
+        foo1: 'cached-foo1',
+        foo2: 'cached-foo2',
+      });
+
+      const { code, metadata } = await transform(
+        dedent`
+          import { css } from "@linaria/core";
+          import { foo1 } from "./__fixtures__/foo";
+
+          export const text = css\`font-size: ${'${foo1}'}\`;
+          `,
+        [evaluator],
+        cache
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
   });
 });

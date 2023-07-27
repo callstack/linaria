@@ -16,6 +16,57 @@ Dependencies: ./__fixtures__/assignToExport
 
 `;
 
+exports[`strategy shaker cache should cache evaluation 1`] = `
+"import { foo2 } from \\"./__fixtures__/foo\\";
+export const text = \\"text_t13jq05\\";"
+`;
+
+exports[`strategy shaker cache should cache evaluation 2`] = `
+
+CSS:
+
+.text_t13jq05 {font-size: foo1}
+
+Dependencies: ./__fixtures__/foo
+
+`;
+
+exports[`strategy shaker cache should ignore uncompleted cached value 1`] = `"export const text = \\"text_t13jq05\\";"`;
+
+exports[`strategy shaker cache should ignore uncompleted cached value 2`] = `
+
+CSS:
+
+.text_t13jq05 {font-size: foo1foo2}
+
+Dependencies: ./__fixtures__/foo
+
+`;
+
+exports[`strategy shaker cache should use cached value 1`] = `"export const text = \\"text_t13jq05\\";"`;
+
+exports[`strategy shaker cache should use cached value 2`] = `
+
+CSS:
+
+.text_t13jq05 {font-size: cached-foo1}
+
+Dependencies: ./__fixtures__/foo
+
+`;
+
+exports[`strategy shaker cache should use cached value even if only part is required 1`] = `"export const text = \\"text_t13jq05\\";"`;
+
+exports[`strategy shaker cache should use cached value even if only part is required 2`] = `
+
+CSS:
+
+.text_t13jq05 {font-size: cached-foo1}
+
+Dependencies: ./__fixtures__/foo
+
+`;
+
 exports[`strategy shaker compiles atomic css 1`] = `
 "/* @flow */
 

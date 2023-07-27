@@ -2,7 +2,7 @@ import { relative, sep } from 'path';
 
 import type { TransformOptions } from '@babel/core';
 
-import type { CustomDebug } from '@linaria/logger';
+import type { CustomDebug, Debugger } from '@linaria/logger';
 import { createCustomDebug } from '@linaria/logger';
 import type { Evaluator } from '@linaria/utils';
 import { getFileIdx } from '@linaria/utils';
@@ -13,6 +13,7 @@ export interface IEntrypoint {
   name: string;
   only: string[];
   parseConfig: TransformOptions;
+  log: Debugger;
 }
 
 type Node = [entrypoint: IEntrypoint, stack: string[], refCount?: number];
