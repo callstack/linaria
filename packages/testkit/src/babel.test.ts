@@ -2722,11 +2722,19 @@ describe('strategy shaker', () => {
   });
 
   it('respects module-resolver plugin', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
     const { code, metadata } = await transformFile(
       resolve(__dirname, './__fixtures__/with-babelrc/index.js'),
       [evaluator]
     );
 
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'This works for now but will be an error in the future'
+      )
+    );
+    warn.mockRestore();
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });

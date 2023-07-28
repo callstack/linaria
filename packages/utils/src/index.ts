@@ -22,6 +22,7 @@ export { default as findIdentifiers, nonType } from './findIdentifiers';
 export { findPackageJSON } from './findPackageJSON';
 export { hasEvaluatorMetadata } from './hasEvaluatorMetadata';
 export { default as getFileIdx } from './getFileIdx';
+export { getPluginKey } from './getPluginKey';
 export { hasMeta } from './hasMeta';
 export { getSource } from './getSource';
 export { isBoxedPrimitive } from './isBoxedPrimitive';

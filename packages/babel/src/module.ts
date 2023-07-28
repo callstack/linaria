@@ -383,7 +383,7 @@ class Module {
 
       // Resolve module id (and filename) relatively to parent module
       const resolved = this.resolve(id);
-      const [filename, onlyAsString] = resolved.split('\0');
+      const [filename, onlyAsString = '*'] = resolved.split('\0');
       if (filename === id && !path.isAbsolute(id)) {
         // The module is a builtin node modules, but not in the allowed list
         throw new Error(

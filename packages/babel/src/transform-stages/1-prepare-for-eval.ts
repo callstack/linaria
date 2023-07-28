@@ -16,6 +16,7 @@ import {
   buildOptions,
   EventEmitter,
   getFileIdx,
+  getPluginKey,
   loadBabelOptions,
 } from '@linaria/utils';
 
@@ -59,26 +60,25 @@ function runPreevalStage(
   babel: Core,
   item: IEntrypoint,
   originalAst: File,
-  pluginOptions: StrictOptions,
   eventEmitter: EventEmitter
 ): BabelFileResult {
-  const babelOptions = item.parseConfig;
+  const { pluginOptions, evalConfig } = item;
 
   const preShakePlugins =
-    babelOptions.plugins?.filter((i) =>
+    evalConfig.plugins?.filter((i) =>
       hasKeyInList(i, pluginOptions.highPriorityPlugins)
     ) ?? [];
 
   const plugins = [
     ...preShakePlugins,
     [require.resolve('../plugins/preeval'), { ...pluginOptions, eventEmitter }],
-    ...(babelOptions.plugins ?? []).filter(
+    ...(evalConfig.plugins ?? []).filter(
       (i) => !hasKeyInList(i, pluginOptions.highPriorityPlugins)
     ),
   ];
 
   const transformConfig = buildOptions({
-    ...babelOptions,
+    ...evalConfig,
     envName: 'linaria',
     plugins,
   });
@@ -100,17 +100,15 @@ export function prepareCode(
   babel: Core,
   item: IEntrypoint,
   originalAst: File,
-  pluginOptions: StrictOptions,
   eventEmitter: EventEmitter
 ): [code: string, imports: Module['imports'], metadata?: BabelFileMetadata] {
-  const { evaluator, log, parseConfig, only } = item;
+  const { evaluator, log, evalConfig, pluginOptions, only } = item;
 
   const onPreevalFinished = eventEmitter.pair({ method: 'preeval' });
   const preevalStageResult = runPreevalStage(
     babel,
     item,
     originalAst,
-    pluginOptions,
     eventEmitter
   );
   onPreevalFinished();
@@ -135,7 +133,7 @@ export function prepareCode(
 
   const onEvaluatorFinished = eventEmitter.pair({ method: 'evaluator' });
   const [, code, imports] = evaluator(
-    parseConfig,
+    evalConfig,
     preevalStageResult.ast!,
     preevalStageResult.code!,
     evaluatorConfig,
@@ -182,7 +180,6 @@ function processQueueItem(
     babel,
     item,
     ast,
-    pluginOptions,
     eventEmitter
   );
 
@@ -268,27 +265,65 @@ export function createEntrypoint(
           paths: [dirname(name)],
         })).default;
 
-  const parseConfig = buildOptions(pluginOptions?.babelOptions, babelOptions, {
+  // FIXME: All those configs should be memoized
+
+  const commonOptions = {
     ast: true,
     filename: name,
     inputSourceMap: options.inputSourceMap,
     root: options.root,
     sourceFileName: name,
     sourceMaps: true,
+  };
+
+  const rawConfig = buildOptions(
+    pluginOptions?.babelOptions,
+    babelOptions,
+    commonOptions
+  );
+
+  const parseConfig = loadBabelOptions(babel, name, {
+    babelrc: true,
+    ...rawConfig,
   });
 
-  const fullParserOptions = loadBabelOptions(babel, name, parseConfig);
+  const isModuleResolver = (plugin: PluginItem) =>
+    getPluginKey(plugin) === 'module-resolver';
+  const parseHasModuleResolver = parseConfig.plugins?.some(isModuleResolver);
+  const rawHasModuleResolver = rawConfig.plugins?.some(isModuleResolver);
+
+  if (parseHasModuleResolver && !rawHasModuleResolver) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[linaria] ${name} has a module-resolver plugin in its babelrc, but it is not present` +
+        `in the babelOptions for the linaria plugin. This works for now but will be an error in the future.` +
+        `Please add the module-resolver plugin to the babelOptions for the linaria plugin.`
+    );
+
+    rawConfig.plugins = [
+      ...(parseConfig.plugins?.filter((plugin) => isModuleResolver(plugin)) ??
+        []),
+      ...(rawConfig.plugins ?? []),
+    ];
+  }
+
+  const evalConfig = loadBabelOptions(babel, name, {
+    babelrc: false,
+    ...rawConfig,
+  });
 
   log('[createEntrypoint] %s (%o)\n%s', name, only, code || EMPTY_FILE);
 
   finishEvent();
   return {
     code,
+    evalConfig,
     evaluator,
+    log,
     name,
     only,
-    parseConfig: fullParserOptions,
-    log,
+    parseConfig,
+    pluginOptions,
   };
 }
 

@@ -82,7 +82,6 @@ describe('prepareCode', () => {
         babel,
         entrypoint,
         ast,
-        pluginOptions,
         EventEmitter.dummy
       );
 
