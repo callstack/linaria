@@ -4,16 +4,18 @@ import type { TransformOptions } from '@babel/core';
 
 import type { CustomDebug, Debugger } from '@linaria/logger';
 import { createCustomDebug } from '@linaria/logger';
-import type { Evaluator } from '@linaria/utils';
+import type { Evaluator, StrictOptions } from '@linaria/utils';
 import { getFileIdx } from '@linaria/utils';
 
 export interface IEntrypoint {
   code: string;
+  evalConfig: TransformOptions;
   evaluator: Evaluator;
+  log: Debugger;
   name: string;
   only: string[];
   parseConfig: TransformOptions;
-  log: Debugger;
+  pluginOptions: StrictOptions;
 }
 
 type Node = [entrypoint: IEntrypoint, stack: string[], refCount?: number];

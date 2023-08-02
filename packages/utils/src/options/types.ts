@@ -28,7 +28,7 @@ export type EvaluatorConfig = {
 };
 
 export type Evaluator = (
-  babelOptions: TransformOptions,
+  evalConfig: TransformOptions,
   ast: File,
   code: string,
   config: EvaluatorConfig,
