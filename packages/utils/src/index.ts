@@ -57,6 +57,7 @@ export type {
   IState,
 } from './collectExportsAndImports';
 export type { IPerfMeterOptions } from './debug/perfMetter';
+export type { OnEvent } from './EventEmitter';
 export type { IVariableContext } from './IVariableContext';
 export type {
   Artifact,

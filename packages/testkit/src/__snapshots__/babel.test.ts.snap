@@ -2001,6 +2001,20 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker should ignore unused wildcard reexports 1`] = `"export const square = \\"square_s13jq05\\";"`;
+
+exports[`strategy shaker should ignore unused wildcard reexports 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  color: foo1;
+}
+
+Dependencies: ./__fixtures__/reexports
+
+`;
+
 exports[`strategy shaker should interpolate imported components 1`] = `"export const square = \\"square_s13jq05\\";"`;
 
 exports[`strategy shaker should interpolate imported components 2`] = `

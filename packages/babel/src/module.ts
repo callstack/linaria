@@ -129,6 +129,10 @@ class Module {
 
   id: string;
 
+  ignored: boolean;
+
+  parentIsIgnored: boolean;
+
   filename: string;
 
   imports: Map<string, string[]> | null;
@@ -161,6 +165,8 @@ class Module {
     this.dependencies = null;
     this.transform = parentModule?.transform ?? null;
     this.debug = createCustomDebug('module', this.idx);
+    this.parentIsIgnored = parentModule?.ignored ?? false;
+    this.ignored = this.cache.get('ignored', filename) ?? this.parentIsIgnored;
 
     this.#lazyValues = new Map();
 
@@ -346,6 +352,22 @@ class Module {
       return null;
     }
 
+    if (this.cache.has('ignored', filename)) {
+      log(
+        'code-cache',
+        '✅ file has been ignored during prepare stage. Original code will be used'
+      );
+      return fs.readFileSync(filename, 'utf-8');
+    }
+
+    if (this.ignored) {
+      log(
+        'code-cache',
+        '✅ one of the parent files has been ignored during prepare stage. Original code will be used'
+      );
+      return fs.readFileSync(filename, 'utf-8');
+    }
+
     // Requested file can be already prepared for evaluation on the stage 1
     if (onlyAsString && this.cache.has('code', filename)) {
       const cached = this.cache.get('code', filename);
@@ -354,12 +376,19 @@ class Module {
         log('code-cache', '✅ ready for evaluation');
         return cached?.result.code ?? '';
       }
+
+      log(
+        'code-cache',
+        '❌ file has been processed during prepare stage but %o is not evaluated yet',
+        uncachedExports
+      );
+    } else {
+      log('code-cache', '❌ file has not been processed during prepare stage');
     }
 
     // If code wasn't extracted from cache, read it from the file system.
     // It indicates that we were unable to process some of the imports on stage1
     // TODO: transpile the file
-    log('code-cache', '❌ file has not been processed during prepare stage');
     return fs.readFileSync(filename, 'utf-8');
   }
 

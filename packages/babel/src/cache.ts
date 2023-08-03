@@ -5,6 +5,7 @@ import type { File } from '@babel/types';
 import { linariaLogger } from '@linaria/logger';
 
 import type { IModule } from './module';
+import type { IEntrypoint } from './transform-stages/queue/types';
 import type { ITransformFileResult } from './types';
 
 function hashContent(content: string) {
@@ -12,6 +13,8 @@ function hashContent(content: string) {
 }
 
 interface ICaches {
+  entrypoints: Map<string, IEntrypoint>;
+  ignored: Map<string, true>;
   resolve: Map<string, string>;
   resolveTask: Map<
     string,
@@ -38,6 +41,8 @@ type MapValue<T> = T extends Map<string, infer V> ? V : never;
 const cacheLogger = linariaLogger.extend('cache');
 
 const cacheNames = [
+  'entrypoints',
+  'ignored',
   'resolve',
   'resolveTask',
   'code',
@@ -57,6 +62,10 @@ const loggers = cacheNames.reduce(
 export class TransformCacheCollection {
   private contentHashes = new Map<string, string>();
 
+  protected readonly entrypoints: Map<string, IEntrypoint>;
+
+  protected readonly ignored: Map<string, true>;
+
   protected readonly resolve: Map<string, string>;
 
   protected readonly resolveTask: Map<string, Promise<string>>;
@@ -75,6 +84,8 @@ export class TransformCacheCollection {
   protected readonly originalAST: Map<string, File>;
 
   constructor(caches: Partial<ICaches> = {}) {
+    this.entrypoints = caches.entrypoints || new Map();
+    this.ignored = caches.ignored || new Map();
     this.resolve = caches.resolve || new Map();
     this.resolveTask = caches.resolveTask || new Map();
     this.code = caches.code || new Map();
