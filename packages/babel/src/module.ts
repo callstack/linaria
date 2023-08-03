@@ -461,6 +461,7 @@ class Module {
       module: this,
       exports: this.#exports,
       require: this.require,
+      __linaria_dynamic_import: async (id: string) => this.require(id),
       __filename: filename,
       __dirname: path.dirname(filename),
     });
