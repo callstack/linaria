@@ -1,0 +1,142 @@
+{
+  "processedFiles": {
+    "/home/runner/work/linaria/linaria/website/src/index.jsx": {
+      "exports": [
+        "__linariaPreval"
+      ],
+      "imports": [
+        {
+          "from": "/home/runner/work/linaria/linaria/node_modules/.pnpm/react@16.14.0/node_modules/react/index.js",
+          "what": [
+            "default"
+          ]
+        },
+        {
+          "from": "/home/runner/work/linaria/linaria/website/src/styles/constants.js",
+          "what": [
+            "default"
+          ]
+        }
+      ],
+      "passes": 1
+    },
+    "/home/runner/work/linaria/linaria/website/src/styles/constants.js": {
+      "exports": [
+        "default"
+      ],
+      "imports": [],
+      "passes": 2
+    },
+    "/home/runner/work/linaria/linaria/website/src/components/App.jsx": {
+      "exports": [
+        "__linariaPreval"
+      ],
+      "imports": [
+        {
+          "from": "/home/runner/work/linaria/linaria/node_modules/.pnpm/react@16.14.0/node_modules/react/index.js",
+          "what": [
+            "default"
+          ]
+        }
+      ],
+      "passes": 1
+    },
+    "/home/runner/work/linaria/linaria/website/src/components/Header.jsx": {
+      "exports": [
+        "__linariaPreval"
+      ],
+      "imports": [
+        {
+          "from": "/home/runner/work/linaria/linaria/node_modules/.pnpm/react@16.14.0/node_modules/react/index.js",
+          "what": [
+            "default"
+          ]
+        },
+        {
+          "from": "/home/runner/work/linaria/linaria/website/src/styles/constants.js",
+          "what": [
+            "default"
+          ]
+        },
+        {
+          "from": "/home/runner/work/linaria/linaria/website/src/styles/utils.js",
+          "what": [
+            "media"
+          ]
+        },
+        {
+          "from": "/home/runner/work/linaria/linaria/website/src/components/Container.js",
+          "what": [
+            "default"
+          ]
+        }
+      ],
+      "passes": 1
+    },
+    "/home/runner/work/linaria/linaria/website/src/components/Container.js": {
+      "exports": [
+        "__linariaPreval"
+      ],
+      "imports": [],
+      "passes": 2
+    },
+    "/home/runner/work/linaria/linaria/website/src/styles/utils.js": {
+      "exports": [
+        "media"
+      ],
+      "imports": [],
+      "passes": 2
+    },
+    "/home/runner/work/linaria/linaria/website/src/components/Hero.jsx": {
+      "exports": [
+        "__linariaPreval"
+      ],
+      "imports": [
+        {
+          "from": "/home/runner/work/linaria/linaria/node_modules/.pnpm/react@16.14.0/node_modules/react/index.js",
+          "what": [
+            "default"
+          ]
+        },
+        {
+          "from": "/home/runner/work/linaria/linaria/website/src/styles/utils.js",
+          "what": [
+            "media"
+          ]
+        },
+        {
+          "from": "/home/runner/work/linaria/linaria/website/assets/linaria-logomark.svg",
+          "what": [
+            "default"
+          ]
+        }
+      ],
+      "passes": 1
+    }
+  },
+  "timings": {
+    "method": {
+      "createEntrypoint": 773,
+      "parseFile": 47,
+      "preeval:processTemplate": 211,
+      "preeval:removeDangerousCode": 76,
+      "preeval:rest-transformations": 139,
+      "preeval": 531,
+      "evaluator": 141,
+      "resolve": 356
+    },
+    "stage": {
+      "stage-1": 1774,
+      "stage-2": 35,
+      "stage-3": 137,
+      "stage-4": 14
+    },
+    "filename": {
+      "/home/runner/work/linaria/linaria/website/src/index.jsx": 1084,
+      "/home/runner/work/linaria/linaria/website/src/components/App.jsx": 156,
+      "/home/runner/work/linaria/linaria/website/src/components/Header.jsx": 490,
+      "/home/runner/work/linaria/linaria/website/src/components/Hero.jsx": 406,
+      "/home/runner/work/linaria/linaria/website/src/components/Container.js": 31
+    }
+  }
+}
