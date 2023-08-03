@@ -72,6 +72,7 @@ function runPreevalStage(
   const plugins = [
     ...preShakePlugins,
     [require.resolve('../plugins/preeval'), { ...pluginOptions, eventEmitter }],
+    [require.resolve('../plugins/dynamic-import')],
     ...(evalConfig.plugins ?? []).filter(
       (i) => !hasKeyInList(i, pluginOptions.highPriorityPlugins)
     ),

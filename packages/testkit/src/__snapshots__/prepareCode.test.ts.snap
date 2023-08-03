@@ -1,5 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`prepareCode Testing transformation for dynamic-import: code 1`] = `
+"\\"use strict\\";
+
+exports.__esModule = true;
+exports.foo = foo;
+function foo(onImport) {
+  __linaria_dynamic_import(\\"./foo\\").then(onImport);
+}"
+`;
+
+exports[`prepareCode Testing transformation for dynamic-import: imports 1`] = `Map {}`;
+
+exports[`prepareCode Testing transformation for dynamic-import: metadata 1`] = `Object {}`;
+
 exports[`prepareCode Testing transformation for for-debug: code 1`] = `
 "'use strict';
 
