@@ -1,18 +1,18 @@
 {
-  "processedFiles": {
-    "/home/runner/work/linaria/linaria/website/src/index.jsx": {
+  "processedDependencies": {
+    "src/index.jsx": {
       "exports": [
         "__linariaPreval"
       ],
       "imports": [
         {
-          "from": "/home/runner/work/linaria/linaria/node_modules/.pnpm/react@16.14.0/node_modules/react/index.js",
+          "from": "../node_modules/.pnpm/react@16.14.0/node_modules/react/index.js",
           "what": [
             "default"
           ]
         },
         {
-          "from": "/home/runner/work/linaria/linaria/website/src/styles/constants.js",
+          "from": "src/styles/constants.js",
           "what": [
             "default"
           ]
@@ -20,92 +20,93 @@
       ],
       "passes": 1
     },
-    "/home/runner/work/linaria/linaria/website/src/styles/constants.js": {
+    "src/styles/constants.js": {
       "exports": [
+        "default"
+      ],
+      "imports": [],
+      "passes": 1
+    },
+    "src/components/App.jsx": {
+      "exports": [
+        "__linariaPreval"
+      ],
+      "imports": [
+        {
+          "from": "../node_modules/.pnpm/react@16.14.0/node_modules/react/index.js",
+          "what": [
+            "default"
+          ]
+        }
+      ],
+      "passes": 1
+    },
+    "src/components/Header.jsx": {
+      "exports": [
+        "__linariaPreval"
+      ],
+      "imports": [
+        {
+          "from": "../node_modules/.pnpm/react@16.14.0/node_modules/react/index.js",
+          "what": [
+            "default"
+          ]
+        },
+        {
+          "from": "src/styles/constants.js",
+          "what": [
+            "default"
+          ]
+        },
+        {
+          "from": "src/styles/utils.js",
+          "what": [
+            "media"
+          ]
+        },
+        {
+          "from": "src/components/Container.js",
+          "what": [
+            "default"
+          ]
+        }
+      ],
+      "passes": 1
+    },
+    "src/components/Container.js": {
+      "exports": [
+        "__linariaPreval",
         "default"
       ],
       "imports": [],
       "passes": 2
     },
-    "/home/runner/work/linaria/linaria/website/src/components/App.jsx": {
-      "exports": [
-        "__linariaPreval"
-      ],
-      "imports": [
-        {
-          "from": "/home/runner/work/linaria/linaria/node_modules/.pnpm/react@16.14.0/node_modules/react/index.js",
-          "what": [
-            "default"
-          ]
-        }
-      ],
-      "passes": 1
-    },
-    "/home/runner/work/linaria/linaria/website/src/components/Header.jsx": {
-      "exports": [
-        "__linariaPreval"
-      ],
-      "imports": [
-        {
-          "from": "/home/runner/work/linaria/linaria/node_modules/.pnpm/react@16.14.0/node_modules/react/index.js",
-          "what": [
-            "default"
-          ]
-        },
-        {
-          "from": "/home/runner/work/linaria/linaria/website/src/styles/constants.js",
-          "what": [
-            "default"
-          ]
-        },
-        {
-          "from": "/home/runner/work/linaria/linaria/website/src/styles/utils.js",
-          "what": [
-            "media"
-          ]
-        },
-        {
-          "from": "/home/runner/work/linaria/linaria/website/src/components/Container.js",
-          "what": [
-            "default"
-          ]
-        }
-      ],
-      "passes": 1
-    },
-    "/home/runner/work/linaria/linaria/website/src/components/Container.js": {
-      "exports": [
-        "__linariaPreval"
-      ],
-      "imports": [],
-      "passes": 2
-    },
-    "/home/runner/work/linaria/linaria/website/src/styles/utils.js": {
+    "src/styles/utils.js": {
       "exports": [
         "media"
       ],
       "imports": [],
-      "passes": 2
+      "passes": 1
     },
-    "/home/runner/work/linaria/linaria/website/src/components/Hero.jsx": {
+    "src/components/Hero.jsx": {
       "exports": [
         "__linariaPreval"
       ],
       "imports": [
         {
-          "from": "/home/runner/work/linaria/linaria/node_modules/.pnpm/react@16.14.0/node_modules/react/index.js",
+          "from": "../node_modules/.pnpm/react@16.14.0/node_modules/react/index.js",
           "what": [
             "default"
           ]
         },
         {
-          "from": "/home/runner/work/linaria/linaria/website/src/styles/utils.js",
+          "from": "src/styles/utils.js",
           "what": [
             "media"
           ]
         },
         {
-          "from": "/home/runner/work/linaria/linaria/website/assets/linaria-logomark.svg",
+          "from": "assets/linaria-logomark.svg",
           "what": [
             "default"
           ]
@@ -114,29 +115,91 @@
       "passes": 1
     }
   },
+  "queueActions": {
+    "src/index.jsx": [
+      "processEntrypoint(__linariaPreval)",
+      "transform(__linariaPreval)",
+      "resolveImports(__linariaPreval)",
+      "processImports(__linariaPreval)",
+      "addToCodeCache(__linariaPreval)"
+    ],
+    "src/styles/constants.js": [
+      "processEntrypoint(default)",
+      "transform(default)",
+      "resolveImports(default)",
+      "processImports(default)",
+      "addToCodeCache(default)",
+      "processEntrypoint(default)"
+    ],
+    "src/components/App.jsx": [
+      "processEntrypoint(__linariaPreval)",
+      "transform(__linariaPreval)",
+      "resolveImports(__linariaPreval)",
+      "processImports(__linariaPreval)",
+      "addToCodeCache(__linariaPreval)"
+    ],
+    "src/components/Header.jsx": [
+      "processEntrypoint(__linariaPreval)",
+      "transform(__linariaPreval)",
+      "resolveImports(__linariaPreval)",
+      "processImports(__linariaPreval)",
+      "addToCodeCache(__linariaPreval)"
+    ],
+    "src/components/Hero.jsx": [
+      "processEntrypoint(__linariaPreval)",
+      "transform(__linariaPreval)",
+      "resolveImports(__linariaPreval)",
+      "processImports(__linariaPreval)",
+      "addToCodeCache(__linariaPreval)"
+    ],
+    "src/components/Container.js": [
+      "processEntrypoint(default)",
+      "transform(default)",
+      "resolveImports(default)",
+      "processImports(default)",
+      "addToCodeCache(default)",
+      "processEntrypoint(__linariaPreval)",
+      "transform(__linariaPreval,default)",
+      "resolveImports(__linariaPreval,default)",
+      "processImports(__linariaPreval,default)",
+      "addToCodeCache(__linariaPreval,default)"
+    ],
+    "src/styles/utils.js": [
+      "processEntrypoint(media)",
+      "transform(media)",
+      "resolveImports(media)",
+      "processImports(media)",
+      "addToCodeCache(media)",
+      "processEntrypoint(media)"
+    ]
+  },
   "timings": {
     "method": {
-      "createEntrypoint": 773,
-      "parseFile": 47,
-      "preeval:processTemplate": 211,
-      "preeval:removeDangerousCode": 76,
-      "preeval:rest-transformations": 139,
-      "preeval": 531,
-      "evaluator": 141,
-      "resolve": 356
+      "parseFile": 26,
+      "createEntrypoint": 558,
+      "queue:processEntrypoint": 2,
+      "queue:transform:preeval:processTemplate": 183,
+      "queue:transform:preeval:removeDangerousCode": 38,
+      "queue:transform:preeval:rest-transformations": 85,
+      "queue:transform:preeval": 381,
+      "queue:transform:evaluator": 190,
+      "queue:transform": 572,
+      "queue:resolveImports": 250,
+      "queue:processImports": 20,
+      "queue:addToCodeCache": 0
     },
     "stage": {
-      "stage-1": 1774,
-      "stage-2": 35,
-      "stage-3": 137,
-      "stage-4": 14
+      "stage-1": 1434,
+      "stage-2": 29,
+      "stage-3": 151,
+      "stage-4": 5
     },
     "filename": {
-      "/home/runner/work/linaria/linaria/website/src/index.jsx": 1084,
-      "/home/runner/work/linaria/linaria/website/src/components/App.jsx": 156,
-      "/home/runner/work/linaria/linaria/website/src/components/Header.jsx": 490,
-      "/home/runner/work/linaria/linaria/website/src/components/Hero.jsx": 406,
-      "/home/runner/work/linaria/linaria/website/src/components/Container.js": 31
+      "src/index.jsx": 860,
+      "src/components/App.jsx": 136,
+      "src/components/Header.jsx": 405,
+      "src/components/Hero.jsx": 345,
+      "src/components/Container.js": 40
     }
   }
 }
