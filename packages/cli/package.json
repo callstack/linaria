@@ -50,7 +50,7 @@
     "@types/yargs": "^17.0.10"
   },
   "engines": {
-    "node": "^12.16.0 || >=13.7.0"
+    "node": ">=16.0.0"
   },
   "publishConfig": {
     "access": "public"

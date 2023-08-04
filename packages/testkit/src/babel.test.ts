@@ -12,7 +12,8 @@ import {
   loadLinariaOptions,
   TransformCacheCollection,
 } from '@linaria/babel-preset';
-import type { Evaluator, StrictOptions } from '@linaria/utils';
+import type { Evaluator, StrictOptions, OnEvent } from '@linaria/utils';
+import { EventEmitter } from '@linaria/utils';
 
 import serializer from './__utils__/linaria-snapshot-serializer';
 
@@ -82,7 +83,8 @@ const getLinariaConfig = (
 async function transform(
   originalCode: string,
   opts: Options,
-  cache?: TransformCacheCollection
+  cache?: TransformCacheCollection,
+  eventEmitter?: EventEmitter
 ) {
   const [
     evaluator,
@@ -109,7 +111,8 @@ async function transform(
     },
     asyncResolve,
     babelPartialConfig,
-    cache
+    cache,
+    eventEmitter
   );
 
   return {
@@ -2564,6 +2567,33 @@ describe('strategy shaker', () => {
 
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
+  });
+
+  xit('should ignore unused wildcard reexports', async () => {
+    const onEvent = jest.fn<void, Parameters<OnEvent>>();
+    const emitter = new EventEmitter(onEvent);
+    const { code, metadata } = await transform(
+      dedent`
+      import { css } from "@linaria/core";
+      import { foo1 } from "./__fixtures__/reexports";
+
+      export const square = css\`
+        color: ${'${foo1}'};
+      \`;
+    `,
+      [evaluator],
+      undefined,
+      emitter
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+
+    const unusedFile = resolve(__dirname, './__fixtures__/bar.js');
+    expect(onEvent).not.toHaveBeenCalledWith(
+      expect.objectContaining({ file: unusedFile }),
+      'single'
+    );
   });
 
   it('should not drop exported vars of renamed imports', async () => {

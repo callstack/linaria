@@ -10,7 +10,7 @@ export interface IPerfMeterOptions {
   print?: boolean;
 }
 
-interface IProcessedFile {
+interface IProcessedDependency {
   exports: string[];
   imports: { from: string; what: string[] }[];
   passes: number;
@@ -23,15 +23,28 @@ export interface IProcessedEvent {
   imports: { from: string; what: string[] }[];
 }
 
-function replacer(key: string, value: unknown) {
+export interface IQueueActionEvent {
+  type: 'queue-action';
+  action: string;
+  file: string;
+  only: string;
+}
+
+const workingDir = process.cwd();
+
+function replacer(_key: string, value: unknown): unknown {
+  if (typeof value === 'string' && path.isAbsolute(value)) {
+    return path.relative(workingDir, value);
+  }
+
   if (value instanceof Map) {
-    return Array.from(value.entries()).reduce(
-      (obj, [k, v]) => ({
+    return Array.from(value.entries()).reduce((obj, [k, v]) => {
+      const key = replacer(k, k) as string;
+      return {
         ...obj,
-        [k]: v,
-      }),
-      {}
-    );
+        [key]: replacer(key, v),
+      };
+    }, {});
   }
 
   return value;
@@ -50,12 +63,14 @@ function printTimings(timings: Timings, startedAt: number, sourceRoot: string) {
 
     const array = Array.from(byLabel.entries());
     // array.sort(([, a], [, b]) => b - a);
-    array.forEach(([value, time]) => {
-      const name = value.startsWith(sourceRoot)
-        ? path.relative(sourceRoot, value)
-        : value;
-      console.log(`    ${name}: ${time}ms`);
-    });
+    array
+      .sort(([a], [b]) => a.localeCompare(b))
+      .forEach(([value, time]) => {
+        const name = value.startsWith(sourceRoot)
+          ? path.relative(sourceRoot, value)
+          : value;
+        console.log(`    ${name}: ${time}ms`);
+      });
   });
 }
 
@@ -80,27 +95,40 @@ export const createPerfMeter = (
     forLabel.set(key, Math.round((forLabel.get(key) || 0) + value));
   };
 
-  const processedFiles = new Map<string, IProcessedFile>();
+  const processedDependencies = new Map<string, IProcessedDependency>();
   const processDependencyEvent = ({ file, only, imports }: IProcessedEvent) => {
-    if (!processedFiles.has(file)) {
-      processedFiles.set(file, {
+    if (!processedDependencies.has(file)) {
+      processedDependencies.set(file, {
         exports: [],
         imports: [],
         passes: 0,
       });
     }
 
-    const processed = processedFiles.get(file)!;
+    const processed = processedDependencies.get(file)!;
     processed.passes += 1;
     processed.exports = only;
     processed.imports = imports;
   };
 
+  const queueActions = new Map<string, string[]>();
+  const processQueueAction = ({ file, action, only }: IQueueActionEvent) => {
+    if (!queueActions.has(file)) {
+      queueActions.set(file, []);
+    }
+
+    queueActions.get(file)!.push(`${action}(${only})`);
+  };
+
   const processSingleEvent = (
-    meta: Record<string, unknown> | IProcessedEvent
+    meta: Record<string, unknown> | IProcessedEvent | IQueueActionEvent
   ) => {
     if (meta.type === 'dependency') {
       processDependencyEvent(meta as IProcessedEvent);
+    }
+
+    if (meta.type === 'queue-action') {
+      processQueueAction(meta as IQueueActionEvent);
     }
   };
 
@@ -136,7 +164,15 @@ export const createPerfMeter = (
         const fs = require('fs');
         fs.writeFileSync(
           options.filename,
-          JSON.stringify({ processedFiles, timings }, replacer, 2)
+          JSON.stringify(
+            {
+              processedDependencies,
+              queueActions,
+              timings,
+            },
+            replacer,
+            2
+          )
         );
       }
     },

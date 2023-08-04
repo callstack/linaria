@@ -42,7 +42,7 @@ export default function preeval(
       this.processors = [];
 
       const onProcessTemplateFinished = eventEmitter.pair({
-        method: 'preeval:processTemplate',
+        method: 'queue:transform:preeval:processTemplate',
       });
 
       file.path.traverse({
@@ -67,7 +67,7 @@ export default function preeval(
       ) {
         log('start', 'Strip all JSX and browser related stuff');
         const onCodeRemovingFinished = eventEmitter.pair({
-          method: 'preeval:removeDangerousCode',
+          method: 'queue:transform:preeval:removeDangerousCode',
         });
         removeDangerousCode(file.path);
         onCodeRemovingFinished();
@@ -75,7 +75,9 @@ export default function preeval(
 
       onFinishCallbacks.set(
         this,
-        eventEmitter.pair({ method: 'preeval:rest-transformations' })
+        eventEmitter.pair({
+          method: 'queue:transform:preeval:rest-transformations',
+        })
       );
     },
     visitor: {},

@@ -8,6 +8,7 @@ import {
   loadLinariaOptions,
   parseFile,
   prepareCode,
+  TransformCacheCollection,
 } from '@linaria/babel-preset';
 import { linariaLogger } from '@linaria/logger';
 import { EventEmitter } from '@linaria/utils';
@@ -61,6 +62,7 @@ describe('prepareCode', () => {
       const entrypoint = createEntrypoint(
         babel,
         linariaLogger,
+        new TransformCacheCollection(),
         inputFilePath,
         only,
         sourceCode,

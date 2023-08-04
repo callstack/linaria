@@ -38,7 +38,7 @@
     "@types/node": "^17.0.39"
   },
   "engines": {
-    "node": "^12.16.0 || >=13.7.0"
+    "node": ">=16.0.0"
   },
   "publishConfig": {
     "access": "public"

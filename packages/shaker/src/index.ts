@@ -10,6 +10,16 @@ const hasKeyInList = (plugin: PluginItem, list: string[]): boolean => {
   return pluginKey ? list.some((i) => pluginKey.includes(i)) : false;
 };
 
+const safeResolve = (id: string, paths: (string | null)[]): string | null => {
+  try {
+    return require.resolve(id, {
+      paths: paths.filter((i) => i !== null) as string[],
+    });
+  } catch {
+    return null;
+  }
+};
+
 const shaker: Evaluator = (
   evalConfig,
   ast,
@@ -42,11 +52,21 @@ const shaker: Evaluator = (
     evalConfig.filename?.endsWith('.tsx')
   ) {
     const hasTypescriptPlugin = evalConfig.plugins?.some(
-      (i) => getPluginKey(i) === '@babel/plugin-transform-typescript'
+      (i) => getPluginKey(i) === 'transform-typescript'
     );
 
     if (!hasTypescriptPlugin) {
-      plugins.push(require.resolve('@babel/plugin-transform-typescript'));
+      const preset = safeResolve('@babel/preset-typescript', [
+        evalConfig.filename,
+      ]);
+      const plugin = safeResolve('@babel/plugin-transform-typescript', [
+        evalConfig.filename,
+        preset,
+      ]);
+
+      if (plugin) {
+        plugins.push(plugin);
+      }
     }
   }
 

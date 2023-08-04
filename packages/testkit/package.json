@@ -39,6 +39,7 @@
     "@babel/plugin-syntax-jsx": "^7.22.5",
     "@babel/plugin-syntax-typescript": "^7.22.5",
     "@babel/plugin-transform-modules-commonjs": "^7.22.5",
+    "@babel/preset-typescript": "^7.22.5",
     "@babel/runtime": "^7.22.6",
     "@babel/types": "^7.22.5",
     "@linaria/atomic": "workspace:^",
@@ -59,7 +60,7 @@
     "ts-jest": "^28.0.4"
   },
   "engines": {
-    "node": "^12.16.0 || >=13.7.0"
+    "node": ">=16.0.0"
   },
   "publishConfig": {
     "access": "public"
