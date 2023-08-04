@@ -14,7 +14,7 @@ const includes = (a: string[], b: string[]) => {
 const mergeImports = (a: string[], b: string[]) => {
   const result = new Set(a);
   b.forEach((item) => result.add(item));
-  return [...result].sort();
+  return [...result].filter((i) => i).sort();
 };
 
 export function syncResolveImports(

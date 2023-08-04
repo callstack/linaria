@@ -144,7 +144,7 @@ export function createEntrypoint(
     evaluator,
     log,
     name,
-    only: [...only].sort(),
+    only: [...only].filter((i) => i).sort(),
     pluginOptions,
   };
 }

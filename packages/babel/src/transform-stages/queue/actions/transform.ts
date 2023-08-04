@@ -3,7 +3,12 @@ import type {
   BabelFileResult,
   PluginItem,
 } from '@babel/core';
-import type { File } from '@babel/types';
+import type {
+  ExportAllDeclaration,
+  File,
+  Node,
+  ExportNamedDeclaration,
+} from '@babel/types';
 
 import type { EvaluatorConfig, EventEmitter } from '@linaria/utils';
 import { buildOptions, getPluginKey } from '@linaria/utils';
@@ -12,7 +17,10 @@ import type { Core } from '../../../babel';
 import type Module from '../../../module';
 import withLinariaMetadata from '../../../utils/withLinariaMetadata';
 import type { Next } from '../../helpers/ActionQueue';
+import { createEntrypoint } from '../createEntrypoint';
 import type { IEntrypoint, ITransformAction, Services } from '../types';
+
+import { findExportsInFiles } from './getExports';
 
 const EMPTY_FILE = '=== empty file ===';
 
@@ -119,20 +127,23 @@ export function prepareCode(
   return [code, imports, preevalStageResult.metadata];
 }
 
-// const getWildcardReexport = (babel: Core, ast: File): string[] => {
-//   const reexportsFrom: string[] = [];
-//   ast.program.body.forEach((node) => {
-//     if (
-//       babel.types.isExportAllDeclaration(node) &&
-//       node.source &&
-//       babel.types.isStringLiteral(node.source)
-//     ) {
-//       reexportsFrom.push(node.source.value);
-//     }
-//   });
-//
-//   return reexportsFrom;
-// };
+const getWildcardReexport = (babel: Core, ast: File) => {
+  const reexportsFrom: { source: string; node: ExportAllDeclaration }[] = [];
+  ast.program.body.forEach((node) => {
+    if (
+      babel.types.isExportAllDeclaration(node) &&
+      node.source &&
+      babel.types.isStringLiteral(node.source)
+    ) {
+      reexportsFrom.push({
+        source: node.source.value,
+        node,
+      });
+    }
+  });
+
+  return reexportsFrom;
+};
 
 /**
  * Prepares the code for evaluation. This includes removing dead and potentially unsafe code.
@@ -140,7 +151,7 @@ export function prepareCode(
  * In the end, the prepared code is added to the cache.
  */
 export function transform(
-  { babel, eventEmitter }: Services,
+  services: Services,
   action: ITransformAction,
   next: Next
 ): void {
@@ -152,33 +163,72 @@ export function transform(
 
   log('>> (%o)', only);
 
-  // const reexportsFrom = getWildcardReexport(babel, ast);
-  // if (reexportsFrom.length) {
-  //   log('has wildcard reexport from %o', reexportsFrom);
-  //
-  //   // Resolve modules
-  //   next({
-  //     type: 'resolveImports',
-  //     entrypoint: action.entrypoint,
-  //     imports: new Map(reexportsFrom.map((i) => [i, ['*']])),
-  //     stack: action.stack,
-  //     callback: (resolvedImports) => {
-  //       console.log('!!!', resolvedImports);
-  //     },
-  //   });
-  //
-  //   // Replace wildcard reexport with named reexports
-  //
-  //   // Reprocess the code
-  //
-  //   return;
-  // }
+  const reexportsFrom = getWildcardReexport(services.babel, ast);
+  if (reexportsFrom.length) {
+    log('has wildcard reexport from %o', reexportsFrom);
+
+    let remaining = reexportsFrom.length;
+    const replacements = new Map<ExportAllDeclaration, Node | null>();
+    const onResolved = (res: Record<string, string[]>) => {
+      remaining -= 1;
+
+      Object.entries(res).forEach(([source, identifiers]) => {
+        const reexport = reexportsFrom.find((i) => i.source === source);
+        if (reexport) {
+          replacements.set(
+            reexport.node,
+            identifiers.length
+              ? services.babel.types.exportNamedDeclaration(
+                  null,
+                  identifiers.map((i) =>
+                    services.babel.types.exportSpecifier(
+                      services.babel.types.identifier(i),
+                      services.babel.types.identifier(i)
+                    )
+                  ),
+                  services.babel.types.stringLiteral(source)
+                )
+              : null
+          );
+        }
+      });
+
+      if (remaining === 0) {
+        // Replace wildcard reexport with named reexports
+        services.babel.traverse(ast, {
+          ExportAllDeclaration(path) {
+            const replacement = replacements.get(path.node);
+            if (replacement) {
+              path.replaceWith(replacement);
+            } else {
+              path.remove();
+            }
+          },
+        });
+
+        next(action);
+      }
+    };
+
+    // Resolve modules
+    next({
+      type: 'resolveImports',
+      entrypoint: action.entrypoint,
+      imports: new Map(reexportsFrom.map((i) => [i.source, []])),
+      stack: action.stack,
+      callback: (resolvedImports) => {
+        findExportsInFiles(services, action, next, resolvedImports, onResolved);
+      },
+    });
+
+    return;
+  }
 
   const [preparedCode, imports, metadata] = prepareCode(
-    babel,
+    services.babel,
     action.entrypoint,
     ast,
-    eventEmitter
+    services.eventEmitter
   );
 
   if (code === preparedCode) {

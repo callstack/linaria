@@ -26,7 +26,9 @@ export function processImports(
     if (resolveCached) {
       const [, cachedOnly] = resolveCached.split('\0');
       cachedOnly?.split(',').forEach((token) => {
-        importsOnlySet.add(token);
+        if (token) {
+          importsOnlySet.add(token);
+        }
       });
     }
 

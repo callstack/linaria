@@ -63,9 +63,15 @@ export interface IProcessImportsAction extends IBaseNode {
   type: 'processImports';
 }
 
+export interface IGetExportsAction extends IBaseNode {
+  callback: (exports: string[]) => void;
+  type: 'getExports';
+}
+
 export type ActionQueueItem =
   | IAddToCodeCacheAction
   | IProcessEntrypointAction
   | IProcessImportsAction
   | IResolveImportsAction
+  | IGetExportsAction
   | ITransformAction;

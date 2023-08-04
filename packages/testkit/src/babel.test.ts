@@ -2569,7 +2569,7 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
-  xit('should ignore unused wildcard reexports', async () => {
+  it('should ignore unused wildcard reexports', async () => {
     const onEvent = jest.fn<void, Parameters<OnEvent>>();
     const emitter = new EventEmitter(onEvent);
     const { code, metadata } = await transform(
@@ -2591,7 +2591,7 @@ describe('strategy shaker', () => {
 
     const unusedFile = resolve(__dirname, './__fixtures__/bar.js');
     expect(onEvent).not.toHaveBeenCalledWith(
-      expect.objectContaining({ file: unusedFile }),
+      expect.objectContaining({ file: unusedFile, action: 'processImports' }),
       'single'
     );
   });
@@ -2733,6 +2733,9 @@ describe('strategy shaker', () => {
   });
 
   it('evaluates chain of reexports', async () => {
+    const onEvent = jest.fn<void, Parameters<OnEvent>>();
+    const emitter = new EventEmitter(onEvent);
+
     const { code, metadata } = await transform(
       dedent`
       import { styled } from '@linaria/react';
@@ -2744,11 +2747,29 @@ describe('strategy shaker', () => {
         color: ${'${value}'};
       \`
       `,
-      [evaluator]
+      [evaluator],
+      undefined,
+      emitter
     );
 
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
+
+    expect(onEvent).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        file: resolve(__dirname, './__fixtures__/bar.js'),
+        action: 'processImports',
+      }),
+      'single'
+    );
+
+    expect(onEvent).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        file: resolve(__dirname, './__fixtures__/re-exports/empty.js'),
+        action: 'processImports',
+      }),
+      'single'
+    );
   });
 
   it('respects module-resolver plugin', async () => {

@@ -11,6 +11,7 @@ import { PriorityQueue } from '../queue/PriorityQueue';
 import type {
   ActionQueueItem,
   IEntrypoint,
+  IGetExportsAction,
   IResolvedImport,
   IResolveImportsAction,
 } from '../queue/types';
@@ -108,13 +109,25 @@ const mergers: {
 
     reprocessEntrypoint(a, b, next);
   },
+  getExports(a, b, next) {
+    const merged: IGetExportsAction = {
+      ...a,
+      callback: (exports) => {
+        a.callback?.(exports);
+        b.callback?.(exports);
+      },
+    };
+
+    next(merged);
+  },
 };
 
 const weights: Record<ActionQueueItem['type'], number> = {
   addToCodeCache: 0,
+  getExports: 20,
   processEntrypoint: 10,
-  resolveImports: 20,
   processImports: 15,
+  resolveImports: 25,
   transform: 5,
 };
 

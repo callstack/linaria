@@ -7,6 +7,7 @@ import type { ITransformFileResult, Options } from '../types';
 
 import { AsyncActionQueue, SyncActionQueue } from './helpers/ActionQueue';
 import { addToCodeCache } from './queue/actions/addToCodeCache';
+import { getExports } from './queue/actions/getExports';
 import { processEntrypoint } from './queue/actions/processEntrypoint';
 import { processImports } from './queue/actions/processImports';
 import {
@@ -47,6 +48,7 @@ export function prepareForEvalSync(
     { babel, cache, options, eventEmitter },
     {
       addToCodeCache,
+      getExports,
       processEntrypoint,
       processImports,
       resolveImports: syncResolveImports.bind(null, resolve),
@@ -107,6 +109,7 @@ export default async function prepareForEval(
     { babel, cache, options, eventEmitter },
     {
       addToCodeCache,
+      getExports,
       processEntrypoint,
       processImports,
       resolveImports: asyncResolveImports.bind(null, resolve),
