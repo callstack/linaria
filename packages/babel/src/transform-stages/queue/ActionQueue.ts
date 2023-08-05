@@ -6,22 +6,49 @@ import type { EventEmitter } from '@linaria/utils';
 import type { Core } from '../../babel';
 import type { TransformCacheCollection } from '../../cache';
 import type { Options } from '../../types';
-import type { IBaseNode, Next as GenericNext } from '../queue/PriorityQueue';
-import { PriorityQueue } from '../queue/PriorityQueue';
+
+import type {
+  EventsHandlers,
+  IBaseNode,
+  IBaseEntrypoint,
+} from './PriorityQueue';
+import { PriorityQueue } from './PriorityQueue';
 import type {
   ActionQueueItem,
   IEntrypoint,
-  IGetExportsAction,
   IResolvedImport,
   IResolveImportsAction,
-} from '../queue/types';
+  BaseAction,
+} from './types';
 
 const peek = <T>(arr: T[]) =>
   arr.length > 0 ? arr[arr.length - 1] : undefined;
 
-export type Next = GenericNext<ActionQueueItem>;
+export type OnNext<TEvents extends Record<string, unknown[]>> = {
+  on: <K extends keyof TEvents>(
+    type: K,
+    callback: (...args: TEvents[K]) => void
+  ) => void;
+};
 
-type Merger<T extends ActionQueueItem> = (a: T, b: T, next: Next) => void;
+export type Next<
+  TEntrypoint extends IBaseEntrypoint,
+  TNode extends IBaseNode<TEntrypoint>
+> = <TType extends TNode['type']>(
+  item: TNode & { type: TType },
+  refCount?: number
+) => Extract<TNode, { type: TType }> extends IBaseNode<
+  TEntrypoint,
+  infer TEvents
+>
+  ? OnNext<TEvents>
+  : { on: (type: never, callback: never) => void };
+
+type Merger<T extends ActionQueueItem> = (
+  a: T,
+  b: T,
+  next: Next<IEntrypoint, ActionQueueItem>
+) => void;
 
 const reprocessEntrypoint: Merger<ActionQueueItem> = (a, b, next) => {
   const entrypoint: IEntrypoint = {
@@ -58,13 +85,10 @@ const mergers: {
 
     a.imports?.forEach(addOrMerge);
     b.imports?.forEach(addOrMerge);
+
     const merged: IResolveImportsAction = {
       ...a,
       imports: mergedImports,
-      callback: (resolved) => {
-        a.callback?.(resolved);
-        b.callback?.(resolved);
-      },
     };
 
     next(merged);
@@ -110,15 +134,7 @@ const mergers: {
     reprocessEntrypoint(a, b, next);
   },
   getExports(a, b, next) {
-    const merged: IGetExportsAction = {
-      ...a,
-      callback: (exports) => {
-        a.callback?.(exports);
-        b.callback?.(exports);
-      },
-    };
-
-    next(merged);
+    next(a);
   },
 };
 
@@ -147,22 +163,60 @@ function hasLessPriority(a: ActionQueueItem, b: ActionQueueItem) {
   return weights[a.type] < weights[b.type];
 }
 
-const nameOf = (node: IBaseNode): string =>
+const nameOf = (node: BaseAction): string =>
   `${node.type}:${node.entrypoint.name}`;
 
-const keyOf = (node: IBaseNode): string => nameOf(node);
+const keyOf = (node: BaseAction): string => nameOf(node);
 
-function merge<T extends ActionQueueItem>(
-  a: T,
+function transferCallbacks<TEvents extends Record<string, unknown[]>>(
+  from: IBaseNode<IBaseEntrypoint>[],
+  to: IBaseNode<IBaseEntrypoint>
+) {
+  const targetCallbacks = (to.callbacks as EventsHandlers<TEvents>) ?? {};
+
+  from.forEach((node) => {
+    if (!node.callbacks) return;
+
+    const callbacks = node.callbacks as EventsHandlers<TEvents>;
+    Object.keys(callbacks).forEach((key) => {
+      const name = key as keyof typeof targetCallbacks;
+      const handlers = callbacks[name];
+      if (!handlers) return;
+      if (!targetCallbacks[name]) {
+        targetCallbacks[name] = [];
+      }
+
+      handlers.forEach((handler) => {
+        if (!handler) return;
+        targetCallbacks[name]!.push(handler);
+      });
+    });
+  });
+
+  // eslint-disable-next-line no-param-reassign
+  to.callbacks = targetCallbacks;
+}
+
+function merge(
+  a: ActionQueueItem,
   b: ActionQueueItem,
-  next: Next
+  insert: (item: ActionQueueItem) => void
 ): void {
   if (a.type === b.type) {
-    return (mergers[a.type] as (a: T, b: T, next: Next) => void)(
-      a,
-      b as T,
-      next
-    );
+    (
+      mergers[a.type] as (
+        a: ActionQueueItem,
+        b: ActionQueueItem,
+        next: (item: ActionQueueItem) => void
+      ) => void
+    )(a, b, (item) => {
+      // Merge callbacks
+      transferCallbacks([a, b], item);
+
+      insert(item);
+    });
+
+    return;
   }
 
   throw new Error(`Cannot merge ${nameOf(a)} with ${nameOf(b)}`);
@@ -175,17 +229,33 @@ type Services = {
   eventEmitter: EventEmitter;
 };
 
-type Handler<TAction extends ActionQueueItem['type'], TRes> = (
+type GetCallbacks<TAction extends ActionQueueItem> = TAction extends IBaseNode<
+  IEntrypoint,
+  infer TEvents
+>
+  ? {
+      [K in keyof TEvents]: (...args: TEvents[K]) => void;
+    }
+  : never;
+
+type Handler<TAction extends ActionQueueItem, TRes> = (
   services: Services,
-  action: Extract<ActionQueueItem, { type: TAction }>,
-  next: Next
+  action: TAction,
+  next: Next<IEntrypoint, ActionQueueItem>,
+  callbacks: GetCallbacks<TAction>
 ) => TRes;
 
-class GenericActionQueue<TRes> extends PriorityQueue<ActionQueueItem> {
+class GenericActionQueue<TRes> extends PriorityQueue<
+  IEntrypoint,
+  ActionQueueItem
+> {
   constructor(
     protected services: Services,
     protected handlers: {
-      [K in ActionQueueItem['type']]: Handler<K, TRes>;
+      [K in ActionQueueItem['type']]: Handler<
+        Extract<ActionQueueItem, { type: K }>,
+        TRes
+      >;
     },
     entrypoint: IEntrypoint
   ) {
@@ -203,30 +273,86 @@ class GenericActionQueue<TRes> extends PriorityQueue<ActionQueueItem> {
     });
   }
 
-  protected handle<T extends ActionQueueItem['type']>(
-    action: Extract<ActionQueueItem, { type: T }>
-  ): TRes {
+  protected next<TType extends ActionQueueItem['type']>(
+    item: ActionQueueItem & { type: TType },
+    refCount = item.refCount ?? 1
+  ) {
+    type ResultType = Extract<
+      ActionQueueItem,
+      { type: TType }
+    > extends BaseAction<infer TEvents>
+      ? OnNext<TEvents>
+      : { on: (type: never, callback: never) => void };
+
+    const callbacks: Record<string, ((...args: unknown[]) => void)[]> =
+      item.callbacks ?? {};
+
+    this.enqueue({
+      ...item,
+      refCount,
+      callbacks,
+    });
+
+    const on: ResultType['on'] = (
+      type: string,
+      callback: (...args: unknown[]) => void
+    ) => {
+      if (!callbacks[type]) {
+        callbacks[type] = [];
+      }
+
+      callbacks[type]!.push(callback);
+    };
+
+    return {
+      on,
+    } as ResultType;
+  }
+
+  protected handle<TAction extends ActionQueueItem>(action: TAction): TRes {
     const { eventEmitter } = this.services;
-    const handler = this.handlers[action.type] as Handler<T, TRes>;
+    const handler = this.handlers[action.type] as Handler<TAction, TRes>;
 
     eventEmitter.single({
       type: 'queue-action',
       action: action.type,
       file: action.entrypoint.name,
-      only: action.entrypoint.only.join(','),
+      args: action.entrypoint.only,
     });
 
-    return eventEmitter.autoPair(
+    const next = this.next.bind(this) as Next<IEntrypoint, ActionQueueItem>;
+
+    type Callbacks = GetCallbacks<TAction>;
+    const allCallbacks = action.callbacks as Record<
+      keyof Callbacks,
+      ((...args: unknown[]) => void)[] | undefined
+    >;
+
+    const callbacks = new Proxy({} as Callbacks, {
+      get: (target, prop) => {
+        const callbackName = prop.toString() as keyof Callbacks;
+        return (...args: unknown[]) => {
+          if (!action.callbacks) {
+            return;
+          }
+
+          eventEmitter.single({
+            type: 'queue-action',
+            action: `${action.type}:${callbackName.toString()}`,
+            file: action.entrypoint.name,
+            args,
+          });
+
+          allCallbacks[callbackName]?.forEach((cb) => cb(...args));
+        };
+      },
+    });
+
+    return eventEmitter.pair(
       {
         method: `queue:${action.type}`,
       },
-      () =>
-        handler(this.services, action, (item, refCount = 1) =>
-          this.enqueue({
-            ...item,
-            refCount,
-          } as ActionQueueItem)
-        )
+      () => handler(this.services, action, next, callbacks)
     );
   }
 }

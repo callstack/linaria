@@ -41,36 +41,38 @@ export default function preeval(
       const rootScope = file.scope;
       this.processors = [];
 
-      const onProcessTemplateFinished = eventEmitter.pair({
-        method: 'queue:transform:preeval:processTemplate',
-      });
-
-      file.path.traverse({
-        Identifier: (p) => {
-          processTemplateExpression(p, file.opts, options, (processor) => {
-            processor.dependencies.forEach((dependency) => {
-              if (dependency.ex.type === 'Identifier') {
-                addIdentifierToLinariaPreval(rootScope, dependency.ex.name);
-              }
-            });
-
-            processor.doEvaltimeReplacement();
-            this.processors.push(processor);
-          });
+      eventEmitter.pair(
+        {
+          method: 'queue:transform:preeval:processTemplate',
         },
-      });
+        () => {
+          file.path.traverse({
+            Identifier: (p) => {
+              processTemplateExpression(p, file.opts, options, (processor) => {
+                processor.dependencies.forEach((dependency) => {
+                  if (dependency.ex.type === 'Identifier') {
+                    addIdentifierToLinariaPreval(rootScope, dependency.ex.name);
+                  }
+                });
 
-      onProcessTemplateFinished();
+                processor.doEvaltimeReplacement();
+                this.processors.push(processor);
+              });
+            },
+          });
+        }
+      );
 
       if (
         isFeatureEnabled(options.features, 'dangerousCodeRemover', filename)
       ) {
         log('start', 'Strip all JSX and browser related stuff');
-        const onCodeRemovingFinished = eventEmitter.pair({
-          method: 'queue:transform:preeval:removeDangerousCode',
-        });
-        removeDangerousCode(file.path);
-        onCodeRemovingFinished();
+        eventEmitter.pair(
+          {
+            method: 'queue:transform:preeval:removeDangerousCode',
+          },
+          () => removeDangerousCode(file.path)
+        );
       }
 
       onFinishCallbacks.set(

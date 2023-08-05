@@ -27,7 +27,7 @@ export interface IQueueActionEvent {
   type: 'queue-action';
   action: string;
   file: string;
-  only: string;
+  args: string[];
 }
 
 const workingDir = process.cwd();
@@ -112,12 +112,13 @@ export const createPerfMeter = (
   };
 
   const queueActions = new Map<string, string[]>();
-  const processQueueAction = ({ file, action, only }: IQueueActionEvent) => {
+  const processQueueAction = ({ file, action, args }: IQueueActionEvent) => {
     if (!queueActions.has(file)) {
       queueActions.set(file, []);
     }
 
-    queueActions.get(file)!.push(`${action}(${only})`);
+    const stringifiedArgs = args.map((arg) => JSON.stringify(arg)).join(', ');
+    queueActions.get(file)!.push(`${action}(${stringifiedArgs})`);
   };
 
   const processSingleEvent = (

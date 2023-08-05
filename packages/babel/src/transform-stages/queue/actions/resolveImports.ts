@@ -20,7 +20,9 @@ const mergeImports = (a: string[], b: string[]) => {
 export function syncResolveImports(
   resolve: (what: string, importer: string, stack: string[]) => string,
   { eventEmitter }: Services,
-  action: IResolveImportsAction
+  action: IResolveImportsAction,
+  next: unknown,
+  callbacks: { resolve: (result: IResolvedImport[]) => void }
 ) {
   const { imports, entrypoint } = action;
   const listOfImports = Array.from(imports?.entries() ?? []);
@@ -58,7 +60,7 @@ export function syncResolveImports(
       })),
     });
 
-    action.callback?.(resolvedImports);
+    callbacks.resolve(resolvedImports);
   } else {
     eventEmitter.single({
       type: 'dependency',
@@ -68,7 +70,7 @@ export function syncResolveImports(
     });
 
     log('%s has no imports', entrypoint.name);
-    action.callback?.([]);
+    callbacks.resolve([]);
   }
 }
 
@@ -79,7 +81,9 @@ export async function asyncResolveImports(
     stack: string[]
   ) => Promise<string | null>,
   { cache, eventEmitter }: Services,
-  action: IResolveImportsAction
+  action: IResolveImportsAction,
+  next: unknown,
+  callbacks: { resolve: (result: IResolvedImport[]) => void }
 ) {
   const { imports, entrypoint } = action;
   const listOfImports = Array.from(imports?.entries() ?? []);
@@ -196,7 +200,7 @@ export async function asyncResolveImports(
       })),
     });
 
-    action.callback?.(resolvedImports);
+    callbacks.resolve(resolvedImports);
   } else {
     eventEmitter.single({
       type: 'dependency',
@@ -206,6 +210,6 @@ export async function asyncResolveImports(
     });
 
     log('%s has no imports', entrypoint.name);
-    action.callback?.([]);
+    callbacks.resolve([]);
   }
 }

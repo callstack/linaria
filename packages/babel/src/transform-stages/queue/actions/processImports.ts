@@ -1,12 +1,17 @@
 /* eslint-disable no-restricted-syntax,no-continue,no-await-in-loop */
-import type { Next } from '../../helpers/ActionQueue';
+import type { Next } from '../ActionQueue';
 import { createEntrypoint } from '../createEntrypoint';
-import type { IProcessImportsAction, Services } from '../types';
+import type {
+  IProcessImportsAction,
+  Services,
+  ActionQueueItem,
+  IEntrypoint,
+} from '../types';
 
 export function processImports(
   { babel, cache, options, eventEmitter }: Services,
   action: IProcessImportsAction,
-  next: Next
+  next: Next<IEntrypoint, ActionQueueItem>
 ) {
   const { resolved: resolvedImports, entrypoint, stack } = action;
 

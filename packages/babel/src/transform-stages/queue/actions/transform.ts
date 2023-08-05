@@ -3,12 +3,7 @@ import type {
   BabelFileResult,
   PluginItem,
 } from '@babel/core';
-import type {
-  ExportAllDeclaration,
-  File,
-  Node,
-  ExportNamedDeclaration,
-} from '@babel/types';
+import type { ExportAllDeclaration, File, Node } from '@babel/types';
 
 import type { EvaluatorConfig, EventEmitter } from '@linaria/utils';
 import { buildOptions, getPluginKey } from '@linaria/utils';
@@ -16,9 +11,13 @@ import { buildOptions, getPluginKey } from '@linaria/utils';
 import type { Core } from '../../../babel';
 import type Module from '../../../module';
 import withLinariaMetadata from '../../../utils/withLinariaMetadata';
-import type { Next } from '../../helpers/ActionQueue';
-import { createEntrypoint } from '../createEntrypoint';
-import type { IEntrypoint, ITransformAction, Services } from '../types';
+import type { Next } from '../ActionQueue';
+import type {
+  IEntrypoint,
+  ITransformAction,
+  Services,
+  ActionQueueItem,
+} from '../types';
 
 import { findExportsInFiles } from './getExports';
 
@@ -81,16 +80,12 @@ export function prepareCode(
 ): [code: string, imports: Module['imports'], metadata?: BabelFileMetadata] {
   const { evaluator, log, evalConfig, pluginOptions, only } = item;
 
-  const onPreevalFinished = eventEmitter.pair({
-    method: 'queue:transform:preeval',
-  });
-  const preevalStageResult = runPreevalStage(
-    babel,
-    item,
-    originalAst,
-    eventEmitter
+  const preevalStageResult = eventEmitter.pair(
+    {
+      method: 'queue:transform:preeval',
+    },
+    () => runPreevalStage(babel, item, originalAst, eventEmitter)
   );
-  onPreevalFinished();
 
   if (
     only.length === 1 &&
@@ -110,17 +105,19 @@ export function prepareCode(
     features: pluginOptions.features,
   };
 
-  const onEvaluatorFinished = eventEmitter.pair({
-    method: 'queue:transform:evaluator',
-  });
-  const [, code, imports] = evaluator(
-    evalConfig,
-    preevalStageResult.ast!,
-    preevalStageResult.code!,
-    evaluatorConfig,
-    babel
+  const [, code, imports] = eventEmitter.pair(
+    {
+      method: 'queue:transform:evaluator',
+    },
+    () =>
+      evaluator(
+        evalConfig,
+        preevalStageResult.ast!,
+        preevalStageResult.code!,
+        evaluatorConfig,
+        babel
+      )
   );
-  onEvaluatorFinished();
 
   log('[evaluator:end]');
 
@@ -153,7 +150,7 @@ const getWildcardReexport = (babel: Core, ast: File) => {
 export function transform(
   services: Services,
   action: ITransformAction,
-  next: Next
+  next: Next<IEntrypoint, ActionQueueItem>
 ): void {
   if (!action) {
     return;
@@ -216,9 +213,8 @@ export function transform(
       entrypoint: action.entrypoint,
       imports: new Map(reexportsFrom.map((i) => [i.source, []])),
       stack: action.stack,
-      callback: (resolvedImports) => {
-        findExportsInFiles(services, action, next, resolvedImports, onResolved);
-      },
+    }).on('resolve', (resolvedImports) => {
+      findExportsInFiles(services, action, next, resolvedImports, onResolved);
     });
 
     return;
@@ -247,14 +243,13 @@ export function transform(
     entrypoint: action.entrypoint,
     imports,
     stack: action.stack,
-    callback: (resolvedImports) => {
-      next({
-        type: 'processImports',
-        entrypoint: action.entrypoint,
-        resolved: resolvedImports,
-        stack: action.stack,
-      });
-    },
+  }).on('resolve', (resolvedImports) => {
+    next({
+      type: 'processImports',
+      entrypoint: action.entrypoint,
+      resolved: resolvedImports,
+      stack: action.stack,
+    });
   });
 
   next({

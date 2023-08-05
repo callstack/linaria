@@ -9,20 +9,22 @@ export class EventEmitter {
 
   constructor(protected onEvent: OnEvent) {}
 
-  public autoPair<TRes>(labels: Record<string, string>, fn: () => TRes) {
+  public pair(labels: Record<string, string>): () => void;
+  public pair<TRes>(labels: Record<string, string>, fn: () => TRes): TRes;
+  public pair<TRes>(labels: Record<string, string>, fn?: () => TRes) {
     this.onEvent(labels, 'start');
-    const result = fn();
-    if (result instanceof Promise) {
-      result.then(() => this.onEvent(labels, 'finish'));
-    } else {
-      this.onEvent(labels, 'finish');
+
+    if (fn) {
+      const result = fn();
+      if (result instanceof Promise) {
+        result.then(() => this.onEvent(labels, 'finish'));
+      } else {
+        this.onEvent(labels, 'finish');
+      }
+
+      return result;
     }
 
-    return result;
-  }
-
-  public pair(labels: Record<string, string>) {
-    this.onEvent(labels, 'start');
     return () => {
       this.onEvent(labels, 'finish');
     };

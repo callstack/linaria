@@ -5,7 +5,7 @@ import type { Core } from '../babel';
 import type { TransformCacheCollection } from '../cache';
 import type { ITransformFileResult, Options } from '../types';
 
-import { AsyncActionQueue, SyncActionQueue } from './helpers/ActionQueue';
+import { AsyncActionQueue, SyncActionQueue } from './queue/ActionQueue';
 import { addToCodeCache } from './queue/actions/addToCodeCache';
 import { getExports } from './queue/actions/getExports';
 import { processEntrypoint } from './queue/actions/processEntrypoint';

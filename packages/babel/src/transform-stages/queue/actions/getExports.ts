@@ -1,14 +1,20 @@
 import { collectExportsAndImports } from '@linaria/utils';
 
-import type { Next } from '../../helpers/ActionQueue';
-import type { IBaseNode } from '../PriorityQueue';
+import type { Next } from '../ActionQueue';
 import { createEntrypoint } from '../createEntrypoint';
-import type { IGetExportsAction, IResolvedImport, Services } from '../types';
+import type {
+  IGetExportsAction,
+  IResolvedImport,
+  Services,
+  BaseAction,
+  ActionQueueItem,
+  IEntrypoint,
+} from '../types';
 
 export function findExportsInFiles(
   { babel, cache, eventEmitter, options }: Services,
-  action: IBaseNode,
-  next: Next,
+  action: BaseAction,
+  next: Next<IEntrypoint, ActionQueueItem>,
   resolvedImports: IResolvedImport[],
   onResolved: (replacements: Record<string, string[]>) => void
 ) {
@@ -39,11 +45,10 @@ export function findExportsInFiles(
       type: 'getExports',
       entrypoint: newEntrypoint,
       stack: action.stack,
-      callback: (exports) => {
-        onResolved({
-          [imp.importedFile]: exports,
-        });
-      },
+    }).on('resolve', (exports) => {
+      onResolved({
+        [imp.importedFile]: exports,
+      });
     });
   });
 }
@@ -51,7 +56,8 @@ export function findExportsInFiles(
 export function getExports(
   services: Services,
   action: IGetExportsAction,
-  next: Next
+  next: Next<IEntrypoint, ActionQueueItem>,
+  callbacks: { resolve: (result: string[]) => void }
 ) {
   const { entrypoint } = action;
 
@@ -82,7 +88,7 @@ export function getExports(
 
           remaining -= 1;
           if (remaining === 0) {
-            action.callback(result);
+            callbacks.resolve(result);
           }
         };
 
@@ -91,18 +97,17 @@ export function getExports(
           entrypoint: action.entrypoint,
           imports: new Map(withWildcardReexport.map((i) => [i.source, []])),
           stack: action.stack,
-          callback: (resolvedImports) => {
-            findExportsInFiles(
-              services,
-              action,
-              next,
-              resolvedImports,
-              onResolved
-            );
-          },
+        }).on('resolve', (resolvedImports) => {
+          findExportsInFiles(
+            services,
+            action,
+            next,
+            resolvedImports,
+            onResolved
+          );
         });
       } else {
-        action.callback(result);
+        callbacks.resolve(result);
       }
     },
   });

@@ -1,5 +1,10 @@
-import type { Next } from '../../helpers/ActionQueue';
-import type { IEntrypoint, IProcessEntrypointAction, Services } from '../types';
+import type { Next } from '../ActionQueue';
+import type {
+  IEntrypoint,
+  IProcessEntrypointAction,
+  Services,
+  ActionQueueItem,
+} from '../types';
 
 const includes = (a: string[], b: string[]) => {
   if (a.includes('*')) return true;
@@ -17,7 +22,7 @@ const abortControllers = new WeakMap<IEntrypoint, AbortController>();
 export function processEntrypoint(
   { cache }: Services,
   action: IProcessEntrypointAction,
-  next: Next
+  next: Next<IEntrypoint, ActionQueueItem>
 ): void {
   const { name, only, log } = action.entrypoint;
   log(

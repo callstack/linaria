@@ -53,16 +53,10 @@ function syncStages(
 
   // *** 2nd stage ***
 
-  const finishStage2Event = eventEmitter.pair({ stage: 'stage-2', filename });
-
-  const evalStageResult = evalStage(
-    cache,
-    prepareStageResult.code,
-    pluginOptions,
-    filename
+  const evalStageResult = eventEmitter.pair(
+    { stage: 'stage-2', filename },
+    () => evalStage(cache, prepareStageResult.code, pluginOptions, filename)
   );
-
-  finishStage2Event();
 
   if (evalStageResult === null) {
     return {
@@ -75,19 +69,19 @@ function syncStages(
 
   // *** 3rd stage ***
 
-  const finishStage3Event = eventEmitter.pair({ stage: 'stage-3', filename });
-
-  const collectStageResult = prepareForRuntime(
-    babel,
-    ast,
-    originalCode,
-    valueCache,
-    pluginOptions,
-    options,
-    babelConfig
+  const collectStageResult = eventEmitter.pair(
+    { stage: 'stage-3', filename },
+    () =>
+      prepareForRuntime(
+        babel,
+        ast,
+        originalCode,
+        valueCache,
+        pluginOptions,
+        options,
+        babelConfig
+      )
   );
-
-  finishStage3Event();
 
   if (!withLinariaMetadata(collectStageResult.metadata)) {
     return {
@@ -96,17 +90,14 @@ function syncStages(
     };
   }
 
+  const linariaMetadata = collectStageResult.metadata.linaria;
+
   // *** 4th stage
 
-  const finishStage4Event = eventEmitter.pair({ stage: 'stage-4', filename });
-
-  const extractStageResult = extractStage(
-    collectStageResult.metadata.linaria.processors,
-    originalCode,
-    options
+  const extractStageResult = eventEmitter.pair(
+    { stage: 'stage-4', filename },
+    () => extractStage(linariaMetadata.processors, originalCode, options)
   );
-
-  finishStage4Event();
 
   return {
     ...extractStageResult,
@@ -114,7 +105,7 @@ function syncStages(
     dependencies,
     replacements: [
       ...extractStageResult.replacements,
-      ...collectStageResult.metadata.linaria.replacements,
+      ...linariaMetadata.replacements,
     ],
     sourceMap: collectStageResult.map,
   };
@@ -129,35 +120,39 @@ export function transformSync(
   eventEmitter = EventEmitter.dummy
 ): Result {
   const { filename } = options;
-  // *** 1st stage ***
+  const results = eventEmitter.pair({ stage: 'stage-1', filename }, () => {
+    // *** 1st stage ***
 
-  const finishEvent = eventEmitter.pair({ stage: 'stage-1', filename });
+    const entrypoint = {
+      name: options.filename,
+      code: originalCode,
+      only: ['__linariaPreval'],
+    };
 
-  const entrypoint = {
-    name: options.filename,
-    code: originalCode,
-    only: ['__linariaPreval'],
-  };
+    const pluginOptions = loadLinariaOptions(options.pluginOptions);
+    const prepareStageResults = prepareForEvalSync(
+      babel,
+      cache,
+      syncResolve,
+      entrypoint,
+      pluginOptions,
+      options,
+      eventEmitter
+    );
 
-  const pluginOptions = loadLinariaOptions(options.pluginOptions);
-  const prepareStageResults = prepareForEvalSync(
-    babel,
-    cache,
-    syncResolve,
-    entrypoint,
-    pluginOptions,
-    options
-  );
-
-  finishEvent();
+    return {
+      prepareStageResults,
+      pluginOptions,
+    };
+  });
 
   // *** The rest of the stages are synchronous ***
 
   return syncStages(
     originalCode,
-    pluginOptions,
+    results.pluginOptions,
     options,
-    prepareStageResults,
+    results.prepareStageResults,
     babelConfig,
     cache,
     eventEmitter
@@ -177,37 +172,42 @@ export default async function transform(
   eventEmitter = EventEmitter.dummy
 ): Promise<Result> {
   const { filename } = options;
+  const results = await eventEmitter.pair(
+    { stage: 'stage-1', filename },
+    async () => {
+      // *** 1st stage ***
 
-  // *** 1st stage ***
+      const entrypoint = {
+        name: options.filename,
+        code: originalCode,
+        only: ['__linariaPreval'],
+      };
 
-  const finishEvent = eventEmitter.pair({ stage: 'stage-1', filename });
+      const pluginOptions = loadLinariaOptions(options.pluginOptions);
+      const prepareStageResults = await prepareForEval(
+        babel,
+        cache,
+        asyncResolve,
+        entrypoint,
+        pluginOptions,
+        options,
+        eventEmitter
+      );
 
-  const entrypoint = {
-    name: filename,
-    code: originalCode,
-    only: ['__linariaPreval'],
-  };
-
-  const pluginOptions = loadLinariaOptions(options.pluginOptions);
-  const prepareStageResults = await prepareForEval(
-    babel,
-    cache,
-    asyncResolve,
-    entrypoint,
-    pluginOptions,
-    options,
-    eventEmitter
+      return {
+        prepareStageResults,
+        pluginOptions,
+      };
+    }
   );
-
-  finishEvent();
 
   // *** The rest of the stages are synchronous ***
 
   return syncStages(
     originalCode,
-    pluginOptions,
+    results.pluginOptions,
     options,
-    prepareStageResults,
+    results.prepareStageResults,
     babelConfig,
     cache,
     eventEmitter

@@ -8,7 +8,7 @@ import type { Core } from '../../babel';
 import type { TransformCacheCollection } from '../../cache';
 import type { ITransformFileResult, Options } from '../../types';
 
-import type { IBaseNode } from './PriorityQueue';
+import type { IBaseNode, IBaseEntrypoint } from './PriorityQueue';
 
 export type Services = {
   babel: Core;
@@ -17,8 +17,7 @@ export type Services = {
   eventEmitter: EventEmitter;
 };
 
-export interface IEntrypoint {
-  abortSignal?: AbortSignal;
+export interface IEntrypoint extends IBaseEntrypoint {
   ast: File;
   code: string;
   evalConfig: TransformOptions;
@@ -29,15 +28,19 @@ export interface IEntrypoint {
   pluginOptions: StrictOptions;
 }
 
-export interface IProcessEntrypointAction extends IBaseNode {
+export type BaseAction<
+  TEvents extends Record<string, unknown[]> = Record<never, unknown[]>
+> = IBaseNode<IEntrypoint, TEvents>;
+
+export interface IProcessEntrypointAction extends BaseAction {
   type: 'processEntrypoint';
 }
 
-export interface ITransformAction extends IBaseNode {
+export interface ITransformAction extends BaseAction {
   type: 'transform';
 }
 
-export interface IAddToCodeCacheAction extends IBaseNode {
+export interface IAddToCodeCacheAction extends BaseAction {
   type: 'addToCodeCache';
   data: {
     imports: Map<string, string[]> | null;
@@ -52,19 +55,23 @@ export interface IResolvedImport {
   resolved: string | null;
 }
 
-export interface IResolveImportsAction extends IBaseNode {
-  callback: (resolved: IResolvedImport[]) => void;
+export interface IResolveImportsAction
+  extends BaseAction<{
+    resolve: [exports: IResolvedImport[]];
+  }> {
   imports: Map<string, string[]> | null;
   type: 'resolveImports';
 }
 
-export interface IProcessImportsAction extends IBaseNode {
+export interface IProcessImportsAction extends BaseAction {
   resolved: IResolvedImport[];
   type: 'processImports';
 }
 
-export interface IGetExportsAction extends IBaseNode {
-  callback: (exports: string[]) => void;
+export interface IGetExportsAction
+  extends BaseAction<{
+    resolve: [exports: string[]];
+  }> {
   type: 'getExports';
 }
 
