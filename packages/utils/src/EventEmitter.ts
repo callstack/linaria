@@ -17,7 +17,10 @@ export class EventEmitter {
     if (fn) {
       const result = fn();
       if (result instanceof Promise) {
-        result.then(() => this.onEvent(labels, 'finish'));
+        result.then(
+          () => this.onEvent(labels, 'finish'),
+          () => this.onEvent(labels, 'finish')
+        );
       } else {
         this.onEvent(labels, 'finish');
       }
