@@ -133,6 +133,9 @@ const mergers: {
 
     reprocessEntrypoint(a, b, next);
   },
+  explodeReexports(a, b, next) {
+    next(a);
+  },
   getExports(a, b, next) {
     next(a);
   },
@@ -140,10 +143,11 @@ const mergers: {
 
 const weights: Record<ActionQueueItem['type'], number> = {
   addToCodeCache: 0,
-  getExports: 20,
-  processEntrypoint: 10,
-  processImports: 15,
-  resolveImports: 25,
+  explodeReexports: 10,
+  getExports: 25,
+  processEntrypoint: 15,
+  processImports: 20,
+  resolveImports: 30,
   transform: 5,
 };
 

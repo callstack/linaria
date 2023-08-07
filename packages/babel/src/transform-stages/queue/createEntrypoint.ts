@@ -26,6 +26,56 @@ const EMPTY_FILE = '=== empty file ===';
 const getLogIdx = (filename: string) =>
   getFileIdx(filename).toString().padStart(5, '0');
 
+const onAbortHandlers = new WeakMap<AbortSignal, (() => void)[]>();
+const knownSignals = new WeakSet<AbortSignal>();
+
+export function addOnAbort(
+  entrypoint: Omit<IEntrypoint, 'onAbort'> & {
+    onAbort?: IEntrypoint['onAbort'];
+  }
+): IEntrypoint {
+  const { abortSignal } = entrypoint;
+
+  const onAbort = (fn: () => void) => {
+    if (!abortSignal) {
+      return () => {};
+    }
+
+    let handlers = onAbortHandlers.get(abortSignal);
+
+    if (!handlers) {
+      handlers = [];
+      onAbortHandlers.set(abortSignal, handlers);
+    }
+
+    handlers.push(fn);
+
+    return () => {
+      const idx = handlers!.indexOf(fn);
+      if (idx !== -1) {
+        handlers!.splice(idx, 1);
+      }
+    };
+  };
+
+  // AbortSignal has a limit of listeners, so we need to reuse the same one
+  if (abortSignal && !knownSignals.has(abortSignal)) {
+    abortSignal.addEventListener('abort', () => {
+      const handlers = onAbortHandlers.get(abortSignal);
+      if (handlers) {
+        handlers.forEach((fn) => fn());
+      }
+    });
+
+    knownSignals.add(abortSignal);
+  }
+
+  return {
+    ...entrypoint,
+    onAbort,
+  };
+}
+
 export function createEntrypoint(
   babel: Core,
   parentLog: Debugger,
@@ -35,7 +85,8 @@ export function createEntrypoint(
   maybeCode: string | undefined,
   pluginOptions: StrictOptions,
   options: Pick<Options, 'root' | 'inputSourceMap'>,
-  eventEmitter: EventEmitter
+  eventEmitter: EventEmitter,
+  abortSignal?: AbortSignal
 ): IEntrypoint | 'ignored' {
   return eventEmitter.pair({ method: 'createEntrypoint' }, () => {
     const log = parentLog.extend(
@@ -135,7 +186,8 @@ export function createEntrypoint(
 
     log('[createEntrypoint] %s (%o)\n%s', name, only, code || EMPTY_FILE);
 
-    return {
+    return addOnAbort({
+      abortSignal,
       ast,
       code,
       evalConfig,
@@ -144,6 +196,6 @@ export function createEntrypoint(
       name,
       only: [...only].filter((i) => i).sort(),
       pluginOptions,
-    };
+    });
   });
 }

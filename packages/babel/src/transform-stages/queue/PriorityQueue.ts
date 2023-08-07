@@ -2,6 +2,7 @@ import type { Debugger } from '@linaria/logger';
 
 export interface IBaseEntrypoint {
   abortSignal?: AbortSignal;
+  onAbort(fn: () => void): () => void;
 }
 
 export type EventsHandlers<TEvents extends Record<string, unknown[]>> = {
@@ -161,12 +162,10 @@ export abstract class PriorityQueue<
 
     this.increaseKey(this.size + 1, newNode);
     this.log('Enqueued %s: %o', key, this.data.map(this.keyOf));
-    if (newNode.entrypoint.abortSignal) {
-      newNode.entrypoint.abortSignal.addEventListener('abort', () => {
-        this.log('Aborting %s', key);
-        this.delete(key);
-      });
-    }
+    newNode.entrypoint.onAbort(() => {
+      this.log('Aborting %s', key);
+      this.delete(key);
+    });
   }
 
   public isEmpty() {

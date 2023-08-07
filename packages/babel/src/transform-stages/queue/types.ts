@@ -32,6 +32,10 @@ export type BaseAction<
   TEvents extends Record<string, unknown[]> = Record<never, unknown[]>
 > = IBaseNode<IEntrypoint, TEvents>;
 
+export interface IExplodeReexportsAction extends BaseAction {
+  type: 'explodeReexports';
+}
+
 export interface IProcessEntrypointAction extends BaseAction {
   type: 'processEntrypoint';
 }
@@ -77,6 +81,7 @@ export interface IGetExportsAction
 
 export type ActionQueueItem =
   | IAddToCodeCacheAction
+  | IExplodeReexportsAction
   | IProcessEntrypointAction
   | IProcessImportsAction
   | IResolveImportsAction

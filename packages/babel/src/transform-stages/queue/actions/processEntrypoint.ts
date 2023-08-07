@@ -1,4 +1,5 @@
 import type { Next } from '../ActionQueue';
+import { addOnAbort } from '../createEntrypoint';
 import type {
   IEntrypoint,
   IProcessEntrypointAction,
@@ -53,19 +54,33 @@ export function processEntrypoint(
 
     // If we already have a result for this file, we should invalidate it
     cache.invalidate('eval', name);
-    abortControllers.get(cached)?.abort();
+
+    const abortController = abortControllers.get(cached);
+    if (abortController) {
+      abortController.abort();
+    }
   }
 
   const abortController = new AbortController();
-  const entrypoint: IEntrypoint = {
+  action.entrypoint.onAbort(() => {
+    abortController.abort();
+  });
+
+  const entrypoint: IEntrypoint = addOnAbort({
     ...action.entrypoint,
     only: mergedOnly,
     abortSignal: abortController.signal,
-  };
+  });
 
   abortControllers.set(entrypoint, abortController);
 
   cache.add('entrypoints', name, entrypoint);
+
+  next({
+    type: 'explodeReexports',
+    entrypoint: action.entrypoint,
+    stack: action.stack,
+  });
 
   next({
     type: 'transform',
