@@ -1,42 +1,13 @@
 import type { Debugger } from '@linaria/logger';
 
-export interface IBaseEntrypoint {
-  abortSignal?: AbortSignal;
-  onAbort(fn: () => void): () => void;
-}
+export abstract class PriorityQueue<TNode> {
+  protected data: Array<TNode> = [];
 
-export type EventsHandlers<TEvents extends Record<string, unknown[]>> = {
-  [K in keyof TEvents]?: Array<(...args: TEvents[K]) => void>;
-};
-
-export interface IBaseNode<
-  TEntrypoint extends IBaseEntrypoint,
-  TEvents extends Record<string, unknown[]> = Record<never, unknown[]>,
-  TCallbacks extends EventsHandlers<TEvents> = EventsHandlers<TEvents>
-> {
-  callbacks?: TCallbacks;
-  entrypoint: TEntrypoint;
-  refCount?: number;
-  stack: string[];
-  type: string;
-}
-
-export abstract class PriorityQueue<
-  TEntrypoint extends IBaseEntrypoint,
-  TNode extends IBaseNode<TEntrypoint>
-> {
-  private data: Array<TNode> = [];
-
-  private keys: Map<string, number> = new Map();
+  protected keys: Map<string, number> = new Map();
 
   protected constructor(
-    private readonly log: Debugger,
+    protected readonly log: Debugger,
     private readonly keyOf: (node: TNode) => string,
-    private readonly merge: (
-      a: TNode,
-      b: TNode,
-      insert: (node: TNode) => void
-    ) => void,
     private readonly hasLessPriority: (a: TNode, b: TNode) => boolean
   ) {}
 
@@ -44,7 +15,7 @@ export abstract class PriorityQueue<
     return this.data.length;
   }
 
-  private delete(key: string) {
+  protected delete(key: string) {
     const idx = this.keys.get(key);
     if (idx === undefined) return;
 
@@ -150,22 +121,8 @@ export abstract class PriorityQueue<
 
   protected enqueue(newNode: TNode) {
     const key = this.keyOf(newNode);
-    const idx = this.keys.get(key);
-    if (idx !== undefined) {
-      // Merge with existing entry
-      const oldNode = this.data[idx];
-      this.delete(key);
-      this.merge(oldNode, newNode, this.enqueue.bind(this));
-
-      return;
-    }
-
     this.increaseKey(this.size + 1, newNode);
     this.log('Enqueued %s: %o', key, this.data.map(this.keyOf));
-    newNode.entrypoint.onAbort(() => {
-      this.log('Aborting %s', key);
-      this.delete(key);
-    });
   }
 
   public isEmpty() {

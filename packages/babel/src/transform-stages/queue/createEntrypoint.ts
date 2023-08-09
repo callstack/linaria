@@ -1,11 +1,11 @@
 import { readFileSync } from 'fs';
 import { dirname, extname } from 'path';
 
-import type { PluginItem } from '@babel/core';
+import type { PluginItem, TransformOptions } from '@babel/core';
 import type { File } from '@babel/types';
 
 import type { Debugger } from '@linaria/logger';
-import type { Evaluator, EventEmitter, StrictOptions } from '@linaria/utils';
+import type { Evaluator, StrictOptions } from '@linaria/utils';
 import {
   buildOptions,
   getFileIdx,
@@ -13,189 +13,319 @@ import {
   loadBabelOptions,
 } from '@linaria/utils';
 
-import type { Core } from '../../babel';
-import type { TransformCacheCollection } from '../../cache';
-import type { Options } from '../../types';
 import { getMatchedRule, parseFile } from '../helpers/parseFile';
 
-import { rootLog } from './rootLog';
-import type { IEntrypoint } from './types';
+import type {
+  IEntrypoint,
+  Services,
+  IBaseEntrypoint,
+  IEntrypointCode,
+} from './types';
 
 const EMPTY_FILE = '=== empty file ===';
 
-const getLogIdx = (filename: string) =>
-  getFileIdx(filename).toString().padStart(5, '0');
+const getIdx = (fn: string) => getFileIdx(fn).toString().padStart(5, '0');
 
-const onAbortHandlers = new WeakMap<AbortSignal, (() => void)[]>();
-const knownSignals = new WeakSet<AbortSignal>();
+const includes = (a: string[], b: string[]) => {
+  if (a.includes('*')) return true;
+  if (a.length !== b.length) return false;
+  return a.every((item, index) => item === b[index]);
+};
 
-export function addOnAbort(
-  entrypoint: Omit<IEntrypoint, 'onAbort'> & {
-    onAbort?: IEntrypoint['onAbort'];
+const isParent = (
+  parent: IEntrypoint | { log: Debugger }
+): parent is IEntrypoint => 'name' in parent;
+
+export function getStack(entrypoint: IBaseEntrypoint) {
+  const stack = [entrypoint.name];
+
+  let { parent } = entrypoint;
+  while (parent) {
+    stack.push(parent.name);
+    parent = parent.parent;
   }
-): IEntrypoint {
-  const { abortSignal } = entrypoint;
 
-  const onAbort = (fn: () => void) => {
-    if (!abortSignal) {
-      return () => {};
-    }
+  return stack;
+}
 
-    let handlers = onAbortHandlers.get(abortSignal);
+const isModuleResolver = (plugin: PluginItem) =>
+  getPluginKey(plugin) === 'module-resolver';
 
-    if (!handlers) {
-      handlers = [];
-      onAbortHandlers.set(abortSignal, handlers);
-    }
+function buildConfigs(
+  services: Services,
+  name: string,
+  pluginOptions: StrictOptions,
+  babelOptions: TransformOptions | undefined
+): {
+  evalConfig: TransformOptions;
+  parseConfig: TransformOptions;
+} {
+  const { babel, options } = services;
 
-    handlers.push(fn);
-
-    return () => {
-      const idx = handlers!.indexOf(fn);
-      if (idx !== -1) {
-        handlers!.splice(idx, 1);
-      }
-    };
+  const commonOptions = {
+    ast: true,
+    filename: name,
+    inputSourceMap: options.inputSourceMap,
+    root: options.root,
+    sourceFileName: name,
+    sourceMaps: true,
   };
 
-  // AbortSignal has a limit of listeners, so we need to reuse the same one
-  if (abortSignal && !knownSignals.has(abortSignal)) {
-    abortSignal.addEventListener('abort', () => {
-      const handlers = onAbortHandlers.get(abortSignal);
-      if (handlers) {
-        handlers.forEach((fn) => fn());
-      }
-    });
+  const rawConfig = buildOptions(
+    pluginOptions?.babelOptions,
+    babelOptions,
+    commonOptions
+  );
 
-    knownSignals.add(abortSignal);
+  const parseConfig = loadBabelOptions(babel, name, {
+    babelrc: true,
+    ...rawConfig,
+  });
+
+  const parseHasModuleResolver = parseConfig.plugins?.some(isModuleResolver);
+  const rawHasModuleResolver = rawConfig.plugins?.some(isModuleResolver);
+
+  if (parseHasModuleResolver && !rawHasModuleResolver) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[linaria] ${name} has a module-resolver plugin in its babelrc, but it is not present` +
+        `in the babelOptions for the linaria plugin. This works for now but will be an error in the future.` +
+        `Please add the module-resolver plugin to the babelOptions for the linaria plugin.`
+    );
+
+    rawConfig.plugins = [
+      ...(parseConfig.plugins?.filter((plugin) => isModuleResolver(plugin)) ??
+        []),
+      ...(rawConfig.plugins ?? []),
+    ];
   }
 
+  const evalConfig = loadBabelOptions(babel, name, {
+    babelrc: false,
+    ...rawConfig,
+  });
+
   return {
-    ...entrypoint,
-    onAbort,
+    evalConfig,
+    parseConfig,
   };
 }
 
-export function createEntrypoint(
-  babel: Core,
-  parentLog: Debugger,
-  cache: TransformCacheCollection,
+function loadAndParse(
+  services: Services,
+  name: string,
+  loadedCode: string | undefined,
+  log: Debugger,
+  pluginOptions: StrictOptions
+) {
+  const { babel, cache, eventEmitter } = services;
+
+  const extension = extname(name);
+
+  if (!pluginOptions.extensions.includes(extension)) {
+    log(
+      '[createEntrypoint] %s is ignored. If you want it to be processed, you should add \'%s\' to the "extensions" option.',
+      name,
+      extension
+    );
+
+    return 'ignored';
+  }
+
+  const code = loadedCode ?? readFileSync(name, 'utf-8');
+
+  const { action, babelOptions } = getMatchedRule(
+    pluginOptions.rules,
+    name,
+    code
+  );
+
+  if (action === 'ignore') {
+    log('[createEntrypoint] %s is ignored by rule', name);
+    cache.add('ignored', name, true);
+    return 'ignored';
+  }
+
+  const evaluator: Evaluator =
+    typeof action === 'function'
+      ? action
+      : require(require.resolve(action, {
+          paths: [dirname(name)],
+        })).default;
+
+  const { evalConfig, parseConfig } = buildConfigs(
+    services,
+    name,
+    pluginOptions,
+    babelOptions
+  );
+
+  const ast: File = eventEmitter.pair(
+    { method: 'parseFile' },
+    () =>
+      cache.get('originalAST', name) ??
+      parseFile(babel, name, code, parseConfig)
+  );
+
+  return {
+    ast,
+    code,
+    evaluator,
+    evalConfig,
+  };
+}
+
+const supersedeHandlers = new WeakMap<
+  IBaseEntrypoint,
+  Array<(newEntrypoint: IEntrypoint<unknown>) => void>
+>();
+
+export function onSupersede<T extends IBaseEntrypoint>(
+  entrypoint: T,
+  callback: (newEntrypoint: T) => void
+) {
+  if (!supersedeHandlers.has(entrypoint)) {
+    supersedeHandlers.set(entrypoint, []);
+  }
+
+  const handlers = supersedeHandlers.get(entrypoint)!;
+  handlers.push(callback as (newEntrypoint: IBaseEntrypoint) => void);
+  supersedeHandlers.set(entrypoint, handlers);
+
+  return () => {
+    const index = handlers.indexOf(
+      callback as (newEntrypoint: IBaseEntrypoint) => void
+    );
+    if (index >= 0) {
+      handlers.splice(index, 1);
+    }
+  };
+}
+
+export function supersedeEntrypoint<TPluginOptions>(
+  services: Pick<Services, 'cache'>,
+  oldEntrypoint: IEntrypoint<TPluginOptions>,
+  newEntrypoint: IEntrypoint<TPluginOptions>
+) {
+  // If we already have a result for this file, we should invalidate it
+  services.cache.invalidate('eval', oldEntrypoint.name);
+
+  supersedeHandlers
+    .get(oldEntrypoint)
+    ?.forEach((handler) => handler(newEntrypoint));
+}
+
+export type LoadAndParseFn<TServices, TPluginOptions> = (
+  services: TServices,
+  name: string,
+  loadedCode: string | undefined,
+  log: Debugger,
+  pluginOptions: TPluginOptions
+) => IEntrypointCode | 'ignored';
+
+export function genericCreateEntrypoint<
+  TServices extends Pick<Services, 'cache' | 'eventEmitter'>,
+  TPluginOptions
+>(
+  loadAndParseFn: LoadAndParseFn<TServices, TPluginOptions>,
+  services: TServices,
+  parent: IEntrypoint | { log: Debugger },
   name: string,
   only: string[],
-  maybeCode: string | undefined,
-  pluginOptions: StrictOptions,
-  options: Pick<Options, 'root' | 'inputSourceMap'>,
-  eventEmitter: EventEmitter,
-  abortSignal?: AbortSignal
-): IEntrypoint | 'ignored' {
+  loadedCode: string | undefined,
+  pluginOptions: TPluginOptions
+): IEntrypoint<TPluginOptions> | 'ignored' {
+  const { cache, eventEmitter } = services;
+
   return eventEmitter.pair({ method: 'createEntrypoint' }, () => {
-    const log = parentLog.extend(
-      getLogIdx(name),
-      parentLog === rootLog ? ':' : '->'
-    );
-    const extension = extname(name);
+    const idx = getIdx(name);
+    const log = parent.log.extend(idx, isParent(parent) ? '->' : ':');
 
-    if (!pluginOptions.extensions.includes(extension)) {
+    let onCreate: (
+      newEntrypoint: IEntrypoint<TPluginOptions>
+    ) => void = () => {};
+
+    const cached = cache.get('entrypoints', name) as
+      | IEntrypoint<TPluginOptions>
+      | undefined;
+    const mergedOnly = cached?.only
+      ? Array.from(new Set([...cached.only, ...only]))
+          .filter((i) => i)
+          .sort()
+      : only;
+
+    if (cached) {
+      if (includes(cached.only, mergedOnly)) {
+        log('%s is cached', name);
+        return cached;
+      }
+
       log(
-        '[createEntrypoint] %s is ignored. If you want it to be processed, you should add \'%s\' to the "extensions" option.',
+        '%s is cached, but with different `only` %o (the cached one %o)',
         name,
-        extension
+        only,
+        cached?.only
       );
 
-      return 'ignored';
+      onCreate = (newEntrypoint) => {
+        supersedeEntrypoint(services, cached, newEntrypoint);
+      };
     }
 
-    const code = maybeCode ?? readFileSync(name, 'utf-8');
-
-    const { action, babelOptions } = getMatchedRule(
-      pluginOptions.rules,
+    const loadedAndParsed = loadAndParseFn(
+      services,
       name,
-      code
+      loadedCode,
+      log,
+      pluginOptions
     );
 
-    if (action === 'ignore') {
-      log('[createEntrypoint] %s is ignored by rule', name);
-      cache.add('ignored', name, true);
+    if (loadedAndParsed === 'ignored') {
       return 'ignored';
     }
 
-    const evaluator: Evaluator =
-      typeof action === 'function'
-        ? action
-        : require(require.resolve(action, {
-            paths: [dirname(name)],
-          })).default;
+    cache.invalidateIfChanged(name, loadedAndParsed.code);
+    cache.add('originalAST', name, loadedAndParsed.ast);
 
-    // FIXME: All those configs should be memoized
-
-    const commonOptions = {
-      ast: true,
-      filename: name,
-      inputSourceMap: options.inputSourceMap,
-      root: options.root,
-      sourceFileName: name,
-      sourceMaps: true,
-    };
-
-    const rawConfig = buildOptions(
-      pluginOptions?.babelOptions,
-      babelOptions,
-      commonOptions
+    log(
+      '[createEntrypoint] %s (%o)\n%s',
+      name,
+      mergedOnly,
+      loadedAndParsed.code || EMPTY_FILE
     );
 
-    const parseConfig = loadBabelOptions(babel, name, {
-      babelrc: true,
-      ...rawConfig,
-    });
-
-    const isModuleResolver = (plugin: PluginItem) =>
-      getPluginKey(plugin) === 'module-resolver';
-    const parseHasModuleResolver = parseConfig.plugins?.some(isModuleResolver);
-    const rawHasModuleResolver = rawConfig.plugins?.some(isModuleResolver);
-
-    if (parseHasModuleResolver && !rawHasModuleResolver) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `[linaria] ${name} has a module-resolver plugin in its babelrc, but it is not present` +
-          `in the babelOptions for the linaria plugin. This works for now but will be an error in the future.` +
-          `Please add the module-resolver plugin to the babelOptions for the linaria plugin.`
-      );
-
-      rawConfig.plugins = [
-        ...(parseConfig.plugins?.filter((plugin) => isModuleResolver(plugin)) ??
-          []),
-        ...(rawConfig.plugins ?? []),
-      ];
-    }
-
-    cache.invalidateIfChanged(name, code);
-
-    const evalConfig = loadBabelOptions(babel, name, {
-      babelrc: false,
-      ...rawConfig,
-    });
-
-    const ast: File = eventEmitter.pair(
-      { method: 'parseFile' },
-      () =>
-        cache.get('originalAST', name) ??
-        parseFile(babel, name, code, parseConfig)
-    );
-
-    cache.add('originalAST', name, ast);
-
-    log('[createEntrypoint] %s (%o)\n%s', name, only, code || EMPTY_FILE);
-
-    return addOnAbort({
-      abortSignal,
-      ast,
-      code,
-      evalConfig,
-      evaluator,
+    const newEntrypoint: IEntrypoint<TPluginOptions> = {
+      ...loadedAndParsed,
+      idx,
       log,
       name,
-      only: [...only].filter((i) => i).sort(),
+      only: mergedOnly,
+      parent: isParent(parent) ? parent : null,
       pluginOptions,
-    });
+    };
+
+    cache.add('entrypoints', name, newEntrypoint);
+    onCreate(newEntrypoint);
+
+    return newEntrypoint;
   });
+}
+
+export function createEntrypoint(
+  services: Services,
+  parent: IEntrypoint | { log: Debugger },
+  name: string,
+  only: string[],
+  loadedCode: string | undefined,
+  pluginOptions: StrictOptions
+): IEntrypoint | 'ignored' {
+  return genericCreateEntrypoint(
+    loadAndParse,
+    services,
+    parent,
+    name,
+    only,
+    loadedCode,
+    pluginOptions
+  );
 }

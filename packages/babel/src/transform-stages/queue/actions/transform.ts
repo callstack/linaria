@@ -11,13 +11,7 @@ import { buildOptions, getPluginKey } from '@linaria/utils';
 import type { Core } from '../../../babel';
 import type Module from '../../../module';
 import withLinariaMetadata from '../../../utils/withLinariaMetadata';
-import type { Next } from '../ActionQueue';
-import type {
-  IEntrypoint,
-  ITransformAction,
-  Services,
-  ActionQueueItem,
-} from '../types';
+import type { IEntrypoint, ITransformAction, Services } from '../types';
 
 const EMPTY_FILE = '=== empty file ===';
 
@@ -124,13 +118,12 @@ export function prepareCode(
 
 /**
  * Prepares the code for evaluation. This includes removing dead and potentially unsafe code.
- * If prepared code has imports, they will be resolved in the next step.
- * In the end, the prepared code is added to the cache.
+ * Emits resolveImports, processImports and addToCodeCache events.
  */
 export function transform(
   services: Services,
   action: ITransformAction,
-  next: Next<IEntrypoint, ActionQueueItem>
+  callbacks: { done: () => void }
 ): void {
   if (!action) {
     return;
@@ -155,34 +148,30 @@ export function transform(
 
   if (preparedCode === '') {
     log('%s is skipped', name);
+    callbacks.done();
     return;
   }
 
-  next({
-    type: 'resolveImports',
-    entrypoint: action.entrypoint,
-    imports,
-    stack: action.stack,
-  }).on('resolve', (resolvedImports) => {
-    next({
-      type: 'processImports',
-      entrypoint: action.entrypoint,
-      resolved: resolvedImports,
-      stack: action.stack,
-    });
-  });
-
-  next({
-    type: 'addToCodeCache',
-    entrypoint: action.entrypoint,
-    data: {
+  action
+    .next('resolveImports', action.entrypoint, {
       imports,
-      result: {
-        code: preparedCode,
-        metadata,
+    })
+    .on('resolve', (resolvedImports) => {
+      action.next('processImports', action.entrypoint, {
+        resolved: resolvedImports,
+      });
+    });
+
+  action
+    .next('addToCodeCache', action.entrypoint, {
+      data: {
+        imports,
+        result: {
+          code: preparedCode,
+          metadata,
+        },
+        only,
       },
-      only,
-    },
-    stack: action.stack,
-  });
+    })
+    .on('done', callbacks.done);
 }

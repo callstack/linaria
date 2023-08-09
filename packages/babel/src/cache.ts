@@ -13,7 +13,7 @@ function hashContent(content: string) {
 }
 
 interface ICaches {
-  entrypoints: Map<string, IEntrypoint>;
+  entrypoints: Map<string, IEntrypoint<unknown>>;
   ignored: Map<string, true>;
   resolve: Map<string, string>;
   resolveTask: Map<
@@ -146,8 +146,12 @@ export class TransformCacheCollection {
   }
 
   public invalidate(cacheName: CacheNames, key: string): void {
-    loggers[cacheName]('invalidate', key);
     const cache = this[cacheName] as Map<string, unknown>;
+    if (!cache.has(key)) {
+      return;
+    }
+
+    loggers[cacheName]('invalidate', key);
 
     cache.delete(key);
   }

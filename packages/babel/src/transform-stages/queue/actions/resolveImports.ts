@@ -1,8 +1,12 @@
 /* eslint-disable no-restricted-syntax,no-continue,no-await-in-loop */
+import { getFileIdx } from '@linaria/utils';
+
+import { getStack } from '../createEntrypoint';
 import type {
   IResolveImportsAction,
   Services,
   IResolvedImport,
+  IBaseEntrypoint,
 } from '../types';
 
 const includes = (a: string[], b: string[]) => {
@@ -17,11 +21,79 @@ const mergeImports = (a: string[], b: string[]) => {
   return [...result].filter((i) => i).sort();
 };
 
+function emitDependency(
+  emitter: Services['eventEmitter'],
+  entrypoint: IResolveImportsAction['entrypoint'],
+  imports: IResolvedImport[]
+) {
+  emitter.single({
+    type: 'dependency',
+    file: entrypoint.name,
+    only: entrypoint.only,
+    imports: imports.map(({ resolved, importsOnly }) => ({
+      from: resolved,
+      what: importsOnly,
+    })),
+    fileIdx: getFileIdx(entrypoint.name).toString().padStart(5, '0'),
+  });
+}
+
+function addToCache(
+  cache: Services['cache'],
+  entrypoint: IBaseEntrypoint,
+  resolvedImports: {
+    importedFile: string;
+    importsOnly: string[];
+    resolved: string | null;
+  }[]
+) {
+  const filteredImports = resolvedImports.filter((i): i is IResolvedImport => {
+    if (i.resolved === null) {
+      entrypoint.log(
+        `[resolve] ✅ %s in %s is ignored`,
+        i.importedFile,
+        entrypoint.name
+      );
+      return false;
+    }
+
+    return true;
+  });
+
+  return filteredImports.map(({ importedFile, importsOnly, resolved }) => {
+    const resolveCacheKey = `${entrypoint.name} -> ${importedFile}`;
+    const resolveCached = cache.get('resolve', resolveCacheKey);
+    const importsOnlySet = new Set(importsOnly);
+    if (resolveCached) {
+      const [, cachedOnly] = resolveCached.split('\0');
+      cachedOnly?.split(',').forEach((token) => {
+        if (token) {
+          importsOnlySet.add(token);
+        }
+      });
+    }
+
+    cache.add(
+      'resolve',
+      resolveCacheKey,
+      `${resolved}\0${[...importsOnlySet].join(',')}`
+    );
+
+    return {
+      importedFile,
+      importsOnly: [...importsOnlySet],
+      resolved,
+    };
+  });
+}
+
+/**
+ * Synchronously resolves specified imports with a provided resolver.
+ */
 export function syncResolveImports(
   resolve: (what: string, importer: string, stack: string[]) => string,
-  { eventEmitter }: Services,
+  { cache, eventEmitter }: Services,
   action: IResolveImportsAction,
-  next: unknown,
   callbacks: { resolve: (result: IResolvedImport[]) => void }
 ) {
   const { imports, entrypoint } = action;
@@ -29,12 +101,7 @@ export function syncResolveImports(
   const { log } = entrypoint;
 
   if (listOfImports.length === 0) {
-    eventEmitter.single({
-      type: 'dependency',
-      file: entrypoint.name,
-      only: entrypoint.only,
-      imports: [],
-    });
+    emitDependency(eventEmitter, entrypoint, []);
 
     log('%s has no imports', entrypoint.name);
     callbacks.resolve([]);
@@ -44,7 +111,11 @@ export function syncResolveImports(
   const resolvedImports = listOfImports.map(([importedFile, importsOnly]) => {
     let resolved: string | null = null;
     try {
-      resolved = resolve(importedFile, entrypoint.name, action.stack);
+      resolved = resolve(
+        importedFile,
+        entrypoint.name,
+        getStack(action.entrypoint)
+      );
       log(
         '[sync-resolve] ✅ %s -> %s (only: %o)',
         importedFile,
@@ -62,19 +133,14 @@ export function syncResolveImports(
     };
   });
 
-  eventEmitter.single({
-    type: 'dependency',
-    file: entrypoint.name,
-    only: entrypoint.only,
-    imports: resolvedImports.map(({ resolved, importsOnly }) => ({
-      from: resolved,
-      what: importsOnly,
-    })),
-  });
-
-  callbacks.resolve(resolvedImports);
+  const filteredImports = addToCache(cache, entrypoint, resolvedImports);
+  emitDependency(eventEmitter, entrypoint, filteredImports);
+  callbacks.resolve(filteredImports);
 }
 
+/**
+ * Asynchronously resolves specified imports with a provided resolver.
+ */
 export async function asyncResolveImports(
   resolve: (
     what: string,
@@ -83,7 +149,6 @@ export async function asyncResolveImports(
   ) => Promise<string | null>,
   { cache, eventEmitter }: Services,
   action: IResolveImportsAction,
-  next: unknown,
   callbacks: { resolve: (result: IResolvedImport[]) => void }
 ) {
   const { imports, entrypoint } = action;
@@ -91,12 +156,7 @@ export async function asyncResolveImports(
   const { log } = entrypoint;
 
   if (listOfImports.length === 0) {
-    eventEmitter.single({
-      type: 'dependency',
-      file: entrypoint.name,
-      only: entrypoint.only,
-      imports: [],
-    });
+    emitDependency(eventEmitter, entrypoint, []);
 
     log('%s has no imports', entrypoint.name);
     callbacks.resolve([]);
@@ -111,7 +171,11 @@ export async function asyncResolveImports(
   ) => {
     let resolved: string | null = null;
     try {
-      resolved = await resolve(importedFile, entrypoint.name, action.stack);
+      resolved = await resolve(
+        importedFile,
+        entrypoint.name,
+        getStack(action.entrypoint)
+      );
     } catch (err) {
       log(
         '[async-resolve] ❌ cannot resolve %s in %s: %O',
@@ -138,7 +202,7 @@ export async function asyncResolveImports(
     };
   };
 
-  const resolvedImports: IResolvedImport[] = await Promise.all(
+  const resolvedImports = await Promise.all(
     listOfImports.map(([importedFile, importsOnly]) => {
       const resolveCacheKey = `${entrypoint.name} -> ${importedFile}`;
 
@@ -203,15 +267,7 @@ export async function asyncResolveImports(
 
   log('resolved %d imports', resolvedImports.length);
 
-  eventEmitter.single({
-    type: 'dependency',
-    file: entrypoint.name,
-    only: entrypoint.only,
-    imports: resolvedImports.map(({ resolved, importsOnly }) => ({
-      from: resolved,
-      what: importsOnly,
-    })),
-  });
-
-  callbacks.resolve(resolvedImports);
+  const filteredImports = addToCache(cache, entrypoint, resolvedImports);
+  emitDependency(eventEmitter, entrypoint, filteredImports);
+  callbacks.resolve(filteredImports);
 }

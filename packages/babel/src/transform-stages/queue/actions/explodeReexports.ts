@@ -1,13 +1,7 @@
 import type { ExportAllDeclaration, Node, File } from '@babel/types';
 
 import type { Core } from '../../../babel';
-import type { Next } from '../ActionQueue';
-import type {
-  ActionQueueItem,
-  IEntrypoint,
-  IExplodeReexportsAction,
-  Services,
-} from '../types';
+import type { IExplodeReexportsAction, Services } from '../types';
 
 import { findExportsInImports } from './getExports';
 
@@ -29,10 +23,14 @@ const getWildcardReexport = (babel: Core, ast: File) => {
   return reexportsFrom;
 };
 
+/**
+ * Replaces wildcard reexports with named reexports.
+ * Recursively emits getExports for each reexported module,
+ * and replaces wildcard with resolved named.
+ */
 export function explodeReexports(
   services: Services,
-  action: IExplodeReexportsAction,
-  next: Next<IEntrypoint, ActionQueueItem>
+  action: IExplodeReexportsAction
 ) {
   const { log, ast } = action.entrypoint;
 
@@ -77,19 +75,16 @@ export function explodeReexports(
         }
       },
     });
-
-    next(action);
   };
 
   // Resolve modules
-  next({
-    type: 'resolveImports',
-    entrypoint: action.entrypoint,
-    imports: new Map(reexportsFrom.map((i) => [i.source, []])),
-    stack: action.stack,
-  }).on('resolve', (resolvedImports) => {
-    findExportsInImports(services, action, next, resolvedImports, {
-      resolve: onResolved,
+  action
+    .next('resolveImports', action.entrypoint, {
+      imports: new Map(reexportsFrom.map((i) => [i.source, []])),
+    })
+    .on('resolve', (resolvedImports) => {
+      findExportsInImports(services, action, resolvedImports, {
+        resolve: onResolved,
+      });
     });
-  });
 }

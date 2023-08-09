@@ -1,8 +1,10 @@
+/* eslint-disable no-restricted-syntax */
 import { readFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
 
 import * as babel from '@babel/core';
 import type { PluginItem } from '@babel/core';
+import debug from 'debug';
 import dedent from 'dedent';
 import stripAnsi from 'strip-ansi';
 
@@ -84,7 +86,8 @@ async function transform(
   originalCode: string,
   opts: Options,
   cache?: TransformCacheCollection,
-  eventEmitter?: EventEmitter
+  eventEmitter?: EventEmitter,
+  filename = 'source'
 ) {
   const [
     evaluator,
@@ -93,7 +96,7 @@ async function transform(
     babelPartialConfig = {},
   ] = opts;
 
-  const filename = join(dirName, `source.${extension}`);
+  const fullFilename = join(dirName, `${filename}.${extension}`);
 
   const presets = getPresets(extension);
   const linariaConfig = getLinariaConfig(
@@ -106,7 +109,7 @@ async function transform(
   const result = await linariaTransform(
     originalCode,
     {
-      filename: babelPartialConfig.filename ?? filename,
+      filename: babelPartialConfig.filename ?? fullFilename,
       pluginOptions: linariaConfig,
     },
     asyncResolve,
@@ -3085,6 +3088,57 @@ describe('strategy shaker', () => {
 
       expect(code).toMatchSnapshot();
       expect(metadata).toMatchSnapshot();
+    });
+  });
+
+  describe('concurrent', () => {
+    debug.enable('linaria:*');
+
+    it('two parallel chains of reexports', async () => {
+      const cache = new TransformCacheCollection();
+
+      const onEvent = jest.fn<void, Parameters<OnEvent>>();
+      const emitter = new EventEmitter(onEvent);
+
+      const files = {
+        'source-1': dedent`
+          import { styled } from '@linaria/react';
+          import { fooStyles } from "./__fixtures__/re-exports";
+
+          const value = fooStyles.foo;
+
+          export const H1 = styled.h1\`
+            color: ${'${value}'};
+          \`
+        `,
+        'source-2': dedent`
+          import { styled } from '@linaria/react';
+          import { bar2 } from "./__fixtures__/re-exports";
+
+          export const H1 = styled.h1\`
+            color: ${'${bar2}'};
+          \`
+        `,
+      };
+
+      const results = await Promise.all(
+        Object.entries(files).map(([filename, content]) =>
+          transform(content, [evaluator], cache, emitter, filename)
+        )
+      );
+
+      for (const { code, metadata } of results) {
+        expect(code).toMatchSnapshot();
+        expect(metadata).toMatchSnapshot();
+      }
+
+      expect(onEvent).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          file: resolve(__dirname, './__fixtures__/re-exports/empty.js'),
+          action: 'processImports',
+        }),
+        'single'
+      );
     });
   });
 });

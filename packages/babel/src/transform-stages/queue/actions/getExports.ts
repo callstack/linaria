@@ -1,21 +1,17 @@
 import type { IReexport } from '@linaria/utils';
 import { collectExportsAndImports } from '@linaria/utils';
 
-import type { Next } from '../ActionQueue';
 import { createEntrypoint } from '../createEntrypoint';
 import type {
+  IExplodeReexportsAction,
   IGetExportsAction,
   IResolvedImport,
   Services,
-  BaseAction,
-  ActionQueueItem,
-  IEntrypoint,
 } from '../types';
 
 export function findExportsInImports(
-  { babel, cache, eventEmitter, options }: Services,
-  action: BaseAction,
-  next: Next<IEntrypoint, ActionQueueItem>,
+  services: Services,
+  action: IGetExportsAction | IExplodeReexportsAction,
   imports: IResolvedImport[],
   callbacks: {
     resolve: (replacements: Record<string, string[]>) => void;
@@ -49,16 +45,12 @@ export function findExportsInImports(
     }
 
     const newEntrypoint = createEntrypoint(
-      babel,
-      action.entrypoint.log,
-      cache,
+      services,
+      action.entrypoint,
       resolved,
       [],
       undefined,
-      action.entrypoint.pluginOptions,
-      options,
-      eventEmitter,
-      action.entrypoint.abortSignal
+      action.entrypoint.pluginOptions
     );
 
     if (newEntrypoint === 'ignored') {
@@ -66,11 +58,7 @@ export function findExportsInImports(
       return;
     }
 
-    next({
-      type: 'getExports',
-      entrypoint: newEntrypoint,
-      stack: [newEntrypoint.name, ...action.stack],
-    }).on('resolve', (exports) => {
+    action.next('getExports', newEntrypoint, {}).on('resolve', (exports) => {
       onResolve({
         [imp.importedFile]: exports,
       });
@@ -81,7 +69,6 @@ export function findExportsInImports(
 export function getExports(
   services: Services,
   action: IGetExportsAction,
-  next: Next<IEntrypoint, ActionQueueItem>,
   callbacks: { resolve: (result: string[]) => void }
 ) {
   const { entrypoint } = action;
@@ -117,16 +104,15 @@ export function getExports(
       callbacks.resolve(result);
     };
 
-    next({
-      type: 'resolveImports',
-      entrypoint: action.entrypoint,
-      imports: new Map(withWildcardReexport.map((i) => [i.source, []])),
-      stack: action.stack,
-    }).on('resolve', (resolvedImports) => {
-      findExportsInImports(services, action, next, resolvedImports, {
-        resolve: onResolved,
+    action
+      .next('resolveImports', action.entrypoint, {
+        imports: new Map(withWildcardReexport.map((i) => [i.source, []])),
+      })
+      .on('resolve', (resolvedImports) => {
+        findExportsInImports(services, action, resolvedImports, {
+          resolve: onResolved,
+        });
       });
-    });
   } else {
     callbacks.resolve(result);
   }

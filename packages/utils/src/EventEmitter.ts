@@ -34,6 +34,12 @@ export class EventEmitter {
   }
 
   public single(labels: Record<string, unknown>) {
-    this.onEvent(labels, 'single');
+    this.onEvent(
+      {
+        ...labels,
+        datetime: new Date(),
+      },
+      'single'
+    );
   }
 }
