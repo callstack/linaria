@@ -2,10 +2,11 @@ import { relative, sep } from 'path';
 
 import type { EventEmitter } from '@linaria/utils';
 
+import type { IBaseEntrypoint } from '../../types';
+
 import { PriorityQueue } from './PriorityQueue';
 import { createAction, getRefsCount, keyOf } from './actions/action';
 import type {
-  IBaseEntrypoint,
   DataOf,
   ActionByType,
   IBaseAction,

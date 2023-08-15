@@ -4,16 +4,14 @@ import type { File } from '@babel/types';
 
 import { linariaLogger } from '@linaria/logger';
 
-import type { IModule } from './module';
-import type { IEntrypoint } from './transform-stages/queue/types';
-import type { ITransformFileResult } from './types';
+import type { IBaseEntrypoint, IModule, ITransformFileResult } from './types';
 
 function hashContent(content: string) {
   return createHash('sha256').update(content).digest('hex');
 }
 
 interface ICaches {
-  entrypoints: Map<string, IEntrypoint<unknown>>;
+  entrypoints: Map<string, IBaseEntrypoint>;
   ignored: Map<string, true>;
   resolve: Map<string, string>;
   resolveTask: Map<
@@ -62,7 +60,7 @@ const loggers = cacheNames.reduce(
 export class TransformCacheCollection {
   private contentHashes = new Map<string, string>();
 
-  protected readonly entrypoints: Map<string, IEntrypoint>;
+  protected readonly entrypoints: Map<string, IBaseEntrypoint>;
 
   protected readonly ignored: Map<string, true>;
 

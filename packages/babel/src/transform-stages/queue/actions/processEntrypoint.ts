@@ -1,5 +1,6 @@
+import type { IBaseEntrypoint } from '../../../types';
 import { onSupersede } from '../createEntrypoint';
-import type { IProcessEntrypointAction, IBaseEntrypoint } from '../types';
+import type { IProcessEntrypointAction } from '../types';
 
 import { getRefsCount } from './action';
 

@@ -49,7 +49,7 @@ describe('processEntrypoint', () => {
     expect(next).toHaveBeenNthCalledWith(2, 'transform', fooBarDefault, {});
   });
 
-  it('should emit processEntrypoint if entrypoint was superseded', async () => {
+  it('should re-emit processEntrypoint if entrypoint was superseded', async () => {
     const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
       'default',
     ]);

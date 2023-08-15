@@ -9,9 +9,8 @@ import type { Core } from '../babel';
 import { TransformCacheCollection } from '../cache';
 import { prepareForEvalSync } from '../transform-stages/1-prepare-for-eval';
 import evalStage from '../transform-stages/2-eval';
-import type { PluginOptions } from '../transform-stages/helpers/loadLinariaOptions';
 import loadLinariaOptions from '../transform-stages/helpers/loadLinariaOptions';
-import type { IPluginState } from '../types';
+import type { IPluginState, PluginOptions } from '../types';
 import { processTemplateExpression } from '../utils/processTemplateExpression';
 import withLinariaMetadata from '../utils/withLinariaMetadata';
 

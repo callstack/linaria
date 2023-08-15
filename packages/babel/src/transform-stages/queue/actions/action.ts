@@ -1,3 +1,4 @@
+import type { IBaseEntrypoint } from '../../../types';
 import type {
   ActionQueueItem,
   IActionControls,
@@ -8,7 +9,6 @@ import type {
   IResolvedImport,
   EventsHandlers,
   ActionByType,
-  IBaseEntrypoint,
 } from '../types';
 
 type MergeAction = 'reprocess' | 'keep existing' | 'replace existing';

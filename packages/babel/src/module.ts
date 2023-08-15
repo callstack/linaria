@@ -25,6 +25,7 @@ import type { StrictOptions } from '@linaria/utils';
 import { getFileIdx } from '@linaria/utils';
 
 import { TransformCacheCollection } from './cache';
+import type { IModule } from './types';
 import createVmContext from './vm/createVmContext';
 
 type HiddenModuleMembers = {
@@ -93,14 +94,6 @@ const hasKey = <TKey extends string | symbol>(
   (typeof obj === 'object' || typeof obj === 'function') &&
   obj !== null &&
   key in obj;
-
-export interface IModule {
-  debug: CustomDebug;
-  readonly exports: unknown;
-  readonly idx: number;
-  readonly isEvaluated: boolean;
-  readonly only: string;
-}
 
 function getUncached(cached: string | string[], test: string): string[] {
   if (cached === test) {

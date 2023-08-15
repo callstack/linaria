@@ -1,12 +1,12 @@
 /* eslint-disable no-restricted-syntax,no-continue,no-await-in-loop */
 import { getFileIdx } from '@linaria/utils';
 
+import type { IBaseEntrypoint } from '../../../types';
 import { getStack } from '../createEntrypoint';
 import type {
   IResolveImportsAction,
   Services,
   IResolvedImport,
-  IBaseEntrypoint,
 } from '../types';
 
 const includes = (a: string[], b: string[]) => {

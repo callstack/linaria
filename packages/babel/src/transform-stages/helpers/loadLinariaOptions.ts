@@ -2,12 +2,7 @@ import { cosmiconfigSync } from 'cosmiconfig';
 
 import type { StrictOptions } from '@linaria/utils';
 
-import type { Stage } from '../../types';
-
-export type PluginOptions = StrictOptions & {
-  configFile?: string | false;
-  stage?: Stage;
-};
+import type { PluginOptions } from '../../types';
 
 const searchPlaces = [
   `.linariarc`,

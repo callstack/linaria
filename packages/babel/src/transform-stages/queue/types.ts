@@ -1,12 +1,15 @@
 import type { TransformOptions } from '@babel/core';
 import type { File } from '@babel/types';
 
-import type { Debugger } from '@linaria/logger';
 import type { Evaluator, StrictOptions, EventEmitter } from '@linaria/utils';
 
 import type { Core } from '../../babel';
 import type { TransformCacheCollection } from '../../cache';
-import type { ITransformFileResult, Options } from '../../types';
+import type {
+  IBaseEntrypoint,
+  ITransformFileResult,
+  Options,
+} from '../../types';
 
 export type Services = {
   babel: Core;
@@ -17,14 +20,6 @@ export type Services = {
 
 export interface IBaseNode {
   type: ActionQueueItem['type'];
-}
-
-export interface IBaseEntrypoint {
-  idx: string;
-  log: Debugger;
-  name: string;
-  only: string[];
-  parent: IEntrypoint | null;
 }
 
 export interface IEntrypointCode {

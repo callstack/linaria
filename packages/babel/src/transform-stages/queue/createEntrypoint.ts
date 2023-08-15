@@ -13,14 +13,10 @@ import {
   loadBabelOptions,
 } from '@linaria/utils';
 
+import type { IBaseEntrypoint } from '../../types';
 import { getMatchedRule, parseFile } from '../helpers/parseFile';
 
-import type {
-  IEntrypoint,
-  Services,
-  IBaseEntrypoint,
-  IEntrypointCode,
-} from './types';
+import type { IEntrypoint, Services, IEntrypointCode } from './types';
 
 const EMPTY_FILE = '=== empty file ===';
 
