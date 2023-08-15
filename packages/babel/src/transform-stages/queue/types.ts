@@ -68,6 +68,7 @@ export interface IBaseAction<
   TEvents extends Record<string, unknown[]> = Record<never, unknown[]>
 > extends IBaseNode,
     IActionControls {
+  abortSignal: AbortSignal | null;
   callbacks?: EventsHandlers<TEvents>;
   entrypoint: TEntrypoint;
   on: ActionOn<TEvents>;
@@ -81,7 +82,8 @@ export type DataOf<TNode extends ActionQueueItem> = Omit<
 export type Next = <TType extends ActionQueueItem['type']>(
   type: TType,
   entrypoint: IBaseEntrypoint,
-  data: DataOf<Extract<ActionQueueItem, { type: TType }>>
+  data: DataOf<Extract<ActionQueueItem, { type: TType }>>,
+  abortSignal?: AbortSignal | null
 ) => Extract<ActionQueueItem, { type: TType }>;
 
 export interface IExplodeReexportsAction extends IBaseAction<IEntrypoint> {

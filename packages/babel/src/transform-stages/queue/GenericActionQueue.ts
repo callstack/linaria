@@ -92,6 +92,18 @@ export class GenericActionQueue<
     this.next('processEntrypoint', entrypoint, {});
   }
 
+  protected override dequeue(): ActionQueueItem | undefined {
+    let action: ActionQueueItem | undefined;
+    // eslint-disable-next-line no-cond-assign
+    while ((action = super.dequeue())) {
+      if (!action?.abortSignal?.aborted) {
+        return action;
+      }
+    }
+
+    return undefined;
+  }
+
   protected override enqueue(newAction: ActionQueueItem) {
     const key = keyOf(newAction);
     // const idx = this.keys.get(key);
@@ -106,20 +118,21 @@ export class GenericActionQueue<
     // }
     //
     super.enqueue(newAction);
-
-    // addQueue(newAction.entrypoint, this);
-    // newAction.onAbort((reason) => {
-    //   this.log('Aborting %s, reason: %s', key, reason ?? 'unknown');
-    //   this.delete(key);
-    // });
   }
 
-  protected next = <TType extends ActionQueueItem['type']>(
+  public next = <TType extends ActionQueueItem['type']>(
     actionType: TType,
     entrypoint: IBaseEntrypoint,
-    data: DataOf<ActionByType<TType>>
+    data: DataOf<ActionByType<TType>>,
+    abortSignal: AbortSignal | null = null
   ): ActionByType<TType> => {
-    const action = createAction(actionType, entrypoint, data, this.next);
+    const action = createAction(
+      actionType,
+      entrypoint,
+      data,
+      abortSignal,
+      this.next
+    );
 
     this.enqueue(action);
 

@@ -192,6 +192,7 @@ function innerCreateAction<TType extends ActionQueueItem['type']>(
   actionType: TType,
   entrypoint: IBaseEntrypoint,
   data: DataOf<ActionByType<TType>>,
+  abortSignal: AbortSignal | null,
   next: Next
 ): ActionByType<TType> {
   type Events = (ActionByType<TType> extends IBaseAction<
@@ -282,10 +283,12 @@ function innerCreateAction<TType extends ActionQueueItem['type']>(
 
   const newAction = {
     ...data,
+    abortSignal,
     callbacks,
     type: actionType,
     entrypoint,
-    next,
+    next: (nextType, nextEntrypoint, nextData, nextAbortSignal) =>
+      next(nextType, nextEntrypoint, nextData, nextAbortSignal ?? abortSignal),
     on,
   } as ActionByType<TType>;
 
@@ -298,9 +301,16 @@ export function createAction<TType extends ActionQueueItem['type']>(
   actionType: TType,
   entrypoint: IBaseEntrypoint,
   data: DataOf<ActionByType<TType>>,
+  abortSignal: AbortSignal | null,
   next: Next
 ): ActionByType<TType> {
-  const action = innerCreateAction(actionType, entrypoint, data, next);
+  const action = innerCreateAction(
+    actionType,
+    entrypoint,
+    data,
+    abortSignal,
+    next
+  );
   addRef(entrypoint, action);
   return action;
 }

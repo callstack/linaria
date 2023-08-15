@@ -1,8 +1,8 @@
 import { EventEmitter } from '@linaria/utils';
 
-import { TransformCacheCollection } from '../../src';
-import { onSupersede } from '../../src/transform-stages/queue/createEntrypoint';
-import type { Services } from '../../src/transform-stages/queue/types';
+import { TransformCacheCollection } from '../../../cache';
+import { onSupersede } from '../createEntrypoint';
+import type { Services } from '../types';
 
 import { createEntrypoint, fakeLoadAndParse } from './entrypoint-helpers';
 

@@ -1,12 +1,9 @@
 import type { File } from '@babel/types';
 
-import type { LoadAndParseFn } from '../../src/transform-stages/queue/createEntrypoint';
-import { genericCreateEntrypoint } from '../../src/transform-stages/queue/createEntrypoint';
-import { rootLog } from '../../src/transform-stages/queue/rootLog';
-import type {
-  IEntrypoint,
-  Services,
-} from '../../src/transform-stages/queue/types';
+import type { LoadAndParseFn } from '../createEntrypoint';
+import { genericCreateEntrypoint } from '../createEntrypoint';
+import { rootLog } from '../rootLog';
+import type { IEntrypoint, Services } from '../types';
 
 export const fakeLoadAndParse = jest.fn<
   ReturnType<LoadAndParseFn<unknown, unknown>>,

@@ -1,22 +1,15 @@
 /* eslint-disable no-await-in-loop */
 import { EventEmitter, getFileIdx } from '@linaria/utils';
 
-import {
-  AsyncActionQueue,
-  SyncActionQueue,
-} from '../../src/transform-stages/queue/ActionQueue';
+import type { IBaseEntrypoint } from '../../../types';
+import { AsyncActionQueue, SyncActionQueue } from '../ActionQueue';
+import type { Handler, Handlers, IBaseServices } from '../GenericActionQueue';
+import { rootLog } from '../rootLog';
 import type {
-  IBaseServices,
-  Handlers,
-  Handler,
-} from '../../src/transform-stages/queue/GenericActionQueue';
-import { rootLog } from '../../src/transform-stages/queue/rootLog';
-import type {
-  IBaseEntrypoint,
+  IBaseAction,
   IGetExportsAction,
   IProcessEntrypointAction,
-  IBaseAction,
-} from '../../src/transform-stages/queue/types';
+} from '../types';
 
 const createEntrypoint = (name: string): IBaseEntrypoint => ({
   name,
@@ -176,5 +169,36 @@ describe.each<[string, Queues]>([
     }
 
     expect(onGetExports).toHaveBeenCalledWith(exports);
+  });
+
+  it('should skip aborted actions', async () => {
+    const abortController = new AbortController();
+    const processEntrypoint: GetHandler<IProcessEntrypointAction> = (
+      _services,
+      action
+    ) => {
+      action.next('transform', action.entrypoint, {}, abortController.signal);
+    };
+
+    const queue = createQueueFor('/foo/bar.js', { processEntrypoint });
+    await queue.runNext(); // processEntrypoint
+
+    expect(handlers.transform).not.toHaveBeenCalled();
+
+    abortController.abort();
+
+    // The queue should have a transform action, but it should be aborted
+    expect(queue.isEmpty()).toBe(false);
+
+    // Try to run the transform action
+    await queue.runNext();
+
+    // And now the queue should be empty
+    expect(queue.isEmpty()).toBe(true);
+
+    // And none of the handlers should have been called
+    Object.values(handlers).forEach((handler) => {
+      expect(handler).not.toHaveBeenCalled();
+    });
   });
 });

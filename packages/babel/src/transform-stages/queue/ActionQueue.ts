@@ -1,19 +1,7 @@
-import type { EventEmitter } from '@linaria/utils';
-
-import type { Core } from '../../babel';
-import type { TransformCacheCollection } from '../../cache';
-import type { Options } from '../../types';
-
+// eslint-disable-next-line max-classes-per-file
 import type { IBaseServices } from './GenericActionQueue';
 import { GenericActionQueue } from './GenericActionQueue';
-import type { ActionQueueItem, IEntrypoint } from './types';
-
-type Services = {
-  babel: Core;
-  cache: TransformCacheCollection;
-  options: Pick<Options, 'root' | 'inputSourceMap'>;
-  eventEmitter: EventEmitter;
-};
+import type { ActionQueueItem } from './types';
 
 export class SyncActionQueue<
   TServices extends IBaseServices
@@ -38,22 +26,32 @@ export class AsyncActionQueue<
     Promise<void> | void
   >();
 
-  public async runNext() {
+  public runNext(): Promise<void> {
     const next = this.dequeue();
     if (!next) {
-      return;
+      return Promise.resolve();
     }
 
     next.entrypoint.log('Start %s from %r', next.type, this.logRef);
 
     // Do not run same task twice
     if (!AsyncActionQueue.taskCache.has(next)) {
-      AsyncActionQueue.taskCache.set(next, this.handle(next));
+      AsyncActionQueue.taskCache.set(
+        next,
+        this.handle(next) ?? Promise.resolve()
+      );
     } else {
       next.entrypoint.log('Reuse %s from another queue', next.type);
     }
 
-    await AsyncActionQueue.taskCache.get(next);
-    next.entrypoint.log('Finish %s from %r', next.type, this.logRef);
+    const task = AsyncActionQueue.taskCache.get(next)!;
+    task.then(
+      () => {
+        next.entrypoint.log('Finish %s from %r', next.type, this.logRef);
+      },
+      () => {}
+    );
+
+    return task;
   }
 }

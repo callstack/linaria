@@ -23,10 +23,40 @@ export function processEntrypoint<TEntrypoint extends IBaseEntrypoint>(
     getRefsCount(action.entrypoint)
   );
 
-  const unsubscribed = onSupersede(action.entrypoint, (newEntrypoint) => {
-    action.next('processEntrypoint', newEntrypoint, {});
+  const abortController = new AbortController();
+
+  const onParentAbort = () => {
+    abortController.abort();
+  };
+
+  if (action.abortSignal) {
+    action.abortSignal.addEventListener('abort', onParentAbort);
+  }
+
+  const unsubscribe = onSupersede(action.entrypoint, (newEntrypoint) => {
+    log(
+      'superseded by %s (only: %s, refs: %d)',
+      newEntrypoint.name,
+      newEntrypoint.only,
+      getRefsCount(newEntrypoint)
+    );
+    abortController.abort();
+    action.next('processEntrypoint', newEntrypoint, {}, null);
   });
 
-  action.next('explodeReexports', action.entrypoint, {});
-  action.next('transform', action.entrypoint, {}).on('done', unsubscribed);
+  const onDone = () => {
+    log('done processing %s', name);
+    unsubscribe();
+    action.abortSignal?.removeEventListener('abort', onParentAbort);
+  };
+
+  action.next(
+    'explodeReexports',
+    action.entrypoint,
+    {},
+    abortController.signal
+  );
+  action
+    .next('transform', action.entrypoint, {}, abortController.signal)
+    .on('done', onDone);
 }

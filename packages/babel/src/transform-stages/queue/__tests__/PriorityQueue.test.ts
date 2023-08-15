@@ -1,5 +1,5 @@
-import { PriorityQueue } from '../../src/transform-stages/queue/PriorityQueue';
-import { rootLog } from '../../src/transform-stages/queue/rootLog';
+import { PriorityQueue } from '../PriorityQueue';
+import { rootLog } from '../rootLog';
 
 class NumberQueue extends PriorityQueue<number> {
   constructor() {

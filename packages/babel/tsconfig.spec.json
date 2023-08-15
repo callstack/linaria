@@ -4,6 +4,6 @@
     "rootDir": ".",
     "types": ["jest", "node"]
   },
-  "include": ["src/**/*.ts", "__tests__/**/*.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": []
 }

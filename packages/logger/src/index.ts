@@ -45,6 +45,10 @@ const format = <T>(text: T) => {
   return text;
 };
 
+export function enableDebug() {
+  genericDebug.enable('linaria:*');
+}
+
 export function debug(
   namespaces: string,
   template: unknown | (() => void),
