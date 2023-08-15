@@ -234,6 +234,10 @@ export function genericCreateEntrypoint<
   const { cache, eventEmitter } = services;
 
   return eventEmitter.pair({ method: 'createEntrypoint' }, () => {
+    if (loadedCode !== undefined) {
+      cache.invalidateIfChanged(name, loadedCode);
+    }
+
     const idx = getIdx(name);
     const log = parent.log.extend(idx, isParent(parent) ? '->' : ':');
 
