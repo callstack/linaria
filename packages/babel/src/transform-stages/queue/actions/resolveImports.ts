@@ -7,6 +7,7 @@ import type {
   IResolveImportsAction,
   Services,
   IResolvedImport,
+  Next,
 } from '../types';
 
 const includes = (a: string[], b: string[]) => {
@@ -94,6 +95,7 @@ export function syncResolveImports(
   resolve: (what: string, importer: string, stack: string[]) => string,
   { cache, eventEmitter }: Services,
   action: IResolveImportsAction,
+  next: Next,
   callbacks: { resolve: (result: IResolvedImport[]) => void }
 ) {
   const { imports, entrypoint } = action;
@@ -149,6 +151,7 @@ export async function asyncResolveImports(
   ) => Promise<string | null>,
   { cache, eventEmitter }: Services,
   action: IResolveImportsAction,
+  next: Next,
   callbacks: { resolve: (result: IResolvedImport[]) => void }
 ) {
   const { imports, entrypoint } = action;

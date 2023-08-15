@@ -50,12 +50,6 @@ export type ActionOn<TEvents extends Record<string, unknown[]>> = <
   callback: (...args: TEvents[K]) => void
 ) => void;
 
-export interface IActionControls {
-  // abort: (reason?: string) => void;
-  next: Next;
-  // onAbort: (callback: (reason?: string) => void) => void;
-}
-
 export type ActionByType<TType extends ActionQueueItem['type']> = Extract<
   ActionQueueItem,
   {
@@ -63,11 +57,14 @@ export type ActionByType<TType extends ActionQueueItem['type']> = Extract<
   }
 >;
 
+export interface IBaseServices {
+  eventEmitter: EventEmitter;
+}
+
 export interface IBaseAction<
   TEntrypoint extends IBaseEntrypoint = IBaseEntrypoint,
   TEvents extends Record<string, unknown[]> = Record<never, unknown[]>
-> extends IBaseNode,
-    IActionControls {
+> extends IBaseNode {
   abortSignal: AbortSignal | null;
   callbacks?: EventsHandlers<TEvents>;
   entrypoint: TEntrypoint;
@@ -76,8 +73,23 @@ export interface IBaseAction<
 
 export type DataOf<TNode extends ActionQueueItem> = Omit<
   TNode,
-  keyof IActionControls | keyof IBaseAction | 'entrypoint'
+  keyof IBaseAction | 'entrypoint'
 >;
+
+export type Handler<
+  TServices extends IBaseServices,
+  TAction extends IBaseAction,
+  TRes
+> = (
+  services: TServices,
+  action: TAction,
+  next: Next,
+  callbacks: EventEmitters<
+    TAction extends IBaseAction<IBaseEntrypoint, infer TEvents>
+      ? TEvents
+      : Record<never, unknown[]>
+  >
+) => TRes;
 
 export type Next = <TType extends ActionQueueItem['type']>(
   type: TType,

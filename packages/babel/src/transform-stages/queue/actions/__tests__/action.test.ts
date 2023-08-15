@@ -5,15 +5,11 @@ import {
   createEntrypoint,
   fakeLoadAndParse,
 } from '../../__tests__/entrypoint-helpers';
-import type { Services, Next } from '../../types';
+import type { Services } from '../../types';
 import { createAction } from '../action';
 
 describe('createAction', () => {
   let services: Pick<Services, 'cache' | 'eventEmitter'>;
-  const nextNext = jest.fn();
-  const next = jest.fn<ReturnType<Next>, Parameters<Next>>((type, ep, data) =>
-    createAction(type, ep, data, null, nextNext)
-  );
 
   beforeEach(() => {
     services = {
@@ -22,8 +18,6 @@ describe('createAction', () => {
     };
 
     fakeLoadAndParse.mockClear();
-    next.mockClear();
-    nextNext.mockClear();
   });
 
   it('should create an action', () => {
@@ -31,8 +25,7 @@ describe('createAction', () => {
       'processEntrypoint',
       createEntrypoint(services, '/foo/bar.js', ['default']),
       {},
-      null,
-      next as Next
+      null
     );
 
     expect(action).toMatchObject({
@@ -52,8 +45,7 @@ describe('createAction', () => {
       'transform',
       createEntrypoint(services, '/foo/bar.js', ['default']),
       {},
-      null,
-      next as Next
+      null
     );
     const cb1 = jest.fn();
     const cb2 = jest.fn();
@@ -62,5 +54,15 @@ describe('createAction', () => {
     expect(action.callbacks).toMatchObject({
       done: [cb1, cb2],
     });
+  });
+
+  it('should merge two existing actions to a new one', () => {
+    const entrypoint = createEntrypoint(services, '/foo/bar.js', ['default']);
+
+    const action1 = createAction('processEntrypoint', entrypoint, {}, null);
+
+    const action2 = createAction('processEntrypoint', entrypoint, {}, null);
+
+    expect(action1).not.toBe(action2);
   });
 });

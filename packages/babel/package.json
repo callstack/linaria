@@ -46,6 +46,7 @@
     "@linaria/utils": "workspace:^",
     "cosmiconfig": "^8.0.0",
     "happy-dom": "10.8.0",
+    "nanoid": "^3.3.6",
     "source-map": "^0.7.3",
     "stylis": "^3.5.4"
   },

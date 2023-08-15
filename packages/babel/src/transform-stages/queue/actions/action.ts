@@ -1,17 +1,13 @@
+import { nanoid } from 'nanoid';
+
 import type { IBaseEntrypoint } from '../../../types';
 import type {
   ActionQueueItem,
-  IActionControls,
   IBaseAction,
-  IEntrypoint,
-  Next,
   DataOf,
-  IResolvedImport,
   EventsHandlers,
   ActionByType,
 } from '../types';
-
-type MergeAction = 'reprocess' | 'keep existing' | 'replace existing';
 
 // type DriedAction<T extends IBaseAction> = DataOf<T> & {
 //   entrypoint: IEntrypoint;
@@ -40,12 +36,28 @@ export const nameOf = (node: {
   };
 }): string => `${node.type}:${node.entrypoint.name}`;
 
-export const keyOf = (node: {
-  type: string;
-  entrypoint: {
-    name: string;
-  };
-}): string => nameOf(node);
+const randomIds = new WeakMap<object, string>();
+const randomIdFor = (obj: object) => {
+  if (!randomIds.has(obj)) {
+    randomIds.set(obj, nanoid(10));
+  }
+
+  return randomIds.get(obj);
+};
+
+export const keyOf = <T extends ActionQueueItem>(node: T): string => {
+  const name = nameOf(node);
+  switch (node.type) {
+    case 'resolveImports':
+      return node.imports ? `${name}:${randomIdFor(node.imports)}` : name;
+
+    case 'processImports':
+      return `${name}:${randomIdFor(node.resolved)}`;
+
+    default:
+      return name;
+  }
+};
 
 // const defaultMerger = (
 //   a: DriedAction<ActionQueueItem>,
@@ -156,14 +168,6 @@ export const keyOf = (node: {
 //   );
 // };
 
-// Only one action of each type can be queued per entrypoint
-const actionsCache = new WeakMap<
-  IBaseEntrypoint,
-  Map<ActionQueueItem['type'], ActionQueueItem>
->();
-
-const nexts = new WeakMap<ActionQueueItem, Set<Next>>();
-
 // export function createCombinedAction<TType extends ActionQueueItem['type']>(
 //   target: ActionByType<TType>,
 //   source: {
@@ -192,8 +196,7 @@ function innerCreateAction<TType extends ActionQueueItem['type']>(
   actionType: TType,
   entrypoint: IBaseEntrypoint,
   data: DataOf<ActionByType<TType>>,
-  abortSignal: AbortSignal | null,
-  next: Next
+  abortSignal: AbortSignal | null
 ): ActionByType<TType> {
   type Events = (ActionByType<TType> extends IBaseAction<
     IBaseEntrypoint,
@@ -203,68 +206,8 @@ function innerCreateAction<TType extends ActionQueueItem['type']>(
     : Record<never, unknown[]>) &
     Record<string, unknown[]>;
 
-  if (!actionsCache.has(entrypoint)) {
-    actionsCache.set(entrypoint, new Map());
-  }
-
-  const cache = actionsCache.get(entrypoint)!;
-  const existing = cache.get(actionType) as ActionByType<TType> | undefined;
-  // if (existing) {
-  //   const dryAction = {
-  //     ...data,
-  //     type: actionType,
-  //     entrypoint,
-  //   };
-  //
-  //   const result = onCollide(existing, dryAction);
-  //   if (result === 'keep existing') {
-  //     const combined = createCombinedAction(existing, { callbacks, next });
-  //     cache.set(actionType, combined);
-  //     return combined;
-  //   }
-  //
-  //   if (result === 'replace existing') {
-  //     const newAction = {
-  //       ...dryAction,
-  //       callbacks,
-  //       next,
-  //       onAbort: () => {},
-  //       abort: () => {},
-  //     } as ActionQueueItem;
-  //
-  //     const combined = createCombinedAction(newAction, {
-  //       callbacks: existing.callbacks,
-  //       next: existing.next.bind(existing),
-  //     });
-  //     cache.set(actionType, combined);
-  //     return combined;
-  //   }
-  //
-  //   if (result === 'reprocess') {
-  //     debugger;
-  //     return createAction('processEntrypoint', entrypoint, {}, next, {});
-  //   }
-  //
-  //   const newAction = {
-  //     ...result,
-  //     callbacks,
-  //     type: actionType,
-  //     entrypoint,
-  //     abort: () => {},
-  //     next,
-  //     onAbort: () => {},
-  //   } as ActionQueueItem;
-  //
-  //   const combined = createCombinedAction(newAction, {
-  //     callbacks: existing.callbacks,
-  //     next: existing.next.bind(existing),
-  //   });
-  //   cache.set(actionType, combined);
-  //   return combined;
-  // }
   type Callbacks = EventsHandlers<Events>;
   const callbacks: Callbacks = {};
-  // const callbacks: GetCallbacksByType<TType> = {};
 
   const on = <T extends keyof Callbacks>(
     type: T,
@@ -287,12 +230,8 @@ function innerCreateAction<TType extends ActionQueueItem['type']>(
     callbacks,
     type: actionType,
     entrypoint,
-    next: (nextType, nextEntrypoint, nextData, nextAbortSignal) =>
-      next(nextType, nextEntrypoint, nextData, nextAbortSignal ?? abortSignal),
     on,
   } as ActionByType<TType>;
-
-  cache.set(actionType, newAction);
 
   return newAction;
 }
@@ -301,16 +240,9 @@ export function createAction<TType extends ActionQueueItem['type']>(
   actionType: TType,
   entrypoint: IBaseEntrypoint,
   data: DataOf<ActionByType<TType>>,
-  abortSignal: AbortSignal | null,
-  next: Next
+  abortSignal: AbortSignal | null = null
 ): ActionByType<TType> {
-  const action = innerCreateAction(
-    actionType,
-    entrypoint,
-    data,
-    abortSignal,
-    next
-  );
+  const action = innerCreateAction(actionType, entrypoint, data, abortSignal);
   addRef(entrypoint, action);
   return action;
 }

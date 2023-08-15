@@ -3,10 +3,12 @@ import { EventEmitter, getFileIdx } from '@linaria/utils';
 
 import type { IBaseEntrypoint } from '../../../types';
 import { AsyncActionQueue, SyncActionQueue } from '../ActionQueue';
-import type { Handler, Handlers, IBaseServices } from '../GenericActionQueue';
+import type { Handlers } from '../GenericActionQueue';
 import { rootLog } from '../rootLog';
 import type {
+  Handler,
   IBaseAction,
+  IBaseServices,
   IGetExportsAction,
   IProcessEntrypointAction,
 } from '../types';
@@ -80,9 +82,10 @@ describe.each<[string, Queues]>([
     it('should process next calls', async () => {
       const processEntrypoint: GetHandler<IProcessEntrypointAction> = (
         _services,
-        action
+        action,
+        next
       ) => {
-        action.next('transform', action.entrypoint, {});
+        next('transform', action.entrypoint, {});
       };
 
       const queue = createQueueFor('/foo/bar.js', { processEntrypoint });
@@ -96,10 +99,11 @@ describe.each<[string, Queues]>([
     it('should call actions according to its weight', async () => {
       const processEntrypoint: GetHandler<IProcessEntrypointAction> = (
         _services,
-        action
+        action,
+        next
       ) => {
-        action.next('transform', action.entrypoint, {});
-        action.next('addToCodeCache', action.entrypoint, {
+        next('transform', action.entrypoint, {});
+        next('addToCodeCache', action.entrypoint, {
           data: {
             imports: null,
             result: {
@@ -109,12 +113,12 @@ describe.each<[string, Queues]>([
             only: [],
           },
         });
-        action.next('explodeReexports', action.entrypoint, {});
-        action.next('processImports', action.entrypoint, {
+        next('explodeReexports', action.entrypoint, {});
+        next('processImports', action.entrypoint, {
           resolved: [],
         });
-        action.next('getExports', action.entrypoint, {});
-        action.next('resolveImports', action.entrypoint, {
+        next('getExports', action.entrypoint, {});
+        next('resolveImports', action.entrypoint, {
           imports: null,
         });
       };
@@ -144,16 +148,16 @@ describe.each<[string, Queues]>([
 
     const processEntrypoint: GetHandler<IProcessEntrypointAction> = (
       _services,
-      action
+      action,
+      next
     ) => {
-      action
-        .next('getExports', action.entrypoint, {})
-        .on('resolve', onGetExports);
+      next('getExports', action.entrypoint, {}).on('resolve', onGetExports);
     };
 
     const getExports: GetHandler<IGetExportsAction> = (
       _services,
       _action,
+      _next,
       callbacks
     ) => {
       callbacks.resolve(exports);
@@ -175,9 +179,10 @@ describe.each<[string, Queues]>([
     const abortController = new AbortController();
     const processEntrypoint: GetHandler<IProcessEntrypointAction> = (
       _services,
-      action
+      action,
+      next
     ) => {
-      action.next('transform', action.entrypoint, {}, abortController.signal);
+      next('transform', action.entrypoint, {}, abortController.signal);
     };
 
     const queue = createQueueFor('/foo/bar.js', { processEntrypoint });

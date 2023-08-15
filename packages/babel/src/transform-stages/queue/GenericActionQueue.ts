@@ -1,22 +1,19 @@
 import { relative, sep } from 'path';
 
-import type { EventEmitter } from '@linaria/utils';
-
 import type { IBaseEntrypoint } from '../../types';
 
 import { PriorityQueue } from './PriorityQueue';
 import { createAction, getRefsCount, keyOf } from './actions/action';
+import { actionRunner } from './actions/actionRunner';
 import type {
   DataOf,
   ActionByType,
   IBaseAction,
   ActionQueueItem,
   EventEmitters,
+  IBaseServices,
+  Handler,
 } from './types';
-
-export interface IBaseServices {
-  eventEmitter: EventEmitter;
-}
 
 const weights: Record<IBaseAction['type'], number> = {
   addToCodeCache: 0,
@@ -45,20 +42,6 @@ function hasLessPriority(a: IBaseAction, b: IBaseAction) {
 
   return weights[a.type] < weights[b.type];
 }
-
-export type Handler<
-  TServices extends IBaseServices,
-  TAction extends IBaseAction,
-  TRes
-> = (
-  services: TServices,
-  action: TAction,
-  callbacks: EventEmitters<
-    TAction extends IBaseAction<IBaseEntrypoint, infer TEvents>
-      ? TEvents
-      : Record<never, unknown[]>
-  >
-) => TRes;
 
 export type Handlers<TRes, TServices extends IBaseServices> = {
   [K in ActionQueueItem['type']]: Handler<TServices, ActionByType<K>, TRes>;
@@ -126,13 +109,7 @@ export class GenericActionQueue<
     data: DataOf<ActionByType<TType>>,
     abortSignal: AbortSignal | null = null
   ): ActionByType<TType> => {
-    const action = createAction(
-      actionType,
-      entrypoint,
-      data,
-      abortSignal,
-      this.next
-    );
+    const action = createAction(actionType, entrypoint, data, abortSignal);
 
     this.enqueue(action);
 
@@ -140,57 +117,18 @@ export class GenericActionQueue<
   };
 
   protected handle<TAction extends ActionQueueItem>(action: TAction): TRes {
-    const { eventEmitter } = this.services;
     const handler = this.handlers[action.type as TAction['type']] as Handler<
       TServices,
       TAction,
       TRes
     >;
 
-    eventEmitter.single({
-      type: 'queue-action',
-      queueIdx: this.queueIdx,
-      action: action.type,
-      file: action.entrypoint.name,
-      args: action.entrypoint.only,
-    });
-
-    type Callbacks = EventEmitters<
-      TAction extends IBaseAction<IBaseEntrypoint, infer TEvents>
-        ? TEvents
-        : Record<never, unknown[]>
-    >;
-    const allCallbacks = action.callbacks as Record<
-      keyof Callbacks,
-      ((...args: unknown[]) => void)[] | undefined
-    >;
-
-    const callbacks = new Proxy({} as Callbacks, {
-      get: (target, prop) => {
-        const callbackName = prop.toString() as keyof Callbacks;
-        return (...args: unknown[]) => {
-          if (!action.callbacks) {
-            return;
-          }
-
-          eventEmitter.single({
-            type: 'queue-action',
-            queueIdx: this.queueIdx,
-            action: `${action.type}:${callbackName.toString()}`,
-            file: action.entrypoint.name,
-            args,
-          });
-
-          allCallbacks[callbackName]?.forEach((cb) => cb(...args));
-        };
-      },
-    });
-
-    return eventEmitter.pair(
-      {
-        method: `queue:${action.type}`,
-      },
-      () => handler(this.services, action, callbacks)
+    return actionRunner<TServices, TAction, TRes>(
+      this.services,
+      this.enqueue.bind(this),
+      handler,
+      action,
+      this.queueIdx
     );
   }
 }

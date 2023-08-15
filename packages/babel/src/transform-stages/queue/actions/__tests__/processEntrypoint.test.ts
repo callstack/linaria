@@ -11,9 +11,8 @@ import { processEntrypoint } from '../processEntrypoint';
 
 describe('processEntrypoint', () => {
   let services: Pick<Services, 'cache' | 'eventEmitter'>;
-  const nextNext = jest.fn();
   const next = jest.fn<ReturnType<Next>, Parameters<Next>>((type, ep, data) =>
-    createAction(type, ep, data, null, nextNext)
+    createAction(type, ep, data, null)
   );
 
   beforeEach(() => {
@@ -24,7 +23,6 @@ describe('processEntrypoint', () => {
 
     fakeLoadAndParse.mockClear();
     next.mockClear();
-    nextNext.mockClear();
   });
 
   it('should emit explodeReexports and transform actions', async () => {
@@ -32,15 +30,9 @@ describe('processEntrypoint', () => {
       'default',
     ]);
 
-    const action = createAction(
-      'processEntrypoint',
-      fooBarDefault,
-      {},
-      null,
-      next as Next
-    );
+    const action = createAction('processEntrypoint', fooBarDefault, {}, null);
 
-    processEntrypoint(services, action);
+    processEntrypoint(services, action, next as Next);
 
     expect(next).toHaveBeenCalledTimes(2);
     expect(next).toHaveBeenNthCalledWith(
@@ -65,15 +57,9 @@ describe('processEntrypoint', () => {
       'default',
     ]);
 
-    const action = createAction(
-      'processEntrypoint',
-      fooBarDefault,
-      {},
-      null,
-      next as Next
-    );
+    const action = createAction('processEntrypoint', fooBarDefault, {}, null);
 
-    processEntrypoint(services, action);
+    processEntrypoint(services, action, next as Next);
 
     expect(next).toHaveBeenCalledTimes(2);
 
@@ -93,15 +79,9 @@ describe('processEntrypoint', () => {
       'default',
     ]);
 
-    const action = createAction(
-      'processEntrypoint',
-      fooBarDefault,
-      {},
-      null,
-      next as Next
-    );
+    const action = createAction('processEntrypoint', fooBarDefault, {}, null);
 
-    processEntrypoint(services, action);
+    processEntrypoint(services, action, next as Next);
 
     expect(next).toHaveBeenCalledTimes(2);
     const emitted = next.mock.calls.map(([, , , abortSignal]) => abortSignal);

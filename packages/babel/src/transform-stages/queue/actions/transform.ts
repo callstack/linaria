@@ -11,7 +11,7 @@ import { buildOptions, getPluginKey } from '@linaria/utils';
 import type { Core } from '../../../babel';
 import type Module from '../../../module';
 import withLinariaMetadata from '../../../utils/withLinariaMetadata';
-import type { IEntrypoint, ITransformAction, Services } from '../types';
+import type { IEntrypoint, ITransformAction, Next, Services } from '../types';
 
 const EMPTY_FILE = '=== empty file ===';
 
@@ -64,12 +64,19 @@ function runPreevalStage(
   return result;
 }
 
-export function prepareCode(
+type PrepareCodeFn = (
   babel: Core,
   item: IEntrypoint,
   originalAst: File,
   eventEmitter: EventEmitter
-): [code: string, imports: Module['imports'], metadata?: BabelFileMetadata] {
+) => [code: string, imports: Module['imports'], metadata?: BabelFileMetadata];
+
+export const prepareCode: PrepareCodeFn = (
+  babel,
+  item,
+  originalAst,
+  eventEmitter
+) => {
   const { evaluator, log, evalConfig, pluginOptions, only } = item;
 
   const preevalStageResult = eventEmitter.pair(
@@ -114,15 +121,13 @@ export function prepareCode(
   log('[evaluator:end]');
 
   return [code, imports, preevalStageResult.metadata];
-}
+};
 
-/**
- * Prepares the code for evaluation. This includes removing dead and potentially unsafe code.
- * Emits resolveImports, processImports and addToCodeCache events.
- */
-export function transform(
+export function internalTransform(
+  prepareFn: PrepareCodeFn,
   services: Services,
   action: ITransformAction,
+  next: Next,
   callbacks: { done: () => void }
 ): void {
   if (!action) {
@@ -133,7 +138,7 @@ export function transform(
 
   log('>> (%o)', only);
 
-  const [preparedCode, imports, metadata] = prepareCode(
+  const [preparedCode, imports, metadata] = prepareFn(
     services.babel,
     action.entrypoint,
     ast,
@@ -152,26 +157,28 @@ export function transform(
     return;
   }
 
-  action
-    .next('resolveImports', action.entrypoint, {
-      imports,
-    })
-    .on('resolve', (resolvedImports) => {
-      action.next('processImports', action.entrypoint, {
-        resolved: resolvedImports,
-      });
+  next('resolveImports', action.entrypoint, {
+    imports,
+  }).on('resolve', (resolvedImports) => {
+    next('processImports', action.entrypoint, {
+      resolved: resolvedImports,
     });
+  });
 
-  action
-    .next('addToCodeCache', action.entrypoint, {
-      data: {
-        imports,
-        result: {
-          code: preparedCode,
-          metadata,
-        },
-        only,
+  next('addToCodeCache', action.entrypoint, {
+    data: {
+      imports,
+      result: {
+        code: preparedCode,
+        metadata,
       },
-    })
-    .on('done', callbacks.done);
+      only,
+    },
+  }).on('done', callbacks.done);
 }
+
+/**
+ * Prepares the code for evaluation. This includes removing dead and potentially unsafe code.
+ * Emits resolveImports, processImports and addToCodeCache events.
+ */
+export const transform = internalTransform.bind(null, prepareCode);

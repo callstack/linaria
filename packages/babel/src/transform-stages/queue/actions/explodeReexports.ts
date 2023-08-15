@@ -1,7 +1,7 @@
 import type { ExportAllDeclaration, Node, File } from '@babel/types';
 
 import type { Core } from '../../../babel';
-import type { IExplodeReexportsAction, Services } from '../types';
+import type { IExplodeReexportsAction, Next, Services } from '../types';
 
 import { findExportsInImports } from './getExports';
 
@@ -30,7 +30,8 @@ const getWildcardReexport = (babel: Core, ast: File) => {
  */
 export function explodeReexports(
   services: Services,
-  action: IExplodeReexportsAction
+  action: IExplodeReexportsAction,
+  next: Next
 ) {
   const { log, ast } = action.entrypoint;
 
@@ -78,13 +79,11 @@ export function explodeReexports(
   };
 
   // Resolve modules
-  action
-    .next('resolveImports', action.entrypoint, {
-      imports: new Map(reexportsFrom.map((i) => [i.source, []])),
-    })
-    .on('resolve', (resolvedImports) => {
-      findExportsInImports(services, action, resolvedImports, {
-        resolve: onResolved,
-      });
+  next('resolveImports', action.entrypoint, {
+    imports: new Map(reexportsFrom.map((i) => [i.source, []])),
+  }).on('resolve', (resolvedImports) => {
+    findExportsInImports(services, action, next, resolvedImports, {
+      resolve: onResolved,
     });
+  });
 }

@@ -6,12 +6,14 @@ import type {
   IExplodeReexportsAction,
   IGetExportsAction,
   IResolvedImport,
+  Next,
   Services,
 } from '../types';
 
 export function findExportsInImports(
   services: Services,
   action: IGetExportsAction | IExplodeReexportsAction,
+  next: Next,
   imports: IResolvedImport[],
   callbacks: {
     resolve: (replacements: Record<string, string[]>) => void;
@@ -58,7 +60,7 @@ export function findExportsInImports(
       return;
     }
 
-    action.next('getExports', newEntrypoint, {}).on('resolve', (exports) => {
+    next('getExports', newEntrypoint, {}).on('resolve', (exports) => {
       onResolve({
         [imp.importedFile]: exports,
       });
@@ -69,6 +71,7 @@ export function findExportsInImports(
 export function getExports(
   services: Services,
   action: IGetExportsAction,
+  next: Next,
   callbacks: { resolve: (result: string[]) => void }
 ) {
   const { entrypoint } = action;
@@ -104,15 +107,13 @@ export function getExports(
       callbacks.resolve(result);
     };
 
-    action
-      .next('resolveImports', action.entrypoint, {
-        imports: new Map(withWildcardReexport.map((i) => [i.source, []])),
-      })
-      .on('resolve', (resolvedImports) => {
-        findExportsInImports(services, action, resolvedImports, {
-          resolve: onResolved,
-        });
+    next('resolveImports', action.entrypoint, {
+      imports: new Map(withWildcardReexport.map((i) => [i.source, []])),
+    }).on('resolve', (resolvedImports) => {
+      findExportsInImports(services, action, next, resolvedImports, {
+        resolve: onResolved,
       });
+    });
   } else {
     callbacks.resolve(result);
   }

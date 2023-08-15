@@ -1,7 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
-import type { IBaseServices } from './GenericActionQueue';
 import { GenericActionQueue } from './GenericActionQueue';
-import type { ActionQueueItem } from './types';
+import type { IBaseServices } from './types';
 
 export class SyncActionQueue<
   TServices extends IBaseServices
@@ -21,37 +20,22 @@ export class SyncActionQueue<
 export class AsyncActionQueue<
   TServices extends IBaseServices
 > extends GenericActionQueue<Promise<void> | void, TServices> {
-  private static taskCache = new WeakMap<
-    ActionQueueItem,
-    Promise<void> | void
-  >();
-
-  public runNext(): Promise<void> {
+  public runNext(): Promise<void> | void {
     const next = this.dequeue();
     if (!next) {
       return Promise.resolve();
     }
 
     next.entrypoint.log('Start %s from %r', next.type, this.logRef);
-
-    // Do not run same task twice
-    if (!AsyncActionQueue.taskCache.has(next)) {
-      AsyncActionQueue.taskCache.set(
-        next,
-        this.handle(next) ?? Promise.resolve()
-      );
+    const result = this.handle(next);
+    const log = () =>
+      next.entrypoint.log('Finish %s from %r', next.type, this.logRef);
+    if (result instanceof Promise) {
+      result.then(log, () => {});
     } else {
-      next.entrypoint.log('Reuse %s from another queue', next.type);
+      log();
     }
 
-    const task = AsyncActionQueue.taskCache.get(next)!;
-    task.then(
-      () => {
-        next.entrypoint.log('Finish %s from %r', next.type, this.logRef);
-      },
-      () => {}
-    );
-
-    return task;
+    return result;
   }
 }

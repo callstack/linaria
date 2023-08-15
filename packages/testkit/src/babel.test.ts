@@ -3092,8 +3092,6 @@ describe('strategy shaker', () => {
   });
 
   describe('concurrent', () => {
-    debug.enable('linaria:*');
-
     it('two parallel chains of reexports', async () => {
       const cache = new TransformCacheCollection();
 

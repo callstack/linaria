@@ -1,6 +1,6 @@
 import type { IBaseEntrypoint } from '../../../types';
 import { onSupersede } from '../createEntrypoint';
-import type { IProcessEntrypointAction } from '../types';
+import type { IProcessEntrypointAction, Next } from '../types';
 
 import { getRefsCount } from './action';
 
@@ -13,7 +13,8 @@ import { getRefsCount } from './action';
  */
 export function processEntrypoint<TEntrypoint extends IBaseEntrypoint>(
   _services: unknown,
-  action: IProcessEntrypointAction<TEntrypoint>
+  action: IProcessEntrypointAction<TEntrypoint>,
+  next: Next
 ): void {
   const { name, only, log } = action.entrypoint;
   log(
@@ -41,7 +42,7 @@ export function processEntrypoint<TEntrypoint extends IBaseEntrypoint>(
       getRefsCount(newEntrypoint)
     );
     abortController.abort();
-    action.next('processEntrypoint', newEntrypoint, {}, null);
+    next('processEntrypoint', newEntrypoint, {}, null);
   });
 
   const onDone = () => {
@@ -50,13 +51,9 @@ export function processEntrypoint<TEntrypoint extends IBaseEntrypoint>(
     action.abortSignal?.removeEventListener('abort', onParentAbort);
   };
 
-  action.next(
-    'explodeReexports',
-    action.entrypoint,
-    {},
-    abortController.signal
+  next('explodeReexports', action.entrypoint, {}, abortController.signal);
+  next('transform', action.entrypoint, {}, abortController.signal).on(
+    'done',
+    onDone
   );
-  action
-    .next('transform', action.entrypoint, {}, abortController.signal)
-    .on('done', onDone);
 }
