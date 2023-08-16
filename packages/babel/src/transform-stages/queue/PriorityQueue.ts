@@ -5,6 +5,8 @@ export abstract class PriorityQueue<TNode> {
 
   protected keys: Map<string, number> = new Map();
 
+  protected dequeueCallbacks: Map<TNode, () => void> = new Map();
+
   protected constructor(
     protected readonly log: Debugger,
     private readonly keyOf: (node: TNode) => string,
@@ -20,22 +22,34 @@ export abstract class PriorityQueue<TNode> {
     if (idx === undefined) return;
 
     if (idx === this.size - 1) {
-      this.data.pop();
+      const deleted = this.data.pop();
+      this.onDequeue(deleted);
       this.keys.delete(key);
       return;
     }
 
     if (this.size <= 1) {
+      const deleted = this.data[0];
       this.data = [];
       this.keys.clear();
+      this.onDequeue(deleted);
       return;
     }
 
+    const deleted = this.data[idx];
     this.data[idx] = this.data.pop()!;
     this.keys.delete(key);
     this.updateKey(idx + 1);
     this.heapifyDown(1);
     this.heapifyUp(this.size);
+    this.onDequeue(deleted);
+  }
+
+  private onDequeue(node: TNode | undefined) {
+    if (node === undefined) return;
+    const callback = this.dequeueCallbacks.get(node);
+    this.dequeueCallbacks.delete(node);
+    callback?.();
   }
 
   private heapifyDown(i = 1): void {
@@ -104,6 +118,7 @@ export abstract class PriorityQueue<TNode> {
       this.data = [];
       this.keys.clear();
       this.log('Dequeued %s', this.keyOf(max));
+      this.onDequeue(max);
       return max;
     }
 
@@ -116,10 +131,15 @@ export abstract class PriorityQueue<TNode> {
 
     this.keys.delete(this.keyOf(max));
     this.log('Dequeued %s: %o', this.keyOf(max), this.data.map(this.keyOf));
+    this.onDequeue(max);
     return max;
   }
 
-  protected enqueue(newNode: TNode) {
+  protected enqueue(newNode: TNode, onDequeue?: () => void) {
+    if (onDequeue) {
+      this.dequeueCallbacks.set(newNode, onDequeue);
+    }
+
     const key = this.keyOf(newNode);
     this.increaseKey(this.size + 1, newNode);
     this.log('Enqueued %s: %o', key, this.data.map(this.keyOf));

@@ -102,6 +102,10 @@ function run<
   return { actions, task };
 }
 
+/**
+ * actionRunner ensures that each action is only run once per entrypoint.
+ * If action is already running, it will re-emmit actions from the previous run.
+ */
 export function actionRunner<
   TServices extends IBaseServices,
   TAction extends ActionQueueItem,
@@ -139,7 +143,7 @@ export function actionRunner<
     return result.task as TRes;
   }
 
-  action.entrypoint.log('replay action %s', action.type);
+  action.entrypoint.log('replay actions %s', action.type);
   cached.actions.onAdd((nextAction) => {
     enqueue(nextAction);
   });

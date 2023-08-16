@@ -67,7 +67,7 @@ describe('prepareCode', () => {
       };
       const entrypoint = createEntrypoint(
         services,
-        null,
+        { log: linariaLogger },
         inputFilePath,
         only,
         sourceCode,

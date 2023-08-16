@@ -90,7 +90,7 @@ describe('AsyncActionQueue', () => {
       processEntrypoint,
       transform: fooBazTransform,
     });
-    const fooBarEntry = createEntrypoint(services, '/foo/bar.js', ['Bar']);
+    createEntrypoint(services, '/foo/bar.js', ['Bar']);
 
     // At that point, both queues should have the same processEntrypoint action for /foo/bar.js
     // If we run this merged action in one queue, it should emit a new `transform` action in both queues

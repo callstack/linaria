@@ -4,7 +4,6 @@ import { dirname, join, resolve } from 'path';
 
 import * as babel from '@babel/core';
 import type { PluginItem } from '@babel/core';
-import debug from 'debug';
 import dedent from 'dedent';
 import stripAnsi from 'strip-ansi';
 

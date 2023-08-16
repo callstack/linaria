@@ -5,12 +5,12 @@ import type { IBaseEntrypoint } from '../../types';
 import { PriorityQueue } from './PriorityQueue';
 import { createAction, getRefsCount, keyOf } from './actions/action';
 import { actionRunner } from './actions/actionRunner';
+import { onSupersede } from './createEntrypoint';
 import type {
   DataOf,
   ActionByType,
   IBaseAction,
   ActionQueueItem,
-  EventEmitters,
   IBaseServices,
   Handler,
 } from './types';
@@ -88,7 +88,33 @@ export class GenericActionQueue<
   }
 
   protected override enqueue(newAction: ActionQueueItem) {
-    const key = keyOf(newAction);
+    const abortController = new AbortController();
+
+    const onParentAbort = () => {
+      abortController.abort();
+    };
+
+    if (newAction.abortSignal) {
+      newAction.abortSignal.addEventListener('abort', onParentAbort);
+    }
+
+    const unsubscribe = onSupersede(newAction.entrypoint, (newEntrypoint) => {
+      this.log(
+        'superseded by %s (only: %s, refs: %d)',
+        newEntrypoint.name,
+        newEntrypoint.only,
+        getRefsCount(newEntrypoint)
+      );
+      abortController.abort();
+      this.next(newAction.type, newEntrypoint, newAction, null);
+    });
+
+    const onDequeue = () => {
+      this.log('done processing %s', newAction.entrypoint.name);
+      unsubscribe();
+      newAction.abortSignal?.removeEventListener('abort', onParentAbort);
+    };
+
     // const idx = this.keys.get(key);
     // if (idx !== undefined) {
     //   // Merge with existing entry
@@ -100,7 +126,13 @@ export class GenericActionQueue<
     //   return;
     // }
     //
-    super.enqueue(newAction);
+    super.enqueue(
+      {
+        ...newAction,
+        abortSignal: abortController.signal,
+      },
+      onDequeue
+    );
   }
 
   public next = <TType extends ActionQueueItem['type']>(
