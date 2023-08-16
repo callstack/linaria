@@ -4,6 +4,7 @@ import { EventEmitter } from '@linaria/utils';
 import { TransformCacheCollection } from '../../../cache';
 import { AsyncActionQueue } from '../ActionQueue';
 import type { Handlers } from '../GenericActionQueue';
+import { processEntrypoint } from '../actions/processEntrypoint';
 import type {
   Services,
   IBaseAction,
@@ -11,6 +12,7 @@ import type {
   ITransformAction,
   IBaseServices,
   Handler,
+  IExplodeReexportsAction,
 } from '../types';
 
 import { createEntrypoint } from './entrypoint-helpers';
@@ -69,26 +71,23 @@ describe('AsyncActionQueue', () => {
   });
 
   it('should emit new action in both queues', () => {
-    const onProcessEntrypoint = jest.fn();
-    const processEntrypoint: GetHandler<IProcessEntrypointAction> = (
-      _services,
-      action,
-      next
-    ) => {
-      next('transform', action.entrypoint, {});
-      onProcessEntrypoint(action);
-    };
-
     const fooBarTransform: GetHandler<ITransformAction> = jest.fn();
+    const fooBarExplodeReexports: GetHandler<IExplodeReexportsAction> =
+      jest.fn();
     const fooBarQueue = createQueueFor('/foo/bar.js', {
       processEntrypoint,
       transform: fooBarTransform,
+      explodeReexports: fooBarExplodeReexports,
     });
+    fooBarQueue.runNext();
 
     const fooBazTransform: GetHandler<ITransformAction> = jest.fn();
+    const fooBazExplodeReexports: GetHandler<IExplodeReexportsAction> =
+      jest.fn();
     const fooBazQueue = createQueueFor('/foo/baz.js', {
       processEntrypoint,
       transform: fooBazTransform,
+      explodeReexports: fooBazExplodeReexports,
     });
     createEntrypoint(services, '/foo/bar.js', ['Bar']);
 
@@ -98,14 +97,19 @@ describe('AsyncActionQueue', () => {
 
     // Drain fooBarQueue
     expect(fooBarTransform).not.toHaveBeenCalled();
+    fooBarQueue.runNext(); // should be the explodeReexports action
+    expect(fooBarExplodeReexports).toHaveBeenCalledTimes(1);
     fooBarQueue.runNext(); // should be the transform action
     expect(fooBarTransform).toHaveBeenCalledTimes(1);
     expect(fooBarQueue.isEmpty()).toBe(true);
 
     fooBazQueue.runNext(); // run processEntrypoint for /foo/baz.js
     expect(fooBazTransform).not.toHaveBeenCalled();
-    fooBazQueue.runNext(); // run processEntrypoint for /foo/bar.js
+    expect(fooBazExplodeReexports).not.toHaveBeenCalled();
+    fooBazQueue.runNext(); // run explodeReexports for /foo/baz.js
+    expect(fooBazExplodeReexports).toHaveBeenCalledTimes(1);
+    fooBazQueue.runNext(); // run transform for /foo/baz.js
+    expect(fooBazTransform).toHaveBeenCalledTimes(1);
+    expect(fooBazQueue.isEmpty()).toBe(true);
   });
-
-  it('should call handlers of each merged action in original context', () => {});
 });

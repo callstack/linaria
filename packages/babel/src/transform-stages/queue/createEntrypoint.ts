@@ -198,6 +198,8 @@ export function onSupersede<T extends IBaseEntrypoint>(
   };
 }
 
+const supersededWith = new WeakMap<IBaseEntrypoint, IBaseEntrypoint>();
+
 export function supersedeEntrypoint<TPluginOptions>(
   services: Pick<Services, 'cache'>,
   oldEntrypoint: IEntrypoint<TPluginOptions>,
@@ -206,9 +208,14 @@ export function supersedeEntrypoint<TPluginOptions>(
   // If we already have a result for this file, we should invalidate it
   services.cache.invalidate('eval', oldEntrypoint.name);
 
+  supersededWith.set(oldEntrypoint, newEntrypoint);
   supersedeHandlers
     .get(oldEntrypoint)
     ?.forEach((handler) => handler(newEntrypoint));
+}
+
+export function getSupersededWith(entrypoint: IBaseEntrypoint) {
+  return supersededWith.get(entrypoint);
 }
 
 export type LoadAndParseFn<TServices, TPluginOptions> = (

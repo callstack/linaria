@@ -327,8 +327,9 @@ class Module {
     if (uncachedExports.length > 0 || !m.isEvaluated) {
       m.debug(
         'eval-cache',
-        'is going to be invalidated because %o is not evaluated yet',
-        uncachedExports
+        'is going to be invalidated because %o is not evaluated yet (evaluated: %o)',
+        uncachedExports,
+        m.only
       );
 
       this.cache.invalidate('eval', filename);
@@ -372,8 +373,9 @@ class Module {
 
       log(
         'code-cache',
-        '❌ file has been processed during prepare stage but %o is not evaluated yet',
-        uncachedExports
+        '❌ file has been processed during prepare stage but %o is not evaluated yet (evaluated: %o)',
+        uncachedExports,
+        cached?.only ?? []
       );
     } else {
       log('code-cache', '❌ file has not been processed during prepare stage');

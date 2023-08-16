@@ -25,6 +25,6 @@ export function processImports(
       continue;
     }
 
-    next('processEntrypoint', nextEntrypoint, {});
+    next('processEntrypoint', nextEntrypoint, {}, null);
   }
 }

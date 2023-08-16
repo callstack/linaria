@@ -48,11 +48,14 @@ const randomIdFor = (obj: object) => {
 export const keyOf = <T extends ActionQueueItem>(node: T): string => {
   const name = nameOf(node);
   switch (node.type) {
-    case 'resolveImports':
-      return node.imports ? `${name}:${randomIdFor(node.imports)}` : name;
+    case 'addToCodeCache':
+      return `${name}:${randomIdFor(node.data)}`;
 
     case 'processImports':
       return `${name}:${randomIdFor(node.resolved)}`;
+
+    case 'resolveImports':
+      return node.imports ? `${name}:${randomIdFor(node.imports)}` : name;
 
     default:
       return name;

@@ -88,7 +88,7 @@ function run<
             type,
             entrypoint,
             data,
-            abortSignal ?? action.abortSignal
+            abortSignal === undefined ? action.abortSignal : abortSignal
           );
 
           actions.add(nextAction);
@@ -117,14 +117,6 @@ export function actionRunner<
   action: TAction,
   queueIdx: string
 ): TRes {
-  services.eventEmitter.single({
-    type: 'queue-action',
-    queueIdx,
-    action: action.type,
-    file: action.entrypoint.name,
-    args: action.entrypoint.only,
-  });
-
   if (!cache.has(action.entrypoint)) {
     cache.set(action.entrypoint, new Map());
   }
@@ -132,6 +124,14 @@ export function actionRunner<
   const entrypointCache = cache.get(action.entrypoint)!;
   const actionKey = keyOf(action);
   const cached = entrypointCache.get(actionKey);
+  services.eventEmitter.single({
+    type: 'queue-action',
+    queueIdx,
+    action: `${action.type}:${cached ? 'replay' : 'run'}`,
+    file: action.entrypoint.name,
+    args: action.entrypoint.only,
+  });
+
   if (!cached) {
     action.entrypoint.log('run action %s', action.type);
     const result = run(services, handler, action, queueIdx);

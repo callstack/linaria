@@ -130,10 +130,6 @@ export function internalTransform(
   next: Next,
   callbacks: { done: () => void }
 ): void {
-  if (!action) {
-    return;
-  }
-
   const { name, only, code, log, ast } = action.entrypoint;
 
   log('>> (%o)', only);
@@ -160,6 +156,10 @@ export function internalTransform(
   next('resolveImports', action.entrypoint, {
     imports,
   }).on('resolve', (resolvedImports) => {
+    if (resolvedImports.length === 0) {
+      return;
+    }
+
     next('processImports', action.entrypoint, {
       resolved: resolvedImports,
     });

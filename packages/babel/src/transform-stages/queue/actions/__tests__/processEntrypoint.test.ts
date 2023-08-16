@@ -39,13 +39,20 @@ describe('processEntrypoint', () => {
       1,
       'explodeReexports',
       fooBarDefault,
-      {}
+      {},
+      expect.any(AbortSignal)
     );
 
-    expect(next).toHaveBeenNthCalledWith(2, 'transform', fooBarDefault, {});
+    expect(next).toHaveBeenNthCalledWith(
+      2,
+      'transform',
+      fooBarDefault,
+      {},
+      expect.any(AbortSignal)
+    );
   });
 
-  xit('should re-emit processEntrypoint if entrypoint was superseded', async () => {
+  it('should re-emit processEntrypoint if entrypoint was superseded', async () => {
     const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
       'default',
     ]);
@@ -67,7 +74,7 @@ describe('processEntrypoint', () => {
     );
   });
 
-  xit('should abort previously emitted actions if entrypoint was superseded', async () => {
+  it('should abort previously emitted actions if entrypoint was superseded', async () => {
     const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
       'default',
     ]);

@@ -82,57 +82,26 @@ export class GenericActionQueue<
       if (!action?.abortSignal?.aborted) {
         return action;
       }
+
+      this.log('%s was aborted', keyOf(action));
     }
 
     return undefined;
   }
 
   protected override enqueue(newAction: ActionQueueItem) {
-    const abortController = new AbortController();
-
-    const onParentAbort = () => {
-      abortController.abort();
-    };
-
-    if (newAction.abortSignal) {
-      newAction.abortSignal.addEventListener('abort', onParentAbort);
-    }
-
-    const unsubscribe = onSupersede(newAction.entrypoint, (newEntrypoint) => {
-      this.log(
-        'superseded by %s (only: %s, refs: %d)',
-        newEntrypoint.name,
-        newEntrypoint.only,
-        getRefsCount(newEntrypoint)
-      );
-      abortController.abort();
-      this.next(newAction.type, newEntrypoint, newAction, null);
+    newAction.abortSignal?.addEventListener('abort', () => {
+      this.services.eventEmitter.single({
+        type: 'queue-action',
+        queueIdx: this.queueIdx,
+        action: `${newAction.type}:abort`,
+        file: newAction.entrypoint.name,
+        args: newAction.entrypoint.only,
+      });
+      this.delete(keyOf(newAction));
     });
 
-    const onDequeue = () => {
-      this.log('done processing %s', newAction.entrypoint.name);
-      unsubscribe();
-      newAction.abortSignal?.removeEventListener('abort', onParentAbort);
-    };
-
-    // const idx = this.keys.get(key);
-    // if (idx !== undefined) {
-    //   // Merge with existing entry
-    //   const oldAction = this.data[idx];
-    //   const mergeAction = onCollide(oldAction, newAction);
-    //   console.log('mergeAction', mergeAction);
-    //   debugger;
-    //
-    //   return;
-    // }
-    //
-    super.enqueue(
-      {
-        ...newAction,
-        abortSignal: abortController.signal,
-      },
-      onDequeue
-    );
+    super.enqueue(newAction);
   }
 
   public next = <TType extends ActionQueueItem['type']>(

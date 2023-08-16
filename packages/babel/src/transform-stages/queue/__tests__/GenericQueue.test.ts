@@ -175,7 +175,7 @@ describe.each<[string, Queues]>([
     expect(onGetExports).toHaveBeenCalledWith(exports);
   });
 
-  it('should skip aborted actions', async () => {
+  it('should remove aborted actions', async () => {
     const abortController = new AbortController();
     const processEntrypoint: GetHandler<IProcessEntrypointAction> = (
       _services,
@@ -192,18 +192,6 @@ describe.each<[string, Queues]>([
 
     abortController.abort();
 
-    // The queue should have a transform action, but it should be aborted
-    expect(queue.isEmpty()).toBe(false);
-
-    // Try to run the transform action
-    await queue.runNext();
-
-    // And now the queue should be empty
     expect(queue.isEmpty()).toBe(true);
-
-    // And none of the handlers should have been called
-    Object.values(handlers).forEach((handler) => {
-      expect(handler).not.toHaveBeenCalled();
-    });
   });
 });
