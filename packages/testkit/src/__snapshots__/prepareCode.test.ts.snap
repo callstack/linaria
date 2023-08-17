@@ -14,6 +14,20 @@ exports[`prepareCode Testing transformation for dynamic-import: imports 1`] = `M
 
 exports[`prepareCode Testing transformation for dynamic-import: metadata 1`] = `Object {}`;
 
+exports[`prepareCode Testing transformation for dynamic-import-param: code 1`] = `
+"\\"use strict\\";
+
+exports.__esModule = true;
+exports.foo = foo;
+function foo(locale, onImport) {
+  __linaria_dynamic_import(\\"./foo/\\" + locale).then(onImport);
+}"
+`;
+
+exports[`prepareCode Testing transformation for dynamic-import-param: imports 1`] = `Map {}`;
+
+exports[`prepareCode Testing transformation for dynamic-import-param: metadata 1`] = `Object {}`;
+
 exports[`prepareCode Testing transformation for for-debug: code 1`] = `
 "'use strict';
 
