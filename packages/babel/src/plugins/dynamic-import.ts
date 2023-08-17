@@ -15,14 +15,26 @@ export default function dynamicImport(babel: Core): PluginObj {
         if (path.get('callee').isImport()) {
           const moduleName = path.get('arguments.0') as NodePath;
 
-          if (!moduleName.isStringLiteral()) {
-            throw new Error('Dynamic import argument must be a string literal');
+          if (moduleName.isStringLiteral()) {
+            path.replaceWith(
+              t.callExpression(t.identifier('__linaria_dynamic_import'), [
+                t.stringLiteral(moduleName.node.value),
+              ])
+            );
+            return;
           }
 
-          path.replaceWith(
-            t.callExpression(t.identifier('__linaria_dynamic_import'), [
-              t.stringLiteral(moduleName.node.value),
-            ])
+          if (moduleName.isTemplateLiteral()) {
+            path.replaceWith(
+              t.callExpression(t.identifier('__linaria_dynamic_import'), [
+                t.cloneNode(moduleName.node, true, true),
+              ])
+            );
+            return;
+          }
+
+          throw new Error(
+            'Dynamic import argument must be a string or a template literal'
           );
         }
       },
