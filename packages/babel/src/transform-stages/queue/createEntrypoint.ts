@@ -307,7 +307,7 @@ export function genericCreateEntrypoint<
     cache.invalidateIfChanged(name, loadedAndParsed.code);
     cache.add('originalAST', name, loadedAndParsed.ast);
 
-    log(
+    log.extend('source')(
       '[createEntrypoint] %s (%o)\n%s',
       name,
       mergedOnly,

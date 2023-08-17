@@ -144,7 +144,8 @@ export function internalTransform(
   if (code === preparedCode) {
     log('<< (%o)\n === no changes ===', only);
   } else {
-    log('<< (%o)\n%s', only, preparedCode || EMPTY_FILE);
+    log('<< (%o)', only);
+    log.extend('source')('%s', preparedCode || EMPTY_FILE);
   }
 
   if (preparedCode === '') {
