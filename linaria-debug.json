@@ -138,14 +138,14 @@
       "processImports(__linariaPreval)",
       "addToCodeCache(__linariaPreval)"
     ],
-    "src/components/Header.jsx": [
+    "src/components/Hero.jsx": [
       "processEntrypoint(__linariaPreval)",
       "transform(__linariaPreval)",
       "resolveImports(__linariaPreval)",
       "processImports(__linariaPreval)",
       "addToCodeCache(__linariaPreval)"
     ],
-    "src/components/Hero.jsx": [
+    "src/components/Header.jsx": [
       "processEntrypoint(__linariaPreval)",
       "transform(__linariaPreval)",
       "resolveImports(__linariaPreval)",
@@ -175,31 +175,31 @@
   },
   "timings": {
     "method": {
-      "parseFile": 33,
-      "createEntrypoint": 454,
+      "parseFile": 21,
+      "createEntrypoint": 536,
       "queue:processEntrypoint": 2,
-      "queue:transform:preeval:processTemplate": 155,
-      "queue:transform:preeval:removeDangerousCode": 39,
-      "queue:transform:preeval:rest-transformations": 92,
-      "queue:transform:preeval": 389,
-      "queue:transform:evaluator": 117,
-      "queue:transform": 505,
-      "queue:resolveImports": 210,
-      "queue:processImports": 23,
+      "queue:transform:preeval:processTemplate": 146,
+      "queue:transform:preeval:removeDangerousCode": 42,
+      "queue:transform:preeval:rest-transformations": 103,
+      "queue:transform:preeval": 368,
+      "queue:transform:evaluator": 138,
+      "queue:transform": 507,
+      "queue:resolveImports": 185,
+      "queue:processImports": 35,
       "queue:addToCodeCache": 0
     },
     "stage": {
-      "stage-1": 1224,
-      "stage-2": 26,
-      "stage-3": 129,
+      "stage-1": 1304,
+      "stage-2": 18,
+      "stage-3": 141,
       "stage-4": 12
     },
     "filename": {
-      "src/index.jsx": 721,
-      "src/components/App.jsx": 142,
-      "src/components/Header.jsx": 348,
-      "src/components/Hero.jsx": 281,
-      "src/components/Container.js": 35
+      "src/index.jsx": 833,
+      "src/components/App.jsx": 89,
+      "src/components/Header.jsx": 212,
+      "src/components/Hero.jsx": 437,
+      "src/components/Container.js": 39
     }
   }
 }
