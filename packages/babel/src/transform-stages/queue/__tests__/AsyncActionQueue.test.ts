@@ -8,7 +8,6 @@ import { processEntrypoint } from '../actions/processEntrypoint';
 import type {
   Services,
   IBaseAction,
-  IProcessEntrypointAction,
   ITransformAction,
   IBaseServices,
   Handler,
@@ -54,7 +53,6 @@ describe('AsyncActionQueue', () => {
   };
 
   it('should merge actions', () => {
-    const processEntrypoint = () => Promise.resolve();
     const fooBarQueue = createQueueFor('/foo/bar.js', {
       processEntrypoint,
     });
