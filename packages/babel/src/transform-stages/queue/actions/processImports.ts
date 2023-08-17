@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-syntax,no-continue,no-await-in-loop */
+/* eslint-disable no-restricted-syntax,no-continue */
 import { createEntrypoint } from '../createEntrypoint';
 import type { IProcessImportsAction, Next, Services } from '../types';
 

@@ -56,6 +56,8 @@ export class GenericActionQueue<
 
   protected readonly log: Debugger;
 
+  protected readonly processed = new WeakMap<IBaseEntrypoint, Set<string>>();
+
   public get logRef() {
     return {
       namespace: this.log.namespace,
@@ -83,7 +85,7 @@ export class GenericActionQueue<
     // eslint-disable-next-line no-cond-assign
     while ((action = super.dequeue())) {
       if (!action?.abortSignal?.aborted) {
-        this.log('Dequeued %s: %o', keyOf(action), this.data.map(keyOf));
+        this.log('Dequeued %s: %O', keyOf(action), this.data.map(keyOf));
 
         return action;
       }
@@ -95,6 +97,18 @@ export class GenericActionQueue<
   }
 
   protected override enqueue(newAction: ActionQueueItem) {
+    const key = keyOf(newAction);
+
+    if (!this.processed.has(newAction.entrypoint)) {
+      this.processed.set(newAction.entrypoint, new Set());
+    }
+
+    const processed = this.processed.get(newAction.entrypoint)!;
+    if (processed.has(key)) {
+      this.log('Skip %s because it was already processed', key);
+      return;
+    }
+
     const onAbort = () => {
       this.services.eventEmitter.single({
         type: 'queue-action',
@@ -112,8 +126,8 @@ export class GenericActionQueue<
       newAction.abortSignal?.removeEventListener('abort', onAbort);
     });
 
-    const key = keyOf(newAction);
-    this.log('Enqueued %s: %o', key, this.data.map(keyOf));
+    processed.add(key);
+    this.log('Enqueued %s: %O', key, this.data.map(keyOf));
   }
 
   public next = <TType extends ActionQueueItem['type']>(

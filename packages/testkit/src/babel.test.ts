@@ -13,7 +13,6 @@ import {
   loadLinariaOptions,
   TransformCacheCollection,
 } from '@linaria/babel-preset';
-import { enableDebug } from '@linaria/logger';
 import type { Evaluator, StrictOptions, OnEvent } from '@linaria/utils';
 import { EventEmitter } from '@linaria/utils';
 
@@ -3111,8 +3110,6 @@ describe('strategy shaker', () => {
   });
 
   describe('concurrent', () => {
-    enableDebug();
-
     it('two parallel chains of reexports', async () => {
       const cache = new TransformCacheCollection();
 

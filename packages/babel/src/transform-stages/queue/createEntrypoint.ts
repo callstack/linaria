@@ -226,17 +226,17 @@ export type LoadAndParseFn<TServices, TPluginOptions> = (
   pluginOptions: TPluginOptions
 ) => IEntrypointCode | 'ignored';
 
-const isLoop = (name: string, entrypoint: IBaseEntrypoint) => {
+const findParent = (name: string, entrypoint: IBaseEntrypoint) => {
   let next: IBaseEntrypoint | null = entrypoint;
   while (next) {
     if (next.name === name) {
-      return true;
+      return next;
     }
 
     next = next.parent;
   }
 
-  return false;
+  return null;
 };
 
 export function genericCreateEntrypoint<
@@ -314,20 +314,22 @@ export function genericCreateEntrypoint<
       loadedAndParsed.code || EMPTY_FILE
     );
 
+    const processedParent = isParent(parent) ? findParent(name, parent) : null;
+
     const newEntrypoint: IEntrypoint<TPluginOptions> = {
       ...loadedAndParsed,
       idx,
-      log,
+      log: processedParent?.log ?? log,
       name,
       only: mergedOnly,
-      parent: isParent(parent) ? parent : null,
+      parent: isParent(parent) ? processedParent?.parent ?? parent : null,
       pluginOptions,
     };
 
     cache.add('entrypoints', name, newEntrypoint);
     onCreate(newEntrypoint);
 
-    if (isParent(parent) && isLoop(name, parent)) {
+    if (processedParent) {
       log('[createEntrypoint] %s is a loop', name);
       return 'ignored';
     }

@@ -150,8 +150,7 @@ export abstract class PriorityQueue<
   protected enqueue(newNode: TNode, onDequeue?: () => void) {
     const key = keyFor(newNode);
     if (this.keys.has(key)) {
-      return;
-      // throw new Error(`Key ${key} already exists`);
+      throw new Error(`Key ${key} already exists`);
     }
 
     if (onDequeue) {
