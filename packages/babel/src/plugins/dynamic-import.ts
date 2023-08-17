@@ -33,7 +33,9 @@ export default function dynamicImport(babel: Core): PluginObj {
             return;
           }
 
-          throw new Error('Dynamic import argument must be a string or a template literal');
+          throw new Error(
+            'Dynamic import argument must be a string or a template literal'
+          );
         }
       },
     },
