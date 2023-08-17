@@ -227,14 +227,16 @@ export type LoadAndParseFn<TServices, TPluginOptions> = (
 ) => IEntrypointCode | 'ignored';
 
 const isLoop = (name: string, entrypoint: IBaseEntrypoint) => {
-  const ancestors = [entrypoint];
-  let { parent } = entrypoint;
-  while (parent) {
-    ancestors.push(parent);
-    parent = parent.parent;
+  let next: IBaseEntrypoint | null = entrypoint;
+  while (next) {
+    if (next.name === name) {
+      return true;
+    }
+
+    next = next.parent;
   }
 
-  return new Set(ancestors.map((i) => i.name)).has(name);
+  return false;
 };
 
 export function genericCreateEntrypoint<
