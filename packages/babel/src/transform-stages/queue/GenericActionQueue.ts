@@ -1,11 +1,12 @@
 import { relative, sep } from 'path';
 
+import type { Debugger } from '@linaria/logger';
+
 import type { IBaseEntrypoint } from '../../types';
 
 import { PriorityQueue } from './PriorityQueue';
 import { createAction, getRefsCount, keyOf } from './actions/action';
 import { actionRunner } from './actions/actionRunner';
-import { onSupersede } from './createEntrypoint';
 import type {
   DataOf,
   ActionByType,
@@ -53,6 +54,8 @@ export class GenericActionQueue<
 > extends PriorityQueue<ActionQueueItem> {
   protected readonly queueIdx: string;
 
+  protected readonly log: Debugger;
+
   public get logRef() {
     return {
       namespace: this.log.namespace,
@@ -65,11 +68,11 @@ export class GenericActionQueue<
     protected handlers: Handlers<TRes, TServices>,
     entrypoint: IBaseEntrypoint
   ) {
-    const log = entrypoint.log.extend('queue');
+    super(hasLessPriority);
 
-    super(log, keyOf, hasLessPriority);
+    this.log = entrypoint.log.extend('queue');
 
-    log('Created for entrypoint %s', entrypoint.name);
+    this.log('Created for entrypoint %s', entrypoint.name);
     this.queueIdx = entrypoint.idx;
 
     this.next('processEntrypoint', entrypoint, {});
@@ -80,6 +83,8 @@ export class GenericActionQueue<
     // eslint-disable-next-line no-cond-assign
     while ((action = super.dequeue())) {
       if (!action?.abortSignal?.aborted) {
+        this.log('Dequeued %s: %o', keyOf(action), this.data.map(keyOf));
+
         return action;
       }
 
@@ -98,10 +103,13 @@ export class GenericActionQueue<
         file: newAction.entrypoint.name,
         args: newAction.entrypoint.only,
       });
-      this.delete(keyOf(newAction));
+      this.delete(newAction);
     });
 
     super.enqueue(newAction);
+
+    const key = keyOf(newAction);
+    this.log('Enqueued %s: %o', key, this.data.map(keyOf));
   }
 
   public next = <TType extends ActionQueueItem['type']>(

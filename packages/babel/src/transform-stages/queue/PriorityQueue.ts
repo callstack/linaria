@@ -1,6 +1,21 @@
-import type { Debugger } from '@linaria/logger';
+import { nanoid } from 'nanoid';
 
-export abstract class PriorityQueue<TNode> {
+const keys = new WeakMap<object, string>();
+const keyFor = (obj: object | number | string): string => {
+  if (typeof obj === 'object') {
+    if (!keys.has(obj)) {
+      keys.set(obj, nanoid(10));
+    }
+
+    return keys.get(obj)!;
+  }
+
+  return obj.toString();
+};
+
+export abstract class PriorityQueue<
+  TNode extends object | { toString(): string }
+> {
   protected data: Array<TNode> = [];
 
   protected keys: Map<string, number> = new Map();
@@ -8,8 +23,6 @@ export abstract class PriorityQueue<TNode> {
   protected dequeueCallbacks: Map<TNode, () => void> = new Map();
 
   protected constructor(
-    protected readonly log: Debugger,
-    private readonly keyOf: (node: TNode) => string,
     private readonly hasLessPriority: (a: TNode, b: TNode) => boolean
   ) {}
 
@@ -17,7 +30,8 @@ export abstract class PriorityQueue<TNode> {
     return this.data.length;
   }
 
-  protected delete(key: string) {
+  protected delete(node: TNode) {
+    const key = keyFor(node);
     const idx = this.keys.get(key);
     if (idx === undefined) return;
 
@@ -107,7 +121,7 @@ export abstract class PriorityQueue<TNode> {
   }
 
   private updateKey(i: number) {
-    this.keys.set(this.keyOf(this.data[i - 1]), i - 1);
+    this.keys.set(keyFor(this.data[i - 1]), i - 1);
   }
 
   protected dequeue(): TNode | undefined {
@@ -117,7 +131,6 @@ export abstract class PriorityQueue<TNode> {
     if (this.size === 1) {
       this.data = [];
       this.keys.clear();
-      this.log('Dequeued %s', this.keyOf(max));
       this.onDequeue(max);
       return max;
     }
@@ -129,20 +142,23 @@ export abstract class PriorityQueue<TNode> {
       this.heapifyDown(1);
     }
 
-    this.keys.delete(this.keyOf(max));
-    this.log('Dequeued %s: %o', this.keyOf(max), this.data.map(this.keyOf));
+    this.keys.delete(keyFor(max));
     this.onDequeue(max);
     return max;
   }
 
   protected enqueue(newNode: TNode, onDequeue?: () => void) {
+    const key = keyFor(newNode);
+    if (this.keys.has(key)) {
+      return;
+      // throw new Error(`Key ${key} already exists`);
+    }
+
     if (onDequeue) {
       this.dequeueCallbacks.set(newNode, onDequeue);
     }
 
-    const key = this.keyOf(newNode);
     this.increaseKey(this.size + 1, newNode);
-    this.log('Enqueued %s: %o', key, this.data.map(this.keyOf));
   }
 
   public isEmpty() {

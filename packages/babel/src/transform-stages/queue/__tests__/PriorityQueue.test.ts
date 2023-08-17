@@ -1,16 +1,11 @@
 import { PriorityQueue } from '../PriorityQueue';
-import { rootLog } from '../rootLog';
 
 class NumberQueue extends PriorityQueue<number> {
   constructor() {
-    super(
-      rootLog,
-      (i) => i.toString(),
-      (a, b) => a < b
-    );
+    super((a, b) => a < b);
   }
 
-  public delete(item: string) {
+  public delete(item: number) {
     super.delete(item);
   }
 
@@ -67,7 +62,7 @@ describe('PriorityQueue', () => {
     it('should dequeue in order after delete', () => {
       const queue = new NumberQueue();
       [2, 1, 4, 3, 5].forEach((i) => queue.enqueue(i));
-      queue.delete('3');
+      queue.delete(3);
       expect(queue.dump()).toEqual([5, 4, 2, 1]);
     });
   });
