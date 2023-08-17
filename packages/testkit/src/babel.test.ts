@@ -2735,6 +2735,25 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should process circular imports', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from '@linaria/react';
+      import { fooStyles } from "./__fixtures__/circular-imports";
+
+      const value = fooStyles.constBar;
+
+      export const H1 = styled.h1\`
+        color: ${'${value}'};
+      \`
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('evaluates chain of reexports', async () => {
     const onEvent = jest.fn<void, Parameters<OnEvent>>();
     const emitter = new EventEmitter(onEvent);

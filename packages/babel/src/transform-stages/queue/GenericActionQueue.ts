@@ -95,7 +95,7 @@ export class GenericActionQueue<
   }
 
   protected override enqueue(newAction: ActionQueueItem) {
-    newAction.abortSignal?.addEventListener('abort', () => {
+    const onAbort = () => {
       this.services.eventEmitter.single({
         type: 'queue-action',
         queueIdx: this.queueIdx,
@@ -104,9 +104,13 @@ export class GenericActionQueue<
         args: newAction.entrypoint.only,
       });
       this.delete(newAction);
-    });
+    };
 
-    super.enqueue(newAction);
+    newAction.abortSignal?.addEventListener('abort', onAbort);
+
+    super.enqueue(newAction, () => {
+      newAction.abortSignal?.removeEventListener('abort', onAbort);
+    });
 
     const key = keyOf(newAction);
     this.log('Enqueued %s: %o', key, this.data.map(keyOf));

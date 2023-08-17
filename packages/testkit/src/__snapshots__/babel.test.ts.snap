@@ -2350,6 +2350,27 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker should process circular imports 1`] = `
+"import { styled } from '@linaria/react';
+export const H1 = /*#__PURE__*/styled('h1')({
+  name: \\"H1\\",
+  class: \\"H1_h13jq05\\",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker should process circular imports 2`] = `
+
+CSS:
+
+.H1_h13jq05 {
+  color: bar;
+}
+
+Dependencies: ./__fixtures__/circular-imports
+
+`;
+
 exports[`strategy shaker should process griffel makeStyles 1`] = `
 "import { __styles as _styles } from \\"@griffel/react\\";
 export const useStyles = /*#__PURE__*/_styles({

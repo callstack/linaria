@@ -226,6 +226,17 @@ export type LoadAndParseFn<TServices, TPluginOptions> = (
   pluginOptions: TPluginOptions
 ) => IEntrypointCode | 'ignored';
 
+const isLoop = (name: string, entrypoint: IBaseEntrypoint) => {
+  const ancestors = [entrypoint];
+  let { parent } = entrypoint;
+  while (parent) {
+    ancestors.push(parent);
+    parent = parent.parent;
+  }
+
+  return new Set(ancestors.map((i) => i.name)).has(name);
+};
+
 export function genericCreateEntrypoint<
   TServices extends Pick<Services, 'cache' | 'eventEmitter'>,
   TPluginOptions
@@ -313,6 +324,11 @@ export function genericCreateEntrypoint<
 
     cache.add('entrypoints', name, newEntrypoint);
     onCreate(newEntrypoint);
+
+    if (isParent(parent) && isLoop(name, parent)) {
+      log('[createEntrypoint] %s is a loop', name);
+      return 'ignored';
+    }
 
     return newEntrypoint;
   });
