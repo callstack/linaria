@@ -175,31 +175,31 @@
   },
   "timings": {
     "method": {
-      "parseFile": 32,
-      "createEntrypoint": 489,
+      "parseFile": 44,
+      "createEntrypoint": 495,
       "queue:processEntrypoint": 2,
-      "queue:transform:preeval:processTemplate": 111,
-      "queue:transform:preeval:removeDangerousCode": 56,
-      "queue:transform:preeval:rest-transformations": 108,
-      "queue:transform:preeval": 360,
-      "queue:transform:evaluator": 142,
-      "queue:transform": 503,
-      "queue:resolveImports": 248,
+      "queue:transform:preeval:processTemplate": 140,
+      "queue:transform:preeval:removeDangerousCode": 32,
+      "queue:transform:preeval:rest-transformations": 135,
+      "queue:transform:preeval": 398,
+      "queue:transform:evaluator": 105,
+      "queue:transform": 504,
+      "queue:resolveImports": 256,
       "queue:processImports": 40,
       "queue:addToCodeCache": 0
     },
     "stage": {
-      "stage-1": 1325,
-      "stage-2": 15,
-      "stage-3": 197,
-      "stage-4": 16
+      "stage-1": 1357,
+      "stage-2": 23,
+      "stage-3": 165,
+      "stage-4": 5
     },
     "filename": {
-      "src/index.jsx": 773,
-      "src/components/App.jsx": 97,
-      "src/components/Header.jsx": 407,
-      "src/components/Hero.jsx": 390,
-      "src/components/Container.js": 34
+      "src/index.jsx": 750,
+      "src/components/App.jsx": 112,
+      "src/components/Header.jsx": 387,
+      "src/components/Hero.jsx": 393,
+      "src/components/Container.js": 46
     }
   }
 }
