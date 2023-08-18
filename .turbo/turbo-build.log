@@ -8,34 +8,35 @@
 
 
 Timings:
-  Total: 8239ms
+  Total: 10209ms
 
   By method:
-    createEntrypoint: 495ms
-    parseFile: 44ms
+    createEntrypoint: 642ms
+    parseFile: 51ms
     queue:addToCodeCache: 0ms
-    queue:processEntrypoint: 2ms
+    queue:explodeReexports: 0ms
+    queue:processEntrypoint: 0ms
     queue:processImports: 40ms
-    queue:resolveImports: 256ms
-    queue:transform: 504ms
-    queue:transform:evaluator: 105ms
-    queue:transform:preeval: 398ms
-    queue:transform:preeval:processTemplate: 140ms
-    queue:transform:preeval:removeDangerousCode: 32ms
-    queue:transform:preeval:rest-transformations: 135ms
+    queue:resolveImports: 273ms
+    queue:transform: 658ms
+    queue:transform:evaluator: 109ms
+    queue:transform:preeval: 547ms
+    queue:transform:preeval:processTemplate: 199ms
+    queue:transform:preeval:removeDangerousCode: 44ms
+    queue:transform:preeval:rest-transformations: 152ms
 
   By stage:
-    stage-1: 1357ms
-    stage-2: 23ms
-    stage-3: 165ms
-    stage-4: 5ms
+    stage-1: 1757ms
+    stage-2: 47ms
+    stage-3: 148ms
+    stage-4: 6ms
 
   By filename:
-    src/components/App.jsx: 112ms
-    src/components/Container.js: 46ms
-    src/components/Header.jsx: 387ms
-    src/components/Hero.jsx: 393ms
-    src/index.jsx: 750ms
+    src/components/App.jsx: 159ms
+    src/components/Container.js: 53ms
+    src/components/Header.jsx: 534ms
+    src/components/Hero.jsx: 471ms
+    src/index.jsx: 925ms
 assets by info 63.5 KiB [1m[32m[immutable][39m[22m
   asset [1m[32mc9d5cf961634b7622bef.png[39m[22m 59.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/code-sample-v4.png] (auxiliary name: app)
   asset [1m[32m62f658e6bb6e95783a3b.svg[39m[22m 2.88 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/linaria-logo.svg] (auxiliary name: app)
@@ -60,9 +61,9 @@ cacheable modules 147 KiB (javascript) 62.6 KiB (asset) 2.7 KiB (css/mini-extrac
       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Hero.jsx[39m[22m 1.35 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/index.jsx[39m[22m 311 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Container.js[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.76.0 compiled [1m[32msuccessfully[39m[22m in 7645 ms
+webpack 5.76.0 compiled [1m[32msuccessfully[39m[22m in 9166 ms
 
 > linaria-website@4.5.4 build:server /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
 
-Successfully compiled 11 files with Babel (1523ms).
+Successfully compiled 11 files with Babel (2351ms).
