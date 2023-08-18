@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-syntax,no-continue,no-await-in-loop */
+/* eslint-disable no-restricted-syntax,no-continue,no-await-in-loop,require-yield */
 import { getFileIdx } from '@linaria/utils';
 
 import type { IBaseEntrypoint } from '../../../types';
@@ -7,8 +7,9 @@ import type {
   IResolveImportsAction,
   Services,
   IResolvedImport,
-  Next,
 } from '../types';
+
+import type { ActionGenerator, AsyncActionGenerator } from './types';
 
 const includes = (a: string[], b: string[]) => {
   if (a.includes('*')) return true;
@@ -91,13 +92,11 @@ function addToCache(
 /**
  * Synchronously resolves specified imports with a provided resolver.
  */
-export function syncResolveImports(
+export function* syncResolveImports(
   resolve: (what: string, importer: string, stack: string[]) => string,
   { cache, eventEmitter }: Services,
-  action: IResolveImportsAction,
-  next: Next,
-  callbacks: { resolve: (result: IResolvedImport[]) => void }
-) {
+  action: IResolveImportsAction
+): ActionGenerator<IResolveImportsAction> {
   const { imports, entrypoint } = action;
   const listOfImports = Array.from(imports?.entries() ?? []);
   const { log } = entrypoint;
@@ -106,8 +105,7 @@ export function syncResolveImports(
     emitDependency(eventEmitter, entrypoint, []);
 
     log('%s has no imports', entrypoint.name);
-    callbacks.resolve([]);
-    return;
+    return [];
   }
 
   const resolvedImports = listOfImports.map(([importedFile, importsOnly]) => {
@@ -137,23 +135,22 @@ export function syncResolveImports(
 
   const filteredImports = addToCache(cache, entrypoint, resolvedImports);
   emitDependency(eventEmitter, entrypoint, filteredImports);
-  callbacks.resolve(filteredImports);
+
+  return filteredImports;
 }
 
 /**
  * Asynchronously resolves specified imports with a provided resolver.
  */
-export async function asyncResolveImports(
+export async function* asyncResolveImports(
   resolve: (
     what: string,
     importer: string,
     stack: string[]
   ) => Promise<string | null>,
   { cache, eventEmitter }: Services,
-  action: IResolveImportsAction,
-  next: Next,
-  callbacks: { resolve: (result: IResolvedImport[]) => void }
-) {
+  action: IResolveImportsAction
+): AsyncActionGenerator<IResolveImportsAction> {
   const { imports, entrypoint } = action;
   const listOfImports = Array.from(imports?.entries() ?? []);
   const { log } = entrypoint;
@@ -162,8 +159,7 @@ export async function asyncResolveImports(
     emitDependency(eventEmitter, entrypoint, []);
 
     log('%s has no imports', entrypoint.name);
-    callbacks.resolve([]);
-    return;
+    return [];
   }
 
   log('resolving %d imports', listOfImports.length);
@@ -272,5 +268,6 @@ export async function asyncResolveImports(
 
   const filteredImports = addToCache(cache, entrypoint, resolvedImports);
   emitDependency(eventEmitter, entrypoint, filteredImports);
-  callbacks.resolve(filteredImports);
+
+  return filteredImports;
 }

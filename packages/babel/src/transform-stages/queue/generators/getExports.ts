@@ -8,39 +8,20 @@ import type {
   IResolvedImport,
   Next,
   Services,
+  ActionGenerator,
 } from '../types';
 
-export function findExportsInImports(
+import { emitAndGetResultOf } from './helpers/emitAndGetResultOf';
+
+export function* findExportsInImports(
   services: Services,
   action: IGetExportsAction | IExplodeReexportsAction,
-  next: Next,
-  imports: IResolvedImport[],
-  callbacks: {
-    resolve: (replacements: Record<string, string[]>) => void;
-  }
-) {
-  let remaining = imports.length;
+  imports: IResolvedImport[]
+): Generator<Parameters<Next>, Record<string, string[]>, never> {
   let results: Record<string, string[]> = {};
 
-  const onResolve = (res: Record<string, string[]>) => {
-    results = {
-      ...results,
-      ...res,
-    };
-
-    remaining -= 1;
-
-    if (remaining === 0) {
-      callbacks.resolve(results);
-    }
-  };
-
-  if (imports.length === 0) {
-    callbacks.resolve({});
-    return;
-  }
-
-  imports.forEach((imp) => {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const imp of imports) {
     const { resolved } = imp;
     if (!resolved) {
       throw new Error(`Could not resolve import ${imp.importedFile}`);
@@ -56,24 +37,24 @@ export function findExportsInImports(
     );
 
     if (newEntrypoint === 'ignored') {
-      onResolve({});
-      return;
+      // eslint-disable-next-line no-continue
+      continue;
     }
 
-    next('getExports', newEntrypoint, {}).on('resolve', (exports) => {
-      onResolve({
-        [imp.importedFile]: exports,
-      });
-    });
-  });
+    const exports = yield* emitAndGetResultOf('getExports', newEntrypoint, {});
+    results = {
+      ...results,
+      [imp.importedFile]: exports,
+    };
+  }
+
+  return results;
 }
 
-export function getExports(
+export function* getExports(
   services: Services,
-  action: IGetExportsAction,
-  next: Next,
-  callbacks: { resolve: (result: string[]) => void }
-) {
+  action: IGetExportsAction
+): ActionGenerator<IGetExportsAction> {
   const { entrypoint } = action;
 
   entrypoint.log(`get exports from %s`, entrypoint.name);
@@ -99,22 +80,24 @@ export function getExports(
   });
 
   if (withWildcardReexport.length) {
-    const onResolved = (res: Record<string, string[]>) => {
-      Object.values(res).forEach((identifiers) => {
-        result.push(...identifiers);
-      });
+    const resolvedImports = yield* emitAndGetResultOf(
+      'resolveImports',
+      action.entrypoint,
+      {
+        imports: new Map(withWildcardReexport.map((i) => [i.source, []])),
+      }
+    );
 
-      callbacks.resolve(result);
-    };
+    const exports = yield* findExportsInImports(
+      services,
+      action,
+      resolvedImports
+    );
 
-    next('resolveImports', action.entrypoint, {
-      imports: new Map(withWildcardReexport.map((i) => [i.source, []])),
-    }).on('resolve', (resolvedImports) => {
-      findExportsInImports(services, action, next, resolvedImports, {
-        resolve: onResolved,
-      });
+    Object.values(exports).forEach((identifiers) => {
+      result.push(...identifiers);
     });
-  } else {
-    callbacks.resolve(result);
   }
+
+  return result;
 }

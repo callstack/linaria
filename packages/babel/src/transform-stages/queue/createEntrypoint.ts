@@ -171,6 +171,8 @@ function loadAndParse(
   };
 }
 
+const supersededWith = new WeakMap<IBaseEntrypoint, IBaseEntrypoint>();
+
 const supersedeHandlers = new WeakMap<
   IBaseEntrypoint,
   Array<(newEntrypoint: IEntrypoint<unknown>) => void>
@@ -180,6 +182,11 @@ export function onSupersede<T extends IBaseEntrypoint>(
   entrypoint: T,
   callback: (newEntrypoint: T) => void
 ) {
+  if (supersededWith.has(entrypoint)) {
+    callback(supersededWith.get(entrypoint)! as T);
+    return () => {};
+  }
+
   if (!supersedeHandlers.has(entrypoint)) {
     supersedeHandlers.set(entrypoint, []);
   }
@@ -198,8 +205,6 @@ export function onSupersede<T extends IBaseEntrypoint>(
   };
 }
 
-const supersededWith = new WeakMap<IBaseEntrypoint, IBaseEntrypoint>();
-
 export function supersedeEntrypoint<TPluginOptions>(
   services: Pick<Services, 'cache'>,
   oldEntrypoint: IEntrypoint<TPluginOptions>,
@@ -212,10 +217,6 @@ export function supersedeEntrypoint<TPluginOptions>(
   supersedeHandlers
     .get(oldEntrypoint)
     ?.forEach((handler) => handler(newEntrypoint));
-}
-
-export function getSupersededWith(entrypoint: IBaseEntrypoint) {
-  return supersededWith.get(entrypoint);
 }
 
 export type LoadAndParseFn<TServices, TPluginOptions> = (

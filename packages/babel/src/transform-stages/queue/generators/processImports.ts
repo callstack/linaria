@@ -1,15 +1,18 @@
 /* eslint-disable no-restricted-syntax,no-continue */
 import { createEntrypoint } from '../createEntrypoint';
-import type { IProcessImportsAction, Next, Services } from '../types';
+import type {
+  IProcessImportsAction,
+  Services,
+  ActionGenerator,
+} from '../types';
 
 /**
  * Creates new entrypoints and emits processEntrypoint for each resolved import
  */
-export function processImports(
+export function* processImports(
   services: Services,
-  action: IProcessImportsAction,
-  next: Next
-) {
+  action: IProcessImportsAction
+): ActionGenerator<IProcessImportsAction> {
   const { resolved: resolvedImports, entrypoint } = action;
 
   for (const { importsOnly, resolved } of resolvedImports) {
@@ -25,6 +28,6 @@ export function processImports(
       continue;
     }
 
-    next('processEntrypoint', nextEntrypoint, {}, null);
+    yield ['processEntrypoint', nextEntrypoint, {}, null];
   }
 }

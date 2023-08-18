@@ -34,7 +34,7 @@
     "dedent": "^0.7.0",
     "esbuild": "^0.15.16",
     "strip-ansi": "^5.2.0",
-    "typescript": "^4.7.4"
+    "typescript": "^5.1.6"
   },
   "devDependencies": {
     "@babel/plugin-syntax-jsx": "^7.22.5",

@@ -35,21 +35,6 @@ export interface IEntrypoint<TPluginOptions = StrictOptions>
   pluginOptions: TPluginOptions;
 }
 
-export type EventEmitters<TEvents extends Record<string, unknown[]>> = {
-  [K in keyof TEvents]: (...args: TEvents[K]) => void;
-};
-
-export type EventsHandlers<TEvents extends Record<string, unknown[]>> = {
-  [K in keyof TEvents]?: Array<(...args: TEvents[K]) => void>;
-};
-
-export type ActionOn<TEvents extends Record<string, unknown[]>> = <
-  K extends keyof TEvents
->(
-  type: K,
-  callback: (...args: TEvents[K]) => void
-) => void;
-
 export type ActionByType<TType extends ActionQueueItem['type']> = Extract<
   ActionQueueItem,
   {
@@ -63,12 +48,11 @@ export interface IBaseServices {
 
 export interface IBaseAction<
   TEntrypoint extends IBaseEntrypoint = IBaseEntrypoint,
-  TEvents extends Record<string, unknown[]> = Record<never, unknown[]>
+  TResult = unknown
 > extends IBaseNode {
   abortSignal: AbortSignal | null;
-  callbacks?: EventsHandlers<TEvents>;
   entrypoint: TEntrypoint;
-  on: ActionOn<TEvents>;
+  result?: TResult;
 }
 
 export type DataOf<TNode extends ActionQueueItem> = Omit<
@@ -79,17 +63,8 @@ export type DataOf<TNode extends ActionQueueItem> = Omit<
 export type Handler<
   TServices extends IBaseServices,
   TAction extends IBaseAction,
-  TRes
-> = (
-  services: TServices,
-  action: TAction,
-  next: Next,
-  callbacks: EventEmitters<
-    TAction extends IBaseAction<IBaseEntrypoint, infer TEvents>
-      ? TEvents
-      : Record<never, unknown[]>
-  >
-) => TRes;
+  TRes extends AnyActionGenerator
+> = (services: TServices, action: TAction) => TRes;
 
 export type Next = <TType extends ActionQueueItem['type']>(
   type: TType,
@@ -98,33 +73,44 @@ export type Next = <TType extends ActionQueueItem['type']>(
   abortSignal?: AbortSignal | null
 ) => Extract<ActionQueueItem, { type: TType }>;
 
-export interface IExplodeReexportsAction extends IBaseAction<IEntrypoint> {
+export type ActionGenerator<TAction extends IBaseAction> = Generator<
+  Parameters<Next>,
+  TAction extends IBaseAction<IBaseEntrypoint, infer TResult> ? TResult : never,
+  never
+>;
+
+export type AsyncActionGenerator<TAction extends IBaseAction> = AsyncGenerator<
+  Parameters<Next>,
+  TAction extends IBaseAction<IBaseEntrypoint, infer TResult> ? TResult : never,
+  never
+>;
+
+export type AnyActionGenerator<
+  TAction extends ActionQueueItem = ActionQueueItem
+> = ActionGenerator<TAction> | AsyncActionGenerator<TAction>;
+
+export type Continuation<TAction extends ActionQueueItem = ActionQueueItem> = {
+  action: TAction;
+  generator: AnyActionGenerator<TAction>;
+  uid: string;
+};
+
+export interface IExplodeReexportsAction
+  extends IBaseAction<IEntrypoint, void> {
   type: 'explodeReexports';
 }
 
 export interface IProcessEntrypointAction<
   TEntrypoint extends IBaseEntrypoint = IBaseEntrypoint
-> extends IBaseAction<TEntrypoint> {
+> extends IBaseAction<TEntrypoint, void> {
   type: 'processEntrypoint';
 }
 
-export interface ITransformAction
-  extends IBaseAction<
-    IEntrypoint,
-    {
-      done: [];
-    }
-  > {
+export interface ITransformAction extends IBaseAction<IEntrypoint, void> {
   type: 'transform';
 }
 
-export interface IAddToCodeCacheAction
-  extends IBaseAction<
-    IBaseEntrypoint,
-    {
-      done: [];
-    }
-  > {
+export interface IAddToCodeCacheAction extends IBaseAction<IEntrypoint, void> {
   type: 'addToCodeCache';
   data: {
     imports: Map<string, string[]> | null;
@@ -140,28 +126,17 @@ export interface IResolvedImport {
 }
 
 export interface IResolveImportsAction
-  extends IBaseAction<
-    IBaseEntrypoint,
-    {
-      resolve: [result: IResolvedImport[]];
-    }
-  > {
+  extends IBaseAction<IBaseEntrypoint, IResolvedImport[]> {
   type: 'resolveImports';
   imports: Map<string, string[]> | null;
 }
 
-export interface IProcessImportsAction extends IBaseAction<IEntrypoint> {
+export interface IProcessImportsAction extends IBaseAction<IEntrypoint, void> {
   type: 'processImports';
   resolved: IResolvedImport[];
 }
 
-export interface IGetExportsAction
-  extends IBaseAction<
-    IEntrypoint,
-    {
-      resolve: [exports: string[]];
-    }
-  > {
+export interface IGetExportsAction extends IBaseAction<IEntrypoint, string[]> {
   type: 'getExports';
 }
 

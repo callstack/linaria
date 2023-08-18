@@ -5,7 +5,6 @@ import type {
   ActionQueueItem,
   IBaseAction,
   DataOf,
-  EventsHandlers,
   ActionByType,
 } from '../types';
 
@@ -47,55 +46,18 @@ export const addRef = (entrypoint: IBaseEntrypoint, action: IBaseAction) => {
   actionsForEntrypoints.get(entrypoint)?.add(action);
 };
 
-function innerCreateAction<TType extends ActionQueueItem['type']>(
-  actionType: TType,
-  entrypoint: IBaseEntrypoint,
-  data: DataOf<ActionByType<TType>>,
-  abortSignal: AbortSignal | null
-): ActionByType<TType> {
-  type Events = (ActionByType<TType> extends IBaseAction<
-    IBaseEntrypoint,
-    infer TEvents
-  >
-    ? TEvents
-    : Record<never, unknown[]>) &
-    Record<string, unknown[]>;
-
-  type Callbacks = EventsHandlers<Events>;
-  const callbacks: Callbacks = {};
-
-  const on = <T extends keyof Callbacks>(
-    type: T,
-    callback: (...args: Events[T]) => void
-  ) => {
-    if (!callback) {
-      return;
-    }
-
-    if (!callbacks[type]) {
-      callbacks[type] = [];
-    }
-
-    callbacks[type]!.push(callback);
-  };
-
-  return {
-    ...data,
-    abortSignal,
-    callbacks,
-    type: actionType,
-    entrypoint,
-    on,
-  } as ActionByType<TType>;
-}
-
 export function createAction<TType extends ActionQueueItem['type']>(
   actionType: TType,
   entrypoint: IBaseEntrypoint,
   data: DataOf<ActionByType<TType>>,
   abortSignal: AbortSignal | null = null
 ): ActionByType<TType> {
-  const action = innerCreateAction(actionType, entrypoint, data, abortSignal);
+  const action = {
+    ...data,
+    abortSignal,
+    type: actionType,
+    entrypoint,
+  } as ActionByType<TType>;
   addRef(entrypoint, action);
   return action;
 }

@@ -11,7 +11,14 @@ import { buildOptions, getPluginKey } from '@linaria/utils';
 import type { Core } from '../../../babel';
 import type Module from '../../../module';
 import withLinariaMetadata from '../../../utils/withLinariaMetadata';
-import type { IEntrypoint, ITransformAction, Next, Services } from '../types';
+import type {
+  IEntrypoint,
+  ITransformAction,
+  Services,
+  ActionGenerator,
+} from '../types';
+
+import { emitAndGetResultOf } from './helpers/emitAndGetResultOf';
 
 const EMPTY_FILE = '=== empty file ===';
 
@@ -123,13 +130,11 @@ export const prepareCode: PrepareCodeFn = (
   return [code, imports, preevalStageResult.metadata];
 };
 
-export function internalTransform(
+export function* internalTransform(
   prepareFn: PrepareCodeFn,
   services: Services,
-  action: ITransformAction,
-  next: Next,
-  callbacks: { done: () => void }
-): void {
+  action: ITransformAction
+): ActionGenerator<ITransformAction> {
   const { name, only, code, log, ast } = action.entrypoint;
 
   log('>> (%o)', only);
@@ -150,32 +155,40 @@ export function internalTransform(
 
   if (preparedCode === '') {
     log('%s is skipped', name);
-    callbacks.done();
     return;
   }
 
-  next('resolveImports', action.entrypoint, {
-    imports,
-  }).on('resolve', (resolvedImports) => {
-    if (resolvedImports.length === 0) {
-      return;
-    }
-
-    next('processImports', action.entrypoint, {
-      resolved: resolvedImports,
-    });
-  });
-
-  next('addToCodeCache', action.entrypoint, {
-    data: {
+  const resolvedImports = yield* emitAndGetResultOf(
+    'resolveImports',
+    action.entrypoint,
+    {
       imports,
-      result: {
-        code: preparedCode,
-        metadata,
+    }
+  );
+
+  if (resolvedImports.length !== 0) {
+    yield [
+      'processImports',
+      action.entrypoint,
+      {
+        resolved: resolvedImports,
       },
-      only,
+    ];
+  }
+
+  yield [
+    'addToCodeCache',
+    action.entrypoint,
+    {
+      data: {
+        imports,
+        result: {
+          code: preparedCode,
+          metadata,
+        },
+      },
     },
-  }).on('done', callbacks.done);
+  ];
 }
 
 /**

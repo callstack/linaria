@@ -6,17 +6,17 @@ import type { TransformCacheCollection } from '../cache';
 import type { ITransformFileResult, Options } from '../types';
 
 import { AsyncActionQueue, SyncActionQueue } from './queue/ActionQueue';
-import { addToCodeCache } from './queue/actions/addToCodeCache';
-import { explodeReexports } from './queue/actions/explodeReexports';
-import { getExports } from './queue/actions/getExports';
-import { processEntrypoint } from './queue/actions/processEntrypoint';
-import { processImports } from './queue/actions/processImports';
+import { createEntrypoint } from './queue/createEntrypoint';
+import { addToCodeCache } from './queue/generators/addToCodeCache';
+import { explodeReexports } from './queue/generators/explodeReexports';
+import { getExports } from './queue/generators/getExports';
+import { processEntrypoint } from './queue/generators/processEntrypoint';
+import { processImports } from './queue/generators/processImports';
 import {
   asyncResolveImports,
   syncResolveImports,
-} from './queue/actions/resolveImports';
-import { transform } from './queue/actions/transform';
-import { createEntrypoint } from './queue/createEntrypoint';
+} from './queue/generators/resolveImports';
+import { transform } from './queue/generators/transform';
 import { rootLog } from './queue/rootLog';
 import type { IEntrypoint } from './queue/types';
 

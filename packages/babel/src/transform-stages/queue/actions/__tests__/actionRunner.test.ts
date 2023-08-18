@@ -6,14 +6,19 @@ import {
   fakeLoadAndParse,
 } from '../../__tests__/entrypoint-helpers';
 import type {
-  Next,
   Services,
   IProcessEntrypointAction,
   ActionQueueItem,
   Handler,
+  ActionGenerator,
+  AnyActionGenerator,
+  Continuation,
 } from '../../types';
 import { createAction } from '../action';
 import { actionRunner } from '../actionRunner';
+
+type QueueItem = ActionQueueItem | Continuation;
+type Queue = QueueItem[];
 
 describe('actionRunner', () => {
   let services: Pick<Services, 'cache' | 'eventEmitter'>;
@@ -38,34 +43,17 @@ describe('actionRunner', () => {
       null
     );
 
-    const handler = jest.fn();
+    const handler1 = jest.fn();
+    const handler2 = jest.fn();
+    function* handlerGenerator(): ActionGenerator<IProcessEntrypointAction> {
+      handler1();
+      yield ['resolveImports', action.entrypoint, { imports: new Map() }, null];
+      handler2();
+    }
 
-    actionRunner(services, () => {}, handler, action, '0001');
-    expect(handler).toHaveBeenCalledTimes(1);
-  });
-
-  it('should run action with callbacks', () => {
-    const onDone = jest.fn();
-    const action = createAction(
-      'transform',
-      createEntrypoint(services, '/foo/bar.js', ['default']),
-      {},
-      null
-    );
-
-    action.on('done', onDone);
-
-    actionRunner(
-      services,
-      () => {},
-      (s, a, n, callbacks) => {
-        callbacks.done();
-      },
-      action,
-      '0001'
-    );
-
-    expect(onDone).toHaveBeenCalledTimes(1);
+    actionRunner(services, () => {}, handlerGenerator, action, '0001');
+    expect(handler1).toHaveBeenCalledTimes(1);
+    expect(handler2).not.toHaveBeenCalled();
   });
 
   it('should not run action if its copy was already run', () => {
@@ -82,12 +70,36 @@ describe('actionRunner', () => {
       null
     );
 
-    const handler = jest.fn();
+    const handler1 = jest.fn();
+    const handler2 = jest.fn();
+    function* handlerGenerator(): ActionGenerator<IProcessEntrypointAction> {
+      handler1();
+      yield [
+        'resolveImports',
+        action2.entrypoint,
+        { imports: new Map() },
+        null,
+      ];
+      handler2();
+    }
 
-    const task1 = actionRunner(services, () => {}, handler, action1, '0001');
-    const task2 = actionRunner(services, () => {}, handler, action2, '0002');
-    expect(handler).toHaveBeenCalledTimes(1);
+    const task1 = actionRunner(
+      services,
+      () => {},
+      handlerGenerator,
+      action1,
+      '0001'
+    );
+    const task2 = actionRunner(
+      services,
+      () => {},
+      handlerGenerator,
+      action2,
+      '0002'
+    );
+    expect(handler1).toHaveBeenCalledTimes(1);
     expect(task1).toBe(task2);
+    expect(handler2).not.toHaveBeenCalled();
   });
 
   it('should call next for both copy', () => {
@@ -105,20 +117,57 @@ describe('actionRunner', () => {
       null
     );
 
-    const handler = (s: unknown, a: IProcessEntrypointAction, n: Next) => {
-      n('resolveImports', a.entrypoint, { imports: new Map() }, null);
-    };
+    function* handler(
+      s: unknown,
+      a: IProcessEntrypointAction
+    ): ActionGenerator<IProcessEntrypointAction> {
+      yield ['resolveImports', a.entrypoint, { imports: new Map() }, null];
+    }
 
     actionRunner(services, enqueue, handler, action1, '0001');
     actionRunner(services, enqueue, handler, action2, '0002');
 
+    expect(enqueue).toHaveBeenCalledTimes(4);
+
+    // Both pair of actions should be called with the same arguments
+    expect(enqueue.mock.calls[0][0]).toBe(enqueue.mock.calls[2][0]);
+    expect(enqueue.mock.calls[1][0]).toBe(enqueue.mock.calls[3][0]);
+  });
+
+  it('should emit continuation of the action if its yielded another action', () => {
+    const enqueue = jest.fn();
+    const action1 = createAction(
+      'processEntrypoint',
+      createEntrypoint(services, '/foo/bar.js', ['default']),
+      {},
+      null
+    );
+
+    const resolveImportsData = { imports: new Map() };
+
+    function* handler(
+      s: unknown,
+      a: IProcessEntrypointAction
+    ): ActionGenerator<IProcessEntrypointAction> {
+      yield ['resolveImports', a.entrypoint, resolveImportsData, null];
+    }
+
+    actionRunner(services, enqueue, handler, action1, '0001');
     expect(enqueue).toHaveBeenCalledTimes(2);
-    // Both actions should be called with the same arguments
-    expect(enqueue).lastCalledWith(...enqueue.mock.calls[0]);
+    expect(enqueue).nthCalledWith(1, {
+      action: action1,
+      generator: expect.anything(),
+    });
+    expect(enqueue).nthCalledWith(2, {
+      entrypoint: action1.entrypoint,
+      abortSignal: null,
+      imports: resolveImportsData.imports,
+      type: 'resolveImports',
+    });
   });
 
   it('should call callback for emitted actions', () => {
-    const queue1: ActionQueueItem[] = [
+    const queue1: Queue = [
       createAction(
         'processEntrypoint',
         createEntrypoint(services, '/foo/bar.js', ['default']),
@@ -126,7 +175,7 @@ describe('actionRunner', () => {
         null
       ),
     ];
-    const queue2: ActionQueueItem[] = [
+    const queue2: Queue = [
       createAction(
         'processEntrypoint',
         createEntrypoint(services, '/foo/bar.js', ['default']),
@@ -135,20 +184,22 @@ describe('actionRunner', () => {
       ),
     ];
 
-    const enqueue = (queue: ActionQueueItem[], action: ActionQueueItem) => {
+    const enqueue = (queue: Queue, action: QueueItem) => {
       queue.push(action);
       return action;
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    function* emptyHandler(): ActionGenerator<ActionQueueItem> {}
+
     const runNthFrom = (
       idx: number,
-      queue: ActionQueueItem[],
-      handler: (
-        s: unknown,
-        a: ActionQueueItem,
-        n: Next,
-        callbacks: Record<string, () => void>
-      ) => void = () => {}
+      queue: Queue,
+      handler: Handler<
+        Pick<Services, 'cache' | 'eventEmitter'>,
+        ActionQueueItem,
+        AnyActionGenerator
+      > = emptyHandler
     ) =>
       actionRunner(
         services,
@@ -156,38 +207,59 @@ describe('actionRunner', () => {
         handler as Handler<
           Pick<Services, 'cache' | 'eventEmitter'>,
           ActionQueueItem,
-          Promise<void> | void
+          AnyActionGenerator
         >,
         queue[idx],
-        `000${queue}`
+        `000${idx}`
       );
 
     // Both queues should have one action
     expect(queue1).toHaveLength(1);
     expect(queue2).toHaveLength(1);
 
-    runNthFrom(0, queue1, (s, a, n) => {
-      n('transform', a.entrypoint, { imports: new Map() }, null).on(
-        'done',
-        () => {
-          n('resolveImports', a.entrypoint, { imports: new Map() }, null);
-        }
-      );
-    });
+    runNthFrom(
+      0,
+      queue1,
+      function* handler(s, a): ActionGenerator<ActionQueueItem> {
+        yield ['transform', a.entrypoint, { imports: new Map() }, null];
+        yield ['resolveImports', a.entrypoint, { imports: new Map() }, null];
+      }
+    );
 
     // The first action from queue1 has been run and emitted a new action
-    expect(queue1).toHaveLength(2);
+    expect(queue1).toHaveLength(3);
     // The second queue shouldn't be affected
     expect(queue2).toHaveLength(1);
 
     // Simulate a traffic jam in queue1 and start running actions from queue2
     runNthFrom(0, queue2);
-    runNthFrom(1, queue2, (s, a, n, callbacks) => {
-      callbacks.done();
-    });
+    runNthFrom(1, queue2);
+    runNthFrom(2, queue2);
+    runNthFrom(3, queue2);
+    runNthFrom(4, queue2);
 
-    // Both queues should have three actions
+    // First queue still has 3 actions because it wasn't touched
     expect(queue1).toHaveLength(3);
-    expect(queue2).toHaveLength(3);
+
+    // Second queue is full
+    expect(queue2).toHaveLength(5);
+
+    const shouldNotBeCalled = jest.fn();
+    // eslint-disable-next-line require-yield
+    function* handlerWithMock() {
+      shouldNotBeCalled();
+    }
+    // Run the rests action from queue1
+    runNthFrom(1, queue1, handlerWithMock);
+    runNthFrom(2, queue2, handlerWithMock);
+    runNthFrom(3, queue2, handlerWithMock);
+    runNthFrom(4, queue2, handlerWithMock);
+    expect(queue1).toHaveLength(5);
+
+    // The second queue should not be affected
+    expect(queue2).toHaveLength(5);
+
+    // The handler should not be called
+    expect(shouldNotBeCalled).not.toHaveBeenCalled();
   });
 });

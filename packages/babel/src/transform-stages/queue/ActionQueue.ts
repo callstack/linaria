@@ -1,10 +1,15 @@
 // eslint-disable-next-line max-classes-per-file
 import { GenericActionQueue } from './GenericActionQueue';
-import type { IBaseServices } from './types';
+import type {
+  ActionGenerator,
+  AsyncActionGenerator,
+  IBaseServices,
+  ActionQueueItem,
+} from './types';
 
 export class SyncActionQueue<
   TServices extends IBaseServices
-> extends GenericActionQueue<void, TServices> {
+> extends GenericActionQueue<ActionGenerator<ActionQueueItem>, TServices> {
   public runNext() {
     const next = this.dequeue();
     if (!next) {
@@ -19,7 +24,10 @@ export class SyncActionQueue<
 
 export class AsyncActionQueue<
   TServices extends IBaseServices
-> extends GenericActionQueue<Promise<void> | void, TServices> {
+> extends GenericActionQueue<
+  ActionGenerator<ActionQueueItem> | AsyncActionGenerator<ActionQueueItem>,
+  TServices
+> {
   public runNext(): Promise<void> | void {
     const next = this.dequeue();
     if (!next) {

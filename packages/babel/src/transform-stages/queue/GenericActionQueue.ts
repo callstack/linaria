@@ -14,6 +14,7 @@ import type {
   ActionQueueItem,
   IBaseServices,
   Handler,
+  AnyActionGenerator,
 } from './types';
 
 const weights: Record<IBaseAction['type'], number> = {
@@ -44,12 +45,15 @@ function hasLessPriority(a: IBaseAction, b: IBaseAction) {
   return weights[a.type] < weights[b.type];
 }
 
-export type Handlers<TRes, TServices extends IBaseServices> = {
+export type Handlers<
+  TRes extends AnyActionGenerator,
+  TServices extends IBaseServices
+> = {
   [K in ActionQueueItem['type']]: Handler<TServices, ActionByType<K>, TRes>;
 };
 
 export class GenericActionQueue<
-  TRes,
+  TRes extends AnyActionGenerator,
   TServices extends IBaseServices
 > extends PriorityQueue<ActionQueueItem> {
   protected readonly queueIdx: string;
