@@ -2,12 +2,7 @@ import { cosmiconfigSync } from 'cosmiconfig';
 
 import type { StrictOptions } from '@linaria/utils';
 
-import type { Stage } from '../../types';
-
-export type PluginOptions = StrictOptions & {
-  configFile?: string | false;
-  stage?: Stage;
-};
+import type { PluginOptions } from '../../types';
 
 const searchPlaces = [
   `.linariarc`,
@@ -74,7 +69,7 @@ export default function loadLinariaOptions(
           }
 
           // If a file contains `export` or `import` keywords, we assume it's an ES-module
-          return /^(?:export|import)\b/.test(code);
+          return /^(?:export|import)\b/m.test(code);
         },
         action: require.resolve('@linaria/shaker'),
       },

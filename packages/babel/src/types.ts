@@ -3,10 +3,14 @@ import type { NodePath } from '@babel/traverse';
 import type { File } from '@babel/types';
 import type { RawSourceMap } from 'source-map';
 
+import type { CustomDebug, Debugger } from '@linaria/logger';
 import type { BaseProcessor } from '@linaria/tags';
-import type { LinariaMetadata, Replacement, Rules } from '@linaria/utils';
-
-import type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
+import type {
+  LinariaMetadata,
+  Replacement,
+  Rules,
+  StrictOptions,
+} from '@linaria/utils';
 
 export type { Value, ValueCache } from '@linaria/tags';
 
@@ -21,6 +25,27 @@ export type {
 } from '@linaria/utils';
 
 export { ValueType } from '@linaria/utils';
+
+export type PluginOptions = StrictOptions & {
+  configFile?: string | false;
+  stage?: Stage;
+};
+
+export interface IModule {
+  debug: CustomDebug;
+  readonly exports: unknown;
+  readonly idx: number;
+  readonly isEvaluated: boolean;
+  readonly only: string;
+}
+
+export interface IBaseEntrypoint {
+  idx: string;
+  log: Debugger;
+  name: string;
+  only: string[];
+  parent: IBaseEntrypoint | null;
+}
 
 export type Dependencies = string[];
 

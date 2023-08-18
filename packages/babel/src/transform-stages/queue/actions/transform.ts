@@ -11,8 +11,7 @@ import { buildOptions, getPluginKey } from '@linaria/utils';
 import type { Core } from '../../../babel';
 import type Module from '../../../module';
 import withLinariaMetadata from '../../../utils/withLinariaMetadata';
-import type { Next } from '../../helpers/ActionQueue';
-import type { IEntrypoint, ITransformAction, Services } from '../types';
+import type { IEntrypoint, ITransformAction, Next, Services } from '../types';
 
 const EMPTY_FILE = '=== empty file ===';
 
@@ -65,24 +64,27 @@ function runPreevalStage(
   return result;
 }
 
-export function prepareCode(
+type PrepareCodeFn = (
   babel: Core,
   item: IEntrypoint,
   originalAst: File,
   eventEmitter: EventEmitter
-): [code: string, imports: Module['imports'], metadata?: BabelFileMetadata] {
+) => [code: string, imports: Module['imports'], metadata?: BabelFileMetadata];
+
+export const prepareCode: PrepareCodeFn = (
+  babel,
+  item,
+  originalAst,
+  eventEmitter
+) => {
   const { evaluator, log, evalConfig, pluginOptions, only } = item;
 
-  const onPreevalFinished = eventEmitter.pair({
-    method: 'queue:transform:preeval',
-  });
-  const preevalStageResult = runPreevalStage(
-    babel,
-    item,
-    originalAst,
-    eventEmitter
+  const preevalStageResult = eventEmitter.pair(
+    {
+      method: 'queue:transform:preeval',
+    },
+    () => runPreevalStage(babel, item, originalAst, eventEmitter)
   );
-  onPreevalFinished();
 
   if (
     only.length === 1 &&
@@ -102,114 +104,69 @@ export function prepareCode(
     features: pluginOptions.features,
   };
 
-  const onEvaluatorFinished = eventEmitter.pair({
-    method: 'queue:transform:evaluator',
-  });
-  const [, code, imports] = evaluator(
-    evalConfig,
-    preevalStageResult.ast!,
-    preevalStageResult.code!,
-    evaluatorConfig,
-    babel
+  const [, code, imports] = eventEmitter.pair(
+    {
+      method: 'queue:transform:evaluator',
+    },
+    () =>
+      evaluator(
+        evalConfig,
+        preevalStageResult.ast!,
+        preevalStageResult.code!,
+        evaluatorConfig,
+        babel
+      )
   );
-  onEvaluatorFinished();
 
   log('[evaluator:end]');
 
   return [code, imports, preevalStageResult.metadata];
-}
+};
 
-// const getWildcardReexport = (babel: Core, ast: File): string[] => {
-//   const reexportsFrom: string[] = [];
-//   ast.program.body.forEach((node) => {
-//     if (
-//       babel.types.isExportAllDeclaration(node) &&
-//       node.source &&
-//       babel.types.isStringLiteral(node.source)
-//     ) {
-//       reexportsFrom.push(node.source.value);
-//     }
-//   });
-//
-//   return reexportsFrom;
-// };
-
-/**
- * Prepares the code for evaluation. This includes removing dead and potentially unsafe code.
- * If prepared code has imports, they will be resolved in the next step.
- * In the end, the prepared code is added to the cache.
- */
-export function transform(
-  { babel, eventEmitter }: Services,
+export function internalTransform(
+  prepareFn: PrepareCodeFn,
+  services: Services,
   action: ITransformAction,
-  next: Next
+  next: Next,
+  callbacks: { done: () => void }
 ): void {
-  if (!action) {
-    return;
-  }
-
   const { name, only, code, log, ast } = action.entrypoint;
 
   log('>> (%o)', only);
 
-  // const reexportsFrom = getWildcardReexport(babel, ast);
-  // if (reexportsFrom.length) {
-  //   log('has wildcard reexport from %o', reexportsFrom);
-  //
-  //   // Resolve modules
-  //   next({
-  //     type: 'resolveImports',
-  //     entrypoint: action.entrypoint,
-  //     imports: new Map(reexportsFrom.map((i) => [i, ['*']])),
-  //     stack: action.stack,
-  //     callback: (resolvedImports) => {
-  //       console.log('!!!', resolvedImports);
-  //     },
-  //   });
-  //
-  //   // Replace wildcard reexport with named reexports
-  //
-  //   // Reprocess the code
-  //
-  //   return;
-  // }
-
-  const [preparedCode, imports, metadata] = prepareCode(
-    babel,
+  const [preparedCode, imports, metadata] = prepareFn(
+    services.babel,
     action.entrypoint,
     ast,
-    eventEmitter
+    services.eventEmitter
   );
 
   if (code === preparedCode) {
     log('<< (%o)\n === no changes ===', only);
   } else {
-    log('<< (%o)\n%s', only, preparedCode || EMPTY_FILE);
+    log('<< (%o)', only);
+    log.extend('source')('%s', preparedCode || EMPTY_FILE);
   }
 
   if (preparedCode === '') {
     log('%s is skipped', name);
+    callbacks.done();
     return;
   }
 
-  next({
-    type: 'resolveImports',
-    entrypoint: action.entrypoint,
+  next('resolveImports', action.entrypoint, {
     imports,
-    stack: action.stack,
-    callback: (resolvedImports) => {
-      next({
-        type: 'processImports',
-        entrypoint: action.entrypoint,
-        resolved: resolvedImports,
-        stack: action.stack,
-      });
-    },
+  }).on('resolve', (resolvedImports) => {
+    if (resolvedImports.length === 0) {
+      return;
+    }
+
+    next('processImports', action.entrypoint, {
+      resolved: resolvedImports,
+    });
   });
 
-  next({
-    type: 'addToCodeCache',
-    entrypoint: action.entrypoint,
+  next('addToCodeCache', action.entrypoint, {
     data: {
       imports,
       result: {
@@ -218,6 +175,11 @@ export function transform(
       },
       only,
     },
-    stack: action.stack,
-  });
+  }).on('done', callbacks.done);
 }
+
+/**
+ * Prepares the code for evaluation. This includes removing dead and potentially unsafe code.
+ * Emits resolveImports, processImports and addToCodeCache events.
+ */
+export const transform = internalTransform.bind(null, prepareCode);

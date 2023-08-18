@@ -154,7 +154,8 @@ export default function linaria({
       vite = {
         ...vite,
         buildStart() {
-          this.warn(
+          // eslint-disable-next-line no-console
+          console.warn(
             'You are trying to use @linaria/rollup with Vite. The support for Vite in @linaria/rollup is deprecated and will be removed in the next major release. Please use @linaria/vite instead.'
           );
         },

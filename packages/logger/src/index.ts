@@ -2,11 +2,6 @@ import genericDebug from 'debug';
 import type { Debugger } from 'debug';
 import pc from 'picocolors';
 
-type LogLevel = 'error' | 'warn' | 'info' | 'debug';
-
-const levels = ['error', 'warn', 'info', 'debug'];
-const currentLevel = levels.indexOf(process.env.LINARIA_LOG || 'warn');
-
 export type { Debugger };
 
 export const linariaLogger = genericDebug('linaria');
@@ -28,10 +23,13 @@ function gerOrCreate(namespace: string | null | undefined): Debugger {
   return loggers.get(namespace)!;
 }
 
-genericDebug.formatters.r = (ref: { namespace: string; text?: string }) => {
-  const color = parseInt(gerOrCreate(ref.namespace).color, 10);
+genericDebug.formatters.r = (
+  ref: string | { namespace: string; text?: string }
+) => {
+  const namespace = typeof ref === 'string' ? ref : ref.namespace;
+  const text = typeof ref === 'string' ? namespace : ref.text ?? namespace;
+  const color = parseInt(gerOrCreate(namespace).color, 10);
   const colorCode = `\u001B[3${color < 8 ? color : `8;5;${color}`}`;
-  const text = ref.text ?? ref.namespace;
   return `${colorCode};1m${text}\u001B[0m`;
 };
 
@@ -47,16 +45,15 @@ const format = <T>(text: T) => {
   return text;
 };
 
-function log(
-  level: LogLevel,
+export function enableDebug(namespace = 'linaria:*') {
+  genericDebug.enable(namespace);
+}
+
+export function debug(
   namespaces: string,
   template: unknown | (() => void),
   ...restArgs: unknown[]
 ) {
-  if (currentLevel < levels.indexOf(level)) {
-    return;
-  }
-
   const logger = gerOrCreate(namespaces);
   if (!logger.enabled) return;
 
@@ -70,11 +67,6 @@ function log(
 
   logger(format(template), ...restArgs);
 }
-
-export const debug = log.bind(null, 'debug');
-export const info = log.bind(null, 'info');
-export const warn = log.bind(null, 'warn');
-export const error = log.bind(null, 'error');
 
 export const notify = (message: string) => {
   // eslint-disable-next-line no-console

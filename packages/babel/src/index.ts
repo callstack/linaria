@@ -8,19 +8,17 @@ import type { ConfigAPI, TransformCaller } from '@babel/core';
 import { debug } from '@linaria/logger';
 
 import transform from './plugins/babel-transform';
-import type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
+import type { PluginOptions } from './types';
 
 export { slugify } from '@linaria/utils';
 
 export { default as preeval } from './plugins/preeval';
 export { default as withLinariaMetadata } from './utils/withLinariaMetadata';
 export { default as Module, DefaultModuleImplementation } from './module';
-export type { IModule } from './module';
 export { default as transform } from './transform';
 export * from './types';
 export { parseFile } from './transform-stages/helpers/parseFile';
 export { default as loadLinariaOptions } from './transform-stages/helpers/loadLinariaOptions';
-export type { PluginOptions } from './transform-stages/helpers/loadLinariaOptions';
 export { prepareCode } from './transform-stages/queue/actions/transform';
 export { createEntrypoint } from './transform-stages/queue/createEntrypoint';
 export { transformUrl } from './transform-stages/4-extract';

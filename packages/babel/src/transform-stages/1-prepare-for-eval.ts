@@ -5,8 +5,10 @@ import type { Core } from '../babel';
 import type { TransformCacheCollection } from '../cache';
 import type { ITransformFileResult, Options } from '../types';
 
-import { AsyncActionQueue, SyncActionQueue } from './helpers/ActionQueue';
+import { AsyncActionQueue, SyncActionQueue } from './queue/ActionQueue';
 import { addToCodeCache } from './queue/actions/addToCodeCache';
+import { explodeReexports } from './queue/actions/explodeReexports';
+import { getExports } from './queue/actions/getExports';
 import { processEntrypoint } from './queue/actions/processEntrypoint';
 import { processImports } from './queue/actions/processImports';
 import {
@@ -27,16 +29,15 @@ export function prepareForEvalSync(
   options: Pick<Options, 'root' | 'inputSourceMap'>,
   eventEmitter = EventEmitter.dummy
 ): ITransformFileResult | undefined {
+  const services = { babel, cache, options, eventEmitter };
+
   const entrypoint = createEntrypoint(
-    babel,
-    rootLog,
-    cache,
+    services,
+    { log: rootLog },
     partialEntrypoint.name,
     partialEntrypoint.only,
     partialEntrypoint.code,
-    pluginOptions,
-    options,
-    eventEmitter
+    pluginOptions
   );
 
   if (entrypoint === 'ignored') {
@@ -44,9 +45,11 @@ export function prepareForEvalSync(
   }
 
   const queue = new SyncActionQueue(
-    { babel, cache, options, eventEmitter },
+    services,
     {
       addToCodeCache,
+      explodeReexports,
+      getExports,
       processEntrypoint,
       processImports,
       resolveImports: syncResolveImports.bind(null, resolve),
@@ -79,6 +82,8 @@ export default async function prepareForEval(
   options: Pick<Options, 'root' | 'inputSourceMap'>,
   eventEmitter = EventEmitter.dummy
 ): Promise<ITransformFileResult | undefined> {
+  const services = { babel, cache, options, eventEmitter };
+
   /*
    * This method can be run simultaneously for multiple files.
    * A shared cache is accessible for all runs, but each run has its own queue
@@ -88,15 +93,12 @@ export default async function prepareForEval(
    * the combined "only" option.
    */
   const entrypoint = createEntrypoint(
-    babel,
-    rootLog,
-    cache,
+    services,
+    { log: rootLog },
     partialEntrypoint.name,
     partialEntrypoint.only,
     partialEntrypoint.code,
-    pluginOptions,
-    options,
-    eventEmitter
+    pluginOptions
   );
 
   if (entrypoint === 'ignored') {
@@ -104,9 +106,11 @@ export default async function prepareForEval(
   }
 
   const queue = new AsyncActionQueue(
-    { babel, cache, options, eventEmitter },
+    services,
     {
       addToCodeCache,
+      explodeReexports,
+      getExports,
       processEntrypoint,
       processImports,
       resolveImports: asyncResolveImports.bind(null, resolve),

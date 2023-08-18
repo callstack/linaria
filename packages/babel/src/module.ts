@@ -25,6 +25,7 @@ import type { StrictOptions } from '@linaria/utils';
 import { getFileIdx } from '@linaria/utils';
 
 import { TransformCacheCollection } from './cache';
+import type { IModule } from './types';
 import createVmContext from './vm/createVmContext';
 
 type HiddenModuleMembers = {
@@ -93,14 +94,6 @@ const hasKey = <TKey extends string | symbol>(
   (typeof obj === 'object' || typeof obj === 'function') &&
   obj !== null &&
   key in obj;
-
-export interface IModule {
-  debug: CustomDebug;
-  readonly exports: unknown;
-  readonly idx: number;
-  readonly isEvaluated: boolean;
-  readonly only: string;
-}
 
 function getUncached(cached: string | string[], test: string): string[] {
   if (cached === test) {
@@ -334,8 +327,9 @@ class Module {
     if (uncachedExports.length > 0 || !m.isEvaluated) {
       m.debug(
         'eval-cache',
-        'is going to be invalidated because %o is not evaluated yet',
-        uncachedExports
+        'is going to be invalidated because %o is not evaluated yet (evaluated: %o)',
+        uncachedExports,
+        m.only
       );
 
       this.cache.invalidate('eval', filename);
@@ -379,8 +373,9 @@ class Module {
 
       log(
         'code-cache',
-        '❌ file has been processed during prepare stage but %o is not evaluated yet',
-        uncachedExports
+        '❌ file has been processed during prepare stage but %o is not evaluated yet (evaluated: %o)',
+        uncachedExports,
+        cached?.only ?? []
       );
     } else {
       log('code-cache', '❌ file has not been processed during prepare stage');

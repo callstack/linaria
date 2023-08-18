@@ -1,25 +1,28 @@
-import type { Debugger } from '@linaria/logger';
+import { nanoid } from 'nanoid';
 
-import type { IEntrypoint } from './types';
+const keys = new WeakMap<object, string>();
+const keyFor = (obj: object | number | string): string => {
+  if (typeof obj === 'object') {
+    if (!keys.has(obj)) {
+      keys.set(obj, nanoid(10));
+    }
 
-export interface IBaseNode {
-  entrypoint: IEntrypoint;
-  refCount?: number;
-  stack: string[];
-  type: string;
-}
+    return keys.get(obj)!;
+  }
 
-export type Next<TNode extends IBaseNode> = (item: TNode) => void;
+  return obj.toString();
+};
 
-export abstract class PriorityQueue<TNode extends IBaseNode> {
-  private data: Array<TNode> = [];
+export abstract class PriorityQueue<
+  TNode extends object | { toString(): string }
+> {
+  protected data: Array<TNode> = [];
 
-  private keys: Map<string, number> = new Map();
+  protected keys: Map<string, number> = new Map();
+
+  protected dequeueCallbacks: Map<TNode, () => void> = new Map();
 
   protected constructor(
-    private readonly log: Debugger,
-    private readonly keyOf: (node: TNode) => string,
-    private readonly merge: (a: TNode, b: TNode, next: Next<TNode>) => void,
     private readonly hasLessPriority: (a: TNode, b: TNode) => boolean
   ) {}
 
@@ -27,27 +30,40 @@ export abstract class PriorityQueue<TNode extends IBaseNode> {
     return this.data.length;
   }
 
-  private delete(key: string) {
+  protected delete(node: TNode) {
+    const key = keyFor(node);
     const idx = this.keys.get(key);
     if (idx === undefined) return;
 
     if (idx === this.size - 1) {
-      this.data.pop();
+      const deleted = this.data.pop();
+      this.onDequeue(deleted);
       this.keys.delete(key);
       return;
     }
 
     if (this.size <= 1) {
+      const deleted = this.data[0];
       this.data = [];
       this.keys.clear();
+      this.onDequeue(deleted);
       return;
     }
 
+    const deleted = this.data[idx];
     this.data[idx] = this.data.pop()!;
     this.keys.delete(key);
     this.updateKey(idx + 1);
     this.heapifyDown(1);
     this.heapifyUp(this.size);
+    this.onDequeue(deleted);
+  }
+
+  private onDequeue(node: TNode | undefined) {
+    if (node === undefined) return;
+    const callback = this.dequeueCallbacks.get(node);
+    this.dequeueCallbacks.delete(node);
+    callback?.();
   }
 
   private heapifyDown(i = 1): void {
@@ -105,7 +121,7 @@ export abstract class PriorityQueue<TNode extends IBaseNode> {
   }
 
   private updateKey(i: number) {
-    this.keys.set(this.keyOf(this.data[i - 1]), i - 1);
+    this.keys.set(keyFor(this.data[i - 1]), i - 1);
   }
 
   protected dequeue(): TNode | undefined {
@@ -115,7 +131,7 @@ export abstract class PriorityQueue<TNode extends IBaseNode> {
     if (this.size === 1) {
       this.data = [];
       this.keys.clear();
-      this.log('Dequeued %s', this.keyOf(max));
+      this.onDequeue(max);
       return max;
     }
 
@@ -126,33 +142,22 @@ export abstract class PriorityQueue<TNode extends IBaseNode> {
       this.heapifyDown(1);
     }
 
-    this.keys.delete(this.keyOf(max));
-    this.log('Dequeued %s: %o', this.keyOf(max), this.data.map(this.keyOf));
+    this.keys.delete(keyFor(max));
+    this.onDequeue(max);
     return max;
   }
 
-  protected enqueue(el: TNode) {
-    const key = this.keyOf(el);
-    const idx = this.keys.get(key);
-    if (idx !== undefined) {
-      // Merge with existing entry
-      const node = this.data[idx];
-      this.delete(key);
-      this.merge(node, el, (newNode) => {
-        this.enqueue(newNode);
-      });
-
-      return;
+  protected enqueue(newNode: TNode, onDequeue?: () => void) {
+    const key = keyFor(newNode);
+    if (this.keys.has(key)) {
+      throw new Error(`Key ${key} already exists`);
     }
 
-    this.increaseKey(this.size + 1, el);
-    this.log('Enqueued %s: %o', key, this.data.map(this.keyOf));
-    if (el.entrypoint.abortSignal) {
-      el.entrypoint.abortSignal.addEventListener('abort', () => {
-        this.log('Aborting %s', key);
-        this.delete(key);
-      });
+    if (onDequeue) {
+      this.dequeueCallbacks.set(newNode, onDequeue);
     }
+
+    this.increaseKey(this.size + 1, newNode);
   }
 
   public isEmpty() {

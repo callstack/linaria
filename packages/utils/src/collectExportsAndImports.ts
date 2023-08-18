@@ -27,7 +27,7 @@ import type {
   VariableDeclarator,
 } from '@babel/types';
 
-import { warn } from '@linaria/logger';
+import { debug } from '@linaria/logger';
 
 import { getScope } from './getScope';
 import isExports from './isExports';
@@ -224,7 +224,7 @@ function importFromVariableDeclarator(
   if (!isSync) {
     // Something went wrong
     // Is it something like `const { … } = import(…)`?
-    warn('evaluator:collectExportsAndImports', '`import` should be awaited');
+    debug('evaluator:collectExportsAndImports', '`import` should be awaited');
     return [];
   }
 
@@ -233,7 +233,7 @@ function importFromVariableDeclarator(
   }
 
   // What else it can be?
-  warn(
+  debug(
     'evaluator:collectExportsAndImports:importFromVariableDeclarator',
     'Unknown type of id',
     id.node.type
@@ -270,7 +270,7 @@ function exportFromVariableDeclarator(
   }
 
   // What else it can be?
-  warn(
+  debug(
     'evaluator:collectExportsAndImports:exportFromVariableDeclarator',
     'Unknown type of id',
     id.node.type
@@ -398,7 +398,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
     if (!imported) {
       // It's not a transpiled import.
       // TODO: Can we guess that it's a namespace import?
-      warn(
+      debug(
         'evaluator:collectExportsAndImports',
         'Unknown wrapper of require',
         container.node.callee
@@ -426,7 +426,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
 
     if (!variableDeclarator.isVariableDeclarator()) {
       // TODO: Where else it can be?
-      warn(
+      debug(
         'evaluator:collectExportsAndImports',
         'Unexpected require inside',
         variableDeclarator.node.type
@@ -436,7 +436,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
 
     const id = variableDeclarator.get('id');
     if (!id.isIdentifier()) {
-      warn(
+      debug(
         'evaluator:collectExportsAndImports',
         'Id should be Identifier',
         variableDeclarator.node.type
@@ -466,7 +466,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
     // It is `require('@linaria/shaker').dep`
     const property = container.get('property');
     if (!property.isIdentifier() && !property.isStringLiteral()) {
-      warn(
+      debug(
         'evaluator:collectExportsAndImports',
         'Property should be Identifier or StringLiteral',
         property.node.type
@@ -488,7 +488,7 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
           type: 'cjs',
         });
       } else {
-        warn(
+        debug(
           'evaluator:collectExportsAndImports',
           'Id should be Identifier',
           variableDeclarator.node.type
@@ -799,7 +799,7 @@ function unfoldNamespaceImport(
         break;
       }
 
-      warn(
+      debug(
         'evaluator:collectExportsAndImports:unfoldNamespaceImports',
         'Unknown import type',
         importType
@@ -820,7 +820,7 @@ function unfoldNamespaceImport(
 
     // Otherwise, we can't predict usage and import it as is
     // TODO: handle more cases
-    warn(
+    debug(
       'evaluator:collectExportsAndImports:unfoldNamespaceImports',
       'Unknown reference',
       referencePath.node.type
@@ -897,7 +897,7 @@ function collectFromExportSpecifier(
   }
 
   // TODO: handle other cases
-  warn(
+  debug(
     'evaluator:collectExportsAndImports:collectFromExportSpecifier',
     'Unprocessed ExportSpecifier',
     path.node.type

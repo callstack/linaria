@@ -411,6 +411,48 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker concurrent two parallel chains of reexports 1`] = `
+"import { styled } from '@linaria/react';
+export const H1 = /*#__PURE__*/styled('h1')({
+  name: \\"H1\\",
+  class: \\"H1_hpsacp3\\",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker concurrent two parallel chains of reexports 2`] = `
+
+CSS:
+
+.H1_hpsacp3 {
+  color: foo;
+}
+
+Dependencies: ./__fixtures__/re-exports
+
+`;
+
+exports[`strategy shaker concurrent two parallel chains of reexports 3`] = `
+"import { styled } from '@linaria/react';
+export const H1 = /*#__PURE__*/styled('h1')({
+  name: \\"H1\\",
+  class: \\"H1_htinbxh\\",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker concurrent two parallel chains of reexports 4`] = `
+
+CSS:
+
+.H1_htinbxh {
+  color: bar2;
+}
+
+Dependencies: ./__fixtures__/re-exports
+
+`;
+
 exports[`strategy shaker derives display name from filename 1`] = `
 "import { styled } from '@linaria/react';
 export default /*#__PURE__*/styled('h1')({
@@ -2305,6 +2347,27 @@ CSS:
   }
 
 Dependencies: NA
+
+`;
+
+exports[`strategy shaker should process circular imports 1`] = `
+"import { styled } from '@linaria/react';
+export const H1 = /*#__PURE__*/styled('h1')({
+  name: \\"H1\\",
+  class: \\"H1_h13jq05\\",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker should process circular imports 2`] = `
+
+CSS:
+
+.H1_h13jq05 {
+  color: bar;
+}
+
+Dependencies: ./__fixtures__/circular-imports
 
 `;
 

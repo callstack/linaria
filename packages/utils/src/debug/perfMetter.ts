@@ -14,6 +14,7 @@ interface IProcessedDependency {
   exports: string[];
   imports: { from: string; what: string[] }[];
   passes: number;
+  fileIdx: string;
 }
 
 export interface IProcessedEvent {
@@ -21,14 +22,24 @@ export interface IProcessedEvent {
   file: string;
   only: string[];
   imports: { from: string; what: string[] }[];
+  fileIdx: string;
 }
 
 export interface IQueueActionEvent {
   type: 'queue-action';
+  datetime: Date;
+  queueIdx: string;
   action: string;
   file: string;
-  only: string;
+  args?: string[];
 }
+
+const formatTime = (date: Date) => {
+  return `${date.toLocaleTimeString()}.${date
+    .getMilliseconds()
+    .toString()
+    .padStart(3, '0')}`;
+};
 
 const workingDir = process.cwd();
 
@@ -96,12 +107,18 @@ export const createPerfMeter = (
   };
 
   const processedDependencies = new Map<string, IProcessedDependency>();
-  const processDependencyEvent = ({ file, only, imports }: IProcessedEvent) => {
+  const processDependencyEvent = ({
+    file,
+    only,
+    imports,
+    fileIdx,
+  }: IProcessedEvent) => {
     if (!processedDependencies.has(file)) {
       processedDependencies.set(file, {
         exports: [],
         imports: [],
         passes: 0,
+        fileIdx,
       });
     }
 
@@ -112,12 +129,24 @@ export const createPerfMeter = (
   };
 
   const queueActions = new Map<string, string[]>();
-  const processQueueAction = ({ file, action, only }: IQueueActionEvent) => {
+  const processQueueAction = ({
+    file,
+    action,
+    args,
+    queueIdx,
+    datetime,
+  }: IQueueActionEvent) => {
     if (!queueActions.has(file)) {
       queueActions.set(file, []);
     }
 
-    queueActions.get(file)!.push(`${action}(${only})`);
+    const stringifiedArgs =
+      args?.map((arg) => JSON.stringify(arg)).join(', ') ?? '';
+    queueActions
+      .get(file)!
+      .push(
+        `${queueIdx}:${action}(${stringifiedArgs})@${formatTime(datetime)}`
+      );
   };
 
   const processSingleEvent = (

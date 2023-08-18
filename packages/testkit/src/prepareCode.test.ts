@@ -59,18 +59,19 @@ describe('prepareCode', () => {
         .map((s) => s.trim());
 
       const sourceCode = restLines.join('\n');
-      const entrypoint = createEntrypoint(
+      const services = {
         babel,
-        linariaLogger,
-        new TransformCacheCollection(),
+        cache: new TransformCacheCollection(),
+        options: { root },
+        eventEmitter: EventEmitter.dummy,
+      };
+      const entrypoint = createEntrypoint(
+        services,
+        { log: linariaLogger },
         inputFilePath,
         only,
         sourceCode,
-        pluginOptions,
-        {
-          root,
-        },
-        EventEmitter.dummy
+        pluginOptions
       );
 
       if (entrypoint === 'ignored') {

@@ -1,11 +1,11 @@
 import { readFileSync } from 'fs';
 import { dirname, extname } from 'path';
 
-import type { PluginItem } from '@babel/core';
+import type { PluginItem, TransformOptions } from '@babel/core';
 import type { File } from '@babel/types';
 
 import type { Debugger } from '@linaria/logger';
-import type { Evaluator, EventEmitter, StrictOptions } from '@linaria/utils';
+import type { Evaluator, StrictOptions } from '@linaria/utils';
 import {
   buildOptions,
   getFileIdx,
@@ -13,72 +13,50 @@ import {
   loadBabelOptions,
 } from '@linaria/utils';
 
-import type { Core } from '../../babel';
-import type { TransformCacheCollection } from '../../cache';
-import type { Options } from '../../types';
+import type { IBaseEntrypoint } from '../../types';
 import { getMatchedRule, parseFile } from '../helpers/parseFile';
 
-import { rootLog } from './rootLog';
-import type { IEntrypoint } from './types';
+import type { IEntrypoint, Services, IEntrypointCode } from './types';
 
 const EMPTY_FILE = '=== empty file ===';
 
-const getLogIdx = (filename: string) =>
-  getFileIdx(filename).toString().padStart(5, '0');
+const getIdx = (fn: string) => getFileIdx(fn).toString().padStart(5, '0');
 
-export function createEntrypoint(
-  babel: Core,
-  parentLog: Debugger,
-  cache: TransformCacheCollection,
+const includes = (a: string[], b: string[]) => {
+  if (a.includes('*')) return true;
+  if (a.length !== b.length) return false;
+  return a.every((item, index) => item === b[index]);
+};
+
+const isParent = (
+  parent: IEntrypoint | { log: Debugger }
+): parent is IEntrypoint => 'name' in parent;
+
+export function getStack(entrypoint: IBaseEntrypoint) {
+  const stack = [entrypoint.name];
+
+  let { parent } = entrypoint;
+  while (parent) {
+    stack.push(parent.name);
+    parent = parent.parent;
+  }
+
+  return stack;
+}
+
+const isModuleResolver = (plugin: PluginItem) =>
+  getPluginKey(plugin) === 'module-resolver';
+
+function buildConfigs(
+  services: Services,
   name: string,
-  only: string[],
-  maybeCode: string | undefined,
   pluginOptions: StrictOptions,
-  options: Pick<Options, 'root' | 'inputSourceMap'>,
-  eventEmitter: EventEmitter
-): IEntrypoint | 'ignored' {
-  const finishEvent = eventEmitter.pair({ method: 'createEntrypoint' });
-
-  const log = parentLog.extend(
-    getLogIdx(name),
-    parentLog === rootLog ? ':' : '->'
-  );
-  const extension = extname(name);
-
-  if (!pluginOptions.extensions.includes(extension)) {
-    log(
-      '[createEntrypoint] %s is ignored. If you want it to be processed, you should add \'%s\' to the "extensions" option.',
-      name,
-      extension
-    );
-
-    finishEvent();
-    return 'ignored';
-  }
-
-  const code = maybeCode ?? readFileSync(name, 'utf-8');
-
-  const { action, babelOptions } = getMatchedRule(
-    pluginOptions.rules,
-    name,
-    code
-  );
-
-  if (action === 'ignore') {
-    log('[createEntrypoint] %s is ignored by rule', name);
-    cache.add('ignored', name, true);
-    finishEvent();
-    return 'ignored';
-  }
-
-  const evaluator: Evaluator =
-    typeof action === 'function'
-      ? action
-      : require(require.resolve(action, {
-          paths: [dirname(name)],
-        })).default;
-
-  // FIXME: All those configs should be memoized
+  babelOptions: TransformOptions | undefined
+): {
+  evalConfig: TransformOptions;
+  parseConfig: TransformOptions;
+} {
+  const { babel, options } = services;
 
   const commonOptions = {
     ast: true,
@@ -100,8 +78,6 @@ export function createEntrypoint(
     ...rawConfig,
   });
 
-  const isModuleResolver = (plugin: PluginItem) =>
-    getPluginKey(plugin) === 'module-resolver';
   const parseHasModuleResolver = parseConfig.plugins?.some(isModuleResolver);
   const rawHasModuleResolver = rawConfig.plugins?.some(isModuleResolver);
 
@@ -120,31 +96,263 @@ export function createEntrypoint(
     ];
   }
 
-  cache.invalidateIfChanged(name, code);
-
   const evalConfig = loadBabelOptions(babel, name, {
     babelrc: false,
     ...rawConfig,
   });
 
-  const onParseFinished = eventEmitter.pair({ method: 'parseFile' });
-  const ast: File =
-    cache.get('originalAST', name) ?? parseFile(babel, name, code, parseConfig);
-  onParseFinished();
+  return {
+    evalConfig,
+    parseConfig,
+  };
+}
 
-  cache.add('originalAST', name, ast);
+function loadAndParse(
+  services: Services,
+  name: string,
+  loadedCode: string | undefined,
+  log: Debugger,
+  pluginOptions: StrictOptions
+) {
+  const { babel, cache, eventEmitter } = services;
 
-  log('[createEntrypoint] %s (%o)\n%s', name, only, code || EMPTY_FILE);
+  const extension = extname(name);
 
-  finishEvent();
+  if (!pluginOptions.extensions.includes(extension)) {
+    log(
+      '[createEntrypoint] %s is ignored. If you want it to be processed, you should add \'%s\' to the "extensions" option.',
+      name,
+      extension
+    );
+
+    return 'ignored';
+  }
+
+  const code = loadedCode ?? readFileSync(name, 'utf-8');
+
+  const { action, babelOptions } = getMatchedRule(
+    pluginOptions.rules,
+    name,
+    code
+  );
+
+  if (action === 'ignore') {
+    log('[createEntrypoint] %s is ignored by rule', name);
+    cache.add('ignored', name, true);
+    return 'ignored';
+  }
+
+  const evaluator: Evaluator =
+    typeof action === 'function'
+      ? action
+      : require(require.resolve(action, {
+          paths: [dirname(name)],
+        })).default;
+
+  const { evalConfig, parseConfig } = buildConfigs(
+    services,
+    name,
+    pluginOptions,
+    babelOptions
+  );
+
+  const ast: File = eventEmitter.pair(
+    { method: 'parseFile' },
+    () =>
+      cache.get('originalAST', name) ??
+      parseFile(babel, name, code, parseConfig)
+  );
+
   return {
     ast,
     code,
-    evalConfig,
     evaluator,
-    log,
-    name,
-    only: [...only].sort(),
-    pluginOptions,
+    evalConfig,
   };
+}
+
+const supersedeHandlers = new WeakMap<
+  IBaseEntrypoint,
+  Array<(newEntrypoint: IEntrypoint<unknown>) => void>
+>();
+
+export function onSupersede<T extends IBaseEntrypoint>(
+  entrypoint: T,
+  callback: (newEntrypoint: T) => void
+) {
+  if (!supersedeHandlers.has(entrypoint)) {
+    supersedeHandlers.set(entrypoint, []);
+  }
+
+  const handlers = supersedeHandlers.get(entrypoint)!;
+  handlers.push(callback as (newEntrypoint: IBaseEntrypoint) => void);
+  supersedeHandlers.set(entrypoint, handlers);
+
+  return () => {
+    const index = handlers.indexOf(
+      callback as (newEntrypoint: IBaseEntrypoint) => void
+    );
+    if (index >= 0) {
+      handlers.splice(index, 1);
+    }
+  };
+}
+
+const supersededWith = new WeakMap<IBaseEntrypoint, IBaseEntrypoint>();
+
+export function supersedeEntrypoint<TPluginOptions>(
+  services: Pick<Services, 'cache'>,
+  oldEntrypoint: IEntrypoint<TPluginOptions>,
+  newEntrypoint: IEntrypoint<TPluginOptions>
+) {
+  // If we already have a result for this file, we should invalidate it
+  services.cache.invalidate('eval', oldEntrypoint.name);
+
+  supersededWith.set(oldEntrypoint, newEntrypoint);
+  supersedeHandlers
+    .get(oldEntrypoint)
+    ?.forEach((handler) => handler(newEntrypoint));
+}
+
+export function getSupersededWith(entrypoint: IBaseEntrypoint) {
+  return supersededWith.get(entrypoint);
+}
+
+export type LoadAndParseFn<TServices, TPluginOptions> = (
+  services: TServices,
+  name: string,
+  loadedCode: string | undefined,
+  log: Debugger,
+  pluginOptions: TPluginOptions
+) => IEntrypointCode | 'ignored';
+
+const findParent = (name: string, entrypoint: IBaseEntrypoint) => {
+  let next: IBaseEntrypoint | null = entrypoint;
+  while (next) {
+    if (next.name === name) {
+      return next;
+    }
+
+    next = next.parent;
+  }
+
+  return null;
+};
+
+export function genericCreateEntrypoint<
+  TServices extends Pick<Services, 'cache' | 'eventEmitter'>,
+  TPluginOptions
+>(
+  loadAndParseFn: LoadAndParseFn<TServices, TPluginOptions>,
+  services: TServices,
+  parent: IEntrypoint | { log: Debugger },
+  name: string,
+  only: string[],
+  loadedCode: string | undefined,
+  pluginOptions: TPluginOptions
+): IEntrypoint<TPluginOptions> | 'ignored' {
+  const { cache, eventEmitter } = services;
+
+  return eventEmitter.pair({ method: 'createEntrypoint' }, () => {
+    if (loadedCode !== undefined) {
+      cache.invalidateIfChanged(name, loadedCode);
+    }
+
+    const idx = getIdx(name);
+    const log = parent.log.extend(idx, isParent(parent) ? '->' : ':');
+
+    let onCreate: (
+      newEntrypoint: IEntrypoint<TPluginOptions>
+    ) => void = () => {};
+
+    const cached = cache.get('entrypoints', name) as
+      | IEntrypoint<TPluginOptions>
+      | undefined;
+    const mergedOnly = cached?.only
+      ? Array.from(new Set([...cached.only, ...only]))
+          .filter((i) => i)
+          .sort()
+      : only;
+
+    if (cached) {
+      if (includes(cached.only, mergedOnly)) {
+        log('%s is cached', name);
+        return cached;
+      }
+
+      log(
+        '%s is cached, but with different `only` %o (the cached one %o)',
+        name,
+        only,
+        cached?.only
+      );
+
+      onCreate = (newEntrypoint) => {
+        supersedeEntrypoint(services, cached, newEntrypoint);
+      };
+    }
+
+    const loadedAndParsed = loadAndParseFn(
+      services,
+      name,
+      loadedCode,
+      log,
+      pluginOptions
+    );
+
+    if (loadedAndParsed === 'ignored') {
+      return 'ignored';
+    }
+
+    cache.invalidateIfChanged(name, loadedAndParsed.code);
+    cache.add('originalAST', name, loadedAndParsed.ast);
+
+    log.extend('source')(
+      '[createEntrypoint] %s (%o)\n%s',
+      name,
+      mergedOnly,
+      loadedAndParsed.code || EMPTY_FILE
+    );
+
+    const processedParent = isParent(parent) ? findParent(name, parent) : null;
+
+    const newEntrypoint: IEntrypoint<TPluginOptions> = {
+      ...loadedAndParsed,
+      idx,
+      log: processedParent?.log ?? log,
+      name,
+      only: mergedOnly,
+      parent: isParent(parent) ? processedParent?.parent ?? parent : null,
+      pluginOptions,
+    };
+
+    cache.add('entrypoints', name, newEntrypoint);
+    onCreate(newEntrypoint);
+
+    if (processedParent) {
+      log('[createEntrypoint] %s is a loop', name);
+      return 'ignored';
+    }
+
+    return newEntrypoint;
+  });
+}
+
+export function createEntrypoint(
+  services: Services,
+  parent: IEntrypoint | { log: Debugger },
+  name: string,
+  only: string[],
+  loadedCode: string | undefined,
+  pluginOptions: StrictOptions
+): IEntrypoint | 'ignored' {
+  return genericCreateEntrypoint(
+    loadAndParse,
+    services,
+    parent,
+    name,
+    only,
+    loadedCode,
+    pluginOptions
+  );
 }
