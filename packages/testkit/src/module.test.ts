@@ -244,78 +244,6 @@ it('has require.ensure available', () => {
   ).not.toThrow();
 });
 
-it('has __filename available', () => {
-  const mod = new Module(getFileName(), '*', options);
-
-  mod.evaluate(dedent`
-  module.exports = __filename;
-  `);
-
-  expect(mod.exports).toBe(mod.filename);
-});
-
-it('has __dirname available', () => {
-  const mod = new Module(getFileName(), '*', options);
-
-  mod.evaluate(dedent`
-  module.exports = __dirname;
-  `);
-
-  expect(mod.exports).toBe(path.dirname(mod.filename));
-});
-
-it('has setTimeout, clearTimeout available', () => {
-  const mod = new Module(getFileName(), '*', options);
-
-  expect(() =>
-    mod.evaluate(dedent`
-  const x = setTimeout(() => {
-    console.log('test');
-  },0);
-
-  clearTimeout(x);
-  `)
-  ).not.toThrow();
-});
-
-it('has setInterval, clearInterval available', () => {
-  const mod = new Module(getFileName(), '*', options);
-
-  expect(() =>
-    mod.evaluate(dedent`
-  const x = setInterval(() => {
-    console.log('test');
-  }, 1000);
-
-  clearInterval(x);
-  `)
-  ).not.toThrow();
-});
-
-it('has setImmediate, clearImmediate available', () => {
-  const mod = new Module(getFileName(), '*', options);
-
-  expect(() =>
-    mod.evaluate(dedent`
-  const x = setImmediate(() => {
-    console.log('test');
-  });
-
-  clearImmediate(x);
-  `)
-  ).not.toThrow();
-});
-
-it('has global objects available without referencing global', () => {
-  const mod = new Module(getFileName(), '*', options);
-
-  expect(() =>
-    mod.evaluate(dedent`
-  const x = new Set();
-  `)
-  ).not.toThrow();
-});
-
 it('changes resolve behaviour on overriding _resolveFilename', () => {
   const resolveFilename = jest
     .spyOn(DefaultModuleImplementation, '_resolveFilename')
@@ -384,4 +312,133 @@ it('export * compiled by typescript to commonjs works', () => {
   `);
 
   expect(mod.exports).toBe('foo');
+});
+
+describe('globals', () => {
+  it('has setTimeout, clearTimeout available', () => {
+    const mod = new Module(getFileName(), '*', options);
+
+    expect(() =>
+      mod.evaluate(dedent`
+        const x = setTimeout(() => {
+          console.log('test');
+        },0);
+
+        clearTimeout(x);
+      `)
+    ).not.toThrow();
+  });
+
+  it('has setInterval, clearInterval available', () => {
+    const mod = new Module(getFileName(), '*', options);
+
+    expect(() =>
+      mod.evaluate(dedent`
+        const x = setInterval(() => {
+          console.log('test');
+        }, 1000);
+
+        clearInterval(x);
+      `)
+    ).not.toThrow();
+  });
+
+  it('has setImmediate, clearImmediate available', () => {
+    const mod = new Module(getFileName(), '*', options);
+
+    expect(() =>
+      mod.evaluate(dedent`
+        const x = setImmediate(() => {
+          console.log('test');
+        });
+
+        clearImmediate(x);
+      `)
+    ).not.toThrow();
+  });
+
+  it('has global objects available without referencing global', () => {
+    const mod = new Module(getFileName(), '*', options);
+
+    expect(() => mod.evaluate(dedent`const x = new Set();`)).not.toThrow();
+  });
+});
+
+describe('definable globals', () => {
+  it('has __filename available', () => {
+    const mod = new Module(getFileName(), '*', options);
+
+    mod.evaluate(dedent`
+  module.exports = __filename;
+  `);
+
+    expect(mod.exports).toBe(mod.filename);
+  });
+
+  it('has __dirname available', () => {
+    const mod = new Module(getFileName(), '*', options);
+
+    mod.evaluate(dedent`
+  module.exports = __dirname;
+  `);
+
+    expect(mod.exports).toBe(path.dirname(mod.filename));
+  });
+});
+
+describe('DOM', () => {
+  it('should have DOM globals available', () => {
+    const mod = new Module(getFileName(), '*', options);
+
+    mod.evaluate(dedent`
+    module.exports = {
+      document: typeof document,
+      window: typeof window,
+      global: typeof global,
+    };
+    `);
+
+    expect(mod.exports).toEqual({
+      document: 'object',
+      window: 'object',
+      global: 'object',
+    });
+  });
+
+  it('should have DOM APIs available', () => {
+    const mod = new Module(getFileName(), '*', options);
+
+    expect(() =>
+      mod.evaluate(dedent`
+        const handler = () => {}
+
+        document.addEventListener('click', handler);
+        document.removeEventListener('click', handler);
+
+        window.addEventListener('click', handler);
+        window.removeEventListener('click', handler);
+      `)
+    ).not.toThrow();
+  });
+
+  it('supports DOM manipulations', () => {
+    const mod = new Module(getFileName(), '*', options);
+
+    mod.evaluate(dedent`
+      const el = document.createElement('div');
+      el.setAttribute('id', 'test');
+
+      document.body.appendChild(el);
+
+      module.exports = {
+        html: document.body.innerHTML,
+        tagName: el.tagName.toLowerCase()
+      };
+    `);
+
+    expect(mod.exports).toEqual({
+      html: '<div id="test"></div>',
+      tagName: 'div',
+    });
+  });
 });

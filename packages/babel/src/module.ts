@@ -25,7 +25,7 @@ import type { StrictOptions } from '@linaria/utils';
 import { getFileIdx } from '@linaria/utils';
 
 import { TransformCacheCollection } from './cache';
-import * as process from './process';
+import createVmContext from './vm/createVmContext';
 
 type HiddenModuleMembers = {
   _extensions: { [key: string]: () => void };
@@ -478,15 +478,7 @@ class Module {
       return;
     }
 
-    const context = vm.createContext({
-      clearImmediate: NOOP,
-      clearInterval: NOOP,
-      clearTimeout: NOOP,
-      setImmediate: NOOP,
-      setInterval: NOOP,
-      setTimeout: NOOP,
-      global,
-      process,
+    const { context, teardown } = createVmContext({
       module: this,
       exports: this.#exports,
       require: this.require,
@@ -523,6 +515,8 @@ class Module {
       throw new EvalError(
         `${(e as Error).message} in${callstack.join('\n| ')}\n`
       );
+    } finally {
+      teardown();
     }
   }
 }
