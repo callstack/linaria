@@ -227,7 +227,7 @@ describe('shaker', () => {
     `;
 
     expect(code).toMatchInlineSnapshot(`
-      "import foo from \\"foo\\";
+      "import foo from "foo";
       export const {
         Alive,
         Dead
@@ -285,7 +285,7 @@ describe('shaker', () => {
       const defaultExports = {
         createContext: n.createContext
       };
-      Object.defineProperty(exports, \\"createContext\\", {
+      Object.defineProperty(exports, "createContext", {
         enumerable: !0,
         get: function () {
           return n.createContext;
@@ -325,10 +325,10 @@ describe('shaker', () => {
       const defaultExports = {
         createContext: n.createContext
       };
-      Object.defineProperty(exports, \\"__esModule\\", {
+      Object.defineProperty(exports, "__esModule", {
         value: true
       });
-      Object.defineProperty(exports, \\"createContext\\", {
+      Object.defineProperty(exports, "createContext", {
         enumerable: !0,
         get: function () {}
       });
