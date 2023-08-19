@@ -8,6 +8,7 @@ import { PriorityQueue } from './PriorityQueue';
 import {
   createAction,
   getRefsCount,
+  getWeight,
   isContinuation,
   keyOf,
 } from './actions/action';
@@ -24,26 +25,26 @@ import type {
   GetGeneratorForRes,
 } from './types';
 
-const weights: Record<IBaseAction['type'], number> = {
-  addToCodeCache: 0,
-  transform: 5,
-  explodeReexports: 10,
-  processEntrypoint: 15,
-  processImports: 20,
-  getExports: 25,
-  resolveImports: 30,
-};
-
 function hasLessPriority(
   a: IBaseAction | Continuation,
   b: IBaseAction | Continuation
 ) {
-  if (isContinuation(a)) {
-    return hasLessPriority(a.action, b);
-  }
+  if (isContinuation(a) || isContinuation(b)) {
+    const weightA = getWeight(a);
+    const weightB = getWeight(b);
+    if (weightA !== weightB) {
+      return getWeight(a) < getWeight(b);
+    }
 
-  if (isContinuation(b)) {
-    return hasLessPriority(a, b.action);
+    if (isContinuation(a) && isContinuation(b)) {
+      // Newer continuations have higher priority
+      return a.uid < b.uid;
+    }
+
+    return hasLessPriority(
+      'action' in a ? a.action : a,
+      'action' in b ? b.action : b
+    );
   }
 
   if (a.type === b.type) {
@@ -60,7 +61,7 @@ function hasLessPriority(
     return refCountA > refCountB;
   }
 
-  return weights[a.type] < weights[b.type];
+  return getWeight(a) < getWeight(b);
 }
 
 export type Handlers<

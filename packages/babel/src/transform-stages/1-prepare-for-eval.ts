@@ -9,6 +9,7 @@ import { AsyncActionQueue, SyncActionQueue } from './queue/ActionQueue';
 import { createEntrypoint } from './queue/createEntrypoint';
 import { addToCodeCache } from './queue/generators/addToCodeCache';
 import { explodeReexports } from './queue/generators/explodeReexports';
+import { finalizeEntrypoint } from './queue/generators/finalizeEntrypoint';
 import { getExports } from './queue/generators/getExports';
 import { processEntrypoint } from './queue/generators/processEntrypoint';
 import { processImports } from './queue/generators/processImports';
@@ -49,6 +50,7 @@ export function prepareForEvalSync(
     {
       addToCodeCache,
       explodeReexports,
+      finalizeEntrypoint,
       getExports,
       processEntrypoint,
       processImports,
@@ -64,6 +66,8 @@ export function prepareForEvalSync(
 
   return cache.get('code', entrypoint.name)?.result;
 }
+
+let testIdx = 0;
 
 /**
  * Parses the specified file and recursively all its dependencies,
@@ -110,6 +114,7 @@ export default async function prepareForEval(
     {
       addToCodeCache,
       explodeReexports,
+      finalizeEntrypoint,
       getExports,
       processEntrypoint,
       processImports,
@@ -120,6 +125,7 @@ export default async function prepareForEval(
   );
 
   while (!queue.isEmpty()) {
+    testIdx += 1;
     // eslint-disable-next-line no-await-in-loop
     await queue.runNext();
   }

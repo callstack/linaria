@@ -5,13 +5,12 @@ import type {
   IBaseServices,
   Handler,
   ActionQueueItem,
-  AnyActionGenerator,
   Next,
   Continuation,
   GetGeneratorForRes,
 } from '../types';
 
-import { createAction, isContinuation, keyOf } from './action';
+import { createAction, getWeight, isContinuation, keyOf } from './action';
 
 type QueueItem = ActionQueueItem | Continuation;
 
@@ -34,6 +33,7 @@ class ListOfEmittedActions {
 interface IResults {
   actions: ListOfEmittedActions;
   task: unknown;
+  value?: unknown;
 }
 
 const cache = new WeakMap<IBaseEntrypoint, Map<string, IResults>>();
@@ -47,12 +47,16 @@ const isActionArgs = (value: unknown): value is Parameters<Next> => {
     return false;
   }
 
-  if (value.length < 3 || value.length > 4) {
+  if (value.length < 3 || value.length > 5) {
     return false;
   }
 
-  const [type, entrypoint, , abortSignal] = value;
+  const [type, entrypoint, , abortSignal, needResult] = value;
   if (typeof type !== 'string') {
+    return false;
+  }
+
+  if (needResult !== undefined && typeof needResult !== 'boolean') {
     return false;
   }
 
@@ -63,14 +67,43 @@ const isActionArgs = (value: unknown): value is Parameters<Next> => {
   return !abortSignal || abortSignal instanceof AbortSignal;
 };
 
-const lastEmittedBy = new WeakMap<ActionQueueItem, ActionQueueItem>();
+const taskResults = new WeakMap<IBaseEntrypoint, Map<string, unknown>>();
+const addTaskResult = (
+  entrypoint: IBaseEntrypoint,
+  id: string,
+  result: unknown
+) => {
+  if (!taskResults.has(entrypoint)) {
+    taskResults.set(entrypoint, new Map());
+  }
+
+  taskResults.get(entrypoint)!.set(id, result);
+};
+
+const hasTaskResult = (entrypoint: IBaseEntrypoint, id: string) => {
+  if (!taskResults.has(entrypoint)) {
+    return false;
+  }
+
+  return taskResults.get(entrypoint)!.has(id);
+};
+
+const getTaskResult = (entrypoint: IBaseEntrypoint, id: string) => {
+  if (!entrypoint || !taskResults.has(entrypoint)) {
+    return undefined;
+  }
+
+  return taskResults.get(entrypoint)!.get(id);
+};
+
+let continuationIdx = 0;
 
 function continueAction<
   TServices extends IBaseServices,
   TAction extends ActionQueueItem
 >(services: TServices, continuation: Continuation<TAction>): IResults {
   const actions = new ListOfEmittedActions();
-  const { action, generator } = continuation;
+  const { action, generator, resultFrom, weight } = continuation;
 
   const task = services.eventEmitter.pair(
     {
@@ -81,7 +114,14 @@ function continueAction<
         result: IteratorResult<unknown, TAction['result']>
       ) => {
         if (result.done) {
-          action.result = result.value;
+          addTaskResult(action.entrypoint, keyOf(action), result.value);
+          action.entrypoint.log(
+            '#%s %s returned %o',
+            action.idx,
+            keyOf(action),
+            result.value
+          );
+
           return result.value;
         }
 
@@ -89,15 +129,14 @@ function continueAction<
           throw new Error('Invalid action');
         }
 
-        actions.add({
-          abortSignal: action.abortSignal,
-          action,
-          generator,
-          uid: nanoid(16),
-        });
+        const [
+          nextActionType,
+          nextEntrypoint,
+          nextData,
+          nextAbortSignal,
+          needResult,
+        ] = result.value;
 
-        const [nextActionType, nextEntrypoint, nextData, nextAbortSignal] =
-          result.value;
         const nextAction = createAction(
           nextActionType,
           nextEntrypoint,
@@ -105,18 +144,47 @@ function continueAction<
           nextAbortSignal === undefined ? action.abortSignal : result.value[3]
         );
 
+        // Add continuation
+        continuationIdx += 1;
+        actions.add({
+          abortSignal: action.abortSignal,
+          action,
+          generator,
+          resultFrom: needResult
+            ? [nextAction.entrypoint, keyOf(nextAction)]
+            : undefined,
+          uid: continuationIdx.toString(16).padStart(8, '0'),
+          weight: needResult ? getWeight(nextAction) - 1 : weight,
+        });
+
+        if (needResult) {
+          nextAction.entrypoint.log(
+            '#%s %s needs result from %s',
+            nextAction.idx,
+            keyOf(action),
+            keyOf(nextAction)
+          );
+        }
+
+        // Add next action
         actions.add(nextAction);
-        lastEmittedBy.set(action, nextAction);
 
         return nextAction;
       };
 
-      const lastEmitted = lastEmittedBy.get(action);
+      if (resultFrom && !hasTaskResult(...resultFrom)) {
+        throw new Error(
+          `${resultFrom[1]} wasn't finished but ${keyOf(
+            action
+          )} tried to get result from it`
+        );
+      }
+
       const next = (
         generator as
           | Generator<Parameters<Next>, ActionQueueItem['result']>
           | AsyncGenerator<Parameters<Next>, ActionQueueItem['result']>
-      ).next(lastEmitted?.result);
+      ).next(resultFrom ? getTaskResult(...resultFrom) : undefined);
       if (next instanceof Promise) {
         return next.then(processArgs);
       }
@@ -167,9 +235,6 @@ function actionRunner<
   const action = isContinuation(actionOrContinuation)
     ? actionOrContinuation.action
     : actionOrContinuation;
-  const generator = isContinuation(actionOrContinuation)
-    ? actionOrContinuation.generator
-    : (handler!(services, action) as Continuation<TAction>['generator']);
 
   const actionKey = keyOf(actionOrContinuation);
 
@@ -189,13 +254,23 @@ function actionRunner<
 
   if (!cached) {
     action.entrypoint.log('run action %s', action.type);
-    const result = continueAction(services, {
-      abortSignal: action.abortSignal,
-      action,
-      generator,
-      uid: nanoid(16),
-    });
+    const result = continueAction(
+      services,
+      isContinuation(actionOrContinuation)
+        ? actionOrContinuation
+        : {
+            abortSignal: action.abortSignal,
+            action,
+            generator: handler!(services, action),
+            uid: nanoid(16),
+            weight: getWeight(action),
+          }
+    );
     result.actions.onAdd((nextAction) => {
+      if (nextAction.abortSignal?.aborted) {
+        return;
+      }
+
       enqueue(nextAction);
     });
 
@@ -205,6 +280,10 @@ function actionRunner<
 
   action.entrypoint.log('replay actions %s', action.type);
   cached.actions.onAdd((nextAction) => {
+    if (nextAction.abortSignal?.aborted) {
+      return;
+    }
+
     enqueue(nextAction);
   });
 

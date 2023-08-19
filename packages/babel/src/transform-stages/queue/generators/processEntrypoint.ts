@@ -33,7 +33,7 @@ export function* processEntrypoint<TEntrypoint extends IBaseEntrypoint>(
   }
 
   let supersededWith: IBaseEntrypoint | null = null;
-  onSupersede(action.entrypoint, (newEntrypoint) => {
+  const unsubscribe = onSupersede(action.entrypoint, (newEntrypoint) => {
     supersededWith = newEntrypoint;
     abortController.abort();
   });
@@ -41,9 +41,16 @@ export function* processEntrypoint<TEntrypoint extends IBaseEntrypoint>(
   yield ['explodeReexports', action.entrypoint, {}, abortController.signal];
   yield ['transform', action.entrypoint, {}, abortController.signal];
 
-  action.abortSignal?.removeEventListener('abort', onParentAbort);
-
-  if (supersededWith) {
-    yield ['processEntrypoint', supersededWith, {}, null];
-  }
+  // Do not pass the abort signal to the finalize action because it should always run
+  yield [
+    'finalizeEntrypoint',
+    action.entrypoint,
+    {
+      finalizer: () => {
+        action.abortSignal?.removeEventListener('abort', onParentAbort);
+        unsubscribe();
+      },
+    },
+    null,
+  ];
 }

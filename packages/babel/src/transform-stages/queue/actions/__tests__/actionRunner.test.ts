@@ -17,7 +17,7 @@ import type {
   IResolveImportsAction,
   IResolvedImport,
 } from '../../types';
-import { createAction, isContinuation } from '../action';
+import { createAction, getWeight, isContinuation } from '../action';
 import { actionRunner } from '../actionRunner';
 
 type QueueItem = ActionQueueItem | Continuation;
@@ -165,6 +165,7 @@ describe('actionRunner', () => {
       action: action1,
       generator: expect.anything(),
       uid: expect.anything(),
+      weight: 15,
     });
     expect(enqueue).nthCalledWith(2, {
       abortSignal: null,
@@ -201,6 +202,7 @@ describe('actionRunner', () => {
           a.entrypoint,
           resolveImportsData,
           null,
+          true,
         ];
         valueCatcher(result);
       }
@@ -210,6 +212,9 @@ describe('actionRunner', () => {
     expect(queue[1]).toMatchObject({
       imports: resolveImportsData.imports,
       type: 'resolveImports',
+    });
+    expect(queue[0]).toMatchObject({
+      weight: getWeight(queue[1]) - 1, // continuation should have less weight than emitted action
     });
 
     const resolvedImports: IResolvedImport[] = [

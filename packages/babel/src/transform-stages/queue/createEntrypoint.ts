@@ -205,6 +205,10 @@ export function onSupersede<T extends IBaseEntrypoint>(
   };
 }
 
+export function getSupersededWith(entrypoint: IBaseEntrypoint) {
+  return supersededWith.get(entrypoint);
+}
+
 export function supersedeEntrypoint<TPluginOptions>(
   services: Pick<Services, 'cache'>,
   oldEntrypoint: IEntrypoint<TPluginOptions>,

@@ -52,6 +52,7 @@ export interface IBaseAction<
 > extends IBaseNode {
   abortSignal: AbortSignal | null;
   entrypoint: TEntrypoint;
+  idx: string;
   result?: TResult;
 }
 
@@ -66,21 +67,30 @@ export type Handler<
   TRes extends AnyActionGenerator
 > = (services: TServices, action: TAction) => TRes;
 
-export type Next = <TType extends ActionQueueItem['type']>(
+type NextParams<TType extends ActionQueueItem['type']> = [
   type: TType,
   entrypoint: IBaseEntrypoint,
   data: DataOf<Extract<ActionQueueItem, { type: TType }>>,
-  abortSignal?: AbortSignal | null
+  abortSignal?: AbortSignal | null,
+  needResult?: boolean
+];
+
+export type Next = <TType extends ActionQueueItem['type']>(
+  ...args: NextParams<TType>
 ) => Extract<ActionQueueItem, { type: TType }>;
 
+export type YieldNext = {
+  [K in ActionQueueItem['type']]: NextParams<K>;
+}[ActionQueueItem['type']];
+
 export type ActionGenerator<TAction extends IBaseAction> = Generator<
-  Parameters<Next>,
+  YieldNext,
   TAction extends IBaseAction<IBaseEntrypoint, infer TResult> ? TResult : never,
   never
 >;
 
 export type AsyncActionGenerator<TAction extends IBaseAction> = AsyncGenerator<
-  Parameters<Next>,
+  YieldNext,
   TAction extends IBaseAction<IBaseEntrypoint, infer TResult> ? TResult : never,
   never
 >;
@@ -100,7 +110,9 @@ export type Continuation<TAction extends IBaseAction = ActionQueueItem> = {
   abortSignal: AbortSignal | null;
   action: TAction;
   generator: AnyActionGenerator<TAction>;
+  resultFrom?: [entrypoint: IBaseEntrypoint, actionKey: string];
   uid: string;
+  weight: number;
 };
 
 export interface IExplodeReexportsAction
@@ -127,6 +139,12 @@ export interface IAddToCodeCacheAction extends IBaseAction<IEntrypoint, void> {
   };
 }
 
+export interface IFinalizeEntrypointAction
+  extends IBaseAction<IEntrypoint, void> {
+  type: 'finalizeEntrypoint';
+  finalizer: () => void;
+}
+
 export interface IResolvedImport {
   importedFile: string;
   importsOnly: string[];
@@ -151,6 +169,7 @@ export interface IGetExportsAction extends IBaseAction<IEntrypoint, string[]> {
 export type ActionQueueItem =
   | IAddToCodeCacheAction
   | IExplodeReexportsAction
+  | IFinalizeEntrypointAction
   | IProcessEntrypointAction
   | IProcessImportsAction
   | IResolveImportsAction

@@ -6,9 +6,9 @@ import type {
   IExplodeReexportsAction,
   IGetExportsAction,
   IResolvedImport,
-  Next,
   Services,
   ActionGenerator,
+  YieldNext,
 } from '../types';
 
 import { emitAndGetResultOf } from './helpers/emitAndGetResultOf';
@@ -17,7 +17,7 @@ export function* findExportsInImports(
   services: Services,
   action: IGetExportsAction | IExplodeReexportsAction,
   imports: IResolvedImport[]
-): Generator<Parameters<Next>, Record<string, string[]>, never> {
+): Generator<YieldNext, Record<string, string[]>, never> {
   let results: Record<string, string[]> = {};
 
   // eslint-disable-next-line no-restricted-syntax

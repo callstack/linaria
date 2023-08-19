@@ -186,6 +186,7 @@ export function* internalTransform(
           code: preparedCode,
           metadata,
         },
+        only,
       },
     },
   ];

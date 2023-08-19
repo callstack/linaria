@@ -12,11 +12,14 @@ export class SyncActionQueue<
       return;
     }
 
-    const { entrypoint, type } = isContinuation(next) ? next.action : next;
+    const action = isContinuation(next) ? next.action : next;
+    const { entrypoint, type } = action;
+    const itemType = isContinuation(next) ? 'continuation' : 'action';
+    const logArgs = [itemType, action.idx, type, this.logRef] as const;
 
-    entrypoint.log('Start %s from %r', type, this.logRef);
+    entrypoint.log('Start %s #%s %s from %r', ...logArgs);
     this.handle(next);
-    entrypoint.log('Finish %s from %r', type, this.logRef);
+    entrypoint.log('Finish %s #%s %s from %r', ...logArgs);
   }
 }
 
@@ -29,11 +32,14 @@ export class AsyncActionQueue<
       return Promise.resolve();
     }
 
-    const { entrypoint, type } = isContinuation(next) ? next.action : next;
+    const action = isContinuation(next) ? next.action : next;
+    const { entrypoint, type } = action;
+    const itemType = isContinuation(next) ? 'continuation' : 'action';
+    const logArgs = [itemType, action.idx, type, this.logRef] as const;
 
-    entrypoint.log('Start %s from %r', type, this.logRef);
+    entrypoint.log('Start %s #%s %s from %r', ...logArgs);
     const result = this.handle(next);
-    const log = () => entrypoint.log('Finish %s from %r', type, this.logRef);
+    const log = () => entrypoint.log('Finish %s #%s %s from %r', ...logArgs);
     if (result instanceof Promise) {
       result.then(log, () => {});
     } else {
