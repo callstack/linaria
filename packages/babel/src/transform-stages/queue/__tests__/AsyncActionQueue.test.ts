@@ -4,7 +4,7 @@ import { EventEmitter } from '@linaria/utils';
 import { TransformCacheCollection } from '../../../cache';
 import { AsyncActionQueue } from '../ActionQueue';
 import type { Handlers } from '../GenericActionQueue';
-import { processEntrypoint } from '../actions/processEntrypoint';
+import { processEntrypoint } from '../generators/processEntrypoint';
 import type {
   Services,
   IBaseAction,
@@ -12,26 +12,41 @@ import type {
   IBaseServices,
   Handler,
   IExplodeReexportsAction,
+  ActionGenerator,
+  ActionQueueItem,
+  AnyActionGenerator,
 } from '../types';
 
 import { createEntrypoint } from './entrypoint-helpers';
 
-type Res = Promise<void> | void;
-type AsyncHandlers = Handlers<Promise<void> | void, IBaseServices>;
+type Res = AnyActionGenerator;
+type AsyncHandlers = Handlers<Res, IBaseServices>;
 type GetHandler<T extends IBaseAction> = Handler<IBaseServices, T, Res>;
 
 describe('AsyncActionQueue', () => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  function* emptyHandler(): ActionGenerator<ActionQueueItem> {}
+
+  async function drainQueue(
+    queue: AsyncActionQueue<Pick<Services, 'cache' | 'eventEmitter'>>
+  ) {
+    while (!queue.isEmpty()) {
+      await queue.runNext();
+    }
+  }
+
   let services: Pick<Services, 'cache' | 'eventEmitter'>;
   let handlers: AsyncHandlers;
   beforeEach(() => {
     handlers = {
-      addToCodeCache: jest.fn(),
-      transform: jest.fn(),
-      explodeReexports: jest.fn(),
-      processEntrypoint: jest.fn(),
-      processImports: jest.fn(),
-      getExports: jest.fn(),
-      resolveImports: jest.fn(),
+      addToCodeCache: jest.fn(emptyHandler),
+      explodeReexports: jest.fn(emptyHandler),
+      finalizeEntrypoint: jest.fn(emptyHandler),
+      getExports: jest.fn(emptyHandler),
+      processEntrypoint: jest.fn(emptyHandler),
+      processImports: jest.fn(emptyHandler),
+      resolveImports: jest.fn(emptyHandler),
+      transform: jest.fn(emptyHandler),
     };
 
     services = {
@@ -68,20 +83,22 @@ describe('AsyncActionQueue', () => {
     expect(fooBarQueue.runNext()).toBe(fooBazQueue.runNext());
   });
 
-  it('should emit new action in both queues', () => {
-    const fooBarTransform: GetHandler<ITransformAction> = jest.fn();
+  it('should emit new action in both queues', async () => {
+    const fooBarTransform: GetHandler<ITransformAction> = jest.fn(emptyHandler);
     const fooBarExplodeReexports: GetHandler<IExplodeReexportsAction> =
-      jest.fn();
+      jest.fn(emptyHandler);
     const fooBarQueue = createQueueFor('/foo/bar.js', {
       processEntrypoint,
       transform: fooBarTransform,
       explodeReexports: fooBarExplodeReexports,
     });
-    fooBarQueue.runNext();
+    fooBarQueue.runNext(); // yield explodeReexports
+    fooBarQueue.runNext(); // yield transform
+    fooBarQueue.runNext(); // yield finalizeEntrypoint
 
-    const fooBazTransform: GetHandler<ITransformAction> = jest.fn();
+    const fooBazTransform: GetHandler<ITransformAction> = jest.fn(emptyHandler);
     const fooBazExplodeReexports: GetHandler<IExplodeReexportsAction> =
-      jest.fn();
+      jest.fn(emptyHandler);
     const fooBazQueue = createQueueFor('/foo/baz.js', {
       processEntrypoint,
       transform: fooBazTransform,
@@ -95,18 +112,16 @@ describe('AsyncActionQueue', () => {
 
     // Drain fooBarQueue
     expect(fooBarTransform).not.toHaveBeenCalled();
-    fooBarQueue.runNext(); // should be the explodeReexports action
+    await drainQueue(fooBarQueue);
+
     expect(fooBarExplodeReexports).toHaveBeenCalledTimes(1);
-    fooBarQueue.runNext(); // should be the transform action
     expect(fooBarTransform).toHaveBeenCalledTimes(1);
     expect(fooBarQueue.isEmpty()).toBe(true);
 
-    fooBazQueue.runNext(); // run processEntrypoint for /foo/baz.js
     expect(fooBazTransform).not.toHaveBeenCalled();
     expect(fooBazExplodeReexports).not.toHaveBeenCalled();
-    fooBazQueue.runNext(); // run explodeReexports for /foo/baz.js
+    await drainQueue(fooBazQueue);
     expect(fooBazExplodeReexports).toHaveBeenCalledTimes(1);
-    fooBazQueue.runNext(); // run transform for /foo/baz.js
     expect(fooBazTransform).toHaveBeenCalledTimes(1);
     expect(fooBazQueue.isEmpty()).toBe(true);
   });

@@ -6,8 +6,6 @@ import { AsyncActionQueue, SyncActionQueue } from '../ActionQueue';
 import type { Handlers } from '../GenericActionQueue';
 import { rootLog } from '../rootLog';
 import type {
-  Handler,
-  IBaseAction,
   IBaseServices,
   IGetExportsAction,
   IProcessEntrypointAction,
@@ -25,9 +23,6 @@ const createEntrypoint = (name: string): IBaseEntrypoint => ({
 
 type Res = ActionGenerator<ActionQueueItem>;
 type UniversalHandlers = Handlers<Res, IBaseServices>;
-
-type GetHandler<T extends IBaseAction> = Handler<IBaseServices, T, Res>;
-
 type Queues = typeof AsyncActionQueue | typeof SyncActionQueue;
 
 describe.each<[string, Queues]>([
@@ -50,12 +45,13 @@ describe.each<[string, Queues]>([
   beforeEach(() => {
     handlers = {
       addToCodeCache: jest.fn(emptyHandler),
-      transform: jest.fn(emptyHandler),
       explodeReexports: jest.fn(emptyHandler),
+      finalizeEntrypoint: jest.fn(emptyHandler),
+      getExports: jest.fn(emptyHandler),
       processEntrypoint: jest.fn(emptyHandler),
       processImports: jest.fn(emptyHandler),
-      getExports: jest.fn(emptyHandler),
       resolveImports: jest.fn(emptyHandler),
+      transform: jest.fn(emptyHandler),
     };
 
     services = {
@@ -153,7 +149,7 @@ describe.each<[string, Queues]>([
     });
   });
 
-  it('should work with events', async () => {
+  it('should return values', async () => {
     const exports: string[] = ['resolved'];
     const onGetExports = jest.fn();
 
@@ -161,7 +157,7 @@ describe.each<[string, Queues]>([
       _services: unknown,
       action: IProcessEntrypointAction
     ): ActionGenerator<IProcessEntrypointAction> {
-      onGetExports(yield ['getExports', action.entrypoint, {}]);
+      onGetExports(yield ['getExports', action.entrypoint, {}, null, true]);
     }
 
     function* getExports(): ActionGenerator<IGetExportsAction> {

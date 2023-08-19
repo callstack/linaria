@@ -9,13 +9,6 @@ import { createAction } from '../../actions/action';
 import type { Next, Services } from '../../types';
 import { processEntrypoint } from '../processEntrypoint';
 
-const run = (generator: Generator<Parameters<Next>, void, unknown>) => {
-  let result: IteratorResult<Parameters<Next>, void>;
-  do {
-    result = generator.next();
-  } while (!result.done);
-};
-
 describe('processEntrypoint', () => {
   let services: Pick<Services, 'cache' | 'eventEmitter'>;
   const next = jest.fn<ReturnType<Next>, Parameters<Next>>((type, ep, data) =>
@@ -32,7 +25,7 @@ describe('processEntrypoint', () => {
     next.mockClear();
   });
 
-  it('should emit explodeReexports and transform actions', async () => {
+  it('should emit explodeReexports, transform and finalizeEntrypoint actions', async () => {
     const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
       'default',
     ]);
@@ -61,29 +54,16 @@ describe('processEntrypoint', () => {
     ]);
     expect(result.done).toBe(false);
 
-    expect(gen.next()).toEqual({ done: true, value: undefined });
-  });
-
-  it('should re-emit processEntrypoint if entrypoint was superseded', async () => {
-    const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
-      'default',
-    ]);
-
-    const action = createAction('processEntrypoint', fooBarDefault, {}, null);
-
-    const gen = processEntrypoint(services, action);
-
-    expect(gen.next().value?.[0]).toEqual('explodeReexports');
-    expect(gen.next().value?.[0]).toEqual('transform');
-
-    const fooBarNamed = createEntrypoint(services, '/foo/bar.js', ['named']);
-
-    expect(gen.next().value).toEqual([
-      'processEntrypoint',
-      fooBarNamed,
-      {},
+    result = gen.next();
+    expect(result.value).toEqual([
+      'finalizeEntrypoint',
+      fooBarDefault,
+      {
+        finalizer: expect.any(Function),
+      },
       null,
     ]);
+    expect(result.done).toBe(false);
 
     expect(gen.next()).toEqual({ done: true, value: undefined });
   });
@@ -107,44 +87,18 @@ describe('processEntrypoint', () => {
       false,
     ]);
 
-    const fooBarNamed = createEntrypoint(services, '/foo/bar.js', ['named']);
+    createEntrypoint(services, '/foo/bar.js', ['named']);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
       true,
       true,
     ]);
 
     expect(gen.next().value).toEqual([
-      'processEntrypoint',
-      fooBarNamed,
-      {},
-      null,
-    ]);
-
-    expect(gen.next()).toEqual({ done: true, value: undefined });
-  });
-
-  it('should emit new processEntrypoint if original was already superseded at start', async () => {
-    const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
-      'default',
-    ]);
-
-    const action = createAction('processEntrypoint', fooBarDefault, {}, null);
-
-    const gen = processEntrypoint(services, action);
-
-    const fooBarNamed = createEntrypoint(services, '/foo/bar.js', ['named']);
-
-    // Should emit two already aborted actions
-    const emitted = [gen.next().value!, gen.next().value!];
-    expect(emitted[0][0]).toEqual('explodeReexports');
-    expect(emitted[0][3]?.aborted).toBe(true);
-    expect(emitted[1][0]).toEqual('transform');
-    expect(emitted[0][3]?.aborted).toBe(true);
-
-    expect(gen.next().value).toEqual([
-      'processEntrypoint',
-      fooBarNamed,
-      {},
+      'finalizeEntrypoint',
+      fooBarDefault,
+      {
+        finalizer: expect.any(Function),
+      },
       null,
     ]);
 
@@ -181,6 +135,15 @@ describe('processEntrypoint', () => {
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
       true,
       true,
+    ]);
+
+    expect(gen.next().value).toEqual([
+      'finalizeEntrypoint',
+      fooBarDefault,
+      {
+        finalizer: expect.any(Function),
+      },
+      null,
     ]);
 
     expect(gen.next()).toEqual({ done: true, value: undefined });

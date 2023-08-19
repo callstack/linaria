@@ -1,20 +1,13 @@
-import { getSupersededWith } from '../createEntrypoint';
 import type {
   IAddToCodeCacheAction,
-  Services,
   ActionGenerator,
   IFinalizeEntrypointAction,
 } from '../types';
 
+// eslint-disable-next-line require-yield
 export function* finalizeEntrypoint(
-  _: Services,
+  _services: unknown,
   action: IFinalizeEntrypointAction
 ): ActionGenerator<IAddToCodeCacheAction> {
   action.finalizer();
-
-  const supersededWith = getSupersededWith(action.entrypoint);
-
-  if (supersededWith) {
-    yield ['processEntrypoint', supersededWith, {}, null];
-  }
 }

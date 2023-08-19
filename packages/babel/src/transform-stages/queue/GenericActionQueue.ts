@@ -13,6 +13,7 @@ import {
   keyOf,
 } from './actions/action';
 import { actionRunner } from './actions/actionRunner';
+import { onSupersede } from './createEntrypoint';
 import type {
   DataOf,
   ActionByType,
@@ -154,6 +155,12 @@ export class GenericActionQueue<
     super.enqueue(newAction, () => {
       newAction.abortSignal?.removeEventListener('abort', onAbort);
     });
+
+    if (!isContinuation(newAction) && newAction.type === 'processEntrypoint') {
+      onSupersede(newAction.entrypoint, (newEntrypoint) => {
+        this.next('processEntrypoint', newEntrypoint, {});
+      });
+    }
 
     processed.add(key);
     this.log('Enqueued %s: %O', key, this.data.map(keyOf));

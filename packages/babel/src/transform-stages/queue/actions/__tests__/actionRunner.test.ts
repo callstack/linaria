@@ -164,12 +164,14 @@ describe('actionRunner', () => {
       abortSignal: null,
       action: action1,
       generator: expect.anything(),
+      resultFrom: undefined,
       uid: expect.anything(),
-      weight: 15,
+      weight: 20,
     });
     expect(enqueue).nthCalledWith(2, {
       abortSignal: null,
       entrypoint: action1.entrypoint,
+      idx: expect.anything(),
       imports: resolveImportsData.imports,
       type: 'resolveImports',
     });

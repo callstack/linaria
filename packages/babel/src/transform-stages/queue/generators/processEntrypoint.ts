@@ -32,9 +32,7 @@ export function* processEntrypoint<TEntrypoint extends IBaseEntrypoint>(
     action.abortSignal.addEventListener('abort', onParentAbort);
   }
 
-  let supersededWith: IBaseEntrypoint | null = null;
-  const unsubscribe = onSupersede(action.entrypoint, (newEntrypoint) => {
-    supersededWith = newEntrypoint;
+  const unsubscribe = onSupersede(action.entrypoint, () => {
     abortController.abort();
   });
 

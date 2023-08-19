@@ -67,8 +67,6 @@ export function prepareForEvalSync(
   return cache.get('code', entrypoint.name)?.result;
 }
 
-let testIdx = 0;
-
 /**
  * Parses the specified file and recursively all its dependencies,
  * finds tags, applies eval-time replacements, removes dead code.
@@ -125,7 +123,6 @@ export default async function prepareForEval(
   );
 
   while (!queue.isEmpty()) {
-    testIdx += 1;
     // eslint-disable-next-line no-await-in-loop
     await queue.runNext();
   }
