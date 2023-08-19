@@ -294,7 +294,7 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
 
     return typeof customSlugFn === 'function'
       ? customSlugFn(context)
-      : buildSlug(customSlugFn, context);
+      : buildSlug(customSlugFn, { ...context });
   }
 
   protected getProps(): IProps {

@@ -8,9 +8,10 @@ import type {
   AnyActionGenerator,
   Next,
   Continuation,
+  GetGeneratorForRes,
 } from '../types';
 
-import { createAction, keyOf } from './action';
+import { createAction, isContinuation, keyOf } from './action';
 
 type QueueItem = ActionQueueItem | Continuation;
 
@@ -62,28 +63,12 @@ const isActionArgs = (value: unknown): value is Parameters<Next> => {
   return !abortSignal || abortSignal instanceof AbortSignal;
 };
 
-const isContinuation = <TAction extends ActionQueueItem>(
-  value: TAction | Continuation<TAction>
-): value is Continuation<TAction> => {
-  if (!value) {
-    return false;
-  }
-
-  if (typeof value !== 'object') {
-    return false;
-  }
-
-  return 'action' in value && 'generator' in value;
-};
+const lastEmittedBy = new WeakMap<ActionQueueItem, ActionQueueItem>();
 
 function continueAction<
   TServices extends IBaseServices,
   TAction extends ActionQueueItem
->(
-  services: TServices,
-  continuation: Continuation<TAction>,
-  queueIdx: string
-): IResults {
+>(services: TServices, continuation: Continuation<TAction>): IResults {
   const actions = new ListOfEmittedActions();
   const { action, generator } = continuation;
 
@@ -92,9 +77,11 @@ function continueAction<
       method: `queue:${action.type}`,
     },
     () => {
-      const processArgs = (result: IteratorResult<unknown, unknown>) => {
+      const processArgs = (
+        result: IteratorResult<unknown, TAction['result']>
+      ) => {
         if (result.done) {
-          // FIXME: Do something with result
+          action.result = result.value;
           return result.value;
         }
 
@@ -103,6 +90,7 @@ function continueAction<
         }
 
         actions.add({
+          abortSignal: action.abortSignal,
           action,
           generator,
           uid: nanoid(16),
@@ -118,11 +106,17 @@ function continueAction<
         );
 
         actions.add(nextAction);
+        lastEmittedBy.set(action, nextAction);
 
         return nextAction;
       };
 
-      const next = generator.next();
+      const lastEmitted = lastEmittedBy.get(action);
+      const next = (
+        generator as
+          | Generator<Parameters<Next>, ActionQueueItem['result']>
+          | AsyncGenerator<Parameters<Next>, ActionQueueItem['result']>
+      ).next(lastEmitted?.result);
       if (next instanceof Promise) {
         return next.then(processArgs);
       }
@@ -138,26 +132,46 @@ function continueAction<
  * actionRunner ensures that each action is only run once per entrypoint.
  * If action is already running, it will re-emmit actions from the previous run.
  */
-export function actionRunner<
+function actionRunner<
   TServices extends IBaseServices,
   TAction extends ActionQueueItem,
-  TRes extends AnyActionGenerator
+  TRes extends Promise<void> | void
 >(
   services: TServices,
   enqueue: (action: ActionQueueItem | Continuation) => void,
-  handler: Handler<TServices, TAction, TRes>,
-  actionOrContinuation: TAction | Continuation<TAction>,
+  action: TAction,
+  queueIdx: string,
+  handler: Handler<TServices, TAction, GetGeneratorForRes<TRes, TAction>>
+): TRes;
+function actionRunner<
+  TServices extends IBaseServices,
+  TAction extends ActionQueueItem,
+  TRes extends Promise<void> | void
+>(
+  services: TServices,
+  enqueue: (action: ActionQueueItem | Continuation) => void,
+  continuation: Continuation<TAction>,
   queueIdx: string
+): TRes;
+function actionRunner<
+  TServices extends IBaseServices,
+  TAction extends ActionQueueItem,
+  TRes extends Promise<void> | void
+>(
+  services: TServices,
+  enqueue: (action: ActionQueueItem | Continuation) => void,
+  actionOrContinuation: TAction | Continuation<TAction>,
+  queueIdx: string,
+  handler?: Handler<TServices, TAction, GetGeneratorForRes<TRes, TAction>>
 ): TRes {
   const action = isContinuation(actionOrContinuation)
     ? actionOrContinuation.action
     : actionOrContinuation;
   const generator = isContinuation(actionOrContinuation)
     ? actionOrContinuation.generator
-    : (handler(services, action) as Continuation<TAction>['generator']);
-  const actionKey = isContinuation(actionOrContinuation)
-    ? `${keyOf(actionOrContinuation.action)}#${actionOrContinuation.uid}`
-    : keyOf(actionOrContinuation);
+    : (handler!(services, action) as Continuation<TAction>['generator']);
+
+  const actionKey = keyOf(actionOrContinuation);
 
   if (!cache.has(action.entrypoint)) {
     cache.set(action.entrypoint, new Map());
@@ -175,15 +189,12 @@ export function actionRunner<
 
   if (!cached) {
     action.entrypoint.log('run action %s', action.type);
-    const result = continueAction(
-      services,
-      {
-        action,
-        generator,
-        uid: nanoid(16),
-      },
-      queueIdx
-    );
+    const result = continueAction(services, {
+      abortSignal: action.abortSignal,
+      action,
+      generator,
+      uid: nanoid(16),
+    });
     result.actions.onAdd((nextAction) => {
       enqueue(nextAction);
     });
@@ -199,3 +210,5 @@ export function actionRunner<
 
   return cached.task as TRes;
 }
+
+export { actionRunner };

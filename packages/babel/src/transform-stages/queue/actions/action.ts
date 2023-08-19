@@ -6,6 +6,7 @@ import type {
   IBaseAction,
   DataOf,
   ActionByType,
+  Continuation,
 } from '../types';
 
 const randomIds = new WeakMap<object, string>();
@@ -17,7 +18,27 @@ const randomIdFor = (obj: object) => {
   return randomIds.get(obj);
 };
 
-export const keyOf = <T extends ActionQueueItem>(node: T): string => {
+export const isContinuation = <TAction extends IBaseAction>(
+  value: TAction | Continuation<TAction>
+): value is Continuation<TAction> => {
+  if (!value) {
+    return false;
+  }
+
+  if (typeof value !== 'object') {
+    return false;
+  }
+
+  return 'uid' in value && 'action' in value;
+};
+
+export const keyOf = <T extends ActionQueueItem | Continuation>(
+  node: T
+): string => {
+  if ('action' in node) {
+    return `${keyOf(node.action)}#${node.uid}`;
+  }
+
   const name = `${node.type}:${node.entrypoint.name}`;
   switch (node.type) {
     case 'addToCodeCache':

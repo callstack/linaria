@@ -1,3 +1,4 @@
+/* eslint-disable require-yield */
 import { EventEmitter } from '@linaria/utils';
 
 import { TransformCacheCollection } from '../../../../cache';
@@ -13,14 +14,19 @@ import type {
   ActionGenerator,
   AnyActionGenerator,
   Continuation,
+  IResolveImportsAction,
+  IResolvedImport,
 } from '../../types';
-import { createAction } from '../action';
+import { createAction, isContinuation } from '../action';
 import { actionRunner } from '../actionRunner';
 
 type QueueItem = ActionQueueItem | Continuation;
 type Queue = QueueItem[];
 
 describe('actionRunner', () => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  function* emptyHandler(): ActionGenerator<ActionQueueItem> {}
+
   let services: Pick<Services, 'cache' | 'eventEmitter'>;
   beforeEach(() => {
     services = {
@@ -51,7 +57,7 @@ describe('actionRunner', () => {
       handler2();
     }
 
-    actionRunner(services, () => {}, handlerGenerator, action, '0001');
+    actionRunner(services, () => {}, action, '0001', handlerGenerator);
     expect(handler1).toHaveBeenCalledTimes(1);
     expect(handler2).not.toHaveBeenCalled();
   });
@@ -86,16 +92,16 @@ describe('actionRunner', () => {
     const task1 = actionRunner(
       services,
       () => {},
-      handlerGenerator,
       action1,
-      '0001'
+      '0001',
+      handlerGenerator
     );
     const task2 = actionRunner(
       services,
       () => {},
-      handlerGenerator,
       action2,
-      '0002'
+      '0002',
+      handlerGenerator
     );
     expect(handler1).toHaveBeenCalledTimes(1);
     expect(task1).toBe(task2);
@@ -124,8 +130,8 @@ describe('actionRunner', () => {
       yield ['resolveImports', a.entrypoint, { imports: new Map() }, null];
     }
 
-    actionRunner(services, enqueue, handler, action1, '0001');
-    actionRunner(services, enqueue, handler, action2, '0002');
+    actionRunner(services, enqueue, action1, '0001', handler);
+    actionRunner(services, enqueue, action2, '0002', handler);
 
     expect(enqueue).toHaveBeenCalledTimes(4);
 
@@ -152,18 +158,81 @@ describe('actionRunner', () => {
       yield ['resolveImports', a.entrypoint, resolveImportsData, null];
     }
 
-    actionRunner(services, enqueue, handler, action1, '0001');
+    actionRunner(services, enqueue, action1, '0001', handler);
     expect(enqueue).toHaveBeenCalledTimes(2);
     expect(enqueue).nthCalledWith(1, {
+      abortSignal: null,
       action: action1,
       generator: expect.anything(),
+      uid: expect.anything(),
     });
     expect(enqueue).nthCalledWith(2, {
-      entrypoint: action1.entrypoint,
       abortSignal: null,
+      entrypoint: action1.entrypoint,
       imports: resolveImportsData.imports,
       type: 'resolveImports',
     });
+  });
+
+  it('should return value from yielded action', () => {
+    const action1 = createAction(
+      'processEntrypoint',
+      createEntrypoint(services, '/foo/bar.js', ['default']),
+      {},
+      null
+    );
+
+    const resolveImportsData = { imports: new Map() };
+
+    const valueCatcher = jest.fn();
+    const queue: Queue = [];
+    const enqueue = (action: QueueItem) => {
+      queue.push(action);
+    };
+
+    actionRunner(
+      services,
+      enqueue,
+      action1,
+      '0001',
+      function* handler(s, a): ActionGenerator<IProcessEntrypointAction> {
+        const result = yield [
+          'resolveImports',
+          a.entrypoint,
+          resolveImportsData,
+          null,
+        ];
+        valueCatcher(result);
+      }
+    );
+
+    expect(queue).toHaveLength(2);
+    expect(queue[1]).toMatchObject({
+      imports: resolveImportsData.imports,
+      type: 'resolveImports',
+    });
+
+    const resolvedImports: IResolvedImport[] = [
+      {
+        importedFile: './bar',
+        importsOnly: ['default'],
+        resolved: '/foo/bar.js',
+      },
+    ];
+    actionRunner(
+      services,
+      enqueue,
+      queue[1] as IResolveImportsAction,
+      '0001',
+      function* handler(): ActionGenerator<IResolveImportsAction> {
+        return resolvedImports;
+      }
+    );
+
+    actionRunner(services, enqueue, queue[0] as Continuation, '0001');
+
+    expect(valueCatcher).toBeCalledTimes(1);
+    expect(valueCatcher).toBeCalledWith(resolvedImports);
   });
 
   it('should call callback for emitted actions', () => {
@@ -189,9 +258,6 @@ describe('actionRunner', () => {
       return action;
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    function* emptyHandler(): ActionGenerator<ActionQueueItem> {}
-
     const runNthFrom = (
       idx: number,
       queue: Queue,
@@ -200,18 +266,24 @@ describe('actionRunner', () => {
         ActionQueueItem,
         AnyActionGenerator
       > = emptyHandler
-    ) =>
-      actionRunner(
+    ) => {
+      const act = queue[idx];
+      const emit = enqueue.bind(null, queue);
+      if (isContinuation(act)) {
+        return actionRunner(services, emit, act, `000${idx}`);
+      }
+      return actionRunner(
         services,
-        enqueue.bind(null, queue),
+        emit,
+        act,
+        `000${idx}`,
         handler as Handler<
           Pick<Services, 'cache' | 'eventEmitter'>,
           ActionQueueItem,
           AnyActionGenerator
-        >,
-        queue[idx],
-        `000${idx}`
+        >
       );
+    };
 
     // Both queues should have one action
     expect(queue1).toHaveLength(1);
@@ -245,7 +317,6 @@ describe('actionRunner', () => {
     expect(queue2).toHaveLength(5);
 
     const shouldNotBeCalled = jest.fn();
-    // eslint-disable-next-line require-yield
     function* handlerWithMock() {
       shouldNotBeCalled();
     }

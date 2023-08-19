@@ -19,7 +19,7 @@ export { default as transform } from './transform';
 export * from './types';
 export { parseFile } from './transform-stages/helpers/parseFile';
 export { default as loadLinariaOptions } from './transform-stages/helpers/loadLinariaOptions';
-export { prepareCode } from './transform-stages/queue/actions/transform';
+export { prepareCode } from './transform-stages/queue/generators/transform';
 export { createEntrypoint } from './transform-stages/queue/createEntrypoint';
 export { transformUrl } from './transform-stages/4-extract';
 export { default as isNode } from './utils/isNode';

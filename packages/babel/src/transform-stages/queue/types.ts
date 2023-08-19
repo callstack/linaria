@@ -85,11 +85,19 @@ export type AsyncActionGenerator<TAction extends IBaseAction> = AsyncGenerator<
   never
 >;
 
-export type AnyActionGenerator<
-  TAction extends ActionQueueItem = ActionQueueItem
-> = ActionGenerator<TAction> | AsyncActionGenerator<TAction>;
+export type AnyActionGenerator<TAction extends IBaseAction = ActionQueueItem> =
+  | ActionGenerator<TAction>
+  | AsyncActionGenerator<TAction>;
 
-export type Continuation<TAction extends ActionQueueItem = ActionQueueItem> = {
+export type GetGeneratorForRes<
+  TRes extends Promise<void> | void,
+  TAction extends IBaseAction
+> = TRes extends Promise<void>
+  ? AnyActionGenerator<TAction>
+  : ActionGenerator<TAction>;
+
+export type Continuation<TAction extends IBaseAction = ActionQueueItem> = {
+  abortSignal: AbortSignal | null;
   action: TAction;
   generator: AnyActionGenerator<TAction>;
   uid: string;

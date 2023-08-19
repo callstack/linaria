@@ -7,9 +7,9 @@ import type {
   IResolveImportsAction,
   Services,
   IResolvedImport,
+  ActionGenerator,
+  AsyncActionGenerator,
 } from '../types';
-
-import type { ActionGenerator, AsyncActionGenerator } from './types';
 
 const includes = (a: string[], b: string[]) => {
   if (a.includes('*')) return true;

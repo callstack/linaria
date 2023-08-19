@@ -8,7 +8,7 @@
     "linaria-website": "workspace:^4.1.8"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.9",
+    "@babel/core": "^7.22.10",
     "@linaria/webpack5-loader": "workspace:^4.1.8",
     "babel-loader": "^9.1.0",
     "cross-env": "^7.0.3",

@@ -35,24 +35,7 @@ describe('createAction', () => {
         only: ['default'],
         parent: null,
       },
-      callbacks: {},
       abortSignal: null,
-    });
-  });
-
-  it('should create an action with callbacks', () => {
-    const action = createAction(
-      'transform',
-      createEntrypoint(services, '/foo/bar.js', ['default']),
-      {},
-      null
-    );
-    const cb1 = jest.fn();
-    const cb2 = jest.fn();
-    action.on('done', cb1);
-    action.on('done', cb2);
-    expect(action.callbacks).toMatchObject({
-      done: [cb1, cb2],
     });
   });
 

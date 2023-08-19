@@ -1,4 +1,4 @@
-/* eslint-disable no-await-in-loop */
+/* eslint-disable no-await-in-loop,require-yield */
 import { EventEmitter, getFileIdx } from '@linaria/utils';
 
 import type { IBaseEntrypoint } from '../../../types';
@@ -11,6 +11,8 @@ import type {
   IBaseServices,
   IGetExportsAction,
   IProcessEntrypointAction,
+  ActionGenerator,
+  ActionQueueItem,
 } from '../types';
 
 const createEntrypoint = (name: string): IBaseEntrypoint => ({
@@ -21,7 +23,7 @@ const createEntrypoint = (name: string): IBaseEntrypoint => ({
   parent: null,
 });
 
-type Res = Promise<void> | void;
+type Res = ActionGenerator<ActionQueueItem>;
 type UniversalHandlers = Handlers<Res, IBaseServices>;
 
 type GetHandler<T extends IBaseAction> = Handler<IBaseServices, T, Res>;
@@ -32,17 +34,28 @@ describe.each<[string, Queues]>([
   ['AsyncActionQueue', AsyncActionQueue],
   ['SyncActionQueue', SyncActionQueue],
 ])('%s', (_name, Queue) => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  function* emptyHandler(): ActionGenerator<ActionQueueItem> {}
+
+  function drainQueue(
+    queue: AsyncActionQueue<IBaseServices> | SyncActionQueue<IBaseServices>
+  ) {
+    while (!queue.isEmpty()) {
+      queue.runNext();
+    }
+  }
+
   let services: IBaseServices;
   let handlers: UniversalHandlers;
   beforeEach(() => {
     handlers = {
-      addToCodeCache: jest.fn(),
-      transform: jest.fn(),
-      explodeReexports: jest.fn(),
-      processEntrypoint: jest.fn(),
-      processImports: jest.fn(),
-      getExports: jest.fn(),
-      resolveImports: jest.fn(),
+      addToCodeCache: jest.fn(emptyHandler),
+      transform: jest.fn(emptyHandler),
+      explodeReexports: jest.fn(emptyHandler),
+      processEntrypoint: jest.fn(emptyHandler),
+      processImports: jest.fn(emptyHandler),
+      getExports: jest.fn(emptyHandler),
+      resolveImports: jest.fn(emptyHandler),
     };
 
     services = {
@@ -80,51 +93,50 @@ describe.each<[string, Queues]>([
     });
 
     it('should process next calls', async () => {
-      const processEntrypoint: GetHandler<IProcessEntrypointAction> = (
-        _services,
-        action,
-        next
-      ) => {
-        next('transform', action.entrypoint, {});
-      };
+      function* processEntrypoint(
+        _services: unknown,
+        action: IProcessEntrypointAction
+      ): ActionGenerator<IProcessEntrypointAction> {
+        yield ['transform', action.entrypoint, {}];
+      }
 
       const queue = createQueueFor('/foo/bar.js', { processEntrypoint });
       await queue.runNext();
       expect(queue.isEmpty()).toBe(false);
-      await queue.runNext();
+      await drainQueue(queue);
       expect(queue.isEmpty()).toBe(true);
       expect(handlers.transform).toHaveBeenCalledTimes(1);
     });
 
     it('should call actions according to its weight', async () => {
-      const processEntrypoint: GetHandler<IProcessEntrypointAction> = (
-        _services,
-        action,
-        next
-      ) => {
-        next('transform', action.entrypoint, {});
-        next('addToCodeCache', action.entrypoint, {
-          data: {
-            imports: null,
-            result: {
-              code: '',
-              metadata: undefined,
+      function* processEntrypoint(
+        _services: unknown,
+        action: IProcessEntrypointAction
+      ): ActionGenerator<IProcessEntrypointAction> {
+        yield ['transform', action.entrypoint, {}];
+        yield [
+          'addToCodeCache',
+          action.entrypoint,
+          {
+            data: {
+              imports: null,
+              result: {
+                code: '',
+                metadata: undefined,
+              },
+              only: [],
             },
-            only: [],
           },
-        });
-        next('explodeReexports', action.entrypoint, {});
-        next('processImports', action.entrypoint, {
-          resolved: [],
-        });
-        next('getExports', action.entrypoint, {});
-        next('resolveImports', action.entrypoint, {
-          imports: null,
-        });
-      };
+        ];
+        yield ['explodeReexports', action.entrypoint, {}];
+        yield ['processImports', action.entrypoint, { resolved: [] }];
+        yield ['getExports', action.entrypoint, {}];
+        yield ['resolveImports', action.entrypoint, { imports: null }];
+      }
 
       const queue = createQueueFor('/foo/bar.js', { processEntrypoint });
-      await queue.runNext(); // processEntrypoint
+
+      await drainQueue(queue);
 
       const rightOrder: (keyof UniversalHandlers)[] = [
         'resolveImports',
@@ -136,7 +148,6 @@ describe.each<[string, Queues]>([
       ];
 
       for (let i = 0; i < rightOrder.length; i++) {
-        await queue.runNext();
         expect(handlers[rightOrder[i]]).toHaveBeenCalledTimes(1);
       }
     });
@@ -146,22 +157,16 @@ describe.each<[string, Queues]>([
     const exports: string[] = ['resolved'];
     const onGetExports = jest.fn();
 
-    const processEntrypoint: GetHandler<IProcessEntrypointAction> = (
-      _services,
-      action,
-      next
-    ) => {
-      next('getExports', action.entrypoint, {}).on('resolve', onGetExports);
-    };
+    function* processEntrypoint(
+      _services: unknown,
+      action: IProcessEntrypointAction
+    ): ActionGenerator<IProcessEntrypointAction> {
+      onGetExports(yield ['getExports', action.entrypoint, {}]);
+    }
 
-    const getExports: GetHandler<IGetExportsAction> = (
-      _services,
-      _action,
-      _next,
-      callbacks
-    ) => {
-      callbacks.resolve(exports);
-    };
+    function* getExports(): ActionGenerator<IGetExportsAction> {
+      return exports;
+    }
 
     const queue = createQueueFor('/foo/bar.js', {
       processEntrypoint,
@@ -177,17 +182,18 @@ describe.each<[string, Queues]>([
 
   it('should remove aborted actions', async () => {
     const abortController = new AbortController();
-    const processEntrypoint: GetHandler<IProcessEntrypointAction> = (
-      _services,
-      action,
-      next
-    ) => {
-      next('transform', action.entrypoint, {}, abortController.signal);
-    };
+    function* processEntrypoint(
+      _services: unknown,
+      action: IProcessEntrypointAction
+    ): ActionGenerator<IProcessEntrypointAction> {
+      yield ['transform', action.entrypoint, {}, abortController.signal];
+    }
 
     const queue = createQueueFor('/foo/bar.js', { processEntrypoint });
-    await queue.runNext(); // processEntrypoint
+    await queue.runNext(); // processEntrypoint …
+    await queue.runNext(); // … and its continuation
 
+    expect(queue.isEmpty()).toBe(false);
     expect(handlers.transform).not.toHaveBeenCalled();
 
     abortController.abort();

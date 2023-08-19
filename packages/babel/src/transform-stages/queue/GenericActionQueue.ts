@@ -5,7 +5,12 @@ import type { Debugger } from '@linaria/logger';
 import type { IBaseEntrypoint } from '../../types';
 
 import { PriorityQueue } from './PriorityQueue';
-import { createAction, getRefsCount, keyOf } from './actions/action';
+import {
+  createAction,
+  getRefsCount,
+  isContinuation,
+  keyOf,
+} from './actions/action';
 import { actionRunner } from './actions/actionRunner';
 import type {
   DataOf,
@@ -15,6 +20,8 @@ import type {
   IBaseServices,
   Handler,
   AnyActionGenerator,
+  Continuation,
+  GetGeneratorForRes,
 } from './types';
 
 const weights: Record<IBaseAction['type'], number> = {
@@ -27,7 +34,18 @@ const weights: Record<IBaseAction['type'], number> = {
   resolveImports: 30,
 };
 
-function hasLessPriority(a: IBaseAction, b: IBaseAction) {
+function hasLessPriority(
+  a: IBaseAction | Continuation,
+  b: IBaseAction | Continuation
+) {
+  if (isContinuation(a)) {
+    return hasLessPriority(a.action, b);
+  }
+
+  if (isContinuation(b)) {
+    return hasLessPriority(a, b.action);
+  }
+
   if (a.type === b.type) {
     const parentA = a.entrypoint.parent?.name;
     const parentB = b.entrypoint.parent?.name;
@@ -53,9 +71,9 @@ export type Handlers<
 };
 
 export class GenericActionQueue<
-  TRes extends AnyActionGenerator,
+  TRes extends Promise<void> | void,
   TServices extends IBaseServices
-> extends PriorityQueue<ActionQueueItem> {
+> extends PriorityQueue<ActionQueueItem | Continuation> {
   protected readonly queueIdx: string;
 
   protected readonly log: Debugger;
@@ -71,7 +89,10 @@ export class GenericActionQueue<
 
   constructor(
     protected services: TServices,
-    protected handlers: Handlers<TRes, TServices>,
+    protected handlers: Handlers<
+      GetGeneratorForRes<TRes, ActionQueueItem>,
+      TServices
+    >,
     entrypoint: IBaseEntrypoint
   ) {
     super(hasLessPriority);
@@ -84,8 +105,8 @@ export class GenericActionQueue<
     this.next('processEntrypoint', entrypoint, {});
   }
 
-  protected override dequeue(): ActionQueueItem | undefined {
-    let action: ActionQueueItem | undefined;
+  protected override dequeue(): ActionQueueItem | Continuation | undefined {
+    let action: ActionQueueItem | Continuation | undefined;
     // eslint-disable-next-line no-cond-assign
     while ((action = super.dequeue())) {
       if (!action?.abortSignal?.aborted) {
@@ -100,14 +121,17 @@ export class GenericActionQueue<
     return undefined;
   }
 
-  protected override enqueue(newAction: ActionQueueItem) {
+  protected override enqueue(newAction: ActionQueueItem | Continuation) {
     const key = keyOf(newAction);
+    const { entrypoint, type } = isContinuation(newAction)
+      ? newAction.action
+      : newAction;
 
-    if (!this.processed.has(newAction.entrypoint)) {
-      this.processed.set(newAction.entrypoint, new Set());
+    if (!this.processed.has(entrypoint)) {
+      this.processed.set(entrypoint, new Set());
     }
 
-    const processed = this.processed.get(newAction.entrypoint)!;
+    const processed = this.processed.get(entrypoint)!;
     if (processed.has(key)) {
       this.log('Skip %s because it was already processed', key);
       return;
@@ -117,9 +141,9 @@ export class GenericActionQueue<
       this.services.eventEmitter.single({
         type: 'queue-action',
         queueIdx: this.queueIdx,
-        action: `${newAction.type}:abort`,
-        file: newAction.entrypoint.name,
-        args: newAction.entrypoint.only,
+        action: `${type}:abort`,
+        file: entrypoint.name,
+        args: entrypoint.only,
       });
       this.delete(newAction);
     };
@@ -147,19 +171,30 @@ export class GenericActionQueue<
     return action;
   };
 
-  protected handle<TAction extends ActionQueueItem>(action: TAction): TRes {
+  protected handle<TAction extends ActionQueueItem>(
+    action: TAction | Continuation<TAction>
+  ): TRes {
+    if (isContinuation(action)) {
+      return actionRunner(
+        this.services,
+        this.enqueue.bind(this),
+        action,
+        this.queueIdx
+      );
+    }
+
     const handler = this.handlers[action.type as TAction['type']] as Handler<
       TServices,
       TAction,
-      TRes
+      GetGeneratorForRes<TRes, TAction>
     >;
 
-    return actionRunner<TServices, TAction, TRes>(
+    return actionRunner(
       this.services,
       this.enqueue.bind(this),
-      handler,
       action,
-      this.queueIdx
+      this.queueIdx,
+      handler
     );
   }
 }
