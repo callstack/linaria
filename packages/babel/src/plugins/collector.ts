@@ -15,6 +15,8 @@ import type { Core } from '../babel';
 import type { IPluginState, ValueCache } from '../types';
 import { processTemplateExpression } from '../utils/processTemplateExpression';
 
+export const filename = __filename;
+
 export default function collector(
   babel: Core,
   options: StrictOptions & { values?: ValueCache }

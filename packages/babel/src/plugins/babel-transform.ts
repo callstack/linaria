@@ -7,8 +7,6 @@ import { removeWithRelated, syncResolve } from '@linaria/utils';
 
 import type { Core } from '../babel';
 import { TransformCacheCollection } from '../cache';
-import { prepareForEvalSync } from '../transform-stages/1-prepare-for-eval';
-import evalStage from '../transform-stages/2-eval';
 import loadLinariaOptions from '../transform-stages/helpers/loadLinariaOptions';
 import type { IPluginState, PluginOptions } from '../types';
 import { processTemplateExpression } from '../utils/processTemplateExpression';
@@ -33,58 +31,58 @@ export default function collector(
 
       const pluginOptions = loadLinariaOptions(options);
 
-      const prepareStageResult = prepareForEvalSync(
-        babel,
-        cache,
-        syncResolve,
-        entrypoint,
-        pluginOptions,
-        {
-          root: file.opts.root ?? undefined,
-          inputSourceMap: file.opts.inputSourceMap ?? undefined,
-        }
-      );
-
-      if (
-        !prepareStageResult ||
-        !withLinariaMetadata(prepareStageResult?.metadata)
-      ) {
-        return;
-      }
-
-      const evalStageResult = evalStage(
-        cache,
-        prepareStageResult.code,
-        pluginOptions,
-        file.opts.filename!
-      );
-
-      if (evalStageResult === null) {
-        return;
-      }
-
-      const [valueCache] = evalStageResult;
-
-      const identifiers: NodePath<Identifier>[] = [];
-      file.path.traverse({
-        Identifier: (p) => {
-          identifiers.push(p);
-        },
-      });
-      identifiers.forEach((p) => {
-        processTemplateExpression(p, file.opts, pluginOptions, (processor) => {
-          processor.build(valueCache);
-          processor.doRuntimeReplacement();
-        });
-      });
-
-      // We can remove __linariaPreval export and all related code
-      const prevalExport = (
-        file.path.scope.getData('__linariaPreval') as NodePath | undefined
-      )?.findParent((p) => p.isExpressionStatement());
-      if (prevalExport) {
-        removeWithRelated([prevalExport]);
-      }
+      // const prepareStageResult = prepareForEvalSync(
+      //   babel,
+      //   cache,
+      //   syncResolve,
+      //   entrypoint,
+      //   pluginOptions,
+      //   {
+      //     root: file.opts.root ?? undefined,
+      //     inputSourceMap: file.opts.inputSourceMap ?? undefined,
+      //   }
+      // );
+      //
+      // if (
+      //   !prepareStageResult ||
+      //   !withLinariaMetadata(prepareStageResult?.metadata)
+      // ) {
+      //   return;
+      // }
+      //
+      // const evalStageResult = evalStage(
+      //   cache,
+      //   prepareStageResult.code,
+      //   pluginOptions,
+      //   file.opts.filename!
+      // );
+      //
+      // if (evalStageResult === null) {
+      //   return;
+      // }
+      //
+      // const [valueCache] = evalStageResult;
+      //
+      // const identifiers: NodePath<Identifier>[] = [];
+      // file.path.traverse({
+      //   Identifier: (p) => {
+      //     identifiers.push(p);
+      //   },
+      // });
+      // identifiers.forEach((p) => {
+      //   processTemplateExpression(p, file.opts, pluginOptions, (processor) => {
+      //     processor.build(valueCache);
+      //     processor.doRuntimeReplacement();
+      //   });
+      // });
+      //
+      // // We can remove __linariaPreval export and all related code
+      // const prevalExport = (
+      //   file.path.scope.getData('__linariaPreval') as NodePath | undefined
+      // )?.findParent((p) => p.isExpressionStatement());
+      // if (prevalExport) {
+      //   removeWithRelated([prevalExport]);
+      // }
     },
     visitor: {},
     post(file: BabelFile) {

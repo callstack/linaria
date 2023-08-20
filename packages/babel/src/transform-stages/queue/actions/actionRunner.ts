@@ -8,6 +8,7 @@ import type {
   Next,
   Continuation,
   GetGeneratorForRes,
+  TypeOfValue,
 } from '../types';
 
 import { createAction, getWeight, isContinuation, keyOf } from './action';
@@ -88,7 +89,7 @@ const hasTaskResult = (entrypoint: IBaseEntrypoint, id: string) => {
   return taskResults.get(entrypoint)!.has(id);
 };
 
-const getTaskResult = (entrypoint: IBaseEntrypoint, id: string) => {
+export const getTaskResult = (entrypoint: IBaseEntrypoint, id: string) => {
   if (!entrypoint || !taskResults.has(entrypoint)) {
     return undefined;
   }
@@ -111,7 +112,7 @@ function continueAction<
     },
     () => {
       const processArgs = (
-        result: IteratorResult<unknown, TAction['result']>
+        result: IteratorResult<unknown, TypeOfValue<ActionQueueItem>>
       ) => {
         if (result.done) {
           addTaskResult(action.entrypoint, keyOf(action), result.value);
@@ -182,8 +183,8 @@ function continueAction<
 
       const next = (
         generator as
-          | Generator<Parameters<Next>, ActionQueueItem['result']>
-          | AsyncGenerator<Parameters<Next>, ActionQueueItem['result']>
+          | Generator<Parameters<Next>, TypeOfValue<ActionQueueItem>>
+          | AsyncGenerator<Parameters<Next>, TypeOfValue<ActionQueueItem>>
       ).next(resultFrom ? getTaskResult(...resultFrom) : undefined);
       if (next instanceof Promise) {
         return next.then(processArgs);

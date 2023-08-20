@@ -21,7 +21,7 @@ export { parseFile } from './transform-stages/helpers/parseFile';
 export { default as loadLinariaOptions } from './transform-stages/helpers/loadLinariaOptions';
 export { prepareCode } from './transform-stages/queue/generators/transform';
 export { createEntrypoint } from './transform-stages/queue/createEntrypoint';
-export { transformUrl } from './transform-stages/4-extract';
+export { transformUrl } from './transform-stages/queue/generators/extract';
 export { default as isNode } from './utils/isNode';
 export { default as getTagProcessor } from './utils/getTagProcessor';
 export { default as getVisitorKeys } from './utils/getVisitorKeys';

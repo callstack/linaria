@@ -324,6 +324,7 @@ export function genericCreateEntrypoint<
     const newEntrypoint: IEntrypoint<TPluginOptions> = {
       ...loadedAndParsed,
       idx,
+      generation: (cached?.generation ?? 0) + 1,
       log: processedParent?.log ?? log,
       name,
       only: mergedOnly,

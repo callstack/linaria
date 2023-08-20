@@ -158,22 +158,24 @@ export function* internalTransform(
     return;
   }
 
-  const resolvedImports = yield* emitAndGetResultOf(
-    'resolveImports',
-    action.entrypoint,
-    {
-      imports,
-    }
-  );
-
-  if (resolvedImports.length !== 0) {
-    yield [
-      'processImports',
+  if (imports !== null && imports.size > 0) {
+    const resolvedImports = yield* emitAndGetResultOf(
+      'resolveImports',
       action.entrypoint,
       {
-        resolved: resolvedImports,
-      },
-    ];
+        imports,
+      }
+    );
+
+    if (resolvedImports.length !== 0) {
+      yield [
+        'processImports',
+        action.entrypoint,
+        {
+          resolved: resolvedImports,
+        },
+      ];
+    }
   }
 
   yield [

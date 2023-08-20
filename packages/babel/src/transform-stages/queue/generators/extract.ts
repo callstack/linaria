@@ -4,9 +4,10 @@ import type { Mapping } from 'source-map';
 import { SourceMapGenerator } from 'source-map';
 import stylis from 'stylis';
 
-import type { Artifact, Replacements, Rules } from '@linaria/utils';
+import type { Replacements, Rules } from '@linaria/utils';
 
-import type { Options, PreprocessorFn } from '../types';
+import type { Options, PreprocessorFn } from '../../../types';
+import type { IExtractAction, ActionGenerator, Services } from '../types';
 
 const STYLIS_DECLARATION = 1;
 const posixSep = path.posix.sep;
@@ -35,7 +36,7 @@ function extractCssFromAst(
   rules: Rules,
   originalCode: string,
   options: Pick<Options, 'preprocessor' | 'filename' | 'outputFilename'>
-) {
+): { cssText: string; cssSourceMapText: string; rules: Rules } {
   const mappings: Mapping[] = [];
 
   let cssText = '';
@@ -117,11 +118,14 @@ function extractCssFromAst(
 /**
  * Extract artifacts (e.g. CSS) from processors
  */
-export default function extractStage(
-  processors: { artifacts: Artifact[] }[],
-  originalCode: string,
-  options: Pick<Options, 'preprocessor' | 'filename' | 'outputFilename'>
-) {
+// eslint-disable-next-line require-yield
+export function* extract(
+  services: Services,
+  action: IExtractAction
+): ActionGenerator<IExtractAction> {
+  const { options } = services;
+  const { processors, entrypoint } = action;
+  const { code } = entrypoint;
   let allRules: Rules = {};
   const allReplacements: Replacements = [];
   processors.forEach((processor) => {
@@ -142,7 +146,7 @@ export default function extractStage(
   });
 
   return {
-    ...extractCssFromAst(allRules, originalCode, options),
+    ...extractCssFromAst(allRules, code, options),
     replacements: allReplacements,
   };
 }

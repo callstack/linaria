@@ -103,8 +103,6 @@ export class GenericActionQueue<
 
     this.log('Created for entrypoint %s', entrypoint.name);
     this.queueIdx = entrypoint.idx;
-
-    this.next('processEntrypoint', entrypoint, {});
   }
 
   protected override dequeue(): ActionQueueItem | Continuation | undefined {

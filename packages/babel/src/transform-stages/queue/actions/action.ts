@@ -18,6 +18,10 @@ const weights: Record<IBaseAction['type'], number> = {
   processImports: 25,
   getExports: 30,
   resolveImports: 35,
+  workflow: 0,
+  collect: -10,
+  evalFile: -5,
+  extract: -15,
 };
 
 const randomIds = new WeakMap<object, string>();

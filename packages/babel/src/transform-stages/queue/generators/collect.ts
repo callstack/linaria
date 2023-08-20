@@ -1,32 +1,26 @@
-import type {
-  BabelFileResult,
-  PluginItem,
-  TransformOptions,
-} from '@babel/core';
-import type { File } from '@babel/types';
+import type { PluginItem } from '@babel/core';
 
-import type { StrictOptions } from '@linaria/utils';
 import { buildOptions } from '@linaria/utils';
 
-import type { Core } from '../babel';
-import type { Options, ValueCache } from '../types';
+import { filename as collectorPlugin } from '../../../plugins/collector';
+import type { Services, ActionGenerator, ICollectAction } from '../types';
 
 /**
  * Parses the specified file, finds tags, applies run-time replacements,
  * removes dead code.
  */
-export default function prepareForRuntime(
-  babel: Core,
-  ast: File,
-  code: string,
-  valueCache: ValueCache,
-  pluginOptions: StrictOptions,
-  options: Pick<Options, 'filename' | 'inputSourceMap' | 'root'>,
-  babelConfig: TransformOptions
-): BabelFileResult {
+// eslint-disable-next-line require-yield
+export function* collect(
+  services: Services,
+  action: ICollectAction
+): ActionGenerator<ICollectAction> {
+  const { babel, options } = services;
+  const { valueCache, entrypoint } = action;
+  const { ast, code, name, pluginOptions } = entrypoint;
+
   const transformPlugins: PluginItem[] = [
     [
-      require.resolve('../plugins/collector'),
+      collectorPlugin,
       {
         ...pluginOptions,
         values: valueCache,
@@ -38,7 +32,7 @@ export default function prepareForRuntime(
     envName: 'linaria',
     plugins: transformPlugins,
     sourceMaps: true,
-    sourceFileName: babelConfig.filename ?? options.filename,
+    sourceFileName: name,
     inputSourceMap: options.inputSourceMap,
     root: options.root,
     ast: true,
@@ -49,8 +43,8 @@ export default function prepareForRuntime(
 
   const result = babel.transformFromAstSync(ast, code, {
     ...transformConfig,
-    cwd: babelConfig.cwd,
-    filename: babelConfig.filename ?? options.filename,
+    cwd: options.root,
+    filename: name,
   });
 
   if (!result || !result.ast?.program) {

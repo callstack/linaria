@@ -1,7 +1,15 @@
-import type { TransformOptions } from '@babel/core';
+import type { BabelFileResult, TransformOptions } from '@babel/core';
 import type { File } from '@babel/types';
 
-import type { Evaluator, StrictOptions, EventEmitter } from '@linaria/utils';
+import type { ValueCache } from '@linaria/tags';
+import type {
+  Evaluator,
+  StrictOptions,
+  EventEmitter,
+  Artifact,
+  Rules,
+  Replacements,
+} from '@linaria/utils';
 
 import type { Core } from '../../babel';
 import type { TransformCacheCollection } from '../../cache';
@@ -14,7 +22,10 @@ import type {
 export type Services = {
   babel: Core;
   cache: TransformCacheCollection;
-  options: Pick<Options, 'root' | 'inputSourceMap'>;
+  options: Pick<
+    Options,
+    'root' | 'inputSourceMap' | 'preprocessor' | 'filename' | 'outputFilename'
+  >;
   eventEmitter: EventEmitter;
 };
 
@@ -46,6 +57,8 @@ export interface IBaseServices {
   eventEmitter: EventEmitter;
 }
 
+const HiddenTypeOfValueSymbol = Symbol('TypeOfValue');
+
 export interface IBaseAction<
   TEntrypoint extends IBaseEntrypoint = IBaseEntrypoint,
   TResult = unknown
@@ -53,8 +66,15 @@ export interface IBaseAction<
   abortSignal: AbortSignal | null;
   entrypoint: TEntrypoint;
   idx: string;
-  result?: TResult;
+  [HiddenTypeOfValueSymbol]?: TResult;
 }
+
+export type TypeOfValue<T> = T extends IBaseAction<
+  IBaseEntrypoint,
+  infer TResult
+>
+  ? TResult
+  : never;
 
 export type DataOf<TNode extends ActionQueueItem> = Omit<
   TNode,
@@ -166,12 +186,59 @@ export interface IGetExportsAction extends IBaseAction<IEntrypoint, string[]> {
   type: 'getExports';
 }
 
+export interface IEvalAction
+  extends IBaseAction<IEntrypoint, [ValueCache, string[]] | null> {
+  code: string;
+  type: 'evalFile';
+}
+
+export interface ICollectAction
+  extends IBaseAction<IEntrypoint, BabelFileResult> {
+  valueCache: ValueCache;
+  type: 'collect';
+}
+
+export interface IExtracted {
+  cssText: string;
+  cssSourceMapText: string;
+  replacements: Replacements;
+  rules: Rules;
+}
+
+export interface IExtractAction extends IBaseAction<IEntrypoint, IExtracted> {
+  processors: { artifacts: Artifact[] }[];
+  type: 'extract';
+}
+
+export interface IWorkflowActionNonLinariaResult {
+  code: string;
+  sourceMap: BabelFileResult['map'];
+}
+
+export interface IWorkflowActionLinariaResult
+  extends IExtracted,
+    IWorkflowActionNonLinariaResult {
+  dependencies: string[];
+}
+
+export interface IWorkflowAction
+  extends IBaseAction<
+    IEntrypoint,
+    IWorkflowActionLinariaResult | IWorkflowActionNonLinariaResult
+  > {
+  type: 'workflow';
+}
+
 export type ActionQueueItem =
   | IAddToCodeCacheAction
+  | IEvalAction
   | IExplodeReexportsAction
+  | IExtractAction
   | IFinalizeEntrypointAction
+  | IGetExportsAction
+  | ICollectAction
   | IProcessEntrypointAction
   | IProcessImportsAction
   | IResolveImportsAction
-  | IGetExportsAction
-  | ITransformAction;
+  | ITransformAction
+  | IWorkflowAction;

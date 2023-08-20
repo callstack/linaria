@@ -11,105 +11,23 @@ import type { TransformOptions } from '@babel/core';
 import * as babel from '@babel/core';
 
 import { EventEmitter } from '@linaria/utils';
-import type { StrictOptions } from '@linaria/utils';
 
 import { TransformCacheCollection } from './cache';
-import prepareForEval, {
-  prepareForEvalSync,
-} from './transform-stages/1-prepare-for-eval';
-import evalStage from './transform-stages/2-eval';
-import prepareForRuntime from './transform-stages/3-prepare-for-runtime';
-import extractStage from './transform-stages/4-extract';
 import loadLinariaOptions from './transform-stages/helpers/loadLinariaOptions';
-import type { Options, Result, ITransformFileResult } from './types';
-import withLinariaMetadata from './utils/withLinariaMetadata';
-
-function syncStages(
-  originalCode: string,
-  pluginOptions: StrictOptions,
-  options: Pick<
-    Options,
-    'filename' | 'inputSourceMap' | 'root' | 'preprocessor' | 'outputFilename'
-  >,
-  prepareStageResult: ITransformFileResult | undefined,
-  babelConfig: TransformOptions,
-  cache: TransformCacheCollection,
-  eventEmitter = EventEmitter.dummy
-) {
-  const { filename } = options;
-  const ast = cache.get('originalAST', filename) ?? 'ignored';
-
-  // File is ignored or does not contain any tags. Return original code.
-  if (
-    ast === 'ignored' ||
-    !prepareStageResult ||
-    !withLinariaMetadata(prepareStageResult.metadata)
-  ) {
-    return {
-      code: originalCode,
-      sourceMap: options.inputSourceMap,
-    };
-  }
-
-  // *** 2nd stage ***
-
-  const evalStageResult = eventEmitter.pair(
-    { stage: 'stage-2', filename },
-    () => evalStage(cache, prepareStageResult.code, pluginOptions, filename)
-  );
-
-  if (evalStageResult === null) {
-    return {
-      code: originalCode,
-      sourceMap: options.inputSourceMap,
-    };
-  }
-
-  const [valueCache, dependencies] = evalStageResult;
-
-  // *** 3rd stage ***
-
-  const collectStageResult = eventEmitter.pair(
-    { stage: 'stage-3', filename },
-    () =>
-      prepareForRuntime(
-        babel,
-        ast,
-        originalCode,
-        valueCache,
-        pluginOptions,
-        options,
-        babelConfig
-      )
-  );
-
-  if (!withLinariaMetadata(collectStageResult.metadata)) {
-    return {
-      code: collectStageResult.code!,
-      sourceMap: collectStageResult.map,
-    };
-  }
-
-  const linariaMetadata = collectStageResult.metadata.linaria;
-
-  // *** 4th stage
-
-  const extractStageResult = eventEmitter.pair(
-    { stage: 'stage-4', filename },
-    () => extractStage(linariaMetadata.processors, originalCode, options)
-  );
-
-  return {
-    ...extractStageResult,
-    code: collectStageResult.code ?? '',
-    dependencies,
-    replacements: [
-      ...extractStageResult.replacements,
-      ...linariaMetadata.replacements,
-    ],
-    sourceMap: collectStageResult.map,
-  };
-}
+import {
+  AsyncActionQueue,
+  SyncActionQueue,
+} from './transform-stages/queue/ActionQueue';
+import { keyOf } from './transform-stages/queue/actions/action';
+import { getTaskResult } from './transform-stages/queue/actions/actionRunner';
+import { createEntrypoint } from './transform-stages/queue/createEntrypoint';
+import { baseHandlers } from './transform-stages/queue/generators';
+import {
+  asyncResolveImports,
+  syncResolveImports,
+} from './transform-stages/queue/generators/resolveImports';
+import { rootLog } from './transform-stages/queue/rootLog';
+import type { Options, Result } from './types';
 
 export function transformSync(
   originalCode: string,
@@ -119,44 +37,47 @@ export function transformSync(
   cache = new TransformCacheCollection(),
   eventEmitter = EventEmitter.dummy
 ): Result {
-  const { filename } = options;
-  const results = eventEmitter.pair({ stage: 'stage-1', filename }, () => {
-    // *** 1st stage ***
+  if (Object.keys(babelConfig).length > 0) {
+    throw new Error('babelConfig is not supported anymore');
+  }
 
-    const entrypoint = {
-      name: options.filename,
-      code: originalCode,
-      only: ['__linariaPreval'],
-    };
+  const services = { babel, cache, options, eventEmitter };
+  const pluginOptions = loadLinariaOptions(options.pluginOptions);
 
-    const pluginOptions = loadLinariaOptions(options.pluginOptions);
-    const prepareStageResults = prepareForEvalSync(
-      babel,
-      cache,
-      syncResolve,
-      entrypoint,
-      pluginOptions,
-      options,
-      eventEmitter
-    );
-
-    return {
-      prepareStageResults,
-      pluginOptions,
-    };
-  });
-
-  // *** The rest of the stages are synchronous ***
-
-  return syncStages(
+  const entrypoint = createEntrypoint(
+    services,
+    { log: rootLog },
+    options.filename,
+    ['__linariaPreval'],
     originalCode,
-    results.pluginOptions,
-    options,
-    results.prepareStageResults,
-    babelConfig,
-    cache,
-    eventEmitter
+    pluginOptions
   );
+
+  if (entrypoint === 'ignored') {
+    return {
+      code: originalCode,
+      sourceMap: options.inputSourceMap,
+    };
+  }
+
+  const queue = new SyncActionQueue(
+    services,
+    {
+      ...baseHandlers,
+      resolveImports: syncResolveImports.bind(null, syncResolve),
+    },
+    entrypoint
+  );
+
+  const workflowAction = queue.next('workflow', entrypoint, {});
+
+  while (!queue.isEmpty()) {
+    queue.runNext();
+  }
+
+  entrypoint.log('queue is empty, %s is ready', entrypoint.name);
+
+  return getTaskResult(entrypoint, keyOf(workflowAction)) as Result;
 }
 
 export default async function transform(
@@ -171,45 +92,54 @@ export default async function transform(
   cache = new TransformCacheCollection(),
   eventEmitter = EventEmitter.dummy
 ): Promise<Result> {
-  const { filename } = options;
-  const results = await eventEmitter.pair(
-    { stage: 'stage-1', filename },
-    async () => {
-      // *** 1st stage ***
+  if (Object.keys(babelConfig).length > 0) {
+    throw new Error('babelConfig is not supported anymore');
+  }
 
-      const entrypoint = {
-        name: options.filename,
-        code: originalCode,
-        only: ['__linariaPreval'],
-      };
+  const services = { babel, cache, options, eventEmitter };
+  const pluginOptions = loadLinariaOptions(options.pluginOptions);
 
-      const pluginOptions = loadLinariaOptions(options.pluginOptions);
-      const prepareStageResults = await prepareForEval(
-        babel,
-        cache,
-        asyncResolve,
-        entrypoint,
-        pluginOptions,
-        options,
-        eventEmitter
-      );
-
-      return {
-        prepareStageResults,
-        pluginOptions,
-      };
-    }
-  );
-
-  // *** The rest of the stages are synchronous ***
-
-  return syncStages(
+  /*
+   * This method can be run simultaneously for multiple files.
+   * A shared cache is accessible for all runs, but each run has its own queue
+   * to maintain the correct processing order. The cache stores the outcome
+   * of tree-shaking, and if the result is already stored in the cache
+   * but the "only" option has changed, the file will be re-processed using
+   * the combined "only" option.
+   */
+  const entrypoint = createEntrypoint(
+    services,
+    { log: rootLog },
+    options.filename,
+    ['__linariaPreval'],
     originalCode,
-    results.pluginOptions,
-    options,
-    results.prepareStageResults,
-    babelConfig,
-    cache,
-    eventEmitter
+    pluginOptions
   );
+
+  if (entrypoint === 'ignored') {
+    return {
+      code: originalCode,
+      sourceMap: options.inputSourceMap,
+    };
+  }
+
+  const queue = new AsyncActionQueue(
+    services,
+    {
+      ...baseHandlers,
+      resolveImports: asyncResolveImports.bind(null, asyncResolve),
+    },
+    entrypoint
+  );
+
+  const workflowAction = queue.next('workflow', entrypoint, {});
+
+  while (!queue.isEmpty()) {
+    // eslint-disable-next-line no-await-in-loop
+    await queue.runNext();
+  }
+
+  entrypoint.log('queue is empty, %s is ready', entrypoint.name);
+
+  return getTaskResult(entrypoint, keyOf(workflowAction)) as Result;
 }
