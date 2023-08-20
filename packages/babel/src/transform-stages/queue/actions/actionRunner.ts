@@ -155,7 +155,9 @@ function continueAction<
             ? [nextAction.entrypoint, keyOf(nextAction)]
             : undefined,
           uid: continuationIdx.toString(16).padStart(8, '0'),
-          weight: needResult ? getWeight(nextAction) - 1 : weight,
+          weight: needResult
+            ? Math.min(getWeight(nextAction) - 1, weight)
+            : weight,
         });
 
         if (needResult) {
