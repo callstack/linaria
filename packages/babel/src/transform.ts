@@ -18,10 +18,10 @@ import {
   AsyncActionQueue,
   SyncActionQueue,
 } from './transform-stages/queue/ActionQueue';
+import { Entrypoint } from './transform-stages/queue/Entrypoint';
 import type { Handlers } from './transform-stages/queue/GenericActionQueue';
 import { keyOf } from './transform-stages/queue/actions/action';
 import { getTaskResult } from './transform-stages/queue/actions/actionRunner';
-import { createEntrypoint } from './transform-stages/queue/createEntrypoint';
 import { baseHandlers } from './transform-stages/queue/generators';
 import {
   asyncResolveImports,
@@ -62,7 +62,7 @@ export function transformSync(
   const services: RequiredServices = { babel, cache, options, eventEmitter };
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
 
-  const entrypoint = createEntrypoint(
+  const entrypoint = Entrypoint.create(
     services,
     { log: rootLog },
     options.filename,
@@ -125,7 +125,7 @@ export default async function transform(
    * but the "only" option has changed, the file will be re-processed using
    * the combined "only" option.
    */
-  const entrypoint = createEntrypoint(
+  const entrypoint = Entrypoint.create(
     services,
     { log: rootLog },
     options.filename,

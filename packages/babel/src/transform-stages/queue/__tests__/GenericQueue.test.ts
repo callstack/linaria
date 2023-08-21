@@ -1,29 +1,22 @@
 /* eslint-disable no-await-in-loop,require-yield */
-import { EventEmitter, getFileIdx } from '@linaria/utils';
+import { EventEmitter } from '@linaria/utils';
 
-import type { IBaseEntrypoint } from '../../../types';
+import { TransformCacheCollection } from '../../../cache';
 import { AsyncActionQueue, SyncActionQueue } from '../ActionQueue';
 import type { Handlers } from '../GenericActionQueue';
-import { rootLog } from '../rootLog';
 import type {
-  IBaseServices,
   IGetExportsAction,
   IProcessEntrypointAction,
   ActionGenerator,
   ActionQueueItem,
+  Services,
 } from '../types';
 
-const createEntrypoint = (name: string): IBaseEntrypoint => ({
-  name,
-  idx: getFileIdx(name).toString().padStart(5, '0'),
-  generation: 0,
-  only: ['default'],
-  log: rootLog,
-  parent: null,
-});
+import { createEntrypoint } from './entrypoint-helpers';
 
+type BaseServices = Pick<Services, 'cache' | 'eventEmitter'>;
 type Res = ActionGenerator<ActionQueueItem>;
-type UniversalHandlers = Handlers<Res, IBaseServices>;
+type UniversalHandlers = Handlers<Res, BaseServices>;
 type Queues = typeof AsyncActionQueue | typeof SyncActionQueue;
 
 describe.each<[string, Queues]>([
@@ -34,14 +27,14 @@ describe.each<[string, Queues]>([
   function* emptyHandler(): ActionGenerator<ActionQueueItem> {}
 
   function drainQueue(
-    queue: AsyncActionQueue<IBaseServices> | SyncActionQueue<IBaseServices>
+    queue: AsyncActionQueue<BaseServices> | SyncActionQueue<BaseServices>
   ) {
     while (!queue.isEmpty()) {
       queue.runNext();
     }
   }
 
-  let services: IBaseServices;
+  let services: BaseServices;
   let handlers: UniversalHandlers;
   beforeEach(() => {
     handlers = {
@@ -61,6 +54,7 @@ describe.each<[string, Queues]>([
 
     services = {
       eventEmitter: EventEmitter.dummy,
+      cache: new TransformCacheCollection(),
     };
   });
 
@@ -68,7 +62,7 @@ describe.each<[string, Queues]>([
     name: string,
     customHandlers: Partial<UniversalHandlers> = {}
   ) => {
-    const entrypoint = createEntrypoint(name);
+    const entrypoint = createEntrypoint(services, name, ['default']);
     const queue = new Queue(
       services,
       { ...handlers, ...customHandlers },

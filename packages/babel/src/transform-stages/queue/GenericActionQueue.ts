@@ -13,7 +13,6 @@ import {
   keyOf,
 } from './actions/action';
 import { actionRunner } from './actions/actionRunner';
-import { onSupersede } from './createEntrypoint';
 import type {
   DataOf,
   ActionByType,
@@ -155,7 +154,7 @@ export class GenericActionQueue<
     });
 
     if (!isContinuation(newAction) && newAction.type === 'processEntrypoint') {
-      onSupersede(newAction.entrypoint, (newEntrypoint) => {
+      newAction.entrypoint.onSupersede((newEntrypoint) => {
         this.next('processEntrypoint', newEntrypoint, {});
       });
     }

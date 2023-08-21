@@ -1,7 +1,7 @@
 import type { IReexport } from '@linaria/utils';
 import { collectExportsAndImports } from '@linaria/utils';
 
-import { createEntrypoint } from '../createEntrypoint';
+import { Entrypoint } from '../Entrypoint';
 import type {
   IExplodeReexportsAction,
   IGetExportsAction,
@@ -27,7 +27,7 @@ export function* findExportsInImports(
       throw new Error(`Could not resolve import ${imp.importedFile}`);
     }
 
-    const newEntrypoint = createEntrypoint(
+    const newEntrypoint = Entrypoint.create(
       services,
       action.entrypoint,
       resolved,

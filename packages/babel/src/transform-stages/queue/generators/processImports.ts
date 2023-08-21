@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax,no-continue */
-import { createEntrypoint } from '../createEntrypoint';
+import { Entrypoint } from '../Entrypoint';
 import type {
   IProcessImportsAction,
   Services,
@@ -16,7 +16,7 @@ export function* processImports(
   const { resolved: resolvedImports, entrypoint } = action;
 
   for (const { importsOnly, resolved } of resolvedImports) {
-    const nextEntrypoint = createEntrypoint(
+    const nextEntrypoint = Entrypoint.create(
       services,
       entrypoint,
       resolved,

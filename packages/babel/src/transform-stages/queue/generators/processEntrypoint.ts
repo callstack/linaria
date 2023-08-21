@@ -1,6 +1,5 @@
 import type { IBaseEntrypoint } from '../../../types';
 import { getRefsCount } from '../actions/action';
-import { onSupersede } from '../createEntrypoint';
 import type { IProcessEntrypointAction, ActionGenerator } from '../types';
 
 /**
@@ -32,7 +31,7 @@ export function* processEntrypoint<TEntrypoint extends IBaseEntrypoint>(
     action.abortSignal.addEventListener('abort', onParentAbort);
   }
 
-  const unsubscribe = onSupersede(action.entrypoint, () => {
+  const unsubscribe = action.entrypoint.onSupersede(() => {
     abortController.abort();
   });
 

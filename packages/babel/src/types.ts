@@ -45,6 +45,9 @@ export interface IBaseEntrypoint {
   log: Debugger;
   name: string;
   only: string[];
+  onSupersede: (
+    callback: (newEntrypoint: IBaseEntrypoint) => void
+  ) => () => void;
   parent: IBaseEntrypoint | null;
 }
 

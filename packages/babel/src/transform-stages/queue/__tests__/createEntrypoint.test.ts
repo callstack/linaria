@@ -1,7 +1,6 @@
 import { EventEmitter } from '@linaria/utils';
 
 import { TransformCacheCollection } from '../../../cache';
-import { onSupersede } from '../createEntrypoint';
 import type { Services } from '../types';
 
 import { createEntrypoint, fakeLoadAndParse } from './entrypoint-helpers';
@@ -76,7 +75,7 @@ describe('createEntrypoint', () => {
     const callback = jest.fn();
     const entrypoint1 = createEntrypoint(services, '/foo/bar.js', ['default']);
 
-    onSupersede(entrypoint1, callback);
+    entrypoint1.onSupersede(callback);
 
     const entrypoint2 = createEntrypoint(services, '/foo/bar.js', ['named']);
     expect(entrypoint1).not.toBe(entrypoint2);
@@ -87,7 +86,7 @@ describe('createEntrypoint', () => {
     const callback = jest.fn();
     const entrypoint1 = createEntrypoint(services, '/foo/bar.js', ['default']);
 
-    const unsubscribe = onSupersede(entrypoint1, callback);
+    const unsubscribe = entrypoint1.onSupersede(callback);
     unsubscribe();
 
     const entrypoint2 = createEntrypoint(services, '/foo/bar.js', ['named']);

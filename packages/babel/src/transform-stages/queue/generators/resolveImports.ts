@@ -2,7 +2,7 @@
 import { getFileIdx } from '@linaria/utils';
 
 import type { IBaseEntrypoint } from '../../../types';
-import { getStack } from '../createEntrypoint';
+import { includes } from '../Entrypoint.helpers';
 import type {
   IResolveImportsAction,
   Services,
@@ -11,11 +11,17 @@ import type {
   AsyncActionGenerator,
 } from '../types';
 
-const includes = (a: string[], b: string[]) => {
-  if (a.includes('*')) return true;
-  if (a.length !== b.length) return false;
-  return a.every((item, index) => item === b[index]);
-};
+function getStack(entrypoint: IBaseEntrypoint) {
+  const stack = [entrypoint.name];
+
+  let { parent } = entrypoint;
+  while (parent) {
+    stack.push(parent.name);
+    parent = parent.parent;
+  }
+
+  return stack;
+}
 
 const mergeImports = (a: string[], b: string[]) => {
   const result = new Set(a);

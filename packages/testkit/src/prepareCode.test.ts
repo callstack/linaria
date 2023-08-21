@@ -4,7 +4,7 @@ import { join } from 'path';
 import * as babel from '@babel/core';
 
 import {
-  createEntrypoint,
+  Entrypoint,
   loadLinariaOptions,
   parseFile,
   prepareCode,
@@ -65,7 +65,7 @@ describe('prepareCode', () => {
         options: { root, filename: inputFilePath },
         eventEmitter: EventEmitter.dummy,
       };
-      const entrypoint = createEntrypoint(
+      const entrypoint = Entrypoint.create(
         services,
         { log: linariaLogger },
         inputFilePath,

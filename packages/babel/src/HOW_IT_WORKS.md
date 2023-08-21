@@ -2,32 +2,36 @@
 
 This file will be extended and translated before merge.
 
-## IEntrypoint
+## Entrypoint
 
-На каждый файл создаётся `IEntrypoint` (неудачное название, так как он оказался нужен не только на entry), содержащий:
-* `name` с полным именем файла;
-* `only` со списком экспортов, который из этого файла нужны;
-* `idx`, выдаваемый последовательно для каждого имени файла;
-* `generation` — номер поколения (увеличивается, если этот энтрипоинт пересоздавался с новым набором `only`);
-* `log`'ер, привязанный к этому энтрипоинту;
-* `parent` со ссылкой на родителя или null, если это корень дерева;
-* `code` с кодом файла;
-* `ast` с деревом из `code`;
-* `evalConfig` babel-конфиг с которым этот файл надо будет подготовить к запуску;
-* `evaluator`-функция для подготовки к запуску (тоже название неудачное);
-* `pluginOptions` опции Линарии.
+For each file, an `Entrypoint` instance is created, which contains the following fields:
+* `name`: the full file name.
+* `only`: a list of exports needed from this file.
+* `idx`: a sequentially assigned index for each file.
+* `generation`: the generation number (increases when this entrypoint is recreated with a new set of `only`).
+* `log`: a logger attached to this entrypoint.
+* `parent`: a reference to the parent or null if it's the root of the tree.
+* `code`: the file's code.
+* `ast`: the Abstract Syntax Tree (AST) generated from `code`.
+* `evalConfig`: Babel configuration to prepare this file for evaluation.
+* `evaluator` a function used for preparation before evaluation.
+* `pluginOptions`: Linaria options.
 
-### createEntrypoint
+Additionally, the class allows subscribing to the `supersede` event (discussed later) through the `onSupersede` method.
 
-Создание `IEntrypoint` происходит строго внутри функции `createEntrypoint`. Если функция вызывается несколько раз для одного и того же файла, то:
-* если был передан код файла и он отличается от того, что в кэше (например, HMR или когда первый раз мы прочитали код из файла, а на второй он прилетел из лоадера уже трансформированный), сбрасываем все связанные с этим файлом кэши и дальше действуем будто это первый вызов для файла;
-* если вызван с тем же или более узким `only`, то вместо создания нового возвращаем созданный ранее;
-* если новый `only` более широкий чем закэшированный, то создаём новое поколение IEntrypoint и уведомляем все заинтересованные стороны о том, что произошло замещение (`onSupersede`);
-* если при создании выясняется, что в цепочке `parent`'ов уже есть этот файл, то вместо возвращаения нового `IEntrypoint` возвращаем `"ignored"` и для родителя вызывается `onSupersede`.
+### Entrypoint.create
 
-Замещение означает, что задачи, запущенные для старого `IEntrypoint`, резко становятся неактуальными и их надо прибить и запустить процессинг для него с нуля. Если часть задач уже успела выполниться и в очередь поставятся их копии (например, новый энтрипоинт не изменил список импортов и `resolveImports` поставится с тем же набором аргументов), то исполнение таких задач пропустится и результат будет забран из кэша. При этом, результатом работы задачи считается не только возвращаемое значение, но и выкинутые ей в очередь сабтаски, которые так же будут выкинуты в очередь. Закидывать сабтаски ранее выполненной таски в очередь надо на тот случай, если какие-то из них были абортнуты из-за supersede.
+The creation of an `Entrypoint` strictly occurs within the `Entrypoint.create` method. When the method is called multiple times for the same file:
 
-Каждый созданный или пересозданный `IEntrypoint` закидывается в очередь с задачей `processEntrypoint`. Замещение не привязано к конкретному экземпляру очереди и если в очередь `A` добавился `IEntrypoint[foo]`, а потом в `B` добавился `IEntrypoint[foo,bar]`, то для `IEntrypoint[foo]` в очереди `A` будет вызван `onSupersede`, все привязанные к оригиналу действия из `A` будут удалены и добавлено новое `processEntrypoint(IEntrypoint[foo,bar])`.
+* If the file's code differs from what is cached (for example, due to Hot Module Replacement or when the code was initially read from the file and transformed on the second call, such as by a loader), we reset all caches related to this file. We then proceed as if it were the first call for the file.
+* If called with the same or narrower `only` scope, instead of creating a new instance, we return the previously created one.
+* If the new `only` scope is broader than the cached one, we create a new generation of `Entrypoint` and notify all interested parties about the superseding event (`onSupersede`).
+* During creation, if it is determined that this file already exists within the `parent` chain, instead of returning a new `Entrypoint`, we return `"ignored"`, and the `onSupersede` method is called for the parent.
+
+Superseding implies that tasks initiated for the old `Entrypoint` become irrelevant, and they need to be terminated. The processing for the old `Entrypoint` must be restarted from scratch. If some tasks have partially executed and duplicates of these tasks are placed in the queue (for instance, the new entrypoint hasn't altered the list of imports, and a `resolveImports` task is enqueued with the same arguments), the execution of such duplicate tasks is skipped, and their results are retrieved from the cache. The task's outcome is not solely determined by the returned value; any subtasks spawned by the task are also considered, and they are enqueued as well. Adding subtasks from a previously executed task to the queue is necessary in case some of them were aborted due to superseding.
+
+Each newly created or recreated `Entrypoint` is enqueued with a `processEntrypoint` task. Superseding is not bound to a specific queue instance. If `Entrypoint[foo]` is added to queue `A`, and subsequently `Entrypoint[foo,bar]` is added to queue `B`, the `onSupersede` function will be invoked for `Entrypoint[foo]` in queue `A`, all actions linked to the original `Entrypoint` in queue `A` will be removed, and a new `processEntrypoint(Entrypoint[foo,bar])` will be added.
+
 
 ## Actions
 

@@ -1,7 +1,7 @@
 import type { File } from '@babel/types';
 
-import type { LoadAndParseFn } from '../createEntrypoint';
-import { genericCreateEntrypoint } from '../createEntrypoint';
+import { Entrypoint } from '../Entrypoint';
+import type { LoadAndParseFn } from '../Entrypoint.types';
 import { rootLog } from '../rootLog';
 import type { IEntrypoint, Services } from '../types';
 
@@ -21,7 +21,7 @@ export const createEntrypoint = (
   only: string[],
   parent: IEntrypoint<unknown> | null = null
 ) => {
-  const entrypoint = genericCreateEntrypoint(
+  const entrypoint = Entrypoint.createWithCustomLoader(
     fakeLoadAndParse,
     services,
     parent ?? { log: rootLog },

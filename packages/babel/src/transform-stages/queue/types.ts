@@ -1,9 +1,7 @@
-import type { BabelFileResult, TransformOptions } from '@babel/core';
-import type { File } from '@babel/types';
+import type { BabelFileResult } from '@babel/core';
 
 import type { ValueCache } from '@linaria/tags';
 import type {
-  Evaluator,
   StrictOptions,
   EventEmitter,
   Artifact,
@@ -19,6 +17,8 @@ import type {
   Options,
 } from '../../types';
 
+import type { IEntrypointCode } from './Entrypoint.types';
+
 export type Services = {
   babel: Core;
   cache: TransformCacheCollection;
@@ -31,13 +31,6 @@ export type Services = {
 
 export interface IBaseNode {
   type: ActionQueueItem['type'];
-}
-
-export interface IEntrypointCode {
-  ast: File;
-  code: string;
-  evalConfig: TransformOptions;
-  evaluator: Evaluator;
 }
 
 export interface IEntrypoint<TPluginOptions = StrictOptions>
