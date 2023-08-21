@@ -26,6 +26,7 @@ type Options = [
   evaluator: Evaluator,
   linariaConfig?: Partial<StrictOptions>,
   extension?: 'js' | 'ts' | 'jsx' | 'tsx',
+  filename?: string,
   babelConfig?: babel.TransformOptions
 ];
 
@@ -92,10 +93,9 @@ async function transform(
     evaluator,
     linariaPartialConfig = {},
     extension = 'js',
+    fullFilename = join(dirName, `${filename}.${extension}`),
     babelPartialConfig = {},
   ] = opts;
-
-  const fullFilename = join(dirName, `${filename}.${extension}`);
 
   const presets = getPresets(extension);
   const linariaConfig = getLinariaConfig(
@@ -105,17 +105,18 @@ async function transform(
     'collect'
   );
 
-  const result = await linariaTransform(
-    originalCode,
-    {
+  const services = {
+    babel,
+    cache,
+    options: {
       filename: babelPartialConfig.filename ?? fullFilename,
+      root: babelPartialConfig.root ?? undefined,
+      inputSourceMap: babelPartialConfig.inputSourceMap ?? undefined,
       pluginOptions: linariaConfig,
     },
-    asyncResolve,
-    babelPartialConfig,
-    cache,
-    eventEmitter
-  );
+    emitter: eventEmitter,
+  };
+  const result = await linariaTransform(services, originalCode, asyncResolve);
 
   return {
     code: result.code,
@@ -129,21 +130,13 @@ async function transform(
 }
 
 async function transformFile(filename: string, opts: Options) {
-  const [
-    evaluator,
-    linariaPartialConfig = {},
-    extension = 'js',
-    babelPartialConfig = {},
-  ] = opts;
+  const [evaluator, linariaPartialConfig = {}, extension = 'js'] = opts;
   const code = readFileSync(filename, 'utf8');
   return transform(code, [
     evaluator,
     linariaPartialConfig,
     extension,
-    {
-      ...babelPartialConfig,
-      filename,
-    },
+    filename,
   ]);
 }
 
@@ -2023,14 +2016,7 @@ describe('strategy shaker', () => {
         font-size: 14px;
       \`;
       `,
-      [
-        evaluator,
-        {},
-        'js',
-        {
-          filename: join(dirName, 'FancyName.js'),
-        },
-      ]
+      [evaluator, {}, 'js', join(dirName, 'FancyName.js')]
     );
 
     expect(code).toMatchSnapshot();
@@ -2046,14 +2032,7 @@ describe('strategy shaker', () => {
         font-size: 14px;
       \`;
       `,
-      [
-        evaluator,
-        {},
-        'js',
-        {
-          filename: join(dirName, 'FancyName/index.js'),
-        },
-      ]
+      [evaluator, {}, 'js', join(dirName, 'FancyName/index.js')]
     )!;
 
     expect(code).toMatchSnapshot();
@@ -2078,9 +2057,7 @@ describe('strategy shaker', () => {
             extensions: [''],
           },
           'js',
-          {
-            filename: join(dirName, '/.js'),
-          },
+          join(dirName, '/.js'),
         ]
       );
     } catch (e) {

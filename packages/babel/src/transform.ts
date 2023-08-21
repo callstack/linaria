@@ -7,17 +7,18 @@
  * - return transformed code (without Linaria template literals), generated CSS, source maps and babel metadata from transform step.
  */
 
-import type { TransformOptions } from '@babel/core';
-import * as babel from '@babel/core';
+import * as babelCore from '@babel/core';
 
 import { EventEmitter } from '@linaria/utils';
 
+import type { Core } from './babel';
 import { TransformCacheCollection } from './cache';
 import loadLinariaOptions from './transform-stages/helpers/loadLinariaOptions';
 import {
   AsyncActionQueue,
   SyncActionQueue,
 } from './transform-stages/queue/ActionQueue';
+import type { Handlers } from './transform-stages/queue/GenericActionQueue';
 import { keyOf } from './transform-stages/queue/actions/action';
 import { getTaskResult } from './transform-stages/queue/actions/actionRunner';
 import { createEntrypoint } from './transform-stages/queue/createEntrypoint';
@@ -27,21 +28,38 @@ import {
   syncResolveImports,
 } from './transform-stages/queue/generators/resolveImports';
 import { rootLog } from './transform-stages/queue/rootLog';
+import type {
+  ActionQueueItem,
+  GetGeneratorForRes,
+} from './transform-stages/queue/types';
 import type { Options, Result } from './types';
 
-export function transformSync(
-  originalCode: string,
-  options: Options,
-  syncResolve: (what: string, importer: string, stack: string[]) => string,
-  babelConfig: TransformOptions = {},
-  cache = new TransformCacheCollection(),
-  eventEmitter = EventEmitter.dummy
-): Result {
-  if (Object.keys(babelConfig).length > 0) {
-    throw new Error('babelConfig is not supported anymore');
-  }
+interface IServices {
+  babel?: Core;
+  cache?: TransformCacheCollection;
+  options: Options;
+  eventEmitter?: EventEmitter;
+}
 
-  const services = { babel, cache, options, eventEmitter };
+type RequiredServices = Required<IServices>;
+
+type AllHandlers<TRes extends Promise<void> | void> = Handlers<
+  GetGeneratorForRes<TRes, ActionQueueItem>,
+  RequiredServices
+>;
+
+export function transformSync(
+  {
+    babel = babelCore,
+    cache = new TransformCacheCollection(),
+    options,
+    eventEmitter = EventEmitter.dummy,
+  }: IServices,
+  originalCode: string,
+  syncResolve: (what: string, importer: string, stack: string[]) => string,
+  customHandlers: Partial<AllHandlers<void>> = {}
+): Result {
+  const services: RequiredServices = { babel, cache, options, eventEmitter };
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
 
   const entrypoint = createEntrypoint(
@@ -64,6 +82,7 @@ export function transformSync(
     services,
     {
       ...baseHandlers,
+      ...customHandlers,
       resolveImports: syncResolveImports.bind(null, syncResolve),
     },
     entrypoint
@@ -81,22 +100,21 @@ export function transformSync(
 }
 
 export default async function transform(
+  {
+    babel = babelCore,
+    cache = new TransformCacheCollection(),
+    options,
+    eventEmitter = EventEmitter.dummy,
+  }: IServices,
   originalCode: string,
-  options: Options,
   asyncResolve: (
     what: string,
     importer: string,
     stack: string[]
   ) => Promise<string | null>,
-  babelConfig: TransformOptions = {},
-  cache = new TransformCacheCollection(),
-  eventEmitter = EventEmitter.dummy
+  customHandlers: Partial<AllHandlers<Promise<void> | void>> = {}
 ): Promise<Result> {
-  if (Object.keys(babelConfig).length > 0) {
-    throw new Error('babelConfig is not supported anymore');
-  }
-
-  const services = { babel, cache, options, eventEmitter };
+  const services: RequiredServices = { babel, cache, options, eventEmitter };
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
 
   /*
@@ -127,6 +145,7 @@ export default async function transform(
     services,
     {
       ...baseHandlers,
+      ...customHandlers,
       resolveImports: asyncResolveImports.bind(null, asyncResolve),
     },
     entrypoint

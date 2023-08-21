@@ -17,7 +17,7 @@ import type {
   IResolveImportsAction,
   IResolvedImport,
 } from '../../types';
-import { createAction, getWeight, isContinuation } from '../action';
+import { createAction, isContinuation } from '../action';
 import { actionRunner } from '../actionRunner';
 
 type QueueItem = ActionQueueItem | Continuation;
@@ -216,7 +216,7 @@ describe('actionRunner', () => {
       type: 'resolveImports',
     });
     expect(queue[0]).toMatchObject({
-      weight: getWeight(queue[1]) - 1, // continuation should have less weight than emitted action
+      weight: 20, // continuation should have less weight than emitted action
     });
 
     const resolvedImports: IResolvedImport[] = [

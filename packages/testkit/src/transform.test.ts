@@ -60,6 +60,15 @@ describe('transformUrl', () => {
 
 it('rewrites a relative path in url() declarations', async () => {
   const { cssText } = await transform(
+    {
+      options: {
+        filename: './test.js',
+        outputFilename: './.linaria-cache/test.css',
+        pluginOptions: {
+          rules,
+        },
+      },
+    },
     dedent`
     import { css } from '@linaria/core';
 
@@ -69,13 +78,6 @@ it('rewrites a relative path in url() declarations', async () => {
       background-image: url('./assets/test.jpg');
     \`;
     `,
-    {
-      filename: './test.js',
-      outputFilename: './.linaria-cache/test.css',
-      pluginOptions: {
-        rules,
-      },
-    },
     asyncResolveFallback
   );
 
@@ -84,6 +86,15 @@ it('rewrites a relative path in url() declarations', async () => {
 
 it('rewrites multiple relative paths in url() declarations', async () => {
   const { cssText } = await transform(
+    {
+      options: {
+        filename: './test.js',
+        outputFilename,
+        pluginOptions: {
+          rules,
+        },
+      },
+    },
     dedent`
     import { css } from '@linaria/core';
 
@@ -94,13 +105,6 @@ it('rewrites multiple relative paths in url() declarations', async () => {
       }
     \`;
     `,
-    {
-      filename: './test.js',
-      outputFilename,
-      pluginOptions: {
-        rules,
-      },
-    },
     asyncResolveFallback
   );
 
@@ -109,6 +113,15 @@ it('rewrites multiple relative paths in url() declarations', async () => {
 
 it("doesn't rewrite an absolute path in url() declarations", async () => {
   const { cssText } = await transform(
+    {
+      options: {
+        filename: './test.js',
+        outputFilename,
+        pluginOptions: {
+          rules,
+        },
+      },
+    },
     dedent`
     import { css } from '@linaria/core';
 
@@ -116,13 +129,6 @@ it("doesn't rewrite an absolute path in url() declarations", async () => {
       background-image: url(/assets/test.jpg);
     \`;
     `,
-    {
-      filename: './test.js',
-      outputFilename,
-      pluginOptions: {
-        rules,
-      },
-    },
     asyncResolveFallback
   );
 
@@ -134,23 +140,25 @@ it('respects passed babel options', async () => {
 
   await expect(() =>
     transform(
+      {
+        options: {
+          filename: './test.js',
+          outputFilename,
+          pluginOptions: {
+            rules,
+            babelOptions: {
+              babelrc: false,
+              configFile: false,
+              presets: [['@babel/preset-env', { loose: true }]],
+            },
+          },
+        },
+      },
       dedent`
         import { css } from '@linaria/core';
 
         export const error = <jsx />;
         `,
-      {
-        filename: './test.js',
-        outputFilename,
-        pluginOptions: {
-          rules,
-          babelOptions: {
-            babelrc: false,
-            configFile: false,
-            presets: [['@babel/preset-env', { loose: true }]],
-          },
-        },
-      },
       asyncResolveFallback
     )
   ).rejects.toThrow(
@@ -159,6 +167,23 @@ it('respects passed babel options', async () => {
 
   await expect(() =>
     transform(
+      {
+        options: {
+          filename: './test.js',
+          outputFilename,
+          pluginOptions: {
+            rules,
+            babelOptions: {
+              babelrc: false,
+              configFile: false,
+              presets: [
+                ['@babel/preset-env', { loose: true }],
+                '@babel/preset-react',
+              ],
+            },
+          },
+        },
+      },
       dedent`
       import { css } from '@linaria/core';
 
@@ -167,21 +192,6 @@ it('respects passed babel options', async () => {
         background-image: url(/assets/test.jpg);
       \`;
       `,
-      {
-        filename: './test.js',
-        outputFilename,
-        pluginOptions: {
-          rules,
-          babelOptions: {
-            babelrc: false,
-            configFile: false,
-            presets: [
-              ['@babel/preset-env', { loose: true }],
-              '@babel/preset-react',
-            ],
-          },
-        },
-      },
       asyncResolveFallback
     )
   ).not.toThrow('Unexpected token');
@@ -192,6 +202,23 @@ it("doesn't throw due to duplicate preset", async () => {
 
   expect(() =>
     transform(
+      {
+        options: {
+          filename: './test.js',
+          outputFilename,
+          pluginOptions: {
+            rules,
+            babelOptions: {
+              babelrc: false,
+              configFile: false,
+              presets: [require.resolve('@linaria/babel-preset')],
+              plugins: [
+                require.resolve('@babel/plugin-transform-modules-commonjs'),
+              ],
+            },
+          },
+        },
+      },
       dedent`
       import { styled } from '@linaria/react';
 
@@ -203,21 +230,6 @@ it("doesn't throw due to duplicate preset", async () => {
         }
       \`;
       `,
-      {
-        filename: './test.js',
-        outputFilename,
-        pluginOptions: {
-          rules,
-          babelOptions: {
-            babelrc: false,
-            configFile: false,
-            presets: [require.resolve('@linaria/babel-preset')],
-            plugins: [
-              require.resolve('@babel/plugin-transform-modules-commonjs'),
-            ],
-          },
-        },
-      },
       asyncResolveFallback
     )
   ).not.toThrow('Duplicate plugin/preset detected');
@@ -225,6 +237,15 @@ it("doesn't throw due to duplicate preset", async () => {
 
 it('should return transformed code even when file only contains unused linaria code', async () => {
   const { code } = await transform(
+    {
+      options: {
+        filename: './test.js',
+        outputFilename,
+        pluginOptions: {
+          rules,
+        },
+      },
+    },
     dedent`
     import { css } from '@linaria/core';
 
@@ -232,13 +253,6 @@ it('should return transformed code even when file only contains unused linaria c
       color: red;
     \`;
     `,
-    {
-      filename: './test.js',
-      outputFilename,
-      pluginOptions: {
-        rules,
-      },
-    },
     asyncResolveFallback
   );
 

@@ -144,10 +144,8 @@ async function processFiles(files: (number | string)[], options: Options) {
       options.sourceRoot
     );
 
-    // eslint-disable-next-line no-await-in-loop
-    const { code, cssText, sourceMap, cssSourceMapText } = await transform(
-      fs.readFileSync(filename).toString(),
-      {
+    const transformServices = {
+      options: {
         filename,
         outputFilename,
         pluginOptions: {
@@ -155,10 +153,15 @@ async function processFiles(files: (number | string)[], options: Options) {
         },
         root: options.sourceRoot,
       },
-      asyncResolveFallback,
-      {},
       cache,
-      emitter
+      emitter,
+    };
+
+    // eslint-disable-next-line no-await-in-loop
+    const { code, cssText, sourceMap, cssSourceMapText } = await transform(
+      transformServices,
+      fs.readFileSync(filename).toString(),
+      asyncResolveFallback
     );
 
     if (cssText) {

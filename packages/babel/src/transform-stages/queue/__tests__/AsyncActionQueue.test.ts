@@ -40,13 +40,17 @@ describe('AsyncActionQueue', () => {
   beforeEach(() => {
     handlers = {
       addToCodeCache: jest.fn(emptyHandler),
+      collect: jest.fn(emptyHandler),
+      evalFile: jest.fn(emptyHandler),
       explodeReexports: jest.fn(emptyHandler),
+      extract: jest.fn(emptyHandler),
       finalizeEntrypoint: jest.fn(emptyHandler),
       getExports: jest.fn(emptyHandler),
       processEntrypoint: jest.fn(emptyHandler),
       processImports: jest.fn(emptyHandler),
       resolveImports: jest.fn(emptyHandler),
       transform: jest.fn(emptyHandler),
+      workflow: jest.fn(emptyHandler),
     };
 
     services = {
@@ -60,11 +64,15 @@ describe('AsyncActionQueue', () => {
     customHandlers: Partial<AsyncHandlers> = {}
   ) => {
     const entrypoint = createEntrypoint(services, name, ['default']);
-    return new AsyncActionQueue(
+    const queue = new AsyncActionQueue(
       services,
       { ...handlers, ...customHandlers },
       entrypoint
     );
+
+    queue.next('processEntrypoint', entrypoint, {});
+
+    return queue;
   };
 
   it('should merge actions', () => {

@@ -16,6 +16,7 @@ import type {
 const createEntrypoint = (name: string): IBaseEntrypoint => ({
   name,
   idx: getFileIdx(name).toString().padStart(5, '0'),
+  generation: 0,
   only: ['default'],
   log: rootLog,
   parent: null,
@@ -45,13 +46,17 @@ describe.each<[string, Queues]>([
   beforeEach(() => {
     handlers = {
       addToCodeCache: jest.fn(emptyHandler),
+      collect: jest.fn(emptyHandler),
+      evalFile: jest.fn(emptyHandler),
       explodeReexports: jest.fn(emptyHandler),
+      extract: jest.fn(emptyHandler),
       finalizeEntrypoint: jest.fn(emptyHandler),
       getExports: jest.fn(emptyHandler),
       processEntrypoint: jest.fn(emptyHandler),
       processImports: jest.fn(emptyHandler),
       resolveImports: jest.fn(emptyHandler),
       transform: jest.fn(emptyHandler),
+      workflow: jest.fn(emptyHandler),
     };
 
     services = {
@@ -64,7 +69,15 @@ describe.each<[string, Queues]>([
     customHandlers: Partial<UniversalHandlers> = {}
   ) => {
     const entrypoint = createEntrypoint(name);
-    return new Queue(services, { ...handlers, ...customHandlers }, entrypoint);
+    const queue = new Queue(
+      services,
+      { ...handlers, ...customHandlers },
+      entrypoint
+    );
+
+    queue.next('processEntrypoint', entrypoint, {});
+
+    return queue;
   };
 
   describe('base', () => {

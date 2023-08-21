@@ -94,16 +94,21 @@ export default function linaria({
         throw new Error(`Could not resolve ${what}`);
       };
 
-      const result = await transform(
-        code,
-        {
+      const transformServices = {
+        options: {
           filename: id,
+          root: process.cwd(),
           preprocessor,
           pluginOptions: rest,
         },
+        cache,
+      };
+
+      const result = await transform(
+        transformServices,
+        code,
         asyncResolve,
-        emptyConfig,
-        cache
+        emptyConfig
       );
 
       if (!result.cssText) return;
