@@ -8,7 +8,7 @@ import type {
 
 export function* emitAndGetResultOf<
   TAction extends Extract<ActionQueueItem, { type: TType }>,
-  TType extends ActionQueueItem['type']
+  TType extends ActionQueueItem['type'],
 >(
   type: TType,
   entrypoint: IBaseEntrypoint,

@@ -278,17 +278,15 @@ it('throws when using as tag for template literal', () => {
   delete process.env.NODE_ENV;
 
   expect(
-    () =>
-      styled('div')`
-        color: blue;
-      `
+    () => styled('div')`
+      color: blue;
+    `
   ).toThrow('Using the "styled" tag in runtime is not supported');
 
   expect(
-    () =>
-      styled.div`
-        color: blue;
-      `
+    () => styled.div`
+      color: blue;
+    `
   ).toThrow('Using the "styled" tag in runtime is not supported');
 
   process.env.NODE_ENV = nodeEnv;

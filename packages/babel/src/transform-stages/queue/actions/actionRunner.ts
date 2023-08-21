@@ -101,7 +101,7 @@ let continuationIdx = 0;
 
 function continueAction<
   TServices extends IBaseServices,
-  TAction extends ActionQueueItem
+  TAction extends ActionQueueItem,
 >(services: TServices, continuation: Continuation<TAction>): IResults {
   const actions = new ListOfEmittedActions();
   const { action, generator, resultFrom, weight } = continuation;
@@ -206,7 +206,7 @@ function continueAction<
 function actionRunner<
   TServices extends IBaseServices,
   TAction extends ActionQueueItem,
-  TRes extends Promise<void> | void
+  TRes extends Promise<void> | void,
 >(
   services: TServices,
   enqueue: (action: ActionQueueItem | Continuation) => void,
@@ -217,7 +217,7 @@ function actionRunner<
 function actionRunner<
   TServices extends IBaseServices,
   TAction extends ActionQueueItem,
-  TRes extends Promise<void> | void
+  TRes extends Promise<void> | void,
 >(
   services: TServices,
   enqueue: (action: ActionQueueItem | Continuation) => void,
@@ -227,7 +227,7 @@ function actionRunner<
 function actionRunner<
   TServices extends IBaseServices,
   TAction extends ActionQueueItem,
-  TRes extends Promise<void> | void
+  TRes extends Promise<void> | void,
 >(
   services: TServices,
   enqueue: (action: ActionQueueItem | Continuation) => void,

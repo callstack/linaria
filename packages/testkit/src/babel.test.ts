@@ -27,7 +27,7 @@ type Options = [
   linariaConfig?: Partial<StrictOptions>,
   extension?: 'js' | 'ts' | 'jsx' | 'tsx',
   filename?: string,
-  babelConfig?: babel.TransformOptions
+  babelConfig?: babel.TransformOptions,
 ];
 
 const asyncResolve = (what: string, importer: string, stack: string[]) => {

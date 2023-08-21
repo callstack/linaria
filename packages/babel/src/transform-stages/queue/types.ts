@@ -61,7 +61,7 @@ const HiddenTypeOfValueSymbol = Symbol('TypeOfValue');
 
 export interface IBaseAction<
   TEntrypoint extends IBaseEntrypoint = IBaseEntrypoint,
-  TResult = unknown
+  TResult = unknown,
 > extends IBaseNode {
   abortSignal: AbortSignal | null;
   entrypoint: TEntrypoint;
@@ -84,7 +84,7 @@ export type DataOf<TNode extends ActionQueueItem> = Omit<
 export type Handler<
   TServices extends IBaseServices,
   TAction extends IBaseAction,
-  TRes extends AnyActionGenerator
+  TRes extends AnyActionGenerator,
 > = (services: TServices, action: TAction) => TRes;
 
 type NextParams<TType extends ActionQueueItem['type']> = [
@@ -92,7 +92,7 @@ type NextParams<TType extends ActionQueueItem['type']> = [
   entrypoint: IBaseEntrypoint,
   data: DataOf<Extract<ActionQueueItem, { type: TType }>>,
   abortSignal?: AbortSignal | null,
-  needResult?: boolean
+  needResult?: boolean,
 ];
 
 export type Next = <TType extends ActionQueueItem['type']>(
@@ -121,7 +121,7 @@ export type AnyActionGenerator<TAction extends IBaseAction = ActionQueueItem> =
 
 export type GetGeneratorForRes<
   TRes extends Promise<void> | void,
-  TAction extends IBaseAction
+  TAction extends IBaseAction,
 > = TRes extends Promise<void>
   ? AnyActionGenerator<TAction>
   : ActionGenerator<TAction>;
@@ -141,7 +141,7 @@ export interface IExplodeReexportsAction
 }
 
 export interface IProcessEntrypointAction<
-  TEntrypoint extends IBaseEntrypoint = IBaseEntrypoint
+  TEntrypoint extends IBaseEntrypoint = IBaseEntrypoint,
 > extends IBaseAction<TEntrypoint, void> {
   type: 'processEntrypoint';
 }

@@ -47,7 +47,7 @@ const cacheNames = [
   'eval',
   'originalAST',
 ] as const;
-type CacheNames = typeof cacheNames[number];
+type CacheNames = (typeof cacheNames)[number];
 
 const loggers = cacheNames.reduce(
   (acc, key) => ({
@@ -110,7 +110,7 @@ export class TransformCacheCollection {
 
   public add<
     TCache extends CacheNames,
-    TValue extends MapValue<ICaches[TCache]>
+    TValue extends MapValue<ICaches[TCache]>,
   >(cacheName: TCache, key: string, value: TValue): void {
     const cache = this[cacheName] as Map<string, TValue>;
     loggers[cacheName]('add %s %f', key, () => {
@@ -126,7 +126,7 @@ export class TransformCacheCollection {
 
   public get<
     TCache extends CacheNames,
-    TValue extends MapValue<ICaches[TCache]>
+    TValue extends MapValue<ICaches[TCache]>,
   >(cacheName: TCache, key: string): TValue | undefined {
     const cache = this[cacheName] as Map<string, TValue>;
 

@@ -4,7 +4,7 @@ import { isContinuation } from './actions/action';
 import type { IBaseServices } from './types';
 
 export class SyncActionQueue<
-  TServices extends IBaseServices
+  TServices extends IBaseServices,
 > extends GenericActionQueue<void, TServices> {
   public runNext() {
     const next = this.dequeue();
@@ -24,7 +24,7 @@ export class SyncActionQueue<
 }
 
 export class AsyncActionQueue<
-  TServices extends IBaseServices
+  TServices extends IBaseServices,
 > extends GenericActionQueue<Promise<void> | void, TServices> {
   public runNext(): Promise<void> | void {
     const next = this.dequeue();

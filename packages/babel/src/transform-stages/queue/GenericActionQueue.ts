@@ -67,14 +67,14 @@ function hasLessPriority(
 
 export type Handlers<
   TRes extends AnyActionGenerator,
-  TServices extends IBaseServices
+  TServices extends IBaseServices,
 > = {
   [K in ActionQueueItem['type']]: Handler<TServices, ActionByType<K>, TRes>;
 };
 
 export class GenericActionQueue<
   TRes extends Promise<void> | void,
-  TServices extends IBaseServices
+  TServices extends IBaseServices,
 > extends PriorityQueue<ActionQueueItem | Continuation> {
   protected readonly queueIdx: string;
 

@@ -172,10 +172,9 @@ styled.a`
     title: string;
   }
 
-  const Flow = <TProps extends BaseProps>(Cmp: React.FC<TProps>) =>
-    styled(Cmp)`
-      display: flow;
-    `;
+  const Flow = <TProps extends BaseProps>(Cmp: React.FC<TProps>) => styled(Cmp)`
+    display: flow;
+  `;
 
   const Component: React.FC<ComponentProps> = (props) =>
     React.createElement('div', props);

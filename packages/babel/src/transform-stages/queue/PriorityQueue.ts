@@ -14,7 +14,7 @@ const keyFor = (obj: object | number | string): string => {
 };
 
 export abstract class PriorityQueue<
-  TNode extends object | { toString(): string }
+  TNode extends object | { toString(): string },
 > {
   protected data: Array<TNode> = [];
 

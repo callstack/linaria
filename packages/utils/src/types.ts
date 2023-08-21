@@ -28,7 +28,7 @@ export type Serializable = JSONValue;
 
 export type BuildCodeFrameErrorFn = <TError extends Error>(
   msg: string,
-  Error?: new (msg: string) => TError
+  Error?: new (innerMsg: string) => TError
 ) => TError;
 
 export enum ValueType {

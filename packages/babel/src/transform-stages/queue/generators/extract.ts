@@ -133,7 +133,7 @@ export function* extract(
       if (artifact[0] !== 'css') return;
       const [rules, replacements] = artifact[1] as [
         rules: Rules,
-        sourceMapReplacements: Replacements
+        sourceMapReplacements: Replacements,
       ];
 
       allRules = {

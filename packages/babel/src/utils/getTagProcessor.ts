@@ -32,7 +32,7 @@ type BuilderArgs = ConstructorParameters<typeof BaseProcessor> extends [
   typeof t,
   SourceLocation | null,
   (replacement: Expression, isPure: boolean) => void,
-  ...infer T
+  ...infer T,
 ]
   ? T
   : never;
@@ -189,7 +189,7 @@ function getProcessorForIdentifier(
         ([{ imported, source }, p]): [
           ProcessorClass | null,
           TagSource,
-          NodePath<Identifier | MemberExpression> | null
+          NodePath<Identifier | MemberExpression> | null,
         ] => {
           const customFile = tagResolver(source, imported);
           const processor = customFile

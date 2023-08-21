@@ -151,6 +151,58 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
     this.component = component;
   }
 
+  public override get asSelector(): string {
+    return `.${this.className}`;
+  }
+
+  public override get value(): ObjectExpression {
+    const t = this.astService;
+    const extendsNode =
+      typeof this.component === 'string' || this.component.nonLinaria
+        ? null
+        : this.component.node.name;
+
+    return t.objectExpression([
+      t.objectProperty(
+        t.stringLiteral('displayName'),
+        t.stringLiteral(this.displayName)
+      ),
+      t.objectProperty(
+        t.stringLiteral('__linaria'),
+        t.objectExpression([
+          t.objectProperty(
+            t.stringLiteral('className'),
+            t.stringLiteral(this.className)
+          ),
+          t.objectProperty(
+            t.stringLiteral('extends'),
+            extendsNode
+              ? t.callExpression(t.identifier(extendsNode), [])
+              : t.nullLiteral()
+          ),
+        ])
+      ),
+    ]);
+  }
+
+  protected get tagExpression(): CallExpression {
+    const t = this.astService;
+    return t.callExpression(this.callee, [this.tagExpressionArgument]);
+  }
+
+  protected get tagExpressionArgument(): Expression {
+    const t = this.astService;
+    if (typeof this.component === 'string') {
+      if (this.component === 'FunctionalComponent') {
+        return t.arrowFunctionExpression([], t.blockStatement([]));
+      }
+
+      return singleQuotedStringLiteral(this.component);
+    }
+
+    return t.callExpression(t.identifier(this.component.node.name), []);
+  }
+
   public override addInterpolation(
     node: Expression,
     precedingCss: string,
@@ -213,58 +265,6 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
     };
 
     return rules;
-  }
-
-  public override get asSelector(): string {
-    return `.${this.className}`;
-  }
-
-  protected get tagExpressionArgument(): Expression {
-    const t = this.astService;
-    if (typeof this.component === 'string') {
-      if (this.component === 'FunctionalComponent') {
-        return t.arrowFunctionExpression([], t.blockStatement([]));
-      }
-
-      return singleQuotedStringLiteral(this.component);
-    }
-
-    return t.callExpression(t.identifier(this.component.node.name), []);
-  }
-
-  protected get tagExpression(): CallExpression {
-    const t = this.astService;
-    return t.callExpression(this.callee, [this.tagExpressionArgument]);
-  }
-
-  public override get value(): ObjectExpression {
-    const t = this.astService;
-    const extendsNode =
-      typeof this.component === 'string' || this.component.nonLinaria
-        ? null
-        : this.component.node.name;
-
-    return t.objectExpression([
-      t.objectProperty(
-        t.stringLiteral('displayName'),
-        t.stringLiteral(this.displayName)
-      ),
-      t.objectProperty(
-        t.stringLiteral('__linaria'),
-        t.objectExpression([
-          t.objectProperty(
-            t.stringLiteral('className'),
-            t.stringLiteral(this.className)
-          ),
-          t.objectProperty(
-            t.stringLiteral('extends'),
-            extendsNode
-              ? t.callExpression(t.identifier(extendsNode), [])
-              : t.nullLiteral()
-          ),
-        ])
-      ),
-    ]);
   }
 
   public override toString(): string {

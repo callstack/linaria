@@ -246,7 +246,7 @@ const findParent = (name: string, entrypoint: IBaseEntrypoint) => {
 
 export function genericCreateEntrypoint<
   TServices extends Pick<Services, 'cache' | 'eventEmitter'>,
-  TPluginOptions
+  TPluginOptions,
 >(
   loadAndParseFn: LoadAndParseFn<TServices, TPluginOptions>,
   services: TServices,

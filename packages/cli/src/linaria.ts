@@ -89,7 +89,7 @@ type Options = {
   configFile?: string;
   ignore?: string;
   insertCssRequires?: string;
-  modules: typeof modulesOptions[number];
+  modules: (typeof modulesOptions)[number];
   outDir: string;
   sourceMaps?: boolean;
   sourceRoot: string;
