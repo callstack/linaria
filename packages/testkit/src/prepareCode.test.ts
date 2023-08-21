@@ -62,7 +62,7 @@ describe('prepareCode', () => {
       const services = {
         babel,
         cache: new TransformCacheCollection(),
-        options: { root },
+        options: { root, filename: inputFilePath },
         eventEmitter: EventEmitter.dummy,
       };
       const entrypoint = createEntrypoint(
