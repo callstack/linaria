@@ -49,6 +49,8 @@ describe('actionRunner', () => {
     ): SyncScenarioForAction<IProcessEntrypointAction<'sync'>> {
       handler();
       yield ['resolveImports', this.entrypoint, { imports: new Map() }, null];
+
+      return null;
     }
 
     const handlers = getHandlers({
@@ -106,6 +108,8 @@ describe('actionRunner', () => {
       ];
 
       valueCatcher(result);
+
+      return null;
     }
 
     const resolvedImports: IResolvedImport[] = [

@@ -2371,6 +2371,22 @@ Dependencies: ./__fixtures__/circular-imports
 
 `;
 
+exports[`strategy shaker should process dynamic require 1`] = `"export const square = "square_s13jq05";"`;
+
+exports[`strategy shaker should process dynamic require 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  div:before {
+    content: foo2;
+  }
+}
+
+Dependencies: ./__fixtures__/foo
+
+`;
+
 exports[`strategy shaker should process griffel makeStyles 1`] = `
 "import { __styles as _styles } from "@griffel/react";
 export const useStyles = /*#__PURE__*/_styles({

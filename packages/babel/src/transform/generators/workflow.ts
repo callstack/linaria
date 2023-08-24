@@ -15,16 +15,19 @@ export function* workflow(
 
   // *** 1st stage ***
 
-  yield* this.getNext('processEntrypoint', entrypoint, undefined);
+  const prepareStageResult = yield* this.getNext(
+    'processEntrypoint',
+    entrypoint,
+    undefined
+  );
 
-  const prepareStageResult = cache.get('code', name)?.result;
   const ast = cache.get('originalAST', name) ?? 'ignored';
 
   // File is ignored or does not contain any tags. Return original code.
   if (
     ast === 'ignored' ||
     !prepareStageResult ||
-    !withLinariaMetadata(prepareStageResult.metadata)
+    !withLinariaMetadata(prepareStageResult.result.metadata)
   ) {
     return {
       code: originalCode,
@@ -35,7 +38,7 @@ export function* workflow(
   // *** 2nd stage ***
 
   const evalStageResult = yield* this.getNext('evalFile', entrypoint, {
-    code: prepareStageResult.code,
+    code: prepareStageResult.result.code,
   });
 
   if (evalStageResult === null) {

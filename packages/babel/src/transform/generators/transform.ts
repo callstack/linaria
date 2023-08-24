@@ -152,7 +152,7 @@ export function* internalTransform(
 
   if (preparedCode === '') {
     log('%s is skipped', name);
-    return;
+    return null;
   }
 
   if (imports !== null && imports.size > 0) {
@@ -175,18 +175,18 @@ export function* internalTransform(
     }
   }
 
-  yield [
-    'addToCodeCache',
-    this.entrypoint,
-    {
-      imports,
-      result: {
-        code: preparedCode,
-        metadata,
-      },
-      only,
+  const result = {
+    imports,
+    result: {
+      code: preparedCode,
+      metadata,
     },
-  ];
+    only,
+  };
+
+  yield ['addToCodeCache', this.entrypoint, result];
+
+  return result;
 }
 
 /**

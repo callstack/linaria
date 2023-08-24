@@ -15,10 +15,9 @@ export { slugify } from '@linaria/utils';
 export { default as preeval } from './plugins/preeval';
 export { default as withLinariaMetadata } from './utils/withLinariaMetadata';
 export { default as Module, DefaultModuleImplementation } from './module';
-export { default as transform, withDefaultServices } from './transform';
+export { default as transform } from './transform';
 export * from './types';
 export { parseFile } from './transform/Entrypoint.helpers';
-export { default as loadLinariaOptions } from './transform/helpers/loadLinariaOptions';
 export { baseHandlers } from './transform/generators';
 export { prepareCode } from './transform/generators/transform';
 export { Entrypoint } from './transform/Entrypoint';
@@ -27,6 +26,8 @@ export {
   asyncResolveImports,
   syncResolveImports,
 } from './transform/generators/resolveImports';
+export { default as loadLinariaOptions } from './transform/helpers/loadLinariaOptions';
+export { withDefaultServices } from './transform/helpers/withDefaultServices';
 export { default as isNode } from './utils/isNode';
 export { default as getTagProcessor } from './utils/getTagProcessor';
 export { default as getVisitorKeys } from './utils/getVisitorKeys';

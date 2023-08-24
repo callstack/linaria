@@ -2947,6 +2947,27 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should process dynamic require', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { css } from "@linaria/core";
+
+      const url = "./__fixtures__/FOO";
+      const foo2 = require(url.toLowerCase()).foo2;
+
+      export const square = css\`
+        div:before {
+          content: ${'${foo2}'};
+        }
+      \`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   xit('should shake out side effect because its definition uses DOM API', async () => {
     const { code, metadata } = await transform(
       dedent`
