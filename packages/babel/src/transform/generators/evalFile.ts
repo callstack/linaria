@@ -12,6 +12,10 @@ const wrap = <T>(fn: () => T): T | Error => {
   }
 };
 
+/**
+ * Executes the code prepared in previous steps within the current `Entrypoint`.
+ * Returns all exports that were requested in `only`.
+ */
 // eslint-disable-next-line require-yield
 export function* evalFile(
   this: IEvalAction<'sync'>

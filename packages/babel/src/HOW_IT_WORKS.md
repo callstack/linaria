@@ -1,6 +1,7 @@
 # How it works
 
-This file will be extended and translated before merge.
+Every invocation of the `transform` function creates a new root `Entrypoint` instance. If the given file is not ignored, a new `workflow` action is created and launched. Within the `workflow`, recursively for each import, child `Entrypoint` instances are created, and `processEntrypoint` is initiated for them. Once the import tree is fully processed, the file is passed for artifact (styles) computation and preparation for the runtime.
+
 
 ## Entrypoint
 
@@ -21,7 +22,7 @@ Additionally, the class allows subscribing to the `supersede` event (discussed l
 
 ### Entrypoint.create
 
-The creation of an `Entrypoint` strictly occurs within the `Entrypoint.create` method. When the method is called multiple times for the same file:
+The creation of an `Entrypoint` strictly occurs within the protected static `Entrypoint.create` method. When the method is called multiple times for the same file:
 
 * If the file's code differs from what is cached (for example, due to Hot Module Replacement or when the code was initially read from the file and transformed on the second call, such as by a loader), we reset all caches related to this file. We then proceed as if it were the first call for the file.
 * If called with the same or narrower `only` scope, instead of creating a new instance, we return the previously created one.
@@ -38,38 +39,54 @@ Each newly created or recreated `Entrypoint` is enqueued with a `processEntrypoi
 
 ### processEntrypoint
 
-Заводит `AbortController`, подписывается на `AbortSignal` родителя (если есть), подписывается на `onSupersede` и закидывает в очередь три новых таски: `explodeReexports`, `transform` и `finalizeEntrypoint`. В первые две таски передаётся `AbortSignal`, который будет вызван в случае замещения `IEntrypoint`, а `finalizeEntrypoint` должен вызываться в любом случае в самом конце обработки дерева задач этого энтрипоинта. Если у экшена указан `AbortSignal`, то по умолчанию он наследуется всеми порождаемыми действиями.
+The `processEntrypoint` action initializes an `AbortController`, subscribes to the parent's `AbortSignal` if it exists, subscribes to the `onSupersede` signal, and enqueues two new tasks: `explodeReexports` and `transform`. It passes along the `AbortSignal` to these tasks, which will be triggered in case the `Entrypoint` is superseded. If an `AbortSignal` is provided with the action, it is inherited by all subsequent actions by default. If the original `Entrypoint` is superseded, a new `processEntrypoint` action is enqueued for the new `Entrypoint`.
+
 
 ### explodeReexports
 
-Находит инструкции `export * from 'file-name'`, складывает для каждой из них в очередь `getExports`, а по исполнению `getExports` заменяет `*` на именованный список.
+The `explodeReexports` function locates `export * from 'file-name'` statements, queues up `getExports` for each of them, and upon execution of `getExports`, replaces the `*` with a list of named exports.
 
 
 ### getExports
 
-Находит имена всех экспортов в файле, а если в файле есть `export * from`, то рекурсивно добавляет себя в очередь для каждой такой инструкции, пока не получится развернуть весь список.
+This function identifies the names of all exports in the file. If the file contains an `export * from` statement, it recursively adds itself to the queue for each such instruction until the entire list is expanded.
 
 
 ### transform
 
-Готовит файл к исполнению: находит используемые linaria-процессоры, вызывает eval-time замены для них, удаляет лишний код, вызывает `evaluator`. Из оставшегося кода достаются уцелевшие импорты, оборачиваются в `resolveImports` и складываются в очередь. После резолва импортов, ставится задача `processImports` на их обработку. Финальным действием идёт `addToCodeCache`, которое складывает всю полученную информацию в кэш для дальнейшего использования в `module.ts`.
+Prepares the file for execution: identifies the utilized Linaria processors, invokes eval-time substitutions for them, removes unnecessary code, and calls the `evaluator`. From the remaining code, surviving imports are extracted, wrapped in `resolveImports`, and queued. After imports are resolved, the `processImports` task is set to handle them. The final step is `addToCodeCache`, which stores all the gathered information in the cache for later utilization in `evalFile`.
 
 
 ### resolveImports
 
-Существует в двух вариантах: синхронном для строго синхронных окружений и асинхронном на случаи, если функция-резолвер файлов поставляется исключительно в асинхронном варианте (то есть всегда). Оба варианта делают одно и то же, с поправкой на синхронность и асинхронность: вызывают переданную функцию-резовлер для каждого указанного импорта, а так же кэшируют результаты. Асинхронная версия кроме результатов кэширует ещё и промис, чтобы гарантировать, что не будет запущено две параллельных таски на резолв, и обеспечить строгую очередь «первый спросил — первому ответили».
+This function exists in two variants: synchronous for strictly synchronous environments and asynchronous for cases where the file resolver function is exclusively supplied in an asynchronous manner. Both variants perform the same task with adjustments for synchronicity and asynchronicity: they invoke the provided file resolver function for each specified import and cache the results. In the asynchronous version, in addition to caching results, it also caches a promise to ensure that two parallel resolving tasks are not started simultaneously, thus maintaining a strict "first asked, first answered" queue.
 
 
 ### processImports
 
-Вызывает `createEntrypoint` для каждого импорта. На данном этапе может вернуться `"ignored"`, если мы попали в петлю. В этом случае конкретный импорт пропускается. Для остальных же в очередь будут добавлены `processEntrypoint` без `AbortSignal` родителя (в этом месте я не уверен, нужно ли пробрасывать сигнал глубже и канцелять их вместе с корневым `IEntrypoint` или нехай живут).
+Invokes `createEntrypoint` for each import. At this stage, it might return `"ignored"` if a loop is detected. In this case, the specific import is skipped. For the remaining imports, `processEntrypoint` will be enqueued without the parent's `AbortSignal`.
 
 
 ### addToCodeCache
 
-Просто добавляет результат кэш. Можно было бы делать это непосредственно в `transform`, но так в логах нагляднее.
+Simply adds the result to the cache. While it could be done directly in `transform`, this approach provides clearer logging.
 
 
-### finalizeEntrypoint
+### evalFile
 
-Должен вызываться для освобождения ресурсов, когда всё под-дерево обработки конкретного файла было завершено. Но по факту вызывается в самом конце вообще, так как механизм приоритизации хромает на обе ноги.
+Executes the code prepared in previous steps within the current `Entrypoint`. Returns all exports that were requested in `only`.
+
+
+### collect
+
+This step introduces modifications to the final code by replacing tag and function calls with their runtime versions, and removing redundant code.
+
+
+### extract
+
+Extracts and returns all artifacts (styles) for the current `Entrypoint`.
+
+
+### workflow
+
+The entry point for file processing. Sequentially calls `processEntrypoint`, `evalFile`, `collect`, and `extract`. Returns the result of transforming the source code as well as all artifacts obtained from code execution.

@@ -26,4 +26,4 @@
 'linaria-website': major
 ---
 
-All processing stages were merged into one queue-based processor. It allows the implementation of more complex workflows to support features like dynamic imports and re-exports.
+All processing stages were merged into one generators-based processor. It allows the implementation of more complex workflows to support features like dynamic imports and re-exports.
