@@ -30,8 +30,6 @@ type VitePluginOptions = {
 
 export { Plugin };
 
-const emptyConfig = {};
-
 export default function linaria({
   debug,
   include,
@@ -142,18 +140,18 @@ export default function linaria({
         throw new Error(`Could not resolve ${what}`);
       };
 
-      const result = await transform(
-        code,
-        {
+      const transformServices = {
+        options: {
           filename: id,
+          root: process.cwd(),
           preprocessor,
           pluginOptions: rest,
         },
-        asyncResolve,
-        emptyConfig,
         cache,
-        emitter
-      );
+        emitter,
+      };
+
+      const result = await transform(transformServices, code, asyncResolve);
 
       let { cssText, dependencies } = result;
 

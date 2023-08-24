@@ -31,13 +31,13 @@
     "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
-    "@babel/core": "^7.22.9",
-    "@babel/generator": "^7.22.9",
+    "@babel/core": "^7.22.10",
+    "@babel/generator": "^7.22.10",
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@babel/plugin-transform-modules-commonjs": "^7.22.5",
     "@babel/template": "^7.22.5",
-    "@babel/traverse": "^7.22.8",
-    "@babel/types": "^7.22.5",
+    "@babel/traverse": "^7.22.10",
+    "@babel/types": "^7.22.10",
     "@linaria/logger": "workspace:^",
     "babel-merge": "^3.0.0",
     "find-up": "^5.0.0",

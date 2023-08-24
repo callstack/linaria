@@ -28,7 +28,6 @@ type Loader = RawLoaderDefinitionFunction<{
   cacheProvider?: string | ICache;
 }>;
 
-const emptyConfig = {};
 const cache = new TransformCacheCollection();
 
 const webpack5Loader: Loader = function webpack5LoaderPlugin(
@@ -86,19 +85,19 @@ const webpack5Loader: Loader = function webpack5LoaderPlugin(
     });
   };
 
-  transform(
-    content.toString(),
-    {
+  const transformServices = {
+    options: {
       filename: this.resourcePath,
       inputSourceMap: convertSourceMap(inputSourceMap, this.resourcePath),
-      pluginOptions: rest,
+      root: process.cwd(),
       preprocessor,
+      pluginOptions: rest,
     },
-    asyncResolve,
-    emptyConfig,
     cache,
-    sharedState.emitter
-  ).then(
+    emitter: sharedState.emitter,
+  };
+
+  transform(transformServices, content.toString(), asyncResolve).then(
     async (result: Result) => {
       if (result.cssText) {
         let { cssText } = result;

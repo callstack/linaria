@@ -37,7 +37,7 @@ export type Evaluator = (
   ast: File,
   code: string,
   imports: Map<string, string[]> | null,
-  exports?: string[] | null
+  exports?: string[] | null,
 ];
 
 export type EvalRule = {

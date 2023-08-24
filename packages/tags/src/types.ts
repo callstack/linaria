@@ -48,7 +48,7 @@ export type CallParam = readonly ['call', ...ExpressionValue[]];
 export type MemberParam = readonly ['member', string];
 export type TemplateParam = readonly [
   'template',
-  (TemplateElement | ExpressionValue)[]
+  (TemplateElement | ExpressionValue)[],
 ];
 
 export type Param = CalleeParam | CallParam | MemberParam | TemplateParam;

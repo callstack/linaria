@@ -44,7 +44,7 @@
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
-    "@babel/types": "^7.22.5"
+    "@babel/types": "^7.22.10"
   },
   "engines": {
     "node": ">=16.0.0"

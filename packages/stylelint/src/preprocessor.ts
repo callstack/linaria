@@ -57,12 +57,16 @@ function preprocessor() {
     async code(input: string, filename: string) {
       let result;
 
+      const transformServices = {
+        options: {
+          filename,
+        },
+      };
+
       try {
         result = await transform(
+          transformServices,
           input,
-          {
-            filename,
-          },
           asyncResolveFallback
         );
 

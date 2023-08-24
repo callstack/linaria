@@ -491,7 +491,6 @@ class Module {
       );
 
       script.runInContext(context);
-      return;
     } catch (e) {
       if (e instanceof EvalError) {
         this.debug('evaluate:error', '%O', e);

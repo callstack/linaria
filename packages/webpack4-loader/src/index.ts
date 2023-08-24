@@ -29,7 +29,6 @@ const castSourceMap = <T extends { version: number } | { version: string }>(
 
 const outputCssLoader = require.resolve('./outputCssLoader');
 
-const emptyConfig = {};
 const cache = new TransformCacheCollection();
 
 export default function webpack4Loader(
@@ -70,18 +69,18 @@ export default function webpack4Loader(
     });
   };
 
-  transform(
-    content.toString(),
-    {
+  const transformServices = {
+    options: {
       filename: this.resourcePath,
       inputSourceMap: inputSourceMap ?? undefined,
-      pluginOptions: rest,
+      root: process.cwd(),
       preprocessor,
+      pluginOptions: rest,
     },
-    asyncResolve,
-    emptyConfig,
-    cache
-  ).then(
+    cache,
+  };
+
+  transform(transformServices, content.toString(), asyncResolve).then(
     async (result: Result) => {
       if (result.cssText) {
         let { cssText } = result;

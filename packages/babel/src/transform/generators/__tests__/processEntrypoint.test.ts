@@ -1,0 +1,140 @@
+import {
+  createSyncEntrypoint,
+  createServices,
+  getHandlers,
+} from '../../__tests__/entrypoint-helpers';
+import type { Services } from '../../types';
+import { processEntrypoint } from '../processEntrypoint';
+
+import {
+  expectIteratorReturnResult,
+  expectIteratorYieldResult,
+  isIteratorYieldResult,
+} from './helpers';
+
+describe('processEntrypoint', () => {
+  let services: Services;
+  beforeEach(() => {
+    services = createServices();
+  });
+
+  it('should emit explodeReexports, transform and finalizeEntrypoint actions', () => {
+    const handlers = getHandlers<'sync'>({});
+
+    const fooBarDefault = createSyncEntrypoint(
+      services,
+      handlers,
+      '/foo/bar.js',
+      ['default']
+    );
+
+    // const action = createAction('processEntrypoint', fooBarDefault, {}, null);
+    const action = fooBarDefault.createAction(
+      'processEntrypoint',
+      undefined,
+      null
+    );
+    const gen = processEntrypoint.call(action);
+
+    let result = gen.next();
+    expectIteratorYieldResult(result);
+
+    expect(result.value[0]).toBe('explodeReexports');
+    expect(result.value[1]).toBe(fooBarDefault);
+
+    result = gen.next();
+    expectIteratorYieldResult(result);
+    expect(result.value[0]).toBe('transform');
+    expect(result.value[1]).toBe(fooBarDefault);
+
+    expectIteratorReturnResult(gen.next(), undefined);
+  });
+
+  it('should abort previously emitted actions if entrypoint was superseded', () => {
+    const handlers = getHandlers<'sync'>({});
+
+    const fooBarDefault = createSyncEntrypoint(
+      services,
+      handlers,
+      '/foo/bar.js',
+      ['default']
+    );
+
+    const action = fooBarDefault.createAction(
+      'processEntrypoint',
+      undefined,
+      null
+    );
+    const gen = processEntrypoint.call(action);
+
+    const emitted = [gen.next(), gen.next()]
+      .filter(isIteratorYieldResult)
+      .map((result) => result.value);
+    expect(emitted[0][0]).toBe('explodeReexports');
+    expect(emitted[1][0]).toBe('transform');
+
+    const emittedSignals = emitted.map((a) => a[3]);
+    expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
+      false,
+      false,
+    ]);
+
+    const newEntrypoint = createSyncEntrypoint(
+      services,
+      handlers,
+      '/foo/bar.js',
+      ['named']
+    );
+    expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
+      true,
+      true,
+    ]);
+
+    const nextProcessEntrypoint = gen.next();
+    expectIteratorYieldResult(nextProcessEntrypoint);
+    expect(nextProcessEntrypoint.value[0]).toBe('processEntrypoint');
+    expect(nextProcessEntrypoint.value[1]).toBe(newEntrypoint);
+
+    expectIteratorReturnResult(gen.next(), undefined);
+  });
+
+  it('should abort previously emitted actions if parent aborts', () => {
+    const handlers = getHandlers<'sync'>({});
+
+    const fooBarDefault = createSyncEntrypoint(
+      services,
+      handlers,
+      '/foo/bar.js',
+      ['default']
+    );
+
+    const abortController = new AbortController();
+    const action = fooBarDefault.createAction(
+      'processEntrypoint',
+      undefined,
+      abortController.signal
+    );
+    const gen = processEntrypoint.call(action);
+
+    const emitted = [gen.next(), gen.next()]
+      .filter(isIteratorYieldResult)
+      .map((result) => result.value);
+    expect(emitted[0][0]).toBe('explodeReexports');
+    expect(emitted[1][0]).toBe('transform');
+
+    const emittedSignals = emitted.map((a) => a[3]);
+    expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
+      false,
+      false,
+    ]);
+
+    abortController.abort();
+
+    expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
+      true,
+      true,
+    ]);
+
+    expectIteratorReturnResult(gen.next(), undefined);
+  });
+});

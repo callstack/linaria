@@ -227,9 +227,8 @@ export function extractExpression(
 
   const importedFrom: string[] = [];
   function findImportSourceOfIdentifier(idPath: NodePath<Identifier>) {
-    const exBindingIdentifier = idPath.scope.getBinding(
-      idPath.node.name
-    )?.identifier;
+    const exBindingIdentifier = idPath.scope.getBinding(idPath.node.name)
+      ?.identifier;
     const exImport =
       imports.find((i) => i.local.node === exBindingIdentifier) ?? null;
     if (exImport) {

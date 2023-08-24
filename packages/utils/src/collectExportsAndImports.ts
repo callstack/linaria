@@ -87,14 +87,21 @@ const isType = (p: {
   ('importKind' in p.node && p.node.importKind === 'type') ||
   ('exportKind' in p.node && p.node.exportKind === 'type');
 
-// Force TypeScript to check, that we have implementation for every possible specifier
 type SpecifierTypes = ImportDeclaration['specifiers'][number];
-const collectors: {
-  [K in SpecifierTypes['type']]: (
-    path: NodePath<SpecifierTypes & { type: K }>,
-    source: string
-  ) => IImport[];
-} = {
+
+type Collector<T extends SpecifierTypes> = (
+  path: NodePath<T>,
+  source: string
+) => IImport[];
+
+type Collectors = {
+  [K in SpecifierTypes['type']]: Collector<
+    Extract<SpecifierTypes, { type: K }>
+  >;
+};
+
+// Force TypeScript to check, that we have implementation for every possible specifier
+const collectors: Collectors = {
   ImportSpecifier(path: NodePath<ImportSpecifier>, source): IImport[] {
     if (isType(path)) return [];
     const imported = getValue(path.get('imported'));
@@ -133,13 +140,10 @@ function collectFromImportDeclaration(
     state.imports.push({ imported: 'side-effect', local: path, source });
   }
 
-  specifiers.forEach(<T extends SpecifierTypes>(specifier: NodePath<T>) => {
+  specifiers.forEach((specifier) => {
     if (specifier.isImportSpecifier() && isType(specifier)) return;
-
-    const collector = collectors[
-      specifier.node.type
-    ] as typeof collectors[T['type']];
-
+    const { type } = specifier.node;
+    const collector = collectors[type] as Collector<SpecifierTypes>;
     state.imports.push(...collector(specifier, source));
   });
 }

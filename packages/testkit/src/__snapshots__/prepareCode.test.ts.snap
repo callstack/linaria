@@ -1,32 +1,32 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`prepareCode Testing transformation for dynamic-import: code 1`] = `
-"\\"use strict\\";
+""use strict";
 
 exports.__esModule = true;
 exports.foo = foo;
 function foo(onImport) {
-  __linaria_dynamic_import(\\"./foo\\").then(onImport);
+  __linaria_dynamic_import("./foo").then(onImport);
 }"
 `;
 
 exports[`prepareCode Testing transformation for dynamic-import: imports 1`] = `Map {}`;
 
-exports[`prepareCode Testing transformation for dynamic-import: metadata 1`] = `Object {}`;
+exports[`prepareCode Testing transformation for dynamic-import: metadata 1`] = `{}`;
 
 exports[`prepareCode Testing transformation for dynamic-import-param: code 1`] = `
-"\\"use strict\\";
+""use strict";
 
 exports.__esModule = true;
 exports.foo = foo;
 function foo(locale, onImport) {
-  __linaria_dynamic_import(\\"./foo/\\" + locale).then(onImport);
+  __linaria_dynamic_import("./foo/" + locale).then(onImport);
 }"
 `;
 
 exports[`prepareCode Testing transformation for dynamic-import-param: imports 1`] = `Map {}`;
 
-exports[`prepareCode Testing transformation for dynamic-import-param: metadata 1`] = `Object {}`;
+exports[`prepareCode Testing transformation for dynamic-import-param: metadata 1`] = `{}`;
 
 exports[`prepareCode Testing transformation for for-debug: code 1`] = `
 "'use strict';
@@ -45,23 +45,23 @@ Object.defineProperty(exports, 'collectExportsAndImports', {
 Object.defineProperty(exports, 'slugify', {
   enumerable: true,
   get: function get() {
-    return _slugify[\\"default\\"];
+    return _slugify["default"];
   }
 });
 var _slugify = _interopRequireDefault(require('./slugify'));
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {
-    \\"default\\": obj
+    "default": obj
   };
 }"
 `;
 
 exports[`prepareCode Testing transformation for for-debug: imports 1`] = `
 Map {
-  "./slugify" => Array [
+  "./slugify" => [
     "default",
   ],
 }
 `;
 
-exports[`prepareCode Testing transformation for for-debug: metadata 1`] = `Object {}`;
+exports[`prepareCode Testing transformation for for-debug: metadata 1`] = `{}`;

@@ -41,9 +41,13 @@ export interface IModule {
 
 export interface IBaseEntrypoint {
   idx: string;
+  generation: number;
   log: Debugger;
   name: string;
   only: string[];
+  onSupersede: (
+    callback: (newEntrypoint: IBaseEntrypoint) => void
+  ) => () => void;
   parent: IBaseEntrypoint | null;
 }
 
