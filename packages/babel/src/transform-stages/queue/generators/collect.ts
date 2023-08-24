@@ -3,7 +3,7 @@ import type { PluginItem } from '@babel/core';
 import { buildOptions } from '@linaria/utils';
 
 import { filename as collectorPlugin } from '../../../plugins/collector';
-import type { Services, ActionGenerator, ICollectAction } from '../types';
+import type { ICollectAction, SyncScenarioForAction } from '../types';
 
 /**
  * Parses the specified file, finds tags, applies run-time replacements,
@@ -11,11 +11,11 @@ import type { Services, ActionGenerator, ICollectAction } from '../types';
  */
 // eslint-disable-next-line require-yield
 export function* collect(
-  services: Services,
-  action: ICollectAction
-): ActionGenerator<ICollectAction> {
-  const { babel, options } = services;
-  const { valueCache, entrypoint } = action;
+  this: ICollectAction<'sync'>
+): SyncScenarioForAction<ICollectAction<'sync'>> {
+  const { babel, options } = this.services;
+  const { valueCache } = this.data;
+  const { entrypoint } = this;
   const { ast, code, name, pluginOptions } = entrypoint;
 
   const transformPlugins: PluginItem[] = [

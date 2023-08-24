@@ -1,223 +1,138 @@
 /* eslint-disable require-yield */
-import { EventEmitter } from '@linaria/utils';
-
-import { TransformCacheCollection } from '../../../../cache';
 import {
-  createEntrypoint,
-  fakeLoadAndParse,
+  createSyncEntrypoint,
+  createServices,
+  createAsyncEntrypoint,
 } from '../../__tests__/entrypoint-helpers';
 import type {
   Services,
   IProcessEntrypointAction,
   ActionQueueItem,
-  Handler,
-  ActionGenerator,
-  AnyActionGenerator,
-  Continuation,
+  SyncScenarioForAction,
+  Handlers,
   IResolveImportsAction,
-  IResolvedImport,
 } from '../../types';
-import { createAction, isContinuation } from '../action';
-import { actionRunner } from '../actionRunner';
+import { asyncActionRunner, syncActionRunner } from '../actionRunner';
+import type { IResolvedImport } from '../types';
 
-type QueueItem = ActionQueueItem | Continuation;
-type Queue = QueueItem[];
+type SyncHandlers<TMode extends 'async' | 'sync'> = Handlers<TMode>;
 
 describe('actionRunner', () => {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  function* emptyHandler(): ActionGenerator<ActionQueueItem> {}
+  function* emptyHandler<
+    TAction extends ActionQueueItem<'sync'>,
+  >(): SyncScenarioForAction<TAction> {
+    return undefined as any;
+  }
 
-  let services: Pick<Services, 'cache' | 'eventEmitter'>;
+  const getHandlers = <TMode extends 'async' | 'sync'>(
+    partial: Partial<SyncHandlers<TMode>>
+  ) => ({
+    addToCodeCache: jest.fn(emptyHandler),
+    collect: jest.fn(emptyHandler),
+    evalFile: jest.fn(emptyHandler),
+    explodeReexports: jest.fn(emptyHandler),
+    extract: jest.fn(emptyHandler),
+    finalizeEntrypoint: jest.fn(emptyHandler),
+    getExports: jest.fn(emptyHandler),
+    processEntrypoint: jest.fn(emptyHandler),
+    processImports: jest.fn(emptyHandler),
+    resolveImports: jest.fn(emptyHandler),
+    transform: jest.fn(emptyHandler),
+    workflow: jest.fn(emptyHandler),
+    ...partial,
+  });
+  let services: Services;
+
   beforeEach(() => {
-    services = {
-      cache: new TransformCacheCollection(),
-      eventEmitter: EventEmitter.dummy,
-    };
-
-    fakeLoadAndParse.mockClear();
+    services = createServices();
   });
 
   it('should be defined', () => {
-    expect(actionRunner).toBeDefined();
+    expect(asyncActionRunner).toBeDefined();
+    expect(syncActionRunner).toBeDefined();
   });
 
   it('should run action', () => {
-    const action = createAction(
+    const handlers = getHandlers<'sync'>({});
+
+    const entrypoint = createSyncEntrypoint(services, handlers, '/foo/bar.js', [
+      'default',
+    ]);
+    const action = entrypoint.createAction(
       'processEntrypoint',
-      createEntrypoint(services, '/foo/bar.js', ['default']),
-      {},
+      undefined,
       null
     );
 
-    const handler1 = jest.fn();
-    const handler2 = jest.fn();
-    function* handlerGenerator(): ActionGenerator<IProcessEntrypointAction> {
-      handler1();
-      yield ['resolveImports', action.entrypoint, { imports: new Map() }, null];
-      handler2();
-    }
-
-    actionRunner(services, () => {}, action, '0001', handlerGenerator);
-    expect(handler1).toHaveBeenCalledTimes(1);
-    expect(handler2).not.toHaveBeenCalled();
+    syncActionRunner(action);
+    expect(handlers.processEntrypoint).toHaveBeenCalled();
   });
 
-  it('should not run action if its copy was already run', () => {
-    const action1 = createAction(
-      'processEntrypoint',
-      createEntrypoint(services, '/foo/bar.js', ['default']),
-      {},
-      null
-    );
-    const action2 = createAction(
-      'processEntrypoint',
-      createEntrypoint(services, '/foo/bar.js', ['default']),
-      {},
-      null
-    );
-
-    const handler1 = jest.fn();
-    const handler2 = jest.fn();
-    function* handlerGenerator(): ActionGenerator<IProcessEntrypointAction> {
-      handler1();
-      yield [
-        'resolveImports',
-        action2.entrypoint,
-        { imports: new Map() },
-        null,
-      ];
-      handler2();
+  it('should not run action if its copy was already run', async () => {
+    const handler = jest.fn();
+    function* handlerGenerator(
+      this: IProcessEntrypointAction<'sync'>
+    ): SyncScenarioForAction<IProcessEntrypointAction<'sync'>> {
+      handler();
+      yield ['resolveImports', this.entrypoint, { imports: new Map() }, null];
     }
 
-    const task1 = actionRunner(
-      services,
-      () => {},
-      action1,
-      '0001',
-      handlerGenerator
-    );
-    const task2 = actionRunner(
-      services,
-      () => {},
-      action2,
-      '0002',
-      handlerGenerator
-    );
-    expect(handler1).toHaveBeenCalledTimes(1);
-    expect(task1).toBe(task2);
-    expect(handler2).not.toHaveBeenCalled();
-  });
-
-  it('should call next for both copy', () => {
-    const enqueue = jest.fn();
-    const action1 = createAction(
-      'processEntrypoint',
-      createEntrypoint(services, '/foo/bar.js', ['default']),
-      {},
-      null
-    );
-    const action2 = createAction(
-      'processEntrypoint',
-      createEntrypoint(services, '/foo/bar.js', ['default']),
-      {},
-      null
-    );
-
-    function* handler(
-      s: unknown,
-      a: IProcessEntrypointAction
-    ): ActionGenerator<IProcessEntrypointAction> {
-      yield ['resolveImports', a.entrypoint, { imports: new Map() }, null];
-    }
-
-    actionRunner(services, enqueue, action1, '0001', handler);
-    actionRunner(services, enqueue, action2, '0002', handler);
-
-    expect(enqueue).toHaveBeenCalledTimes(4);
-
-    // Both pair of actions should be called with the same arguments
-    expect(enqueue.mock.calls[0][0]).toBe(enqueue.mock.calls[2][0]);
-    expect(enqueue.mock.calls[1][0]).toBe(enqueue.mock.calls[3][0]);
-  });
-
-  it('should emit continuation of the action if its yielded another action', () => {
-    const enqueue = jest.fn();
-    const action1 = createAction(
-      'processEntrypoint',
-      createEntrypoint(services, '/foo/bar.js', ['default']),
-      {},
-      null
-    );
-
-    const resolveImportsData = { imports: new Map() };
-
-    function* handler(
-      s: unknown,
-      a: IProcessEntrypointAction
-    ): ActionGenerator<IProcessEntrypointAction> {
-      yield ['resolveImports', a.entrypoint, resolveImportsData, null];
-    }
-
-    actionRunner(services, enqueue, action1, '0001', handler);
-    expect(enqueue).toHaveBeenCalledTimes(2);
-    expect(enqueue).nthCalledWith(1, {
-      abortSignal: null,
-      action: action1,
-      generator: expect.anything(),
-      resultFrom: undefined,
-      uid: expect.anything(),
-      weight: 20,
+    const handlers = getHandlers({
+      processEntrypoint: handlerGenerator,
     });
-    expect(enqueue).nthCalledWith(2, {
-      abortSignal: null,
-      entrypoint: action1.entrypoint,
-      idx: expect.anything(),
-      imports: resolveImportsData.imports,
-      type: 'resolveImports',
-    });
-  });
 
-  it('should return value from yielded action', () => {
-    const action1 = createAction(
+    const entrypoint1 = createAsyncEntrypoint(
+      services,
+      handlers,
+      '/foo/bar.js',
+      ['default']
+    );
+    const entrypoint2 = createAsyncEntrypoint(
+      services,
+      handlers,
+      '/foo/bar.js',
+      ['default']
+    );
+
+    expect(entrypoint1).toBe(entrypoint2);
+
+    const action1 = entrypoint1.createAction(
       'processEntrypoint',
-      createEntrypoint(services, '/foo/bar.js', ['default']),
-      {},
+      undefined,
+      null
+    );
+    const action2 = entrypoint2.createAction(
+      'processEntrypoint',
+      undefined,
       null
     );
 
+    expect(action1).toBe(action2);
+
+    const task1 = asyncActionRunner(action1);
+    const task2 = asyncActionRunner(action2);
+    await Promise.all([task1, task2]);
+
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handlers.resolveImports).toHaveBeenCalledTimes(1);
+  });
+
+  it('should return value from yielded action', async () => {
     const resolveImportsData = { imports: new Map() };
 
     const valueCatcher = jest.fn();
-    const queue: Queue = [];
-    const enqueue = (action: QueueItem) => {
-      queue.push(action);
-    };
+    function* processEntrypoint(
+      this: IProcessEntrypointAction<'sync'>
+    ): SyncScenarioForAction<IProcessEntrypointAction<'sync'>> {
+      const result = yield [
+        'resolveImports',
+        this.entrypoint,
+        resolveImportsData,
+        null,
+      ];
 
-    actionRunner(
-      services,
-      enqueue,
-      action1,
-      '0001',
-      function* handler(s, a): ActionGenerator<IProcessEntrypointAction> {
-        const result = yield [
-          'resolveImports',
-          a.entrypoint,
-          resolveImportsData,
-          null,
-          true,
-        ];
-        valueCatcher(result);
-      }
-    );
-
-    expect(queue).toHaveLength(2);
-    expect(queue[1]).toMatchObject({
-      imports: resolveImportsData.imports,
-      type: 'resolveImports',
-    });
-    expect(queue[0]).toMatchObject({
-      weight: 20, // continuation should have less weight than emitted action
-    });
+      valueCatcher(result);
+    }
 
     const resolvedImports: IResolvedImport[] = [
       {
@@ -226,118 +141,34 @@ describe('actionRunner', () => {
         resolved: '/foo/bar.js',
       },
     ];
-    actionRunner(
+
+    function* resolveImports(): SyncScenarioForAction<
+      IResolveImportsAction<'sync'>
+    > {
+      return resolvedImports;
+    }
+
+    const handlers = getHandlers({
+      processEntrypoint,
+      resolveImports,
+    });
+
+    const entrypoint = createAsyncEntrypoint(
       services,
-      enqueue,
-      queue[1] as IResolveImportsAction,
-      '0001',
-      function* handler(): ActionGenerator<IResolveImportsAction> {
-        return resolvedImports;
-      }
+      handlers,
+      '/foo/bar.js',
+      ['default']
     );
 
-    actionRunner(services, enqueue, queue[0] as Continuation, '0001');
+    const action = entrypoint.createAction(
+      'processEntrypoint',
+      undefined,
+      null
+    );
+
+    await asyncActionRunner(action);
 
     expect(valueCatcher).toBeCalledTimes(1);
     expect(valueCatcher).toBeCalledWith(resolvedImports);
-  });
-
-  it('should call callback for emitted actions', () => {
-    const queue1: Queue = [
-      createAction(
-        'processEntrypoint',
-        createEntrypoint(services, '/foo/bar.js', ['default']),
-        {},
-        null
-      ),
-    ];
-    const queue2: Queue = [
-      createAction(
-        'processEntrypoint',
-        createEntrypoint(services, '/foo/bar.js', ['default']),
-        {},
-        null
-      ),
-    ];
-
-    const enqueue = (queue: Queue, action: QueueItem) => {
-      queue.push(action);
-      return action;
-    };
-
-    const runNthFrom = (
-      idx: number,
-      queue: Queue,
-      handler: Handler<
-        Pick<Services, 'cache' | 'eventEmitter'>,
-        ActionQueueItem,
-        AnyActionGenerator
-      > = emptyHandler
-    ) => {
-      const act = queue[idx];
-      const emit = enqueue.bind(null, queue);
-      if (isContinuation(act)) {
-        return actionRunner(services, emit, act, `000${idx}`);
-      }
-      return actionRunner(
-        services,
-        emit,
-        act,
-        `000${idx}`,
-        handler as Handler<
-          Pick<Services, 'cache' | 'eventEmitter'>,
-          ActionQueueItem,
-          AnyActionGenerator
-        >
-      );
-    };
-
-    // Both queues should have one action
-    expect(queue1).toHaveLength(1);
-    expect(queue2).toHaveLength(1);
-
-    runNthFrom(
-      0,
-      queue1,
-      function* handler(s, a): ActionGenerator<ActionQueueItem> {
-        yield ['transform', a.entrypoint, { imports: new Map() }, null];
-        yield ['resolveImports', a.entrypoint, { imports: new Map() }, null];
-      }
-    );
-
-    // The first action from queue1 has been run and emitted a new action
-    expect(queue1).toHaveLength(3);
-    // The second queue shouldn't be affected
-    expect(queue2).toHaveLength(1);
-
-    // Simulate a traffic jam in queue1 and start running actions from queue2
-    runNthFrom(0, queue2);
-    runNthFrom(1, queue2);
-    runNthFrom(2, queue2);
-    runNthFrom(3, queue2);
-    runNthFrom(4, queue2);
-
-    // First queue still has 3 actions because it wasn't touched
-    expect(queue1).toHaveLength(3);
-
-    // Second queue is full
-    expect(queue2).toHaveLength(5);
-
-    const shouldNotBeCalled = jest.fn();
-    function* handlerWithMock() {
-      shouldNotBeCalled();
-    }
-    // Run the rests action from queue1
-    runNthFrom(1, queue1, handlerWithMock);
-    runNthFrom(2, queue2, handlerWithMock);
-    runNthFrom(3, queue2, handlerWithMock);
-    runNthFrom(4, queue2, handlerWithMock);
-    expect(queue1).toHaveLength(5);
-
-    // The second queue should not be affected
-    expect(queue2).toHaveLength(5);
-
-    // The handler should not be called
-    expect(shouldNotBeCalled).not.toHaveBeenCalled();
   });
 });

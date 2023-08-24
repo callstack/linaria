@@ -1,14 +1,9 @@
-import type { ExportAllDeclaration, Node, File } from '@babel/types';
+import type { ExportAllDeclaration, File, Node } from '@babel/types';
 
 import type { Core } from '../../../babel';
-import type {
-  IExplodeReexportsAction,
-  Services,
-  ActionGenerator,
-} from '../types';
+import type { IExplodeReexportsAction, SyncScenarioForAction } from '../types';
 
 import { findExportsInImports } from './getExports';
-import { emitAndGetResultOf } from './helpers/emitAndGetResultOf';
 
 const getWildcardReexport = (babel: Core, ast: File) => {
   const reexportsFrom: { source: string; node: ExportAllDeclaration }[] = [];
@@ -34,58 +29,63 @@ const getWildcardReexport = (babel: Core, ast: File) => {
  * and replaces wildcard with resolved named.
  */
 export function* explodeReexports(
-  services: Services,
-  action: IExplodeReexportsAction
-  // next: Next
-): ActionGenerator<IExplodeReexportsAction> {
-  const { log, ast } = action.entrypoint;
+  this: IExplodeReexportsAction<'sync'>
+): SyncScenarioForAction<IExplodeReexportsAction<'sync'>> {
+  const { babel } = this.services;
+  const { log, ast } = this.entrypoint;
 
-  const reexportsFrom = getWildcardReexport(services.babel, ast);
+  const reexportsFrom = getWildcardReexport(babel, ast);
   if (!reexportsFrom.length) {
     return;
   }
 
   log('has wildcard reexport from %o', reexportsFrom);
 
-  const resolvedImports = yield* emitAndGetResultOf(
+  const resolvedImports = yield* this.getNext(
     'resolveImports',
-    action.entrypoint,
+    this.entrypoint,
     {
       imports: new Map(reexportsFrom.map((i) => [i.source, []])),
     }
   );
 
-  const exports = yield* findExportsInImports(
-    services,
-    action,
+  const importedEntrypoints = findExportsInImports(
+    this.entrypoint,
     resolvedImports
   );
 
   const replacements = new Map<ExportAllDeclaration, Node | null>();
+  for (const importedEntrypoint of importedEntrypoints) {
+    const exports = yield* this.getNext(
+      'getExports',
+      importedEntrypoint.entrypoint,
+      undefined
+    );
 
-  Object.entries(exports).forEach(([source, identifiers]) => {
-    const reexport = reexportsFrom.find((i) => i.source === source);
+    const reexport = reexportsFrom.find(
+      (i) => i.source === importedEntrypoint.import
+    );
     if (reexport) {
       replacements.set(
         reexport.node,
-        identifiers.length
-          ? services.babel.types.exportNamedDeclaration(
+        exports.length
+          ? babel.types.exportNamedDeclaration(
               null,
-              identifiers.map((i) =>
-                services.babel.types.exportSpecifier(
-                  services.babel.types.identifier(i),
-                  services.babel.types.identifier(i)
+              exports.map((i) =>
+                babel.types.exportSpecifier(
+                  babel.types.identifier(i),
+                  babel.types.identifier(i)
                 )
               ),
-              services.babel.types.stringLiteral(source)
+              babel.types.stringLiteral(importedEntrypoint.import)
             )
           : null
       );
     }
-  });
+  }
 
   // Replace wildcard reexport with named reexports
-  services.babel.traverse(ast, {
+  babel.traverse(ast, {
     ExportAllDeclaration(path) {
       const replacement = replacements.get(path.node);
       if (replacement) {

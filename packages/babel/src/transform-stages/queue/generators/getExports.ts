@@ -1,68 +1,49 @@
 import type { IReexport } from '@linaria/utils';
 import { collectExportsAndImports } from '@linaria/utils';
 
-import { Entrypoint } from '../Entrypoint';
-import type {
-  IExplodeReexportsAction,
-  IGetExportsAction,
-  IResolvedImport,
-  Services,
-  ActionGenerator,
-  YieldNext,
-} from '../types';
+import type { Entrypoint } from '../Entrypoint';
+import type { IResolvedImport } from '../actions/types';
+import type { IGetExportsAction, SyncScenarioForAction } from '../types';
 
-import { emitAndGetResultOf } from './helpers/emitAndGetResultOf';
-
-export function* findExportsInImports(
-  services: Services,
-  action: IGetExportsAction | IExplodeReexportsAction,
+export function findExportsInImports(
+  entrypoint: Entrypoint<'sync'>,
   imports: IResolvedImport[]
-): Generator<YieldNext, Record<string, string[]>, never> {
-  let results: Record<string, string[]> = {};
+): { import: string; entrypoint: Entrypoint<'sync'> }[] {
+  const results: { import: string; entrypoint: Entrypoint<'sync'> }[] = [];
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const imp of imports) {
     const { resolved } = imp;
     if (!resolved) {
       throw new Error(`Could not resolve import ${imp.importedFile}`);
     }
 
-    const newEntrypoint = Entrypoint.create(
-      services,
-      action.entrypoint,
-      resolved,
-      [],
-      undefined,
-      action.entrypoint.pluginOptions
-    );
+    const newEntrypoint = entrypoint.createChild(resolved, []);
 
     if (newEntrypoint === 'ignored') {
       // eslint-disable-next-line no-continue
       continue;
     }
 
-    const exports = yield* emitAndGetResultOf('getExports', newEntrypoint, {});
-    results = {
-      ...results,
-      [imp.importedFile]: exports,
-    };
+    results.push({
+      import: imp.importedFile,
+      entrypoint: newEntrypoint,
+    });
   }
 
   return results;
 }
 
 export function* getExports(
-  services: Services,
-  action: IGetExportsAction
-): ActionGenerator<IGetExportsAction> {
-  const { entrypoint } = action;
+  this: IGetExportsAction<'sync'>
+): SyncScenarioForAction<IGetExportsAction<'sync'>> {
+  const { entrypoint } = this;
 
   entrypoint.log(`get exports from %s`, entrypoint.name);
 
   let withWildcardReexport: IReexport[] = [];
   const result: string[] = [];
 
-  services.babel.traverse(entrypoint.ast!, {
+  this.services.babel.traverse(entrypoint.ast!, {
     Program(path) {
       const { exports, reexports } = collectExportsAndImports(path);
       exports.forEach((e) => {
@@ -80,23 +61,28 @@ export function* getExports(
   });
 
   if (withWildcardReexport.length) {
-    const resolvedImports = yield* emitAndGetResultOf(
+    const resolvedImports = yield* this.getNext(
       'resolveImports',
-      action.entrypoint,
+      this.entrypoint,
       {
         imports: new Map(withWildcardReexport.map((i) => [i.source, []])),
       }
     );
 
-    const exports = yield* findExportsInImports(
-      services,
-      action,
+    const importedEntrypoints = findExportsInImports(
+      this.entrypoint,
       resolvedImports
     );
 
-    Object.values(exports).forEach((identifiers) => {
-      result.push(...identifiers);
-    });
+    for (const importedEntrypoint of importedEntrypoints) {
+      const exports = yield* this.getNext(
+        'getExports',
+        importedEntrypoint.entrypoint,
+        undefined
+      );
+
+      result.push(...exports);
+    }
   }
 
   return result;

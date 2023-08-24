@@ -1,3 +1,11 @@
+const noRestrictedSyntax =
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  require('eslint-config-airbnb-base/rules/style').rules[
+    'no-restricted-syntax'
+  ].filter(
+    (rule) => typeof rule === 'string' || rule.selector !== 'ForOfStatement'
+  );
+
 // Workaround for https://github.com/import-js/eslint-plugin-import/issues/1810
 const noUnresolved = ['error', { ignore: ['@linaria/*'] }];
 
@@ -238,6 +246,7 @@ module.exports = {
         'global-require': 0,
         'import/no-dynamic-require': 0,
         'no-underscore-dangle': 0,
+        'no-restricted-syntax': noRestrictedSyntax,
       },
     },
     {

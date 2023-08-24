@@ -2,7 +2,7 @@ import type { ValueCache } from '@linaria/tags';
 
 import evaluate from '../../../evaluators';
 import hasLinariaPreval from '../../../utils/hasLinariaPreval';
-import type { Services, ActionGenerator, IEvalAction } from '../types';
+import type { IEvalAction, SyncScenarioForAction } from '../types';
 
 const wrap = <T>(fn: () => T): T | Error => {
   try {
@@ -14,15 +14,15 @@ const wrap = <T>(fn: () => T): T | Error => {
 
 // eslint-disable-next-line require-yield
 export function* evalFile(
-  services: Services,
-  action: IEvalAction
-): ActionGenerator<IEvalAction> {
-  const { code, entrypoint } = action;
+  this: IEvalAction<'sync'>
+): SyncScenarioForAction<IEvalAction<'sync'>> {
+  const { code } = this.data;
+  const { entrypoint } = this;
   const { log, name, pluginOptions } = entrypoint;
 
   log(`>> evaluate __linariaPreval`);
 
-  const evaluated = evaluate(services.cache, code, pluginOptions, name);
+  const evaluated = evaluate(this.services.cache, code, pluginOptions, name);
 
   const linariaPreval = hasLinariaPreval(evaluated.value)
     ? evaluated.value.__linariaPreval

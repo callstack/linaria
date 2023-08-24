@@ -7,9 +7,8 @@ import type { Core } from '../babel';
 import { TransformCacheCollection } from '../cache';
 import { transformSync } from '../transform';
 import type {
-  ActionGenerator,
   ICollectAction,
-  Services,
+  SyncScenarioForAction,
 } from '../transform-stages/queue/types';
 import type { IPluginState, PluginOptions } from '../types';
 
@@ -26,11 +25,10 @@ export default function babelTransform(
     pre(file: BabelFile) {
       // eslint-disable-next-line require-yield
       function* collect(
-        services: Services,
-        action: ICollectAction
-      ): ActionGenerator<ICollectAction> {
-        const { valueCache, entrypoint } = action;
-        const { ast, code, pluginOptions } = entrypoint;
+        this: ICollectAction<'sync'>
+      ): SyncScenarioForAction<ICollectAction<'sync'>> {
+        const { valueCache } = this.data;
+        const { ast, code, pluginOptions } = this.entrypoint;
 
         collector(file, pluginOptions, valueCache);
 

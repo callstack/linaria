@@ -1,13 +1,8 @@
-import type {
-  IAddToCodeCacheAction,
-  Services,
-  ActionGenerator,
-} from '../types';
+import type { IAddToCodeCacheAction, SyncScenarioForAction } from '../types';
 
 // eslint-disable-next-line require-yield
 export function* addToCodeCache(
-  { cache }: Services,
-  action: IAddToCodeCacheAction
-): ActionGenerator<IAddToCodeCacheAction> {
-  cache.add('code', action.entrypoint.name, action.data);
+  this: IAddToCodeCacheAction<'sync'>
+): SyncScenarioForAction<IAddToCodeCacheAction<'sync'>> {
+  this.services.cache.add('code', this.entrypoint.name, this.data);
 }

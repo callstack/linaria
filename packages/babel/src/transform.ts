@@ -11,17 +11,14 @@ import * as babelCore from '@babel/core';
 
 import { EventEmitter } from '@linaria/utils';
 
-import type { Core } from './babel';
 import { TransformCacheCollection } from './cache';
 import loadLinariaOptions from './transform-stages/helpers/loadLinariaOptions';
-import {
-  AsyncActionQueue,
-  SyncActionQueue,
-} from './transform-stages/queue/ActionQueue';
 import { Entrypoint } from './transform-stages/queue/Entrypoint';
-import type { Handlers } from './transform-stages/queue/GenericActionQueue';
-import { keyOf } from './transform-stages/queue/actions/action';
-import { getTaskResult } from './transform-stages/queue/actions/actionRunner';
+import { loadAndParse } from './transform-stages/queue/Entrypoint.helpers';
+import {
+  asyncActionRunner,
+  syncActionRunner,
+} from './transform-stages/queue/actions/actionRunner';
 import { baseHandlers } from './transform-stages/queue/generators';
 import {
   asyncResolveImports,
@@ -29,42 +26,53 @@ import {
 } from './transform-stages/queue/generators/resolveImports';
 import { rootLog } from './transform-stages/queue/rootLog';
 import type {
-  ActionQueueItem,
-  GetGeneratorForRes,
+  Handlers,
+  IResolveImportsAction,
+  Services,
 } from './transform-stages/queue/types';
-import type { Options, Result } from './types';
+import type { Result } from './types';
 
-interface IServices {
-  babel?: Core;
-  cache?: TransformCacheCollection;
-  options: Options;
-  eventEmitter?: EventEmitter;
-}
+type RequiredServices = 'options';
+type PartialServices = Partial<Omit<Services, RequiredServices>> &
+  Pick<Services, RequiredServices>;
 
-type RequiredServices = Required<IServices>;
+type AllHandlers<TMode extends 'async' | 'sync'> = Handlers<TMode>;
 
-type AllHandlers<TRes extends Promise<void> | void> = Handlers<
-  GetGeneratorForRes<TRes, ActionQueueItem>,
-  RequiredServices
->;
+const withDefaultServices = ({
+  babel = babelCore,
+  cache = new TransformCacheCollection(),
+  loadAndParseFn = loadAndParse,
+  log = rootLog,
+  options,
+  eventEmitter = EventEmitter.dummy,
+}: PartialServices): Services => ({
+  babel,
+  cache,
+  loadAndParseFn,
+  log,
+  options,
+  eventEmitter,
+});
 
 export function transformSync(
-  {
-    babel = babelCore,
-    cache = new TransformCacheCollection(),
-    options,
-    eventEmitter = EventEmitter.dummy,
-  }: IServices,
+  partialServices: PartialServices,
   originalCode: string,
   syncResolve: (what: string, importer: string, stack: string[]) => string,
-  customHandlers: Partial<AllHandlers<void>> = {}
+  customHandlers: Partial<AllHandlers<'sync'>> = {}
 ): Result {
-  const services: RequiredServices = { babel, cache, options, eventEmitter };
+  const services = withDefaultServices(partialServices);
+  const { options } = services;
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
 
-  const entrypoint = Entrypoint.create(
+  const entrypoint = Entrypoint.createSyncRoot(
     services,
-    { log: rootLog },
+    {
+      ...baseHandlers,
+      ...customHandlers,
+      resolveImports(this: IResolveImportsAction<'sync'>) {
+        return syncResolveImports.call(this, syncResolve);
+      },
+    },
     options.filename,
     ['__linariaPreval'],
     originalCode,
@@ -78,43 +86,27 @@ export function transformSync(
     };
   }
 
-  const queue = new SyncActionQueue(
-    services,
-    {
-      ...baseHandlers,
-      ...customHandlers,
-      resolveImports: syncResolveImports.bind(null, syncResolve),
-    },
-    entrypoint
-  );
+  const workflowAction = entrypoint.createAction('workflow', undefined);
 
-  const workflowAction = queue.next('workflow', entrypoint, {});
+  const result = syncActionRunner(workflowAction);
 
-  while (!queue.isEmpty()) {
-    queue.runNext();
-  }
+  entrypoint.log('%s is ready', entrypoint.name);
 
-  entrypoint.log('queue is empty, %s is ready', entrypoint.name);
-
-  return getTaskResult(entrypoint, keyOf(workflowAction)) as Result;
+  return result;
 }
 
 export default async function transform(
-  {
-    babel = babelCore,
-    cache = new TransformCacheCollection(),
-    options,
-    eventEmitter = EventEmitter.dummy,
-  }: IServices,
+  partialServices: PartialServices,
   originalCode: string,
   asyncResolve: (
     what: string,
     importer: string,
     stack: string[]
   ) => Promise<string | null>,
-  customHandlers: Partial<AllHandlers<Promise<void> | void>> = {}
+  customHandlers: Partial<AllHandlers<'sync'>> = {}
 ): Promise<Result> {
-  const services: RequiredServices = { babel, cache, options, eventEmitter };
+  const services = withDefaultServices(partialServices);
+  const { options } = services;
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
 
   /*
@@ -125,9 +117,15 @@ export default async function transform(
    * but the "only" option has changed, the file will be re-processed using
    * the combined "only" option.
    */
-  const entrypoint = Entrypoint.create(
+  const entrypoint = Entrypoint.createAsyncRoot(
     services,
-    { log: rootLog },
+    {
+      ...baseHandlers,
+      ...customHandlers,
+      resolveImports(this: IResolveImportsAction<'async'>) {
+        return asyncResolveImports.call(this, asyncResolve);
+      },
+    },
     options.filename,
     ['__linariaPreval'],
     originalCode,
@@ -141,24 +139,11 @@ export default async function transform(
     };
   }
 
-  const queue = new AsyncActionQueue(
-    services,
-    {
-      ...baseHandlers,
-      ...customHandlers,
-      resolveImports: asyncResolveImports.bind(null, asyncResolve),
-    },
-    entrypoint
-  );
+  const workflowAction = entrypoint.createAction('workflow', undefined);
 
-  const workflowAction = queue.next('workflow', entrypoint, {});
+  const result = await asyncActionRunner(workflowAction);
 
-  while (!queue.isEmpty()) {
-    // eslint-disable-next-line no-await-in-loop
-    await queue.runNext();
-  }
+  entrypoint.log('%s is ready', entrypoint.name);
 
-  entrypoint.log('queue is empty, %s is ready', entrypoint.name);
-
-  return getTaskResult(entrypoint, keyOf(workflowAction)) as Result;
+  return result;
 }

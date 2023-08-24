@@ -1,87 +1,76 @@
-import { EventEmitter } from '@linaria/utils';
-
-import { TransformCacheCollection } from '../../../../cache';
 import {
   createEntrypoint,
-  fakeLoadAndParse,
+  createServices,
 } from '../../__tests__/entrypoint-helpers';
-import { createAction } from '../../actions/action';
-import type { Next, Services } from '../../types';
+import type { Services } from '../../types';
 import { processEntrypoint } from '../processEntrypoint';
 
+import {
+  expectIteratorReturnResult,
+  expectIteratorYieldResult,
+  isIteratorYieldResult,
+} from './helpers';
+
 describe('processEntrypoint', () => {
-  let services: Pick<Services, 'cache' | 'eventEmitter'>;
-  const next = jest.fn<ReturnType<Next>, Parameters<Next>>((type, ep, data) =>
-    createAction(type, ep, data, null)
-  );
-
+  let services: Services;
   beforeEach(() => {
-    services = {
-      cache: new TransformCacheCollection(),
-      eventEmitter: EventEmitter.dummy,
-    };
-
-    fakeLoadAndParse.mockClear();
-    next.mockClear();
+    services = createServices();
   });
 
-  it('should emit explodeReexports, transform and finalizeEntrypoint actions', async () => {
+  it('should emit explodeReexports, transform and finalizeEntrypoint actions', () => {
     const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
       'default',
     ]);
 
-    const action = createAction('processEntrypoint', fooBarDefault, {}, null);
+    // const action = createAction('processEntrypoint', fooBarDefault, {}, null);
+    const action = fooBarDefault.createAction(
+      'processEntrypoint',
+      undefined,
+      null
+    );
+    const gen = processEntrypoint.call(action);
 
-    const gen = processEntrypoint(services, action);
+    let result = gen.next();
+    expectIteratorYieldResult(result);
 
-    let result: IteratorResult<Parameters<Next>, void>;
-
-    result = gen.next();
-    expect(result.value).toEqual([
-      'explodeReexports',
-      fooBarDefault,
-      {},
-      expect.any(AbortSignal),
-    ]);
-    expect(result.done).toBe(false);
-
-    result = gen.next();
-    expect(result.value).toEqual([
-      'transform',
-      fooBarDefault,
-      {},
-      expect.any(AbortSignal),
-    ]);
-    expect(result.done).toBe(false);
+    expect(result.value[0]).toBe('explodeReexports');
+    expect(result.value[1]).toBe(fooBarDefault);
 
     result = gen.next();
-    expect(result.value).toEqual([
-      'finalizeEntrypoint',
-      fooBarDefault,
-      {
-        finalizer: expect.any(Function),
-      },
-      null,
-    ]);
-    expect(result.done).toBe(false);
+    expectIteratorYieldResult(result);
+    expect(result.value[0]).toBe('transform');
+    expect(result.value[1]).toBe(fooBarDefault);
 
-    expect(gen.next()).toEqual({ done: true, value: undefined });
+    result = gen.next();
+    expectIteratorYieldResult(result);
+    expect(result.value[0]).toBe('finalizeEntrypoint');
+    expect(result.value[1]).toBe(fooBarDefault);
+    expect(result.value[2]).toMatchObject({
+      finalizer: expect.any(Function),
+    });
+
+    expectIteratorReturnResult(gen.next(), undefined);
   });
 
-  it('should abort previously emitted actions if entrypoint was superseded', async () => {
+  it('should abort previously emitted actions if entrypoint was superseded', () => {
     const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
       'default',
     ]);
 
-    const action = createAction('processEntrypoint', fooBarDefault, {}, null);
+    const action = fooBarDefault.createAction(
+      'processEntrypoint',
+      undefined,
+      null
+    );
+    const gen = processEntrypoint.call(action);
 
-    const gen = processEntrypoint(services, action);
+    const emitted = [gen.next(), gen.next()]
+      .filter(isIteratorYieldResult)
+      .map((result) => result.value);
+    expect(emitted[0][0]).toBe('explodeReexports');
+    expect(emitted[1][0]).toBe('transform');
 
-    const emitted = [gen.next().value!, gen.next().value!];
-    expect(emitted[0][0]).toEqual('explodeReexports');
-    expect(emitted[1][0]).toEqual('transform');
-
-    const emittedSignals = emitted.map(([, , , abortSignal]) => abortSignal);
+    const emittedSignals = emitted.map((a) => a[3]);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
       false,
       false,
@@ -93,38 +82,38 @@ describe('processEntrypoint', () => {
       true,
     ]);
 
-    expect(gen.next().value).toEqual([
-      'finalizeEntrypoint',
-      fooBarDefault,
-      {
-        finalizer: expect.any(Function),
-      },
-      null,
-    ]);
+    const result = gen.next();
+    expectIteratorYieldResult(result);
 
-    expect(gen.next()).toEqual({ done: true, value: undefined });
+    expect(result.value[0]).toBe('finalizeEntrypoint');
+    expect(result.value[1]).toBe(fooBarDefault);
+    expect(result.value[2]).toMatchObject({
+      finalizer: expect.any(Function),
+    });
+
+    expectIteratorReturnResult(gen.next(), undefined);
   });
 
-  it('should abort previously emitted actions if parent aborts', async () => {
+  it('should abort previously emitted actions if parent aborts', () => {
     const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
       'default',
     ]);
 
     const abortController = new AbortController();
-    const action = createAction(
+    const action = fooBarDefault.createAction(
       'processEntrypoint',
-      fooBarDefault,
-      {},
+      undefined,
       abortController.signal
     );
+    const gen = processEntrypoint.call(action);
 
-    const gen = processEntrypoint(services, action);
+    const emitted = [gen.next(), gen.next()]
+      .filter(isIteratorYieldResult)
+      .map((result) => result.value);
+    expect(emitted[0][0]).toBe('explodeReexports');
+    expect(emitted[1][0]).toBe('transform');
 
-    const emitted = [gen.next().value!, gen.next().value!];
-    expect(emitted[0][0]).toEqual('explodeReexports');
-    expect(emitted[1][0]).toEqual('transform');
-
-    const emittedSignals = emitted.map(([, , , abortSignal]) => abortSignal);
+    const emittedSignals = emitted.map((a) => a[3]);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
       false,
       false,
@@ -137,15 +126,15 @@ describe('processEntrypoint', () => {
       true,
     ]);
 
-    expect(gen.next().value).toEqual([
-      'finalizeEntrypoint',
-      fooBarDefault,
-      {
-        finalizer: expect.any(Function),
-      },
-      null,
-    ]);
+    const result = gen.next();
+    expectIteratorYieldResult(result);
 
-    expect(gen.next()).toEqual({ done: true, value: undefined });
+    expect(result.value[0]).toBe('finalizeEntrypoint');
+    expect(result.value[1]).toBe(fooBarDefault);
+    expect(result.value[2]).toMatchObject({
+      finalizer: expect.any(Function),
+    });
+
+    expectIteratorReturnResult(gen.next(), undefined);
   });
 });

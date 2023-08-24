@@ -1,19 +1,16 @@
 import withLinariaMetadata from '../../../utils/withLinariaMetadata';
-import type { ActionGenerator, Services, IWorkflowAction } from '../types';
-
-import { emitAndGetResultOf } from './helpers/emitAndGetResultOf';
+import type { IWorkflowAction, SyncScenarioForAction } from '../types';
 
 export function* workflow(
-  services: Services,
-  action: IWorkflowAction
-): ActionGenerator<IWorkflowAction> {
-  const { cache, options } = services;
-  const { entrypoint } = action;
+  this: IWorkflowAction<'sync'>
+): SyncScenarioForAction<IWorkflowAction<'sync'>> {
+  const { cache, options } = this.services;
+  const { entrypoint } = this;
   const { name, code: originalCode } = entrypoint;
 
   // *** 1st stage ***
 
-  yield* emitAndGetResultOf('processEntrypoint', entrypoint, {});
+  yield* this.getNext('processEntrypoint', entrypoint, undefined);
 
   const prepareStageResult = cache.get('code', name)?.result;
   const ast = cache.get('originalAST', name) ?? 'ignored';
@@ -32,7 +29,7 @@ export function* workflow(
 
   // *** 2nd stage ***
 
-  const evalStageResult = yield* emitAndGetResultOf('evalFile', entrypoint, {
+  const evalStageResult = yield* this.getNext('evalFile', entrypoint, {
     code: prepareStageResult.code,
   });
 
@@ -47,7 +44,7 @@ export function* workflow(
 
   // *** 3rd stage ***
 
-  const collectStageResult = yield* emitAndGetResultOf('collect', entrypoint, {
+  const collectStageResult = yield* this.getNext('collect', entrypoint, {
     valueCache,
   });
 
@@ -62,7 +59,7 @@ export function* workflow(
 
   // *** 4th stage
 
-  const extractStageResult = yield* emitAndGetResultOf('extract', entrypoint, {
+  const extractStageResult = yield* this.getNext('extract', entrypoint, {
     processors: linariaMetadata.processors,
   });
 

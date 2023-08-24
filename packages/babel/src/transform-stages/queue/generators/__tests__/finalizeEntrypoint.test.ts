@@ -1,78 +1,57 @@
-import { EventEmitter } from '@linaria/utils';
-
-import { TransformCacheCollection } from '../../../../cache';
 import {
   createEntrypoint,
-  fakeLoadAndParse,
+  createServices,
 } from '../../__tests__/entrypoint-helpers';
-import { createAction } from '../../actions/action';
-import type { Next, Services } from '../../types';
+import type { Services } from '../../types';
 import { finalizeEntrypoint } from '../finalizeEntrypoint';
 
+import { expectIteratorReturnResult } from './helpers';
+
 describe('finalizeEntrypoint', () => {
-  let services: Pick<Services, 'cache' | 'eventEmitter'>;
-  const next = jest.fn<ReturnType<Next>, Parameters<Next>>((type, ep, data) =>
-    createAction(type, ep, data, null)
-  );
-
+  let services: Services;
   beforeEach(() => {
-    services = {
-      cache: new TransformCacheCollection(),
-      eventEmitter: EventEmitter.dummy,
-    };
-
-    fakeLoadAndParse.mockClear();
-    next.mockClear();
+    services = createServices();
   });
 
-  it('should call finalizer', async () => {
+  it('should call finalizer', () => {
     const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
       'default',
     ]);
 
     const finalizer = jest.fn();
-    const action = createAction(
+    const action = fooBarDefault.createAction(
       'finalizeEntrypoint',
-      fooBarDefault,
       {
         finalizer,
       },
       null
     );
 
-    const gen = finalizeEntrypoint(services, action);
-
-    const result: IteratorResult<Parameters<Next>, void> = gen.next();
-
-    expect(result.done).toBe(true);
+    const gen = finalizeEntrypoint.call(action);
+    expectIteratorReturnResult(gen.next(), undefined);
     expect(finalizer).toHaveBeenCalled();
   });
 
-  xit('should re-emit processEntrypoint if entrypoint was superseded', async () => {
+  xit('should re-emit processEntrypoint if entrypoint was superseded', () => {
     const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
       'default',
     ]);
 
     const finalizer = jest.fn();
-    const action = createAction(
+    const action = fooBarDefault.createAction(
       'finalizeEntrypoint',
-      fooBarDefault,
       {
         finalizer,
       },
       null
     );
+    const gen = finalizeEntrypoint.call(action);
 
-    const gen = finalizeEntrypoint(services, action);
     const fooBarNamed = createEntrypoint(services, '/foo/bar.js', ['named']);
 
-    expect(gen.next().value).toEqual([
-      'processEntrypoint',
-      fooBarNamed,
-      {},
-      null,
-    ]);
+    const result = gen.next();
+    expect(result.value).toEqual(['processEntrypoint', fooBarNamed, {}, null]);
 
-    expect(gen.next()).toEqual({ done: true, value: undefined });
+    expectIteratorReturnResult(gen.next(), undefined);
   });
 });

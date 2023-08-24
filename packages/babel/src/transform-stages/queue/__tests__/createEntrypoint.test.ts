@@ -1,20 +1,12 @@
-import { EventEmitter } from '@linaria/utils';
-
-import { TransformCacheCollection } from '../../../cache';
 import type { Services } from '../types';
 
-import { createEntrypoint, fakeLoadAndParse } from './entrypoint-helpers';
+import { createEntrypoint, createServices } from './entrypoint-helpers';
 
 describe('createEntrypoint', () => {
-  let services: Pick<Services, 'cache' | 'eventEmitter'>;
+  let services: Services;
 
   beforeEach(() => {
-    services = {
-      cache: new TransformCacheCollection(),
-      eventEmitter: EventEmitter.dummy,
-    };
-
-    fakeLoadAndParse.mockClear();
+    services = createServices();
   });
 
   it('should create a new entrypoint', () => {
@@ -30,6 +22,23 @@ describe('createEntrypoint', () => {
     const entrypoint1 = createEntrypoint(services, '/foo/bar.js', ['default']);
     const entrypoint2 = createEntrypoint(services, '/foo/bar.js', ['default']);
     expect(entrypoint1).toBe(entrypoint2);
+  });
+
+  it('should invalidate cache if source code was changed', () => {
+    const entrypoint1 = createEntrypoint(
+      services,
+      '/foo/bar.js',
+      ['default'],
+      'foo'
+    );
+    const entrypoint2 = createEntrypoint(
+      services,
+      '/foo/bar.js',
+      ['default'],
+      'bar'
+    );
+    expect(entrypoint1).not.toBe(entrypoint2);
+    expect(entrypoint1.supersededWith).toBe(entrypoint2);
   });
 
   it('should not take from cache if path differs', () => {
@@ -50,6 +59,7 @@ describe('createEntrypoint', () => {
     const entrypoint1 = createEntrypoint(services, '/foo/bar.js', ['default']);
     const entrypoint2 = createEntrypoint(services, '/foo/bar.js', ['named']);
     expect(entrypoint1).not.toBe(entrypoint2);
+    expect(entrypoint1.supersededWith).toBe(entrypoint2);
     expect(entrypoint2).toMatchObject({
       name: '/foo/bar.js',
       only: ['default', 'named'],
@@ -79,6 +89,7 @@ describe('createEntrypoint', () => {
 
     const entrypoint2 = createEntrypoint(services, '/foo/bar.js', ['named']);
     expect(entrypoint1).not.toBe(entrypoint2);
+    expect(entrypoint1.supersededWith).toBe(entrypoint2);
     expect(callback).toBeCalledWith(entrypoint2);
   });
 
@@ -91,6 +102,7 @@ describe('createEntrypoint', () => {
 
     const entrypoint2 = createEntrypoint(services, '/foo/bar.js', ['named']);
     expect(entrypoint1).not.toBe(entrypoint2);
+    expect(entrypoint1.supersededWith).toBe(entrypoint2);
     expect(callback).not.toBeCalled();
   });
 });

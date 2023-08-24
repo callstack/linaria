@@ -1,14 +1,14 @@
-/* eslint-disable no-restricted-syntax,no-continue,no-await-in-loop,require-yield */
+/* eslint-disable no-continue,no-await-in-loop,require-yield */
 import { getFileIdx } from '@linaria/utils';
 
 import type { IBaseEntrypoint } from '../../../types';
 import { includes } from '../Entrypoint.helpers';
+import type { IResolvedImport } from '../actions/types';
 import type {
   IResolveImportsAction,
   Services,
-  IResolvedImport,
-  ActionGenerator,
-  AsyncActionGenerator,
+  SyncScenarioForAction,
+  AsyncScenarioForAction,
 } from '../types';
 
 function getStack(entrypoint: IBaseEntrypoint) {
@@ -29,9 +29,9 @@ const mergeImports = (a: string[], b: string[]) => {
   return [...result].filter((i) => i).sort();
 };
 
-function emitDependency(
+function emitDependency<TMode extends 'async' | 'sync'>(
   emitter: Services['eventEmitter'],
-  entrypoint: IResolveImportsAction['entrypoint'],
+  entrypoint: IResolveImportsAction<TMode>['entrypoint'],
   imports: IResolvedImport[]
 ) {
   emitter.single({
@@ -99,11 +99,12 @@ function addToCache(
  * Synchronously resolves specified imports with a provided resolver.
  */
 export function* syncResolveImports(
-  resolve: (what: string, importer: string, stack: string[]) => string,
-  { cache, eventEmitter }: Services,
-  action: IResolveImportsAction
-): ActionGenerator<IResolveImportsAction> {
-  const { imports, entrypoint } = action;
+  this: IResolveImportsAction<'sync'>,
+  resolve: (what: string, importer: string, stack: string[]) => string
+): SyncScenarioForAction<IResolveImportsAction<'sync'>> {
+  const { cache, eventEmitter } = this.services;
+  const { entrypoint } = this;
+  const { imports } = this.data;
   const listOfImports = Array.from(imports?.entries() ?? []);
   const { log } = entrypoint;
 
@@ -117,11 +118,7 @@ export function* syncResolveImports(
   const resolvedImports = listOfImports.map(([importedFile, importsOnly]) => {
     let resolved: string | null = null;
     try {
-      resolved = resolve(
-        importedFile,
-        entrypoint.name,
-        getStack(action.entrypoint)
-      );
+      resolved = resolve(importedFile, entrypoint.name, getStack(entrypoint));
       log(
         '[sync-resolve] ✅ %s -> %s (only: %o)',
         importedFile,
@@ -149,15 +146,16 @@ export function* syncResolveImports(
  * Asynchronously resolves specified imports with a provided resolver.
  */
 export async function* asyncResolveImports(
+  this: IResolveImportsAction<'async'>,
   resolve: (
     what: string,
     importer: string,
     stack: string[]
-  ) => Promise<string | null>,
-  { cache, eventEmitter }: Services,
-  action: IResolveImportsAction
-): AsyncActionGenerator<IResolveImportsAction> {
-  const { imports, entrypoint } = action;
+  ) => Promise<string | null>
+): AsyncScenarioForAction<IResolveImportsAction<'async'>> {
+  const { cache, eventEmitter } = this.services;
+  const { entrypoint } = this;
+  const { imports } = this.data;
   const listOfImports = Array.from(imports?.entries() ?? []);
   const { log } = entrypoint;
 
@@ -179,7 +177,7 @@ export async function* asyncResolveImports(
       resolved = await resolve(
         importedFile,
         entrypoint.name,
-        getStack(action.entrypoint)
+        getStack(entrypoint)
       );
     } catch (err) {
       log(

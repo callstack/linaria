@@ -1,13 +1,8 @@
 import type { BabelFileResult } from '@babel/core';
 
+import type { Debugger } from '@linaria/logger';
 import type { ValueCache } from '@linaria/tags';
-import type {
-  StrictOptions,
-  EventEmitter,
-  Artifact,
-  Rules,
-  Replacements,
-} from '@linaria/utils';
+import type { StrictOptions, EventEmitter, Artifact } from '@linaria/utils';
 
 import type { Core } from '../../babel';
 import type { TransformCacheCollection } from '../../cache';
@@ -17,30 +12,37 @@ import type {
   Options,
 } from '../../types';
 
-import type { IEntrypointCode } from './Entrypoint.types';
+import type { Entrypoint } from './Entrypoint';
+import type { IEntrypointCode, LoadAndParseFn } from './Entrypoint.types';
+import type {
+  IExtracted,
+  IResolvedImport,
+  IWorkflowActionLinariaResult,
+  IWorkflowActionNonLinariaResult,
+} from './actions/types';
 
 export type Services = {
   babel: Core;
   cache: TransformCacheCollection;
-  options: Pick<
-    Options,
-    'root' | 'inputSourceMap' | 'preprocessor' | 'filename' | 'outputFilename'
-  >;
+  loadAndParseFn: LoadAndParseFn;
+  log: Debugger;
+  options: Options;
   eventEmitter: EventEmitter;
 };
 
 export interface IBaseNode {
-  type: ActionQueueItem['type'];
+  type: ActionTypes;
 }
 
-export interface IEntrypoint<TPluginOptions = StrictOptions>
-  extends IBaseEntrypoint,
-    IEntrypointCode {
-  pluginOptions: TPluginOptions;
+export interface IEntrypoint extends IBaseEntrypoint, IEntrypointCode {
+  pluginOptions: StrictOptions;
 }
 
-export type ActionByType<TType extends ActionQueueItem['type']> = Extract<
-  ActionQueueItem,
+export type ActionByType<
+  TMode extends 'async' | 'sync',
+  TType extends ActionQueueItem<TMode>['type'],
+> = Extract<
+  ActionQueueItem<TMode>,
   {
     type: TType;
   }
@@ -50,188 +52,264 @@ export interface IBaseServices {
   eventEmitter: EventEmitter;
 }
 
-const HiddenTypeOfValueSymbol = Symbol('TypeOfValue');
+export const Pending = Symbol('pending');
 
-export interface IBaseAction<
-  TEntrypoint extends IBaseEntrypoint = IBaseEntrypoint,
-  TResult = unknown,
-> extends IBaseNode {
+// export type AnyGenerator<TNext, TResult, TNextResults> =
+//   | Generator<TNext, TResult, TNextResults>
+//   | AsyncGenerator<TNext, TResult, TNextResults>;
+
+// export type AnyActionGenerator<
+//   TAction extends ActionQueueItem = ActionQueueItem,
+// > = AnyGenerator<YieldArg, TAction['result'], YieldResult>;
+
+// export type SyncActionGenerator<
+//   TAction extends ActionQueueItem = ActionQueueItem,
+// > = Generator<YieldArg, TAction['result'], YieldResult>;
+
+export type YieldResult<TMode extends 'async' | 'sync'> = Exclude<
+  ActionQueueItem<TMode>['result'],
+  typeof Pending
+>;
+
+export type AnyIteratorResult<TMode extends 'async' | 'sync', TResult> = {
+  async: Promise<IteratorResult<YieldArg<TMode>, TResult>>;
+  sync: IteratorResult<YieldArg<TMode>, TResult>;
+}[TMode];
+
+export interface IBaseAction<TMode extends 'async' | 'sync', TResult, TData>
+  extends IBaseNode {
   abortSignal: AbortSignal | null;
-  entrypoint: TEntrypoint;
+  data: TData;
+  entrypoint: Entrypoint<TMode>;
+  getNext: GetNext<TMode>;
   idx: string;
-  [HiddenTypeOfValueSymbol]?: TResult;
+  mode: TMode;
+  result: TResult | typeof Pending;
+  run: () => {
+    next: (arg: YieldResult<TMode>) => AnyIteratorResult<TMode, TResult>;
+  };
+  services: Services;
 }
 
-export type TypeOfValue<T> = T extends IBaseAction<
-  IBaseEntrypoint,
-  infer TResult
->
-  ? TResult
-  : never;
-
-export type DataOf<TNode extends ActionQueueItem> = Omit<
-  TNode,
-  keyof IBaseAction | 'entrypoint'
->;
-
-export type Handler<
-  TServices extends IBaseServices,
-  TAction extends IBaseAction,
-  TRes extends AnyActionGenerator,
-> = (services: TServices, action: TAction) => TRes;
-
-type NextParams<TType extends ActionQueueItem['type']> = [
+type NextParams<
+  TMode extends 'async' | 'sync',
+  TType extends ActionTypes,
+  TNextAction extends ActionByType<TMode, TType> = ActionByType<TMode, TType>,
+> = [
   type: TType,
-  entrypoint: IBaseEntrypoint,
-  data: DataOf<Extract<ActionQueueItem, { type: TType }>>,
+  entrypoint: Entrypoint<TMode>,
+  data: TNextAction['data'],
   abortSignal?: AbortSignal | null,
-  needResult?: boolean,
 ];
 
-export type Next = <TType extends ActionQueueItem['type']>(
-  ...args: NextParams<TType>
-) => Extract<ActionQueueItem, { type: TType }>;
+export type YieldArg<TMode extends 'async' | 'sync'> = {
+  [K in ActionQueueItem<TMode>['type']]: NextParams<TMode, K>;
+}[ActionQueueItem<TMode>['type']];
 
-export type YieldNext = {
-  [K in ActionQueueItem['type']]: NextParams<K>;
-}[ActionQueueItem['type']];
+export type SyncScenarioFor<TResult> = {
+  next(arg: YieldResult<'sync'>): IteratorResult<YieldArg<'sync'>, TResult>;
+  return(value: TResult): IteratorResult<YieldArg<'sync'>, TResult>;
+  throw(e: unknown): IteratorResult<YieldArg<'sync'>, TResult>;
+  [Symbol.iterator](): SyncScenarioFor<TResult>;
+};
 
-export type ActionGenerator<TAction extends IBaseAction> = Generator<
-  YieldNext,
-  TAction extends IBaseAction<IBaseEntrypoint, infer TResult> ? TResult : never,
-  never
+export type AsyncScenarioFor<TResult> = {
+  next(
+    arg: YieldResult<'async'>
+  ): Promise<IteratorResult<YieldArg<'async'>, TResult>>;
+  return(
+    value: TResult | PromiseLike<TResult>
+  ): Promise<IteratorResult<YieldArg<'async'>, TResult>>;
+  throw(e: unknown): Promise<IteratorResult<YieldArg<'async'>, TResult>>;
+  [Symbol.asyncIterator](): AsyncScenarioFor<TResult>;
+};
+
+export type SyncScenarioForAction<TAction extends ActionQueueItem<'sync'>> =
+  SyncScenarioFor<TypeOfResult<'sync', TAction>>;
+
+export type AsyncScenarioForAction<TAction extends ActionQueueItem<'async'>> =
+  AsyncScenarioFor<TypeOfResult<'async', TAction>>;
+
+export type ScenarioFor<
+  TMode extends 'async' | 'sync',
+  TResult,
+> = TMode extends 'async'
+  ? AsyncScenarioFor<TResult>
+  : SyncScenarioFor<TResult>;
+
+export type ScenarioForAction<
+  TMode extends 'async' | 'sync',
+  TAction extends ActionQueueItem<TMode>,
+> = TAction extends ActionQueueItem<'sync'>
+  ? SyncScenarioForAction<TAction>
+  : TAction extends ActionQueueItem<'async'>
+  ? AsyncScenarioForAction<TAction>
+  : never;
+
+type Handler<TType extends ActionTypes> = {
+  sync: (
+    this: ActionByType<'sync', TType>
+  ) => SyncScenarioForAction<ActionQueueItem<'sync'>>;
+  async: (
+    this: ActionByType<'async', TType>
+  ) => AsyncScenarioForAction<ActionQueueItem<'async'>>;
+};
+
+export type Handlers<TMode extends 'async' | 'sync'> = {
+  [K in ActionQueueItem<TMode>['type']]: Handler<K>[TMode];
+};
+
+export type TypeOfResult<
+  TMode extends 'async' | 'sync',
+  T extends ActionQueueItem<TMode>,
+> = Exclude<T['result'], typeof Pending>;
+
+export type TypeOfData<
+  TMode extends 'async' | 'sync',
+  TNode extends ActionQueueItem<TMode>,
+> = TNode['data'];
+
+export type Next = <TMode extends 'async' | 'sync', TType extends ActionTypes>(
+  ...args: NextParams<TMode, TType>
+) => Extract<ActionQueueItem<TMode>, { type: TType }>;
+
+export type GetNext<TMode extends 'async' | 'sync'> = <
+  TType extends ActionTypes,
+  TNextAction extends ActionByType<TMode, TType> = ActionByType<TMode, TType>,
+>(
+  ...args: NextParams<TMode, TType, TNextAction>
+) => Generator<
+  [TType, Entrypoint<TMode>, TNextAction['data'], AbortSignal | null],
+  TypeOfResult<TMode, TNextAction>,
+  YieldResult<TMode>
 >;
 
-export type AsyncActionGenerator<TAction extends IBaseAction> = AsyncGenerator<
-  YieldNext,
-  TAction extends IBaseAction<IBaseEntrypoint, infer TResult> ? TResult : never,
-  never
->;
+// export type GetGeneratorForRes<
+//   TMode extends 'async' | 'sync',
+//   TRes extends Promise<void> | void,
+//   TAction extends ActionQueueItem<TMode>,
+// > = TRes extends Promise<void>
+//   ? AnyActionGenerator<TAction>
+//   : SyncActionGenerator<TAction>;
 
-export type AnyActionGenerator<TAction extends IBaseAction = ActionQueueItem> =
-  | ActionGenerator<TAction>
-  | AsyncActionGenerator<TAction>;
-
-export type GetGeneratorForRes<
-  TRes extends Promise<void> | void,
-  TAction extends IBaseAction,
-> = TRes extends Promise<void>
-  ? AnyActionGenerator<TAction>
-  : ActionGenerator<TAction>;
-
-export type Continuation<TAction extends IBaseAction = ActionQueueItem> = {
+export type Continuation<
+  TMode extends 'async' | 'sync',
+  TAction extends ActionQueueItem<TMode> = ActionQueueItem<TMode>,
+> = {
   abortSignal: AbortSignal | null;
   action: TAction;
-  generator: AnyActionGenerator<TAction>;
+  generator: ScenarioForAction<TMode, TAction>;
   resultFrom?: [entrypoint: IBaseEntrypoint, actionKey: string];
   uid: string;
   weight: number;
 };
 
-export interface IExplodeReexportsAction
-  extends IBaseAction<IEntrypoint, void> {
-  type: 'explodeReexports';
-}
-
-export interface IProcessEntrypointAction<
-  TEntrypoint extends IBaseEntrypoint = IBaseEntrypoint,
-> extends IBaseAction<TEntrypoint, void> {
-  type: 'processEntrypoint';
-}
-
-export interface ITransformAction extends IBaseAction<IEntrypoint, void> {
-  type: 'transform';
-}
-
-export interface IAddToCodeCacheAction extends IBaseAction<IEntrypoint, void> {
+export interface IAddToCodeCacheAction<TMode extends 'async' | 'sync'>
+  extends IBaseAction<
+    TMode,
+    void,
+    {
+      imports: Map<string, string[]> | null;
+      only: string[];
+      result: ITransformFileResult;
+    }
+  > {
   type: 'addToCodeCache';
-  data: {
-    imports: Map<string, string[]> | null;
-    only: string[];
-    result: ITransformFileResult;
-  };
 }
 
-export interface IFinalizeEntrypointAction
-  extends IBaseAction<IEntrypoint, void> {
-  type: 'finalizeEntrypoint';
-  finalizer: () => void;
-}
-
-export interface IResolvedImport {
-  importedFile: string;
-  importsOnly: string[];
-  resolved: string;
-}
-
-export interface IResolveImportsAction
-  extends IBaseAction<IBaseEntrypoint, IResolvedImport[]> {
-  type: 'resolveImports';
-  imports: Map<string, string[]> | null;
-}
-
-export interface IProcessImportsAction extends IBaseAction<IEntrypoint, void> {
-  type: 'processImports';
-  resolved: IResolvedImport[];
-}
-
-export interface IGetExportsAction extends IBaseAction<IEntrypoint, string[]> {
-  type: 'getExports';
-}
-
-export interface IEvalAction
-  extends IBaseAction<IEntrypoint, [ValueCache, string[]] | null> {
-  code: string;
-  type: 'evalFile';
-}
-
-export interface ICollectAction
-  extends IBaseAction<IEntrypoint, BabelFileResult> {
-  valueCache: ValueCache;
+export interface ICollectAction<TMode extends 'async' | 'sync'>
+  extends IBaseAction<TMode, BabelFileResult, { valueCache: ValueCache }> {
   type: 'collect';
 }
 
-export interface IExtracted {
-  cssText: string;
-  cssSourceMapText: string;
-  replacements: Replacements;
-  rules: Rules;
+export interface IEvalAction<TMode extends 'async' | 'sync'>
+  extends IBaseAction<TMode, [ValueCache, string[]] | null, { code: string }> {
+  type: 'evalFile';
 }
 
-export interface IExtractAction extends IBaseAction<IEntrypoint, IExtracted> {
-  processors: { artifacts: Artifact[] }[];
+export interface IExplodeReexportsAction<TMode extends 'async' | 'sync'>
+  extends IBaseAction<TMode, void, undefined> {
+  type: 'explodeReexports';
+}
+
+export interface IExtractAction<TMode extends 'async' | 'sync'>
+  extends IBaseAction<
+    TMode,
+    IExtracted,
+    { processors: { artifacts: Artifact[] }[] }
+  > {
   type: 'extract';
 }
 
-export interface IWorkflowActionNonLinariaResult {
-  code: string;
-  sourceMap: BabelFileResult['map'];
-}
-
-export interface IWorkflowActionLinariaResult
-  extends IExtracted,
-    IWorkflowActionNonLinariaResult {
-  dependencies: string[];
-}
-
-export interface IWorkflowAction
+export interface IFinalizeEntrypointAction<TMode extends 'async' | 'sync'>
   extends IBaseAction<
-    IEntrypoint,
-    IWorkflowActionLinariaResult | IWorkflowActionNonLinariaResult
+    TMode,
+    void,
+    {
+      finalizer: () => void;
+    }
+  > {
+  type: 'finalizeEntrypoint';
+}
+
+export interface IGetExportsAction<TMode extends 'async' | 'sync'>
+  extends IBaseAction<TMode, string[], undefined> {
+  type: 'getExports';
+}
+
+export interface IProcessEntrypointAction<TMode extends 'async' | 'sync'>
+  extends IBaseAction<TMode, void, undefined> {
+  type: 'processEntrypoint';
+}
+
+export interface IProcessImportsAction<TMode extends 'async' | 'sync'>
+  extends IBaseAction<
+    TMode,
+    void,
+    {
+      resolved: IResolvedImport[];
+    }
+  > {
+  type: 'processImports';
+}
+
+export interface IResolveImportsAction<TMode extends 'async' | 'sync'>
+  extends IBaseAction<
+    TMode,
+    IResolvedImport[],
+    {
+      imports: Map<string, string[]> | null;
+    }
+  > {
+  type: 'resolveImports';
+}
+
+export interface ITransformAction<TMode extends 'async' | 'sync'>
+  extends IBaseAction<TMode, void, undefined> {
+  type: 'transform';
+}
+
+export interface IWorkflowAction<TMode extends 'async' | 'sync'>
+  extends IBaseAction<
+    TMode,
+    IWorkflowActionLinariaResult | IWorkflowActionNonLinariaResult,
+    undefined
   > {
   type: 'workflow';
 }
 
-export type ActionQueueItem =
-  | IAddToCodeCacheAction
-  | IEvalAction
-  | IExplodeReexportsAction
-  | IExtractAction
-  | IFinalizeEntrypointAction
-  | IGetExportsAction
-  | ICollectAction
-  | IProcessEntrypointAction
-  | IProcessImportsAction
-  | IResolveImportsAction
-  | ITransformAction
-  | IWorkflowAction;
+export type ActionQueueItem<TMode extends 'async' | 'sync'> =
+  | IAddToCodeCacheAction<TMode>
+  | IEvalAction<TMode>
+  | IExplodeReexportsAction<TMode>
+  | IExtractAction<TMode>
+  | IFinalizeEntrypointAction<TMode>
+  | IGetExportsAction<TMode>
+  | ICollectAction<TMode>
+  | IProcessEntrypointAction<TMode>
+  | IProcessImportsAction<TMode>
+  | IResolveImportsAction<TMode>
+  | ITransformAction<TMode>
+  | IWorkflowAction<TMode>;
+
+export type ActionTypes = ActionQueueItem<'async' | 'sync'>['type'];

@@ -2,7 +2,9 @@ import type { TransformOptions } from '@babel/core';
 import type { File } from '@babel/types';
 
 import type { Debugger } from '@linaria/logger';
-import type { Evaluator } from '@linaria/utils';
+import type { Evaluator, StrictOptions } from '@linaria/utils';
+
+import type { Services } from './types';
 
 export interface IEntrypointCode {
   ast: File;
@@ -11,10 +13,10 @@ export interface IEntrypointCode {
   evaluator: Evaluator;
 }
 
-export type LoadAndParseFn<TServices, TPluginOptions> = (
-  services: TServices,
+export type LoadAndParseFn = (
+  services: Services,
   name: string,
   loadedCode: string | undefined,
   log: Debugger,
-  pluginOptions: TPluginOptions
+  pluginOptions: StrictOptions
 ) => IEntrypointCode | 'ignored';

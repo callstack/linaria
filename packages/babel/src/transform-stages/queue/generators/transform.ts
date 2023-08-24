@@ -14,11 +14,8 @@ import withLinariaMetadata from '../../../utils/withLinariaMetadata';
 import type {
   IEntrypoint,
   ITransformAction,
-  Services,
-  ActionGenerator,
+  SyncScenarioForAction,
 } from '../types';
-
-import { emitAndGetResultOf } from './helpers/emitAndGetResultOf';
 
 const EMPTY_FILE = '=== empty file ===';
 
@@ -131,19 +128,19 @@ export const prepareCode: PrepareCodeFn = (
 };
 
 export function* internalTransform(
-  prepareFn: PrepareCodeFn,
-  services: Services,
-  action: ITransformAction
-): ActionGenerator<ITransformAction> {
-  const { name, only, code, log, ast } = action.entrypoint;
+  this: ITransformAction<'sync'>,
+  prepareFn: PrepareCodeFn
+): SyncScenarioForAction<ITransformAction<'sync'>> {
+  const { babel, eventEmitter } = this.services;
+  const { name, only, code, log, ast } = this.entrypoint;
 
   log('>> (%o)', only);
 
   const [preparedCode, imports, metadata] = prepareFn(
-    services.babel,
-    action.entrypoint,
+    babel,
+    this.entrypoint,
     ast,
-    services.eventEmitter
+    eventEmitter
   );
 
   if (code === preparedCode) {
@@ -159,9 +156,9 @@ export function* internalTransform(
   }
 
   if (imports !== null && imports.size > 0) {
-    const resolvedImports = yield* emitAndGetResultOf(
+    const resolvedImports = yield* this.getNext(
       'resolveImports',
-      action.entrypoint,
+      this.entrypoint,
       {
         imports,
       }
@@ -170,7 +167,7 @@ export function* internalTransform(
     if (resolvedImports.length !== 0) {
       yield [
         'processImports',
-        action.entrypoint,
+        this.entrypoint,
         {
           resolved: resolvedImports,
         },
@@ -180,16 +177,14 @@ export function* internalTransform(
 
   yield [
     'addToCodeCache',
-    action.entrypoint,
+    this.entrypoint,
     {
-      data: {
-        imports,
-        result: {
-          code: preparedCode,
-          metadata,
-        },
-        only,
+      imports,
+      result: {
+        code: preparedCode,
+        metadata,
       },
+      only,
     },
   ];
 }
@@ -198,4 +193,6 @@ export function* internalTransform(
  * Prepares the code for evaluation. This includes removing dead and potentially unsafe code.
  * Emits resolveImports, processImports and addToCodeCache events.
  */
-export const transform = internalTransform.bind(null, prepareCode);
+export function transform(this: ITransformAction<'sync'>) {
+  return internalTransform.call(this, prepareCode);
+}

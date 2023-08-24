@@ -1,13 +1,12 @@
 import type {
   IAddToCodeCacheAction,
-  ActionGenerator,
   IFinalizeEntrypointAction,
+  SyncScenarioForAction,
 } from '../types';
 
 // eslint-disable-next-line require-yield
 export function* finalizeEntrypoint(
-  _services: unknown,
-  action: IFinalizeEntrypointAction
-): ActionGenerator<IAddToCodeCacheAction> {
-  action.finalizer();
+  this: IFinalizeEntrypointAction<'sync'>
+): SyncScenarioForAction<IAddToCodeCacheAction<'sync'>> {
+  this.data.finalizer();
 }

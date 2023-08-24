@@ -105,7 +105,11 @@ export class TransformCacheCollection {
       cacheLogger('content has changed, invalidate all for %s', filename);
       this.contentHashes.set(filename, newHash);
       this.invalidateForFile(filename);
+
+      return true;
     }
+
+    return false;
   }
 
   public add<
