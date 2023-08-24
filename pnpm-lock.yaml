@@ -383,9 +383,6 @@ importers:
       happy-dom:
         specifier: 10.8.0
         version: 10.8.0
-      nanoid:
-        specifier: ^3.3.6
-        version: 3.3.6
       source-map:
         specifier: ^0.7.3
         version: 0.7.3
@@ -2566,7 +2563,7 @@ packages:
       '@babel/helper-module-imports': 7.22.5
       '@babel/helper-plugin-utils': 7.22.5
       '@babel/plugin-syntax-jsx': 7.22.5(@babel/core@7.20.2)
-      '@babel/types': 7.22.5
+      '@babel/types': 7.20.2
     dev: true
 
   /@babel/plugin-transform-react-jsx@7.19.0(@babel/core@7.22.10):

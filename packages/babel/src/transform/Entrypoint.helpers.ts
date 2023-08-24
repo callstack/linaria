@@ -14,8 +14,8 @@ import {
   loadBabelOptions,
 } from '@linaria/utils';
 
-import type { Core } from '../../babel';
-import type { IBaseEntrypoint } from '../../types';
+import type { Core } from '../babel';
+import type { IBaseEntrypoint } from '../types';
 
 import type { Services } from './types';
 

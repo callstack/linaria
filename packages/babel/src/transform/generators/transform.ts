@@ -8,9 +8,9 @@ import type { File } from '@babel/types';
 import type { EvaluatorConfig, EventEmitter } from '@linaria/utils';
 import { buildOptions, getPluginKey } from '@linaria/utils';
 
-import type { Core } from '../../../babel';
-import type Module from '../../../module';
-import withLinariaMetadata from '../../../utils/withLinariaMetadata';
+import type { Core } from '../../babel';
+import type Module from '../../module';
+import withLinariaMetadata from '../../utils/withLinariaMetadata';
 import type {
   IEntrypoint,
   ITransformAction,
@@ -40,10 +40,10 @@ function runPreevalStage(
   const plugins = [
     ...preShakePlugins,
     [
-      require.resolve('../../../plugins/preeval'),
+      require.resolve('../../plugins/preeval'),
       { ...pluginOptions, eventEmitter },
     ],
-    [require.resolve('../../../plugins/dynamic-import')],
+    [require.resolve('../../plugins/dynamic-import')],
     ...(evalConfig.plugins ?? []).filter(
       (i) => !hasKeyInList(i, pluginOptions.highPriorityPlugins)
     ),

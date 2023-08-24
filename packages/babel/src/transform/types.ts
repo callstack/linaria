@@ -4,13 +4,9 @@ import type { Debugger } from '@linaria/logger';
 import type { ValueCache } from '@linaria/tags';
 import type { StrictOptions, EventEmitter, Artifact } from '@linaria/utils';
 
-import type { Core } from '../../babel';
-import type { TransformCacheCollection } from '../../cache';
-import type {
-  IBaseEntrypoint,
-  ITransformFileResult,
-  Options,
-} from '../../types';
+import type { Core } from '../babel';
+import type { TransformCacheCollection } from '../cache';
+import type { IBaseEntrypoint, ITransformFileResult, Options } from '../types';
 
 import type { Entrypoint } from './Entrypoint';
 import type { IEntrypointCode, LoadAndParseFn } from './Entrypoint.types';
@@ -87,6 +83,7 @@ export interface IBaseAction<TMode extends 'async' | 'sync', TResult, TData>
   result: TResult | typeof Pending;
   run: () => {
     next: (arg: YieldResult<TMode>) => AnyIteratorResult<TMode, TResult>;
+    throw(e: unknown): AnyIteratorResult<TMode, TResult>;
   };
   services: Services;
 }
@@ -241,17 +238,6 @@ export interface IExtractAction<TMode extends 'async' | 'sync'>
   type: 'extract';
 }
 
-export interface IFinalizeEntrypointAction<TMode extends 'async' | 'sync'>
-  extends IBaseAction<
-    TMode,
-    void,
-    {
-      finalizer: () => void;
-    }
-  > {
-  type: 'finalizeEntrypoint';
-}
-
 export interface IGetExportsAction<TMode extends 'async' | 'sync'>
   extends IBaseAction<TMode, string[], undefined> {
   type: 'getExports';
@@ -303,7 +289,6 @@ export type ActionQueueItem<TMode extends 'async' | 'sync'> =
   | IEvalAction<TMode>
   | IExplodeReexportsAction<TMode>
   | IExtractAction<TMode>
-  | IFinalizeEntrypointAction<TMode>
   | IGetExportsAction<TMode>
   | ICollectAction<TMode>
   | IProcessEntrypointAction<TMode>

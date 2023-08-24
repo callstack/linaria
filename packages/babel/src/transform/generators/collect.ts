@@ -2,7 +2,7 @@ import type { PluginItem } from '@babel/core';
 
 import { buildOptions } from '@linaria/utils';
 
-import { filename as collectorPlugin } from '../../../plugins/collector';
+import { filename as collectorPlugin } from '../../plugins/collector';
 import type { ICollectAction, SyncScenarioForAction } from '../types';
 
 /**

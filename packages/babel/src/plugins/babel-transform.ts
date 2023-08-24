@@ -6,10 +6,7 @@ import { syncResolve } from '@linaria/utils';
 import type { Core } from '../babel';
 import { TransformCacheCollection } from '../cache';
 import { transformSync } from '../transform';
-import type {
-  ICollectAction,
-  SyncScenarioForAction,
-} from '../transform-stages/queue/types';
+import type { ICollectAction, SyncScenarioForAction } from '../transform/types';
 import type { IPluginState, PluginOptions } from '../types';
 
 import { collector } from './collector';

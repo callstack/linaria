@@ -6,7 +6,7 @@ import stylis from 'stylis';
 
 import type { Replacements, Rules } from '@linaria/utils';
 
-import type { Options, PreprocessorFn } from '../../../types';
+import type { Options, PreprocessorFn } from '../../types';
 import type { IExtractAction, SyncScenarioForAction } from '../types';
 
 const STYLIS_DECLARATION = 1;

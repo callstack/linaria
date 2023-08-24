@@ -12,24 +12,24 @@ import * as babelCore from '@babel/core';
 import { EventEmitter } from '@linaria/utils';
 
 import { TransformCacheCollection } from './cache';
-import loadLinariaOptions from './transform-stages/helpers/loadLinariaOptions';
-import { Entrypoint } from './transform-stages/queue/Entrypoint';
-import { loadAndParse } from './transform-stages/queue/Entrypoint.helpers';
+import { Entrypoint } from './transform/Entrypoint';
+import { loadAndParse } from './transform/Entrypoint.helpers';
 import {
   asyncActionRunner,
   syncActionRunner,
-} from './transform-stages/queue/actions/actionRunner';
-import { baseHandlers } from './transform-stages/queue/generators';
+} from './transform/actions/actionRunner';
+import { baseHandlers } from './transform/generators';
 import {
   asyncResolveImports,
   syncResolveImports,
-} from './transform-stages/queue/generators/resolveImports';
-import { rootLog } from './transform-stages/queue/rootLog';
+} from './transform/generators/resolveImports';
+import loadLinariaOptions from './transform/helpers/loadLinariaOptions';
+import { rootLog } from './transform/rootLog';
 import type {
   Handlers,
   IResolveImportsAction,
   Services,
-} from './transform-stages/queue/types';
+} from './transform/types';
 import type { Result } from './types';
 
 type RequiredServices = 'options';
@@ -38,7 +38,7 @@ type PartialServices = Partial<Omit<Services, RequiredServices>> &
 
 type AllHandlers<TMode extends 'async' | 'sync'> = Handlers<TMode>;
 
-const withDefaultServices = ({
+export const withDefaultServices = ({
   babel = babelCore,
   cache = new TransformCacheCollection(),
   loadAndParseFn = loadAndParse,
@@ -69,7 +69,7 @@ export function transformSync(
     {
       ...baseHandlers,
       ...customHandlers,
-      resolveImports(this: IResolveImportsAction<'sync'>) {
+      resolveImports() {
         return syncResolveImports.call(this, syncResolve);
       },
     },

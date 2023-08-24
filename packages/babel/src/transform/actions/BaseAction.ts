@@ -92,32 +92,49 @@ export class BaseAction<
       this.activeScenarioNextResults = [];
     }
 
+    const processError = (e: unknown) => {
+      const nextResult = this.activeScenario!.throw(e);
+      this.activeScenarioNextResults.push(
+        nextResult as AnyIteratorResult<TMode, TypeOfResult<TMode, TAction>>
+      );
+    };
+
     let nextIdx = 0;
     return {
       next: (arg: YieldResult<TMode>) => {
         if (this.activeScenarioNextResults.length <= nextIdx) {
-          const nextResult = this.activeScenario!.next(arg);
-          if ('then' in nextResult) {
-            nextResult.then(
-              (result) => {
+          try {
+            const nextResult = this.activeScenario!.next(arg);
+            if ('then' in nextResult) {
+              nextResult.then((result) => {
                 if (result.done) {
                   this.result = result.value;
                 }
-              },
-              () => {}
-            );
-          } else if (nextResult.done) {
-            this.result = nextResult.value;
-          }
+              }, processError);
+            } else if (nextResult.done) {
+              this.result = nextResult.value;
+            }
 
-          this.activeScenarioNextResults.push(
-            nextResult as AnyIteratorResult<TMode, TypeOfResult<TMode, TAction>>
-          );
+            this.activeScenarioNextResults.push(
+              nextResult as AnyIteratorResult<
+                TMode,
+                TypeOfResult<TMode, TAction>
+              >
+            );
+          } catch (e) {
+            processError(e);
+          }
         }
 
         const nextResult = this.activeScenarioNextResults[nextIdx]!;
         nextIdx += 1;
         return nextResult;
+      },
+      throw: (
+        e: unknown
+      ): AnyIteratorResult<TMode, TypeOfResult<TMode, TAction>> => {
+        processError(e);
+        return this.activeScenarioNextResults[nextIdx]!;
       },
     };
   }

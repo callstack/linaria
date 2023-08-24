@@ -4,14 +4,15 @@ import { join } from 'path';
 import * as babel from '@babel/core';
 
 import {
+  baseHandlers,
   Entrypoint,
   loadLinariaOptions,
   parseFile,
   prepareCode,
-  TransformCacheCollection,
+  syncResolveImports,
+  withDefaultServices,
 } from '@linaria/babel-preset';
-import { linariaLogger } from '@linaria/logger';
-import { EventEmitter } from '@linaria/utils';
+import { EventEmitter, syncResolve } from '@linaria/utils';
 
 const testCasesDir = join(__dirname, '__fixtures__', 'prepare-code-test-cases');
 
@@ -59,15 +60,18 @@ describe('prepareCode', () => {
         .map((s) => s.trim());
 
       const sourceCode = restLines.join('\n');
-      const services = {
+      const services = withDefaultServices({
         babel,
-        cache: new TransformCacheCollection(),
         options: { root, filename: inputFilePath },
-        eventEmitter: EventEmitter.dummy,
-      };
-      const entrypoint = Entrypoint.create(
+      });
+      const entrypoint = Entrypoint.createSyncRoot(
         services,
-        { log: linariaLogger },
+        {
+          ...baseHandlers,
+          resolveImports() {
+            return syncResolveImports.call(this, syncResolve);
+          },
+        },
         inputFilePath,
         only,
         sourceCode,

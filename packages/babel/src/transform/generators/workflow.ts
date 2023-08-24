@@ -1,4 +1,4 @@
-import withLinariaMetadata from '../../../utils/withLinariaMetadata';
+import withLinariaMetadata from '../../utils/withLinariaMetadata';
 import type { IWorkflowAction, SyncScenarioForAction } from '../types';
 
 export function* workflow(

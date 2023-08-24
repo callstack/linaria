@@ -4,11 +4,42 @@ import type { File } from '@babel/types';
 import type { StrictOptions } from '@linaria/utils';
 import { EventEmitter } from '@linaria/utils';
 
-import { TransformCacheCollection } from '../../../cache';
+import { TransformCacheCollection } from '../../cache';
 import { Entrypoint } from '../Entrypoint';
 import type { LoadAndParseFn } from '../Entrypoint.types';
 import { rootLog } from '../rootLog';
-import type { Services, Handlers } from '../types';
+import type {
+  Services,
+  Handlers,
+  ActionQueueItem,
+  SyncScenarioForAction,
+} from '../types';
+
+export type SyncHandlers<TMode extends 'async' | 'sync'> = Handlers<TMode>;
+
+// eslint-disable-next-line require-yield
+function* emptyHandler<
+  TAction extends ActionQueueItem<'sync'>,
+>(): SyncScenarioForAction<TAction> {
+  return undefined as never;
+}
+
+export const getHandlers = <TMode extends 'async' | 'sync'>(
+  partial: Partial<SyncHandlers<TMode>>
+) => ({
+  addToCodeCache: jest.fn(emptyHandler),
+  collect: jest.fn(emptyHandler),
+  evalFile: jest.fn(emptyHandler),
+  explodeReexports: jest.fn(emptyHandler),
+  extract: jest.fn(emptyHandler),
+  getExports: jest.fn(emptyHandler),
+  processEntrypoint: jest.fn(emptyHandler),
+  processImports: jest.fn(emptyHandler),
+  resolveImports: jest.fn(emptyHandler),
+  transform: jest.fn(emptyHandler),
+  workflow: jest.fn(emptyHandler),
+  ...partial,
+});
 
 export const createServices: () => Services = () => ({
   babel,

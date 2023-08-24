@@ -1,7 +1,7 @@
 /* eslint-disable no-continue,no-await-in-loop,require-yield */
 import { getFileIdx } from '@linaria/utils';
 
-import type { IBaseEntrypoint } from '../../../types';
+import type { IBaseEntrypoint } from '../../types';
 import { includes } from '../Entrypoint.helpers';
 import type { IResolvedImport } from '../actions/types';
 import type {

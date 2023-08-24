@@ -1,7 +1,7 @@
 import type { ValueCache } from '@linaria/tags';
 
-import evaluate from '../../../evaluators';
-import hasLinariaPreval from '../../../utils/hasLinariaPreval';
+import evaluate from '../../evaluators';
+import hasLinariaPreval from '../../utils/hasLinariaPreval';
 import type { IEvalAction, SyncScenarioForAction } from '../types';
 
 const wrap = <T>(fn: () => T): T | Error => {

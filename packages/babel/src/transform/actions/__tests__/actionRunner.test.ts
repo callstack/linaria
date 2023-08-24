@@ -3,44 +3,18 @@ import {
   createSyncEntrypoint,
   createServices,
   createAsyncEntrypoint,
+  getHandlers,
 } from '../../__tests__/entrypoint-helpers';
 import type {
   Services,
   IProcessEntrypointAction,
-  ActionQueueItem,
   SyncScenarioForAction,
-  Handlers,
   IResolveImportsAction,
 } from '../../types';
 import { asyncActionRunner, syncActionRunner } from '../actionRunner';
 import type { IResolvedImport } from '../types';
 
-type SyncHandlers<TMode extends 'async' | 'sync'> = Handlers<TMode>;
-
 describe('actionRunner', () => {
-  function* emptyHandler<
-    TAction extends ActionQueueItem<'sync'>,
-  >(): SyncScenarioForAction<TAction> {
-    return undefined as any;
-  }
-
-  const getHandlers = <TMode extends 'async' | 'sync'>(
-    partial: Partial<SyncHandlers<TMode>>
-  ) => ({
-    addToCodeCache: jest.fn(emptyHandler),
-    collect: jest.fn(emptyHandler),
-    evalFile: jest.fn(emptyHandler),
-    explodeReexports: jest.fn(emptyHandler),
-    extract: jest.fn(emptyHandler),
-    finalizeEntrypoint: jest.fn(emptyHandler),
-    getExports: jest.fn(emptyHandler),
-    processEntrypoint: jest.fn(emptyHandler),
-    processImports: jest.fn(emptyHandler),
-    resolveImports: jest.fn(emptyHandler),
-    transform: jest.fn(emptyHandler),
-    workflow: jest.fn(emptyHandler),
-    ...partial,
-  });
   let services: Services;
 
   beforeEach(() => {

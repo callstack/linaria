@@ -1,6 +1,6 @@
 import type { ExportAllDeclaration, File, Node } from '@babel/types';
 
-import type { Core } from '../../../babel';
+import type { Core } from '../../babel';
 import type { IExplodeReexportsAction, SyncScenarioForAction } from '../types';
 
 import { findExportsInImports } from './getExports';
