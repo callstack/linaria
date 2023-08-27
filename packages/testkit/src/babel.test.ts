@@ -2770,7 +2770,7 @@ describe('strategy shaker', () => {
     );
   });
 
-  it('respects module-resolver plugin', async () => {
+  it('respects module-resolver plugin and show waring', async () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
     const { code, metadata } = await transformFile(
@@ -2783,6 +2783,36 @@ describe('strategy shaker', () => {
         'This works for now but will be an error in the future'
       )
     );
+    warn.mockRestore();
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it("respects module-resolver plugin and don't show waring", async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const { code, metadata } = await transformFile(
+      resolve(__dirname, './__fixtures__/with-babelrc/index.js'),
+      [
+        evaluator,
+        {
+          babelOptions: {
+            plugins: [
+              [
+                'module-resolver',
+                {
+                  alias: {
+                    _: './src/__fixtures__',
+                  },
+                },
+              ],
+            ],
+          },
+        },
+      ]
+    );
+
+    expect(warn).toHaveBeenCalledTimes(0);
     warn.mockRestore();
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();

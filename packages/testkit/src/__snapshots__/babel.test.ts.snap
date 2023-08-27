@@ -1959,7 +1959,7 @@ Dependencies: NA
 
 `;
 
-exports[`strategy shaker respects module-resolver plugin 1`] = `
+exports[`strategy shaker respects module-resolver plugin and don't show waring 1`] = `
 "import { styled } from '@linaria/react';
 export const H1 = /*#__PURE__*/styled('h1')({
   name: "H1",
@@ -1968,7 +1968,28 @@ export const H1 = /*#__PURE__*/styled('h1')({
 });"
 `;
 
-exports[`strategy shaker respects module-resolver plugin 2`] = `
+exports[`strategy shaker respects module-resolver plugin and don't show waring 2`] = `
+
+CSS:
+
+.H1_hlxjig5 {
+  color: foo;
+}
+
+Dependencies: ../re-exports
+
+`;
+
+exports[`strategy shaker respects module-resolver plugin and show waring 1`] = `
+"import { styled } from '@linaria/react';
+export const H1 = /*#__PURE__*/styled('h1')({
+  name: "H1",
+  class: "H1_hlxjig5",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker respects module-resolver plugin and show waring 2`] = `
 
 CSS:
 
