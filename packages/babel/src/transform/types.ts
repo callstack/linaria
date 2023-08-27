@@ -6,7 +6,7 @@ import type { StrictOptions, EventEmitter, Artifact } from '@linaria/utils';
 
 import type { Core } from '../babel';
 import type { TransformCacheCollection } from '../cache';
-import type { IBaseEntrypoint, ITransformFileResult, Options } from '../types';
+import type { IBaseEntrypoint, Options } from '../types';
 
 import type { Entrypoint } from './Entrypoint';
 import type { IEntrypointCode, LoadAndParseFn } from './Entrypoint.types';
@@ -15,6 +15,7 @@ import type {
   IResolvedImport,
   IWorkflowActionLinariaResult,
   IWorkflowActionNonLinariaResult,
+  ITransformResult,
 } from './actions/types';
 
 export type Services = {
@@ -44,23 +45,7 @@ export type ActionByType<
   }
 >;
 
-export interface IBaseServices {
-  eventEmitter: EventEmitter;
-}
-
 export const Pending = Symbol('pending');
-
-// export type AnyGenerator<TNext, TResult, TNextResults> =
-//   | Generator<TNext, TResult, TNextResults>
-//   | AsyncGenerator<TNext, TResult, TNextResults>;
-
-// export type AnyActionGenerator<
-//   TAction extends ActionQueueItem = ActionQueueItem,
-// > = AnyGenerator<YieldArg, TAction['result'], YieldResult>;
-
-// export type SyncActionGenerator<
-//   TAction extends ActionQueueItem = ActionQueueItem,
-// > = Generator<YieldArg, TAction['result'], YieldResult>;
 
 export type YieldResult<TMode extends 'async' | 'sync'> = Exclude<
   ActionQueueItem<TMode>['result'],
@@ -134,15 +119,6 @@ export type ScenarioFor<
   ? AsyncScenarioFor<TResult>
   : SyncScenarioFor<TResult>;
 
-export type ScenarioForAction<
-  TMode extends 'async' | 'sync',
-  TAction extends ActionQueueItem<TMode>,
-> = TAction extends ActionQueueItem<'sync'>
-  ? SyncScenarioForAction<TAction>
-  : TAction extends ActionQueueItem<'async'>
-  ? AsyncScenarioForAction<TAction>
-  : never;
-
 type Handler<TType extends ActionTypes> = {
   sync: (
     this: ActionByType<'sync', TType>
@@ -161,11 +137,6 @@ export type TypeOfResult<
   T extends ActionQueueItem<TMode>,
 > = Exclude<T['result'], typeof Pending>;
 
-export type TypeOfData<
-  TMode extends 'async' | 'sync',
-  TNode extends ActionQueueItem<TMode>,
-> = TNode['data'];
-
 export type Next = <TMode extends 'async' | 'sync', TType extends ActionTypes>(
   ...args: NextParams<TMode, TType>
 ) => Extract<ActionQueueItem<TMode>, { type: TType }>;
@@ -181,36 +152,8 @@ export type GetNext<TMode extends 'async' | 'sync'> = <
   YieldResult<TMode>
 >;
 
-// export type GetGeneratorForRes<
-//   TMode extends 'async' | 'sync',
-//   TRes extends Promise<void> | void,
-//   TAction extends ActionQueueItem<TMode>,
-// > = TRes extends Promise<void>
-//   ? AnyActionGenerator<TAction>
-//   : SyncActionGenerator<TAction>;
-
-export type Continuation<
-  TMode extends 'async' | 'sync',
-  TAction extends ActionQueueItem<TMode> = ActionQueueItem<TMode>,
-> = {
-  abortSignal: AbortSignal | null;
-  action: TAction;
-  generator: ScenarioForAction<TMode, TAction>;
-  resultFrom?: [entrypoint: IBaseEntrypoint, actionKey: string];
-  uid: string;
-  weight: number;
-};
-
 export interface IAddToCodeCacheAction<TMode extends 'async' | 'sync'>
-  extends IBaseAction<
-    TMode,
-    void,
-    {
-      imports: Map<string, string[]> | null;
-      only: string[];
-      result: ITransformFileResult;
-    }
-  > {
+  extends IBaseAction<TMode, void, ITransformResult> {
   type: 'addToCodeCache';
 }
 
@@ -244,7 +187,7 @@ export interface IGetExportsAction<TMode extends 'async' | 'sync'>
 }
 
 export interface IProcessEntrypointAction<TMode extends 'async' | 'sync'>
-  extends IBaseAction<TMode, void, undefined> {
+  extends IBaseAction<TMode, ITransformResult | null, undefined> {
   type: 'processEntrypoint';
 }
 
@@ -271,7 +214,7 @@ export interface IResolveImportsAction<TMode extends 'async' | 'sync'>
 }
 
 export interface ITransformAction<TMode extends 'async' | 'sync'>
-  extends IBaseAction<TMode, void, undefined> {
+  extends IBaseAction<TMode, ITransformResult | null, undefined> {
   type: 'transform';
 }
 

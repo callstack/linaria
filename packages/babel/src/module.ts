@@ -25,6 +25,12 @@ import type { StrictOptions } from '@linaria/utils';
 import { getFileIdx } from '@linaria/utils';
 
 import { TransformCacheCollection } from './cache';
+import { Entrypoint } from './transform/Entrypoint';
+import { syncActionRunner } from './transform/actions/actionRunner';
+import { baseProcessingHandlers } from './transform/generators/baseProcessingHandlers';
+import { syncResolveImports } from './transform/generators/resolveImports';
+import loadLinariaOptions from './transform/helpers/loadLinariaOptions';
+import { withDefaultServices } from './transform/helpers/withDefaultServices';
 import type { IModule } from './types';
 import createVmContext from './vm/createVmContext';
 
@@ -381,10 +387,51 @@ class Module {
       log('code-cache', '❌ file has not been processed during prepare stage');
     }
 
-    // If code wasn't extracted from cache, read it from the file system.
-    // It indicates that we were unable to process some of the imports on stage1
-    // TODO: transpile the file
-    return fs.readFileSync(filename, 'utf-8');
+    // If code wasn't extracted from cache, it indicates that we were unable
+    // to process some of the imports on stage1. Let's try to reprocess.
+    const services = withDefaultServices({
+      cache: this.cache,
+      options: {
+        filename,
+      },
+    });
+
+    const syncResolve = (what: string, importer: string): string => {
+      return this.moduleImpl._resolveFilename(what, {
+        id: importer,
+        filename: importer,
+        paths: this.moduleImpl._nodeModulePaths(path.dirname(importer)),
+      });
+    };
+
+    const pluginOptions = loadLinariaOptions({});
+    const code = fs.readFileSync(filename, 'utf-8');
+    const entrypoint = Entrypoint.createSyncRoot(
+      services,
+      {
+        ...baseProcessingHandlers,
+        resolveImports() {
+          return syncResolveImports.call(this, syncResolve);
+        },
+      },
+      filename,
+      onlyAsString ? onlyAsString.split(',') : ['*'],
+      code,
+      pluginOptions
+    );
+
+    if (entrypoint === 'ignored') {
+      log(
+        'code-cache',
+        '✅ file has been ignored during prepare stage. Original code will be used'
+      );
+      return code;
+    }
+
+    const action = entrypoint.createAction('processEntrypoint', undefined);
+    const actionResult = syncActionRunner(action);
+
+    return actionResult?.result?.code ?? code;
   }
 
   require: {
@@ -419,6 +466,7 @@ class Module {
 
       this.debug('require', `${id} -> ${filename}`);
 
+      const code = this.getCachedCode(filename, onlyAsString, this.debug);
       const cached = this.getCachedModule(filename, onlyAsString);
       if (cached) {
         return cached.exports;
@@ -435,7 +483,6 @@ class Module {
 
       this.cache.add('eval', filename, m);
 
-      const code = this.getCachedCode(filename, onlyAsString, this.debug);
       if (code === null) {
         m.exports = filename;
         m.#isEvaluated = true;

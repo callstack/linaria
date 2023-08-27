@@ -7,13 +7,7 @@
  * - return transformed code (without Linaria template literals), generated CSS, source maps and babel metadata from transform step.
  */
 
-import * as babelCore from '@babel/core';
-
-import { EventEmitter } from '@linaria/utils';
-
-import { TransformCacheCollection } from './cache';
 import { Entrypoint } from './transform/Entrypoint';
-import { loadAndParse } from './transform/Entrypoint.helpers';
 import {
   asyncActionRunner,
   syncActionRunner,
@@ -24,7 +18,7 @@ import {
   syncResolveImports,
 } from './transform/generators/resolveImports';
 import loadLinariaOptions from './transform/helpers/loadLinariaOptions';
-import { rootLog } from './transform/rootLog';
+import { withDefaultServices } from './transform/helpers/withDefaultServices';
 import type {
   Handlers,
   IResolveImportsAction,
@@ -37,22 +31,6 @@ type PartialServices = Partial<Omit<Services, RequiredServices>> &
   Pick<Services, RequiredServices>;
 
 type AllHandlers<TMode extends 'async' | 'sync'> = Handlers<TMode>;
-
-export const withDefaultServices = ({
-  babel = babelCore,
-  cache = new TransformCacheCollection(),
-  loadAndParseFn = loadAndParse,
-  log = rootLog,
-  options,
-  eventEmitter = EventEmitter.dummy,
-}: PartialServices): Services => ({
-  babel,
-  cache,
-  loadAndParseFn,
-  log,
-  options,
-  eventEmitter,
-});
 
 export function transformSync(
   partialServices: PartialServices,

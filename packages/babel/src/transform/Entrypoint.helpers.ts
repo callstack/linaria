@@ -60,8 +60,18 @@ export function parseFile(
   return parseResult;
 }
 
-const isModuleResolver = (plugin: PluginItem) =>
-  getPluginKey(plugin) === 'module-resolver';
+const isModuleResolver = (plugin: PluginItem) => {
+  const key = getPluginKey(plugin);
+  if (!key) return false;
+
+  if (['module-resolver', 'babel-plugin-module-resolver'].includes(key)) {
+    return true;
+  }
+
+  return /([\\/])babel-plugin-module-resolver\1/.test(key);
+};
+
+let moduleResolverWarned = false;
 
 function buildConfigs(
   services: Services,
@@ -98,12 +108,16 @@ function buildConfigs(
   const rawHasModuleResolver = rawConfig.plugins?.some(isModuleResolver);
 
   if (parseHasModuleResolver && !rawHasModuleResolver) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `[linaria] ${name} has a module-resolver plugin in its babelrc, but it is not present` +
-        `in the babelOptions for the linaria plugin. This works for now but will be an error in the future.` +
-        `Please add the module-resolver plugin to the babelOptions for the linaria plugin.`
-    );
+    if (!moduleResolverWarned) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[linaria] ${name} has a module-resolver plugin in its babelrc, but it is not present ` +
+          `in the babelOptions for the linaria plugin. This works for now but will be an error in the future. ` +
+          `Please add the module-resolver plugin to the babelOptions for the linaria plugin.`
+      );
+
+      moduleResolverWarned = true;
+    }
 
     rawConfig.plugins = [
       ...(parseConfig.plugins?.filter((plugin) => isModuleResolver(plugin)) ??

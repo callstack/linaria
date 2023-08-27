@@ -1,4 +1,5 @@
 import { isAborted } from '../actions/AbortError';
+import type { ITransformResult } from '../actions/types';
 import type { IProcessEntrypointAction, SyncScenarioForAction } from '../types';
 
 /**
@@ -28,6 +29,7 @@ export function* processEntrypoint(
     abortController.abort();
   });
 
+  let result: ITransformResult | null = null;
   try {
     yield [
       'explodeReexports',
@@ -35,7 +37,12 @@ export function* processEntrypoint(
       undefined,
       abortController.signal,
     ];
-    yield ['transform', this.entrypoint, undefined, abortController.signal];
+    result = yield* this.getNext(
+      'transform',
+      this.entrypoint,
+      undefined,
+      abortController.signal
+    );
   } catch (e) {
     if (isAborted(e)) {
       log('aborting processing');
@@ -50,8 +57,15 @@ export function* processEntrypoint(
   const { supersededWith } = this.entrypoint;
   if (supersededWith) {
     log('entrypoint superseded, rescheduling processing');
-    yield ['processEntrypoint', supersededWith, undefined, null];
-  } else {
-    log('entrypoint processing finished');
+    result = yield* this.getNext(
+      'processEntrypoint',
+      supersededWith,
+      undefined,
+      null
+    );
   }
+
+  log('entrypoint processing finished');
+
+  return result;
 }
