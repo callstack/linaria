@@ -3077,6 +3077,7 @@ describe('strategy shaker', () => {
         evaluated: true,
         evaluatedOnly: only,
         generation: 1,
+        exports,
         exportsValues,
         ignored: false,
         log: linariaLogger,

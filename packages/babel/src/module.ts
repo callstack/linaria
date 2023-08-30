@@ -24,7 +24,7 @@ import { TransformCacheCollection } from './cache';
 import { Entrypoint } from './transform/Entrypoint';
 import { getStack, isSuperSet } from './transform/Entrypoint.helpers';
 import type { IEntrypointDependency } from './transform/Entrypoint.types';
-import type { EvaluatedEntrypoint } from './transform/EvaluatedEntrypoint';
+import type { IEvaluatedEntrypoint } from './transform/EvaluatedEntrypoint';
 import { syncActionRunner } from './transform/actions/actionRunner';
 import { baseProcessingHandlers } from './transform/generators/baseProcessingHandlers';
 import { syncResolveImports } from './transform/generators/resolveImports';
@@ -231,7 +231,12 @@ class Module {
   }
 
   evaluate(): void {
-    const { entrypoint } = this;
+    let { entrypoint } = this;
+    // Evaluate could be called before the entrypoint was superseded.
+    // In this case, we need to find the latest entrypoint.
+    while (entrypoint.supersededWith) {
+      entrypoint = entrypoint.supersededWith;
+    }
 
     this.cache.add(
       'entrypoints',
@@ -308,7 +313,7 @@ class Module {
     filename: string,
     only: string[],
     log: Debugger
-  ): Entrypoint | EvaluatedEntrypoint | null {
+  ): Entrypoint | IEvaluatedEntrypoint | null {
     const extension = path.extname(filename);
     if (extension !== '.json' && !this.extensions.includes(extension)) {
       return null;

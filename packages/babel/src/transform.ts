@@ -82,6 +82,10 @@ export function transformSync(
 
     return result;
   } catch (err) {
+    if (process.env.NODE_ENV === 'test') {
+      throw err;
+    }
+
     // eslint-disable-next-line no-console
     console.error(`Error during transform of ${entrypoint.name}:`, err);
 
@@ -151,6 +155,10 @@ export default async function transform(
 
     return result;
   } catch (err) {
+    if (process.env.NODE_ENV === 'test') {
+      throw err;
+    }
+
     // eslint-disable-next-line no-console
     console.error(`Error during transform of ${entrypoint.name}:`, err);
 

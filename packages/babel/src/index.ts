@@ -17,6 +17,8 @@ export { default as withLinariaMetadata } from './utils/withLinariaMetadata';
 export { default as Module, DefaultModuleImplementation } from './module';
 export { default as transform } from './transform';
 export * from './types';
+export { EvaluatedEntrypoint } from './transform/EvaluatedEntrypoint';
+export type { IEvaluatedEntrypoint } from './transform/EvaluatedEntrypoint';
 export { parseFile } from './transform/Entrypoint.helpers';
 export type { LoadAndParseFn } from './transform/Entrypoint.types';
 export { baseHandlers } from './transform/generators';

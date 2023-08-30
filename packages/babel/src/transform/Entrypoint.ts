@@ -160,6 +160,7 @@ export class Entrypoint extends BaseEntrypoint {
         services,
         parent
           ? {
+              evaluated: parent.evaluated,
               log: parent.log,
               name: parent.name,
               parent: parent.parent,
