@@ -13,10 +13,6 @@ export class StackOfMaps<TKeys, TValues> implements Map<TKeys, TValues> {
     return this.entries();
   }
 
-  public join(stack: StackOfMaps<TKeys, TValues>): void {
-    this.stack.unshift(...stack.stack);
-  }
-
   public clear(): void {
     this.stack.forEach((map) => map.clear());
   }
@@ -79,6 +75,10 @@ export class StackOfMaps<TKeys, TValues> implements Map<TKeys, TValues> {
     }
 
     return false;
+  }
+
+  public join(stack: StackOfMaps<TKeys, TValues>): void {
+    this.stack.unshift(...stack.stack);
   }
 
   public *keys(): IterableIterator<TKeys> {

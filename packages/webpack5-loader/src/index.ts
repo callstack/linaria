@@ -22,10 +22,10 @@ export { LinariaDebugPlugin } from './LinariaDebugPlugin';
 const outputCssLoader = require.resolve('./outputCssLoader');
 
 type Loader = RawLoaderDefinitionFunction<{
-  sourceMap?: boolean;
-  preprocessor?: Preprocessor;
-  extension?: string;
   cacheProvider?: string | ICache;
+  extension?: string;
+  preprocessor?: Preprocessor;
+  sourceMap?: boolean;
 }>;
 
 const cache = new TransformCacheCollection();

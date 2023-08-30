@@ -55,6 +55,10 @@ export default abstract class TaggedTemplateProcessor extends BaseProcessor {
     }
   }
 
+  public override toString(): string {
+    return `${super.toString()}\`…\``;
+  }
+
   /**
    * It is called for each resolved expression in a template literal.
    * @param node
@@ -75,8 +79,4 @@ export default abstract class TaggedTemplateProcessor extends BaseProcessor {
     cssText: string,
     loc?: SourceLocation | null
   ): Rules;
-
-  public override toString(): string {
-    return `${super.toString()}\`…\``;
-  }
 }

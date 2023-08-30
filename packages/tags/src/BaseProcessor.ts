@@ -89,11 +89,35 @@ export abstract class BaseProcessor {
     [[, this.callee]] = params;
   }
 
-  public abstract build(values: ValueCache): void;
+  /**
+   * A replacement for tag referenced in a template literal.
+   */
+  public abstract get asSelector(): string;
+
+  /**
+   * A replacement for the tag in evaluation time.
+   * For example, `css` tag will be replaced with its className,
+   * whereas `styled` tag will be replaced with an object with metadata.
+   */
+  public abstract get value(): Expression;
 
   public isValidValue(value: unknown): value is Value {
     return typeof value === 'function' || isCSSable(value) || hasMeta(value);
   }
+
+  public toString(): string {
+    return this.tagSourceCode();
+  }
+
+  protected tagSourceCode(): string {
+    if (this.callee.type === 'Identifier') {
+      return this.callee.name;
+    }
+
+    return generator(this.callee).code;
+  }
+
+  public abstract build(values: ValueCache): void;
 
   /**
    * Perform a replacement for the tag in evaluation time.
@@ -110,28 +134,4 @@ export abstract class BaseProcessor {
    * they will be replaced with placeholders.
    */
   public abstract doRuntimeReplacement(): void;
-
-  /**
-   * A replacement for tag referenced in a template literal.
-   */
-  public abstract get asSelector(): string;
-
-  /**
-   * A replacement for the tag in evaluation time.
-   * For example, `css` tag will be replaced with its className,
-   * whereas `styled` tag will be replaced with an object with metadata.
-   */
-  public abstract get value(): Expression;
-
-  protected tagSourceCode(): string {
-    if (this.callee.type === 'Identifier') {
-      return this.callee.name;
-    }
-
-    return generator(this.callee).code;
-  }
-
-  public toString(): string {
-    return this.tagSourceCode();
-  }
 }

@@ -7,7 +7,7 @@ import type { IExplodeReexportsAction, SyncScenarioForAction } from '../types';
 import { findExportsInImports } from './getExports';
 
 const getWildcardReexport = (babel: Core, ast: File) => {
-  const reexportsFrom: { source: string; node: ExportAllDeclaration }[] = [];
+  const reexportsFrom: { node: ExportAllDeclaration; source: string }[] = [];
   ast.program.body.forEach((node) => {
     if (
       babel.types.isExportAllDeclaration(node) &&

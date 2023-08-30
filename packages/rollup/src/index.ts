@@ -23,17 +23,17 @@ import type { Plugin as VitePlugin } from '@linaria/vite';
 import vitePlugin from '@linaria/vite';
 
 type RollupPluginOptions = {
-  include?: string | string[];
   exclude?: string | string[];
-  sourceMap?: boolean;
+  include?: string | string[];
   preprocessor?: Preprocessor;
+  sourceMap?: boolean;
 } & Partial<PluginOptions>;
 
 export default function linaria({
-  include,
   exclude,
-  sourceMap,
+  include,
   preprocessor,
+  sourceMap,
   ...rest
 }: RollupPluginOptions = {}): Plugin {
   const filter = createFilter(include, exclude);
@@ -149,10 +149,10 @@ export default function linaria({
     ownKeys() {
       // Rollup doesn't ask config about its own keys, so it is Vite.
       vite = vitePlugin({
-        include,
         exclude,
-        sourceMap,
+        include,
         preprocessor,
+        sourceMap,
         ...rest,
       });
 

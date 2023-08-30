@@ -36,7 +36,7 @@ function extractCssFromAst(
   rules: Rules,
   originalCode: string,
   options: Pick<Options, 'preprocessor' | 'filename' | 'outputFilename'>
-): { cssText: string; cssSourceMapText: string; rules: Rules } {
+): { cssSourceMapText: string; cssText: string; rules: Rules } {
   const mappings: Mapping[] = [];
 
   let cssText = '';

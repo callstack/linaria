@@ -22,10 +22,10 @@ import { createPerfMeter, getFileIdx, syncResolve } from '@linaria/utils';
 
 type VitePluginOptions = {
   debug?: IPerfMeterOptions | false | null | undefined;
-  include?: FilterPattern;
   exclude?: FilterPattern;
-  sourceMap?: boolean;
+  include?: FilterPattern;
   preprocessor?: Preprocessor;
+  sourceMap?: boolean;
 } & Partial<PluginOptions>;
 
 export { Plugin };
@@ -47,7 +47,7 @@ export default function linaria({
   const { emitter, onDone } = createPerfMeter(debug ?? false);
 
   // <dependency id, targets>
-  const targets: { id: string; dependencies: string[] }[] = [];
+  const targets: { dependencies: string[]; id: string }[] = [];
   const cache = new TransformCacheCollection();
   return {
     name: 'linaria',
@@ -90,12 +90,10 @@ export default function linaria({
         cache.invalidateForFile(depId);
       }
 
-      const modules = affected
+      return affected
         .map((target) => devServer.moduleGraph.getModuleById(target.id))
         .concat(ctx.modules)
         .filter((m): m is ModuleNode => !!m);
-
-      return modules;
     },
     async transform(code: string, url: string) {
       const [id] = url.split('?', 1);

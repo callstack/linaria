@@ -8,10 +8,10 @@ import type { IGetExportsAction, SyncScenarioForAction } from '../types';
 export function findExportsInImports(
   entrypoint: Entrypoint,
   imports: IEntrypointDependency[]
-): { import: string; entrypoint: Entrypoint }[] {
+): { entrypoint: Entrypoint; import: string }[] {
   const results: {
-    import: string;
     entrypoint: Entrypoint;
+    import: string;
   }[] = [];
 
   for (const imp of imports) {
@@ -28,8 +28,8 @@ export function findExportsInImports(
     }
 
     results.push({
-      import: imp.source,
       entrypoint: newEntrypoint,
+      import: imp.source,
     });
   }
 

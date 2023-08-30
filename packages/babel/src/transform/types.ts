@@ -20,10 +20,10 @@ import type {
 export type Services = {
   babel: Core;
   cache: TransformCacheCollection;
+  eventEmitter: EventEmitter;
   loadAndParseFn: LoadAndParseFn;
   log: Debugger;
   options: Options;
-  eventEmitter: EventEmitter;
 };
 
 export interface IBaseNode {
@@ -78,19 +78,19 @@ export type YieldArg = {
 }[ActionQueueItem['type']];
 
 export type SyncScenarioFor<TResult> = {
+  [Symbol.iterator](): SyncScenarioFor<TResult>;
   next(arg: YieldResult): IteratorResult<YieldArg, TResult>;
   return(value: TResult): IteratorResult<YieldArg, TResult>;
   throw(e: unknown): IteratorResult<YieldArg, TResult>;
-  [Symbol.iterator](): SyncScenarioFor<TResult>;
 };
 
 export type AsyncScenarioFor<TResult> = {
+  [Symbol.asyncIterator](): AsyncScenarioFor<TResult>;
   next(arg: YieldResult): Promise<IteratorResult<YieldArg, TResult>>;
   return(
     value: TResult | PromiseLike<TResult>
   ): Promise<IteratorResult<YieldArg, TResult>>;
   throw(e: unknown): Promise<IteratorResult<YieldArg, TResult>>;
-  [Symbol.asyncIterator](): AsyncScenarioFor<TResult>;
 };
 
 export type SyncScenarioForAction<TAction extends ActionQueueItem> =
@@ -103,8 +103,8 @@ export type Handler<
   TMode extends 'async' | 'sync',
   TAction extends ActionQueueItem,
 > = (this: BaseAction<TAction>) => {
-  sync: SyncScenarioForAction<TAction>;
   async: AsyncScenarioForAction<TAction>;
+  sync: SyncScenarioForAction<TAction>;
 }[TMode];
 
 export type Handlers<TMode extends 'async' | 'sync'> = {

@@ -14,7 +14,6 @@ import type {
 import { buildOptions, getPluginKey } from '@linaria/utils';
 
 import type { Core } from '../../babel';
-import type Module from '../../module';
 import withLinariaMetadata from '../../utils/withLinariaMetadata';
 import type { Entrypoint } from '../Entrypoint';
 import type { ITransformAction, SyncScenarioForAction } from '../types';
@@ -71,7 +70,11 @@ type PrepareCodeFn = (
   item: Entrypoint,
   originalAst: File,
   eventEmitter: EventEmitter
-) => [code: string, imports: Module['imports'], metadata?: BabelFileMetadata];
+) => [
+  code: string,
+  imports: Map<string, string[]> | null,
+  metadata?: BabelFileMetadata,
+];
 
 export const prepareCode = (
   babel: Core,

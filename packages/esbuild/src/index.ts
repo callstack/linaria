@@ -18,9 +18,9 @@ import {
 } from '@linaria/babel-preset';
 
 type EsbuildPluginOptions = {
-  sourceMap?: boolean;
-  preprocessor?: Preprocessor;
   esbuildOptions?: TransformOptions;
+  preprocessor?: Preprocessor;
+  sourceMap?: boolean;
 } & Partial<PluginOptions>;
 
 const nodeModulesRegex = /^(?:.*[\\/])?node_modules(?:[\\/].*)?$/;

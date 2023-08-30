@@ -31,9 +31,19 @@ type GetBase<TAction extends ActionQueueItem> = IBaseAction<
 export class BaseAction<TAction extends ActionQueueItem>
   implements GetBase<TAction>
 {
-  result: TypeOfResult<TAction> | typeof Pending = Pending;
-
   public readonly idx: string;
+
+  public result: TypeOfResult<TAction> | typeof Pending = Pending;
+
+  private activeScenario:
+    | SyncScenarioForAction<TAction>
+    | AsyncScenarioForAction<TAction>
+    | null = null;
+
+  private activeScenarioNextResults: AnyIteratorResult<
+    'async' | 'sync',
+    TypeOfResult<TAction>
+  >[] = [];
 
   public constructor(
     public readonly type: TAction['type'],
@@ -66,16 +76,6 @@ export class BaseAction<TAction extends ActionQueueItem>
       abortSignal,
     ]) as TypeOfResult<TNextAction>;
   }
-
-  private activeScenario:
-    | SyncScenarioForAction<TAction>
-    | AsyncScenarioForAction<TAction>
-    | null = null;
-
-  private activeScenarioNextResults: AnyIteratorResult<
-    'async' | 'sync',
-    TypeOfResult<TAction>
-  >[] = [];
 
   public run<TMode extends 'async' | 'sync'>(handler: Handler<TMode, TAction>) {
     type IterationResult = AnyIteratorResult<TMode, TypeOfResult<TAction>>;

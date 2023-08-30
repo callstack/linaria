@@ -31,10 +31,6 @@ export type PluginOptions = StrictOptions & {
   stage?: Stage;
 };
 
-export interface IModule {
-  readonly exports: unknown;
-}
-
 export type ParentEntrypoint = {
   log: Debugger;
   name: string;
@@ -44,30 +40,30 @@ export type ParentEntrypoint = {
 export type Dependencies = string[];
 
 export interface IPluginState extends PluginPass {
-  processors: BaseProcessor[];
   dependencies: Dependencies;
   file: BabelFile & {
     metadata: {
       linaria?: LinariaMetadata;
     };
   };
+  processors: BaseProcessor[];
 }
 
 export interface ITransformFileResult {
-  metadata?: BabelFileMetadata;
   code: string;
+  metadata?: BabelFileMetadata;
 }
 
 export type Stage = 'preeval' | 'collect';
 
 export type Result = {
   code: string;
-  sourceMap?: RawSourceMap | null;
-  cssText?: string;
   cssSourceMapText?: string;
+  cssText?: string;
   dependencies?: string[];
-  rules?: Rules;
   replacements?: Replacement[];
+  rules?: Rules;
+  sourceMap?: RawSourceMap | null;
 };
 
 export type Options = {
@@ -85,6 +81,6 @@ export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
 export type MissedBabelCoreTypes = {
   File: new (
     options: { filename: string },
-    file: { code: string; ast: File }
+    file: { ast: File; code: string }
   ) => { path: NodePath<File> };
 };

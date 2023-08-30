@@ -137,22 +137,6 @@ const createExports = (container: IExportsContainer) => {
 const EXPORTS = Symbol('exports');
 
 export abstract class BaseEntrypoint {
-  public get exports() {
-    if (this.exportsValues.has(EXPORTS)) {
-      return this.exportsValues.get(EXPORTS);
-    }
-
-    return createExports(this);
-  }
-
-  public set exports(value: unknown) {
-    if (isProxy(value)) {
-      this.exportsValues.join(getLazyValues(value));
-    } else {
-      this.exportsValues.set(EXPORTS, value);
-    }
-  }
-
   public readonly idx: string;
 
   public readonly log: Debugger;
@@ -169,5 +153,21 @@ export abstract class BaseEntrypoint {
     this.idx = getIdx(name);
     this.log =
       parent?.log.extend(this.idx, '->') ?? services.log.extend(this.idx);
+  }
+
+  public get exports() {
+    if (this.exportsValues.has(EXPORTS)) {
+      return this.exportsValues.get(EXPORTS);
+    }
+
+    return createExports(this);
+  }
+
+  public set exports(value: unknown) {
+    if (isProxy(value)) {
+      this.exportsValues.join(getLazyValues(value));
+    } else {
+      this.exportsValues.set(EXPORTS, value);
+    }
   }
 }

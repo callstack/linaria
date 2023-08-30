@@ -2,8 +2,8 @@ import { withLinariaMetadata } from '@linaria/babel-preset';
 import type { LinariaMetadata } from '@linaria/utils';
 
 type Serializer<T> = {
-  test: (value: unknown) => value is T;
   serialize: (value: T) => string;
+  test: (value: unknown) => value is T;
 };
 
 export default {

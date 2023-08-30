@@ -60,12 +60,12 @@ export type FeatureFlags<
 
 export type StrictOptions = {
   babelOptions: TransformOptions;
-  highPriorityPlugins: string[];
   classNameSlug?: string | ClassNameFn;
   displayName: boolean;
   evaluate: boolean;
   extensions: string[];
   features: FeatureFlags;
+  highPriorityPlugins: string[];
   ignore?: RegExp;
   rules: EvalRule[];
   tagResolver?: (source: string, tag: string) => string | null;

@@ -130,7 +130,7 @@ async function processFiles(files: (number | string)[], options: Options) {
   );
   const cache = new TransformCacheCollection();
 
-  const modifiedFiles: { name: string; content: string }[] = [];
+  const modifiedFiles: { content: string; name: string }[] = [];
 
   // eslint-disable-next-line no-restricted-syntax
   for (const filename of resolvedFiles) {

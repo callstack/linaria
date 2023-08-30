@@ -3,8 +3,8 @@ import type { BabelFileResult } from '@babel/core';
 import type { Replacements, Rules } from '@linaria/utils';
 
 export interface IExtracted {
-  cssText: string;
   cssSourceMapText: string;
+  cssText: string;
   replacements: Replacements;
   rules: Rules;
 }

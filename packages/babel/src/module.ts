@@ -34,11 +34,11 @@ import { createVmContext } from './vm/createVmContext';
 
 type HiddenModuleMembers = {
   _extensions: { [key: string]: () => void };
-  _nodeModulePaths(filename: string): string[];
   _resolveFilename: (
     id: string,
-    options: { id: string; filename: string; paths: string[] }
+    options: { filename: string; id: string; paths: string[] }
   ) => string;
+  _nodeModulePaths(filename: string): string[];
 };
 
 export const DefaultModuleImplementation = NativeModule as typeof NativeModule &
@@ -96,28 +96,101 @@ function getUncached(cached: string | string[], test: string[]): string[] {
   return test.filter((t) => !cachedSet.has(t));
 }
 
+function resolve(
+  this: { resolveDependency: (id: string) => IEntrypointDependency },
+  id: string
+): string {
+  const { resolved } = this.resolveDependency(id);
+  invariant(resolved, `Unable to resolve "${id}"`);
+  return resolved;
+}
+
 class Module {
-  #isEvaluated = false;
+  public readonly callstack: string[] = [];
 
-  readonly idx: string;
+  public readonly debug: Debugger;
 
-  id: string;
+  public readonly dependencies: string[];
 
-  ignored: boolean;
+  public readonly extensions: string[];
 
-  parentIsIgnored: boolean;
+  public readonly filename: string;
 
-  filename: string;
+  public id: string;
 
-  imports: Map<string, string[]> | null;
+  public readonly idx: string;
 
-  extensions: string[];
+  public readonly ignored: boolean;
 
-  dependencies: string[];
+  public isEvaluated: boolean = false;
 
-  debug: Debugger;
+  public readonly parentIsIgnored: boolean;
 
-  readonly callstack: string[] = [];
+  public require: {
+    (id: string): unknown;
+    ensure: () => void;
+    resolve: (id: string) => string;
+  } = Object.assign(
+    (id: string) => {
+      if (id in builtins) {
+        // The module is in the allowed list of builtin node modules
+        // Ideally we should prevent importing them, but webpack polyfills some
+        // So we check for the list of polyfills to determine which ones to support
+        if (builtins[id as keyof typeof builtins]) {
+          this.debug('require', `builtin '${id}'`);
+          return require(id);
+        }
+
+        return null;
+      }
+
+      // Resolve module id (and filename) relatively to parent module
+      const dependency = this.resolveDependency(id);
+      if (dependency.resolved === id && !path.isAbsolute(id)) {
+        // The module is a builtin node modules, but not in the allowed list
+        throw new Error(
+          `Unable to import "${id}". Importing Node builtins is not supported in the sandbox.`
+        );
+      }
+
+      invariant(
+        dependency.resolved,
+        `Dependency ${dependency.source} cannot be resolved`
+      );
+
+      this.dependencies.push(id);
+
+      this.debug('require', `${id} -> ${dependency.resolved}`);
+
+      const entrypoint = this.getEntrypoint(
+        dependency.resolved,
+        dependency.only,
+        this.debug
+      );
+
+      if (entrypoint === null) {
+        return dependency.resolved;
+      }
+
+      if (
+        entrypoint.evaluated ||
+        isSuperSet(entrypoint.evaluatedOnly, dependency.only)
+      ) {
+        return entrypoint.exports;
+      }
+
+      const m = new Module(entrypoint, this.cache, this);
+      m.evaluate();
+
+      return entrypoint.exports;
+    },
+    {
+      ensure: NOOP,
+      resolve: resolve.bind(this),
+    }
+  );
+
+  public resolve = resolve.bind(this);
 
   constructor(
     protected entrypoint: Entrypoint,
@@ -128,7 +201,6 @@ class Module {
     this.idx = entrypoint.idx;
     this.id = entrypoint.name;
     this.filename = entrypoint.name;
-    this.imports = null;
     this.dependencies = [];
     this.debug = entrypoint.log.extend('module');
     this.parentIsIgnored = parentModule?.ignored ?? false;
@@ -158,69 +230,79 @@ class Module {
     );
   }
 
-  public get isEvaluated() {
-    return this.#isEvaluated;
-  }
+  evaluate(): void {
+    const { entrypoint } = this;
 
-  public set isEvaluated(value) {
-    this.#isEvaluated = value;
-  }
+    this.cache.add(
+      'entrypoints',
+      entrypoint.name,
+      entrypoint.createEvaluated()
+    );
 
-  resolveDependency = (id: string): IEntrypointDependency => {
-    const cached = this.entrypoint.getDependency(id);
-    invariant(!(cached instanceof Promise), 'Dependency is not resolved yet');
+    const source =
+      entrypoint.transformedCode ??
+      entrypoint.originalCode ??
+      entrypoint.initialCode;
 
-    if (cached) {
-      return cached;
+    if (!source) {
+      this.debug(`evaluate`, 'there is nothing to evaluate');
+      return;
     }
 
-    if (!this.ignored) {
-      this.debug(
-        '❌ import has not been resolved during prepare stage. Fallback to Node.js resolver'
-      );
+    if (this.isEvaluated) {
+      this.debug('evaluate', `is already evaluated`);
+      return;
     }
 
-    const extensions = this.moduleImpl._extensions;
-    const added: string[] = [];
+    this.debug('evaluate');
+    this.debug.extend('source')('%s', source);
+
+    this.isEvaluated = true;
+
+    const { filename } = this;
+
+    if (/\.json$/.test(filename)) {
+      // For JSON files, parse it to a JS object similar to Node
+      this.exports = JSON.parse(source);
+      return;
+    }
+
+    const { context, teardown } = createVmContext(
+      filename,
+      entrypoint.pluginOptions.features,
+      {
+        module: this,
+        exports: entrypoint.exports,
+        require: this.require,
+        __linaria_dynamic_import: async (id: string) => this.require(id),
+        __dirname: path.dirname(filename),
+      }
+    );
 
     try {
-      // Check for supported extensions
-      this.extensions.forEach((ext) => {
-        if (ext in extensions) {
-          return;
+      const script = new vm.Script(
+        `(function (exports) { ${source}\n})(exports);`,
+        {
+          filename,
         }
+      );
 
-        // When an extension is not supported, add it
-        // And keep track of it to clean it up after resolving
-        // Use noop for the transform function since we handle it
-        extensions[ext] = NOOP;
-        added.push(ext);
-      });
+      script.runInContext(context);
+    } catch (e) {
+      if (e instanceof EvalError) {
+        this.debug('%O', e);
 
-      const { filename } = this;
+        throw e;
+      }
 
-      const resolved = this.moduleImpl._resolveFilename(id, {
-        id: filename,
-        filename,
-        paths: this.moduleImpl._nodeModulePaths(path.dirname(filename)),
-      });
-
-      return {
-        source: id,
-        only: ['*'],
-        resolved,
-      };
+      this.debug('%O\n%O', e, this.callstack);
+      throw new EvalError(
+        `${(e as Error).message} in${this.callstack.join('\n| ')}\n`
+      );
     } finally {
-      // Cleanup the extensions we added to restore previous behaviour
-      added.forEach((ext) => delete extensions[ext]);
+      teardown();
     }
-  };
-
-  resolve = (id: string): string => {
-    const { resolved } = this.resolveDependency(id);
-    invariant(resolved, `Unable to resolve "${id}"`);
-    return resolved;
-  };
+  }
 
   getEntrypoint(
     filename: string,
@@ -333,143 +415,55 @@ class Module {
     return newEntrypoint;
   }
 
-  require: {
-    (id: string): unknown;
-    resolve: (id: string) => string;
-    ensure: () => void;
-  } = Object.assign(
-    (id: string) => {
-      if (id in builtins) {
-        // The module is in the allowed list of builtin node modules
-        // Ideally we should prevent importing them, but webpack polyfills some
-        // So we check for the list of polyfills to determine which ones to support
-        if (builtins[id as keyof typeof builtins]) {
-          this.debug('require', `builtin '${id}'`);
-          return require(id);
-        }
+  resolveDependency = (id: string): IEntrypointDependency => {
+    const cached = this.entrypoint.getDependency(id);
+    invariant(!(cached instanceof Promise), 'Dependency is not resolved yet');
 
-        return null;
-      }
+    if (cached) {
+      return cached;
+    }
 
-      // Resolve module id (and filename) relatively to parent module
-      const dependency = this.resolveDependency(id);
-      if (dependency.resolved === id && !path.isAbsolute(id)) {
-        // The module is a builtin node modules, but not in the allowed list
-        throw new Error(
-          `Unable to import "${id}". Importing Node builtins is not supported in the sandbox.`
-        );
-      }
-
-      invariant(
-        dependency.resolved,
-        `Dependency ${dependency.source} cannot be resolved`
+    if (!this.ignored) {
+      this.debug(
+        '❌ import has not been resolved during prepare stage. Fallback to Node.js resolver'
       );
-
-      this.dependencies.push(id);
-
-      this.debug('require', `${id} -> ${dependency.resolved}`);
-
-      const entrypoint = this.getEntrypoint(
-        dependency.resolved,
-        dependency.only,
-        this.debug
-      );
-
-      if (entrypoint === null) {
-        return dependency.resolved;
-      }
-
-      if (
-        entrypoint.evaluated ||
-        isSuperSet(entrypoint.evaluatedOnly, dependency.only)
-      ) {
-        return entrypoint.exports;
-      }
-
-      const m = new Module(entrypoint, this.cache, this);
-      m.evaluate();
-
-      return entrypoint.exports;
-    },
-    {
-      ensure: NOOP,
-      resolve: this.resolve,
-    }
-  );
-
-  evaluate(): void {
-    const { entrypoint } = this;
-
-    this.cache.add(
-      'entrypoints',
-      entrypoint.name,
-      entrypoint.createEvaluated()
-    );
-
-    const source =
-      entrypoint.transformedCode ??
-      entrypoint.originalCode ??
-      entrypoint.initialCode;
-
-    if (!source) {
-      this.debug(`evaluate`, 'there is nothing to evaluate');
-      return;
     }
 
-    if (this.isEvaluated) {
-      this.debug('evaluate', `is already evaluated`);
-      return;
-    }
-
-    this.debug('evaluate');
-    this.debug.extend('source')('%s', source);
-
-    this.isEvaluated = true;
-
-    const { filename } = this;
-
-    if (/\.json$/.test(filename)) {
-      // For JSON files, parse it to a JS object similar to Node
-      this.exports = JSON.parse(source);
-      return;
-    }
-
-    const { context, teardown } = createVmContext(
-      filename,
-      entrypoint.pluginOptions.features,
-      {
-        module: this,
-        exports: entrypoint.exports,
-        require: this.require,
-        __linaria_dynamic_import: async (id: string) => this.require(id),
-        __dirname: path.dirname(filename),
-      }
-    );
+    const extensions = this.moduleImpl._extensions;
+    const added: string[] = [];
 
     try {
-      const script = new vm.Script(
-        `(function (exports) { ${source}\n})(exports);`,
-        {
-          filename,
+      // Check for supported extensions
+      this.extensions.forEach((ext) => {
+        if (ext in extensions) {
+          return;
         }
-      );
 
-      script.runInContext(context);
-    } catch (e) {
-      if (e instanceof EvalError) {
-        this.debug('%O', e);
+        // When an extension is not supported, add it
+        // And keep track of it to clean it up after resolving
+        // Use noop for the transform function since we handle it
+        extensions[ext] = NOOP;
+        added.push(ext);
+      });
 
-        throw e;
-      }
+      const { filename } = this;
 
-      this.debug('%O\n%O', e, this.callstack);
-      throw new EvalError(
-        `${(e as Error).message} in${this.callstack.join('\n| ')}\n`
-      );
+      const resolved = this.moduleImpl._resolveFilename(id, {
+        id: filename,
+        filename,
+        paths: this.moduleImpl._nodeModulePaths(path.dirname(filename)),
+      });
+
+      return {
+        source: id,
+        only: ['*'],
+        resolved,
+      };
     } finally {
-      teardown();
+      // Cleanup the extensions we added to restore previous behaviour
+      added.forEach((ext) => delete extensions[ext]);
     }
-  }
+  };
 }
 
 export default Module;

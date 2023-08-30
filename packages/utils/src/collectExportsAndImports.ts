@@ -64,8 +64,8 @@ export interface IState {
   exportRefs: Map<string, NodePath<MemberExpression>[]>;
   exports: IExport[];
   imports: (IImport | ISideEffectImport)[];
-  reexports: IReexport[];
   isEsModule: boolean;
+  reexports: IReexport[];
 }
 
 export const sideEffectImport = (
@@ -149,8 +149,8 @@ function collectFromImportDeclaration(
 }
 
 interface IDestructed {
-  what: string | '*';
   as: NodePath<Identifier>;
+  what: string | '*';
 }
 
 function getAncestorsWhile(path: NodePath, cond: (p: NodePath) => boolean) {

@@ -36,81 +36,102 @@ function ancestorOrSelf(name: string, parent: ParentEntrypoint) {
 type DependencyType = IEntrypointDependency | Promise<IEntrypointDependency>;
 
 export class Entrypoint extends BaseEntrypoint {
-  private static innerCreate(
+  public readonly evaluated = false;
+
+  public readonly loadedAndParsed: IEntrypointCode | IIgnoredEntrypoint;
+
+  protected onSupersedeHandlers: Array<(newEntrypoint: Entrypoint) => void> =
+    [];
+
+  private actionsCache: Map<
+    ActionTypes,
+    Map<unknown, BaseAction<ActionQueueItem>>
+  > = new Map();
+
+  #supersededWith: Entrypoint | null = null;
+
+  #transformResult: ITransformFileResult | null = null;
+
+  private constructor(
     services: Services,
     parent: ParentEntrypoint,
+    public readonly initialCode: string | undefined,
+    name: string,
+    only: string[],
+    public readonly pluginOptions: StrictOptions,
+    exports: StackOfMaps<string | symbol, unknown>,
+    evaluatedOnly: string[],
+    loadedAndParsed?: IEntrypointCode | IIgnoredEntrypoint,
+    protected readonly dependencies = new Map<string, DependencyType>(),
+    generation = 1
+  ) {
+    const stackOfMaps = new StackOfMaps<string | symbol, unknown>();
+    if (exports) {
+      stackOfMaps.join(exports);
+    }
+
+    super(services, evaluatedOnly, stackOfMaps, generation, name, only, parent);
+
+    this.loadedAndParsed =
+      loadedAndParsed ??
+      services.loadAndParseFn(
+        services,
+        name,
+        initialCode,
+        parent?.log ?? services.log,
+        pluginOptions
+      );
+
+    if (this.loadedAndParsed.code !== undefined) {
+      services.cache.invalidateIfChanged(name, this.loadedAndParsed.code);
+    }
+
+    this.log.extend('source')(
+      'created %s (%o)\n%s',
+      name,
+      only,
+      this.originalCode || EMPTY_FILE
+    );
+
+    if (exports) {
+      this.exportsValues.join(exports);
+    }
+  }
+
+  public get ignored() {
+    return this.loadedAndParsed.evaluator === 'ignored';
+  }
+
+  public get originalCode() {
+    return this.loadedAndParsed.code;
+  }
+
+  public get supersededWith() {
+    return this.#supersededWith;
+  }
+
+  public get transformedCode() {
+    return this.#transformResult?.code;
+  }
+
+  public static createRoot(
+    services: Services,
     name: string,
     only: string[],
     loadedCode: string | undefined,
     pluginOptions: StrictOptions
-  ): ['loop' | 'created' | 'cached', Entrypoint] {
-    const { cache } = services;
-
-    const cached = cache.get('entrypoints', name);
-    const changed =
-      loadedCode !== undefined
-        ? cache.invalidateIfChanged(name, loadedCode)
-        : false;
-
-    if (!cached?.evaluated && cached?.ignored) {
-      return ['cached', cached];
-    }
-
-    const exports =
-      cached?.exportsValues ?? new StackOfMaps<string | symbol, unknown>();
-    const evaluatedOnly = cached?.evaluatedOnly ?? [];
-    const mergedOnly =
-      !changed && cached?.only
-        ? mergeOnly(cached.only, only).filter((i) => !evaluatedOnly.includes(i))
-        : only;
-
-    if (cached?.evaluated) {
-      cached.log('is already evaluated with', cached.evaluatedOnly);
-      // if (mergedOnly.length === 0) {
-      //   return ['cached', cached];
-      // }
-    }
-
-    if (!changed && cached && !cached.evaluated) {
-      const isLoop = parent && ancestorOrSelf(name, parent) !== null;
-      if (isLoop) {
-        parent.log('[createEntrypoint] %s is a loop', name);
-      }
-
-      if (isSuperSet(cached.only, mergedOnly)) {
-        cached.log('is cached', name);
-        return [isLoop ? 'loop' : 'cached', cached];
-      }
-
-      cached.log(
-        'is cached, but with different `only` %o (the cached one %o)',
-        only,
-        cached?.only
-      );
-
-      return [isLoop ? 'loop' : 'created', cached.supersede(mergedOnly)];
-    }
-
-    const newEntrypoint = new Entrypoint(
+  ): Entrypoint {
+    const created = Entrypoint.create(
       services,
-      parent,
-      loadedCode,
+      null,
       name,
-      mergedOnly,
-      pluginOptions,
-      exports,
-      evaluatedOnly,
-      undefined,
-      cached && 'dependencies' in cached ? cached.dependencies : undefined,
-      cached ? cached.generation + 1 : 1
+      only,
+      loadedCode,
+      pluginOptions
     );
+    invariant(created !== 'loop', 'loop detected');
 
-    if (cached && !cached.evaluated) {
-      cached.log('is cached, but with different code');
-      cached.supersede(newEntrypoint);
-    }
-
-    return ['created', newEntrypoint];
+    return created;
   }
 
   /**
@@ -158,114 +179,82 @@ export class Entrypoint extends BaseEntrypoint {
     });
   }
 
-  public static createRoot(
+  private static innerCreate(
     services: Services,
+    parent: ParentEntrypoint,
     name: string,
     only: string[],
     loadedCode: string | undefined,
     pluginOptions: StrictOptions
-  ): Entrypoint {
-    const created = Entrypoint.create(
+  ): ['loop' | 'created' | 'cached', Entrypoint] {
+    const { cache } = services;
+
+    const cached = cache.get('entrypoints', name);
+    const changed =
+      loadedCode !== undefined
+        ? cache.invalidateIfChanged(name, loadedCode)
+        : false;
+
+    if (!cached?.evaluated && cached?.ignored) {
+      return ['cached', cached];
+    }
+
+    const exports =
+      cached?.exportsValues ?? new StackOfMaps<string | symbol, unknown>();
+    const evaluatedOnly = cached?.evaluatedOnly ?? [];
+    const mergedOnly =
+      !changed && cached?.only
+        ? mergeOnly(cached.only, only).filter((i) => !evaluatedOnly.includes(i))
+        : only;
+
+    if (cached?.evaluated) {
+      cached.log('is already evaluated with', cached.evaluatedOnly);
+    }
+
+    if (!changed && cached && !cached.evaluated) {
+      const isLoop = parent && ancestorOrSelf(name, parent) !== null;
+      if (isLoop) {
+        parent.log('[createEntrypoint] %s is a loop', name);
+      }
+
+      if (isSuperSet(cached.only, mergedOnly)) {
+        cached.log('is cached', name);
+        return [isLoop ? 'loop' : 'cached', cached];
+      }
+
+      cached.log(
+        'is cached, but with different `only` %o (the cached one %o)',
+        only,
+        cached?.only
+      );
+
+      return [isLoop ? 'loop' : 'created', cached.supersede(mergedOnly)];
+    }
+
+    const newEntrypoint = new Entrypoint(
       services,
-      null,
-      name,
-      only,
+      parent,
       loadedCode,
-      pluginOptions
+      name,
+      mergedOnly,
+      pluginOptions,
+      exports,
+      evaluatedOnly,
+      undefined,
+      cached && 'dependencies' in cached ? cached.dependencies : undefined,
+      cached ? cached.generation + 1 : 1
     );
-    invariant(created !== 'loop', 'loop detected');
 
-    return created;
+    if (cached && !cached.evaluated) {
+      cached.log('is cached, but with different code');
+      cached.supersede(newEntrypoint);
+    }
+
+    return ['created', newEntrypoint];
   }
-
-  #transformResult: ITransformFileResult | null = null;
-
-  #supersededWith: Entrypoint | null = null;
-
-  public readonly evaluated = false;
-
-  public get supersededWith() {
-    return this.#supersededWith;
-  }
-
-  public get transformedCode() {
-    return this.#transformResult?.code;
-  }
-
-  public setTransformResult(res: ITransformFileResult | null) {
-    this.#transformResult = res;
-  }
-
-  protected onSupersedeHandlers: Array<(newEntrypoint: Entrypoint) => void> =
-    [];
-
-  private actionsCache: Map<
-    ActionTypes,
-    Map<unknown, BaseAction<ActionQueueItem>>
-  > = new Map();
 
   public addDependency(name: string, dependency: DependencyType): void {
     this.dependencies.set(name, dependency);
-  }
-
-  public getDependency(name: string): DependencyType | undefined {
-    return this.dependencies.get(name);
-  }
-
-  public readonly loadedAndParsed: IEntrypointCode | IIgnoredEntrypoint;
-
-  public get originalCode() {
-    return this.loadedAndParsed.code;
-  }
-
-  public get ignored() {
-    return this.loadedAndParsed.evaluator === 'ignored';
-  }
-
-  private constructor(
-    services: Services,
-    parent: ParentEntrypoint,
-    public readonly initialCode: string | undefined,
-    name: string,
-    only: string[],
-    public readonly pluginOptions: StrictOptions,
-    exports: StackOfMaps<string | symbol, unknown>,
-    evaluatedOnly: string[],
-    loadedAndParsed?: IEntrypointCode | IIgnoredEntrypoint,
-    protected readonly dependencies = new Map<string, DependencyType>(),
-    generation = 1
-  ) {
-    const stackOfMaps = new StackOfMaps<string | symbol, unknown>();
-    if (exports) {
-      stackOfMaps.join(exports);
-    }
-
-    super(services, evaluatedOnly, stackOfMaps, generation, name, only, parent);
-
-    this.loadedAndParsed =
-      loadedAndParsed ??
-      services.loadAndParseFn(
-        services,
-        name,
-        initialCode,
-        parent?.log ?? services.log,
-        pluginOptions
-      );
-
-    if (this.loadedAndParsed.code !== undefined) {
-      services.cache.invalidateIfChanged(name, this.loadedAndParsed.code);
-    }
-
-    this.log.extend('source')(
-      'created %s (%o)\n%s',
-      name,
-      only,
-      this.originalCode || EMPTY_FILE
-    );
-
-    if (exports) {
-      this.exportsValues.join(exports);
-    }
   }
 
   public createAction<
@@ -314,6 +303,46 @@ export class Entrypoint extends BaseEntrypoint {
     );
   }
 
+  public createEvaluated() {
+    return new EvaluatedEntrypoint(
+      this.services,
+      mergeOnly(this.evaluatedOnly, this.only),
+      this.exportsValues,
+      this.generation + 1,
+      this.name,
+      this.only,
+      this.parent
+    );
+  }
+
+  public getDependency(name: string): DependencyType | undefined {
+    return this.dependencies.get(name);
+  }
+
+  public hasLinariaMetadata() {
+    return withLinariaMetadata(this.#transformResult?.metadata);
+  }
+
+  public onSupersede(callback: (newEntrypoint: Entrypoint) => void) {
+    if (this.#supersededWith) {
+      callback(this.#supersededWith);
+      return () => {};
+    }
+
+    this.onSupersedeHandlers.push(callback);
+
+    return () => {
+      const index = this.onSupersedeHandlers.indexOf(callback);
+      if (index >= 0) {
+        this.onSupersedeHandlers.splice(index, 1);
+      }
+    };
+  }
+
+  public setTransformResult(res: ITransformFileResult | null) {
+    this.#transformResult = res;
+  }
+
   private supersede(newOnlyOrEntrypoint: string[] | Entrypoint): Entrypoint {
     const newEntrypoint =
       newOnlyOrEntrypoint instanceof Entrypoint
@@ -337,37 +366,5 @@ export class Entrypoint extends BaseEntrypoint {
     this.onSupersedeHandlers.forEach((handler) => handler(newEntrypoint));
 
     return newEntrypoint;
-  }
-
-  public hasLinariaMetadata() {
-    return withLinariaMetadata(this.#transformResult?.metadata);
-  }
-
-  public onSupersede(callback: (newEntrypoint: Entrypoint) => void) {
-    if (this.#supersededWith) {
-      callback(this.#supersededWith);
-      return () => {};
-    }
-
-    this.onSupersedeHandlers.push(callback);
-
-    return () => {
-      const index = this.onSupersedeHandlers.indexOf(callback);
-      if (index >= 0) {
-        this.onSupersedeHandlers.splice(index, 1);
-      }
-    };
-  }
-
-  public createEvaluated() {
-    return new EvaluatedEntrypoint(
-      this.services,
-      mergeOnly(this.evaluatedOnly, this.only),
-      this.exportsValues,
-      this.generation + 1,
-      this.name,
-      this.only,
-      this.parent
-    );
   }
 }

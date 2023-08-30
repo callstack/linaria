@@ -30,33 +30,12 @@ const loggers = cacheNames.reduce(
 );
 
 export class TransformCacheCollection {
-  private contentHashes = new Map<string, string>();
-
   protected readonly entrypoints: Map<string, Entrypoint | EvaluatedEntrypoint>;
+
+  private contentHashes = new Map<string, string>();
 
   constructor(caches: Partial<ICaches> = {}) {
     this.entrypoints = caches.entrypoints || new Map();
-  }
-
-  public invalidateForFile(filename: string) {
-    cacheNames.forEach((cacheName) => {
-      this.invalidate(cacheName, filename);
-    });
-  }
-
-  public invalidateIfChanged(filename: string, content: string) {
-    const hash = this.contentHashes.get(filename);
-    const newHash = hashContent(content);
-
-    if (hash !== newHash) {
-      cacheLogger('content has changed, invalidate all for %s', filename);
-      this.contentHashes.set(filename, newHash);
-      this.invalidateForFile(filename);
-
-      return true;
-    }
-
-    return false;
   }
 
   public add<
@@ -73,6 +52,25 @@ export class TransformCacheCollection {
     });
 
     cache.set(key, value);
+  }
+
+  public clear(cacheName: CacheNames | 'all'): void {
+    if (cacheName === 'all') {
+      cacheNames.forEach((name) => {
+        this.clear(name);
+      });
+
+      return;
+    }
+
+    loggers[cacheName]('clear');
+    const cache = this[cacheName] as Map<string, unknown>;
+
+    cache.clear();
+  }
+
+  public delete(cacheName: CacheNames, key: string): void {
+    this.invalidate(cacheName, key);
   }
 
   public get<
@@ -94,10 +92,6 @@ export class TransformCacheCollection {
     return res;
   }
 
-  public delete(cacheName: CacheNames, key: string): void {
-    this.invalidate(cacheName, key);
-  }
-
   public invalidate(cacheName: CacheNames, key: string): void {
     const cache = this[cacheName] as Map<string, unknown>;
     if (!cache.has(key)) {
@@ -109,18 +103,24 @@ export class TransformCacheCollection {
     cache.delete(key);
   }
 
-  public clear(cacheName: CacheNames | 'all'): void {
-    if (cacheName === 'all') {
-      cacheNames.forEach((name) => {
-        this.clear(name);
-      });
+  public invalidateForFile(filename: string) {
+    cacheNames.forEach((cacheName) => {
+      this.invalidate(cacheName, filename);
+    });
+  }
 
-      return;
+  public invalidateIfChanged(filename: string, content: string) {
+    const hash = this.contentHashes.get(filename);
+    const newHash = hashContent(content);
+
+    if (hash !== newHash) {
+      cacheLogger('content has changed, invalidate all for %s', filename);
+      this.contentHashes.set(filename, newHash);
+      this.invalidateForFile(filename);
+
+      return true;
     }
 
-    loggers[cacheName]('clear');
-    const cache = this[cacheName] as Map<string, unknown>;
-
-    cache.clear();
+    return false;
   }
 }
