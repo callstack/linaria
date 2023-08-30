@@ -21,6 +21,8 @@ const options: StrictOptions = {
   babelOptions: {},
   features: {
     dangerousCodeRemover: true,
+    globalCache: true,
+    happyDOM: false,
   },
   highPriorityPlugins: [],
 };
@@ -96,10 +98,7 @@ it('should use cached version from the codeCache', () => {
 
   cache.add('code', resolved, {
     only: ['margin'],
-    imports: null,
-    result: {
-      code: 'module.exports = { margin: 1 };',
-    },
+    code: 'module.exports = { margin: 1 };',
   });
 
   mod.evaluate(dedent`
@@ -123,10 +122,7 @@ it('should reread module from disk when it is in codeCache but not in resolveCac
 
   cache.add('code', resolved, {
     only: ['margin'],
-    imports: null,
-    result: {
-      code: 'module.exports = { margin: 1 };',
-    },
+    code: 'module.exports = { margin: 1 };',
   });
 
   mod.evaluate(dedent`

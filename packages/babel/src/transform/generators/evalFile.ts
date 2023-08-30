@@ -18,15 +18,14 @@ const wrap = <T>(fn: () => T): T | Error => {
  */
 // eslint-disable-next-line require-yield
 export function* evalFile(
-  this: IEvalAction<'sync'>
-): SyncScenarioForAction<IEvalAction<'sync'>> {
-  const { code } = this.data;
+  this: IEvalAction
+): SyncScenarioForAction<IEvalAction> {
   const { entrypoint } = this;
-  const { log, name, pluginOptions } = entrypoint;
+  const { log } = entrypoint;
 
   log(`>> evaluate __linariaPreval`);
 
-  const evaluated = evaluate(this.services.cache, code, pluginOptions, name);
+  const evaluated = evaluate(this.services.cache, entrypoint);
 
   const linariaPreval = hasLinariaPreval(evaluated.value)
     ? evaluated.value.__linariaPreval

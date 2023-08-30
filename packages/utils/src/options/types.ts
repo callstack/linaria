@@ -48,9 +48,15 @@ export type EvalRule = {
 
 export type FeatureFlag = boolean | string | string[];
 
-export type FeatureFlags = {
+type AllFeatureFlags = {
   dangerousCodeRemover: FeatureFlag;
+  globalCache: FeatureFlag;
+  happyDOM: FeatureFlag;
 };
+
+export type FeatureFlags<
+  TOnly extends keyof AllFeatureFlags = keyof AllFeatureFlags,
+> = Pick<AllFeatureFlags, TOnly>;
 
 export type StrictOptions = {
   babelOptions: TransformOptions;

@@ -13,13 +13,23 @@ import type {
   Handlers,
   ActionQueueItem,
   SyncScenarioForAction,
+  ICollectAction,
+  IEvalAction,
+  IExplodeReexportsAction,
+  IExtractAction,
+  IGetExportsAction,
+  IProcessEntrypointAction,
+  IProcessImportsAction,
+  IResolveImportsAction,
+  ITransformAction,
+  IWorkflowAction,
 } from '../types';
 
 export type SyncHandlers<TMode extends 'async' | 'sync'> = Handlers<TMode>;
 
 // eslint-disable-next-line require-yield
 function* emptyHandler<
-  TAction extends ActionQueueItem<'sync'>,
+  TAction extends ActionQueueItem,
 >(): SyncScenarioForAction<TAction> {
   return undefined as never;
 }
@@ -27,17 +37,16 @@ function* emptyHandler<
 export const getHandlers = <TMode extends 'async' | 'sync'>(
   partial: Partial<SyncHandlers<TMode>>
 ) => ({
-  addToCodeCache: jest.fn(emptyHandler),
-  collect: jest.fn(emptyHandler),
-  evalFile: jest.fn(emptyHandler),
-  explodeReexports: jest.fn(emptyHandler),
-  extract: jest.fn(emptyHandler),
-  getExports: jest.fn(emptyHandler),
-  processEntrypoint: jest.fn(emptyHandler),
-  processImports: jest.fn(emptyHandler),
-  resolveImports: jest.fn(emptyHandler),
-  transform: jest.fn(emptyHandler),
-  workflow: jest.fn(emptyHandler),
+  collect: jest.fn(emptyHandler<ICollectAction>),
+  evalFile: jest.fn(emptyHandler<IEvalAction>),
+  explodeReexports: jest.fn(emptyHandler<IExplodeReexportsAction>),
+  extract: jest.fn(emptyHandler<IExtractAction>),
+  getExports: jest.fn(emptyHandler<IGetExportsAction>),
+  processEntrypoint: jest.fn(emptyHandler<IProcessEntrypointAction>),
+  processImports: jest.fn(emptyHandler<IProcessImportsAction>),
+  resolveImports: jest.fn(emptyHandler<IResolveImportsAction>),
+  transform: jest.fn(emptyHandler<ITransformAction>),
+  workflow: jest.fn(emptyHandler<IWorkflowAction>),
   ...partial,
 });
 
@@ -55,45 +64,21 @@ export const createServices: () => Services = () => ({
   options: {} as Services['options'],
 });
 
-export const createSyncEntrypoint = (
+export const createEntrypoint = (
   services: Services,
-  actionHandlers: Handlers<'sync'>,
   name: string,
   only: string[],
   code?: string
 ) => {
-  const entrypoint = Entrypoint.createSyncRoot(
+  const entrypoint = Entrypoint.createRoot(
     services,
-    actionHandlers,
     name,
     only,
     code,
     services.options.pluginOptions as StrictOptions
   );
 
-  if (entrypoint === 'ignored') {
-    throw new Error('entrypoint was ignored');
-  }
-
-  return entrypoint;
-};
-export const createAsyncEntrypoint = (
-  services: Services,
-  actionHandlers: Handlers<'async' | 'sync'>,
-  name: string,
-  only: string[],
-  code?: string
-) => {
-  const entrypoint = Entrypoint.createAsyncRoot(
-    services,
-    actionHandlers,
-    name,
-    only,
-    code,
-    services.options.pluginOptions as StrictOptions
-  );
-
-  if (entrypoint === 'ignored') {
+  if (entrypoint.ignored) {
     throw new Error('entrypoint was ignored');
   }
 

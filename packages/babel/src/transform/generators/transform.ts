@@ -2,20 +2,22 @@ import type {
   BabelFileMetadata,
   BabelFileResult,
   PluginItem,
+  TransformOptions,
 } from '@babel/core';
 import type { File } from '@babel/types';
 
-import type { EvaluatorConfig, EventEmitter } from '@linaria/utils';
+import type {
+  EvaluatorConfig,
+  EventEmitter,
+  StrictOptions,
+} from '@linaria/utils';
 import { buildOptions, getPluginKey } from '@linaria/utils';
 
 import type { Core } from '../../babel';
 import type Module from '../../module';
 import withLinariaMetadata from '../../utils/withLinariaMetadata';
-import type {
-  IEntrypoint,
-  ITransformAction,
-  SyncScenarioForAction,
-} from '../types';
+import type { Entrypoint } from '../Entrypoint';
+import type { ITransformAction, SyncScenarioForAction } from '../types';
 
 const EMPTY_FILE = '=== empty file ===';
 
@@ -26,12 +28,12 @@ const hasKeyInList = (plugin: PluginItem, list: string[]): boolean => {
 
 function runPreevalStage(
   babel: Core,
-  item: IEntrypoint,
+  evalConfig: TransformOptions,
+  pluginOptions: StrictOptions,
+  code: string,
   originalAst: File,
   eventEmitter: EventEmitter
 ): BabelFileResult {
-  const { pluginOptions, evalConfig } = item;
-
   const preShakePlugins =
     evalConfig.plugins?.filter((i) =>
       hasKeyInList(i, pluginOptions.highPriorityPlugins)
@@ -55,11 +57,7 @@ function runPreevalStage(
     plugins,
   });
 
-  const result = babel.transformFromAstSync(
-    originalAst,
-    item.code,
-    transformConfig
-  );
+  const result = babel.transformFromAstSync(originalAst, code, transformConfig);
 
   if (!result || !result.ast?.program) {
     throw new Error('Babel transform failed');
@@ -70,24 +68,38 @@ function runPreevalStage(
 
 type PrepareCodeFn = (
   babel: Core,
-  item: IEntrypoint,
+  item: Entrypoint,
   originalAst: File,
   eventEmitter: EventEmitter
 ) => [code: string, imports: Module['imports'], metadata?: BabelFileMetadata];
 
-export const prepareCode: PrepareCodeFn = (
-  babel,
-  item,
-  originalAst,
-  eventEmitter
-) => {
-  const { evaluator, log, evalConfig, pluginOptions, only } = item;
+export const prepareCode = (
+  babel: Core,
+  item: Entrypoint,
+  originalAst: File,
+  eventEmitter: EventEmitter
+): ReturnType<PrepareCodeFn> => {
+  const { log, pluginOptions, only, loadedAndParsed } = item;
+  if (loadedAndParsed.evaluator === 'ignored') {
+    log('is ignored');
+    return [loadedAndParsed.code ?? '', null, undefined];
+  }
+
+  const { code, evalConfig, evaluator } = loadedAndParsed;
 
   const preevalStageResult = eventEmitter.pair(
     {
       method: 'queue:transform:preeval',
     },
-    () => runPreevalStage(babel, item, originalAst, eventEmitter)
+    () =>
+      runPreevalStage(
+        babel,
+        evalConfig,
+        pluginOptions,
+        code,
+        originalAst,
+        eventEmitter
+      )
   );
 
   if (
@@ -108,7 +120,7 @@ export const prepareCode: PrepareCodeFn = (
     features: pluginOptions.features,
   };
 
-  const [, code, imports] = eventEmitter.pair(
+  const [, transformedCode, imports] = eventEmitter.pair(
     {
       method: 'queue:transform:evaluator',
     },
@@ -124,26 +136,30 @@ export const prepareCode: PrepareCodeFn = (
 
   log('[evaluator:end]');
 
-  return [code, imports, preevalStageResult.metadata];
+  return [transformedCode, imports, preevalStageResult.metadata];
 };
 
 export function* internalTransform(
-  this: ITransformAction<'sync'>,
+  this: ITransformAction,
   prepareFn: PrepareCodeFn
-): SyncScenarioForAction<ITransformAction<'sync'>> {
+): SyncScenarioForAction<ITransformAction> {
   const { babel, eventEmitter } = this.services;
-  const { name, only, code, log, ast } = this.entrypoint;
+  const { only, loadedAndParsed, log } = this.entrypoint;
+  if (loadedAndParsed.evaluator === 'ignored') {
+    log('is ignored');
+    return null;
+  }
 
   log('>> (%o)', only);
 
   const [preparedCode, imports, metadata] = prepareFn(
     babel,
     this.entrypoint,
-    ast,
+    loadedAndParsed.ast,
     eventEmitter
   );
 
-  if (code === preparedCode) {
+  if (loadedAndParsed.code === preparedCode) {
     log('<< (%o)\n === no changes ===', only);
   } else {
     log('<< (%o)', only);
@@ -151,7 +167,7 @@ export function* internalTransform(
   }
 
   if (preparedCode === '') {
-    log('%s is skipped', name);
+    log('is skipped');
     return null;
   }
 
@@ -175,24 +191,16 @@ export function* internalTransform(
     }
   }
 
-  const result = {
-    imports,
-    result: {
-      code: preparedCode,
-      metadata,
-    },
-    only,
+  return {
+    code: preparedCode,
+    metadata,
   };
-
-  yield ['addToCodeCache', this.entrypoint, result];
-
-  return result;
 }
 
 /**
  * Prepares the code for evaluation. This includes removing dead and potentially unsafe code.
- * Emits resolveImports, processImports and addToCodeCache events.
+ * Emits resolveImports and processImports events.
  */
-export function transform(this: ITransformAction<'sync'>) {
+export function transform(this: ITransformAction) {
   return internalTransform.call(this, prepareCode);
 }

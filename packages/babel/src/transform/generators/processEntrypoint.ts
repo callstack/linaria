@@ -1,5 +1,4 @@
 import { isAborted } from '../actions/AbortError';
-import type { ITransformResult } from '../actions/types';
 import type { IProcessEntrypointAction, SyncScenarioForAction } from '../types';
 
 /**
@@ -10,8 +9,8 @@ import type { IProcessEntrypointAction, SyncScenarioForAction } from '../types';
  * - rescheduling itself if the entrypoint is superseded
  */
 export function* processEntrypoint(
-  this: IProcessEntrypointAction<'sync'>
-): SyncScenarioForAction<IProcessEntrypointAction<'sync'>> {
+  this: IProcessEntrypointAction
+): SyncScenarioForAction<IProcessEntrypointAction> {
   const { only, log } = this.entrypoint;
   log('start processing (only: %s)', only);
 
@@ -29,7 +28,6 @@ export function* processEntrypoint(
     abortController.abort();
   });
 
-  let result: ITransformResult | null = null;
   try {
     yield [
       'explodeReexports',
@@ -37,12 +35,13 @@ export function* processEntrypoint(
       undefined,
       abortController.signal,
     ];
-    result = yield* this.getNext(
+    const result = yield* this.getNext(
       'transform',
       this.entrypoint,
       undefined,
       abortController.signal
     );
+    this.entrypoint.setTransformResult(result);
   } catch (e) {
     if (isAborted(e)) {
       log('aborting processing');
@@ -57,15 +56,8 @@ export function* processEntrypoint(
   const { supersededWith } = this.entrypoint;
   if (supersededWith) {
     log('entrypoint superseded, rescheduling processing');
-    result = yield* this.getNext(
-      'processEntrypoint',
-      supersededWith,
-      undefined,
-      null
-    );
+    yield* this.getNext('processEntrypoint', supersededWith, undefined, null);
   }
 
   log('entrypoint processing finished');
-
-  return result;
 }

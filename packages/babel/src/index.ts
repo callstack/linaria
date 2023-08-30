@@ -27,6 +27,7 @@ export {
   syncResolveImports,
 } from './transform/generators/resolveImports';
 export { default as loadLinariaOptions } from './transform/helpers/loadLinariaOptions';
+export { StackOfMaps } from './transform/helpers/StackOfMaps';
 export { withDefaultServices } from './transform/helpers/withDefaultServices';
 export { default as isNode } from './utils/isNode';
 export { default as getTagProcessor } from './utils/getTagProcessor';

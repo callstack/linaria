@@ -54,7 +54,7 @@ This function identifies the names of all exports in the file. If the file conta
 
 ### transform
 
-Prepares the file for execution: identifies the utilized Linaria processors, invokes eval-time substitutions for them, removes unnecessary code, and calls the `evaluator`. From the remaining code, surviving imports are extracted, wrapped in `resolveImports`, and queued. After imports are resolved, the `processImports` task is set to handle them. The final step is `addToCodeCache`, which stores all the gathered information in the cache for later utilization in `evalFile`.
+Prepares the file for execution: identifies the utilized Linaria processors, invokes eval-time substitutions for them, removes unnecessary code, and calls the `evaluator`. From the remaining code, surviving imports are extracted, wrapped in `resolveImports`, and queued. After imports are resolved, the `processImports` task is set to handle them.
 
 
 ### resolveImports
@@ -65,11 +65,6 @@ This function exists in two variants: synchronous for strictly synchronous envir
 ### processImports
 
 Invokes `createEntrypoint` for each import. At this stage, it might return `"ignored"` if a loop is detected. In this case, the specific import is skipped. For the remaining imports, `processEntrypoint` will be enqueued without the parent's `AbortSignal`.
-
-
-### addToCodeCache
-
-Simply adds the result to the cache. While it could be done directly in `transform`, this approach provides clearer logging.
 
 
 ### evalFile

@@ -1,8 +1,8 @@
 /* eslint-disable require-yield */
+import type { IEntrypointDependency } from '../../Entrypoint.types';
 import {
-  createSyncEntrypoint,
+  createEntrypoint,
   createServices,
-  createAsyncEntrypoint,
   getHandlers,
 } from '../../__tests__/entrypoint-helpers';
 import type {
@@ -12,7 +12,6 @@ import type {
   IResolveImportsAction,
 } from '../../types';
 import { asyncActionRunner, syncActionRunner } from '../actionRunner';
-import type { IResolvedImport } from '../types';
 
 describe('actionRunner', () => {
   let services: Services;
@@ -29,46 +28,32 @@ describe('actionRunner', () => {
   it('should run action', () => {
     const handlers = getHandlers<'sync'>({});
 
-    const entrypoint = createSyncEntrypoint(services, handlers, '/foo/bar.js', [
-      'default',
-    ]);
+    const entrypoint = createEntrypoint(services, '/foo/bar.js', ['default']);
     const action = entrypoint.createAction(
       'processEntrypoint',
       undefined,
       null
     );
 
-    syncActionRunner(action);
+    syncActionRunner(action, handlers);
     expect(handlers.processEntrypoint).toHaveBeenCalled();
   });
 
   it('should not run action if its copy was already run', async () => {
     const handler = jest.fn();
     function* handlerGenerator(
-      this: IProcessEntrypointAction<'sync'>
-    ): SyncScenarioForAction<IProcessEntrypointAction<'sync'>> {
+      this: IProcessEntrypointAction
+    ): SyncScenarioForAction<IProcessEntrypointAction> {
       handler();
       yield ['resolveImports', this.entrypoint, { imports: new Map() }, null];
-
-      return null;
     }
 
     const handlers = getHandlers({
       processEntrypoint: handlerGenerator,
     });
 
-    const entrypoint1 = createAsyncEntrypoint(
-      services,
-      handlers,
-      '/foo/bar.js',
-      ['default']
-    );
-    const entrypoint2 = createAsyncEntrypoint(
-      services,
-      handlers,
-      '/foo/bar.js',
-      ['default']
-    );
+    const entrypoint1 = createEntrypoint(services, '/foo/bar.js', ['default']);
+    const entrypoint2 = createEntrypoint(services, '/foo/bar.js', ['default']);
 
     expect(entrypoint1).toBe(entrypoint2);
 
@@ -85,8 +70,8 @@ describe('actionRunner', () => {
 
     expect(action1).toBe(action2);
 
-    const task1 = asyncActionRunner(action1);
-    const task2 = asyncActionRunner(action2);
+    const task1 = asyncActionRunner(action1, handlers);
+    const task2 = asyncActionRunner(action2, handlers);
     await Promise.all([task1, task2]);
 
     expect(handler).toHaveBeenCalledTimes(1);
@@ -98,8 +83,8 @@ describe('actionRunner', () => {
 
     const valueCatcher = jest.fn();
     function* processEntrypoint(
-      this: IProcessEntrypointAction<'sync'>
-    ): SyncScenarioForAction<IProcessEntrypointAction<'sync'>> {
+      this: IProcessEntrypointAction
+    ): SyncScenarioForAction<IProcessEntrypointAction> {
       const result = yield [
         'resolveImports',
         this.entrypoint,
@@ -108,21 +93,17 @@ describe('actionRunner', () => {
       ];
 
       valueCatcher(result);
-
-      return null;
     }
 
-    const resolvedImports: IResolvedImport[] = [
+    const resolvedImports: IEntrypointDependency[] = [
       {
-        importedFile: './bar',
-        importsOnly: ['default'],
+        source: './bar',
+        only: ['default'],
         resolved: '/foo/bar.js',
       },
     ];
 
-    function* resolveImports(): SyncScenarioForAction<
-      IResolveImportsAction<'sync'>
-    > {
+    function* resolveImports(): SyncScenarioForAction<IResolveImportsAction> {
       return resolvedImports;
     }
 
@@ -131,12 +112,7 @@ describe('actionRunner', () => {
       resolveImports,
     });
 
-    const entrypoint = createAsyncEntrypoint(
-      services,
-      handlers,
-      '/foo/bar.js',
-      ['default']
-    );
+    const entrypoint = createEntrypoint(services, '/foo/bar.js', ['default']);
 
     const action = entrypoint.createAction(
       'processEntrypoint',
@@ -144,7 +120,7 @@ describe('actionRunner', () => {
       null
     );
 
-    await asyncActionRunner(action);
+    await asyncActionRunner(action, handlers);
 
     expect(valueCatcher).toBeCalledTimes(1);
     expect(valueCatcher).toBeCalledWith(resolvedImports);

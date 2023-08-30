@@ -11,12 +11,16 @@ import type { ICollectAction, SyncScenarioForAction } from '../types';
  */
 // eslint-disable-next-line require-yield
 export function* collect(
-  this: ICollectAction<'sync'>
-): SyncScenarioForAction<ICollectAction<'sync'>> {
+  this: ICollectAction
+): SyncScenarioForAction<ICollectAction> {
   const { babel, options } = this.services;
   const { valueCache } = this.data;
   const { entrypoint } = this;
-  const { ast, code, name, pluginOptions } = entrypoint;
+  const { loadedAndParsed, name, pluginOptions } = entrypoint;
+
+  if (loadedAndParsed.evaluator === 'ignored') {
+    throw new Error('entrypoint was ignored');
+  }
 
   const transformPlugins: PluginItem[] = [
     [
@@ -41,11 +45,15 @@ export function* collect(
     sourceType: 'unambiguous',
   });
 
-  const result = babel.transformFromAstSync(ast, code, {
-    ...transformConfig,
-    cwd: options.root,
-    filename: name,
-  });
+  const result = babel.transformFromAstSync(
+    loadedAndParsed.ast,
+    loadedAndParsed.code,
+    {
+      ...transformConfig,
+      cwd: options.root,
+      filename: name,
+    }
+  );
 
   if (!result || !result.ast?.program) {
     throw new Error('Babel transform failed');

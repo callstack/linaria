@@ -7,28 +7,25 @@ import type { IWorkflowAction, SyncScenarioForAction } from '../types';
  * the source code as well as all artifacts obtained from code execution.
  */
 export function* workflow(
-  this: IWorkflowAction<'sync'>
-): SyncScenarioForAction<IWorkflowAction<'sync'>> {
-  const { cache, options } = this.services;
+  this: IWorkflowAction
+): SyncScenarioForAction<IWorkflowAction> {
+  const { options } = this.services;
   const { entrypoint } = this;
-  const { name, code: originalCode } = entrypoint;
+  if (entrypoint.ignored) {
+    return {
+      code: entrypoint.loadedAndParsed.code ?? '',
+      sourceMap: options.inputSourceMap,
+    };
+  }
+
+  const { code: originalCode = '' } = entrypoint.loadedAndParsed;
 
   // *** 1st stage ***
 
-  const prepareStageResult = yield* this.getNext(
-    'processEntrypoint',
-    entrypoint,
-    undefined
-  );
-
-  const ast = cache.get('originalAST', name) ?? 'ignored';
+  yield* this.getNext('processEntrypoint', entrypoint, undefined);
 
   // File is ignored or does not contain any tags. Return original code.
-  if (
-    ast === 'ignored' ||
-    !prepareStageResult ||
-    !withLinariaMetadata(prepareStageResult.result.metadata)
-  ) {
+  if (!entrypoint.hasLinariaMetadata()) {
     return {
       code: originalCode,
       sourceMap: options.inputSourceMap,
@@ -37,9 +34,11 @@ export function* workflow(
 
   // *** 2nd stage ***
 
-  const evalStageResult = yield* this.getNext('evalFile', entrypoint, {
-    code: prepareStageResult.result.code,
-  });
+  const evalStageResult = yield* this.getNext(
+    'evalFile',
+    entrypoint,
+    undefined
+  );
 
   if (evalStageResult === null) {
     return {

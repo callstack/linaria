@@ -3,7 +3,7 @@ import type { NodePath } from '@babel/traverse';
 import type { File } from '@babel/types';
 import type { RawSourceMap } from 'source-map';
 
-import type { CustomDebug, Debugger } from '@linaria/logger';
+import type { Debugger } from '@linaria/logger';
 import type { BaseProcessor } from '@linaria/tags';
 import type {
   LinariaMetadata,
@@ -32,24 +32,14 @@ export type PluginOptions = StrictOptions & {
 };
 
 export interface IModule {
-  debug: CustomDebug;
   readonly exports: unknown;
-  readonly idx: number;
-  readonly isEvaluated: boolean;
-  readonly only: string;
 }
 
-export interface IBaseEntrypoint {
-  idx: string;
-  generation: number;
+export type ParentEntrypoint = {
   log: Debugger;
   name: string;
-  only: string[];
-  onSupersede: (
-    callback: (newEntrypoint: IBaseEntrypoint) => void
-  ) => () => void;
-  parent: IBaseEntrypoint | null;
-}
+  parent: ParentEntrypoint | null;
+} | null;
 
 export type Dependencies = string[];
 

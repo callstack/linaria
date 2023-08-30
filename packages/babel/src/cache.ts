@@ -1,52 +1,24 @@
 import { createHash } from 'crypto';
 
-import type { File } from '@babel/types';
-
 import { linariaLogger } from '@linaria/logger';
 
-import type { IBaseEntrypoint, IModule, ITransformFileResult } from './types';
+import type { Entrypoint } from './transform/Entrypoint';
+import type { IEvaluatedEntrypoint } from './transform/Entrypoint.types';
 
 function hashContent(content: string) {
   return createHash('sha256').update(content).digest('hex');
 }
 
 interface ICaches {
-  entrypoints: Map<string, IBaseEntrypoint>;
-  ignored: Map<string, true>;
-  resolve: Map<string, string>;
-  resolveTask: Map<
-    string,
-    Promise<{
-      importedFile: string;
-      importsOnly: string[];
-      resolved: string | null;
-    }>
-  >;
-  code: Map<
-    string,
-    {
-      imports: Map<string, string[]> | null;
-      only: string[];
-      result: ITransformFileResult;
-    }
-  >;
-  eval: Map<string, IModule>;
-  originalAST: Map<string, File>;
+  contentHashes: Map<string, string>;
+  entrypoints: Map<string, Entrypoint | IEvaluatedEntrypoint>;
 }
 
 type MapValue<T> = T extends Map<string, infer V> ? V : never;
 
 const cacheLogger = linariaLogger.extend('cache');
 
-const cacheNames = [
-  'entrypoints',
-  'ignored',
-  'resolve',
-  'resolveTask',
-  'code',
-  'eval',
-  'originalAST',
-] as const;
+const cacheNames = ['entrypoints', 'contentHashes'] as const;
 type CacheNames = (typeof cacheNames)[number];
 
 const loggers = cacheNames.reduce(
@@ -60,35 +32,13 @@ const loggers = cacheNames.reduce(
 export class TransformCacheCollection {
   private contentHashes = new Map<string, string>();
 
-  protected readonly entrypoints: Map<string, IBaseEntrypoint>;
-
-  protected readonly ignored: Map<string, true>;
-
-  protected readonly resolve: Map<string, string>;
-
-  protected readonly resolveTask: Map<string, Promise<string>>;
-
-  protected readonly code: Map<
+  protected readonly entrypoints: Map<
     string,
-    {
-      imports: Map<string, string[]> | null;
-      only: string[];
-      result: ITransformFileResult;
-    }
+    Entrypoint | IEvaluatedEntrypoint
   >;
-
-  protected readonly eval: Map<string, IModule>;
-
-  protected readonly originalAST: Map<string, File>;
 
   constructor(caches: Partial<ICaches> = {}) {
     this.entrypoints = caches.entrypoints || new Map();
-    this.ignored = caches.ignored || new Map();
-    this.resolve = caches.resolve || new Map();
-    this.resolveTask = caches.resolveTask || new Map();
-    this.code = caches.code || new Map();
-    this.eval = caches.eval || new Map();
-    this.originalAST = caches.originalAST || new Map();
   }
 
   public invalidateForFile(filename: string) {
@@ -147,6 +97,10 @@ export class TransformCacheCollection {
     return res;
   }
 
+  public delete(cacheName: CacheNames, key: string): void {
+    this.invalidate(cacheName, key);
+  }
+
   public invalidate(cacheName: CacheNames, key: string): void {
     const cache = this[cacheName] as Map<string, unknown>;
     if (!cache.has(key)) {
@@ -158,7 +112,15 @@ export class TransformCacheCollection {
     cache.delete(key);
   }
 
-  public clear(cacheName: CacheNames): void {
+  public clear(cacheName: CacheNames | 'all'): void {
+    if (cacheName === 'all') {
+      cacheNames.forEach((name) => {
+        this.clear(name);
+      });
+
+      return;
+    }
+
     loggers[cacheName]('clear');
     const cache = this[cacheName] as Map<string, unknown>;
 

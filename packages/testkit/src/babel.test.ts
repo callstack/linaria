@@ -12,7 +12,9 @@ import {
   transform as linariaTransform,
   loadLinariaOptions,
   TransformCacheCollection,
+  StackOfMaps,
 } from '@linaria/babel-preset';
+import { linariaLogger } from '@linaria/logger';
 import type { Evaluator, StrictOptions, OnEvent } from '@linaria/utils';
 import { EventEmitter } from '@linaria/utils';
 
@@ -3022,10 +3024,17 @@ describe('strategy shaker', () => {
       cache: TransformCacheCollection,
       filename: string
     ) => {
-      const cachedFoo = cache.get('eval', filename);
-      return (
-        typeof cachedFoo?.exports === 'object' ? cachedFoo.exports ?? {} : {}
-      ) as Record<string, unknown>;
+      const cachedFoo = cache.get('entrypoints', filename);
+      if (!cachedFoo?.evaluated) {
+        throw new Error('Expected entrypoint to be evaluated');
+      }
+
+      const result: Record<string | symbol, unknown> = {};
+      cachedFoo.exportsValues.forEach((value, key) => {
+        result[key] = value;
+      });
+
+      return result;
     };
 
     it('should cache evaluation', async () => {
@@ -3050,27 +3059,28 @@ describe('strategy shaker', () => {
       expect(exports.foo2).toBe(undefined); // foo2 is not used and should not be evaluated
     });
 
-    const createCacheFor = (
+    const createCacheFor = async (
       filename: string,
       exports: Record<string, string>
     ) => {
       const fooContent = readFileSync(filename, 'utf-8');
       const cache = new TransformCacheCollection();
       cache.invalidateIfChanged(filename, fooContent);
-      const keys = Object.keys(exports);
-      cache.add('code', filename, {
-        imports: null,
-        only: keys,
-        result: {
-          code: fooContent,
-        },
-      });
-      cache.add('eval', filename, {
-        debug: () => {},
-        idx: 1,
-        isEvaluated: true,
-        only: keys.join(','),
-        exports,
+
+      const only = Object.keys(exports);
+      const exportsValues = new StackOfMaps<string, unknown>();
+      for (const [key, value] of Object.entries(exports)) {
+        exportsValues.set(key, value);
+      }
+
+      cache.add('entrypoints', filename, {
+        evaluated: true,
+        evaluatedOnly: only,
+        generation: 1,
+        exportsValues,
+        ignored: false,
+        log: linariaLogger,
+        only,
       });
 
       return cache;
@@ -3078,7 +3088,7 @@ describe('strategy shaker', () => {
 
     it('should use cached value', async () => {
       const filename = require.resolve(join(dirName, './__fixtures__/foo'));
-      const cache = createCacheFor(filename, { foo1: 'cached-foo1' });
+      const cache = await createCacheFor(filename, { foo1: 'cached-foo1' });
 
       const { code, metadata } = await transform(
         dedent`
@@ -3097,7 +3107,7 @@ describe('strategy shaker', () => {
 
     it('should ignore uncompleted cached value', async () => {
       const filename = require.resolve(join(dirName, './__fixtures__/foo'));
-      const cache = createCacheFor(filename, { foo1: 'cached-foo1' });
+      const cache = await createCacheFor(filename, { foo1: 'cached-foo1' });
 
       const { code, metadata } = await transform(
         dedent`
@@ -3114,9 +3124,10 @@ describe('strategy shaker', () => {
       expect(metadata).toMatchSnapshot();
     });
 
+    // it('should use cached value even if only part of it is required', async () => {
     it('should use cached value even if only part is required', async () => {
       const filename = require.resolve(join(dirName, './__fixtures__/foo'));
-      const cache = createCacheFor(filename, {
+      const cache = await createCacheFor(filename, {
         foo1: 'cached-foo1',
         foo2: 'cached-foo2',
       });

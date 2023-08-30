@@ -3,50 +3,44 @@ import type {
   ActionQueueItem,
   ActionTypes,
   AnyIteratorResult,
-  Handlers,
+  AsyncScenarioForAction,
   IBaseAction,
-  ScenarioFor,
   Services,
   TypeOfResult,
   YieldResult,
+  SyncScenarioForAction,
+  Handler,
 } from '../types';
 import { Pending } from '../types';
 
 let actionIdx = 0;
 
-export type ActionByType<
-  TMode extends 'async' | 'sync',
-  TType extends ActionTypes,
-> = Extract<
-  ActionQueueItem<TMode>,
+export type ActionByType<TType extends ActionTypes> = Extract<
+  ActionQueueItem,
   {
     type: TType;
   }
 >;
 
-type GetBase<
-  TMode extends 'async' | 'sync',
-  TAction extends ActionQueueItem<TMode>,
-> = IBaseAction<TMode, TypeOfResult<TMode, TAction>, TAction['data']>;
+type GetBase<TAction extends ActionQueueItem> = IBaseAction<
+  TAction,
+  TypeOfResult<TAction>,
+  TAction['data']
+>;
 
-export class BaseAction<
-  TMode extends 'async' | 'sync',
-  TType extends ActionTypes,
-  TAction extends ActionByType<TMode, TType> = ActionByType<TMode, TType>,
-> implements GetBase<TMode, TAction>
+export class BaseAction<TAction extends ActionQueueItem>
+  implements GetBase<TAction>
 {
-  result: TypeOfResult<TMode, TAction> | typeof Pending = Pending;
+  result: TypeOfResult<TAction> | typeof Pending = Pending;
 
   public readonly idx: string;
 
   public constructor(
-    public readonly mode: TMode,
-    public readonly type: TType,
+    public readonly type: TAction['type'],
     public readonly services: Services,
-    public readonly entrypoint: Entrypoint<TMode>,
+    public readonly entrypoint: Entrypoint,
     public readonly data: TAction['data'],
-    public readonly abortSignal: AbortSignal | null,
-    protected readonly handler: Handlers<TMode>[TType]
+    public readonly abortSignal: AbortSignal | null
   ) {
     actionIdx += 1;
     this.idx = actionIdx.toString(16).padStart(6, '0');
@@ -54,54 +48,51 @@ export class BaseAction<
 
   public *getNext<
     TNextType extends ActionTypes,
-    TNextAction extends ActionByType<TMode, TNextType> = ActionByType<
-      TMode,
-      TNextType
-    >,
+    TNextAction extends ActionByType<TNextType> = ActionByType<TNextType>,
   >(
     type: TNextType,
-    entrypoint: Entrypoint<TMode>,
+    entrypoint: Entrypoint,
     data: TNextAction['data'],
     abortSignal: AbortSignal | null = this.abortSignal
   ): Generator<
-    [TNextType, Entrypoint<TMode>, TNextAction['data'], AbortSignal | null],
-    TypeOfResult<TMode, TNextAction>,
-    YieldResult<TMode>
+    [TNextType, Entrypoint, TNextAction['data'], AbortSignal | null],
+    TypeOfResult<TNextAction>,
+    YieldResult
   > {
-    return (yield [type, entrypoint, data, abortSignal]) as TypeOfResult<
-      TMode,
-      TNextAction
-    >;
+    return (yield [
+      type,
+      entrypoint,
+      data,
+      abortSignal,
+    ]) as TypeOfResult<TNextAction>;
   }
 
-  private activeScenario: ScenarioFor<
-    TMode,
-    TypeOfResult<TMode, TAction>
-  > | null = null;
+  private activeScenario:
+    | SyncScenarioForAction<TAction>
+    | AsyncScenarioForAction<TAction>
+    | null = null;
 
   private activeScenarioNextResults: AnyIteratorResult<
-    TMode,
-    TypeOfResult<TMode, TAction>
+    'async' | 'sync',
+    TypeOfResult<TAction>
   >[] = [];
 
-  public run() {
+  public run<TMode extends 'async' | 'sync'>(handler: Handler<TMode, TAction>) {
+    type IterationResult = AnyIteratorResult<TMode, TypeOfResult<TAction>>;
+
     if (!this.activeScenario) {
-      // FIXME: I spent two whole days trying to type all this generator stuff. I'm giving up for now.
-      // @ts-expect-error
-      this.activeScenario = this.handler.call(this);
+      this.activeScenario = handler.call(this);
       this.activeScenarioNextResults = [];
     }
 
     const processError = (e: unknown) => {
       const nextResult = this.activeScenario!.throw(e);
-      this.activeScenarioNextResults.push(
-        nextResult as AnyIteratorResult<TMode, TypeOfResult<TMode, TAction>>
-      );
+      this.activeScenarioNextResults.push(nextResult as IterationResult);
     };
 
     let nextIdx = 0;
     return {
-      next: (arg: YieldResult<TMode>) => {
+      next: (arg: YieldResult): IterationResult => {
         if (this.activeScenarioNextResults.length <= nextIdx) {
           try {
             const nextResult = this.activeScenario!.next(arg);
@@ -115,12 +106,7 @@ export class BaseAction<
               this.result = nextResult.value;
             }
 
-            this.activeScenarioNextResults.push(
-              nextResult as AnyIteratorResult<
-                TMode,
-                TypeOfResult<TMode, TAction>
-              >
-            );
+            this.activeScenarioNextResults.push(nextResult as IterationResult);
           } catch (e) {
             processError(e);
           }
@@ -128,13 +114,11 @@ export class BaseAction<
 
         const nextResult = this.activeScenarioNextResults[nextIdx]!;
         nextIdx += 1;
-        return nextResult;
+        return nextResult as IterationResult;
       },
-      throw: (
-        e: unknown
-      ): AnyIteratorResult<TMode, TypeOfResult<TMode, TAction>> => {
+      throw: (e: unknown): IterationResult => {
         processError(e);
-        return this.activeScenarioNextResults[nextIdx]!;
+        return this.activeScenarioNextResults[nextIdx] as IterationResult;
       },
     };
   }

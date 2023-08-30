@@ -15,8 +15,10 @@ import {
 } from '@linaria/utils';
 
 import type { Core } from '../babel';
-import type { IBaseEntrypoint } from '../types';
+import type { ParentEntrypoint } from '../types';
 
+import type { IEntrypointCode, IIgnoredEntrypoint } from './Entrypoint.types';
+import { StackOfMaps } from './helpers/StackOfMaps';
 import type { Services } from './types';
 
 export function getMatchedRule(
@@ -143,8 +145,8 @@ export function loadAndParse(
   loadedCode: string | undefined,
   log: Debugger,
   pluginOptions: StrictOptions
-) {
-  const { babel, cache, eventEmitter } = services;
+): IEntrypointCode | IIgnoredEntrypoint {
+  const { babel, eventEmitter } = services;
 
   const extension = extname(name);
 
@@ -155,7 +157,11 @@ export function loadAndParse(
       extension
     );
 
-    return 'ignored';
+    return {
+      code: undefined,
+      evaluator: 'ignored',
+      reason: 'extension',
+    };
   }
 
   const code = loadedCode ?? readFileSync(name, 'utf-8');
@@ -168,8 +174,11 @@ export function loadAndParse(
 
   if (action === 'ignore') {
     log('[createEntrypoint] %s is ignored by rule', name);
-    cache.add('ignored', name, true);
-    return 'ignored';
+    return {
+      code,
+      evaluator: 'ignored',
+      reason: 'rule',
+    };
   }
 
   const evaluator: Evaluator =
@@ -186,11 +195,8 @@ export function loadAndParse(
     babelOptions
   );
 
-  const ast: File = eventEmitter.pair(
-    { method: 'parseFile' },
-    () =>
-      cache.get('originalAST', name) ??
-      parseFile(babel, name, code, parseConfig)
+  const ast: File = eventEmitter.pair({ method: 'parseFile' }, () =>
+    parseFile(babel, name, code, parseConfig)
   );
 
   return {
@@ -204,7 +210,9 @@ export function loadAndParse(
 export const getIdx = (fn: string) =>
   getFileIdx(fn).toString().padStart(5, '0');
 
-export function getStack(entrypoint: IBaseEntrypoint) {
+export function getStack(entrypoint: ParentEntrypoint) {
+  if (!entrypoint) return [];
+
   const stack = [entrypoint.name];
 
   let { parent } = entrypoint;
@@ -216,8 +224,128 @@ export function getStack(entrypoint: IBaseEntrypoint) {
   return stack;
 }
 
-export const includes = (a: string[], b: string[]) => {
+export function mergeOnly(a: string[], b: string[]) {
+  const result = new Set(a);
+  b.forEach((item) => result.add(item));
+  return [...result].filter((i) => i).sort();
+}
+
+export const isSuperSet = <T>(a: (T | '*')[], b: (T | '*')[]) => {
   if (a.includes('*')) return true;
-  if (a.length !== b.length) return false;
-  return a.every((item, index) => item === b[index]);
+  if (b.length === 0) return true;
+  const aSet = new Set(a);
+  return b.every((item) => aSet.has(item));
+};
+
+const hasKey = <TKey extends string | symbol>(
+  obj: unknown,
+  key: TKey
+): obj is Record<TKey, unknown> =>
+  (typeof obj === 'object' || typeof obj === 'function') &&
+  obj !== null &&
+  key in obj;
+
+const VALUES = Symbol('values');
+
+export const isProxy = (
+  obj: unknown
+): obj is { [VALUES]: StackOfMaps<string | symbol, unknown> } =>
+  typeof obj === 'object' && obj !== null && VALUES in obj;
+
+export const getLazyValues = (obj: unknown) => {
+  if (isProxy(obj)) {
+    return obj[VALUES];
+  }
+
+  if (obj instanceof StackOfMaps) {
+    return obj;
+  }
+
+  return new StackOfMaps<string | symbol, unknown>();
+};
+
+export const createExports = (
+  container: {
+    readonly exportsValues: StackOfMaps<string | symbol, unknown>;
+  },
+  log: Debugger
+) => {
+  const exports: Record<string | symbol, unknown> = {};
+
+  return new Proxy(exports, {
+    get: (target, key) => {
+      if (key === VALUES) {
+        return container.exportsValues;
+      }
+
+      let value: unknown;
+      if (container.exportsValues.has(key)) {
+        value = container.exportsValues.get(key);
+      } else {
+        // Support Object.prototype methods on `exports`
+        // e.g `exports.hasOwnProperty`
+        value = Reflect.get(target, key);
+      }
+
+      if (value === undefined && container.exportsValues.has('default')) {
+        const defaultValue = container.exportsValues.get('default');
+        if (hasKey(defaultValue, key)) {
+          log(
+            '⚠️  %s has been found in `default`. It indicates that ESM to CJS conversion went wrong.',
+            key
+          );
+          value = defaultValue[key];
+        }
+      }
+
+      log('get %s: %o', key, value);
+      return value;
+    },
+    has: (target, key) => {
+      if (key === VALUES) return true;
+      return container.exportsValues.has(key);
+    },
+    ownKeys: () => {
+      return Array.from(container.exportsValues.keys());
+    },
+    set: (target, key, value) => {
+      if (key !== '__esModule') {
+        log('set %s: %o', key, value);
+      }
+
+      if (value !== undefined) {
+        container.exportsValues.set(key, value);
+      }
+
+      return true;
+    },
+    defineProperty: (target, key, descriptor) => {
+      const { value } = descriptor;
+      if (value !== undefined) {
+        if (key !== '__esModule') {
+          log('defineProperty %s with value %o', key, value);
+        }
+
+        container.exportsValues.set(key, value);
+
+        return true;
+      }
+
+      if ('get' in descriptor) {
+        container.exportsValues.setLazy(key, descriptor.get!);
+        log('defineProperty %s with getter', key);
+      }
+
+      return true;
+    },
+    getOwnPropertyDescriptor: (target, key) => {
+      if (container.exportsValues.has(key))
+        return {
+          enumerable: true,
+          configurable: true,
+        };
+
+      return undefined;
+    },
+  });
 };

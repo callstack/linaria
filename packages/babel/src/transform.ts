@@ -7,6 +7,9 @@
  * - return transformed code (without Linaria template literals), generated CSS, source maps and babel metadata from transform step.
  */
 
+import { isFeatureEnabled } from '@linaria/utils';
+
+import { TransformCacheCollection } from './cache';
 import { Entrypoint } from './transform/Entrypoint';
 import {
   asyncActionRunner,
@@ -42,22 +45,22 @@ export function transformSync(
   const { options } = services;
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
 
-  const entrypoint = Entrypoint.createSyncRoot(
+  if (
+    !isFeatureEnabled(pluginOptions.features, 'globalCache', options.filename)
+  ) {
+    // If global cache is disabled, we need to create a new cache for each file
+    services.cache = new TransformCacheCollection();
+  }
+
+  const entrypoint = Entrypoint.createRoot(
     services,
-    {
-      ...baseHandlers,
-      ...customHandlers,
-      resolveImports() {
-        return syncResolveImports.call(this, syncResolve);
-      },
-    },
     options.filename,
     ['__linariaPreval'],
     originalCode,
     pluginOptions
   );
 
-  if (entrypoint === 'ignored') {
+  if (entrypoint.ignored) {
     return {
       code: originalCode,
       sourceMap: options.inputSourceMap,
@@ -66,7 +69,13 @@ export function transformSync(
 
   const workflowAction = entrypoint.createAction('workflow', undefined);
 
-  const result = syncActionRunner(workflowAction);
+  const result = syncActionRunner(workflowAction, {
+    ...baseHandlers,
+    ...customHandlers,
+    resolveImports() {
+      return syncResolveImports.call(this, syncResolve);
+    },
+  });
 
   entrypoint.log('%s is ready', entrypoint.name);
 
@@ -83,9 +92,16 @@ export default async function transform(
   ) => Promise<string | null>,
   customHandlers: Partial<AllHandlers<'sync'>> = {}
 ): Promise<Result> {
+  const { options } = partialServices;
   const services = withDefaultServices(partialServices);
-  const { options } = services;
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
+
+  if (
+    !isFeatureEnabled(pluginOptions.features, 'globalCache', options.filename)
+  ) {
+    // If global cache is disabled, we need to create a new cache for each file
+    services.cache = new TransformCacheCollection();
+  }
 
   /*
    * This method can be run simultaneously for multiple files.
@@ -95,22 +111,15 @@ export default async function transform(
    * but the "only" option has changed, the file will be re-processed using
    * the combined "only" option.
    */
-  const entrypoint = Entrypoint.createAsyncRoot(
+  const entrypoint = Entrypoint.createRoot(
     services,
-    {
-      ...baseHandlers,
-      ...customHandlers,
-      resolveImports(this: IResolveImportsAction<'async'>) {
-        return asyncResolveImports.call(this, asyncResolve);
-      },
-    },
     options.filename,
     ['__linariaPreval'],
     originalCode,
     pluginOptions
   );
 
-  if (entrypoint === 'ignored') {
+  if (entrypoint.ignored) {
     return {
       code: originalCode,
       sourceMap: options.inputSourceMap,
@@ -119,7 +128,13 @@ export default async function transform(
 
   const workflowAction = entrypoint.createAction('workflow', undefined);
 
-  const result = await asyncActionRunner(workflowAction);
+  const result = await asyncActionRunner(workflowAction, {
+    ...baseHandlers,
+    ...customHandlers,
+    resolveImports(this: IResolveImportsAction) {
+      return asyncResolveImports.call(this, asyncResolve);
+    },
+  });
 
   entrypoint.log('%s is ready', entrypoint.name);
 

@@ -16,23 +16,28 @@ import NativeModule from 'module';
 import path from 'path';
 import vm from 'vm';
 
-import type { BabelFileResult } from '@babel/core';
+import { invariant } from 'ts-invariant';
 
-import type { CustomDebug } from '@linaria/logger';
-import { createCustomDebug } from '@linaria/logger';
-import type { BaseProcessor } from '@linaria/tags';
-import type { StrictOptions } from '@linaria/utils';
-import { getFileIdx } from '@linaria/utils';
+import type { Debugger } from '@linaria/logger';
 
 import { TransformCacheCollection } from './cache';
 import { Entrypoint } from './transform/Entrypoint';
+import {
+  createExports,
+  getStack,
+  isSuperSet,
+  mergeOnly,
+} from './transform/Entrypoint.helpers';
+import type {
+  IEntrypointDependency,
+  IEvaluatedEntrypoint,
+} from './transform/Entrypoint.types';
 import { syncActionRunner } from './transform/actions/actionRunner';
 import { baseProcessingHandlers } from './transform/generators/baseProcessingHandlers';
 import { syncResolveImports } from './transform/generators/resolveImports';
 import loadLinariaOptions from './transform/helpers/loadLinariaOptions';
 import { withDefaultServices } from './transform/helpers/withDefaultServices';
-import type { IModule } from './types';
-import createVmContext from './vm/createVmContext';
+import { createVmContext } from './vm/createVmContext';
 
 type HiddenModuleMembers = {
   _extensions: { [key: string]: () => void };
@@ -84,28 +89,9 @@ const builtins = {
   zlib: true,
 };
 
-const VALUES = Symbol('values');
-
-const isProxy = (
-  obj: unknown
-): obj is { [VALUES]: Record<string | symbol, unknown> } =>
-  typeof obj === 'object' && obj !== null && VALUES in obj;
-
 const NOOP = () => {};
 
-const hasKey = <TKey extends string | symbol>(
-  obj: unknown,
-  key: TKey
-): obj is Record<TKey, unknown> =>
-  (typeof obj === 'object' || typeof obj === 'function') &&
-  obj !== null &&
-  key in obj;
-
-function getUncached(cached: string | string[], test: string): string[] {
-  if (cached === test) {
-    return [];
-  }
-
+function getUncached(cached: string | string[], test: string[]): string[] {
   const cachedSet = new Set(
     typeof cached === 'string' ? cached.split(',') : cached
   );
@@ -114,17 +100,13 @@ function getUncached(cached: string | string[], test: string): string[] {
     return [];
   }
 
-  return test.split(',').filter((t) => !cachedSet.has(t));
+  return test.filter((t) => !cachedSet.has(t));
 }
 
 class Module {
   #isEvaluated = false;
 
-  #exports: Record<string, unknown> | unknown;
-
-  #lazyValues: Map<string | symbol, () => unknown>;
-
-  readonly idx: number;
+  readonly idx: string;
 
   id: string;
 
@@ -136,150 +118,50 @@ class Module {
 
   imports: Map<string, string[]> | null;
 
-  // paths: string[];
-
   extensions: string[];
 
-  dependencies: string[] | null;
+  dependencies: string[];
 
-  tagProcessors: BaseProcessor[] = [];
+  debug: Debugger;
 
-  transform: ((text: string) => BabelFileResult | null) | null;
-
-  debug: CustomDebug;
+  readonly callstack: string[] = [];
 
   constructor(
-    filename: string,
-    public only: string,
-    public options: Pick<StrictOptions, 'extensions'>,
+    protected entrypoint: Entrypoint,
     private cache = new TransformCacheCollection(),
-    private debuggerDepth = 0,
-    private parentModule?: Module,
+    parentModule?: Module,
     private moduleImpl: HiddenModuleMembers = DefaultModuleImplementation
   ) {
-    this.idx = getFileIdx(filename);
-    this.id = filename;
-    this.filename = filename;
+    this.idx = entrypoint.idx;
+    this.id = entrypoint.name;
+    this.filename = entrypoint.name;
     this.imports = null;
-    this.dependencies = null;
-    this.transform = parentModule?.transform ?? null;
-    this.debug = createCustomDebug('module', this.idx);
+    this.dependencies = [];
+    this.debug = entrypoint.log.extend('module');
     this.parentIsIgnored = parentModule?.ignored ?? false;
-    this.ignored = this.cache.get('ignored', filename) ?? this.parentIsIgnored;
+    this.ignored = entrypoint.ignored ?? this.parentIsIgnored;
 
-    this.#lazyValues = new Map();
+    if (parentModule) {
+      this.callstack = [...parentModule.callstack, parentModule.filename];
+    } else {
+      this.callstack = [];
+    }
 
-    const exports: Record<string | symbol, unknown> = {};
+    this.extensions = entrypoint.pluginOptions.extensions;
 
-    this.#exports = new Proxy(exports, {
-      get: (target, key) => {
-        if (key === VALUES) {
-          const values: Record<string | symbol, unknown> = {};
-          this.#lazyValues.forEach((v, k) => {
-            values[k] = v();
-          });
-
-          return values;
-        }
-        let value: unknown;
-        if (this.#lazyValues.has(key)) {
-          value = this.#lazyValues.get(key)?.();
-        } else {
-          // Support Object.prototype methods on `exports`
-          // e.g `exports.hasOwnProperty`
-          value = Reflect.get(target, key);
-        }
-
-        if (value === undefined && this.#lazyValues.has('default')) {
-          const defaultValue = this.#lazyValues.get('default')?.();
-          if (hasKey(defaultValue, key)) {
-            this.debug(
-              'evaluated',
-              '⚠️  %s has been found in `default`. It indicates that ESM to CJS conversion of %s went wrong.',
-              key,
-              filename
-            );
-            value = defaultValue[key];
-          }
-        }
-
-        this.debug('evaluated', 'get %s: %o', key, value);
-        return value;
-      },
-      has: (target, key) => {
-        if (key === VALUES) return true;
-        return this.#lazyValues.has(key);
-      },
-      ownKeys: () => {
-        return Array.from(this.#lazyValues.keys());
-      },
-      set: (target, key, value) => {
-        if (key !== '__esModule') {
-          this.debug('evaluated', 'set %s: %o', key, value);
-        }
-
-        if (value !== undefined) {
-          this.#lazyValues.set(key, () => value);
-        }
-
-        return true;
-      },
-      defineProperty: (target, key, descriptor) => {
-        const { value } = descriptor;
-        if (value !== undefined) {
-          this.#lazyValues.set(key, () => value);
-
-          if (key !== '__esModule') {
-            this.debug(
-              'evaluated',
-              'defineProperty %s with value %o',
-              key,
-              value
-            );
-          }
-
-          this.#lazyValues.set(key, () => value);
-
-          return true;
-        }
-
-        if ('get' in descriptor) {
-          this.#lazyValues.set(key, descriptor.get!);
-          this.debug('evaluated', 'defineProperty %s with getter', key);
-        }
-
-        return true;
-      },
-      getOwnPropertyDescriptor: (target, key) => {
-        if (this.#lazyValues.has(key))
-          return {
-            enumerable: true,
-            configurable: true,
-          };
-
-        return undefined;
-      },
-    });
-
-    this.extensions = options.extensions;
-    this.debug('init', filename);
+    this.debug('init', entrypoint.name);
   }
 
   public get exports() {
-    return this.#exports;
+    return this.entrypoint.exports;
   }
 
   public set exports(value) {
-    if (isProxy(value)) {
-      this.#exports = value[VALUES];
-    } else {
-      this.#exports = value;
-    }
+    this.entrypoint.exports = value;
 
     this.debug(
-      'evaluated',
       'the whole exports was overridden with %O',
-      this.#exports
+      this.entrypoint.exportsValues
     );
   }
 
@@ -287,10 +169,22 @@ class Module {
     return this.#isEvaluated;
   }
 
-  resolve = (id: string) => {
-    const resolveCacheKey = `${this.filename} -> ${id}`;
-    if (this.cache.has('resolve', resolveCacheKey)) {
-      return this.cache.get('resolve', resolveCacheKey)!;
+  public set isEvaluated(value) {
+    this.#isEvaluated = value;
+  }
+
+  resolveDependency = (id: string): IEntrypointDependency => {
+    const cached = this.entrypoint.getDependency(id);
+    invariant(!(cached instanceof Promise), 'Dependency is not resolved yet');
+
+    if (cached) {
+      return cached;
+    }
+
+    if (!this.ignored) {
+      this.debug(
+        '❌ import has not been resolved during prepare stage. Fallback to Node.js resolver'
+      );
     }
 
     const extensions = this.moduleImpl._extensions;
@@ -312,79 +206,88 @@ class Module {
 
       const { filename } = this;
 
-      return this.moduleImpl._resolveFilename(id, {
+      const resolved = this.moduleImpl._resolveFilename(id, {
         id: filename,
         filename,
         paths: this.moduleImpl._nodeModulePaths(path.dirname(filename)),
       });
+
+      return {
+        source: id,
+        only: ['*'],
+        resolved,
+      };
     } finally {
       // Cleanup the extensions we added to restore previous behaviour
       added.forEach((ext) => delete extensions[ext]);
     }
   };
 
-  getCachedModule(filename: string, onlyAsString: string): IModule | null {
-    if (!this.cache.has('eval', filename)) {
-      return null;
-    }
+  resolve = (id: string): string => {
+    const { resolved } = this.resolveDependency(id);
+    invariant(resolved, `Unable to resolve "${id}"`);
+    return resolved;
+  };
 
-    const m = this.cache.get('eval', filename)!;
-    const uncachedExports = getUncached(m.only, onlyAsString);
-    if (uncachedExports.length > 0 || !m.isEvaluated) {
-      m.debug(
-        'eval-cache',
-        'is going to be invalidated because %o is not evaluated yet (evaluated: %o)',
-        uncachedExports,
-        m.only
-      );
-
-      this.cache.invalidate('eval', filename);
-
-      return null;
-    }
-
-    return m;
-  }
-
-  getCachedCode(filename: string, onlyAsString: string, log: CustomDebug) {
+  getEntrypoint(
+    filename: string,
+    only: string[],
+    log: Debugger
+  ): Entrypoint | IEvaluatedEntrypoint | null {
     const extension = path.extname(filename);
     if (extension !== '.json' && !this.extensions.includes(extension)) {
       return null;
     }
 
-    if (this.cache.has('ignored', filename)) {
+    const entrypoint = this.cache.get('entrypoints', filename);
+    if (entrypoint && isSuperSet(entrypoint.evaluatedOnly ?? [], only)) {
+      log('✅ file has been already evaluated');
+      return entrypoint;
+    }
+
+    if (entrypoint?.ignored) {
       log(
-        'code-cache',
         '✅ file has been ignored during prepare stage. Original code will be used'
       );
-      return fs.readFileSync(filename, 'utf-8');
+      return entrypoint;
     }
 
     if (this.ignored) {
       log(
-        'code-cache',
         '✅ one of the parent files has been ignored during prepare stage. Original code will be used'
       );
-      return fs.readFileSync(filename, 'utf-8');
+
+      const newEntrypoint = this.entrypoint.createChild(
+        filename,
+        ['*'],
+        fs.readFileSync(filename, 'utf-8')
+      );
+
+      if (newEntrypoint === 'loop') {
+        const stack = getStack(this.entrypoint);
+        throw new Error(
+          `Circular dependency detected: ${stack.join(' -> ')} -> ${filename}`
+        );
+      }
+
+      return newEntrypoint;
     }
 
     // Requested file can be already prepared for evaluation on the stage 1
-    if (onlyAsString && this.cache.has('code', filename)) {
-      const cached = this.cache.get('code', filename);
-      const uncachedExports = getUncached(cached?.only ?? [], onlyAsString);
+    if (only && entrypoint) {
+      const uncachedExports = getUncached(entrypoint.only ?? [], only);
       if (uncachedExports.length === 0) {
-        log('code-cache', '✅ ready for evaluation');
-        return cached?.result.code ?? '';
+        log('✅ ready for evaluation');
+        return entrypoint;
       }
 
       log(
-        'code-cache',
         '❌ file has been processed during prepare stage but %o is not evaluated yet (evaluated: %o)',
         uncachedExports,
-        cached?.only ?? []
+        entrypoint.only
       );
     } else {
-      log('code-cache', '❌ file has not been processed during prepare stage');
+      log('❌ file has not been processed during prepare stage');
     }
 
     // If code wasn't extracted from cache, it indicates that we were unable
@@ -406,32 +309,35 @@ class Module {
 
     const pluginOptions = loadLinariaOptions({});
     const code = fs.readFileSync(filename, 'utf-8');
-    const entrypoint = Entrypoint.createSyncRoot(
+    const newEntrypoint = Entrypoint.createRoot(
       services,
-      {
-        ...baseProcessingHandlers,
-        resolveImports() {
-          return syncResolveImports.call(this, syncResolve);
-        },
-      },
       filename,
-      onlyAsString ? onlyAsString.split(',') : ['*'],
+      only,
       code,
       pluginOptions
     );
 
-    if (entrypoint === 'ignored') {
-      log(
-        'code-cache',
-        '✅ file has been ignored during prepare stage. Original code will be used'
-      );
-      return code;
+    if (newEntrypoint.evaluated) {
+      log('✅ file has been already evaluated');
+      return newEntrypoint;
     }
 
-    const action = entrypoint.createAction('processEntrypoint', undefined);
-    const actionResult = syncActionRunner(action);
+    if (newEntrypoint.ignored) {
+      log(
+        '✅ file has been ignored during prepare stage. Original code will be used'
+      );
+      return newEntrypoint;
+    }
 
-    return actionResult?.result?.code ?? code;
+    const action = newEntrypoint.createAction('processEntrypoint', undefined);
+    syncActionRunner(action, {
+      ...baseProcessingHandlers,
+      resolveImports() {
+        return syncResolveImports.call(this, syncResolve);
+      },
+    });
+
+    return newEntrypoint;
   }
 
   require: {
@@ -453,44 +359,54 @@ class Module {
       }
 
       // Resolve module id (and filename) relatively to parent module
-      const resolved = this.resolve(id);
-      const [filename, onlyAsString = '*'] = resolved.split('\0');
-      if (filename === id && !path.isAbsolute(id)) {
+      const dependency = this.resolveDependency(id);
+      if (dependency.resolved === id && !path.isAbsolute(id)) {
         // The module is a builtin node modules, but not in the allowed list
         throw new Error(
           `Unable to import "${id}". Importing Node builtins is not supported in the sandbox.`
         );
       }
 
-      this.dependencies?.push(id);
-
-      this.debug('require', `${id} -> ${filename}`);
-
-      const code = this.getCachedCode(filename, onlyAsString, this.debug);
-      const cached = this.getCachedModule(filename, onlyAsString);
-      if (cached) {
-        return cached.exports;
-      }
-
-      const m = new Module(
-        filename,
-        onlyAsString,
-        this.options,
-        this.cache,
-        this.debuggerDepth + 1,
-        this
+      invariant(
+        dependency.resolved,
+        `Dependency ${dependency.source} cannot be resolved`
       );
 
-      this.cache.add('eval', filename, m);
+      this.dependencies.push(id);
 
-      if (code === null) {
-        m.exports = filename;
-        m.#isEvaluated = true;
-      } else {
-        m.evaluate(code);
+      this.debug('require', `${id} -> ${dependency.resolved}`);
+
+      const entrypoint = this.getEntrypoint(
+        dependency.resolved,
+        dependency.only,
+        this.debug
+      );
+
+      if (entrypoint === null) {
+        return dependency.resolved;
       }
 
-      return m.exports;
+      if (
+        entrypoint.evaluated ||
+        isSuperSet(entrypoint.evaluatedOnly, dependency.only)
+      ) {
+        return createExports(entrypoint, this.debug);
+      }
+
+      const m = new Module(entrypoint, this.cache, this);
+
+      this.cache.add('entrypoints', entrypoint.name, {
+        evaluated: true,
+        evaluatedOnly: mergeOnly(entrypoint.evaluatedOnly, entrypoint.only),
+        exportsValues: entrypoint.exportsValues,
+        generation: entrypoint.generation + 1,
+        ignored: false,
+        log: entrypoint.log,
+        only: entrypoint.only,
+      });
+      m.evaluate();
+
+      return entrypoint.exports;
     },
     {
       ensure: NOOP,
@@ -498,9 +414,13 @@ class Module {
     }
   );
 
-  evaluate(source: string): void {
+  evaluate(): void {
+    const source =
+      this.entrypoint.transformedCode ?? this.entrypoint.originalCode;
+
     if (!source) {
       this.debug(`evaluate`, 'there is nothing to evaluate');
+      return;
     }
 
     if (this.isEvaluated) {
@@ -508,9 +428,10 @@ class Module {
       return;
     }
 
-    this.debug('evaluate', `\n${source}`);
+    this.debug('evaluate');
+    this.debug.extend('source')('%s', source);
 
-    this.#isEvaluated = true;
+    this.isEvaluated = true;
 
     const { filename } = this;
 
@@ -520,14 +441,17 @@ class Module {
       return;
     }
 
-    const { context, teardown } = createVmContext({
-      module: this,
-      exports: this.#exports,
-      require: this.require,
-      __linaria_dynamic_import: async (id: string) => this.require(id),
-      __filename: filename,
-      __dirname: path.dirname(filename),
-    });
+    const { context, teardown } = createVmContext(
+      filename,
+      this.entrypoint.pluginOptions.features,
+      {
+        module: this,
+        exports: this.entrypoint.exports,
+        require: this.require,
+        __linaria_dynamic_import: async (id: string) => this.require(id),
+        __dirname: path.dirname(filename),
+      }
+    );
 
     try {
       const script = new vm.Script(
@@ -540,21 +464,14 @@ class Module {
       script.runInContext(context);
     } catch (e) {
       if (e instanceof EvalError) {
-        this.debug('evaluate:error', '%O', e);
+        this.debug('%O', e);
 
         throw e;
       }
 
-      const callstack: string[] = ['', filename];
-      let module = this.parentModule;
-      while (module) {
-        callstack.push(module.filename);
-        module = module.parentModule;
-      }
-
-      this.debug('evaluate:error', '%O\n%O', e, callstack);
+      this.debug('%O\n%O', e, this.callstack);
       throw new EvalError(
-        `${(e as Error).message} in${callstack.join('\n| ')}\n`
+        `${(e as Error).message} in${this.callstack.join('\n| ')}\n`
       );
     } finally {
       teardown();

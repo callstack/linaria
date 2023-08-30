@@ -1,6 +1,6 @@
 import { cosmiconfigSync } from 'cosmiconfig';
 
-import type { StrictOptions } from '@linaria/utils';
+import type { FeatureFlags, StrictOptions } from '@linaria/utils';
 
 import type { PluginOptions } from '../../types';
 
@@ -44,8 +44,10 @@ export default function loadLinariaOptions(
       ? explorerSync.load(configFile)
       : explorerSync.search();
 
-  const defaultFeatures = {
+  const defaultFeatures: FeatureFlags = {
     dangerousCodeRemover: true,
+    globalCache: true,
+    happyDOM: true,
   };
 
   const options: StrictOptions = {

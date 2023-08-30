@@ -22,16 +22,19 @@ export default function babelTransform(
     pre(file: BabelFile) {
       // eslint-disable-next-line require-yield
       function* collect(
-        this: ICollectAction<'sync'>
-      ): SyncScenarioForAction<ICollectAction<'sync'>> {
+        this: ICollectAction
+      ): SyncScenarioForAction<ICollectAction> {
         const { valueCache } = this.data;
-        const { ast, code, pluginOptions } = this.entrypoint;
+        const { loadedAndParsed, pluginOptions } = this.entrypoint;
+        if (loadedAndParsed.evaluator === 'ignored') {
+          throw new Error('entrypoint was ignored');
+        }
 
         collector(file, pluginOptions, valueCache);
 
         return {
-          ast,
-          code,
+          ast: loadedAndParsed.ast,
+          code: loadedAndParsed.code,
         };
       }
 

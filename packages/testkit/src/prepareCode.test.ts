@@ -4,15 +4,13 @@ import { join } from 'path';
 import * as babel from '@babel/core';
 
 import {
-  baseHandlers,
   Entrypoint,
   loadLinariaOptions,
   parseFile,
   prepareCode,
-  syncResolveImports,
   withDefaultServices,
 } from '@linaria/babel-preset';
-import { EventEmitter, syncResolve } from '@linaria/utils';
+import { EventEmitter } from '@linaria/utils';
 
 const testCasesDir = join(__dirname, '__fixtures__', 'prepare-code-test-cases');
 
@@ -64,21 +62,15 @@ describe('prepareCode', () => {
         babel,
         options: { root, filename: inputFilePath },
       });
-      const entrypoint = Entrypoint.createSyncRoot(
+      const entrypoint = Entrypoint.createRoot(
         services,
-        {
-          ...baseHandlers,
-          resolveImports() {
-            return syncResolveImports.call(this, syncResolve);
-          },
-        },
         inputFilePath,
         only,
         sourceCode,
         pluginOptions
       );
 
-      if (entrypoint === 'ignored') {
+      if (entrypoint.ignored) {
         throw new Error('Ignored');
       }
       const ast = parseFile(babel, inputFilePath, sourceCode, {

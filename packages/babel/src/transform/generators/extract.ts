@@ -120,12 +120,16 @@ function extractCssFromAst(
  */
 // eslint-disable-next-line require-yield
 export function* extract(
-  this: IExtractAction<'sync'>
-): SyncScenarioForAction<IExtractAction<'sync'>> {
+  this: IExtractAction
+): SyncScenarioForAction<IExtractAction> {
   const { options } = this.services;
   const { entrypoint } = this;
   const { processors } = this.data;
-  const { code } = entrypoint;
+  const { loadedAndParsed } = entrypoint;
+  if (loadedAndParsed.evaluator === 'ignored') {
+    throw new Error('entrypoint was ignored');
+  }
+
   let allRules: Rules = {};
   const allReplacements: Replacements = [];
   processors.forEach((processor) => {
@@ -146,7 +150,7 @@ export function* extract(
   });
 
   return {
-    ...extractCssFromAst(allRules, code, options),
+    ...extractCssFromAst(allRules, loadedAndParsed.code, options),
     replacements: allReplacements,
   };
 }

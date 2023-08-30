@@ -1,65 +1,93 @@
-import type { TransformOptions } from '@babel/core';
-import type { File } from '@babel/types';
+import { invariant } from 'ts-invariant';
 
 import type { Debugger } from '@linaria/logger';
-import type { Evaluator, StrictOptions } from '@linaria/utils';
+import type { StrictOptions } from '@linaria/utils';
 
-import { getIdx, includes } from './Entrypoint.helpers';
-import type { IEntrypointCode } from './Entrypoint.types';
+import type { ParentEntrypoint, ITransformFileResult } from '../types';
+import withLinariaMetadata from '../utils/withLinariaMetadata';
+
+import {
+  createExports,
+  getIdx,
+  getLazyValues,
+  isSuperSet,
+  isProxy,
+  mergeOnly,
+} from './Entrypoint.helpers';
+import type {
+  IEntrypointCode,
+  IEntrypointDependency,
+  IIgnoredEntrypoint,
+} from './Entrypoint.types';
 import type { ActionByType } from './actions/BaseAction';
 import { BaseAction } from './actions/BaseAction';
-import type { IEntrypoint, Services, Handlers, ActionTypes } from './types';
+import { StackOfMaps } from './helpers/StackOfMaps';
+import type { Services, ActionTypes, ActionQueueItem } from './types';
 
 const EMPTY_FILE = '=== empty file ===';
 
-type CreateArgs<TMode extends 'async' | 'sync'> = [
-  services: Services,
-  actionHandlers: Handlers<TMode>,
-  name: string,
-  only: string[],
-  loadedCode: string | undefined,
-  pluginOptions: StrictOptions,
-];
+function ancestorOrSelf(name: string, parent: ParentEntrypoint) {
+  let next = parent;
+  while (next) {
+    if (next.name === name) {
+      return next;
+    }
 
-export class Entrypoint<TMode extends 'async' | 'sync'>
-  implements IEntrypoint, IEntrypointCode
-{
-  private static innerCreate<TMode extends 'async' | 'sync'>(
-    mode: TMode,
+    next = next.parent;
+  }
+
+  return null;
+}
+
+type DependencyType = IEntrypointDependency | Promise<IEntrypointDependency>;
+
+const EXPORTS = Symbol('exports');
+
+export class Entrypoint {
+  private static innerCreate(
     services: Services,
-    actionHandlers: Handlers<TMode>,
-    parent: Entrypoint<TMode> | null,
+    parent: ParentEntrypoint,
     name: string,
     only: string[],
     loadedCode: string | undefined,
     pluginOptions: StrictOptions
-  ): ['ready', Entrypoint<TMode>] | ['ignored', Entrypoint<TMode> | null] {
+  ): ['loop' | 'created' | 'cached', Entrypoint] {
     const { cache } = services;
 
-    const cached = cache.get('entrypoints', name) as
-      | Entrypoint<TMode>
-      | undefined;
+    const cached = cache.get('entrypoints', name);
     const changed =
       loadedCode !== undefined
         ? cache.invalidateIfChanged(name, loadedCode)
         : false;
 
+    if (!cached?.evaluated && cached?.ignored) {
+      return ['cached', cached];
+    }
+
+    const exports =
+      cached?.exportsValues ?? new StackOfMaps<string | symbol, unknown>();
+    const evaluatedOnly = cached?.evaluatedOnly ?? [];
     const mergedOnly =
       !changed && cached?.only
-        ? Array.from(new Set([...cached.only, ...only]))
-            .filter((i) => i)
-            .sort()
+        ? mergeOnly(cached.only, only).filter((i) => !evaluatedOnly.includes(i))
         : only;
 
-    if (!changed && cached) {
-      const isLoop = parent && parent.ancestorOrSelf(name) !== null;
+    if (cached?.evaluated) {
+      cached.log('is already evaluated with', cached.evaluatedOnly);
+      // if (mergedOnly.length === 0) {
+      //   return ['cached', cached];
+      // }
+    }
+
+    if (!changed && cached && !cached.evaluated) {
+      const isLoop = parent && ancestorOrSelf(name, parent) !== null;
       if (isLoop) {
         parent.log('[createEntrypoint] %s is a loop', name);
       }
 
-      if (includes(cached.only, mergedOnly)) {
+      if (isSuperSet(cached.only, mergedOnly)) {
         cached.log('is cached', name);
-        return [isLoop ? 'ignored' : 'ready', cached];
+        return [isLoop ? 'loop' : 'cached', cached];
       }
 
       cached.log(
@@ -68,44 +96,29 @@ export class Entrypoint<TMode extends 'async' | 'sync'>
         cached?.only
       );
 
-      return [isLoop ? 'ignored' : 'ready', cached.supersede(mergedOnly)];
+      return [isLoop ? 'loop' : 'created', cached.supersede(mergedOnly)];
     }
-
-    const loadedAndParsed = services.loadAndParseFn(
-      services,
-      name,
-      loadedCode,
-      parent?.log ?? services.log,
-      pluginOptions
-    );
-
-    if (loadedAndParsed === 'ignored') {
-      return ['ignored', null];
-    }
-
-    cache.invalidateIfChanged(name, loadedAndParsed.code);
-    cache.add('originalAST', name, loadedAndParsed.ast);
 
     const newEntrypoint = new Entrypoint(
-      mode,
       services,
-      actionHandlers,
       parent,
-      loadedAndParsed.ast,
-      loadedAndParsed.code,
-      loadedAndParsed.evalConfig,
-      loadedAndParsed.evaluator,
+      loadedCode,
       name,
       mergedOnly,
-      pluginOptions
+      pluginOptions,
+      exports,
+      evaluatedOnly,
+      undefined,
+      cached && 'dependencies' in cached ? cached.dependencies : undefined,
+      cached ? cached.generation + 1 : 1
     );
 
-    if (cached) {
+    if (cached && !cached.evaluated) {
       cached.log('is cached, but with different code');
       cached.supersede(newEntrypoint);
     }
 
-    return ['ready', newEntrypoint];
+    return ['created', newEntrypoint];
   }
 
   /**
@@ -120,156 +133,202 @@ export class Entrypoint<TMode extends 'async' | 'sync'>
    * 3. If `only` is superset of the existing entrypoint's `only`, the existing entrypoint will be superseded and the new one will be returned.
    * 4. If a loop is detected, 'ignored' will be returned, the existing entrypoint will be superseded or not depending on the `only` value.
    */
-  protected static create<TMode extends 'async' | 'sync'>(
-    mode: TMode,
+  protected static create(
     services: Services,
-    actionHandlers: Handlers<TMode>,
-    parent: Entrypoint<TMode> | null,
+    parent: ParentEntrypoint,
     name: string,
     only: string[],
     loadedCode: string | undefined,
     pluginOptions: StrictOptions
-  ): Entrypoint<TMode> | 'ignored' {
+  ): Entrypoint | 'loop' {
     const { cache, eventEmitter } = services;
     return eventEmitter.pair({ method: 'createEntrypoint' }, () => {
       const [status, entrypoint] = Entrypoint.innerCreate(
-        mode,
         services,
-        actionHandlers,
-        parent,
+        parent
+          ? {
+              log: parent.log,
+              name: parent.name,
+              parent: parent.parent,
+            }
+          : null,
         name,
         only,
         loadedCode,
         pluginOptions
       );
 
-      if (entrypoint) {
+      if (status !== 'cached') {
         cache.add('entrypoints', name, entrypoint);
       }
 
-      return status === 'ignored' ? 'ignored' : entrypoint;
+      return status === 'loop' ? 'loop' : entrypoint;
     });
   }
 
-  private static createRoot<TMode extends 'async' | 'sync'>(
-    mode: TMode,
+  public static createRoot(
     services: Services,
-    actionHandlers: Handlers<TMode>,
     name: string,
     only: string[],
     loadedCode: string | undefined,
     pluginOptions: StrictOptions
-  ): Entrypoint<TMode> | 'ignored' {
-    return Entrypoint.create(
-      mode,
+  ): Entrypoint {
+    const created = Entrypoint.create(
       services,
-      actionHandlers,
       null,
       name,
       only,
       loadedCode,
       pluginOptions
     );
-  }
+    invariant(created !== 'loop', 'loop detected');
 
-  public static createSyncRoot(...args: CreateArgs<'sync'>) {
-    return Entrypoint.createRoot('sync', ...args);
-  }
-
-  public static createAsyncRoot(...args: CreateArgs<'async' | 'sync'>) {
-    return Entrypoint.createRoot('async', ...args);
+    return created;
   }
 
   public readonly idx: string;
 
   public readonly log: Debugger;
 
-  #supersededWith: Entrypoint<TMode> | null = null;
+  #transformResult: ITransformFileResult | null = null;
 
-  public get isSuperseded() {
-    return this.#supersededWith !== null;
+  #supersededWith: Entrypoint | null = null;
+
+  public readonly evaluated = false;
+
+  #exportsValues = new StackOfMaps<string | symbol, unknown>();
+
+  public get exportsValues() {
+    return this.#exportsValues;
+  }
+
+  public get exports() {
+    if (this.#exportsValues.has(EXPORTS)) {
+      return this.#exportsValues.get(EXPORTS);
+    }
+
+    return createExports(this, this.log.extend('exports'));
+  }
+
+  public set exports(value: unknown) {
+    if (isProxy(value)) {
+      this.#exportsValues.join(getLazyValues(value));
+    } else {
+      this.#exportsValues.set(EXPORTS, value);
+    }
+  }
+
+  public hasEvaluatedExports() {
+    return this.#exportsValues.size > 0;
   }
 
   public get supersededWith() {
     return this.#supersededWith;
   }
 
-  protected onSupersedeHandlers: Array<
-    (newEntrypoint: Entrypoint<TMode>) => void
-  > = [];
+  public get transformedCode() {
+    return this.#transformResult?.code;
+  }
+
+  public setTransformResult(res: ITransformFileResult | null) {
+    this.#transformResult = res;
+  }
+
+  protected onSupersedeHandlers: Array<(newEntrypoint: Entrypoint) => void> =
+    [];
 
   private actionsCache: Map<
-    keyof Handlers<TMode>,
-    Map<unknown, BaseAction<TMode, ActionTypes>>
+    ActionTypes,
+    Map<unknown, BaseAction<ActionQueueItem>>
   > = new Map();
 
+  public addDependency(name: string, dependency: DependencyType): void {
+    this.dependencies.set(name, dependency);
+  }
+
+  public getDependency(name: string): DependencyType | undefined {
+    return this.dependencies.get(name);
+  }
+
+  public readonly loadedAndParsed: IEntrypointCode | IIgnoredEntrypoint;
+
+  public get originalCode() {
+    return this.loadedAndParsed.code;
+  }
+
+  public get ignored() {
+    return this.loadedAndParsed.evaluator === 'ignored';
+  }
+
   private constructor(
-    public readonly mode: TMode,
     protected services: Services,
-    protected actionHandlers: Handlers<TMode>,
-    public readonly parent: Entrypoint<TMode> | null,
-    public readonly ast: File,
-    public readonly code: string,
-    public readonly evalConfig: TransformOptions,
-    public readonly evaluator: Evaluator,
+    public readonly parent: ParentEntrypoint,
+    public readonly initialCode: string | undefined,
     public readonly name: string,
     public readonly only: string[],
     public readonly pluginOptions: StrictOptions,
+    exports: StackOfMaps<string | symbol, unknown>,
+    public readonly evaluatedOnly: string[],
+    loadedAndParsed?: IEntrypointCode | IIgnoredEntrypoint,
+    protected readonly dependencies = new Map<string, DependencyType>(),
     public readonly generation = 1
   ) {
+    this.loadedAndParsed =
+      loadedAndParsed ??
+      services.loadAndParseFn(
+        services,
+        name,
+        initialCode,
+        parent?.log ?? services.log,
+        pluginOptions
+      );
+
+    if (this.loadedAndParsed.code !== undefined) {
+      services.cache.invalidateIfChanged(name, this.loadedAndParsed.code);
+    }
+
     this.idx = getIdx(name);
     this.log =
       parent?.log.extend(this.idx, '->') ?? services.log.extend(this.idx);
 
     this.only = only;
 
-    Object.keys(actionHandlers).forEach((type) => {
-      this.actionsCache.set(type as keyof Handlers<TMode>, new Map());
-    });
-
     this.log.extend('source')(
       'created %s (%o)\n%s',
       name,
       only,
-      code || EMPTY_FILE
+      this.originalCode || EMPTY_FILE
     );
+
+    if (exports) {
+      this.#exportsValues.join(exports);
+    }
   }
 
-  public ancestorOrSelf(name: string) {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let next: Entrypoint<TMode> | null = this;
-    while (next) {
-      if (next.name === name) {
-        return next;
-      }
-
-      next = next.parent;
+  public createAction<
+    TType extends ActionTypes,
+    TAction extends ActionByType<TType>,
+  >(
+    actionType: TType,
+    data: TAction['data'],
+    abortSignal: AbortSignal | null = null
+  ): BaseAction<TAction> {
+    if (!this.actionsCache.has(actionType)) {
+      this.actionsCache.set(actionType, new Map());
     }
 
-    return null;
-  }
-
-  public createAction<TType extends ActionTypes>(
-    actionType: TType,
-    data: ActionByType<TMode, TType>['data'],
-    abortSignal: AbortSignal | null = null
-  ): {
-    [K in TType]: BaseAction<TMode, K, ActionByType<TMode, K>>;
-  }[TType] {
     const cache = this.actionsCache.get(actionType)!;
     const cached = cache.get(data);
     if (cached) {
-      return cached as BaseAction<TMode, TType, ActionByType<TMode, TType>>;
+      return cached as BaseAction<TAction>;
     }
 
-    const newAction = new BaseAction<TMode, TType, ActionByType<TMode, TType>>(
-      this.mode,
-      actionType,
+    const newAction = new BaseAction<TAction>(
+      actionType as TAction['type'],
       this.services,
       this,
       data,
-      abortSignal,
-      this.actionHandlers[actionType]
+      abortSignal
     );
 
     cache.set(data, newAction);
@@ -281,11 +340,9 @@ export class Entrypoint<TMode extends 'async' | 'sync'>
     name: string,
     only: string[],
     loadedCode?: string
-  ): Entrypoint<TMode> | 'ignored' {
+  ): Entrypoint | 'loop' {
     return Entrypoint.create(
-      this.mode,
       this.services,
-      this.actionHandlers,
       this,
       name,
       only,
@@ -294,24 +351,21 @@ export class Entrypoint<TMode extends 'async' | 'sync'>
     );
   }
 
-  protected supersede(
-    newOnlyOrEntrypoint: string[] | Entrypoint<TMode>
-  ): Entrypoint<TMode> {
+  private supersede(newOnlyOrEntrypoint: string[] | Entrypoint): Entrypoint {
     const newEntrypoint =
       newOnlyOrEntrypoint instanceof Entrypoint
         ? newOnlyOrEntrypoint
         : new Entrypoint(
-            this.mode,
             this.services,
-            this.actionHandlers,
             this.parent,
-            this.ast,
-            this.code,
-            this.evalConfig,
-            this.evaluator,
+            this.initialCode,
             this.name,
             newOnlyOrEntrypoint,
             this.pluginOptions,
+            this.exportsValues,
+            this.evaluatedOnly,
+            this.loadedAndParsed,
+            this.dependencies,
             this.generation + 1
           );
 
@@ -322,7 +376,11 @@ export class Entrypoint<TMode extends 'async' | 'sync'>
     return newEntrypoint;
   }
 
-  public onSupersede(callback: (newEntrypoint: Entrypoint<TMode>) => void) {
+  public hasLinariaMetadata() {
+    return withLinariaMetadata(this.#transformResult?.metadata);
+  }
+
+  public onSupersede(callback: (newEntrypoint: Entrypoint) => void) {
     if (this.#supersededWith) {
       callback(this.#supersededWith);
       return () => {};

@@ -1,3 +1,4 @@
+import generate from '@babel/generator';
 import type { ExportAllDeclaration, File, Node } from '@babel/types';
 
 import type { Core } from '../../babel';
@@ -29,12 +30,15 @@ const getWildcardReexport = (babel: Core, ast: File) => {
  * and replaces wildcard with resolved named.
  */
 export function* explodeReexports(
-  this: IExplodeReexportsAction<'sync'>
-): SyncScenarioForAction<IExplodeReexportsAction<'sync'>> {
+  this: IExplodeReexportsAction
+): SyncScenarioForAction<IExplodeReexportsAction> {
   const { babel } = this.services;
-  const { log, ast } = this.entrypoint;
+  const { log, loadedAndParsed } = this.entrypoint;
+  if (loadedAndParsed.evaluator === 'ignored') {
+    return;
+  }
 
-  const reexportsFrom = getWildcardReexport(babel, ast);
+  const reexportsFrom = getWildcardReexport(babel, loadedAndParsed.ast);
   if (!reexportsFrom.length) {
     return;
   }
@@ -85,7 +89,7 @@ export function* explodeReexports(
   }
 
   // Replace wildcard reexport with named reexports
-  babel.traverse(ast, {
+  babel.traverse(loadedAndParsed.ast, {
     ExportAllDeclaration(path) {
       const replacement = replacements.get(path.node);
       if (replacement) {
@@ -95,4 +99,6 @@ export function* explodeReexports(
       }
     },
   });
+
+  loadedAndParsed.code = generate(loadedAndParsed.ast).code;
 }
