@@ -28,7 +28,8 @@ function getHandler<
 
 export async function asyncActionRunner<TAction extends ActionQueueItem>(
   action: BaseAction<TAction>,
-  actionHandlers: Handlers<'async' | 'sync'>
+  actionHandlers: Handlers<'async' | 'sync'>,
+  stack: string[] = [action.type]
 ): Promise<TypeOfResult<TAction>> {
   if (action.abortSignal?.aborted) {
     throw new AbortError();
@@ -46,7 +47,10 @@ export async function asyncActionRunner<TAction extends ActionQueueItem>(
     const nextAction = entrypoint.createAction(type, data, abortSignal);
 
     try {
-      const actionResult = await asyncActionRunner(nextAction, actionHandlers);
+      const actionResult = await asyncActionRunner(nextAction, actionHandlers, [
+        ...stack,
+        type,
+      ]);
       result = await generator.next(actionResult);
     } catch (e) {
       result = await generator.throw(e);
@@ -58,7 +62,8 @@ export async function asyncActionRunner<TAction extends ActionQueueItem>(
 
 export function syncActionRunner<TAction extends ActionQueueItem>(
   action: BaseAction<TAction>,
-  actionHandlers: Handlers<'sync'>
+  actionHandlers: Handlers<'sync'>,
+  stack: string[] = [action.type]
 ): TypeOfResult<TAction> {
   if (action.abortSignal?.aborted) {
     throw new AbortError();
@@ -76,7 +81,10 @@ export function syncActionRunner<TAction extends ActionQueueItem>(
     const nextAction = entrypoint.createAction(type, data, abortSignal);
 
     try {
-      const actionResult = syncActionRunner(nextAction, actionHandlers);
+      const actionResult = syncActionRunner(nextAction, actionHandlers, [
+        ...stack,
+        type,
+      ]);
       result = generator.next(actionResult);
     } catch (e) {
       result = generator.throw(e);

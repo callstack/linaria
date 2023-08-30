@@ -56,7 +56,7 @@ export function* processEntrypoint(
   const { supersededWith } = this.entrypoint;
   if (supersededWith) {
     log('entrypoint superseded, rescheduling processing');
-    yield* this.getNext('processEntrypoint', supersededWith, undefined, null);
+    yield ['processEntrypoint', supersededWith, undefined, null];
   }
 
   log('entrypoint processing finished');

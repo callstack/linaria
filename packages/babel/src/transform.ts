@@ -69,17 +69,27 @@ export function transformSync(
 
   const workflowAction = entrypoint.createAction('workflow', undefined);
 
-  const result = syncActionRunner(workflowAction, {
-    ...baseHandlers,
-    ...customHandlers,
-    resolveImports() {
-      return syncResolveImports.call(this, syncResolve);
-    },
-  });
+  try {
+    const result = syncActionRunner(workflowAction, {
+      ...baseHandlers,
+      ...customHandlers,
+      resolveImports() {
+        return syncResolveImports.call(this, syncResolve);
+      },
+    });
 
-  entrypoint.log('%s is ready', entrypoint.name);
+    entrypoint.log('%s is ready', entrypoint.name);
 
-  return result;
+    return result;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(`Error during transform of ${entrypoint.name}:`, err);
+
+    return {
+      code: originalCode,
+      sourceMap: options.inputSourceMap,
+    };
+  }
 }
 
 export default async function transform(
@@ -128,15 +138,25 @@ export default async function transform(
 
   const workflowAction = entrypoint.createAction('workflow', undefined);
 
-  const result = await asyncActionRunner(workflowAction, {
-    ...baseHandlers,
-    ...customHandlers,
-    resolveImports(this: IResolveImportsAction) {
-      return asyncResolveImports.call(this, asyncResolve);
-    },
-  });
+  try {
+    const result = await asyncActionRunner(workflowAction, {
+      ...baseHandlers,
+      ...customHandlers,
+      resolveImports(this: IResolveImportsAction) {
+        return asyncResolveImports.call(this, asyncResolve);
+      },
+    });
 
-  entrypoint.log('%s is ready', entrypoint.name);
+    entrypoint.log('%s is ready', entrypoint.name);
 
-  return result;
+    return result;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(`Error during transform of ${entrypoint.name}:`, err);
+
+    return {
+      code: originalCode,
+      sourceMap: options.inputSourceMap,
+    };
+  }
 }

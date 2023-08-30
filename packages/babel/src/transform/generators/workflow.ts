@@ -1,4 +1,5 @@
 import withLinariaMetadata from '../../utils/withLinariaMetadata';
+import { isAborted } from '../actions/AbortError';
 import type { IWorkflowAction, SyncScenarioForAction } from '../types';
 
 /**
@@ -22,7 +23,16 @@ export function* workflow(
 
   // *** 1st stage ***
 
-  yield* this.getNext('processEntrypoint', entrypoint, undefined);
+  try {
+    yield* this.getNext('processEntrypoint', entrypoint, undefined);
+  } catch (e) {
+    if (isAborted(e)) {
+      entrypoint.log('entrypoint superseded, rescheduling workflow');
+      yield* this.getNext('workflow', entrypoint.supersededWith!, undefined);
+    } else {
+      throw e;
+    }
+  }
 
   // File is ignored or does not contain any tags. Return original code.
   if (!entrypoint.hasLinariaMetadata()) {
