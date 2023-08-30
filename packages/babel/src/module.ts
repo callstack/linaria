@@ -394,16 +394,6 @@ class Module {
       }
 
       const m = new Module(entrypoint, this.cache, this);
-
-      this.cache.add('entrypoints', entrypoint.name, {
-        evaluated: true,
-        evaluatedOnly: mergeOnly(entrypoint.evaluatedOnly, entrypoint.only),
-        exportsValues: entrypoint.exportsValues,
-        generation: entrypoint.generation + 1,
-        ignored: false,
-        log: entrypoint.log,
-        only: entrypoint.only,
-      });
       m.evaluate();
 
       return entrypoint.exports;
@@ -415,8 +405,19 @@ class Module {
   );
 
   evaluate(): void {
-    const source =
-      this.entrypoint.transformedCode ?? this.entrypoint.originalCode;
+    const { entrypoint } = this;
+
+    this.cache.add('entrypoints', entrypoint.name, {
+      evaluated: true,
+      evaluatedOnly: mergeOnly(entrypoint.evaluatedOnly, entrypoint.only),
+      exportsValues: entrypoint.exportsValues,
+      generation: entrypoint.generation + 1,
+      ignored: false,
+      log: entrypoint.log,
+      only: entrypoint.only,
+    });
+
+    const source = entrypoint.transformedCode ?? entrypoint.originalCode;
 
     if (!source) {
       this.debug(`evaluate`, 'there is nothing to evaluate');
@@ -443,10 +444,10 @@ class Module {
 
     const { context, teardown } = createVmContext(
       filename,
-      this.entrypoint.pluginOptions.features,
+      entrypoint.pluginOptions.features,
       {
         module: this,
-        exports: this.entrypoint.exports,
+        exports: entrypoint.exports,
         require: this.require,
         __linaria_dynamic_import: async (id: string) => this.require(id),
         __dirname: path.dirname(filename),
