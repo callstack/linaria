@@ -18,6 +18,7 @@ export { default as Module, DefaultModuleImplementation } from './module';
 export { default as transform } from './transform';
 export * from './types';
 export { parseFile } from './transform/Entrypoint.helpers';
+export type { LoadAndParseFn } from './transform/Entrypoint.types';
 export { baseHandlers } from './transform/generators';
 export { prepareCode } from './transform/generators/transform';
 export { Entrypoint } from './transform/Entrypoint';
@@ -29,6 +30,7 @@ export {
 export { default as loadLinariaOptions } from './transform/helpers/loadLinariaOptions';
 export { StackOfMaps } from './transform/helpers/StackOfMaps';
 export { withDefaultServices } from './transform/helpers/withDefaultServices';
+export type { Services } from './transform/types';
 export { default as isNode } from './utils/isNode';
 export { default as getTagProcessor } from './utils/getTagProcessor';
 export { default as getVisitorKeys } from './utils/getVisitorKeys';

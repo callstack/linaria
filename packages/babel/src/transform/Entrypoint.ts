@@ -1,24 +1,18 @@
 import { invariant } from 'ts-invariant';
 
-import type { Debugger } from '@linaria/logger';
 import type { StrictOptions } from '@linaria/utils';
 
 import type { ParentEntrypoint, ITransformFileResult } from '../types';
 import withLinariaMetadata from '../utils/withLinariaMetadata';
 
-import {
-  createExports,
-  getIdx,
-  getLazyValues,
-  isSuperSet,
-  isProxy,
-  mergeOnly,
-} from './Entrypoint.helpers';
+import { BaseEntrypoint } from './BaseEntrypoint';
+import { isSuperSet, mergeOnly } from './Entrypoint.helpers';
 import type {
   IEntrypointCode,
   IEntrypointDependency,
   IIgnoredEntrypoint,
 } from './Entrypoint.types';
+import { EvaluatedEntrypoint } from './EvaluatedEntrypoint';
 import type { ActionByType } from './actions/BaseAction';
 import { BaseAction } from './actions/BaseAction';
 import { StackOfMaps } from './helpers/StackOfMaps';
@@ -41,9 +35,7 @@ function ancestorOrSelf(name: string, parent: ParentEntrypoint) {
 
 type DependencyType = IEntrypointDependency | Promise<IEntrypointDependency>;
 
-const EXPORTS = Symbol('exports');
-
-export class Entrypoint {
+export class Entrypoint extends BaseEntrypoint {
   private static innerCreate(
     services: Services,
     parent: ParentEntrypoint,
@@ -186,41 +178,11 @@ export class Entrypoint {
     return created;
   }
 
-  public readonly idx: string;
-
-  public readonly log: Debugger;
-
   #transformResult: ITransformFileResult | null = null;
 
   #supersededWith: Entrypoint | null = null;
 
   public readonly evaluated = false;
-
-  #exportsValues = new StackOfMaps<string | symbol, unknown>();
-
-  public get exportsValues() {
-    return this.#exportsValues;
-  }
-
-  public get exports() {
-    if (this.#exportsValues.has(EXPORTS)) {
-      return this.#exportsValues.get(EXPORTS);
-    }
-
-    return createExports(this, this.log.extend('exports'));
-  }
-
-  public set exports(value: unknown) {
-    if (isProxy(value)) {
-      this.#exportsValues.join(getLazyValues(value));
-    } else {
-      this.#exportsValues.set(EXPORTS, value);
-    }
-  }
-
-  public hasEvaluatedExports() {
-    return this.#exportsValues.size > 0;
-  }
 
   public get supersededWith() {
     return this.#supersededWith;
@@ -261,18 +223,25 @@ export class Entrypoint {
   }
 
   private constructor(
-    protected services: Services,
-    public readonly parent: ParentEntrypoint,
+    services: Services,
+    parent: ParentEntrypoint,
     public readonly initialCode: string | undefined,
-    public readonly name: string,
-    public readonly only: string[],
+    name: string,
+    only: string[],
     public readonly pluginOptions: StrictOptions,
     exports: StackOfMaps<string | symbol, unknown>,
-    public readonly evaluatedOnly: string[],
+    evaluatedOnly: string[],
     loadedAndParsed?: IEntrypointCode | IIgnoredEntrypoint,
     protected readonly dependencies = new Map<string, DependencyType>(),
-    public readonly generation = 1
+    generation = 1
   ) {
+    const stackOfMaps = new StackOfMaps<string | symbol, unknown>();
+    if (exports) {
+      stackOfMaps.join(exports);
+    }
+
+    super(services, evaluatedOnly, stackOfMaps, generation, name, only, parent);
+
     this.loadedAndParsed =
       loadedAndParsed ??
       services.loadAndParseFn(
@@ -287,12 +256,6 @@ export class Entrypoint {
       services.cache.invalidateIfChanged(name, this.loadedAndParsed.code);
     }
 
-    this.idx = getIdx(name);
-    this.log =
-      parent?.log.extend(this.idx, '->') ?? services.log.extend(this.idx);
-
-    this.only = only;
-
     this.log.extend('source')(
       'created %s (%o)\n%s',
       name,
@@ -301,7 +264,7 @@ export class Entrypoint {
     );
 
     if (exports) {
-      this.#exportsValues.join(exports);
+      this.exportsValues.join(exports);
     }
   }
 
@@ -394,5 +357,17 @@ export class Entrypoint {
         this.onSupersedeHandlers.splice(index, 1);
       }
     };
+  }
+
+  public createEvaluated() {
+    return new EvaluatedEntrypoint(
+      this.services,
+      mergeOnly(this.evaluatedOnly, this.only),
+      this.exportsValues,
+      this.generation + 1,
+      this.name,
+      this.only,
+      this.parent
+    );
   }
 }

@@ -3,7 +3,7 @@ import { createHash } from 'crypto';
 import { linariaLogger } from '@linaria/logger';
 
 import type { Entrypoint } from './transform/Entrypoint';
-import type { IEvaluatedEntrypoint } from './transform/Entrypoint.types';
+import type { EvaluatedEntrypoint } from './transform/EvaluatedEntrypoint';
 
 function hashContent(content: string) {
   return createHash('sha256').update(content).digest('hex');
@@ -11,7 +11,7 @@ function hashContent(content: string) {
 
 interface ICaches {
   contentHashes: Map<string, string>;
-  entrypoints: Map<string, Entrypoint | IEvaluatedEntrypoint>;
+  entrypoints: Map<string, Entrypoint | EvaluatedEntrypoint>;
 }
 
 type MapValue<T> = T extends Map<string, infer V> ? V : never;
@@ -32,10 +32,7 @@ const loggers = cacheNames.reduce(
 export class TransformCacheCollection {
   private contentHashes = new Map<string, string>();
 
-  protected readonly entrypoints: Map<
-    string,
-    Entrypoint | IEvaluatedEntrypoint
-  >;
+  protected readonly entrypoints: Map<string, Entrypoint | EvaluatedEntrypoint>;
 
   constructor(caches: Partial<ICaches> = {}) {
     this.entrypoints = caches.entrypoints || new Map();

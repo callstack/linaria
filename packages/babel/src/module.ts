@@ -22,16 +22,9 @@ import type { Debugger } from '@linaria/logger';
 
 import { TransformCacheCollection } from './cache';
 import { Entrypoint } from './transform/Entrypoint';
-import {
-  createExports,
-  getStack,
-  isSuperSet,
-  mergeOnly,
-} from './transform/Entrypoint.helpers';
-import type {
-  IEntrypointDependency,
-  IEvaluatedEntrypoint,
-} from './transform/Entrypoint.types';
+import { getStack, isSuperSet } from './transform/Entrypoint.helpers';
+import type { IEntrypointDependency } from './transform/Entrypoint.types';
+import type { EvaluatedEntrypoint } from './transform/EvaluatedEntrypoint';
 import { syncActionRunner } from './transform/actions/actionRunner';
 import { baseProcessingHandlers } from './transform/generators/baseProcessingHandlers';
 import { syncResolveImports } from './transform/generators/resolveImports';
@@ -233,7 +226,7 @@ class Module {
     filename: string,
     only: string[],
     log: Debugger
-  ): Entrypoint | IEvaluatedEntrypoint | null {
+  ): Entrypoint | EvaluatedEntrypoint | null {
     const extension = path.extname(filename);
     if (extension !== '.json' && !this.extensions.includes(extension)) {
       return null;
@@ -390,7 +383,7 @@ class Module {
         entrypoint.evaluated ||
         isSuperSet(entrypoint.evaluatedOnly, dependency.only)
       ) {
-        return createExports(entrypoint, this.debug);
+        return entrypoint.exports;
       }
 
       const m = new Module(entrypoint, this.cache, this);
@@ -407,17 +400,16 @@ class Module {
   evaluate(): void {
     const { entrypoint } = this;
 
-    this.cache.add('entrypoints', entrypoint.name, {
-      evaluated: true,
-      evaluatedOnly: mergeOnly(entrypoint.evaluatedOnly, entrypoint.only),
-      exportsValues: entrypoint.exportsValues,
-      generation: entrypoint.generation + 1,
-      ignored: false,
-      log: entrypoint.log,
-      only: entrypoint.only,
-    });
+    this.cache.add(
+      'entrypoints',
+      entrypoint.name,
+      entrypoint.createEvaluated()
+    );
 
-    const source = entrypoint.transformedCode ?? entrypoint.originalCode;
+    const source =
+      entrypoint.transformedCode ??
+      entrypoint.originalCode ??
+      entrypoint.initialCode;
 
     if (!source) {
       this.debug(`evaluate`, 'there is nothing to evaluate');
