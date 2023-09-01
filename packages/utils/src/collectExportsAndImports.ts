@@ -34,6 +34,7 @@ import isExports from './isExports';
 import isNotNull from './isNotNull';
 import isRequire from './isRequire';
 import isTypedNode from './isTypedNode';
+import { getTraversalCache } from './traversalCache';
 
 export interface ISideEffectImport {
   imported: 'side-effect';
@@ -953,8 +954,6 @@ function collectFromExportDefaultDeclaration(
   state.exports.push({ exported: 'default', local: declaration });
 }
 
-const cache = new WeakMap<NodePath, IState>();
-
 function collectFromAssignmentExpression(
   path: NodePath<AssignmentExpression>,
   state: IState
@@ -1129,7 +1128,7 @@ function collectFromCallExpression(
 
 export function collectExportsAndImports(
   path: NodePath,
-  force = false
+  cacheMode: 'disabled' | 'force' | 'enabled' = 'enabled'
 ): IState {
   const state: IState = {
     exportRefs: new Map(),
@@ -1139,7 +1138,12 @@ export function collectExportsAndImports(
     isEsModule: false,
   };
 
-  if (!force && cache.has(path)) {
+  const cache =
+    cacheMode !== 'disabled'
+      ? getTraversalCache<IState>(path, 'collectExportsAndImports')
+      : undefined;
+
+  if (cacheMode === 'enabled' && cache?.has(path)) {
     return cache.get(path) ?? state;
   }
 
@@ -1157,7 +1161,7 @@ export function collectExportsAndImports(
     state
   );
 
-  cache.set(path, state);
+  cache?.set(path, state);
 
   return state;
 }

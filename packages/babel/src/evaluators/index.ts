@@ -13,9 +13,10 @@ export default function evaluate(
   const m = new Module(entrypoint, cache);
 
   m.evaluate();
+  m.dispose();
 
   return {
-    value: m.exports,
+    value: entrypoint.exports,
     dependencies: m.dependencies,
   };
 }

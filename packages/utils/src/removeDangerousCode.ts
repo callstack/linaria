@@ -2,7 +2,7 @@ import type { NodePath } from '@babel/core';
 import type { Identifier, Program } from '@babel/types';
 
 import { nonType } from './findIdentifiers';
-import isUnnecessaryReactCall from './isUnnecessaryReactCall';
+import { isUnnecessaryReactCall } from './isUnnecessaryReactCall';
 import { removeWithRelated } from './scopeHelpers';
 import JSXElementsRemover from './visitors/JSXElementsRemover';
 

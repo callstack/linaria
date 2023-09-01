@@ -31,18 +31,6 @@ Dependencies: ./__fixtures__/foo
 
 `;
 
-exports[`strategy shaker cache should ignore uncompleted cached value 1`] = `"export const text = "text_t13jq05";"`;
-
-exports[`strategy shaker cache should ignore uncompleted cached value 2`] = `
-
-CSS:
-
-.text_t13jq05 {font-size: foo1foo2}
-
-Dependencies: ./__fixtures__/foo
-
-`;
-
 exports[`strategy shaker cache should use cached value 1`] = `"export const text = "text_t13jq05";"`;
 
 exports[`strategy shaker cache should use cached value 2`] = `
@@ -62,6 +50,18 @@ exports[`strategy shaker cache should use cached value even if only part is requ
 CSS:
 
 .text_t13jq05 {font-size: cached-foo1}
+
+Dependencies: ./__fixtures__/foo
+
+`;
+
+exports[`strategy shaker cache should use partially cached value 1`] = `"export const text = "text_t13jq05";"`;
+
+exports[`strategy shaker cache should use partially cached value 2`] = `
+
+CSS:
+
+.text_t13jq05 {font-size: cached-foo1foo2}
 
 Dependencies: ./__fixtures__/foo
 
@@ -2078,6 +2078,28 @@ Dependencies: ./__fixtures__/reexports
 
 `;
 
+exports[`strategy shaker should import react as namespace 1`] = `
+"import { styled } from "@linaria/react";
+import * as React from "react";
+const Cmp = React.memo(() => null);
+const _exp = /*#__PURE__*/() => Cmp;
+export const StyledTitle = /*#__PURE__*/styled(_exp())({
+  name: "StyledTitle",
+  class: "StyledTitle_s13jq05",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should import react as namespace 2`] = `
+
+CSS:
+
+.StyledTitle_s13jq05 {}
+
+Dependencies: react
+
+`;
+
 exports[`strategy shaker should interpolate imported components 1`] = `"export const square = "square_s13jq05";"`;
 
 exports[`strategy shaker should interpolate imported components 2`] = `
@@ -2431,6 +2453,22 @@ CSS:
 
 
 Dependencies: NA
+
+`;
+
+exports[`strategy shaker should process module.exports = require(…) 1`] = `"export const square = "square_s13jq05";"`;
+
+exports[`strategy shaker should process module.exports = require(…) 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  div:before {
+    content: foo;
+  }
+}
+
+Dependencies: ./__fixtures__/module-reexport
 
 `;
 

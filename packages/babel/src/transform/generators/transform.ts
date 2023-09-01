@@ -1,5 +1,4 @@
 import type {
-  BabelFileMetadata,
   BabelFileResult,
   PluginItem,
   TransformOptions,
@@ -9,12 +8,13 @@ import type { File } from '@babel/types';
 import type {
   EvaluatorConfig,
   EventEmitter,
+  LinariaMetadata,
   StrictOptions,
 } from '@linaria/utils';
 import { buildOptions, getPluginKey } from '@linaria/utils';
 
 import type { Core } from '../../babel';
-import withLinariaMetadata from '../../utils/withLinariaMetadata';
+import { getLinariaMetadata } from '../../utils/withLinariaMetadata';
 import type { Entrypoint } from '../Entrypoint';
 import type { ITransformAction, SyncScenarioForAction } from '../types';
 
@@ -73,7 +73,7 @@ type PrepareCodeFn = (
 ) => [
   code: string,
   imports: Map<string, string[]> | null,
-  metadata?: BabelFileMetadata,
+  metadata: LinariaMetadata | null,
 ];
 
 export const prepareCode = (
@@ -85,7 +85,7 @@ export const prepareCode = (
   const { log, pluginOptions, only, loadedAndParsed } = item;
   if (loadedAndParsed.evaluator === 'ignored') {
     log('is ignored');
-    return [loadedAndParsed.code ?? '', null, undefined];
+    return [loadedAndParsed.code ?? '', null, null];
   }
 
   const { code, evalConfig, evaluator } = loadedAndParsed;
@@ -105,16 +105,14 @@ export const prepareCode = (
       )
   );
 
-  if (
-    only.length === 1 &&
-    only[0] === '__linariaPreval' &&
-    !withLinariaMetadata(preevalStageResult.metadata)
-  ) {
+  const linariaMetadata = getLinariaMetadata(preevalStageResult.metadata);
+
+  if (only.length === 1 && only[0] === '__linariaPreval' && !linariaMetadata) {
     log('[evaluator:end] no metadata');
-    return [preevalStageResult.code!, null, preevalStageResult.metadata];
+    return [preevalStageResult.code!, null, null];
   }
 
-  log('[preeval] metadata %O', preevalStageResult.metadata);
+  log('[preeval] metadata %O', linariaMetadata);
   log('[evaluator:start] using %s', evaluator.name);
 
   const evaluatorConfig: EvaluatorConfig = {
@@ -139,7 +137,7 @@ export const prepareCode = (
 
   log('[evaluator:end]');
 
-  return [transformedCode, imports, preevalStageResult.metadata];
+  return [transformedCode, imports, linariaMetadata ?? null];
 };
 
 export function* internalTransform(

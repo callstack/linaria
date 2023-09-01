@@ -1,4 +1,3 @@
-import withLinariaMetadata from '../../utils/withLinariaMetadata';
 import { isAborted } from '../actions/AbortError';
 import type { IWorkflowAction, SyncScenarioForAction } from '../types';
 
@@ -71,19 +70,17 @@ export function* workflow(
     valueCache,
   });
 
-  if (!withLinariaMetadata(collectStageResult.metadata)) {
+  if (!collectStageResult.metadata) {
     return {
       code: collectStageResult.code!,
       sourceMap: collectStageResult.map,
     };
   }
 
-  const linariaMetadata = collectStageResult.metadata.linaria;
-
   // *** 4th stage
 
   const extractStageResult = yield* this.getNext('extract', entrypoint, {
-    processors: linariaMetadata.processors,
+    processors: collectStageResult.metadata.processors,
   });
 
   return {
@@ -92,7 +89,7 @@ export function* workflow(
     dependencies,
     replacements: [
       ...extractStageResult.replacements,
-      ...linariaMetadata.replacements,
+      ...collectStageResult.metadata.replacements,
     ],
     sourceMap: collectStageResult.map,
   };

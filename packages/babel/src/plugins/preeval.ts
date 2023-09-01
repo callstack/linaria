@@ -12,6 +12,7 @@ import {
   addIdentifierToLinariaPreval,
   removeDangerousCode,
   isFeatureEnabled,
+  invalidateTraversalCache,
 } from '@linaria/utils';
 
 import type { Core } from '../babel';
@@ -87,6 +88,8 @@ export default function preeval(
       onFinishCallbacks.get(this)?.();
 
       const log = createCustomDebug('preeval', getFileIdx(file.opts.filename!));
+
+      invalidateTraversalCache(file.path);
 
       if (this.processors.length === 0) {
         log('end', "We didn't find any Linaria template literals");

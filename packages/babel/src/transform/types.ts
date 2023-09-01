@@ -2,7 +2,7 @@ import type { BabelFileResult } from '@babel/core';
 
 import type { Debugger } from '@linaria/logger';
 import type { ValueCache } from '@linaria/tags';
-import type { EventEmitter, Artifact } from '@linaria/utils';
+import type { EventEmitter, Artifact, LinariaMetadata } from '@linaria/utils';
 
 import type { Core } from '../babel';
 import type { TransformCacheCollection } from '../cache';
@@ -127,10 +127,17 @@ export type GetNext = <
   YieldResult
 >;
 
+export interface ICollectActionResult {
+  ast: BabelFileResult['ast']; // FIXME: looks like this is not used
+  code: BabelFileResult['code'];
+  map?: BabelFileResult['map'];
+  metadata?: LinariaMetadata | null;
+}
+
 export interface ICollectAction
   extends IBaseAction<
     ICollectAction,
-    BabelFileResult,
+    ICollectActionResult,
     { valueCache: ValueCache }
   > {
   type: 'collect';

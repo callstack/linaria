@@ -1,4 +1,4 @@
-import type { BabelFile, BabelFileMetadata, PluginPass } from '@babel/core';
+import type { BabelFile, PluginPass } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import type { File } from '@babel/types';
 import type { RawSourceMap } from 'source-map';
@@ -52,7 +52,7 @@ export interface IPluginState extends PluginPass {
 
 export interface ITransformFileResult {
   code: string;
-  metadata?: BabelFileMetadata;
+  metadata: LinariaMetadata | null;
 }
 
 export type Stage = 'preeval' | 'collect';

@@ -1,9 +1,9 @@
+/* eslint-disable no-param-reassign */
 import type { Debugger } from '@linaria/logger';
 import { getFileIdx } from '@linaria/utils';
 
 import type { ParentEntrypoint } from '../types';
 
-import { StackOfMaps } from './helpers/StackOfMaps';
 import type { Services } from './types';
 
 const getIdx = (fn: string) => getFileIdx(fn).toString().padStart(5, '0');
@@ -20,57 +20,32 @@ const VALUES = Symbol('values');
 
 const isProxy = (
   obj: unknown
-): obj is { [VALUES]: StackOfMaps<string | symbol, unknown> } =>
+): obj is { [VALUES]: Record<string | symbol, unknown> } =>
   typeof obj === 'object' && obj !== null && VALUES in obj;
 
-const getLazyValues = (obj: unknown) => {
-  if (isProxy(obj)) {
-    return obj[VALUES];
-  }
+const createExports = (log: Debugger) => {
+  let exports: Record<string | symbol, unknown> = {};
+  const lazyFields = new Set<string | symbol>();
 
-  if (obj instanceof StackOfMaps) {
-    return obj;
-  }
-
-  return new StackOfMaps<string | symbol, unknown>();
-};
-
-interface IExportsContainer {
-  readonly exportsValues: StackOfMaps<string | symbol, unknown>;
-  log: Debugger;
-}
-
-const cachedExports = new WeakMap<
-  StackOfMaps<string | symbol, unknown>,
-  Record<string | symbol, unknown>
->();
-
-const createExports = (container: IExportsContainer) => {
-  if (cachedExports.has(container.exportsValues)) {
-    return cachedExports.get(container.exportsValues)!;
-  }
-
-  const exports: Record<string | symbol, unknown> = {};
-
-  const proxy = new Proxy(exports, {
-    get: (target, key) => {
+  return new Proxy(exports, {
+    get: (_target, key) => {
       if (key === VALUES) {
-        return container.exportsValues;
+        return exports;
       }
 
       let value: unknown;
-      if (container.exportsValues.has(key)) {
-        value = container.exportsValues.get(key);
+      if (key in exports) {
+        value = exports[key];
       } else {
         // Support Object.prototype methods on `exports`
         // e.g `exports.hasOwnProperty`
-        value = Reflect.get(target, key);
+        value = Reflect.get(exports, key);
       }
 
-      if (value === undefined && container.exportsValues.has('default')) {
-        const defaultValue = container.exportsValues.get('default');
+      if (value === undefined && 'default' in exports) {
+        const defaultValue = exports.default;
         if (hasKey(defaultValue, key)) {
-          container.log(
+          log(
             '⚠️  %s has been found in `default`. It indicates that ESM to CJS conversion went wrong.',
             key
           );
@@ -78,48 +53,81 @@ const createExports = (container: IExportsContainer) => {
         }
       }
 
-      container.log('get %s: %o', key, value);
+      if (value !== undefined && lazyFields.has(key)) {
+        value = (value as () => unknown)();
+      }
+
+      log('get %s: %o', key, value);
       return value;
     },
-    has: (target, key) => {
+    has: (_target, key) => {
       if (key === VALUES) return true;
-      return container.exportsValues.has(key);
+      return key in exports;
     },
     ownKeys: () => {
-      return Array.from(container.exportsValues.keys());
+      return Object.keys(exports);
     },
-    set: (target, key, value) => {
+    set: (_target, key, value) => {
+      if (key === VALUES) {
+        exports = value;
+        return true;
+      }
+
       if (key !== '__esModule') {
-        container.log('set %s: %o', key, value);
+        log('set %s: %o', key, value);
       }
 
       if (value !== undefined) {
-        container.exportsValues.set(key, value);
+        exports[key] = value;
+        lazyFields.delete(key);
       }
 
       return true;
     },
-    defineProperty: (target, key, descriptor) => {
+    defineProperty: (_target, key, descriptor) => {
       const { value } = descriptor;
       if (value !== undefined) {
         if (key !== '__esModule') {
-          container.log('defineProperty %s with value %o', key, value);
+          log('defineProperty %s with value %o', key, value);
         }
 
-        container.exportsValues.set(key, value);
+        exports[key] = value;
+        lazyFields.delete(key);
 
         return true;
       }
 
       if ('get' in descriptor) {
-        container.exportsValues.setLazy(key, descriptor.get!);
-        container.log('defineProperty %s with getter', key);
+        if (lazyFields.has(key)) {
+          const prev = exports[key] as () => void;
+          exports[key] = () => {
+            const v = descriptor.get?.();
+            if (v !== undefined) {
+              return v;
+            }
+
+            return prev();
+          };
+        } else {
+          const prev = exports[key];
+          exports[key] = () => {
+            const v = descriptor.get?.();
+            if (v !== undefined) {
+              return v;
+            }
+
+            return prev;
+          };
+        }
+
+        lazyFields.add(key);
+        log('defineProperty %s with getter', key);
       }
 
       return true;
     },
-    getOwnPropertyDescriptor: (target, key) => {
-      if (container.exportsValues.has(key))
+    getOwnPropertyDescriptor: (_target, key) => {
+      if (key in exports)
         return {
           enumerable: true,
           configurable: true,
@@ -128,23 +136,32 @@ const createExports = (container: IExportsContainer) => {
       return undefined;
     },
   });
-
-  cachedExports.set(container.exportsValues, proxy);
-
-  return proxy;
 };
 
 const EXPORTS = Symbol('exports');
 
+function dumpExports(proxy: Record<string, unknown>) {
+  const exports: Record<string | symbol, unknown> = {};
+  Object.keys(proxy).forEach((key) => {
+    exports[key] = proxy[key];
+  });
+
+  return exports;
+}
+
 export abstract class BaseEntrypoint {
+  public static createExports = createExports;
+
   public readonly idx: string;
 
   public readonly log: Debugger;
 
+  readonly #exports: Record<string | symbol, unknown>;
+
   protected constructor(
     protected services: Services,
     public readonly evaluatedOnly: string[],
-    public readonly exportsValues: StackOfMaps<string | symbol, unknown>,
+    exports: Record<string | symbol, unknown> | undefined,
     public readonly generation: number,
     public readonly name: string,
     public readonly only: string[],
@@ -153,21 +170,37 @@ export abstract class BaseEntrypoint {
     this.idx = getIdx(name);
     this.log =
       parent?.log.extend(this.idx, '->') ?? services.log.extend(this.idx);
+
+    if (exports) {
+      if (isProxy(exports)) {
+        this.#exports = exports;
+      } else {
+        this.#exports = createExports(this.log);
+        this.#exports[EXPORTS] = exports;
+      }
+      this.exports = exports;
+    } else {
+      this.#exports = createExports(this.log);
+    }
   }
 
-  public get exports() {
-    if (this.exportsValues.has(EXPORTS)) {
-      return this.exportsValues.get(EXPORTS);
+  public get exports(): Record<string | symbol, unknown> {
+    if (EXPORTS in this.#exports) {
+      return this.#exports[EXPORTS] as Record<string | symbol, unknown>;
     }
 
-    return createExports(this);
+    return this.#exports;
   }
 
   public set exports(value: unknown) {
     if (isProxy(value)) {
-      this.exportsValues.join(getLazyValues(value));
+      this.#exports[VALUES] = value[VALUES];
     } else {
-      this.exportsValues.set(EXPORTS, value);
+      this.#exports[EXPORTS] = value;
     }
+  }
+
+  protected dumpExports() {
+    return dumpExports(this.#exports);
   }
 }

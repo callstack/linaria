@@ -1,6 +1,6 @@
 import * as vm from 'vm';
 
-import { Window } from 'happy-dom';
+import type { Window } from 'happy-dom';
 
 import type { FeatureFlags } from '@linaria/utils';
 import { isFeatureEnabled } from '@linaria/utils';
@@ -10,7 +10,8 @@ import * as process from './process';
 const NOOP = () => {};
 
 function createWindow(): Window {
-  const win = new Window();
+  const HappyWindow = require('happy-dom').Window;
+  const win = new HappyWindow();
 
   // TODO: browser doesn't expose Buffer, but a lot of dependencies use it
   win.Buffer = Buffer;

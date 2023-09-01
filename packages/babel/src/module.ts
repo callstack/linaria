@@ -105,6 +105,12 @@ function resolve(
   return resolved;
 }
 
+function assertDisposed(
+  entrypoint: Entrypoint | null
+): asserts entrypoint is Entrypoint {
+  invariant(entrypoint, 'Module is disposed');
+}
+
 class Module {
   public readonly callstack: string[] = [];
 
@@ -181,6 +187,7 @@ class Module {
 
       const m = new Module(entrypoint, this.cache, this);
       m.evaluate();
+      m.dispose();
 
       return entrypoint.exports;
     },
@@ -192,12 +199,15 @@ class Module {
 
   public resolve = resolve.bind(this);
 
+  protected entrypoint: Entrypoint | null;
+
   constructor(
-    protected entrypoint: Entrypoint,
+    entrypoint: Entrypoint,
     private cache = new TransformCacheCollection(),
     parentModule?: Module,
     private moduleImpl: HiddenModuleMembers = DefaultModuleImplementation
   ) {
+    this.entrypoint = entrypoint;
     this.idx = entrypoint.idx;
     this.id = entrypoint.name;
     this.filename = entrypoint.name;
@@ -207,9 +217,9 @@ class Module {
     this.ignored = entrypoint.ignored ?? this.parentIsIgnored;
 
     if (parentModule) {
-      this.callstack = [...parentModule.callstack, parentModule.filename];
+      this.callstack = [entrypoint.name, ...parentModule.callstack];
     } else {
-      this.callstack = [];
+      this.callstack = [entrypoint.name];
     }
 
     this.extensions = entrypoint.pluginOptions.extensions;
@@ -218,19 +228,29 @@ class Module {
   }
 
   public get exports() {
+    assertDisposed(this.entrypoint);
     return this.entrypoint.exports;
   }
 
   public set exports(value) {
+    assertDisposed(this.entrypoint);
+
     this.entrypoint.exports = value;
 
-    this.debug(
-      'the whole exports was overridden with %O',
-      this.entrypoint.exportsValues
-    );
+    this.debug('the whole exports was overridden with %O', value);
+  }
+
+  dispose(): void {
+    assertDisposed(this.entrypoint);
+
+    this.debug('dispose');
+
+    this.entrypoint = null;
   }
 
   evaluate(): void {
+    assertDisposed(this.entrypoint);
+
     let { entrypoint } = this;
     // Evaluate could be called before the entrypoint was superseded.
     // In this case, we need to find the latest entrypoint.
@@ -314,6 +334,8 @@ class Module {
     only: string[],
     log: Debugger
   ): Entrypoint | IEvaluatedEntrypoint | null {
+    assertDisposed(this.entrypoint);
+
     const extension = path.extname(filename);
     if (extension !== '.json' && !this.extensions.includes(extension)) {
       return null;
@@ -421,6 +443,8 @@ class Module {
   }
 
   resolveDependency = (id: string): IEntrypointDependency => {
+    assertDisposed(this.entrypoint);
+
     const cached = this.entrypoint.getDependency(id);
     invariant(!(cached instanceof Promise), 'Dependency is not resolved yet');
 

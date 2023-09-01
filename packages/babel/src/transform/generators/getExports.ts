@@ -52,7 +52,7 @@ export function* getExports(
 
   this.services.babel.traverse(loadedAndParsed.ast!, {
     Program(path) {
-      const { exports, reexports } = collectExportsAndImports(path);
+      const { exports, reexports } = collectExportsAndImports(path, 'disabled');
       exports.forEach((e) => {
         result.push(e.exported);
       });

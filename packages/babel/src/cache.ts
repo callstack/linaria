@@ -10,7 +10,6 @@ function hashContent(content: string) {
 }
 
 interface ICaches {
-  contentHashes: Map<string, string>;
   entrypoints: Map<string, Entrypoint | IEvaluatedEntrypoint>;
 }
 
@@ -18,7 +17,7 @@ type MapValue<T> = T extends Map<string, infer V> ? V : never;
 
 const cacheLogger = linariaLogger.extend('cache');
 
-const cacheNames = ['entrypoints', 'contentHashes'] as const;
+const cacheNames = ['entrypoints'] as const;
 type CacheNames = (typeof cacheNames)[number];
 
 const loggers = cacheNames.reduce(
@@ -30,10 +29,7 @@ const loggers = cacheNames.reduce(
 );
 
 export class TransformCacheCollection {
-  protected readonly entrypoints: Map<
-    string,
-    Entrypoint | IEvaluatedEntrypoint
-  >;
+  public readonly entrypoints: Map<string, Entrypoint | IEvaluatedEntrypoint>;
 
   private contentHashes = new Map<string, string>();
 

@@ -227,6 +227,10 @@ async function processFiles(files: (number | string)[], options: Options) {
   console.log(`Successfully extracted ${count} CSS files.`);
 
   onDone(options.sourceRoot ?? process.cwd());
+
+  cache.clear('all');
+  modifiedFiles.length = 0;
+  resolvedFiles.length = 0;
 }
 
 processFiles(argv._, {

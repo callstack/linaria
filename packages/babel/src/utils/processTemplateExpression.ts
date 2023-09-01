@@ -4,7 +4,7 @@ import type { Identifier } from '@babel/types';
 import type { BaseProcessor, IFileContext } from '@linaria/tags';
 import type { StrictOptions } from '@linaria/utils';
 
-import getTagProcessor from './getTagProcessor';
+import { getTagProcessor } from './getTagProcessor';
 
 const processed = new WeakSet<Identifier>();
 

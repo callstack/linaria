@@ -97,7 +97,7 @@ function isClassicReactRuntime(
   return false;
 }
 
-export default function isUnnecessaryReactCall(path: NodePath<CallExpression>) {
+export function isUnnecessaryReactCall(path: NodePath<CallExpression>) {
   const programPath = path.findParent((p) => p.isProgram()) as
     | NodePath<Program>
     | undefined;

@@ -12,7 +12,7 @@ import {
   transform as linariaTransform,
   loadLinariaOptions,
   TransformCacheCollection,
-  StackOfMaps,
+  Entrypoint,
 } from '@linaria/babel-preset';
 import { linariaLogger } from '@linaria/logger';
 import type { Evaluator, StrictOptions, OnEvent } from '@linaria/utils';
@@ -2920,12 +2920,12 @@ describe('strategy shaker', () => {
   it('should not eval wrapped component from a non-linaria library', async () => {
     const { code, metadata } = await transform(
       dedent`
-      import { styled } from "@linaria/react";
-      import { connect } from "./__fixtures__/linaria-ui-library/hocs";
-      import { Title } from "./__fixtures__/non-linaria-ui-library/index";
+        import { styled } from "@linaria/react";
+        import { connect } from "./__fixtures__/linaria-ui-library/hocs";
+        import { Title } from "./__fixtures__/non-linaria-ui-library/index";
 
-      export const StyledTitle = styled(connect(Title))\`\`;
-    `,
+        export const StyledTitle = styled(connect(Title))\`\`;
+      `,
       [evaluator]
     );
 
@@ -2936,21 +2936,21 @@ describe('strategy shaker', () => {
   it('should not import types', async () => {
     const { code, metadata } = await transform(
       dedent`
-      import { styled } from "@linaria/react";
-      import { Title } from "./__fixtures__/linaria-ui-library/components/index";
-      import { ComponentType } from "./__fixtures__/linaria-ui-library/types";
+        import { styled } from "@linaria/react";
+        import { Title } from "./__fixtures__/linaria-ui-library/components/index";
+        import { ComponentType } from "./__fixtures__/linaria-ui-library/types";
 
-      const map = new Map<string, ComponentType>()
-        .set('Title', Title);
+        const map = new Map<string, ComponentType>()
+          .set('Title', Title);
 
-      const Gate = (props: { type: ComponentType, className: string }) => {
-        const { className, type } = props;
-        const Component = map.get(type);
-        return <Component className={className}/>;
-      };
+        const Gate = (props: { type: ComponentType, className: string }) => {
+          const { className, type } = props;
+          const Component = map.get(type);
+          return <Component className={className}/>;
+        };
 
-      export const StyledTitle = styled(Gate)\`\`;
-    `,
+        export const StyledTitle = styled(Gate)\`\`;
+      `,
       [evaluator, {}, 'tsx']
     );
 
@@ -2961,20 +2961,20 @@ describe('strategy shaker', () => {
   it('should shake out identifiers that are referenced only in types', async () => {
     const { code, metadata } = await transform(
       dedent`
-      import { styled } from "@linaria/react";
-      import * as yup from "yup";
-      import { Form } from "./__fixtures__/linaria-ui-library/components/index";
+        import { styled } from "@linaria/react";
+        import * as yup from "yup";
+        import { Form } from "./__fixtures__/linaria-ui-library/components/index";
 
-      const validationSchema = yup.object();
-      type IModel = yup.InferType<typeof validationSchema>;
+        const validationSchema = yup.object();
+        type IModel = yup.InferType<typeof validationSchema>;
 
-      const Editor = () => {
-        const initial: IModel = {};
-        return <Form schema={validationSchema} data={initial} />;
-      };
+        const Editor = () => {
+          const initial: IModel = {};
+          return <Form schema={validationSchema} data={initial} />;
+        };
 
-      export const StyledEditor = styled(Editor)\`\`;
-    `,
+        export const StyledEditor = styled(Editor)\`\`;
+      `,
       [evaluator, {}, 'tsx']
     );
 
@@ -2985,17 +2985,54 @@ describe('strategy shaker', () => {
   it('should process dynamic require', async () => {
     const { code, metadata } = await transform(
       dedent`
-      import { css } from "@linaria/core";
+        import { css } from "@linaria/core";
 
-      const url = "./__fixtures__/FOO";
-      const foo2 = require(url.toLowerCase()).foo2;
+        const url = "./__fixtures__/FOO";
+        const foo2 = require(url.toLowerCase()).foo2;
 
-      export const square = css\`
-        div:before {
-          content: ${'${foo2}'};
-        }
-      \`;
-    `,
+        export const square = css\`
+          div:before {
+            content: ${'${foo2}'};
+          }
+        \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should process module.exports = require(…)', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { css } from "@linaria/core";
+
+        const mod = require("./__fixtures__/module-reexport");
+
+        export const square = css\`
+          div:before {
+            content: ${'${mod.foo}'};
+          }
+        \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should import react as namespace', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { styled } from "@linaria/react";
+        import * as React from "react";
+
+        const Cmp = React.memo(() => null);
+
+        export const StyledTitle = styled(Cmp)\`\`;
+      `,
       [evaluator]
     );
 
@@ -3033,8 +3070,8 @@ describe('strategy shaker', () => {
       }
 
       const result: Record<string | symbol, unknown> = {};
-      cachedFoo.exportsValues.forEach((value, key) => {
-        result[key] = value;
+      Object.keys(cachedFoo.exports).forEach((key) => {
+        result[key] = cachedFoo.exports[key];
       });
 
       return result;
@@ -3071,17 +3108,16 @@ describe('strategy shaker', () => {
       cache.invalidateIfChanged(filename, fooContent);
 
       const only = Object.keys(exports);
-      const exportsValues = new StackOfMaps<string, unknown>();
-      for (const [key, value] of Object.entries(exports)) {
-        exportsValues.set(key, value);
-      }
+      const exportsProxy = Entrypoint.createExports(linariaLogger);
+      only.forEach((key) => {
+        exportsProxy[key] = exports[key];
+      });
 
       cache.add('entrypoints', filename, {
         evaluated: true,
         evaluatedOnly: only,
         generation: 1,
-        exports,
-        exportsValues,
+        exports: exportsProxy,
         ignored: false,
         log: linariaLogger,
         only,
@@ -3109,7 +3145,7 @@ describe('strategy shaker', () => {
       expect(metadata).toMatchSnapshot();
     });
 
-    it('should ignore uncompleted cached value', async () => {
+    it('should use partially cached value', async () => {
       const filename = require.resolve(join(dirName, './__fixtures__/foo'));
       const cache = await createCacheFor(filename, { foo1: 'cached-foo1' });
 

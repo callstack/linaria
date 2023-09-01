@@ -13,7 +13,10 @@ import type { PluginOptions } from './types';
 export { slugify } from '@linaria/utils';
 
 export { default as preeval } from './plugins/preeval';
-export { default as withLinariaMetadata } from './utils/withLinariaMetadata';
+export {
+  default as withLinariaMetadata,
+  getLinariaMetadata,
+} from './utils/withLinariaMetadata';
 export { default as Module, DefaultModuleImplementation } from './module';
 export { default as transform } from './transform';
 export * from './types';
@@ -30,11 +33,10 @@ export {
   syncResolveImports,
 } from './transform/generators/resolveImports';
 export { default as loadLinariaOptions } from './transform/helpers/loadLinariaOptions';
-export { StackOfMaps } from './transform/helpers/StackOfMaps';
 export { withDefaultServices } from './transform/helpers/withDefaultServices';
 export type { Services } from './transform/types';
 export { default as isNode } from './utils/isNode';
-export { default as getTagProcessor } from './utils/getTagProcessor';
+export { getTagProcessor } from './utils/getTagProcessor';
 export { default as getVisitorKeys } from './utils/getVisitorKeys';
 export type { VisitorKeys } from './utils/getVisitorKeys';
 export { default as peek } from './utils/peek';

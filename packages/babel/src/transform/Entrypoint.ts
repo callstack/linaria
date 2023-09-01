@@ -3,7 +3,6 @@ import { invariant } from 'ts-invariant';
 import type { StrictOptions } from '@linaria/utils';
 
 import type { ParentEntrypoint, ITransformFileResult } from '../types';
-import withLinariaMetadata from '../utils/withLinariaMetadata';
 
 import { BaseEntrypoint } from './BaseEntrypoint';
 import { isSuperSet, mergeOnly } from './Entrypoint.helpers';
@@ -15,7 +14,6 @@ import type {
 import { EvaluatedEntrypoint } from './EvaluatedEntrypoint';
 import type { ActionByType } from './actions/BaseAction';
 import { BaseAction } from './actions/BaseAction';
-import { StackOfMaps } from './helpers/StackOfMaps';
 import type { Services, ActionTypes, ActionQueueItem } from './types';
 
 const EMPTY_FILE = '=== empty file ===';
@@ -48,9 +46,11 @@ export class Entrypoint extends BaseEntrypoint {
     Map<unknown, BaseAction<ActionQueueItem>>
   > = new Map();
 
+  #hasLinariaMetadata: boolean = false;
+
   #supersededWith: Entrypoint | null = null;
 
-  #transformResult: ITransformFileResult | null = null;
+  #transformResultCode: string | null = null;
 
   private constructor(
     services: Services,
@@ -59,18 +59,13 @@ export class Entrypoint extends BaseEntrypoint {
     name: string,
     only: string[],
     public readonly pluginOptions: StrictOptions,
-    exports: StackOfMaps<string | symbol, unknown>,
+    exports: Record<string | symbol, unknown> | undefined,
     evaluatedOnly: string[],
     loadedAndParsed?: IEntrypointCode | IIgnoredEntrypoint,
     protected readonly dependencies = new Map<string, DependencyType>(),
     generation = 1
   ) {
-    const stackOfMaps = new StackOfMaps<string | symbol, unknown>();
-    if (exports) {
-      stackOfMaps.join(exports);
-    }
-
-    super(services, evaluatedOnly, stackOfMaps, generation, name, only, parent);
+    super(services, evaluatedOnly, exports, generation, name, only, parent);
 
     this.loadedAndParsed =
       loadedAndParsed ??
@@ -92,10 +87,6 @@ export class Entrypoint extends BaseEntrypoint {
       only,
       this.originalCode || EMPTY_FILE
     );
-
-    if (exports) {
-      this.exportsValues.join(exports);
-    }
   }
 
   public get ignored() {
@@ -111,7 +102,7 @@ export class Entrypoint extends BaseEntrypoint {
   }
 
   public get transformedCode() {
-    return this.#transformResult?.code;
+    return this.#transformResultCode;
   }
 
   public static createRoot(
@@ -200,8 +191,7 @@ export class Entrypoint extends BaseEntrypoint {
       return ['cached', cached];
     }
 
-    const exports =
-      cached?.exportsValues ?? new StackOfMaps<string | symbol, unknown>();
+    const exports = cached?.exports;
     const evaluatedOnly = cached?.evaluatedOnly ?? [];
     const mergedOnly =
       !changed && cached?.only
@@ -305,10 +295,17 @@ export class Entrypoint extends BaseEntrypoint {
   }
 
   public createEvaluated() {
+    const evaluatedOnly = mergeOnly(this.evaluatedOnly, this.only);
+    this.log('create EvaluatedEntrypoint for %o: %f', evaluatedOnly, () =>
+      this.dumpExports()
+    );
+
+    // Значение вычисляется уже после вызова конструктора EvaluatedEntrypoint
+
     return new EvaluatedEntrypoint(
       this.services,
-      mergeOnly(this.evaluatedOnly, this.only),
-      this.exportsValues,
+      evaluatedOnly,
+      this.exports,
       this.generation + 1,
       this.name,
       this.only,
@@ -321,7 +318,7 @@ export class Entrypoint extends BaseEntrypoint {
   }
 
   public hasLinariaMetadata() {
-    return withLinariaMetadata(this.#transformResult?.metadata);
+    return this.#hasLinariaMetadata;
   }
 
   public onSupersede(callback: (newEntrypoint: Entrypoint) => void) {
@@ -341,7 +338,8 @@ export class Entrypoint extends BaseEntrypoint {
   }
 
   public setTransformResult(res: ITransformFileResult | null) {
-    this.#transformResult = res;
+    this.#hasLinariaMetadata = Boolean(res?.metadata);
+    this.#transformResultCode = res?.code ?? null;
   }
 
   private supersede(newOnlyOrEntrypoint: string[] | Entrypoint): Entrypoint {
@@ -355,7 +353,7 @@ export class Entrypoint extends BaseEntrypoint {
             this.name,
             newOnlyOrEntrypoint,
             this.pluginOptions,
-            this.exportsValues,
+            this.exports,
             this.evaluatedOnly,
             this.loadedAndParsed,
             this.dependencies,

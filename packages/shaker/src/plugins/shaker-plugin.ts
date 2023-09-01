@@ -16,6 +16,7 @@ import {
   dereference,
   findActionForNode,
   getFileIdx,
+  invalidateTraversalCache,
   isRemoved,
   reference,
   removeWithRelated,
@@ -370,6 +371,8 @@ export default function shakerPlugin(
       (file.metadata as IMetadata).linariaEvaluator = {
         imports,
       };
+
+      invalidateTraversalCache(file.path);
     },
   };
 }

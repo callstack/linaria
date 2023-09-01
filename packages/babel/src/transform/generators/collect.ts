@@ -3,6 +3,7 @@ import type { PluginItem } from '@babel/core';
 import { buildOptions } from '@linaria/utils';
 
 import { filename as collectorPlugin } from '../../plugins/collector';
+import { getLinariaMetadata } from '../../utils/withLinariaMetadata';
 import type { ICollectAction, SyncScenarioForAction } from '../types';
 
 /**
@@ -59,5 +60,12 @@ export function* collect(
     throw new Error('Babel transform failed');
   }
 
-  return result;
+  const linariaMetadata = getLinariaMetadata(result.metadata);
+
+  return {
+    ast: result.ast,
+    code: result.code,
+    map: result.map,
+    metadata: linariaMetadata ?? null,
+  };
 }
