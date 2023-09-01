@@ -82,17 +82,19 @@ export function transformSync(
 
     return result;
   } catch (err) {
-    if (process.env.NODE_ENV === 'test') {
-      throw err;
+    if (
+      isFeatureEnabled(pluginOptions.features, 'softErrors', options.filename)
+    ) {
+      // eslint-disable-next-line no-console
+      console.error(`Error during transform of ${entrypoint.name}:`, err);
+
+      return {
+        code: originalCode,
+        sourceMap: options.inputSourceMap,
+      };
     }
 
-    // eslint-disable-next-line no-console
-    console.error(`Error during transform of ${entrypoint.name}:`, err);
-
-    return {
-      code: originalCode,
-      sourceMap: options.inputSourceMap,
-    };
+    throw err;
   }
 }
 
@@ -155,16 +157,18 @@ export default async function transform(
 
     return result;
   } catch (err) {
-    if (process.env.NODE_ENV === 'test') {
-      throw err;
+    if (
+      isFeatureEnabled(pluginOptions.features, 'softErrors', options.filename)
+    ) {
+      // eslint-disable-next-line no-console
+      console.error(`Error during transform of ${entrypoint.name}:`, err);
+
+      return {
+        code: originalCode,
+        sourceMap: options.inputSourceMap,
+      };
     }
 
-    // eslint-disable-next-line no-console
-    console.error(`Error during transform of ${entrypoint.name}:`, err);
-
-    return {
-      code: originalCode,
-      sourceMap: options.inputSourceMap,
-    };
+    throw err;
   }
 }

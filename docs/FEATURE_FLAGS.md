@@ -10,6 +10,7 @@ Feature flags are used to enable or disable specific features provided. The `fea
 - `["glob1", "glob2"]`: Enables the feature for files matching any of the specified glob patterns.
 - `["glob1", "!glob2"]`: Enables the feature for files matching `glob1` but excludes files that match `glob2`.
 
+
 # `dangerousCodeRemover` Feature
 
 The `dangerousCodeRemover` is a flag that is enabled by default. It is designed to enhance the static evaluation of values that are interpolated in styles and to optimize the processing of styled-wrapped components during the build stage. This optimization is crucial for maintaining a stable and fast build process. It is important to note that the `dangerousCodeRemover` does not impact the runtime code; it solely focuses on the code used during the build.
@@ -45,3 +46,18 @@ Suppose you have a file named `specialComponent.js` that contains code that shou
 ```
 
 You are instructing Linaria to exclude the `specialComponent.js` file from the removal process. As a result, any code within this file that would have been removed by the `dangerousCodeRemover` will be retained in the build output.
+
+
+# `globalCache` Feature
+
+The `globalCache` is enabled by default. Linaria uses two levels of caching to improve the performance of the build process. The first level is used to cache transformation and evaluation results for each `transform` call, usually a single call of Webpack's loader or Vite's transform hook. The second level is used to cache the results of the entire build process. The `globalCache` feature controls the second level of caching. Turning off this feature will result in a slower build process but decreased memory usage.
+
+
+# `happyDOM` Feature
+
+The `happyDOM` is enabled by default. This feature enables usage of https://github.com/capricorn86/happy-dom to emulate a browser environment during the build process. Typically, the `dangerousCodeRemover` feature should remove all browser-related code. However, some libraries may still contain browser-specific code that cannot be statically evaluated. In such cases, the `happyDOM` feature can be used to emulate a browser environment during the build process. This allows Linaria to evaluate the code without encountering errors caused by missing browser APIs.
+
+
+# `softErrors` Feature
+
+The `softErrors` is disabled by default. It is designed to provide a more lenient evaluation of styles and values that are interpolated in styles. This flag is useful for debugging and prevents the build from failing even if some files cannot be processed with Linaria.

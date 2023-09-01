@@ -45,6 +45,7 @@ const options: StrictOptions = {
     dangerousCodeRemover: true,
     globalCache: true,
     happyDOM: true,
+    softErrors: false,
   },
   highPriorityPlugins: [],
 };

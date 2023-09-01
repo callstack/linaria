@@ -52,6 +52,7 @@ type AllFeatureFlags = {
   dangerousCodeRemover: FeatureFlag;
   globalCache: FeatureFlag;
   happyDOM: FeatureFlag;
+  softErrors: FeatureFlag;
 };
 
 export type FeatureFlags<

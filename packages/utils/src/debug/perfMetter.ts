@@ -204,6 +204,12 @@ export const createPerfMeter = (
           )
         );
       }
+
+      timings.clear();
+      processedDependencies.clear();
+      queueActions.clear();
+
+      console.log(process.memoryUsage());
     },
   };
 };

@@ -80,6 +80,9 @@ const getLinariaConfig = (
         action: 'ignore',
       },
     ],
+    features: {
+      softErrors: false,
+    },
     stage,
     ...linariaConfig,
   });
