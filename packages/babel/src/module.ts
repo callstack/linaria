@@ -251,18 +251,14 @@ class Module {
   evaluate(): void {
     assertDisposed(this.entrypoint);
 
-    let { entrypoint } = this;
-    // Evaluate could be called before the entrypoint was superseded.
-    // In this case, we need to find the latest entrypoint.
-    while (entrypoint.supersededWith) {
-      entrypoint = entrypoint.supersededWith;
+    const { entrypoint } = this;
+    if (!entrypoint.supersededWith) {
+      this.cache.add(
+        'entrypoints',
+        entrypoint.name,
+        entrypoint.createEvaluated()
+      );
     }
-
-    this.cache.add(
-      'entrypoints',
-      entrypoint.name,
-      entrypoint.createEvaluated()
-    );
 
     const source =
       entrypoint.transformedCode ??

@@ -296,11 +296,7 @@ export class Entrypoint extends BaseEntrypoint {
 
   public createEvaluated() {
     const evaluatedOnly = mergeOnly(this.evaluatedOnly, this.only);
-    this.log('create EvaluatedEntrypoint for %o: %f', evaluatedOnly, () =>
-      this.dumpExports()
-    );
-
-    // Значение вычисляется уже после вызова конструктора EvaluatedEntrypoint
+    this.log('create EvaluatedEntrypoint for %o', evaluatedOnly);
 
     return new EvaluatedEntrypoint(
       this.services,

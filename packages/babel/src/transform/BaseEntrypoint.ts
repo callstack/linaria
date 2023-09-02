@@ -140,15 +140,6 @@ const createExports = (log: Debugger) => {
 
 const EXPORTS = Symbol('exports');
 
-function dumpExports(proxy: Record<string, unknown>) {
-  const exports: Record<string | symbol, unknown> = {};
-  Object.keys(proxy).forEach((key) => {
-    exports[key] = proxy[key];
-  });
-
-  return exports;
-}
-
 export abstract class BaseEntrypoint {
   public static createExports = createExports;
 
@@ -198,9 +189,5 @@ export abstract class BaseEntrypoint {
     } else {
       this.#exports[EXPORTS] = value;
     }
-  }
-
-  protected dumpExports() {
-    return dumpExports(this.#exports);
   }
 }
