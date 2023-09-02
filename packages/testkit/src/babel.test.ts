@@ -14,7 +14,7 @@ import {
   TransformCacheCollection,
   Entrypoint,
 } from '@linaria/babel-preset';
-import { linariaLogger } from '@linaria/logger';
+import { enableDebug, linariaLogger } from '@linaria/logger';
 import type { Evaluator, StrictOptions, OnEvent } from '@linaria/utils';
 import { EventEmitter } from '@linaria/utils';
 
@@ -3244,6 +3244,40 @@ describe('strategy shaker', () => {
         }),
         'single'
       );
+    });
+
+    it('multiple parallel chains of reexports', async () => {
+      enableDebug();
+      const cache = new TransformCacheCollection();
+
+      const onEvent = jest.fn<void, Parameters<OnEvent>>();
+      const emitter = new EventEmitter(onEvent);
+
+      const tokens = ['foo', 'bar', 'bar1', 'bar2'];
+
+      const results = await Promise.all(
+        tokens.map((token) =>
+          transform(
+            dedent`
+              import { styled } from '@linaria/react';
+              import { ${token} } from "./__fixtures__/re-exports";
+
+              export const H1${token} = styled.h1\`
+                color: ${`\${${token}}`};
+              \`
+            `,
+            [evaluator],
+            cache,
+            emitter,
+            token
+          )
+        )
+      );
+
+      for (const { code, metadata } of results) {
+        expect(code).toMatchSnapshot();
+        expect(metadata).toMatchSnapshot();
+      }
     });
   });
 });

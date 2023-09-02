@@ -356,7 +356,12 @@ export class Entrypoint extends BaseEntrypoint {
             this.generation + 1
           );
 
-    this.log('superseded by %s', newEntrypoint.name);
+    this.log(
+      'superseded by %s (%o -> %o)',
+      newEntrypoint.name,
+      this.only,
+      newEntrypoint.only
+    );
     this.#supersededWith = newEntrypoint;
     this.onSupersedeHandlers.forEach((handler) => handler(newEntrypoint));
 

@@ -411,6 +411,90 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker concurrent multiple parallel chains of reexports 1`] = `
+"import { styled } from '@linaria/react';
+export const H1foo = /*#__PURE__*/styled('h1')({
+  name: "H1foo",
+  class: "H1foo_h1m1lid5",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 2`] = `
+
+CSS:
+
+.H1foo_h1m1lid5 {
+  color: foo;
+}
+
+Dependencies: ./__fixtures__/re-exports
+
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 3`] = `
+"import { styled } from '@linaria/react';
+export const H1bar = /*#__PURE__*/styled('h1')({
+  name: "H1bar",
+  class: "H1bar_h1r70tzz",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 4`] = `
+
+CSS:
+
+.H1bar_h1r70tzz {
+  color: bar;
+}
+
+Dependencies: ./__fixtures__/re-exports
+
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 5`] = `
+"import { styled } from '@linaria/react';
+export const H1bar1 = /*#__PURE__*/styled('h1')({
+  name: "H1bar1",
+  class: "H1bar1_hsluxkf",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 6`] = `
+
+CSS:
+
+.H1bar1_hsluxkf {
+  color: bar1;
+}
+
+Dependencies: ./__fixtures__/re-exports
+
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 7`] = `
+"import { styled } from '@linaria/react';
+export const H1bar2 = /*#__PURE__*/styled('h1')({
+  name: "H1bar2",
+  class: "H1bar2_ht4s9ym",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 8`] = `
+
+CSS:
+
+.H1bar2_ht4s9ym {
+  color: bar2;
+}
+
+Dependencies: ./__fixtures__/re-exports
+
+`;
+
 exports[`strategy shaker concurrent two parallel chains of reexports 1`] = `
 "import { styled } from '@linaria/react';
 export const H1 = /*#__PURE__*/styled('h1')({

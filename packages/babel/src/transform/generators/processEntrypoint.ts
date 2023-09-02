@@ -14,9 +14,21 @@ export function* processEntrypoint(
   const { only, log } = this.entrypoint;
   log('start processing (only: %s)', only);
 
+  if (this.entrypoint.supersededWith) {
+    log('entrypoint already superseded, rescheduling processing');
+    yield [
+      'processEntrypoint',
+      this.entrypoint.supersededWith,
+      undefined,
+      null,
+    ];
+    return;
+  }
+
   const abortController = new AbortController();
 
   const onParentAbort = () => {
+    log('parent aborted, aborting processing');
     abortController.abort();
   };
 
@@ -43,7 +55,7 @@ export function* processEntrypoint(
     );
     this.entrypoint.setTransformResult(result);
   } catch (e) {
-    if (isAborted(e)) {
+    if (isAborted(e) && this.entrypoint.supersededWith) {
       log('aborting processing');
     } else {
       throw e;

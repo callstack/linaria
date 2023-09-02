@@ -25,7 +25,7 @@ export function* workflow(
   try {
     yield* this.getNext('processEntrypoint', entrypoint, undefined);
   } catch (e) {
-    if (isAborted(e)) {
+    if (isAborted(e) && entrypoint.supersededWith) {
       entrypoint.log('entrypoint superseded, rescheduling workflow');
       yield* this.getNext('workflow', entrypoint.supersededWith!, undefined);
     } else {
