@@ -1,5 +1,9 @@
 import { isAborted } from '../actions/AbortError';
-import type { IWorkflowAction, SyncScenarioForAction } from '../types';
+import type {
+  IWorkflowAction,
+  SyncScenarioForAction,
+  YieldArg,
+} from '../types';
 
 /**
  * The entry point for file processing. Sequentially calls `processEntrypoint`,
@@ -11,6 +15,17 @@ export function* workflow(
 ): SyncScenarioForAction<IWorkflowAction> {
   const { cache, options } = this.services;
   const { entrypoint } = this;
+
+  if (entrypoint.supersededWith) {
+    entrypoint.log('entrypoint already superseded, rescheduling workflow');
+    return yield* this.getNext(
+      'workflow',
+      entrypoint.supersededWith!,
+      undefined,
+      null
+    );
+  }
+
   if (entrypoint.ignored) {
     return {
       code: entrypoint.loadedAndParsed.code ?? '',
@@ -22,16 +37,7 @@ export function* workflow(
 
   // *** 1st stage ***
 
-  try {
-    yield* this.getNext('processEntrypoint', entrypoint, undefined);
-  } catch (e) {
-    if (isAborted(e) && entrypoint.supersededWith) {
-      entrypoint.log('entrypoint superseded, rescheduling workflow');
-      yield* this.getNext('workflow', entrypoint.supersededWith!, undefined);
-    } else {
-      throw e;
-    }
-  }
+  yield* this.getNext('processEntrypoint', entrypoint, undefined);
 
   // File is ignored or does not contain any tags. Return original code.
   if (!entrypoint.hasLinariaMetadata()) {
@@ -94,3 +100,13 @@ export function* workflow(
     sourceMap: collectStageResult.map,
   };
 }
+
+workflow.recover = (e: unknown, action: IWorkflowAction): YieldArg => {
+  if (isAborted(e) && action.entrypoint.supersededWith) {
+    action.entrypoint.log('aborting processing');
+    return ['workflow', action.entrypoint.supersededWith, undefined, null];
+  }
+
+  action.entrypoint.log(`Unhandled error: %O`, e);
+  throw e;
+};

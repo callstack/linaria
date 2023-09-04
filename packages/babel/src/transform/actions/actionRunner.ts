@@ -26,15 +26,25 @@ function getHandler<
   return handler as unknown as Handler<TMode, TAction>;
 }
 
+const getActionRef = (type: string, entrypoint: { ref: string }) =>
+  `${type}@${entrypoint.ref}`;
+
+function assertIfAborted<TAction extends ActionQueueItem>(
+  action: BaseAction<TAction>,
+  stack: string[]
+) {
+  if (action.abortSignal?.aborted) {
+    action.entrypoint.log('Action %s was aborted', stack.join('->'));
+    throw new AbortError(stack[0]);
+  }
+}
+
 export async function asyncActionRunner<TAction extends ActionQueueItem>(
   action: BaseAction<TAction>,
   actionHandlers: Handlers<'async' | 'sync'>,
-  stack: string[] = [action.type]
+  stack: string[] = [getActionRef(action.type, action.entrypoint)]
 ): Promise<TypeOfResult<TAction>> {
-  if (action.abortSignal?.aborted) {
-    action.entrypoint.log('Action %s was aborted', stack.join('->'));
-    throw new AbortError();
-  }
+  assertIfAborted(action, stack);
 
   if (action.result !== Pending) {
     return action.result as TypeOfResult<TAction>;
@@ -50,11 +60,22 @@ export async function asyncActionRunner<TAction extends ActionQueueItem>(
     try {
       const actionResult = await asyncActionRunner(nextAction, actionHandlers, [
         ...stack,
-        type,
+        getActionRef(type, entrypoint),
       ]);
       result = await generator.next(actionResult);
     } catch (e) {
-      result = await generator.throw(e);
+      if (handler.recover) {
+        try {
+          result = {
+            done: false,
+            value: handler.recover(e, action),
+          };
+        } catch (errorInRecover) {
+          result = await generator.throw(errorInRecover);
+        }
+      } else {
+        result = await generator.throw(e);
+      }
     }
   }
 
@@ -64,13 +85,8 @@ export async function asyncActionRunner<TAction extends ActionQueueItem>(
 export function syncActionRunner<TAction extends ActionQueueItem>(
   action: BaseAction<TAction>,
   actionHandlers: Handlers<'sync'>,
-  stack: string[] = [action.type]
+  stack: string[] = [getActionRef(action.type, action.entrypoint)]
 ): TypeOfResult<TAction> {
-  if (action.abortSignal?.aborted) {
-    action.entrypoint.log('Action %s was aborted', stack.join('->'));
-    throw new AbortError();
-  }
-
   if (action.result !== Pending) {
     return action.result as TypeOfResult<TAction>;
   }
@@ -79,17 +95,30 @@ export function syncActionRunner<TAction extends ActionQueueItem>(
   const generator = action.run(handler);
   let result = generator.next();
   while (!result.done) {
+    assertIfAborted(action, stack);
+
     const [type, entrypoint, data, abortSignal] = result.value;
     const nextAction = entrypoint.createAction(type, data, abortSignal);
 
     try {
       const actionResult = syncActionRunner(nextAction, actionHandlers, [
         ...stack,
-        type,
+        getActionRef(type, entrypoint),
       ]);
       result = generator.next(actionResult);
     } catch (e) {
-      result = generator.throw(e);
+      if (handler.recover) {
+        try {
+          result = {
+            done: false,
+            value: handler.recover(e, action),
+          };
+        } catch (errorInRecover) {
+          result = generator.throw(errorInRecover);
+        }
+      } else {
+        result = generator.throw(e);
+      }
     }
   }
 

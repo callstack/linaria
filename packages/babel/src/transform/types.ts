@@ -102,10 +102,12 @@ export type AsyncScenarioForAction<TAction extends ActionQueueItem> =
 export type Handler<
   TMode extends 'async' | 'sync',
   TAction extends ActionQueueItem,
-> = (this: BaseAction<TAction>) => {
+> = ((this: BaseAction<TAction>) => {
   async: AsyncScenarioForAction<TAction>;
   sync: SyncScenarioForAction<TAction>;
-}[TMode];
+}[TMode]) & {
+  recover?: (e: unknown, action: BaseAction<TAction>) => YieldArg;
+};
 
 export type Handlers<TMode extends 'async' | 'sync'> = {
   [TAction in ActionQueueItem as TAction['type']]: Handler<TMode, TAction>;

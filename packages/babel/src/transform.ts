@@ -82,6 +82,8 @@ export function transformSync(
 
     return result;
   } catch (err) {
+    entrypoint.log('Unhandled error %O', err);
+
     if (
       isFeatureEnabled(pluginOptions.features, 'softErrors', options.filename)
     ) {
@@ -157,6 +159,8 @@ export default async function transform(
 
     return result;
   } catch (err) {
+    entrypoint.log('Unhandled error %O', err);
+
     if (
       isFeatureEnabled(pluginOptions.features, 'softErrors', options.filename)
     ) {

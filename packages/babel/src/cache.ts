@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 
 import { linariaLogger } from '@linaria/logger';
+import { getFileIdx } from '@linaria/utils';
 
 import type { Entrypoint } from './transform/Entrypoint';
 import type { IEvaluatedEntrypoint } from './transform/EvaluatedEntrypoint';
@@ -42,13 +43,18 @@ export class TransformCacheCollection {
     TValue extends MapValue<ICaches[TCache]>,
   >(cacheName: TCache, key: string, value: TValue): void {
     const cache = this[cacheName] as Map<string, TValue>;
-    loggers[cacheName]('add %s %f', key, () => {
-      if (!cache.has(key)) {
-        return 'added';
-      }
+    loggers[cacheName](
+      '%s:add %s %f',
+      getFileIdx(key).toString().padStart(5, '0'),
+      key,
+      () => {
+        if (!cache.has(key)) {
+          return 'added';
+        }
 
-      return cache.get(key) === value ? 'unchanged' : 'updated';
-    });
+        return cache.get(key) === value ? 'unchanged' : 'updated';
+      }
+    );
 
     cache.set(key, value);
   }

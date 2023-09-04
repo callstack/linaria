@@ -33,7 +33,7 @@ import { withDefaultServices } from './transform/helpers/withDefaultServices';
 import { createVmContext } from './vm/createVmContext';
 
 type HiddenModuleMembers = {
-  _extensions: { [key: string]: () => void };
+  _extensions: Record<string, () => void>;
   _resolveFilename: (
     id: string,
     options: { filename: string; id: string; paths: string[] }

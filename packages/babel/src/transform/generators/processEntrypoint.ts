@@ -1,5 +1,9 @@
 import { isAborted } from '../actions/AbortError';
-import type { IProcessEntrypointAction, SyncScenarioForAction } from '../types';
+import type {
+  IProcessEntrypointAction,
+  SyncScenarioForAction,
+  YieldArg,
+} from '../types';
 
 /**
  * The first stage of processing an entrypoint.
@@ -55,16 +59,10 @@ export function* processEntrypoint(
       abortController.signal
     );
     this.entrypoint.setTransformResult(result);
-  } catch (e) {
-    if (isAborted(e) && this.entrypoint.supersededWith) {
-      log('aborting processing');
-    } else {
-      throw e;
-    }
+  } finally {
+    this.abortSignal?.removeEventListener('abort', onParentAbort);
+    unsubscribe();
   }
-
-  this.abortSignal?.removeEventListener('abort', onParentAbort);
-  unsubscribe();
 
   const { supersededWith } = this.entrypoint;
   if (supersededWith) {
@@ -74,3 +72,21 @@ export function* processEntrypoint(
 
   log('entrypoint processing finished');
 }
+
+processEntrypoint.recover = (
+  e: unknown,
+  action: IProcessEntrypointAction
+): YieldArg => {
+  if (isAborted(e) && action.entrypoint.supersededWith) {
+    action.entrypoint.log('aborting processing');
+    return [
+      'processEntrypoint',
+      action.entrypoint.supersededWith,
+      undefined,
+      null,
+    ];
+  }
+
+  action.entrypoint.log(`Unhandled error: %O`, e);
+  throw e;
+};

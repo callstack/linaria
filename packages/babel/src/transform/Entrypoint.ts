@@ -97,6 +97,10 @@ export class Entrypoint extends BaseEntrypoint {
     return this.loadedAndParsed.code;
   }
 
+  public get ref() {
+    return `${this.idx}#${this.generation}`;
+  }
+
   public get supersededWith() {
     return this.#supersededWith;
   }
