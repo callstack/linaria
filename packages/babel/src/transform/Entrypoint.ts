@@ -101,8 +101,8 @@ export class Entrypoint extends BaseEntrypoint {
     return `${this.idx}#${this.generation}`;
   }
 
-  public get supersededWith() {
-    return this.#supersededWith;
+  public get supersededWith(): Entrypoint | null {
+    return this.#supersededWith?.supersededWith ?? this.#supersededWith;
   }
 
   public get transformedCode() {
@@ -266,7 +266,7 @@ export class Entrypoint extends BaseEntrypoint {
 
     const cache = this.actionsCache.get(actionType)!;
     const cached = cache.get(data);
-    if (cached) {
+    if (cached && !cached.abortSignal?.aborted) {
       return cached as BaseAction<TAction>;
     }
 

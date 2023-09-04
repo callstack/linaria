@@ -1,16 +1,23 @@
 /* eslint-disable require-yield */
+import { enableDebug } from '@linaria/logger';
+
 import type { IEntrypointDependency } from '../../Entrypoint.types';
 import {
   createEntrypoint,
   createServices,
   getHandlers,
 } from '../../__tests__/entrypoint-helpers';
+import { processEntrypoint } from '../../generators/processEntrypoint';
 import type {
   Services,
   IProcessEntrypointAction,
   SyncScenarioForAction,
   IResolveImportsAction,
+  IWorkflowAction,
+  YieldArg,
+  IExplodeReexportsAction,
 } from '../../types';
+import type { BaseAction } from '../BaseAction';
 import { asyncActionRunner, syncActionRunner } from '../actionRunner';
 
 describe('actionRunner', () => {
@@ -82,19 +89,6 @@ describe('actionRunner', () => {
     const resolveImportsData = { imports: new Map() };
 
     const valueCatcher = jest.fn();
-    function* processEntrypoint(
-      this: IProcessEntrypointAction
-    ): SyncScenarioForAction<IProcessEntrypointAction> {
-      const result = yield [
-        'resolveImports',
-        this.entrypoint,
-        resolveImportsData,
-        null,
-      ];
-
-      valueCatcher(result);
-    }
-
     const resolvedImports: IEntrypointDependency[] = [
       {
         source: './bar',
@@ -108,7 +102,18 @@ describe('actionRunner', () => {
     }
 
     const handlers = getHandlers({
-      processEntrypoint,
+      *processEntrypoint(
+        this: IProcessEntrypointAction
+      ): SyncScenarioForAction<IProcessEntrypointAction> {
+        const result = yield [
+          'resolveImports',
+          this.entrypoint,
+          resolveImportsData,
+          null,
+        ];
+
+        valueCatcher(result);
+      },
       resolveImports,
     });
 
@@ -124,5 +129,135 @@ describe('actionRunner', () => {
 
     expect(valueCatcher).toBeCalledTimes(1);
     expect(valueCatcher).toBeCalledWith(resolvedImports);
+  });
+
+  it('should throw if action was aborted', () => {
+    const abortController = new AbortController();
+    abortController.abort();
+
+    function* handlerGenerator(
+      this: IWorkflowAction
+    ): SyncScenarioForAction<IWorkflowAction> {
+      yield [
+        'processEntrypoint',
+        this.entrypoint,
+        undefined,
+        abortController.signal,
+      ];
+
+      throw new Error('Should not be reached');
+    }
+
+    const handlers = getHandlers<'sync'>({
+      workflow: handlerGenerator,
+    });
+
+    const entrypoint = createEntrypoint(services, '/foo/bar.js', ['default']);
+    const action = entrypoint.createAction('workflow', undefined, null);
+
+    expect(() => syncActionRunner(action, handlers)).toThrowError(
+      'workflow@00001#1'
+    );
+  });
+
+  it('should call recover', () => {
+    const abortController = new AbortController();
+    abortController.abort();
+
+    function* handlerGenerator(
+      this: IWorkflowAction
+    ): SyncScenarioForAction<IWorkflowAction> {
+      yield [
+        'processEntrypoint',
+        this.entrypoint,
+        undefined,
+        abortController.signal,
+      ];
+
+      throw new Error('Should not be reached');
+    }
+
+    handlerGenerator.recover = jest.fn<
+      YieldArg,
+      [e: unknown, action: BaseAction<IWorkflowAction>]
+    >((e): YieldArg => {
+      throw e;
+    });
+
+    const handlers = getHandlers<'sync'>({
+      workflow: handlerGenerator,
+    });
+
+    const entrypoint = createEntrypoint(services, '/foo/bar.js', ['default']);
+    const action = entrypoint.createAction('workflow', undefined, null);
+
+    expect(() => syncActionRunner(action, handlers)).toThrowError(
+      'workflow@00001#1'
+    );
+
+    expect(handlerGenerator.recover).toHaveBeenCalled();
+  });
+
+  it('should recover', () => {
+    enableDebug();
+
+    const abortController = new AbortController();
+    abortController.abort();
+
+    function* handlerGenerator(
+      this: IWorkflowAction
+    ): SyncScenarioForAction<IWorkflowAction> {
+      yield [
+        'processEntrypoint',
+        this.entrypoint,
+        undefined,
+        abortController.signal,
+      ];
+
+      throw new Error('Should not be reached');
+    }
+
+    handlerGenerator.recover = jest.fn<
+      YieldArg,
+      [e: unknown, action: BaseAction<IWorkflowAction>]
+    >((e, action): YieldArg => {
+      return ['processEntrypoint', action.entrypoint, undefined, null];
+    });
+
+    const handlers = getHandlers<'sync'>({
+      workflow: handlerGenerator,
+    });
+
+    const entrypoint = createEntrypoint(services, '/foo/bar.js', ['default']);
+    const action = entrypoint.createAction('workflow', undefined, null);
+
+    syncActionRunner(action, handlers);
+    expect(handlerGenerator.recover).toHaveBeenCalled();
+  });
+
+  it('should process triple superseded entrypoint', () => {
+    const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
+      'default',
+    ]);
+
+    const handlers = getHandlers<'sync'>({
+      explodeReexports: function* explodeReexports(
+        this: IExplodeReexportsAction
+      ): SyncScenarioForAction<IExplodeReexportsAction> {
+        createEntrypoint(services, '/foo/bar.js', ['named']);
+        createEntrypoint(services, '/foo/bar.js', ['default', 'bar']);
+
+        yield ['getExports', this.entrypoint, undefined, null];
+      },
+      processEntrypoint,
+    });
+
+    const action = fooBarDefault.createAction(
+      'processEntrypoint',
+      undefined,
+      null
+    );
+
+    syncActionRunner(action, handlers);
   });
 });

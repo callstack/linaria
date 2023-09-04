@@ -46,12 +46,7 @@ export function* processEntrypoint(
   });
 
   try {
-    yield [
-      'explodeReexports',
-      this.entrypoint,
-      undefined,
-      abortController.signal,
-    ];
+    yield ['explodeReexports', this.entrypoint, undefined, null];
     const result = yield* this.getNext(
       'transform',
       this.entrypoint,

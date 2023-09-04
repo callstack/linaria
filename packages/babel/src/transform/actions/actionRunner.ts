@@ -87,6 +87,8 @@ export function syncActionRunner<TAction extends ActionQueueItem>(
   actionHandlers: Handlers<'sync'>,
   stack: string[] = [getActionRef(action.type, action.entrypoint)]
 ): TypeOfResult<TAction> {
+  assertIfAborted(action, stack);
+
   if (action.result !== Pending) {
     return action.result as TypeOfResult<TAction>;
   }
@@ -95,8 +97,6 @@ export function syncActionRunner<TAction extends ActionQueueItem>(
   const generator = action.run(handler);
   let result = generator.next();
   while (!result.done) {
-    assertIfAborted(action, stack);
-
     const [type, entrypoint, data, abortSignal] = result.value;
     const nextAction = entrypoint.createAction(type, data, abortSignal);
 

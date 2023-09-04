@@ -64,13 +64,13 @@ describe('processEntrypoint', () => {
 
     const emittedSignals = emitted.map((a) => a[3]);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
-      false,
+      undefined,
       false,
     ]);
 
     const newEntrypoint = createEntrypoint(services, '/foo/bar.js', ['named']);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
-      true,
+      undefined,
       true,
     ]);
 
@@ -103,14 +103,14 @@ describe('processEntrypoint', () => {
 
     const emittedSignals = emitted.map((a) => a[3]);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
-      false,
+      undefined,
       false,
     ]);
 
     abortController.abort();
 
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
-      true,
+      undefined,
       true,
     ]);
 
