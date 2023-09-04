@@ -32,6 +32,7 @@ export async function asyncActionRunner<TAction extends ActionQueueItem>(
   stack: string[] = [action.type]
 ): Promise<TypeOfResult<TAction>> {
   if (action.abortSignal?.aborted) {
+    action.entrypoint.log('Action %s was aborted', stack.join('->'));
     throw new AbortError();
   }
 
@@ -66,6 +67,7 @@ export function syncActionRunner<TAction extends ActionQueueItem>(
   stack: string[] = [action.type]
 ): TypeOfResult<TAction> {
   if (action.abortSignal?.aborted) {
+    action.entrypoint.log('Action %s was aborted', stack.join('->'));
     throw new AbortError();
   }
 

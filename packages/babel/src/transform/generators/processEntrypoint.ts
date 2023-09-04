@@ -37,6 +37,7 @@ export function* processEntrypoint(
   }
 
   const unsubscribe = this.entrypoint.onSupersede(() => {
+    log('entrypoint superseded, aborting processing');
     abortController.abort();
   });
 
