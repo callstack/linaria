@@ -1,7 +1,13 @@
 /* eslint-disable no-console */
 import path from 'path';
 
-import { EventEmitter } from '../EventEmitter';
+import type {
+  OnAction,
+  OnEvent,
+  OnActionFinishArgs,
+  OnActionStartArgs,
+} from '../EventEmitter';
+import { EventEmitter, isOnActionStartArgs } from '../EventEmitter';
 
 type Timings = Map<string, Map<string, number>>;
 
@@ -162,7 +168,8 @@ export const createPerfMeter = (
   };
 
   const startTimes = new Map<string, number>();
-  const emitter = new EventEmitter((meta, type) => {
+
+  const onEvent: OnEvent = (meta, type) => {
     if (type === 'single') {
       processSingleEvent(meta);
       return;
@@ -180,7 +187,49 @@ export const createPerfMeter = (
         }
       });
     }
-  });
+  };
+
+  interface IAction {
+    entrypointRef: string;
+    finishedAt?: number;
+    idx: string;
+    isAsync?: boolean;
+    startedAt: number;
+    type: string;
+  }
+
+  const actions: IAction[] = [];
+
+  const onAction: OnAction = (
+    ...args: OnActionStartArgs | OnActionFinishArgs
+  ) => {
+    if (isOnActionStartArgs(args)) {
+      const [, timestamp, type, idx, entrypointRef] = args;
+      const id = actions.length;
+      actions.push({
+        entrypointRef,
+        idx,
+        startedAt: timestamp,
+        type,
+      });
+
+      return id;
+    }
+
+    const [, timestamp, id, isAsync] = args;
+    actions[id].finishedAt = timestamp;
+    actions[id].isAsync = isAsync;
+
+    addTiming(
+      'actions',
+      `${isAsync ? 'async' : 'sync'} ${actions[id].type}`,
+      timestamp - actions[id].startedAt
+    );
+
+    return id;
+  };
+
+  const emitter = new EventEmitter(onEvent, onAction);
 
   return {
     emitter,

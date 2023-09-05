@@ -91,9 +91,32 @@ export class BaseAction<TAction extends ActionQueueItem>
 
     let nextIdx = 0;
 
+    const throwFn = (e: unknown) =>
+      this.emitAction(() => this.activeScenario!.throw(e));
+
+    const nextFn = (arg: YieldResult) =>
+      this.emitAction(() => this.activeScenario!.next(arg));
+
+    const processNextResult = (
+      result: IterationResult,
+      onError?: (e: unknown) => void
+    ) => {
+      if ('then' in result) {
+        result.then((r) => {
+          if (r.done) {
+            this.result = r.value;
+          }
+        }, onError);
+      } else if (result.done) {
+        this.result = result.value;
+      }
+
+      this.activeScenarioNextResults.push(result);
+    };
+
     const processError = (e: unknown) => {
-      const nextResult = this.activeScenario!.throw(e);
-      this.activeScenarioNextResults.push(nextResult as IterationResult);
+      const nextResult = throwFn(e);
+      processNextResult(nextResult as IterationResult);
     };
 
     const processNext = (arg: YieldResult) => {
@@ -102,18 +125,8 @@ export class BaseAction<TAction extends ActionQueueItem>
       }
 
       try {
-        const nextResult = this.activeScenario!.next(arg);
-        if ('then' in nextResult) {
-          nextResult.then((result) => {
-            if (result.done) {
-              this.result = result.value;
-            }
-          }, processError);
-        } else if (nextResult.done) {
-          this.result = nextResult.value;
-        }
-
-        this.activeScenarioNextResults.push(nextResult as IterationResult);
+        const nextResult = nextFn(arg);
+        processNextResult(nextResult as IterationResult, processError);
       } catch (e) {
         processError(e);
       }
@@ -129,5 +142,14 @@ export class BaseAction<TAction extends ActionQueueItem>
         return this.activeScenarioNextResults[nextIdx++] as IterationResult;
       },
     };
+  }
+
+  protected emitAction<TRes>(fn: () => TRes) {
+    return this.services.eventEmitter.action(
+      this.type,
+      this.idx,
+      this.entrypoint.ref,
+      fn
+    );
   }
 }
