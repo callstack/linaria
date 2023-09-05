@@ -21,6 +21,7 @@ const commonJSTargets = {
 
 module.exports = {
   presets: ['@babel/preset-typescript'],
+  plugins: ['@babel/plugin-proposal-explicit-resource-management'],
   env: {
     legacy: {
       presets: [

@@ -6,7 +6,7 @@
   "type": "module",
   "devDependencies": {
     "@astrojs/solid-js": "^1.2.3",
-    "@babel/core": "^7.22.10",
+    "@babel/core": "^7.22.15",
     "@linaria/core": "workspace:^",
     "@linaria/shaker": "workspace:^",
     "@linaria/vite": "workspace:^",

@@ -344,7 +344,7 @@ export function findActionForNode(
     return findActionForNode(parent);
   }
 
-  if (!path.listKey) {
+  if (!path.listKey && path.key) {
     const field = NODE_FIELDS[parent.type][path.key];
     if (!validateField(parent.node, path.key as string, null, field)) {
       // The parent node isn't valid without this field, so we should remove it also.
