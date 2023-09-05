@@ -1,5 +1,3 @@
-import type { File } from '@babel/types';
-
 import type { IReexport } from '@linaria/utils';
 import { collectExportsAndImports } from '@linaria/utils';
 
@@ -38,12 +36,13 @@ export function findExportsInImports(
   return results;
 }
 
-const cache = new WeakMap<File, string[]>();
-
 export function* getExports(
   this: IGetExportsAction
 ): SyncScenarioForAction<IGetExportsAction> {
-  const { entrypoint } = this;
+  const {
+    entrypoint,
+    services: { cache },
+  } = this;
   const { loadedAndParsed } = entrypoint;
   if (loadedAndParsed.evaluator === 'ignored') {
     return [];
@@ -51,8 +50,8 @@ export function* getExports(
 
   entrypoint.log(`get exports from %s`, entrypoint.name);
 
-  if (cache.has(loadedAndParsed.ast!)) {
-    return cache.get(loadedAndParsed.ast!)!;
+  if (cache.has('exports', entrypoint.name)) {
+    return cache.get('exports', entrypoint.name)!;
   }
 
   let withWildcardReexport: IReexport[] = [];
@@ -96,7 +95,7 @@ export function* getExports(
     }
   }
 
-  cache.set(loadedAndParsed.ast!, result);
+  cache.add('exports', entrypoint.name, result);
 
   return result;
 }
