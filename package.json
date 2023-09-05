@@ -79,7 +79,7 @@
     "react": "^16.14.0",
     "syncpack": "^8.0.0",
     "tsup": "^7.2.0",
-    "turbo": "^1.6.3",
+    "turbo": "^1.7.4",
     "typescript": "^5.2.2"
   },
   "engines": {
