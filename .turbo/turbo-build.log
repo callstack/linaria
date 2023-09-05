@@ -8,22 +8,22 @@
 
 
 Timings:
-  Total: 10872ms
+  Total: 8644ms
 
   By method:
-    createEntrypoint: 575ms
-    parseFile: 30ms
-    queue:transform:evaluator: 168ms
-    queue:transform:preeval: 488ms
-    queue:transform:preeval:processTemplate: 198ms
-    queue:transform:preeval:removeDangerousCode: 41ms
-    queue:transform:preeval:rest-transformations: 146ms
+    createEntrypoint: 541ms
+    parseFile: 45ms
+    queue:transform:evaluator: 120ms
+    queue:transform:preeval: 366ms
+    queue:transform:preeval:processTemplate: 142ms
+    queue:transform:preeval:removeDangerousCode: 45ms
+    queue:transform:preeval:rest-transformations: 110ms
 {
-  rss: 197677056,
-  heapTotal: 131223552,
-  heapUsed: 99474888,
-  external: 3566331,
-  arrayBuffers: 1117972
+  rss: 195579904,
+  heapTotal: 131366912,
+  heapUsed: 99897632,
+  external: 3435331,
+  arrayBuffers: 986972
 }
 assets by info 63.5 KiB [1m[32m[immutable][39m[22m
   asset [1m[32mc9d5cf961634b7622bef.png[39m[22m 59.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/code-sample-v4.png] (auxiliary name: app)
@@ -49,9 +49,9 @@ cacheable modules 148 KiB (javascript) 62.6 KiB (asset) 2.7 KiB (css/mini-extrac
       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Hero.jsx[39m[22m 1.35 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/index.jsx[39m[22m 311 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Container.js[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.76.0 compiled [1m[32msuccessfully[39m[22m in 9676 ms
+webpack 5.76.0 compiled [1m[32msuccessfully[39m[22m in 7365 ms
 
 > linaria-website@4.5.4 build:server /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
 
-Successfully compiled 11 files with Babel (1980ms).
+Successfully compiled 11 files with Babel (1834ms).
