@@ -183,9 +183,11 @@ export function loadAndParse(
   const evaluator: Evaluator =
     typeof action === 'function'
       ? action
-      : require(require.resolve(action, {
-          paths: [dirname(name)],
-        })).default;
+      : require(
+          require.resolve(action, {
+            paths: [dirname(name)],
+          })
+        ).default;
 
   const { evalConfig, parseConfig } = buildConfigs(
     services,

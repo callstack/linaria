@@ -26,11 +26,11 @@
     "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.10",
-    "@babel/traverse": "^7.22.10",
-    "@babel/types": "^7.22.10",
-    "@types/babel__core": "^7.1.19",
-    "@types/babel__traverse": "^7.17.1",
+    "@babel/core": "^7.22.15",
+    "@babel/traverse": "^7.22.15",
+    "@babel/types": "^7.22.15",
+    "@types/babel__core": "^7.20.1",
+    "@types/babel__traverse": "^7.20.1",
     "dedent": "^0.7.0"
   },
   "engines": {

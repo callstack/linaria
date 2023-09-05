@@ -20,6 +20,7 @@ import { invariant } from 'ts-invariant';
 
 import type { Debugger } from '@linaria/logger';
 
+import './utils/dispose-polyfill';
 import { TransformCacheCollection } from './cache';
 import { Entrypoint } from './transform/Entrypoint';
 import { getStack, isSuperSet } from './transform/Entrypoint.helpers';
@@ -111,7 +112,7 @@ function assertDisposed(
   invariant(entrypoint, 'Module is disposed');
 }
 
-class Module {
+class Module implements Disposable {
   public readonly callstack: string[] = [];
 
   public readonly debug: Debugger;
@@ -185,9 +186,8 @@ class Module {
         return entrypoint.exports;
       }
 
-      const m = new Module(entrypoint, this.cache, this);
+      using m = new Module(entrypoint, this.cache, this);
       m.evaluate();
-      m.dispose();
 
       return entrypoint.exports;
     },
@@ -240,7 +240,7 @@ class Module {
     this.debug('the whole exports was overridden with %O', value);
   }
 
-  dispose(): void {
+  [Symbol.dispose](): void {
     assertDisposed(this.entrypoint);
 
     this.debug('dispose');

@@ -10,10 +10,9 @@ export default function evaluate(
   cache: TransformCacheCollection,
   entrypoint: Entrypoint
 ) {
-  const m = new Module(entrypoint, cache);
+  using m = new Module(entrypoint, cache);
 
   m.evaluate();
-  m.dispose();
 
   return {
     value: entrypoint.exports,

@@ -15,11 +15,11 @@
       "@linaria/*": ["./packages/*/src"]
     },
     "jsx": "react",
-    "lib": ["es6", "es2017", "es2018", "ES2019.Array", "dom"],
+    "lib": ["es6", "es2017", "es2018", "es2022", "ES2019.Array", "dom", "esnext.disposable"],
     "module": "es6",
     "moduleResolution": "node",
     "strict": true,
-    "target": "esnext",
+    "target": "es2022",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

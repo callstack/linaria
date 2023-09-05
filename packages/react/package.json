@@ -67,8 +67,8 @@
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
-    "@babel/types": "^7.22.10",
-    "@types/babel__core": "^7.1.19",
+    "@babel/types": "^7.22.15",
+    "@types/babel__core": "^7.20.1",
     "@types/node": "^17.0.39",
     "@types/react": ">=16",
     "react": "^16.14.0",

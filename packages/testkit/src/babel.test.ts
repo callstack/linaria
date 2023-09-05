@@ -14,7 +14,7 @@ import {
   TransformCacheCollection,
   Entrypoint,
 } from '@linaria/babel-preset';
-import { enableDebug, linariaLogger } from '@linaria/logger';
+import { linariaLogger } from '@linaria/logger';
 import type { Evaluator, StrictOptions, OnEvent } from '@linaria/utils';
 import { EventEmitter } from '@linaria/utils';
 
@@ -3247,7 +3247,6 @@ describe('strategy shaker', () => {
     });
 
     it('multiple parallel chains of reexports', async () => {
-      enableDebug();
       const cache = new TransformCacheCollection();
 
       const onEvent = jest.fn<void, Parameters<OnEvent>>();
