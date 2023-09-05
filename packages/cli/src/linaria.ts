@@ -161,7 +161,7 @@ async function processFiles(files: (number | string)[], options: Options) {
         root: options.sourceRoot,
       },
       cache,
-      emitter,
+      eventEmitter: emitter,
     };
 
     tasks.push(() =>

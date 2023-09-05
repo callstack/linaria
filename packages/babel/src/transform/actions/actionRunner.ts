@@ -51,7 +51,7 @@ export async function asyncActionRunner<TAction extends ActionQueueItem>(
   }
 
   const handler = getHandler(action, actionHandlers);
-  const generator = action.run(handler);
+  const generator = action.run<'async' | 'sync'>(handler);
   let result = await generator.next();
   while (!result.done) {
     const [type, entrypoint, data, abortSignal] = result.value;
@@ -94,7 +94,7 @@ export function syncActionRunner<TAction extends ActionQueueItem>(
   }
 
   const handler = getHandler(action, actionHandlers);
-  const generator = action.run(handler);
+  const generator = action.run<'sync'>(handler);
   let result = generator.next();
   while (!result.done) {
     const [type, entrypoint, data, abortSignal] = result.value;

@@ -94,7 +94,7 @@ const webpack5Loader: Loader = function webpack5LoaderPlugin(
       pluginOptions: rest,
     },
     cache,
-    emitter: sharedState.emitter,
+    eventEmitter: sharedState.emitter,
   };
 
   transform(transformServices, content.toString(), asyncResolve).then(

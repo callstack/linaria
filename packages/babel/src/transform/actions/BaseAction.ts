@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 import type { Entrypoint } from '../Entrypoint';
 import type {
   ActionQueueItem,
@@ -77,7 +78,10 @@ export class BaseAction<TAction extends ActionQueueItem>
     ]) as TypeOfResult<TNextAction>;
   }
 
-  public run<TMode extends 'async' | 'sync'>(handler: Handler<TMode, TAction>) {
+  public run<
+    TMode extends 'async' | 'sync',
+    THandler extends Handler<TMode, TAction> = Handler<TMode, TAction>,
+  >(handler: THandler) {
     type IterationResult = AnyIteratorResult<TMode, TypeOfResult<TAction>>;
 
     if (!this.activeScenario) {
@@ -85,40 +89,44 @@ export class BaseAction<TAction extends ActionQueueItem>
       this.activeScenarioNextResults = [];
     }
 
+    let nextIdx = 0;
+
     const processError = (e: unknown) => {
       const nextResult = this.activeScenario!.throw(e);
       this.activeScenarioNextResults.push(nextResult as IterationResult);
     };
 
-    let nextIdx = 0;
-    return {
-      next: (arg: YieldResult): IterationResult => {
-        if (this.activeScenarioNextResults.length <= nextIdx) {
-          try {
-            const nextResult = this.activeScenario!.next(arg);
-            if ('then' in nextResult) {
-              nextResult.then((result) => {
-                if (result.done) {
-                  this.result = result.value;
-                }
-              }, processError);
-            } else if (nextResult.done) {
-              this.result = nextResult.value;
-            }
+    const processNext = (arg: YieldResult) => {
+      if (this.activeScenarioNextResults.length > nextIdx) {
+        return;
+      }
 
-            this.activeScenarioNextResults.push(nextResult as IterationResult);
-          } catch (e) {
-            processError(e);
-          }
+      try {
+        const nextResult = this.activeScenario!.next(arg);
+        if ('then' in nextResult) {
+          nextResult.then((result) => {
+            if (result.done) {
+              this.result = result.value;
+            }
+          }, processError);
+        } else if (nextResult.done) {
+          this.result = nextResult.value;
         }
 
-        const nextResult = this.activeScenarioNextResults[nextIdx]!;
-        nextIdx += 1;
-        return nextResult as IterationResult;
+        this.activeScenarioNextResults.push(nextResult as IterationResult);
+      } catch (e) {
+        processError(e);
+      }
+    };
+
+    return {
+      next: (arg: YieldResult): IterationResult => {
+        processNext(arg);
+        return this.activeScenarioNextResults[nextIdx++] as IterationResult;
       },
       throw: (e: unknown): IterationResult => {
         processError(e);
-        return this.activeScenarioNextResults[nextIdx] as IterationResult;
+        return this.activeScenarioNextResults[nextIdx++] as IterationResult;
       },
     };
   }

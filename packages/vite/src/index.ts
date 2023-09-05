@@ -146,7 +146,7 @@ export default function linaria({
           pluginOptions: rest,
         },
         cache,
-        emitter,
+        eventEmitter: emitter,
       };
 
       const result = await transform(transformServices, code, asyncResolve);
