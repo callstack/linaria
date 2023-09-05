@@ -1,6 +1,4 @@
 /* eslint-disable require-yield */
-import { enableDebug } from '@linaria/logger';
-
 import type { IEntrypointDependency } from '../../Entrypoint.types';
 import {
   createEntrypoint,
@@ -199,8 +197,6 @@ describe('actionRunner', () => {
   });
 
   it('should recover', () => {
-    enableDebug();
-
     const abortController = new AbortController();
     abortController.abort();
 

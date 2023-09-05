@@ -40,7 +40,12 @@ export interface IQueueActionEvent {
   type: 'queue-action';
 }
 
-const formatTime = (date: Date) => {
+const formatTime = (timestamps: number | undefined) => {
+  if (!timestamps) {
+    return 'unfinished';
+  }
+
+  const date = new Date(performance.timeOrigin + timestamps);
   return `${date.toLocaleTimeString()}.${date
     .getMilliseconds()
     .toString()
@@ -134,36 +139,11 @@ export const createPerfMeter = (
     processed.imports = imports;
   };
 
-  const queueActions = new Map<string, string[]>();
-  const processQueueAction = ({
-    file,
-    action,
-    args,
-    queueIdx,
-    datetime,
-  }: IQueueActionEvent) => {
-    if (!queueActions.has(file)) {
-      queueActions.set(file, []);
-    }
-
-    const stringifiedArgs =
-      args?.map((arg) => JSON.stringify(arg)).join(', ') ?? '';
-    queueActions
-      .get(file)!
-      .push(
-        `${queueIdx}:${action}(${stringifiedArgs})@${formatTime(datetime)}`
-      );
-  };
-
   const processSingleEvent = (
     meta: Record<string, unknown> | IProcessedEvent | IQueueActionEvent
   ) => {
     if (meta.type === 'dependency') {
       processDependencyEvent(meta as IProcessedEvent);
-    }
-
-    if (meta.type === 'queue-action') {
-      processQueueAction(meta as IQueueActionEvent);
     }
   };
 
@@ -245,7 +225,13 @@ export const createPerfMeter = (
           JSON.stringify(
             {
               processedDependencies,
-              queueActions,
+              actions: actions.map(({ finishedAt, ...action }) => ({
+                ...action,
+                duration: finishedAt
+                  ? finishedAt - action.startedAt
+                  : 'unfinished',
+                startedAt: formatTime(action.startedAt),
+              })),
               timings,
             },
             replacer,
@@ -254,9 +240,9 @@ export const createPerfMeter = (
         );
       }
 
+      actions.length = 0;
       timings.clear();
       processedDependencies.clear();
-      queueActions.clear();
 
       console.log(process.memoryUsage());
     },

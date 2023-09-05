@@ -146,10 +146,10 @@ it('should use cached version from the codeCache', () => {
   `;
 
   const resolved = require.resolve('./__fixtures__/objectExport.js');
-  entrypoint.addDependency('./objectExport', {
+  entrypoint.addDependency({
     only: ['margin'],
     resolved,
-    source: 'objectExport',
+    source: './objectExport',
   });
 
   entrypoint.createChild(
@@ -319,12 +319,12 @@ it('should resolve from the cache', () => {
     ];
   `;
 
-  entrypoint.addDependency('foo', {
+  entrypoint.addDependency({
     only: ['*'],
     resolved: 'resolved foo',
     source: 'foo',
   });
-  entrypoint.addDependency('test', {
+  entrypoint.addDependency({
     only: ['*'],
     resolved: 'resolved test',
     source: 'test',

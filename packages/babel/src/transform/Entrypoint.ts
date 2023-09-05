@@ -31,8 +31,6 @@ function ancestorOrSelf(name: string, parent: ParentEntrypoint) {
   return null;
 }
 
-type DependencyType = IEntrypointDependency | Promise<IEntrypointDependency>;
-
 export class Entrypoint extends BaseEntrypoint {
   public readonly evaluated = false;
 
@@ -62,7 +60,11 @@ export class Entrypoint extends BaseEntrypoint {
     exports: Record<string | symbol, unknown> | undefined,
     evaluatedOnly: string[],
     loadedAndParsed?: IEntrypointCode | IIgnoredEntrypoint,
-    protected readonly dependencies = new Map<string, DependencyType>(),
+    protected readonly resolveTasks = new Map<
+      string,
+      Promise<IEntrypointDependency>
+    >(),
+    protected readonly dependencies = new Map<string, IEntrypointDependency>(),
     generation = 1
   ) {
     super(services, evaluatedOnly, exports, generation, name, only, parent);
@@ -150,7 +152,7 @@ export class Entrypoint extends BaseEntrypoint {
     pluginOptions: StrictOptions
   ): Entrypoint | 'loop' {
     const { cache, eventEmitter } = services;
-    return eventEmitter.pair({ method: 'createEntrypoint' }, () => {
+    return eventEmitter.perf('createEntrypoint', () => {
       const [status, entrypoint] = Entrypoint.innerCreate(
         services,
         parent
@@ -236,6 +238,7 @@ export class Entrypoint extends BaseEntrypoint {
       exports,
       evaluatedOnly,
       undefined,
+      cached && 'resolveTasks' in cached ? cached.resolveTasks : undefined,
       cached && 'dependencies' in cached ? cached.dependencies : undefined,
       cached ? cached.generation + 1 : 1
     );
@@ -248,8 +251,16 @@ export class Entrypoint extends BaseEntrypoint {
     return ['created', newEntrypoint];
   }
 
-  public addDependency(name: string, dependency: DependencyType): void {
-    this.dependencies.set(name, dependency);
+  public addDependency(dependency: IEntrypointDependency): void {
+    this.resolveTasks.delete(dependency.source);
+    this.dependencies.set(dependency.source, dependency);
+  }
+
+  public addResolveTask(
+    name: string,
+    dependency: Promise<IEntrypointDependency>
+  ): void {
+    this.resolveTasks.set(name, dependency);
   }
 
   public createAction<
@@ -313,8 +324,14 @@ export class Entrypoint extends BaseEntrypoint {
     );
   }
 
-  public getDependency(name: string): DependencyType | undefined {
+  public getDependency(name: string): IEntrypointDependency | undefined {
     return this.dependencies.get(name);
+  }
+
+  public getResolveTask(
+    name: string
+  ): Promise<IEntrypointDependency> | undefined {
+    return this.resolveTasks.get(name);
   }
 
   public hasLinariaMetadata() {
@@ -356,6 +373,7 @@ export class Entrypoint extends BaseEntrypoint {
             this.exports,
             this.evaluatedOnly,
             this.loadedAndParsed,
+            this.resolveTasks,
             this.dependencies,
             this.generation + 1
           );

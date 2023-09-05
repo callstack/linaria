@@ -5,10 +5,10 @@ import type { Entrypoint } from '../Entrypoint';
 import { getStack, isSuperSet, mergeOnly } from '../Entrypoint.helpers';
 import type { IEntrypointDependency } from '../Entrypoint.types';
 import type {
+  AsyncScenarioForAction,
   IResolveImportsAction,
   Services,
   SyncScenarioForAction,
-  AsyncScenarioForAction,
 } from '../types';
 
 function emitDependency(
@@ -154,9 +154,18 @@ export async function* asyncResolveImports(
   const resolvedImports = await Promise.all<IEntrypointDependency>(
     listOfImports.map(([source, importsOnly]) => {
       const cached = entrypoint.getDependency(source);
-      if (cached instanceof Promise) {
+      if (cached) {
+        return {
+          source,
+          only: mergeOnly(cached.only, importsOnly),
+          resolved: cached.resolved,
+        };
+      }
+
+      const task = entrypoint.getResolveTask(source);
+      if (task) {
         // If we have cached task, we need to merge only…
-        const newTask = cached.then((res) => {
+        const newTask = task.then((res) => {
           if (isSuperSet(res.only, importsOnly)) {
             return res;
           }
@@ -166,38 +175,17 @@ export async function* asyncResolveImports(
 
           log('merging imports %o and %o: %o', importsOnly, res.only, merged);
 
-          entrypoint.addDependency(source, {
-            only: merged,
-            resolved: res.resolved,
-            source,
-          });
-
           return { ...res, only: merged };
         });
 
         // … and update the cache
-        entrypoint.addDependency(source, newTask);
+        entrypoint.addResolveTask(source, newTask);
         return newTask;
       }
 
-      if (cached) {
-        const merged = {
-          source,
-          only: mergeOnly(cached.only, importsOnly),
-          resolved: cached.resolved,
-        };
+      const resolveTask = getResolveTask(source, importsOnly);
 
-        entrypoint.addDependency(source, merged);
-
-        return merged;
-      }
-
-      const resolveTask = getResolveTask(source, importsOnly).then((res) => {
-        entrypoint.addDependency(source, res);
-        return res;
-      });
-
-      entrypoint.addDependency(source, resolveTask);
+      entrypoint.addResolveTask(source, resolveTask);
 
       return resolveTask;
     })

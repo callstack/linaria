@@ -15,7 +15,13 @@ import {
   Entrypoint,
 } from '@linaria/babel-preset';
 import { linariaLogger } from '@linaria/logger';
-import type { Evaluator, StrictOptions, OnEvent } from '@linaria/utils';
+import type {
+  Evaluator,
+  StrictOptions,
+  OnEvent,
+  OnActionStartArgs,
+  OnActionFinishArgs,
+} from '@linaria/utils';
 import { EventEmitter } from '@linaria/utils';
 
 import serializer from './__utils__/linaria-snapshot-serializer';
@@ -2555,7 +2561,8 @@ describe('strategy shaker', () => {
 
   it('should ignore unused wildcard reexports', async () => {
     const onEvent = jest.fn<void, Parameters<OnEvent>>();
-    const emitter = new EventEmitter(onEvent);
+    const onAction = jest.fn<number, OnActionStartArgs | OnActionFinishArgs>();
+    const emitter = new EventEmitter(onEvent, onAction);
     const { code, metadata } = await transform(
       dedent`
       import { css } from "@linaria/core";
@@ -2737,7 +2744,8 @@ describe('strategy shaker', () => {
 
   it('evaluates chain of reexports', async () => {
     const onEvent = jest.fn<void, Parameters<OnEvent>>();
-    const emitter = new EventEmitter(onEvent);
+    const onAction = jest.fn<number, OnActionStartArgs | OnActionFinishArgs>();
+    const emitter = new EventEmitter(onEvent, onAction);
 
     const { code, metadata } = await transform(
       dedent`
@@ -3203,7 +3211,11 @@ describe('strategy shaker', () => {
       const cache = new TransformCacheCollection();
 
       const onEvent = jest.fn<void, Parameters<OnEvent>>();
-      const emitter = new EventEmitter(onEvent);
+      const onAction = jest.fn<
+        number,
+        OnActionStartArgs | OnActionFinishArgs
+      >();
+      const emitter = new EventEmitter(onEvent, onAction);
 
       const files = {
         'source-1': dedent`
@@ -3250,7 +3262,11 @@ describe('strategy shaker', () => {
       const cache = new TransformCacheCollection();
 
       const onEvent = jest.fn<void, Parameters<OnEvent>>();
-      const emitter = new EventEmitter(onEvent);
+      const onAction = jest.fn<
+        number,
+        OnActionStartArgs | OnActionFinishArgs
+      >();
+      const emitter = new EventEmitter(onEvent, onAction);
 
       const tokens = ['foo', 'bar', 'bar1', 'bar2'];
 

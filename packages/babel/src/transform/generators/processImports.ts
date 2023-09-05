@@ -7,10 +7,13 @@ import type { IProcessImportsAction, SyncScenarioForAction } from '../types';
 export function* processImports(
   this: IProcessImportsAction
 ): SyncScenarioForAction<IProcessImportsAction> {
-  for (const { only, resolved } of this.data.resolved) {
+  for (const dependency of this.data.resolved) {
+    const { resolved, only } = dependency;
     if (!resolved) {
       continue;
     }
+
+    this.entrypoint.addDependency(dependency);
 
     const nextEntrypoint = this.entrypoint.createChild(resolved, only);
     if (nextEntrypoint === 'loop' || nextEntrypoint.ignored) {

@@ -90,19 +90,15 @@ export const prepareCode = (
 
   const { code, evalConfig, evaluator } = loadedAndParsed;
 
-  const preevalStageResult = eventEmitter.pair(
-    {
-      method: 'queue:transform:preeval',
-    },
-    () =>
-      runPreevalStage(
-        babel,
-        evalConfig,
-        pluginOptions,
-        code,
-        originalAst,
-        eventEmitter
-      )
+  const preevalStageResult = eventEmitter.perf('transform:preeval', () =>
+    runPreevalStage(
+      babel,
+      evalConfig,
+      pluginOptions,
+      code,
+      originalAst,
+      eventEmitter
+    )
   );
 
   const linariaMetadata = getLinariaMetadata(preevalStageResult.metadata);
@@ -121,10 +117,8 @@ export const prepareCode = (
     features: pluginOptions.features,
   };
 
-  const [, transformedCode, imports] = eventEmitter.pair(
-    {
-      method: 'queue:transform:evaluator',
-    },
+  const [, transformedCode, imports] = eventEmitter.perf(
+    'transform:evaluator',
     () =>
       evaluator(
         evalConfig,

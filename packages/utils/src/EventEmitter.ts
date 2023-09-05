@@ -73,28 +73,22 @@ export class EventEmitter {
     return result;
   }
 
-  public pair(labels: Record<string, string>): () => void;
-  public pair<TRes>(labels: Record<string, string>, fn: () => TRes): TRes;
-  public pair<TRes>(labels: Record<string, string>, fn?: () => TRes) {
+  public perf<TRes>(method: string, fn: () => TRes): TRes {
+    const labels = { method };
+
     this.onEvent(labels, 'start');
 
-    if (fn) {
-      const result = fn();
-      if (result instanceof Promise) {
-        result.then(
-          () => this.onEvent(labels, 'finish'),
-          () => this.onEvent(labels, 'finish')
-        );
-      } else {
-        this.onEvent(labels, 'finish');
-      }
-
-      return result;
+    const result = fn();
+    if (result instanceof Promise) {
+      result.then(
+        () => this.onEvent(labels, 'finish'),
+        () => this.onEvent(labels, 'finish')
+      );
+    } else {
+      this.onEvent(labels, 'finish');
     }
 
-    return () => {
-      this.onEvent(labels, 'finish');
-    };
+    return result;
   }
 
   public single(labels: Record<string, unknown>) {

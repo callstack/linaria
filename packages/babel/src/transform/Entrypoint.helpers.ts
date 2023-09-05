@@ -196,7 +196,7 @@ export function loadAndParse(
     babelOptions
   );
 
-  const ast: File = eventEmitter.pair({ method: 'parseFile' }, () =>
+  const ast: File = eventEmitter.perf('parseFile', () =>
     parseFile(babel, name, code, parseConfig)
   );
 
