@@ -67,7 +67,7 @@
         }
       ],
       "passes": 1,
-      "fileIdx": "00008"
+      "fileIdx": "00007"
     },
     "src/components/Hero.jsx": {
       "exports": [
@@ -94,19 +94,19 @@
         }
       ],
       "passes": 1,
-      "fileIdx": "00007"
+      "fileIdx": "00008"
     }
   },
   "queueActions": {},
   "timings": {
     "method": {
-      "parseFile": 45,
-      "createEntrypoint": 541,
-      "queue:transform:preeval:processTemplate": 142,
-      "queue:transform:preeval:removeDangerousCode": 45,
-      "queue:transform:preeval:rest-transformations": 110,
-      "queue:transform:preeval": 366,
-      "queue:transform:evaluator": 120
+      "parseFile": 59,
+      "createEntrypoint": 474,
+      "queue:transform:preeval:processTemplate": 86,
+      "queue:transform:preeval:removeDangerousCode": 33,
+      "queue:transform:preeval:rest-transformations": 89,
+      "queue:transform:preeval": 264,
+      "queue:transform:evaluator": 112
     }
   }
 }
