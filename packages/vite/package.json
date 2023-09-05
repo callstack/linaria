@@ -40,7 +40,7 @@
     "@linaria/babel-preset": "workspace:^",
     "@linaria/logger": "workspace:^",
     "@linaria/utils": "workspace:^",
-    "@rollup/pluginutils": "^4.1.0"
+    "@rollup/pluginutils": "^5.0.4"
   },
   "devDependencies": {
     "@types/node": "^17.0.39",

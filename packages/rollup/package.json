@@ -41,7 +41,7 @@
     "@linaria/logger": "workspace:^",
     "@linaria/utils": "workspace:^",
     "@linaria/vite": "workspace:^",
-    "@rollup/pluginutils": "^4.1.0"
+    "@rollup/pluginutils": "^5.0.4"
   },
   "devDependencies": {
     "rollup": "^3.11.0"

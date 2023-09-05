@@ -33,7 +33,6 @@
   "dependencies": {
     "@babel/core": "^7.22.15",
     "@babel/generator": "^7.22.15",
-    "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@babel/plugin-transform-modules-commonjs": "^7.22.15",
     "@babel/template": "^7.22.15",
     "@babel/traverse": "^7.22.15",
