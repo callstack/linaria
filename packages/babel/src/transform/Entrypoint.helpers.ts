@@ -15,8 +15,9 @@ import {
 } from '@linaria/utils';
 
 import type { Core } from '../babel';
-import type { IBaseEntrypoint } from '../types';
+import type { ParentEntrypoint } from '../types';
 
+import type { IEntrypointCode, IIgnoredEntrypoint } from './Entrypoint.types';
 import type { Services } from './types';
 
 export function getMatchedRule(
@@ -143,8 +144,8 @@ export function loadAndParse(
   loadedCode: string | undefined,
   log: Debugger,
   pluginOptions: StrictOptions
-) {
-  const { babel, cache, eventEmitter } = services;
+): IEntrypointCode | IIgnoredEntrypoint {
+  const { babel, eventEmitter } = services;
 
   const extension = extname(name);
 
@@ -155,7 +156,11 @@ export function loadAndParse(
       extension
     );
 
-    return 'ignored';
+    return {
+      code: undefined,
+      evaluator: 'ignored',
+      reason: 'extension',
+    };
   }
 
   const code = loadedCode ?? readFileSync(name, 'utf-8');
@@ -168,8 +173,11 @@ export function loadAndParse(
 
   if (action === 'ignore') {
     log('[createEntrypoint] %s is ignored by rule', name);
-    cache.add('ignored', name, true);
-    return 'ignored';
+    return {
+      code,
+      evaluator: 'ignored',
+      reason: 'rule',
+    };
   }
 
   const evaluator: Evaluator =
@@ -186,11 +194,8 @@ export function loadAndParse(
     babelOptions
   );
 
-  const ast: File = eventEmitter.pair(
-    { method: 'parseFile' },
-    () =>
-      cache.get('originalAST', name) ??
-      parseFile(babel, name, code, parseConfig)
+  const ast: File = eventEmitter.pair({ method: 'parseFile' }, () =>
+    parseFile(babel, name, code, parseConfig)
   );
 
   return {
@@ -201,10 +206,9 @@ export function loadAndParse(
   };
 }
 
-export const getIdx = (fn: string) =>
-  getFileIdx(fn).toString().padStart(5, '0');
+export function getStack(entrypoint: ParentEntrypoint) {
+  if (!entrypoint) return [];
 
-export function getStack(entrypoint: IBaseEntrypoint) {
   const stack = [entrypoint.name];
 
   let { parent } = entrypoint;
@@ -216,8 +220,15 @@ export function getStack(entrypoint: IBaseEntrypoint) {
   return stack;
 }
 
-export const includes = (a: string[], b: string[]) => {
+export function mergeOnly(a: string[], b: string[]) {
+  const result = new Set(a);
+  b.forEach((item) => result.add(item));
+  return [...result].filter((i) => i).sort();
+}
+
+export const isSuperSet = <T>(a: (T | '*')[], b: (T | '*')[]) => {
   if (a.includes('*')) return true;
-  if (a.length !== b.length) return false;
-  return a.every((item, index) => item === b[index]);
+  if (b.length === 0) return true;
+  const aSet = new Set(a);
+  return b.every((item) => aSet.has(item));
 };

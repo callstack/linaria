@@ -1,5 +1,9 @@
-import withLinariaMetadata from '../../utils/withLinariaMetadata';
-import type { IWorkflowAction, SyncScenarioForAction } from '../types';
+import { isAborted } from '../actions/AbortError';
+import type {
+  IWorkflowAction,
+  SyncScenarioForAction,
+  YieldArg,
+} from '../types';
 
 /**
  * The entry point for file processing. Sequentially calls `processEntrypoint`,
@@ -7,28 +11,42 @@ import type { IWorkflowAction, SyncScenarioForAction } from '../types';
  * the source code as well as all artifacts obtained from code execution.
  */
 export function* workflow(
-  this: IWorkflowAction<'sync'>
-): SyncScenarioForAction<IWorkflowAction<'sync'>> {
+  this: IWorkflowAction
+): SyncScenarioForAction<IWorkflowAction> {
   const { cache, options } = this.services;
   const { entrypoint } = this;
-  const { name, code: originalCode } = entrypoint;
+
+  if (entrypoint.supersededWith) {
+    entrypoint.log('entrypoint already superseded, rescheduling workflow');
+    return yield* this.getNext(
+      'workflow',
+      entrypoint.supersededWith!,
+      undefined,
+      null
+    );
+  }
+
+  if (entrypoint.ignored) {
+    return {
+      code: entrypoint.loadedAndParsed.code ?? '',
+      sourceMap: options.inputSourceMap,
+    };
+  }
+
+  const { code: originalCode = '' } = entrypoint.loadedAndParsed;
 
   // *** 1st stage ***
 
-  const prepareStageResult = yield* this.getNext(
-    'processEntrypoint',
-    entrypoint,
-    undefined
-  );
-
-  const ast = cache.get('originalAST', name) ?? 'ignored';
+  yield* this.getNext('processEntrypoint', entrypoint, undefined);
 
   // File is ignored or does not contain any tags. Return original code.
-  if (
-    ast === 'ignored' ||
-    !prepareStageResult ||
-    !withLinariaMetadata(prepareStageResult.result.metadata)
-  ) {
+  if (!entrypoint.hasLinariaMetadata()) {
+    if (entrypoint.generation === 1) {
+      // 1st generation here means that it's __linariaPreval entrypoint
+      // without __linariaPreval, so we don't need it cached
+      cache.delete('entrypoints', entrypoint.name);
+    }
+
     return {
       code: originalCode,
       sourceMap: options.inputSourceMap,
@@ -37,9 +55,11 @@ export function* workflow(
 
   // *** 2nd stage ***
 
-  const evalStageResult = yield* this.getNext('evalFile', entrypoint, {
-    code: prepareStageResult.result.code,
-  });
+  const evalStageResult = yield* this.getNext(
+    'evalFile',
+    entrypoint,
+    undefined
+  );
 
   if (evalStageResult === null) {
     return {
@@ -56,19 +76,17 @@ export function* workflow(
     valueCache,
   });
 
-  if (!withLinariaMetadata(collectStageResult.metadata)) {
+  if (!collectStageResult.metadata) {
     return {
       code: collectStageResult.code!,
       sourceMap: collectStageResult.map,
     };
   }
 
-  const linariaMetadata = collectStageResult.metadata.linaria;
-
   // *** 4th stage
 
   const extractStageResult = yield* this.getNext('extract', entrypoint, {
-    processors: linariaMetadata.processors,
+    processors: collectStageResult.metadata.processors,
   });
 
   return {
@@ -77,8 +95,18 @@ export function* workflow(
     dependencies,
     replacements: [
       ...extractStageResult.replacements,
-      ...linariaMetadata.replacements,
+      ...collectStageResult.metadata.replacements,
     ],
     sourceMap: collectStageResult.map,
   };
 }
+
+workflow.recover = (e: unknown, action: IWorkflowAction): YieldArg => {
+  if (isAborted(e) && action.entrypoint.supersededWith) {
+    action.entrypoint.log('aborting processing');
+    return ['workflow', action.entrypoint.supersededWith, undefined, null];
+  }
+
+  action.entrypoint.log(`Unhandled error: %O`, e);
+  throw e;
+};

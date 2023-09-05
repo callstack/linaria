@@ -16,16 +16,16 @@ import {
   TransformCacheCollection,
 } from '@linaria/babel-preset';
 import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
-import { createCustomDebug } from '@linaria/logger';
+import { linariaLogger } from '@linaria/logger';
 import type { IPerfMeterOptions } from '@linaria/utils';
 import { createPerfMeter, getFileIdx, syncResolve } from '@linaria/utils';
 
 type VitePluginOptions = {
   debug?: IPerfMeterOptions | false | null | undefined;
-  include?: FilterPattern;
   exclude?: FilterPattern;
-  sourceMap?: boolean;
+  include?: FilterPattern;
   preprocessor?: Preprocessor;
+  sourceMap?: boolean;
 } & Partial<PluginOptions>;
 
 export { Plugin };
@@ -47,7 +47,7 @@ export default function linaria({
   const { emitter, onDone } = createPerfMeter(debug ?? false);
 
   // <dependency id, targets>
-  const targets: { id: string; dependencies: string[] }[] = [];
+  const targets: { dependencies: string[]; id: string }[] = [];
   const cache = new TransformCacheCollection();
   return {
     name: 'linaria',
@@ -90,12 +90,10 @@ export default function linaria({
         cache.invalidateForFile(depId);
       }
 
-      const modules = affected
+      return affected
         .map((target) => devServer.moduleGraph.getModuleById(target.id))
         .concat(ctx.modules)
         .filter((m): m is ModuleNode => !!m);
-
-      return modules;
     },
     async transform(code: string, url: string) {
       const [id] = url.split('?', 1);
@@ -104,9 +102,9 @@ export default function linaria({
       if (url.includes('node_modules') || !filter(url) || id in cssLookup)
         return;
 
-      const log = createCustomDebug('rollup', getFileIdx(id));
+      const log = linariaLogger.extend('vite');
 
-      log('rollup-init', id);
+      log('Vite transform', getFileIdx(id));
 
       const asyncResolve = async (
         what: string,
@@ -119,11 +117,11 @@ export default function linaria({
             // If module is marked as external, Rollup will not resolve it,
             // so we need to resolve it ourselves with default resolver
             const resolvedId = syncResolve(what, importer, stack);
-            log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
+            log("resolve ✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
             return resolvedId;
           }
 
-          log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
+          log("resolve ✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
           // Vite adds param like `?v=667939b3` to cached modules
           const resolvedId = resolved.id.split('?', 1)[0];
 
@@ -136,7 +134,7 @@ export default function linaria({
           return resolvedId;
         }
 
-        log('resolve', "❌ '%s'@'%s", what, importer);
+        log("resolve ❌ '%s'@'%s", what, importer);
         throw new Error(`Could not resolve ${what}`);
       };
 
@@ -148,7 +146,7 @@ export default function linaria({
           pluginOptions: rest,
         },
         cache,
-        emitter,
+        eventEmitter: emitter,
       };
 
       const result = await transform(transformServices, code, asyncResolve);

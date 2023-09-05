@@ -73,3 +73,6 @@ build/
 tsconfig.tsbuildinfo
 
 .linaria-cache
+
+# debug
+*.debug.ts

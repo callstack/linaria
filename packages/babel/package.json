@@ -47,7 +47,8 @@
     "cosmiconfig": "^8.0.0",
     "happy-dom": "10.8.0",
     "source-map": "^0.7.3",
-    "stylis": "^3.5.4"
+    "stylis": "^3.5.4",
+    "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
     "@types/babel__core": "^7.1.19",

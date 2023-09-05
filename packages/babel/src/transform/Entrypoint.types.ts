@@ -13,10 +13,22 @@ export interface IEntrypointCode {
   evaluator: Evaluator;
 }
 
+export interface IIgnoredEntrypoint {
+  code?: string;
+  evaluator: 'ignored';
+  reason: 'extension' | 'rule';
+}
+
+export interface IEntrypointDependency {
+  only: string[];
+  resolved: string | null;
+  source: string;
+}
+
 export type LoadAndParseFn = (
   services: Services,
   name: string,
   loadedCode: string | undefined,
   log: Debugger,
   pluginOptions: StrictOptions
-) => IEntrypointCode | 'ignored';
+) => IEntrypointCode | IIgnoredEntrypoint;

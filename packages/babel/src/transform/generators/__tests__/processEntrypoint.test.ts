@@ -1,7 +1,6 @@
 import {
-  createSyncEntrypoint,
+  createEntrypoint,
   createServices,
-  getHandlers,
 } from '../../__tests__/entrypoint-helpers';
 import type { Services } from '../../types';
 import { processEntrypoint } from '../processEntrypoint';
@@ -19,14 +18,9 @@ describe('processEntrypoint', () => {
   });
 
   it('should emit explodeReexports, transform and finalizeEntrypoint actions', () => {
-    const handlers = getHandlers<'sync'>({});
-
-    const fooBarDefault = createSyncEntrypoint(
-      services,
-      handlers,
-      '/foo/bar.js',
-      ['default']
-    );
+    const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
+      'default',
+    ]);
 
     // const action = createAction('processEntrypoint', fooBarDefault, {}, null);
     const action = fooBarDefault.createAction(
@@ -51,14 +45,9 @@ describe('processEntrypoint', () => {
   });
 
   it('should abort previously emitted actions if entrypoint was superseded', () => {
-    const handlers = getHandlers<'sync'>({});
-
-    const fooBarDefault = createSyncEntrypoint(
-      services,
-      handlers,
-      '/foo/bar.js',
-      ['default']
-    );
+    const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
+      'default',
+    ]);
 
     const action = fooBarDefault.createAction(
       'processEntrypoint',
@@ -75,18 +64,13 @@ describe('processEntrypoint', () => {
 
     const emittedSignals = emitted.map((a) => a[3]);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
-      false,
+      undefined,
       false,
     ]);
 
-    const newEntrypoint = createSyncEntrypoint(
-      services,
-      handlers,
-      '/foo/bar.js',
-      ['named']
-    );
+    const newEntrypoint = createEntrypoint(services, '/foo/bar.js', ['named']);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
-      true,
+      undefined,
       true,
     ]);
 
@@ -99,14 +83,9 @@ describe('processEntrypoint', () => {
   });
 
   it('should abort previously emitted actions if parent aborts', () => {
-    const handlers = getHandlers<'sync'>({});
-
-    const fooBarDefault = createSyncEntrypoint(
-      services,
-      handlers,
-      '/foo/bar.js',
-      ['default']
-    );
+    const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
+      'default',
+    ]);
 
     const abortController = new AbortController();
     const action = fooBarDefault.createAction(
@@ -124,14 +103,14 @@ describe('processEntrypoint', () => {
 
     const emittedSignals = emitted.map((a) => a[3]);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
-      false,
+      undefined,
       false,
     ]);
 
     abortController.abort();
 
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
-      true,
+      undefined,
       true,
     ]);
 

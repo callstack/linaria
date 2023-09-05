@@ -3,6 +3,7 @@ import type { PluginItem } from '@babel/core';
 import { buildOptions } from '@linaria/utils';
 
 import { filename as collectorPlugin } from '../../plugins/collector';
+import { getLinariaMetadata } from '../../utils/withLinariaMetadata';
 import type { ICollectAction, SyncScenarioForAction } from '../types';
 
 /**
@@ -11,12 +12,16 @@ import type { ICollectAction, SyncScenarioForAction } from '../types';
  */
 // eslint-disable-next-line require-yield
 export function* collect(
-  this: ICollectAction<'sync'>
-): SyncScenarioForAction<ICollectAction<'sync'>> {
+  this: ICollectAction
+): SyncScenarioForAction<ICollectAction> {
   const { babel, options } = this.services;
   const { valueCache } = this.data;
   const { entrypoint } = this;
-  const { ast, code, name, pluginOptions } = entrypoint;
+  const { loadedAndParsed, name, pluginOptions } = entrypoint;
+
+  if (loadedAndParsed.evaluator === 'ignored') {
+    throw new Error('entrypoint was ignored');
+  }
 
   const transformPlugins: PluginItem[] = [
     [
@@ -41,15 +46,26 @@ export function* collect(
     sourceType: 'unambiguous',
   });
 
-  const result = babel.transformFromAstSync(ast, code, {
-    ...transformConfig,
-    cwd: options.root,
-    filename: name,
-  });
+  const result = babel.transformFromAstSync(
+    loadedAndParsed.ast,
+    loadedAndParsed.code,
+    {
+      ...transformConfig,
+      cwd: options.root,
+      filename: name,
+    }
+  );
 
   if (!result || !result.ast?.program) {
     throw new Error('Babel transform failed');
   }
 
-  return result;
+  const linariaMetadata = getLinariaMetadata(result.metadata);
+
+  return {
+    ast: result.ast,
+    code: result.code,
+    map: result.map,
+    metadata: linariaMetadata ?? null,
+  };
 }

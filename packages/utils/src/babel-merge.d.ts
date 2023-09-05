@@ -2,16 +2,16 @@ declare module 'babel-merge' {
   import type { TransformOptions } from '@babel/core';
 
   interface Options {
-    arrayMerge?(
-      target: unknown[],
-      source: unknown[],
-      options?: Options
-    ): unknown[];
     clone?: boolean;
     customMerge?: (
       key: string,
       options?: Options
     ) => ((x: unknown, y: unknown) => unknown) | undefined;
+    arrayMerge?(
+      target: unknown[],
+      source: unknown[],
+      options?: Options
+    ): unknown[];
     isMergeableObject?(value: object): boolean;
   }
 

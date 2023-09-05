@@ -1,9 +1,9 @@
-import type { BabelFile, BabelFileMetadata, PluginPass } from '@babel/core';
+import type { BabelFile, PluginPass } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 import type { File } from '@babel/types';
 import type { RawSourceMap } from 'source-map';
 
-import type { CustomDebug, Debugger } from '@linaria/logger';
+import type { Debugger } from '@linaria/logger';
 import type { BaseProcessor } from '@linaria/tags';
 import type {
   LinariaMetadata,
@@ -31,53 +31,40 @@ export type PluginOptions = StrictOptions & {
   stage?: Stage;
 };
 
-export interface IModule {
-  debug: CustomDebug;
-  readonly exports: unknown;
-  readonly idx: number;
-  readonly isEvaluated: boolean;
-  readonly only: string;
-}
-
-export interface IBaseEntrypoint {
-  idx: string;
-  generation: number;
+export type ParentEntrypoint = {
+  evaluated: boolean;
   log: Debugger;
   name: string;
-  only: string[];
-  onSupersede: (
-    callback: (newEntrypoint: IBaseEntrypoint) => void
-  ) => () => void;
-  parent: IBaseEntrypoint | null;
-}
+  parent: ParentEntrypoint | null;
+} | null;
 
 export type Dependencies = string[];
 
 export interface IPluginState extends PluginPass {
-  processors: BaseProcessor[];
   dependencies: Dependencies;
   file: BabelFile & {
     metadata: {
       linaria?: LinariaMetadata;
     };
   };
+  processors: BaseProcessor[];
 }
 
 export interface ITransformFileResult {
-  metadata?: BabelFileMetadata;
   code: string;
+  metadata: LinariaMetadata | null;
 }
 
 export type Stage = 'preeval' | 'collect';
 
 export type Result = {
   code: string;
-  sourceMap?: RawSourceMap | null;
-  cssText?: string;
   cssSourceMapText?: string;
+  cssText?: string;
   dependencies?: string[];
-  rules?: Rules;
   replacements?: Replacement[];
+  rules?: Rules;
+  sourceMap?: RawSourceMap | null;
 };
 
 export type Options = {
@@ -95,6 +82,6 @@ export type Preprocessor = 'none' | 'stylis' | PreprocessorFn | void;
 export type MissedBabelCoreTypes = {
   File: new (
     options: { filename: string },
-    file: { code: string; ast: File }
+    file: { ast: File; code: string }
   ) => { path: NodePath<File> };
 };

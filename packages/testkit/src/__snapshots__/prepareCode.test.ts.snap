@@ -12,7 +12,7 @@ function foo(onImport) {
 
 exports[`prepareCode Testing transformation for dynamic-import: imports 1`] = `Map {}`;
 
-exports[`prepareCode Testing transformation for dynamic-import: metadata 1`] = `{}`;
+exports[`prepareCode Testing transformation for dynamic-import: metadata 1`] = `null`;
 
 exports[`prepareCode Testing transformation for dynamic-import-param: code 1`] = `
 ""use strict";
@@ -26,7 +26,7 @@ function foo(locale, onImport) {
 
 exports[`prepareCode Testing transformation for dynamic-import-param: imports 1`] = `Map {}`;
 
-exports[`prepareCode Testing transformation for dynamic-import-param: metadata 1`] = `{}`;
+exports[`prepareCode Testing transformation for dynamic-import-param: metadata 1`] = `null`;
 
 exports[`prepareCode Testing transformation for for-debug: code 1`] = `
 "'use strict';
@@ -64,4 +64,4 @@ Map {
 }
 `;
 
-exports[`prepareCode Testing transformation for for-debug: metadata 1`] = `{}`;
+exports[`prepareCode Testing transformation for for-debug: metadata 1`] = `null`;

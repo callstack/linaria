@@ -237,6 +237,7 @@ module.exports = {
           'error',
           { prefer: 'type-imports' },
         ],
+        '@typescript-eslint/member-ordering': memberOrder,
 
         // TODO
         '@typescript-eslint/ban-ts-comment': 0,
@@ -251,9 +252,7 @@ module.exports = {
     },
     {
       files: ['**/processors/**/*.ts'],
-      rules: {
-        '@typescript-eslint/member-ordering': memberOrder,
-      },
+      rules: {},
     },
     {
       files: ['*.js', '*.jsx'],

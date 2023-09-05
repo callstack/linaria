@@ -1,6 +1,6 @@
 import { cosmiconfigSync } from 'cosmiconfig';
 
-import type { StrictOptions } from '@linaria/utils';
+import type { FeatureFlags, StrictOptions } from '@linaria/utils';
 
 import type { PluginOptions } from '../../types';
 
@@ -23,12 +23,16 @@ const searchPlaces = [
 
 const explorerSync = cosmiconfigSync('linaria', { searchPlaces });
 
-const cache = new WeakMap<Partial<PluginOptions>, StrictOptions>();
+type PartialOptions = Partial<Omit<PluginOptions, 'features'>> & {
+  features?: Partial<FeatureFlags>;
+};
+
+const cache = new WeakMap<Partial<PartialOptions>, StrictOptions>();
 const defaultOverrides = {};
 const nodeModulesRegExp = /[\\/]node_modules[\\/]/;
 
 export default function loadLinariaOptions(
-  overrides: Partial<PluginOptions> = defaultOverrides
+  overrides: PartialOptions = defaultOverrides
 ): StrictOptions {
   if (cache.has(overrides)) {
     return cache.get(overrides)!;
@@ -44,8 +48,11 @@ export default function loadLinariaOptions(
       ? explorerSync.load(configFile)
       : explorerSync.search();
 
-  const defaultFeatures = {
+  const defaultFeatures: FeatureFlags = {
     dangerousCodeRemover: true,
+    globalCache: true,
+    happyDOM: true,
+    softErrors: false,
   };
 
   const options: StrictOptions = {

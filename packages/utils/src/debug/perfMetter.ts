@@ -12,26 +12,26 @@ export interface IPerfMeterOptions {
 
 interface IProcessedDependency {
   exports: string[];
+  fileIdx: string;
   imports: { from: string; what: string[] }[];
   passes: number;
-  fileIdx: string;
 }
 
 export interface IProcessedEvent {
-  type: 'dependency';
   file: string;
-  only: string[];
-  imports: { from: string; what: string[] }[];
   fileIdx: string;
+  imports: { from: string; what: string[] }[];
+  only: string[];
+  type: 'dependency';
 }
 
 export interface IQueueActionEvent {
-  type: 'queue-action';
-  datetime: Date;
-  queueIdx: string;
   action: string;
-  file: string;
   args?: string[];
+  datetime: Date;
+  file: string;
+  queueIdx: string;
+  type: 'queue-action';
 }
 
 const formatTime = (date: Date) => {
@@ -204,6 +204,12 @@ export const createPerfMeter = (
           )
         );
       }
+
+      timings.clear();
+      processedDependencies.clear();
+      queueActions.clear();
+
+      console.log(process.memoryUsage());
     },
   };
 };

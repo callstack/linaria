@@ -9,7 +9,7 @@ import type { Identifier } from '@babel/types';
 
 import { debug } from '@linaria/logger';
 import type { StrictOptions, LinariaMetadata } from '@linaria/utils';
-import { removeWithRelated } from '@linaria/utils';
+import { invalidateTraversalCache, removeWithRelated } from '@linaria/utils';
 
 import type { Core } from '../babel';
 import type { IPluginState, ValueCache } from '../types';
@@ -86,5 +86,8 @@ export default function collectorPlugin(
       debug('collect:end', file.opts.filename);
     },
     visitor: {},
+    post(file: BabelFile) {
+      invalidateTraversalCache(file.path);
+    },
   };
 }

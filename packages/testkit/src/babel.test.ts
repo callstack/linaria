@@ -12,7 +12,9 @@ import {
   transform as linariaTransform,
   loadLinariaOptions,
   TransformCacheCollection,
+  Entrypoint,
 } from '@linaria/babel-preset';
+import { enableDebug, linariaLogger } from '@linaria/logger';
 import type { Evaluator, StrictOptions, OnEvent } from '@linaria/utils';
 import { EventEmitter } from '@linaria/utils';
 
@@ -78,6 +80,9 @@ const getLinariaConfig = (
         action: 'ignore',
       },
     ],
+    features: {
+      softErrors: false,
+    },
     stage,
     ...linariaConfig,
   });
@@ -2915,12 +2920,12 @@ describe('strategy shaker', () => {
   it('should not eval wrapped component from a non-linaria library', async () => {
     const { code, metadata } = await transform(
       dedent`
-      import { styled } from "@linaria/react";
-      import { connect } from "./__fixtures__/linaria-ui-library/hocs";
-      import { Title } from "./__fixtures__/non-linaria-ui-library/index";
+        import { styled } from "@linaria/react";
+        import { connect } from "./__fixtures__/linaria-ui-library/hocs";
+        import { Title } from "./__fixtures__/non-linaria-ui-library/index";
 
-      export const StyledTitle = styled(connect(Title))\`\`;
-    `,
+        export const StyledTitle = styled(connect(Title))\`\`;
+      `,
       [evaluator]
     );
 
@@ -2931,21 +2936,21 @@ describe('strategy shaker', () => {
   it('should not import types', async () => {
     const { code, metadata } = await transform(
       dedent`
-      import { styled } from "@linaria/react";
-      import { Title } from "./__fixtures__/linaria-ui-library/components/index";
-      import { ComponentType } from "./__fixtures__/linaria-ui-library/types";
+        import { styled } from "@linaria/react";
+        import { Title } from "./__fixtures__/linaria-ui-library/components/index";
+        import { ComponentType } from "./__fixtures__/linaria-ui-library/types";
 
-      const map = new Map<string, ComponentType>()
-        .set('Title', Title);
+        const map = new Map<string, ComponentType>()
+          .set('Title', Title);
 
-      const Gate = (props: { type: ComponentType, className: string }) => {
-        const { className, type } = props;
-        const Component = map.get(type);
-        return <Component className={className}/>;
-      };
+        const Gate = (props: { type: ComponentType, className: string }) => {
+          const { className, type } = props;
+          const Component = map.get(type);
+          return <Component className={className}/>;
+        };
 
-      export const StyledTitle = styled(Gate)\`\`;
-    `,
+        export const StyledTitle = styled(Gate)\`\`;
+      `,
       [evaluator, {}, 'tsx']
     );
 
@@ -2956,20 +2961,20 @@ describe('strategy shaker', () => {
   it('should shake out identifiers that are referenced only in types', async () => {
     const { code, metadata } = await transform(
       dedent`
-      import { styled } from "@linaria/react";
-      import * as yup from "yup";
-      import { Form } from "./__fixtures__/linaria-ui-library/components/index";
+        import { styled } from "@linaria/react";
+        import * as yup from "yup";
+        import { Form } from "./__fixtures__/linaria-ui-library/components/index";
 
-      const validationSchema = yup.object();
-      type IModel = yup.InferType<typeof validationSchema>;
+        const validationSchema = yup.object();
+        type IModel = yup.InferType<typeof validationSchema>;
 
-      const Editor = () => {
-        const initial: IModel = {};
-        return <Form schema={validationSchema} data={initial} />;
-      };
+        const Editor = () => {
+          const initial: IModel = {};
+          return <Form schema={validationSchema} data={initial} />;
+        };
 
-      export const StyledEditor = styled(Editor)\`\`;
-    `,
+        export const StyledEditor = styled(Editor)\`\`;
+      `,
       [evaluator, {}, 'tsx']
     );
 
@@ -2980,17 +2985,64 @@ describe('strategy shaker', () => {
   it('should process dynamic require', async () => {
     const { code, metadata } = await transform(
       dedent`
-      import { css } from "@linaria/core";
+        import { css } from "@linaria/core";
 
-      const url = "./__fixtures__/FOO";
-      const foo2 = require(url.toLowerCase()).foo2;
+        const url = "./__fixtures__/FOO";
+        const foo2 = require(url.toLowerCase()).foo2;
 
-      export const square = css\`
-        div:before {
-          content: ${'${foo2}'};
-        }
-      \`;
-    `,
+        export const square = css\`
+          div:before {
+            content: ${'${foo2}'};
+          }
+        \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should process module.exports = require(…)', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { css } from "@linaria/core";
+
+        const mod = require("./__fixtures__/module-reexport");
+
+        export const square = css\`
+          div:before {
+            content: ${'${mod.foo}'};
+          }
+        \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should import react as namespace', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { styled } from "@linaria/react";
+        import * as React from "react";
+
+        const Cmp = React.memo(() => null);
+
+        export const StyledTitle = styled(Cmp)\`\`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should process superseded entrypoint', async () => {
+    const { code, metadata } = await transformFile(
+      resolve(__dirname, './__fixtures__/superseded/index.js'),
       [evaluator]
     );
 
@@ -3022,10 +3074,17 @@ describe('strategy shaker', () => {
       cache: TransformCacheCollection,
       filename: string
     ) => {
-      const cachedFoo = cache.get('eval', filename);
-      return (
-        typeof cachedFoo?.exports === 'object' ? cachedFoo.exports ?? {} : {}
-      ) as Record<string, unknown>;
+      const cachedFoo = cache.get('entrypoints', filename);
+      if (!cachedFoo?.evaluated) {
+        throw new Error('Expected entrypoint to be evaluated');
+      }
+
+      const result: Record<string | symbol, unknown> = {};
+      Object.keys(cachedFoo.exports).forEach((key) => {
+        result[key] = cachedFoo.exports[key];
+      });
+
+      return result;
     };
 
     it('should cache evaluation', async () => {
@@ -3050,27 +3109,28 @@ describe('strategy shaker', () => {
       expect(exports.foo2).toBe(undefined); // foo2 is not used and should not be evaluated
     });
 
-    const createCacheFor = (
+    const createCacheFor = async (
       filename: string,
       exports: Record<string, string>
     ) => {
       const fooContent = readFileSync(filename, 'utf-8');
       const cache = new TransformCacheCollection();
       cache.invalidateIfChanged(filename, fooContent);
-      const keys = Object.keys(exports);
-      cache.add('code', filename, {
-        imports: null,
-        only: keys,
-        result: {
-          code: fooContent,
-        },
+
+      const only = Object.keys(exports);
+      const exportsProxy = Entrypoint.createExports(linariaLogger);
+      only.forEach((key) => {
+        exportsProxy[key] = exports[key];
       });
-      cache.add('eval', filename, {
-        debug: () => {},
-        idx: 1,
-        isEvaluated: true,
-        only: keys.join(','),
-        exports,
+
+      cache.add('entrypoints', filename, {
+        evaluated: true,
+        evaluatedOnly: only,
+        generation: 1,
+        exports: exportsProxy,
+        ignored: false,
+        log: linariaLogger,
+        only,
       });
 
       return cache;
@@ -3078,7 +3138,7 @@ describe('strategy shaker', () => {
 
     it('should use cached value', async () => {
       const filename = require.resolve(join(dirName, './__fixtures__/foo'));
-      const cache = createCacheFor(filename, { foo1: 'cached-foo1' });
+      const cache = await createCacheFor(filename, { foo1: 'cached-foo1' });
 
       const { code, metadata } = await transform(
         dedent`
@@ -3095,9 +3155,9 @@ describe('strategy shaker', () => {
       expect(metadata).toMatchSnapshot();
     });
 
-    it('should ignore uncompleted cached value', async () => {
+    it('should use partially cached value', async () => {
       const filename = require.resolve(join(dirName, './__fixtures__/foo'));
-      const cache = createCacheFor(filename, { foo1: 'cached-foo1' });
+      const cache = await createCacheFor(filename, { foo1: 'cached-foo1' });
 
       const { code, metadata } = await transform(
         dedent`
@@ -3114,9 +3174,10 @@ describe('strategy shaker', () => {
       expect(metadata).toMatchSnapshot();
     });
 
+    // it('should use cached value even if only part of it is required', async () => {
     it('should use cached value even if only part is required', async () => {
       const filename = require.resolve(join(dirName, './__fixtures__/foo'));
-      const cache = createCacheFor(filename, {
+      const cache = await createCacheFor(filename, {
         foo1: 'cached-foo1',
         foo2: 'cached-foo2',
       });
@@ -3183,6 +3244,40 @@ describe('strategy shaker', () => {
         }),
         'single'
       );
+    });
+
+    it('multiple parallel chains of reexports', async () => {
+      enableDebug();
+      const cache = new TransformCacheCollection();
+
+      const onEvent = jest.fn<void, Parameters<OnEvent>>();
+      const emitter = new EventEmitter(onEvent);
+
+      const tokens = ['foo', 'bar', 'bar1', 'bar2'];
+
+      const results = await Promise.all(
+        tokens.map((token) =>
+          transform(
+            dedent`
+              import { styled } from '@linaria/react';
+              import { ${token} } from "./__fixtures__/re-exports";
+
+              export const H1${token} = styled.h1\`
+                color: ${`\${${token}}`};
+              \`
+            `,
+            [evaluator],
+            cache,
+            emitter,
+            token
+          )
+        )
+      );
+
+      for (const { code, metadata } of results) {
+        expect(code).toMatchSnapshot();
+        expect(metadata).toMatchSnapshot();
+      }
     });
   });
 });

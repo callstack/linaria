@@ -1,13 +1,17 @@
 import * as vm from 'vm';
 
-import { Window } from 'happy-dom';
+import type { Window } from 'happy-dom';
+
+import type { FeatureFlags } from '@linaria/utils';
+import { isFeatureEnabled } from '@linaria/utils';
 
 import * as process from './process';
 
 const NOOP = () => {};
 
 function createWindow(): Window {
-  const win = new Window();
+  const HappyWindow = require('happy-dom').Window;
+  const win = new HappyWindow();
 
   // TODO: browser doesn't expose Buffer, but a lot of dependencies use it
   win.Buffer = Buffer;
@@ -17,12 +21,12 @@ function createWindow(): Window {
 }
 
 function createBaseContext(
-  win: Window,
+  win: Window | undefined,
   additionalContext: Partial<vm.Context>
 ): Partial<vm.Context> {
-  const baseContext: vm.Context = win;
+  const baseContext: vm.Context = win ?? {};
 
-  baseContext.document = win.document;
+  baseContext.document = win?.document;
   baseContext.window = win;
   baseContext.self = win;
   baseContext.top = win;
@@ -47,18 +51,43 @@ function createBaseContext(
   return baseContext;
 }
 
-function createVmContext(additionalContext: Partial<vm.Context>) {
-  const window = createWindow();
-  const baseContext = createBaseContext(window, additionalContext);
+function createHappyDOMWindow() {
+  const win = createWindow();
+
+  return {
+    teardown: () => {
+      win.happyDOM.cancelAsync();
+    },
+    window: win,
+  };
+}
+
+function createNothing() {
+  return {
+    teardown: () => {},
+    window: undefined,
+  };
+}
+
+export function createVmContext(
+  filename: string,
+  features: FeatureFlags<'happyDOM'>,
+  additionalContext: Partial<vm.Context>
+) {
+  const isHappyDOMEnabled = isFeatureEnabled(features, 'happyDOM', filename);
+
+  const { teardown, window } = isHappyDOMEnabled
+    ? createHappyDOMWindow()
+    : createNothing();
+  const baseContext = createBaseContext(window, {
+    __filename: filename,
+    ...additionalContext,
+  });
 
   const context = vm.createContext(baseContext);
 
   return {
     context,
-    teardown: () => {
-      window.happyDOM.cancelAsync();
-    },
+    teardown,
   };
 }
-
-export default createVmContext;

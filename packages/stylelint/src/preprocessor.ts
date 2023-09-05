@@ -7,14 +7,14 @@ import { asyncResolveFallback } from '@linaria/utils';
 type Errors = {
   [key: string]:
     | {
-        name?: string;
         code?: string;
-        message: string;
-        pos?: number;
         loc?: {
-          line: number;
           column: number;
+          line: number;
         };
+        message: string;
+        name?: string;
+        pos?: number;
       }
     | null
     | undefined;
@@ -25,11 +25,11 @@ type Cache = {
 };
 
 type Warning = {
-  rule?: string;
-  text: string;
-  severity: 'error' | 'warning';
-  line: number;
   column: number;
+  line: number;
+  rule?: string;
+  severity: 'error' | 'warning';
+  text: string;
 };
 
 type LintResult = {
@@ -38,8 +38,8 @@ type LintResult = {
 };
 
 interface IPosition {
-  line: number;
   column: number;
+  line: number;
 }
 
 interface ISourceOffset {

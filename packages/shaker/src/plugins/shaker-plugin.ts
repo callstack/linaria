@@ -16,6 +16,7 @@ import {
   dereference,
   findActionForNode,
   getFileIdx,
+  invalidateTraversalCache,
   isRemoved,
   reference,
   removeWithRelated,
@@ -27,8 +28,8 @@ import shouldKeepSideEffect from './utils/shouldKeepSideEffect';
 type Core = typeof core;
 
 export interface IShakerOptions {
-  keepSideEffects?: boolean;
   ifUnknownExport?: 'error' | 'ignore' | 'reexport-all' | 'skip-shaking';
+  keepSideEffects?: boolean;
   onlyExports: string[];
 }
 
@@ -370,6 +371,8 @@ export default function shakerPlugin(
       (file.metadata as IMetadata).linariaEvaluator = {
         imports,
       };
+
+      invalidateTraversalCache(file.path);
     },
   };
 }

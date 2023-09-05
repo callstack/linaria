@@ -32,7 +32,7 @@ export { default as isRemoved } from './isRemoved';
 export { default as isRequire } from './isRequire';
 export { isSerializable } from './isSerializable';
 export { default as isTypedNode } from './isTypedNode';
-export { default as isUnnecessaryReactCall } from './isUnnecessaryReactCall';
+export { isUnnecessaryReactCall } from './isUnnecessaryReactCall';
 export * from './options';
 export { removeDangerousCode } from './removeDangerousCode';
 export {
@@ -45,6 +45,11 @@ export {
   referenceAll,
 } from './scopeHelpers';
 export { default as slugify } from './slugify';
+export {
+  clearBabelTraversalCache,
+  invalidateTraversalCache,
+  getTraversalCache,
+} from './traversalCache';
 export { ValueType } from './types';
 export { valueToLiteral } from './valueToLiteral';
 export { default as JSXElementsRemover } from './visitors/JSXElementsRemover';

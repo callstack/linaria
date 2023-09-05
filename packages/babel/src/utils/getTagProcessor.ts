@@ -22,6 +22,7 @@ import {
   extractExpression,
   findPackageJSON,
   getSource,
+  getTraversalCache,
   isNotNull,
   mutate,
 } from '@linaria/utils';
@@ -427,9 +428,7 @@ const getNextIndex = (state: IFileContext) => {
   return counter;
 };
 
-const cache = new WeakMap<Identifier, BaseProcessor | null>();
-
-export default function getTagProcessor(
+export function getTagProcessor(
   path: NodePath<Identifier>,
   fileContext: IFileContext,
   options: Pick<
@@ -437,6 +436,11 @@ export default function getTagProcessor(
     'classNameSlug' | 'displayName' | 'evaluate' | 'tagResolver'
   >
 ): BaseProcessor | null {
+  const cache = getTraversalCache<BaseProcessor | null, Identifier>(
+    path,
+    'getTagProcessor'
+  );
+
   if (!cache.has(path.node)) {
     const root = path.scope.getProgramParent().path as NodePath<Program>;
     const { imports } = collectExportsAndImports(root);

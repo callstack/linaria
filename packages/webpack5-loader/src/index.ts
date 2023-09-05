@@ -22,10 +22,10 @@ export { LinariaDebugPlugin } from './LinariaDebugPlugin';
 const outputCssLoader = require.resolve('./outputCssLoader');
 
 type Loader = RawLoaderDefinitionFunction<{
-  sourceMap?: boolean;
-  preprocessor?: Preprocessor;
-  extension?: string;
   cacheProvider?: string | ICache;
+  extension?: string;
+  preprocessor?: Preprocessor;
+  sourceMap?: boolean;
 }>;
 
 const cache = new TransformCacheCollection();
@@ -94,7 +94,7 @@ const webpack5Loader: Loader = function webpack5LoaderPlugin(
       pluginOptions: rest,
     },
     cache,
-    emitter: sharedState.emitter,
+    eventEmitter: sharedState.emitter,
   };
 
   transform(transformServices, content.toString(), asyncResolve).then(

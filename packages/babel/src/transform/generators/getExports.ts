@@ -2,31 +2,34 @@ import type { IReexport } from '@linaria/utils';
 import { collectExportsAndImports } from '@linaria/utils';
 
 import type { Entrypoint } from '../Entrypoint';
-import type { IResolvedImport } from '../actions/types';
+import type { IEntrypointDependency } from '../Entrypoint.types';
 import type { IGetExportsAction, SyncScenarioForAction } from '../types';
 
 export function findExportsInImports(
-  entrypoint: Entrypoint<'sync'>,
-  imports: IResolvedImport[]
-): { import: string; entrypoint: Entrypoint<'sync'> }[] {
-  const results: { import: string; entrypoint: Entrypoint<'sync'> }[] = [];
+  entrypoint: Entrypoint,
+  imports: IEntrypointDependency[]
+): { entrypoint: Entrypoint; import: string }[] {
+  const results: {
+    entrypoint: Entrypoint;
+    import: string;
+  }[] = [];
 
   for (const imp of imports) {
     const { resolved } = imp;
     if (!resolved) {
-      throw new Error(`Could not resolve import ${imp.importedFile}`);
+      throw new Error(`Could not resolve import ${imp.source}`);
     }
 
     const newEntrypoint = entrypoint.createChild(resolved, []);
 
-    if (newEntrypoint === 'ignored') {
+    if (newEntrypoint === 'loop') {
       // eslint-disable-next-line no-continue
       continue;
     }
 
     results.push({
-      import: imp.importedFile,
       entrypoint: newEntrypoint,
+      import: imp.source,
     });
   }
 
@@ -34,18 +37,29 @@ export function findExportsInImports(
 }
 
 export function* getExports(
-  this: IGetExportsAction<'sync'>
-): SyncScenarioForAction<IGetExportsAction<'sync'>> {
-  const { entrypoint } = this;
+  this: IGetExportsAction
+): SyncScenarioForAction<IGetExportsAction> {
+  const {
+    entrypoint,
+    services: { cache },
+  } = this;
+  const { loadedAndParsed } = entrypoint;
+  if (loadedAndParsed.evaluator === 'ignored') {
+    return [];
+  }
 
   entrypoint.log(`get exports from %s`, entrypoint.name);
+
+  if (cache.has('exports', entrypoint.name)) {
+    return cache.get('exports', entrypoint.name)!;
+  }
 
   let withWildcardReexport: IReexport[] = [];
   const result: string[] = [];
 
-  this.services.babel.traverse(entrypoint.ast!, {
+  this.services.babel.traverse(loadedAndParsed.ast!, {
     Program(path) {
-      const { exports, reexports } = collectExportsAndImports(path);
+      const { exports, reexports } = collectExportsAndImports(path, 'disabled');
       exports.forEach((e) => {
         result.push(e.exported);
       });
@@ -61,16 +75,12 @@ export function* getExports(
   });
 
   if (withWildcardReexport.length) {
-    const resolvedImports = yield* this.getNext(
-      'resolveImports',
-      this.entrypoint,
-      {
-        imports: new Map(withWildcardReexport.map((i) => [i.source, []])),
-      }
-    );
+    const resolvedImports = yield* this.getNext('resolveImports', entrypoint, {
+      imports: new Map(withWildcardReexport.map((i) => [i.source, []])),
+    });
 
     const importedEntrypoints = findExportsInImports(
-      this.entrypoint,
+      entrypoint,
       resolvedImports
     );
 
@@ -84,6 +94,8 @@ export function* getExports(
       result.push(...exports);
     }
   }
+
+  cache.add('exports', entrypoint.name, result);
 
   return result;
 }

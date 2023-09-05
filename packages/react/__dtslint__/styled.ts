@@ -88,7 +88,7 @@ styled(Fabric<{ className: string; style: {} }>())`
   };
 `;
 
-styled(Fabric<{ className: string; style: {}; color: 'red' | 'blue' }>())`
+styled(Fabric<{ className: string; color: 'red' | 'blue'; style: {} }>())`
   & > ${SimplestComponent} {
     color: ${(props) => props.color};
   }

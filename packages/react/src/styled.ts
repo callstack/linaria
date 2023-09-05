@@ -100,9 +100,9 @@ const warnIfInvalid = (value: unknown, componentName: string) => {
 };
 
 interface IProps {
+  [props: string]: unknown;
   className?: string;
   style?: Record<string, string>;
-  [props: string]: unknown;
 }
 
 let idx = 0;

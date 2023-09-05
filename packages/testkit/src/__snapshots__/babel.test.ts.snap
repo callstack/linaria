@@ -31,18 +31,6 @@ Dependencies: ./__fixtures__/foo
 
 `;
 
-exports[`strategy shaker cache should ignore uncompleted cached value 1`] = `"export const text = "text_t13jq05";"`;
-
-exports[`strategy shaker cache should ignore uncompleted cached value 2`] = `
-
-CSS:
-
-.text_t13jq05 {font-size: foo1foo2}
-
-Dependencies: ./__fixtures__/foo
-
-`;
-
 exports[`strategy shaker cache should use cached value 1`] = `"export const text = "text_t13jq05";"`;
 
 exports[`strategy shaker cache should use cached value 2`] = `
@@ -62,6 +50,18 @@ exports[`strategy shaker cache should use cached value even if only part is requ
 CSS:
 
 .text_t13jq05 {font-size: cached-foo1}
+
+Dependencies: ./__fixtures__/foo
+
+`;
+
+exports[`strategy shaker cache should use partially cached value 1`] = `"export const text = "text_t13jq05";"`;
+
+exports[`strategy shaker cache should use partially cached value 2`] = `
+
+CSS:
+
+.text_t13jq05 {font-size: cached-foo1foo2}
 
 Dependencies: ./__fixtures__/foo
 
@@ -408,6 +408,90 @@ CSS:
 }
 
 Dependencies: NA
+
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 1`] = `
+"import { styled } from '@linaria/react';
+export const H1foo = /*#__PURE__*/styled('h1')({
+  name: "H1foo",
+  class: "H1foo_h1m1lid5",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 2`] = `
+
+CSS:
+
+.H1foo_h1m1lid5 {
+  color: foo;
+}
+
+Dependencies: ./__fixtures__/re-exports
+
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 3`] = `
+"import { styled } from '@linaria/react';
+export const H1bar = /*#__PURE__*/styled('h1')({
+  name: "H1bar",
+  class: "H1bar_h1r70tzz",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 4`] = `
+
+CSS:
+
+.H1bar_h1r70tzz {
+  color: bar;
+}
+
+Dependencies: ./__fixtures__/re-exports
+
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 5`] = `
+"import { styled } from '@linaria/react';
+export const H1bar1 = /*#__PURE__*/styled('h1')({
+  name: "H1bar1",
+  class: "H1bar1_hsluxkf",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 6`] = `
+
+CSS:
+
+.H1bar1_hsluxkf {
+  color: bar1;
+}
+
+Dependencies: ./__fixtures__/re-exports
+
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 7`] = `
+"import { styled } from '@linaria/react';
+export const H1bar2 = /*#__PURE__*/styled('h1')({
+  name: "H1bar2",
+  class: "H1bar2_ht4s9ym",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker concurrent multiple parallel chains of reexports 8`] = `
+
+CSS:
+
+.H1bar2_ht4s9ym {
+  color: bar2;
+}
+
+Dependencies: ./__fixtures__/re-exports
 
 `;
 
@@ -2078,6 +2162,28 @@ Dependencies: ./__fixtures__/reexports
 
 `;
 
+exports[`strategy shaker should import react as namespace 1`] = `
+"import { styled } from "@linaria/react";
+import * as React from "react";
+const Cmp = React.memo(() => null);
+const _exp = /*#__PURE__*/() => Cmp;
+export const StyledTitle = /*#__PURE__*/styled(_exp())({
+  name: "StyledTitle",
+  class: "StyledTitle_s13jq05",
+  propsAsIs: true
+});"
+`;
+
+exports[`strategy shaker should import react as namespace 2`] = `
+
+CSS:
+
+.StyledTitle_s13jq05 {}
+
+Dependencies: react
+
+`;
+
 exports[`strategy shaker should interpolate imported components 1`] = `"export const square = "square_s13jq05";"`;
 
 exports[`strategy shaker should interpolate imported components 2`] = `
@@ -2431,6 +2537,44 @@ CSS:
 
 
 Dependencies: NA
+
+`;
+
+exports[`strategy shaker should process module.exports = require(…) 1`] = `"export const square = "square_s13jq05";"`;
+
+exports[`strategy shaker should process module.exports = require(…) 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  div:before {
+    content: foo;
+  }
+}
+
+Dependencies: ./__fixtures__/module-reexport
+
+`;
+
+exports[`strategy shaker should process superseded entrypoint 1`] = `
+"import { styled } from '@linaria/react';
+export const color = 'red';
+export const T1 = /*#__PURE__*/styled('h1')({
+  name: "T1",
+  class: "T1_t1rerg8n",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker should process superseded entrypoint 2`] = `
+
+CSS:
+
+.T1_t1rerg8n {
+  color: red;
+}
+
+Dependencies: ./colors
 
 `;
 
