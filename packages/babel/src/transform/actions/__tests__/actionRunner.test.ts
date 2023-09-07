@@ -162,7 +162,7 @@ describe('actionRunner', () => {
     const abortController = new AbortController();
     abortController.abort();
 
-    function* handlerGenerator(
+    function* workflow(
       this: IWorkflowAction
     ): SyncScenarioForAction<IWorkflowAction> {
       yield [
@@ -175,15 +175,24 @@ describe('actionRunner', () => {
       throw new Error('Should not be reached');
     }
 
-    handlerGenerator.recover = jest.fn<
+    const shouldNotBeCalled = jest.fn();
+
+    function* processEntrypointMock(
+      this: IProcessEntrypointAction
+    ): SyncScenarioForAction<IProcessEntrypointAction> {
+      shouldNotBeCalled();
+    }
+
+    processEntrypointMock.recover = jest.fn<
       YieldArg,
-      [e: unknown, action: BaseAction<IWorkflowAction>]
+      [e: unknown, action: BaseAction<IProcessEntrypointAction>]
     >((e): YieldArg => {
       throw e;
     });
 
     const handlers = getHandlers<'sync'>({
-      workflow: handlerGenerator,
+      processEntrypoint: processEntrypointMock,
+      workflow,
     });
 
     const entrypoint = createEntrypoint(services, '/foo/bar.js', ['default']);
@@ -193,14 +202,23 @@ describe('actionRunner', () => {
       'workflow@00001#1'
     );
 
-    expect(handlerGenerator.recover).toHaveBeenCalled();
+    expect(processEntrypointMock.recover).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'workflow@00001#1',
+        name: 'AbortError',
+      }),
+      expect.objectContaining({ type: 'processEntrypoint' })
+    );
+    expect(shouldNotBeCalled).not.toHaveBeenCalled();
   });
 
   it('should recover', () => {
     const abortController = new AbortController();
     abortController.abort();
 
-    function* handlerGenerator(
+    const shouldBeCalled = jest.fn();
+
+    function* workflow(
       this: IWorkflowAction
     ): SyncScenarioForAction<IWorkflowAction> {
       yield [
@@ -210,25 +228,37 @@ describe('actionRunner', () => {
         abortController.signal,
       ];
 
-      throw new Error('Should not be reached');
+      shouldBeCalled();
+
+      return {
+        code: '',
+        sourceMap: null,
+      };
     }
 
-    handlerGenerator.recover = jest.fn<
+    function* processEntrypointMock(
+      this: IProcessEntrypointAction
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+    ): SyncScenarioForAction<IProcessEntrypointAction> {}
+
+    processEntrypointMock.recover = jest.fn<
       YieldArg,
-      [e: unknown, action: BaseAction<IWorkflowAction>]
+      [e: unknown, action: BaseAction<IProcessEntrypointAction>]
     >((e, action): YieldArg => {
       return ['processEntrypoint', action.entrypoint, undefined, null];
     });
 
     const handlers = getHandlers<'sync'>({
-      workflow: handlerGenerator,
+      processEntrypoint: processEntrypointMock,
+      workflow,
     });
 
     const entrypoint = createEntrypoint(services, '/foo/bar.js', ['default']);
     const action = entrypoint.createAction('workflow', undefined, null);
 
     syncActionRunner(action, handlers);
-    expect(handlerGenerator.recover).toHaveBeenCalled();
+    expect(processEntrypointMock.recover).toHaveBeenCalled();
+    expect(shouldBeCalled).toHaveBeenCalledTimes(1);
   });
 
   it('should process triple superseded entrypoint', () => {

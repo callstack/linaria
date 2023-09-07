@@ -17,6 +17,7 @@ export type OnActionFinishArgs = [
   timestamp: number,
   id: number,
   isAsync: boolean,
+  error?: unknown,
 ];
 
 export const isOnActionStartArgs = (
@@ -60,17 +61,23 @@ export class EventEmitter {
       idx,
       entrypointRef
     );
-    const result = fn();
-    if (result instanceof Promise) {
-      result.then(
-        () => this.onAction('finish', performance.now(), id, true),
-        () => this.onAction('fail', performance.now(), id, true)
-      );
-    } else {
-      this.onAction('finish', performance.now(), id, false);
-    }
 
-    return result;
+    try {
+      const result = fn();
+      if (result instanceof Promise) {
+        result.then(
+          () => this.onAction('finish', performance.now(), id, true),
+          (e) => this.onAction('fail', performance.now(), id, true, e)
+        );
+      } else {
+        this.onAction('finish', performance.now(), id, false);
+      }
+
+      return result;
+    } catch (e) {
+      this.onAction('fail', performance.now(), id, false, e);
+      throw e;
+    }
   }
 
   public perf<TRes>(method: string, fn: () => TRes): TRes {

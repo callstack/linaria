@@ -16,16 +16,6 @@ export function* workflow(
   const { cache, options } = this.services;
   const { entrypoint } = this;
 
-  if (entrypoint.supersededWith) {
-    entrypoint.log('entrypoint already superseded, rescheduling workflow');
-    return yield* this.getNext(
-      'workflow',
-      entrypoint.supersededWith!,
-      undefined,
-      null
-    );
-  }
-
   if (entrypoint.ignored) {
     return {
       code: entrypoint.loadedAndParsed.code ?? '',
@@ -33,11 +23,15 @@ export function* workflow(
     };
   }
 
+  entrypoint.abortIfSuperseded();
+
+  using abortSignal = null;
   const { code: originalCode = '' } = entrypoint.loadedAndParsed;
 
   // *** 1st stage ***
 
-  yield* this.getNext('processEntrypoint', entrypoint, undefined);
+  yield* this.getNext('processEntrypoint', entrypoint, undefined, abortSignal);
+  entrypoint.abortIfSuperseded();
 
   // File is ignored or does not contain any tags. Return original code.
   if (!entrypoint.hasLinariaMetadata()) {
@@ -58,7 +52,8 @@ export function* workflow(
   const evalStageResult = yield* this.getNext(
     'evalFile',
     entrypoint,
-    undefined
+    undefined,
+    abortSignal
   );
 
   if (evalStageResult === null) {
@@ -72,9 +67,14 @@ export function* workflow(
 
   // *** 3rd stage ***
 
-  const collectStageResult = yield* this.getNext('collect', entrypoint, {
-    valueCache,
-  });
+  const collectStageResult = yield* this.getNext(
+    'collect',
+    entrypoint,
+    {
+      valueCache,
+    },
+    abortSignal
+  );
 
   if (!collectStageResult.metadata) {
     return {
@@ -85,9 +85,14 @@ export function* workflow(
 
   // *** 4th stage
 
-  const extractStageResult = yield* this.getNext('extract', entrypoint, {
-    processors: collectStageResult.metadata.processors,
-  });
+  const extractStageResult = yield* this.getNext(
+    'extract',
+    entrypoint,
+    {
+      processors: collectStageResult.metadata.processors,
+    },
+    abortSignal
+  );
 
   return {
     ...extractStageResult,

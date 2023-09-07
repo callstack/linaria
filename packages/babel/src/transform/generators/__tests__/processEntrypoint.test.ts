@@ -64,21 +64,17 @@ describe('processEntrypoint', () => {
 
     const emittedSignals = emitted.map((a) => a[3]);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
-      undefined,
+      false,
       false,
     ]);
 
-    const newEntrypoint = createEntrypoint(services, '/foo/bar.js', ['named']);
+    createEntrypoint(services, '/foo/bar.js', ['named']);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
-      undefined,
+      true,
       true,
     ]);
 
-    const nextProcessEntrypoint = gen.next();
-    expectIteratorYieldResult(nextProcessEntrypoint);
-    expect(nextProcessEntrypoint.value[0]).toBe('processEntrypoint');
-    expect(nextProcessEntrypoint.value[1]).toBe(newEntrypoint);
-
+    expect(() => gen.next()).toThrow(/superseded/);
     expectIteratorReturnResult(gen.next(), undefined);
   });
 
@@ -103,14 +99,14 @@ describe('processEntrypoint', () => {
 
     const emittedSignals = emitted.map((a) => a[3]);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
-      undefined,
+      false,
       false,
     ]);
 
     abortController.abort();
 
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
-      undefined,
+      true,
       true,
     ]);
 

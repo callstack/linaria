@@ -29,57 +29,48 @@ function getHandler<
 const getActionRef = (type: string, entrypoint: { ref: string }) =>
   `${type}@${entrypoint.ref}`;
 
-function assertIfAborted<TAction extends ActionQueueItem>(
-  action: BaseAction<TAction>,
-  stack: string[]
-) {
-  if (action.abortSignal?.aborted) {
-    action.entrypoint.log('Action %s was aborted', stack.join('->'));
-    throw new AbortError(stack[0]);
-  }
-}
+const ACTION_ERROR = Symbol('ACTION_ERROR');
+type ActionError = [marker: typeof ACTION_ERROR, err: unknown];
+const isActionError = (e: unknown): e is ActionError =>
+  Array.isArray(e) && e[0] === ACTION_ERROR;
 
 export async function asyncActionRunner<TAction extends ActionQueueItem>(
   action: BaseAction<TAction>,
   actionHandlers: Handlers<'async' | 'sync'>,
   stack: string[] = [getActionRef(action.type, action.entrypoint)]
 ): Promise<TypeOfResult<TAction>> {
-  assertIfAborted(action, stack);
-
   if (action.result !== Pending) {
     return action.result as TypeOfResult<TAction>;
   }
 
   const handler = getHandler(action, actionHandlers);
   const generator = action.run<'async' | 'sync'>(handler);
-  let result = await generator.next();
-  while (!result.done) {
+  let actionResult: TypeOfResult<ActionQueueItem> | ActionError | undefined;
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    if (action.abortSignal?.aborted) {
+      generator.throw(new AbortError(stack[0]));
+    }
+
+    const result = await (isActionError(actionResult)
+      ? generator.throw(actionResult[1])
+      : generator.next(actionResult));
+    if (result.done) {
+      return result.value as TypeOfResult<TAction>;
+    }
+
     const [type, entrypoint, data, abortSignal] = result.value;
     const nextAction = entrypoint.createAction(type, data, abortSignal);
 
     try {
-      const actionResult = await asyncActionRunner(nextAction, actionHandlers, [
+      actionResult = await asyncActionRunner(nextAction, actionHandlers, [
         ...stack,
         getActionRef(type, entrypoint),
       ]);
-      result = await generator.next(actionResult);
     } catch (e) {
-      if (handler.recover) {
-        try {
-          result = {
-            done: false,
-            value: handler.recover(e, action),
-          };
-        } catch (errorInRecover) {
-          result = await generator.throw(errorInRecover);
-        }
-      } else {
-        result = await generator.throw(e);
-      }
+      actionResult = [ACTION_ERROR, e];
     }
   }
-
-  return result.value as TypeOfResult<TAction>;
 }
 
 export function syncActionRunner<TAction extends ActionQueueItem>(
@@ -87,40 +78,36 @@ export function syncActionRunner<TAction extends ActionQueueItem>(
   actionHandlers: Handlers<'sync'>,
   stack: string[] = [getActionRef(action.type, action.entrypoint)]
 ): TypeOfResult<TAction> {
-  assertIfAborted(action, stack);
-
   if (action.result !== Pending) {
     return action.result as TypeOfResult<TAction>;
   }
 
   const handler = getHandler(action, actionHandlers);
   const generator = action.run<'sync'>(handler);
-  let result = generator.next();
-  while (!result.done) {
+  let actionResult: TypeOfResult<ActionQueueItem> | ActionError | undefined;
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    if (action.abortSignal?.aborted) {
+      generator.throw(new AbortError(stack[0]));
+    }
+
+    const result = isActionError(actionResult)
+      ? generator.throw(actionResult[1])
+      : generator.next(actionResult);
+    if (result.done) {
+      return result.value as TypeOfResult<TAction>;
+    }
+
     const [type, entrypoint, data, abortSignal] = result.value;
     const nextAction = entrypoint.createAction(type, data, abortSignal);
 
     try {
-      const actionResult = syncActionRunner(nextAction, actionHandlers, [
+      actionResult = syncActionRunner(nextAction, actionHandlers, [
         ...stack,
         getActionRef(type, entrypoint),
       ]);
-      result = generator.next(actionResult);
     } catch (e) {
-      if (handler.recover) {
-        try {
-          result = {
-            done: false,
-            value: handler.recover(e, action),
-          };
-        } catch (errorInRecover) {
-          result = generator.throw(errorInRecover);
-        }
-      } else {
-        result = generator.throw(e);
-      }
+      actionResult = [ACTION_ERROR, e];
     }
   }
-
-  return result.value as TypeOfResult<TAction>;
 }

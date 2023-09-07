@@ -1,16 +1,17 @@
 /* eslint-disable no-plusplus */
+import '../../utils/dispose-polyfill';
 import type { Entrypoint } from '../Entrypoint';
 import type {
   ActionQueueItem,
   ActionTypes,
   AnyIteratorResult,
   AsyncScenarioForAction,
+  Handler,
   IBaseAction,
   Services,
+  SyncScenarioForAction,
   TypeOfResult,
   YieldResult,
-  SyncScenarioForAction,
-  Handler,
 } from '../types';
 import { Pending } from '../types';
 
@@ -57,6 +58,28 @@ export class BaseAction<TAction extends ActionQueueItem>
     this.idx = actionIdx.toString(16).padStart(6, '0');
   }
 
+  public createAbortSignal(): AbortSignal & Disposable {
+    const abortController = new AbortController();
+
+    const unsubscribeFromParentAbort = this.onAbort(() => {
+      this.entrypoint.log('parent aborted');
+      abortController.abort();
+    });
+
+    const unsubscribeFromSupersede = this.entrypoint.onSupersede(() => {
+      this.entrypoint.log('entrypoint superseded, aborting processing');
+      abortController.abort();
+    });
+
+    const abortSignal = abortController.signal as AbortSignal & Disposable;
+    abortSignal[Symbol.dispose] = () => {
+      unsubscribeFromParentAbort();
+      unsubscribeFromSupersede();
+    };
+
+    return abortSignal;
+  }
+
   public *getNext<
     TNextType extends ActionTypes,
     TNextAction extends ActionByType<TNextType> = ActionByType<TNextType>,
@@ -78,6 +101,14 @@ export class BaseAction<TAction extends ActionQueueItem>
     ]) as TypeOfResult<TNextAction>;
   }
 
+  public onAbort(fn: () => void): () => void {
+    this.abortSignal?.addEventListener('abort', fn);
+
+    return () => {
+      this.abortSignal?.removeEventListener('abort', fn);
+    };
+  }
+
   public run<
     TMode extends 'async' | 'sync',
     THandler extends Handler<TMode, TAction> = Handler<TMode, TAction>,
@@ -92,10 +123,10 @@ export class BaseAction<TAction extends ActionQueueItem>
     let nextIdx = 0;
 
     const throwFn = (e: unknown) =>
-      this.emitAction(() => this.activeScenario!.throw(e));
+      this.emitAction(nextIdx, () => this.activeScenario!.throw(e));
 
     const nextFn = (arg: YieldResult) =>
-      this.emitAction(() => this.activeScenario!.next(arg));
+      this.emitAction(nextIdx, () => this.activeScenario!.next(arg));
 
     const processNextResult = (
       result: IterationResult,
@@ -115,8 +146,23 @@ export class BaseAction<TAction extends ActionQueueItem>
     };
 
     const processError = (e: unknown) => {
-      const nextResult = throwFn(e);
-      processNextResult(nextResult as IterationResult);
+      try {
+        const nextResult = throwFn(e);
+        processNextResult(nextResult as IterationResult, processError);
+      } catch (errorInGenerator) {
+        const { recover } = handler;
+        if (recover) {
+          const nextResult = {
+            done: false,
+            value: recover(errorInGenerator, this),
+          };
+
+          processNextResult(nextResult as IterationResult, processError);
+          return;
+        }
+
+        throw errorInGenerator;
+      }
     };
 
     const processNext = (arg: YieldResult) => {
@@ -144,10 +190,10 @@ export class BaseAction<TAction extends ActionQueueItem>
     };
   }
 
-  protected emitAction<TRes>(fn: () => TRes) {
+  protected emitAction<TRes>(yieldIdx: number, fn: () => TRes) {
     return this.services.eventEmitter.action(
       this.type,
-      this.idx,
+      `${this.idx}:${yieldIdx + 1}`,
       this.entrypoint.ref,
       fn
     );

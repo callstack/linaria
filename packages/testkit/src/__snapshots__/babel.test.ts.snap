@@ -2556,28 +2556,6 @@ Dependencies: ./__fixtures__/module-reexport
 
 `;
 
-exports[`strategy shaker should process superseded entrypoint 1`] = `
-"import { styled } from '@linaria/react';
-export const color = 'red';
-export const T1 = /*#__PURE__*/styled('h1')({
-  name: "T1",
-  class: "T1_t1rerg8n",
-  propsAsIs: false
-});"
-`;
-
-exports[`strategy shaker should process superseded entrypoint 2`] = `
-
-CSS:
-
-.T1_t1rerg8n {
-  color: red;
-}
-
-Dependencies: ./colors
-
-`;
-
 exports[`strategy shaker should process unary expressions in interpolation 1`] = `
 "export const class1 = "class1_c13jq05";
 export const class2 = "class2_c1vhermz";"

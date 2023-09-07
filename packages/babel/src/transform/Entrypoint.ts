@@ -12,6 +12,7 @@ import type {
   IIgnoredEntrypoint,
 } from './Entrypoint.types';
 import { EvaluatedEntrypoint } from './EvaluatedEntrypoint';
+import { AbortError } from './actions/AbortError';
 import type { ActionByType } from './actions/BaseAction';
 import { BaseAction } from './actions/BaseAction';
 import type { Services, ActionTypes, ActionQueueItem } from './types';
@@ -99,16 +100,14 @@ export class Entrypoint extends BaseEntrypoint {
     return this.loadedAndParsed.code;
   }
 
-  public get ref() {
-    return `${this.idx}#${this.generation}`;
-  }
-
   public get supersededWith(): Entrypoint | null {
     return this.#supersededWith?.supersededWith ?? this.#supersededWith;
   }
 
-  public get transformedCode() {
-    return this.#transformResultCode;
+  public get transformedCode(): string | null {
+    return (
+      this.#transformResultCode ?? this.supersededWith?.transformedCode ?? null
+    );
   }
 
   public static createRoot(
@@ -249,6 +248,13 @@ export class Entrypoint extends BaseEntrypoint {
     }
 
     return ['created', newEntrypoint];
+  }
+
+  public abortIfSuperseded() {
+    if (this.supersededWith) {
+      this.log('superseded, aborting');
+      throw new AbortError('superseded');
+    }
   }
 
   public addDependency(dependency: IEntrypointDependency): void {

@@ -3048,16 +3048,6 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
-  it('should process superseded entrypoint', async () => {
-    const { code, metadata } = await transformFile(
-      resolve(__dirname, './__fixtures__/superseded/index.js'),
-      [evaluator]
-    );
-
-    expect(code).toMatchSnapshot();
-    expect(metadata).toMatchSnapshot();
-  });
-
   xit('should shake out side effect because its definition uses DOM API', async () => {
     const { code, metadata } = await transform(
       dedent`

@@ -40,6 +40,17 @@ export interface IQueueActionEvent {
   type: 'queue-action';
 }
 
+interface IAction {
+  entrypointRef: string;
+  error?: unknown;
+  finishedAt?: number;
+  idx: string;
+  isAsync?: boolean;
+  result?: 'finished' | 'failed';
+  startedAt: number;
+  type: string;
+}
+
 const formatTime = (timestamps: number | undefined) => {
   if (!timestamps) {
     return 'unfinished';
@@ -94,6 +105,46 @@ function printTimings(timings: Timings, startedAt: number, sourceRoot: string) {
         console.log(`    ${name}: ${time}ms`);
       });
   });
+}
+
+function printActions(actions: IAction[]) {
+  const actionsIdx = new Set<string>();
+  const actionsByType = new Map<string, Set<string>>();
+  const actionsByEntrypoint = new Map<string, Set<string>>();
+
+  const getIdx = (action: IAction) => action.idx.split(':')[0];
+
+  actions.forEach((action) => {
+    actionsIdx.add(getIdx(action));
+
+    if (!actionsByType.has(action.type)) {
+      actionsByType.set(action.type, new Set());
+    }
+
+    actionsByType.get(action.type)!.add(getIdx(action));
+
+    if (!actionsByEntrypoint.has(action.entrypointRef)) {
+      actionsByEntrypoint.set(action.entrypointRef, new Set());
+    }
+
+    actionsByEntrypoint.get(action.entrypointRef)!.add(getIdx(action));
+  });
+
+  console.log('\nActions:');
+  console.log(`  Total: ${actionsIdx.size}`);
+  console.log(`  By type:`);
+  Array.from(actionsByType.entries())
+    .sort(([, a], [, b]) => b.size - a.size)
+    .forEach(([type, set]) => {
+      console.log(`    ${type}: ${set.size}`);
+    });
+  console.log(`  By entrypoint (top 10):`);
+  Array.from(actionsByEntrypoint.entries())
+    .sort(([, a], [, b]) => b.size - a.size)
+    .slice(0, 10)
+    .forEach(([entrypoint, set]) => {
+      console.log(`    ${entrypoint}: ${set.size}`);
+    });
 }
 
 export const createPerfMeter = (
@@ -169,15 +220,6 @@ export const createPerfMeter = (
     }
   };
 
-  interface IAction {
-    entrypointRef: string;
-    finishedAt?: number;
-    idx: string;
-    isAsync?: boolean;
-    startedAt: number;
-    type: string;
-  }
-
   const actions: IAction[] = [];
 
   const onAction: OnAction = (
@@ -196,9 +238,11 @@ export const createPerfMeter = (
       return id;
     }
 
-    const [, timestamp, id, isAsync] = args;
+    const [result, timestamp, id, isAsync, error] = args;
+    actions[id].error = error;
     actions[id].finishedAt = timestamp;
     actions[id].isAsync = isAsync;
+    actions[id].result = `${result}ed`;
 
     addTiming(
       'actions',
@@ -216,6 +260,15 @@ export const createPerfMeter = (
     onDone: (sourceRoot: string) => {
       if (options === true || options.print) {
         printTimings(timings, startedAt, sourceRoot);
+
+        console.log(
+          '\nNumber of processed dependencies:',
+          processedDependencies.size
+        );
+
+        printActions(actions);
+
+        console.log('\nMemory usage:', process.memoryUsage());
       }
 
       if (options !== true && options.filename) {
@@ -243,8 +296,6 @@ export const createPerfMeter = (
       actions.length = 0;
       timings.clear();
       processedDependencies.clear();
-
-      console.log(process.memoryUsage());
     },
   };
 };

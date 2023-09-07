@@ -160,7 +160,7 @@ export abstract class BaseEntrypoint {
   ) {
     this.idx = getIdx(name);
     this.log =
-      parent?.log.extend(this.idx, '->') ?? services.log.extend(this.idx);
+      parent?.log.extend(this.ref, '->') ?? services.log.extend(this.ref);
 
     if (exports) {
       if (isProxy(exports)) {
@@ -189,5 +189,9 @@ export abstract class BaseEntrypoint {
     } else {
       this.#exports[EXPORTS] = value;
     }
+  }
+
+  public get ref() {
+    return `${this.idx}#${this.generation}`;
   }
 }

@@ -59,67 +59,36 @@ const memberOrder = [
 
         'constructor',
 
-        // Getters
-        'public-static-get',
-        'protected-static-get',
-        'private-static-get',
-        '#private-static-get',
+        // Getters & Setters
+        ['public-static-get', 'public-static-set'],
+        ['protected-static-get', 'protected-static-set'],
+        ['private-static-get', 'private-static-set'],
+        ['#private-static-get', '#private-static-set'],
 
-        'public-decorated-get',
-        'protected-decorated-get',
-        'private-decorated-get',
+        ['public-decorated-get', 'public-decorated-set'],
+        ['protected-decorated-get', 'protected-decorated-set'],
+        ['private-decorated-get', 'private-decorated-set'],
 
-        'public-instance-get',
-        'protected-instance-get',
-        'private-instance-get',
-        '#private-instance-get',
+        ['public-instance-get', 'public-instance-set'],
+        ['protected-instance-get', 'protected-instance-set'],
+        ['private-instance-get', 'private-instance-set'],
+        ['#private-instance-get', '#private-instance-set'],
 
-        'public-abstract-get',
-        'protected-abstract-get',
+        ['public-abstract-get', 'public-abstract-set'],
+        ['protected-abstract-get', 'protected-abstract-set'],
 
-        'public-get',
-        'protected-get',
-        'private-get',
-        '#private-get',
+        ['public-get', 'public-set'],
+        ['protected-get', 'protected-set'],
+        ['private-get', 'private-set'],
+        ['#private-get', '#private-set'],
 
-        'static-get',
-        'instance-get',
-        'abstract-get',
+        ['static-get', 'static-set'],
+        ['instance-get', 'instance-set'],
+        ['abstract-get', 'abstract-set'],
 
-        'decorated-get',
+        ['decorated-get', 'decorated-set'],
 
-        'get',
-
-        // Setters
-        'public-static-set',
-        'protected-static-set',
-        'private-static-set',
-        '#private-static-set',
-
-        'public-decorated-set',
-        'protected-decorated-set',
-        'private-decorated-set',
-
-        'public-instance-set',
-        'protected-instance-set',
-        'private-instance-set',
-        '#private-instance-set',
-
-        'public-abstract-set',
-        'protected-abstract-set',
-
-        'public-set',
-        'protected-set',
-        'private-set',
-        '#private-set',
-
-        'static-set',
-        'instance-set',
-        'abstract-set',
-
-        'decorated-set',
-
-        'set',
+        ['get', 'set'],
 
         // Methods
         'public-static-method',
