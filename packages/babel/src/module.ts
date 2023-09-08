@@ -156,7 +156,7 @@ class Module {
     this.exports = {};
 
     // We support following extensions by default
-    this.extensions = ['.json', '.js', '.jsx', '.ts', '.tsx'];
+    this.extensions = ['.json', '.js', '.jsx', '.ts', '.tsx', '.cjs'];
     this.debug('prepare', filename);
   }
 
