@@ -171,9 +171,30 @@ export function loadAndParse(
     code
   );
 
+  let ast: File | undefined;
+
+  const { evalConfig, parseConfig } = buildConfigs(
+    services,
+    name,
+    pluginOptions,
+    babelOptions
+  );
+
+  const getOrParse = () => {
+    if (ast) return ast;
+    ast = eventEmitter.perf('parseFile', () =>
+      parseFile(babel, name, code, parseConfig)
+    );
+
+    return ast;
+  };
+
   if (action === 'ignore') {
     log('[createEntrypoint] %s is ignored by rule', name);
     return {
+      get ast() {
+        return getOrParse();
+      },
       code,
       evaluator: 'ignored',
       reason: 'rule',
@@ -189,19 +210,10 @@ export function loadAndParse(
           })
         ).default;
 
-  const { evalConfig, parseConfig } = buildConfigs(
-    services,
-    name,
-    pluginOptions,
-    babelOptions
-  );
-
-  const ast: File = eventEmitter.perf('parseFile', () =>
-    parseFile(babel, name, code, parseConfig)
-  );
-
   return {
-    ast,
+    get ast() {
+      return getOrParse();
+    },
     code,
     evaluator,
     evalConfig,
