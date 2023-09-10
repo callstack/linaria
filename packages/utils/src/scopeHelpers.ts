@@ -466,12 +466,12 @@ function removeWithRelated(paths: NodePath[]) {
 
   const affectedPaths = actions.map(getPathFromAction);
 
-  let referencedIdentifiers = findIdentifiers(affectedPaths, 'referenced');
+  let referencedIdentifiers = findIdentifiers(affectedPaths, 'reference');
   referencedIdentifiers.sort(
     (a, b) => a.node?.name.localeCompare(b.node?.name)
   );
 
-  const referencesOfBinding = findIdentifiers(affectedPaths, 'binding')
+  const referencesOfBinding = findIdentifiers(affectedPaths, 'declaration')
     .map((i) => (i.node && getScope(i).getBinding(i.node.name)) ?? null)
     .filter(isNotNull)
     .reduce(

@@ -408,9 +408,6 @@ importers:
       '@types/babel__traverse':
         specifier: ^7.20.1
         version: 7.20.1
-      '@types/dedent':
-        specifier: ^0.7.0
-        version: 0.7.0
       '@types/jest':
         specifier: ^28.1.0
         version: 28.1.0
@@ -418,8 +415,8 @@ importers:
         specifier: ^17.0.39
         version: 17.0.39
       dedent:
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^1.5.1
+        version: 1.5.1
       jest:
         specifier: ^29.6.2
         version: 29.6.2(@types/node@17.0.39)
@@ -559,8 +556,8 @@ importers:
         specifier: ^7.20.1
         version: 7.20.1
       dedent:
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^1.5.1
+        version: 1.5.1
 
   packages/linaria:
     dependencies:
@@ -707,12 +704,9 @@ importers:
         specifier: ^8.3.11
         version: 8.4.14
     devDependencies:
-      '@types/dedent':
-        specifier: ^0.7.0
-        version: 0.7.0
       dedent:
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^1.5.1
+        version: 1.5.1
       prettier:
         specifier: ^3.0.3
         version: 3.0.3
@@ -762,9 +756,6 @@ importers:
       '@types/babel__traverse':
         specifier: ^7.20.1
         version: 7.20.1
-      '@types/dedent':
-        specifier: ^0.7.0
-        version: 0.7.0
       '@types/jest':
         specifier: ^28.1.0
         version: 28.1.0
@@ -772,8 +763,8 @@ importers:
         specifier: ^17.0.39
         version: 17.0.39
       dedent:
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^1.5.1
+        version: 1.5.1
       jest:
         specifier: ^29.6.2
         version: 29.6.2(@types/node@17.0.39)
@@ -876,8 +867,8 @@ importers:
         specifier: ^4.3.4
         version: 4.3.4
       dedent:
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^1.5.1
+        version: 1.5.1
       esbuild:
         specifier: ^0.15.16
         version: 0.15.16
@@ -933,9 +924,6 @@ importers:
       '@types/debug':
         specifier: ^4.1.8
         version: 4.1.8
-      '@types/dedent':
-        specifier: ^0.7.0
-        version: 0.7.0
       '@types/jest':
         specifier: ^28.1.0
         version: 28.1.0
@@ -1009,6 +997,9 @@ importers:
       '@types/node':
         specifier: ^17.0.39
         version: 17.0.39
+      dedent:
+        specifier: ^1.5.1
+        version: 1.5.1
       jest:
         specifier: ^29.6.2
         version: 29.6.2(@types/node@17.0.39)
@@ -1145,8 +1136,8 @@ importers:
         specifier: ^1.1.1
         version: 1.1.1
       dedent:
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^1.5.1
+        version: 1.5.1
       escape-html:
         specifier: ^1.0.3
         version: 1.0.3
@@ -4493,10 +4484,6 @@ packages:
       '@types/ms': 0.7.31
     dev: true
 
-  /@types/dedent@0.7.0:
-    resolution: {integrity: sha512-EGlKlgMhnLt/cM4DbUSafFdrkeJoC9Mvnj0PUCU7tFmTjMjNRT957kXCx0wYm3JuEq4o4ZsS5vG+NlkM2DMd2A==}
-    dev: true
-
   /@types/enhanced-resolve@3.0.7:
     resolution: {integrity: sha512-H23Fzk0BCz4LoKq1ricnLSRQuzoXTv57bGUwC+Cn84kKPaoHIS7bhFhfy4DzMeSBxoXc6jFziYoqpCab1U511w==}
     dependencies:
@@ -7567,9 +7554,6 @@ packages:
     engines: {node: '>=0.10'}
     dev: false
 
-  /dedent@0.7.0:
-    resolution: {integrity: sha512-Q6fKUPqnAHAyhiUgFU7BUzLiv0kd8saH9al7tnu5Q/okj6dnupxyTgFIBjVzJATdfIAm9NAsvXNzjaKa+bxVyA==}
-
   /dedent@1.5.1:
     resolution: {integrity: sha512-+LxW+KLWxu3HW3M2w2ympwtqPrqYRzU8fqi6Fhd18fBALe15blJPI/I4+UHveMVG6lJqB4JNd4UG0S5cnVHwIg==}
     peerDependencies:
@@ -7577,7 +7561,6 @@ packages:
     peerDependenciesMeta:
       babel-plugin-macros:
         optional: true
-    dev: true
 
   /deep-equal@1.0.1:
     resolution: {integrity: sha512-bHtC0iYvWhyaTzvV3CZgPeZQqCOBGyGsVV7v4eevpdkLHfiSrXUdBG+qAuSz4RI70sszvjQ1QSZ98An1yNwpSw==}
@@ -10743,6 +10726,7 @@ packages:
   /is-extglob@2.1.1:
     resolution: {integrity: sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
 
   /is-finalizationregistry@1.0.2:
     resolution: {integrity: sha512-0by5vtUJs8iFQb5TYUHHPudOR+qXYIMKtiUzvLIZITZUjknFmziyBJuLhVRc+Ds0dREFlskDNJKYIdIzu/9pfw==}
