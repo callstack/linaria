@@ -7,8 +7,8 @@ import { removeDangerousCode } from '../removeDangerousCode';
 
 const run = (code: TemplateStringsArray) => {
   const ast = parseSync(dedent(code), {
-    filename: 'test.ts',
-    presets: ['@babel/preset-typescript'],
+    filename: 'test.tsx',
+    presets: ['@babel/preset-typescript', '@babel/preset-react'],
   });
 
   if (!ast) {
@@ -43,6 +43,25 @@ describe('removeDangerousCode', () => {
           return null;
         }
       }
+    `;
+
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should replace body of react component with null', () => {
+    const result = run`
+      export var Popup = /*#__PURE__*/function () {
+        var Popup = function Popup(props) {
+          const { title } = props;
+          const TITLE = title.toUpperCase();
+          return <h1>{TITLE}</h1>;
+        }
+
+        Popup.propTypes = {};
+        Popup.defaultProps = {};
+
+        return Popup;
+      }();
     `;
 
     expect(result).toMatchSnapshot();

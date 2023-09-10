@@ -253,7 +253,7 @@ export const createPerfMeter = (
     return id;
   };
 
-  const emitter = new EventEmitter(onEvent, onAction);
+  const emitter = new EventEmitter(onEvent, onAction, () => {});
 
   return {
     emitter,

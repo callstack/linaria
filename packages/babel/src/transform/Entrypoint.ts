@@ -160,6 +160,7 @@ export class Entrypoint extends BaseEntrypoint {
               log: parent.log,
               name: parent.name,
               parent: parent.parent,
+              seqId: parent.seqId,
             }
           : null,
         name,
@@ -297,6 +298,12 @@ export class Entrypoint extends BaseEntrypoint {
 
     cache.set(data, newAction);
 
+    this.services.eventEmitter.entrypointEvent(this.seqId, {
+      type: 'actionCreated',
+      actionType,
+      actionIdx: newAction.idx,
+    });
+
     return newAction;
   }
 
@@ -363,6 +370,11 @@ export class Entrypoint extends BaseEntrypoint {
   public setTransformResult(res: ITransformFileResult | null) {
     this.#hasLinariaMetadata = Boolean(res?.metadata);
     this.#transformResultCode = res?.code ?? null;
+
+    this.services.eventEmitter.entrypointEvent(this.seqId, {
+      isNull: res === null,
+      type: 'setTransformResult',
+    });
   }
 
   private supersede(newOnlyOrEntrypoint: string[] | Entrypoint): Entrypoint {
@@ -384,6 +396,10 @@ export class Entrypoint extends BaseEntrypoint {
             this.generation + 1
           );
 
+    this.services.eventEmitter.entrypointEvent(this.seqId, {
+      type: 'superseded',
+      with: newEntrypoint.seqId,
+    });
     this.log(
       'superseded by %s (%o -> %o)',
       newEntrypoint.name,

@@ -140,12 +140,17 @@ const createExports = (log: Debugger) => {
 
 const EXPORTS = Symbol('exports');
 
+let entrypointSeqId = 0;
+
 export abstract class BaseEntrypoint {
   public static createExports = createExports;
 
   public readonly idx: string;
 
   public readonly log: Debugger;
+
+  // eslint-disable-next-line no-plusplus
+  public readonly seqId = entrypointSeqId++;
 
   readonly #exports: Record<string | symbol, unknown>;
 
@@ -162,9 +167,11 @@ export abstract class BaseEntrypoint {
     this.log =
       parent?.log.extend(this.ref, '->') ?? services.log.extend(this.ref);
 
+    let isExportsInherited = false;
     if (exports) {
       if (isProxy(exports)) {
         this.#exports = exports;
+        isExportsInherited = true;
       } else {
         this.#exports = createExports(this.log);
         this.#exports[EXPORTS] = exports;
@@ -173,6 +180,18 @@ export abstract class BaseEntrypoint {
     } else {
       this.#exports = createExports(this.log);
     }
+
+    services.eventEmitter.entrypointEvent(this.seqId, {
+      class: this.constructor.name,
+      evaluatedOnly: this.evaluatedOnly,
+      filename: name,
+      generation,
+      idx: this.idx,
+      isExportsInherited,
+      only,
+      parentId: parent?.seqId ?? null,
+      type: 'created',
+    });
   }
 
   public get exports(): Record<string | symbol, unknown> {

@@ -12,7 +12,7 @@ import normalize from 'normalize-path';
 import yargs from 'yargs';
 
 import { TransformCacheCollection, transform } from '@linaria/babel-preset';
-import { asyncResolveFallback, createPerfMeter } from '@linaria/utils';
+import { asyncResolveFallback, createFileReporter } from '@linaria/utils';
 
 const modulesOptions = [
   'commonjs',
@@ -121,7 +121,7 @@ function resolveOutputFilename(
 }
 
 async function processFiles(files: (number | string)[], options: Options) {
-  const { emitter, onDone } = createPerfMeter();
+  const { emitter, onDone } = createFileReporter();
 
   const resolvedFiles = files.reduce(
     (acc, pattern) => [

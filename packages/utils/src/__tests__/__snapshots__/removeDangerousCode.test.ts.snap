@@ -8,3 +8,14 @@ export function setVersion(packageName, packageVersion) {
   }
 }"
 `;
+
+exports[`removeDangerousCode should replace body of react component with null 1`] = `
+"export var Popup = /*#__PURE__*/function () {
+  var Popup = function Popup() {
+    return null;
+  };
+  Popup.propTypes = {};
+  Popup.defaultProps = {};
+  return Popup;
+}();"
+`;

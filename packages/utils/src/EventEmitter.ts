@@ -4,6 +4,46 @@ export type OnEvent = (
   event?: unknown
 ) => void;
 
+export interface IActionCreated {
+  actionIdx: string;
+  actionType: string;
+  type: 'actionCreated';
+}
+
+export interface ICreatedEvent {
+  class: string;
+  evaluatedOnly: string[];
+  filename: string;
+  generation: number;
+  idx: string;
+  isExportsInherited: boolean;
+  only: string[];
+  parentId: number | null;
+  type: 'created';
+}
+
+export interface ISupersededEvent {
+  type: 'superseded';
+  with: number;
+}
+
+export interface ISetTransformResultEvent {
+  isNull: boolean;
+  type: 'setTransformResult';
+}
+
+export type EntrypointEvent =
+  | IActionCreated
+  | ICreatedEvent
+  | ISupersededEvent
+  | ISetTransformResultEvent;
+
+export type OnEntrypointEvent = (
+  idx: number,
+  timestamp: number,
+  event: EntrypointEvent
+) => void;
+
 export type OnActionStartArgs = [
   phase: 'start',
   timestamp: number,
@@ -40,12 +80,14 @@ export interface OnAction {
 export class EventEmitter {
   static dummy = new EventEmitter(
     () => {},
-    () => 0
+    () => 0,
+    () => {}
   );
 
   constructor(
     protected onEvent: OnEvent,
-    protected onAction: OnAction
+    protected onAction: OnAction,
+    protected onEntrypointEvent: OnEntrypointEvent
   ) {}
 
   public action<TRes>(
@@ -78,6 +120,10 @@ export class EventEmitter {
       this.onAction('fail', performance.now(), id, false, e);
       throw e;
     }
+  }
+
+  public entrypointEvent(sequenceId: number, event: EntrypointEvent) {
+    this.onEntrypointEvent(sequenceId, performance.now(), event);
   }
 
   public perf<TRes>(method: string, fn: () => TRes): TRes {

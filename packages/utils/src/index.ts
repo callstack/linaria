@@ -16,6 +16,7 @@ export {
   extractExpression,
 } from './collectTemplateDependencies';
 export { createId } from './createId';
+export { createFileReporter } from './debug/fileReporter';
 export { createPerfMeter } from './debug/perfMetter';
 export {
   EventEmitter,
@@ -65,6 +66,7 @@ export type {
   ISideEffectImport,
   IState,
 } from './collectExportsAndImports';
+export type { IFileReporterOptions } from './debug/fileReporter';
 export type { IPerfMeterOptions } from './debug/perfMetter';
 export type { OnEvent } from './EventEmitter';
 export type { IVariableContext } from './IVariableContext';
