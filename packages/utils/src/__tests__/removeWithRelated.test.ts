@@ -4,10 +4,17 @@ import { join } from 'path';
 import * as babel from '@babel/core';
 import type { NodePath } from '@babel/core';
 import generator from '@babel/generator';
+import type { File as FileNode } from '@babel/types';
 import dedent from 'dedent';
 
-import type { MissedBabelCoreTypes } from '@linaria/babel-preset';
-import { removeWithRelated } from '@linaria/utils';
+import { removeWithRelated } from '../scopeHelpers';
+
+type MissedBabelCoreTypes = {
+  File: new (
+    options: { filename: string },
+    file: { ast: FileNode; code: string }
+  ) => { path: NodePath<FileNode> };
+};
 
 const { File } = babel as typeof babel & MissedBabelCoreTypes;
 

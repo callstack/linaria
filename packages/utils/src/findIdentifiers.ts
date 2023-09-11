@@ -41,7 +41,8 @@ const checkers: Record<
   any: (ex) => isBindingIdentifier(ex) || isReferencedIdentifier(ex),
   binding: (ex) => isBindingIdentifier(ex),
   declaration: (ex) =>
-    isBindingIdentifier(ex) && ex.scope.getBinding(ex.node.name)?.path === ex,
+    isBindingIdentifier(ex) &&
+    ex.scope.getBinding(ex.node.name)?.identifier === ex.node,
   reference: (ex) => isReferencedIdentifier(ex),
 };
 
