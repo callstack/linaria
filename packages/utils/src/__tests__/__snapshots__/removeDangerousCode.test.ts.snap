@@ -14,8 +14,7 @@ exports[`removeDangerousCode should replace body of react component with null 1`
   var Popup = function Popup() {
     return null;
   };
-  Popup.propTypes = {};
-  Popup.defaultProps = {};
+  Popup.displayName = 'Popup';
   return Popup;
 }();"
 `;

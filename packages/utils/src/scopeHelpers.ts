@@ -61,7 +61,24 @@ export function reference(
   binding.references = binding.referencePaths.length;
 }
 
-function isReferenced({ kind, referenced, referencePaths }: Binding) {
+function isReferenced(binding: Binding): boolean {
+  const { kind, referenced, referencePaths, path } = binding;
+
+  if (
+    path.isFunctionExpression() &&
+    path.key === 'init' &&
+    path.parentPath.isVariableDeclarator()
+  ) {
+    // It is a function expression in a variable declarator
+    const id = path.parentPath.get('id');
+    if (id.isIdentifier()) {
+      const idBinding = getBinding(id);
+      return idBinding ? isReferenced(idBinding) : true;
+    }
+
+    return true;
+  }
+
   if (!referenced) {
     return false;
   }

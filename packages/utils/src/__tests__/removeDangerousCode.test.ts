@@ -51,14 +51,12 @@ describe('removeDangerousCode', () => {
   it('should replace body of react component with null', () => {
     const result = run`
       export var Popup = /*#__PURE__*/function () {
-        var Popup = function Popup(props) {
-          const { title } = props;
-          const TITLE = title.toUpperCase();
-          return <h1>{TITLE}</h1>;
-        }
+        var Popup = function Popup() {
+          var name = Popup.displayName;
+          return <div>{name}</div>;
+        };
 
-        Popup.propTypes = {};
-        Popup.defaultProps = {};
+        Popup.displayName = 'Popup';
 
         return Popup;
       }();
