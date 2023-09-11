@@ -148,6 +148,10 @@ export class BaseAction<TAction extends ActionQueueItem>
     };
 
     const processError = (e: unknown) => {
+      if (this.activeScenarioNextResults.length > nextIdx) {
+        return;
+      }
+
       try {
         const nextResult = throwFn(e);
         processNextResult(nextResult as IterationResult, processError);

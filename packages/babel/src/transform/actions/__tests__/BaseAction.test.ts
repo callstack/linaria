@@ -183,5 +183,36 @@ describe('BaseAction', () => {
       expect(() => generator1.next()).toThrow(error);
       expect(() => generator2.next()).toThrow(error);
     });
+
+    it('should process parallel throws', () => {
+      const handler: Handler<'sync', ITransformAction> = function* handler() {
+        try {
+          yield ['resolveImports', entrypoint, { imports: new Map() }, null];
+        } catch (e) {
+          onError(e);
+        }
+
+        return null;
+      };
+
+      const generator1 = action.run(handler);
+      const generator2 = action.run(handler);
+
+      expect(generator1.next()).toEqual({
+        done: false,
+        value: ['resolveImports', entrypoint, { imports: new Map() }, null],
+      });
+      expect(generator2.next()).toEqual({
+        done: false,
+        value: ['resolveImports', entrypoint, { imports: new Map() }, null],
+      });
+
+      const error1 = new Error('foo');
+      const error2 = new Error('bar');
+      expect(generator1.throw(error1)).toEqual({ done: true, value: null });
+      expect(generator2.throw(error2)).toEqual({ done: true, value: null });
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onError).toHaveBeenCalledWith(error1);
+    });
   });
 });
