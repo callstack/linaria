@@ -1,5 +1,7 @@
 /* eslint-disable no-plusplus */
 import '../../utils/dispose-polyfill';
+import type { Debugger } from '@linaria/logger';
+
 import type { Entrypoint } from '../Entrypoint';
 import type {
   ActionQueueItem,
@@ -58,6 +60,14 @@ export class BaseAction<TAction extends ActionQueueItem>
   ) {
     actionIdx += 1;
     this.idx = actionIdx.toString(16).padStart(6, '0');
+  }
+
+  public get log(): Debugger {
+    return this.entrypoint.log.extend(this.ref);
+  }
+
+  public get ref() {
+    return `${this.type}@${this.idx}`;
   }
 
   public createAbortSignal(): AbortSignal & Disposable {
@@ -149,8 +159,14 @@ export class BaseAction<TAction extends ActionQueueItem>
 
     const processError = (e: unknown) => {
       if (this.activeScenarioNextResults.length > nextIdx) {
+        this.log(
+          'error was already handled in another branch, result idx is %d',
+          nextIdx
+        );
         return;
       }
+
+      this.log('error processing, result idx is %d', nextIdx);
 
       try {
         const nextResult = throwFn(e);
@@ -174,8 +190,14 @@ export class BaseAction<TAction extends ActionQueueItem>
 
     const processNext = (arg: YieldResult) => {
       if (this.activeScenarioNextResults.length > nextIdx) {
+        this.log(
+          'next was already handled in another branch, result idx is %d',
+          nextIdx
+        );
         return;
       }
+
+      this.log('next processing, result idx is %d', nextIdx);
 
       try {
         const nextResult = nextFn(arg);
@@ -187,20 +209,12 @@ export class BaseAction<TAction extends ActionQueueItem>
 
     return {
       next: (arg: YieldResult): IterationResult => {
-        if (this.activeScenarioError) {
-          // eslint-disable-next-line @typescript-eslint/no-throw-literal
-          throw this.activeScenarioError;
-        }
-
+        this.rethrowActiveScenarioError();
         processNext(arg);
         return this.activeScenarioNextResults[nextIdx++] as IterationResult;
       },
       throw: (e: unknown): IterationResult => {
-        if (this.activeScenarioError) {
-          // eslint-disable-next-line @typescript-eslint/no-throw-literal
-          throw this.activeScenarioError;
-        }
-
+        this.rethrowActiveScenarioError();
         processError(e);
         return this.activeScenarioNextResults[nextIdx++] as IterationResult;
       },
@@ -214,5 +228,19 @@ export class BaseAction<TAction extends ActionQueueItem>
       this.entrypoint.ref,
       fn
     );
+  }
+
+  private rethrowActiveScenarioError() {
+    if (!this.activeScenarioError) {
+      return;
+    }
+
+    this.log(
+      'scenario has an unhandled error from another branch, rethrow %o',
+      this.activeScenarioError
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-throw-literal
+    throw this.activeScenarioError;
   }
 }

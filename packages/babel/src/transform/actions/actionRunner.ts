@@ -40,6 +40,7 @@ export async function asyncActionRunner<TAction extends ActionQueueItem>(
   stack: string[] = [getActionRef(action.type, action.entrypoint)]
 ): Promise<TypeOfResult<TAction>> {
   if (action.result !== Pending) {
+    action.log('result is cached');
     return action.result as TypeOfResult<TAction>;
   }
 
@@ -49,6 +50,7 @@ export async function asyncActionRunner<TAction extends ActionQueueItem>(
   // eslint-disable-next-line no-constant-condition
   while (true) {
     if (action.abortSignal?.aborted) {
+      action.log('action is aborted');
       generator.throw(new AbortError(stack[0]));
     }
 
@@ -68,6 +70,7 @@ export async function asyncActionRunner<TAction extends ActionQueueItem>(
         getActionRef(type, entrypoint),
       ]);
     } catch (e) {
+      nextAction.log('error', e);
       actionResult = [ACTION_ERROR, e];
     }
   }
@@ -79,6 +82,7 @@ export function syncActionRunner<TAction extends ActionQueueItem>(
   stack: string[] = [getActionRef(action.type, action.entrypoint)]
 ): TypeOfResult<TAction> {
   if (action.result !== Pending) {
+    action.log('result is cached');
     return action.result as TypeOfResult<TAction>;
   }
 
@@ -88,6 +92,7 @@ export function syncActionRunner<TAction extends ActionQueueItem>(
   // eslint-disable-next-line no-constant-condition
   while (true) {
     if (action.abortSignal?.aborted) {
+      action.log('action is aborted');
       generator.throw(new AbortError(stack[0]));
     }
 
@@ -107,6 +112,7 @@ export function syncActionRunner<TAction extends ActionQueueItem>(
         getActionRef(type, entrypoint),
       ]);
     } catch (e) {
+      nextAction.log('error', e);
       actionResult = [ACTION_ERROR, e];
     }
   }
