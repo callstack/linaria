@@ -214,5 +214,85 @@ describe('BaseAction', () => {
       expect(onError).toHaveBeenCalledTimes(1);
       expect(onError).toHaveBeenCalledWith(error1);
     });
+
+    it('should cache results of async generators', async () => {
+      const wait = () =>
+        new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(null);
+          }, 100);
+        });
+
+      const handler: Handler<'async', ITransformAction> =
+        async function* handler() {
+          await wait();
+          yield ['resolveImports', entrypoint, { imports: new Map() }, null];
+
+          return { code: 'bar', metadata: null };
+        };
+
+      const generator1 = action.run(handler);
+      const generator2 = action.run(handler);
+
+      const gen1Next = await generator1.next();
+      expect(gen1Next).toEqual({
+        done: false,
+        value: ['resolveImports', entrypoint, { imports: new Map() }, null],
+      });
+
+      expect(await generator2.next()).toEqual(gen1Next);
+
+      const gen1Result = await generator1.next();
+      expect(gen1Result).toEqual({
+        done: true,
+        value: { code: 'bar', metadata: null },
+      });
+
+      expect(await generator2.next()).toEqual(gen1Result);
+    });
+
+    it('should cache errors of async generators', async () => {
+      const wait = () =>
+        new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(null);
+          }, 100);
+        });
+
+      const handler: Handler<'async', ITransformAction> =
+        async function* handler() {
+          await wait();
+          yield ['resolveImports', entrypoint, { imports: new Map() }, null];
+
+          throw new Error('foo');
+        };
+
+      const generator1 = action.run(handler);
+      const generator2 = action.run(handler);
+
+      const gen1Next = await generator1.next();
+      expect(gen1Next).toEqual({
+        done: false,
+        value: ['resolveImports', entrypoint, { imports: new Map() }, null],
+      });
+
+      expect(await generator2.next()).toEqual(gen1Next);
+
+      let error: unknown;
+      try {
+        await generator1.next();
+        fail('should throw');
+      } catch (e) {
+        error = e;
+        expect(e).toBe(error);
+      }
+
+      try {
+        await generator2.next();
+        fail('should throw');
+      } catch (e) {
+        expect(e).toBe(error);
+      }
+    });
   });
 });
