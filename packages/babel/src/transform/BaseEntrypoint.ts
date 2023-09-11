@@ -23,7 +23,7 @@ const isProxy = (
 ): obj is { [VALUES]: Record<string | symbol, unknown> } =>
   typeof obj === 'object' && obj !== null && VALUES in obj;
 
-const createExports = (log: Debugger) => {
+export const createExports = (log: Debugger) => {
   let exports: Record<string | symbol, unknown> = {};
   const lazyFields = new Set<string | symbol>();
 
