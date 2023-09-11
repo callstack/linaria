@@ -178,7 +178,7 @@ export abstract class BaseEntrypoint {
       }
       this.exports = exports;
     } else {
-      this.#exports = createExports(this.log);
+      this.#exports = BaseEntrypoint.createExports(this.log);
     }
 
     services.eventEmitter.entrypointEvent(this.seqId, {
