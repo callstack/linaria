@@ -42,6 +42,8 @@ export class BaseAction<TAction extends ActionQueueItem>
     | AsyncScenarioForAction<TAction>
     | null = null;
 
+  private activeScenarioError?: unknown;
+
   private activeScenarioNextResults: AnyIteratorResult<
     'async' | 'sync',
     TypeOfResult<TAction>
@@ -161,6 +163,7 @@ export class BaseAction<TAction extends ActionQueueItem>
           return;
         }
 
+        this.activeScenarioError = errorInGenerator;
         throw errorInGenerator;
       }
     };
@@ -180,10 +183,20 @@ export class BaseAction<TAction extends ActionQueueItem>
 
     return {
       next: (arg: YieldResult): IterationResult => {
+        if (this.activeScenarioError) {
+          // eslint-disable-next-line @typescript-eslint/no-throw-literal
+          throw this.activeScenarioError;
+        }
+
         processNext(arg);
         return this.activeScenarioNextResults[nextIdx++] as IterationResult;
       },
       throw: (e: unknown): IterationResult => {
+        if (this.activeScenarioError) {
+          // eslint-disable-next-line @typescript-eslint/no-throw-literal
+          throw this.activeScenarioError;
+        }
+
         processError(e);
         return this.activeScenarioNextResults[nextIdx++] as IterationResult;
       },

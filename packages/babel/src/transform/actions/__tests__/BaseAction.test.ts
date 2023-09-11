@@ -169,5 +169,19 @@ describe('BaseAction', () => {
       expect(generator2.next()).toEqual({ done: true, value: null });
       expect(onError).toHaveBeenCalledTimes(1);
     });
+
+    it("should rethrow error from every run if the first one didn't catch it", () => {
+      const error = new Error('foo');
+
+      const handler: Handler<'sync', ITransformAction> = function* handler() {
+        throw error;
+      };
+
+      const generator1 = action.run(handler);
+      const generator2 = action.run(handler);
+
+      expect(() => generator1.next()).toThrow(error);
+      expect(() => generator2.next()).toThrow(error);
+    });
   });
 });
