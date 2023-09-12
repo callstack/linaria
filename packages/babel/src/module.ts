@@ -107,9 +107,15 @@ function resolve(
 }
 
 function assertDisposed(
-  entrypoint: Entrypoint | null
+  entrypoint: Entrypoint | null,
+  log: Debugger
 ): asserts entrypoint is Entrypoint {
-  invariant(entrypoint, 'Module is disposed');
+  try {
+    invariant(entrypoint, 'Module is disposed');
+  } catch (e) {
+    log('module is disposed');
+    throw e;
+  }
 }
 
 class Module implements Disposable {
@@ -228,12 +234,12 @@ class Module implements Disposable {
   }
 
   public get exports() {
-    assertDisposed(this.entrypoint);
+    assertDisposed(this.entrypoint, this.debug);
     return this.entrypoint.exports;
   }
 
   public set exports(value) {
-    assertDisposed(this.entrypoint);
+    assertDisposed(this.entrypoint, this.debug);
 
     this.entrypoint.exports = value;
 
@@ -241,7 +247,7 @@ class Module implements Disposable {
   }
 
   [Symbol.dispose](): void {
-    assertDisposed(this.entrypoint);
+    assertDisposed(this.entrypoint, this.debug);
 
     this.debug('dispose');
 
@@ -249,7 +255,7 @@ class Module implements Disposable {
   }
 
   evaluate(): void {
-    assertDisposed(this.entrypoint);
+    assertDisposed(this.entrypoint, this.debug);
 
     const { entrypoint } = this;
     if (!entrypoint.supersededWith) {
@@ -330,7 +336,7 @@ class Module implements Disposable {
     only: string[],
     log: Debugger
   ): Entrypoint | IEvaluatedEntrypoint | null {
-    assertDisposed(this.entrypoint);
+    assertDisposed(this.entrypoint, this.debug);
 
     const extension = path.extname(filename);
     if (extension !== '.json' && !this.extensions.includes(extension)) {
@@ -439,7 +445,7 @@ class Module implements Disposable {
   }
 
   resolveDependency = (id: string): IEntrypointDependency => {
-    assertDisposed(this.entrypoint);
+    assertDisposed(this.entrypoint, this.debug);
 
     const cached = this.entrypoint.getDependency(id);
     invariant(!(cached instanceof Promise), 'Dependency is not resolved yet');
