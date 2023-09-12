@@ -3263,3 +3263,17 @@ CSS:
 Dependencies: NA
 
 `;
+
+exports[`strategy shaker uses values from json 1`] = `"export const eyeColorClass = "eyeColorClass_e13jq05";"`;
+
+exports[`strategy shaker uses values from json 2`] = `
+
+CSS:
+
+.eyeColorClass_e13jq05 {
+  color: blue;
+}
+
+Dependencies: ./__fixtures__/sample-data.json
+
+`;

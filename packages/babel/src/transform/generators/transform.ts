@@ -142,7 +142,10 @@ export function* internalTransform(
   const { only, loadedAndParsed, log } = this.entrypoint;
   if (loadedAndParsed.evaluator === 'ignored') {
     log('is ignored');
-    return null;
+    return {
+      code: loadedAndParsed.code ?? '',
+      metadata: null,
+    };
   }
 
   log('>> (%o)', only);
@@ -163,7 +166,10 @@ export function* internalTransform(
 
   if (preparedCode === '') {
     log('is skipped');
-    return null;
+    return {
+      code: loadedAndParsed.code ?? '',
+      metadata: null,
+    };
   }
 
   if (imports !== null && imports.size > 0) {

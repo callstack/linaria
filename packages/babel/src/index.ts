@@ -19,6 +19,10 @@ export {
 } from './utils/withLinariaMetadata';
 export { default as Module, DefaultModuleImplementation } from './module';
 export { default as transform } from './transform';
+export {
+  isUnprocessedEntrypointError,
+  UnprocessedEntrypointError,
+} from './transform/actions/UnprocessedEntrypointError';
 export * from './types';
 export { EvaluatedEntrypoint } from './transform/EvaluatedEntrypoint';
 export type { IEvaluatedEntrypoint } from './transform/EvaluatedEntrypoint';

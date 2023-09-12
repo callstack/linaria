@@ -15,7 +15,7 @@ export interface IEntrypointCode {
 
 export interface IIgnoredEntrypoint {
   readonly ast?: File;
-  code?: string;
+  readonly code?: string;
   evaluator: 'ignored';
   reason: 'extension' | 'rule';
 }

@@ -2461,6 +2461,23 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('uses values from json', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { css } from '@linaria/core';
+      import sample from './__fixtures__/sample-data.json';
+
+      export const eyeColorClass = css\`
+        color: ${'${sample.eye_color}'};
+      \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('evaluates complex styles with functions and nested selectors', async () => {
     const { code, metadata } = await transform(
       dedent`

@@ -18,7 +18,7 @@ export function* processEntrypoint(
   const { only, log } = this.entrypoint;
   log('start processing (only: %s)', only);
 
-  this.entrypoint.abortIfSuperseded();
+  this.entrypoint.assertNotSuperseded();
 
   using abortSignal = this.createAbortSignal();
 
@@ -32,7 +32,7 @@ export function* processEntrypoint(
 
   this.entrypoint.setTransformResult(result);
 
-  this.entrypoint.abortIfSuperseded();
+  this.entrypoint.assertNotSuperseded();
 
   log('entrypoint processing finished');
 }

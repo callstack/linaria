@@ -157,7 +157,9 @@ export function loadAndParse(
     );
 
     return {
-      code: undefined,
+      get code() {
+        return loadedCode ?? readFileSync(name, 'utf-8');
+      },
       evaluator: 'ignored',
       reason: 'extension',
     };

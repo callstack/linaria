@@ -23,7 +23,7 @@ export function* workflow(
     };
   }
 
-  entrypoint.abortIfSuperseded();
+  entrypoint.assertNotSuperseded();
 
   using abortSignal = null;
   const { code: originalCode = '' } = entrypoint.loadedAndParsed;
@@ -31,7 +31,7 @@ export function* workflow(
   // *** 1st stage ***
 
   yield* this.getNext('processEntrypoint', entrypoint, undefined, abortSignal);
-  entrypoint.abortIfSuperseded();
+  entrypoint.assertNotSuperseded();
 
   // File is ignored or does not contain any tags. Return original code.
   if (!entrypoint.hasLinariaMetadata()) {

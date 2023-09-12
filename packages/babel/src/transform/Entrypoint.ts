@@ -15,6 +15,7 @@ import { EvaluatedEntrypoint } from './EvaluatedEntrypoint';
 import { AbortError } from './actions/AbortError';
 import type { ActionByType } from './actions/BaseAction';
 import { BaseAction } from './actions/BaseAction';
+import { UnprocessedEntrypointError } from './actions/UnprocessedEntrypointError';
 import type { Services, ActionTypes, ActionQueueItem } from './types';
 
 const EMPTY_FILE = '=== empty file ===';
@@ -251,13 +252,6 @@ export class Entrypoint extends BaseEntrypoint {
     return ['created', newEntrypoint];
   }
 
-  public abortIfSuperseded() {
-    if (this.supersededWith) {
-      this.log('superseded, aborting');
-      throw new AbortError('superseded');
-    }
-  }
-
   public addDependency(dependency: IEntrypointDependency): void {
     this.resolveTasks.delete(dependency.source);
     this.dependencies.set(dependency.source, dependency);
@@ -268,6 +262,20 @@ export class Entrypoint extends BaseEntrypoint {
     dependency: Promise<IEntrypointDependency>
   ): void {
     this.resolveTasks.set(name, dependency);
+  }
+
+  public assertNotSuperseded() {
+    if (this.supersededWith) {
+      this.log('superseded');
+      throw new AbortError('superseded');
+    }
+  }
+
+  public assertTransformed() {
+    if (this.transformedCode === null) {
+      this.log('not transformed');
+      throw new UnprocessedEntrypointError(this);
+    }
   }
 
   public createAction<

@@ -2,6 +2,7 @@ import type { ValueCache } from '@linaria/tags';
 
 import evaluate from '../../evaluators';
 import hasLinariaPreval from '../../utils/hasLinariaPreval';
+import { isUnprocessedEntrypointError } from '../actions/UnprocessedEntrypointError';
 import type { IEvalAction, SyncScenarioForAction } from '../types';
 
 const wrap = <T>(fn: () => T): T | Error => {
@@ -25,23 +26,36 @@ export function* evalFile(
 
   log(`>> evaluate __linariaPreval`);
 
-  const evaluated = evaluate(this.services.cache, entrypoint);
+  try {
+    const evaluated = evaluate(this.services.cache, entrypoint);
 
-  const linariaPreval = hasLinariaPreval(evaluated.value)
-    ? evaluated.value.__linariaPreval
-    : undefined;
+    const linariaPreval = hasLinariaPreval(evaluated.value)
+      ? evaluated.value.__linariaPreval
+      : undefined;
 
-  if (!linariaPreval) {
-    return null;
+    if (!linariaPreval) {
+      return null;
+    }
+
+    const valueCache: ValueCache = new Map();
+    Object.entries(linariaPreval).forEach(([key, lazyValue]) => {
+      const value = wrap(lazyValue);
+      valueCache.set(key, value);
+    });
+
+    log(`<< evaluated __linariaPreval %O`, valueCache);
+
+    return [valueCache, evaluated.dependencies];
+  } catch (e) {
+    if (isUnprocessedEntrypointError(e)) {
+      entrypoint.log(
+        'Evaluation has been aborted because one if the required files is not processed. Schedule reprocessing and re-evaluation.'
+      );
+      yield ['processEntrypoint', e.entrypoint, undefined, null];
+      return yield* evalFile.call(this);
+    }
+
+    entrypoint.log(`Unhandled error: %O`, e);
+    throw e;
   }
-
-  const valueCache: ValueCache = new Map();
-  Object.entries(linariaPreval).forEach(([key, lazyValue]) => {
-    const value = wrap(lazyValue);
-    valueCache.set(key, value);
-  });
-
-  log(`<< evaluated __linariaPreval %O`, valueCache);
-
-  return [valueCache, evaluated.dependencies];
 }

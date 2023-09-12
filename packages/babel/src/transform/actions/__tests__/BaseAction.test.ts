@@ -8,6 +8,8 @@ import type { ITransformAction, Services, Handler } from '../../types';
 import { BaseAction } from '../BaseAction';
 
 describe('BaseAction', () => {
+  const emptyResult = { code: '', metadata: null };
+
   let services: Services;
   let entrypoint: Entrypoint;
 
@@ -42,7 +44,7 @@ describe('BaseAction', () => {
 
     it('run should return generator-like object', () => {
       const generator = action.run(function* dummy() {
-        return null;
+        return emptyResult;
       });
       expect(generator.next).toBeDefined();
       expect(generator.throw).toBeDefined();
@@ -90,7 +92,7 @@ describe('BaseAction', () => {
           onError(e);
         }
 
-        return null;
+        return emptyResult;
       };
 
       const generator = action.run(handler);
@@ -101,7 +103,10 @@ describe('BaseAction', () => {
       });
 
       const error = new Error('foo');
-      expect(generator.throw(error)).toEqual({ done: true, value: null });
+      expect(generator.throw(error)).toEqual({
+        done: true,
+        value: emptyResult,
+      });
       expect(onError).toHaveBeenCalledWith(error);
     });
 
@@ -115,7 +120,7 @@ describe('BaseAction', () => {
 
         yield ['processImports', entrypoint, { resolved: [] }, null];
 
-        return null;
+        return emptyResult;
       };
 
       const generator = action.run(handler);
@@ -134,7 +139,7 @@ describe('BaseAction', () => {
 
       expect(generator.next()).toEqual({
         done: true,
-        value: null,
+        value: emptyResult,
       });
     });
 
@@ -146,7 +151,7 @@ describe('BaseAction', () => {
           onError(e);
         }
 
-        return null;
+        return emptyResult;
       };
 
       const generator1 = action.run(handler);
@@ -158,7 +163,10 @@ describe('BaseAction', () => {
       });
 
       const error = new Error('foo');
-      expect(generator1.throw(error)).toEqual({ done: true, value: null });
+      expect(generator1.throw(error)).toEqual({
+        done: true,
+        value: emptyResult,
+      });
       expect(onError).toHaveBeenCalledWith(error);
 
       expect(generator2.next()).toEqual({
@@ -166,7 +174,7 @@ describe('BaseAction', () => {
         value: ['resolveImports', entrypoint, { imports: new Map() }, null],
       });
 
-      expect(generator2.next()).toEqual({ done: true, value: null });
+      expect(generator2.next()).toEqual({ done: true, value: emptyResult });
       expect(onError).toHaveBeenCalledTimes(1);
     });
 
@@ -192,7 +200,7 @@ describe('BaseAction', () => {
           onError(e);
         }
 
-        return null;
+        return emptyResult;
       };
 
       const generator1 = action.run(handler);
@@ -209,8 +217,14 @@ describe('BaseAction', () => {
 
       const error1 = new Error('foo');
       const error2 = new Error('bar');
-      expect(generator1.throw(error1)).toEqual({ done: true, value: null });
-      expect(generator2.throw(error2)).toEqual({ done: true, value: null });
+      expect(generator1.throw(error1)).toEqual({
+        done: true,
+        value: emptyResult,
+      });
+      expect(generator2.throw(error2)).toEqual({
+        done: true,
+        value: emptyResult,
+      });
       expect(onError).toHaveBeenCalledTimes(1);
       expect(onError).toHaveBeenCalledWith(error1);
     });

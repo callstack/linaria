@@ -7,6 +7,7 @@ import type { LoadAndParseFn, Services } from '@linaria/babel-preset';
 import {
   DefaultModuleImplementation,
   Entrypoint,
+  isUnprocessedEntrypointError,
   Module,
   TransformCacheCollection,
 } from '@linaria/babel-preset';
@@ -63,6 +64,11 @@ const createEntrypoint = (
     throw new Error('entrypoint was ignored');
   }
 
+  entrypoint.setTransformResult({
+    code,
+    metadata: null,
+  });
+
   return entrypoint;
 };
 
@@ -79,12 +85,46 @@ const create = (strings: TemplateStringsArray, ...expressions: unknown[]) => {
   };
 };
 
+function safeEvaluate(m: Module): void {
+  try {
+    return m.evaluate();
+  } catch (e) {
+    if (isUnprocessedEntrypointError(e)) {
+      e.entrypoint.setTransformResult({
+        code: e.entrypoint.loadedAndParsed.code ?? '',
+        metadata: null,
+      });
+
+      return safeEvaluate(m);
+    }
+
+    throw e;
+  }
+}
+
+function safeRequire(m: Module, id: string): unknown {
+  try {
+    return m.require(id);
+  } catch (e) {
+    if (isUnprocessedEntrypointError(e)) {
+      e.entrypoint.setTransformResult({
+        code: e.entrypoint.loadedAndParsed.code ?? '',
+        metadata: null,
+      });
+
+      return safeRequire(m, id);
+    }
+
+    throw e;
+  }
+}
+
 it('creates module for JS files', () => {
   const { mod } = create`
     module.exports = () => 42;
   `;
 
-  mod.evaluate();
+  safeEvaluate(mod);
 
   expect((mod.exports as any)()).toBe(42);
   expect(mod.id).toBe(filename);
@@ -98,7 +138,7 @@ it('requires .js files', () => {
     module.exports = 'The answer is ' + answer;
   `;
 
-  mod.evaluate();
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe('The answer is 42');
 });
@@ -109,7 +149,7 @@ it('requires .cjs files', () => {
 
     module.exports = 'The answer is ' + answer;
   `;
-  mod.evaluate();
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe('The answer is 42');
 });
@@ -120,7 +160,7 @@ it('requires .json files', () => {
 
     module.exports = 'Our saviour, ' + data.name;
   `;
-  mod.evaluate();
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe('Our saviour, Luke Skywalker');
 });
@@ -130,10 +170,10 @@ it('returns module from the cache', () => {
 
   const id = './sample-data.json';
 
-  expect(mod.require(id)).toBe(mod.require(id));
+  expect(safeRequire(mod, id)).toBe(safeRequire(mod, id));
 
-  const res1 = new Module(entrypoint, cache).require(id);
-  const res2 = new Module(entrypoint, cache).require(id);
+  const res1 = safeRequire(new Module(entrypoint, cache), id);
+  const res2 = safeRequire(new Module(entrypoint, cache), id);
 
   expect(res1).toBe(res2);
 });
@@ -160,7 +200,7 @@ it('should use cached version from the codeCache', () => {
     `
   );
 
-  mod.evaluate();
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe('Imported value is 1');
 });
@@ -185,7 +225,7 @@ it('should reread module from disk when it is in codeCache but not in resolveCac
   `
   );
 
-  mod.evaluate();
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe('Imported value is 5');
 });
@@ -194,14 +234,14 @@ it('clears modules from the cache', () => {
   const id = './sample-data.json';
 
   const { entrypoint, mod, cache } = create``;
-  const result = mod.require(id);
+  const result = safeRequire(mod, id);
 
-  expect(new Module(entrypoint, cache).require(id)).toBe(result);
+  expect(safeRequire(new Module(entrypoint, cache), id)).toBe(result);
 
   const dep = new Module(entrypoint, cache).resolve(id);
   cache.invalidateForFile(dep);
 
-  expect(new Module(entrypoint, cache).require(id)).not.toBe(result);
+  expect(safeRequire(new Module(entrypoint, cache), id)).not.toBe(result);
 });
 
 it('exports the path for non JS/JSON files', () => {
@@ -261,7 +301,7 @@ it('has access to NODE_ENV', () => {
     module.exports = process.env.NODE_ENV;
   `;
 
-  mod.evaluate();
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe(process.env.NODE_ENV);
 });
@@ -271,7 +311,7 @@ it('has require.resolve available', () => {
     module.exports = require.resolve('./sample-script');
   `;
 
-  mod.evaluate();
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe(
     path.resolve(path.dirname(mod.filename), 'sample-script.js')
@@ -298,7 +338,7 @@ it('changes resolve behaviour on overriding _resolveFilename', () => {
     ];
   `;
 
-  mod.evaluate();
+  safeEvaluate(mod);
 
   expect(mod.exports).toEqual(['bar', 'test']);
   expect(resolveFilename).toHaveBeenCalledTimes(2);
@@ -330,7 +370,7 @@ it('should resolve from the cache', () => {
     source: 'test',
   });
 
-  mod.evaluate();
+  safeEvaluate(mod);
 
   expect(mod.exports).toEqual(['resolved foo', 'resolved test']);
   expect(resolveFilename).toHaveBeenCalledTimes(0);
@@ -344,7 +384,7 @@ it('correctly processes export declarations in strict mode', () => {
     exports = module.exports = () => 42
   `;
 
-  mod.evaluate();
+  safeEvaluate(mod);
 
   expect((mod.exports as any)()).toBe(42);
   expect(mod.id).toBe(filename);
@@ -358,7 +398,7 @@ it('export * compiled by typescript to commonjs works', () => {
     module.exports = foo;
   `;
 
-  mod.evaluate();
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe('foo');
 });
@@ -394,7 +434,7 @@ describe('definable globals', () => {
       module.exports = __filename;
     `;
 
-    mod.evaluate();
+    safeEvaluate(mod);
 
     expect(mod.exports).toBe(mod.filename);
   });
@@ -404,7 +444,7 @@ describe('definable globals', () => {
       module.exports = __dirname;
     `;
 
-    mod.evaluate();
+    safeEvaluate(mod);
 
     expect(mod.exports).toBe(path.dirname(mod.filename));
   });
@@ -420,7 +460,7 @@ describe('DOM', () => {
       };
     `;
 
-    mod.evaluate();
+    safeEvaluate(mod);
 
     expect(mod.exports).toEqual({
       document: 'object',
@@ -456,7 +496,7 @@ describe('DOM', () => {
       };
     `;
 
-    mod.evaluate();
+    safeEvaluate(mod);
 
     expect(mod.exports).toEqual({
       html: '<div id="test"></div>',
