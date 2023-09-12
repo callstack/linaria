@@ -95,6 +95,8 @@ export function* getExports(
     }
   }
 
+  entrypoint.log(`exports: %o`, result);
+
   cache.add('exports', entrypoint.name, result);
 
   return result;
