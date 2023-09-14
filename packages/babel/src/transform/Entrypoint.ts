@@ -274,7 +274,7 @@ export class Entrypoint extends BaseEntrypoint {
   public assertTransformed() {
     if (this.transformedCode === null) {
       this.log('not transformed');
-      throw new UnprocessedEntrypointError(this);
+      throw new UnprocessedEntrypointError(this.supersededWith ?? this);
     }
   }
 
@@ -337,7 +337,7 @@ export class Entrypoint extends BaseEntrypoint {
     return new EvaluatedEntrypoint(
       this.services,
       evaluatedOnly,
-      this.exports,
+      this.exportsProxy,
       this.generation + 1,
       this.name,
       this.only,

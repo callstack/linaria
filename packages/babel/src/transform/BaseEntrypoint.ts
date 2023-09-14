@@ -213,4 +213,8 @@ export abstract class BaseEntrypoint {
   public get ref() {
     return `${this.idx}#${this.generation}`;
   }
+
+  protected get exportsProxy() {
+    return this.#exports;
+  }
 }
