@@ -8,7 +8,7 @@ import type {
 
 import { getScope } from './getScope';
 
-type FindType = 'binding' | 'both' | 'referenced';
+type FindType = 'any' | 'binding' | 'declaration' | 'reference';
 
 function isInUnary<T extends NodePath>(
   path: T
@@ -34,10 +34,16 @@ function isReferencedIdentifier(
 }
 
 // For some reasons, `isBindingIdentifier` returns true for identifiers inside unary expressions.
-const checkers: Record<FindType, (ex: NodePath) => boolean> = {
+const checkers: Record<
+  FindType,
+  (ex: NodePath<Identifier | JSXIdentifier>) => boolean
+> = {
+  any: (ex) => isBindingIdentifier(ex) || isReferencedIdentifier(ex),
   binding: (ex) => isBindingIdentifier(ex),
-  both: (ex) => isBindingIdentifier(ex) || isReferencedIdentifier(ex),
-  referenced: (ex) => isReferencedIdentifier(ex),
+  declaration: (ex) =>
+    isBindingIdentifier(ex) &&
+    ex.scope.getBinding(ex.node.name)?.identifier === ex.node,
+  reference: (ex) => isReferencedIdentifier(ex),
 };
 
 export function nonType(path: NodePath): boolean {
@@ -53,7 +59,7 @@ export function nonType(path: NodePath): boolean {
 
 export default function findIdentifiers(
   expressions: NodePath<Node | null | undefined>[],
-  type: FindType = 'referenced'
+  type: FindType = 'reference'
 ): NodePath<Identifier | JSXIdentifier>[] {
   const identifiers: NodePath<Identifier | JSXIdentifier>[] = [];
 
@@ -70,7 +76,7 @@ export default function findIdentifiers(
         return;
       }
 
-      if (type === 'referenced' && ex.isAncestor(binding.path)) {
+      if (type === 'reference' && ex.isAncestor(binding.path)) {
         // This identifier is declared inside the expression. We don't need it.
         return;
       }

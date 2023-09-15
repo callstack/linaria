@@ -90,19 +90,15 @@ export const prepareCode = (
 
   const { code, evalConfig, evaluator } = loadedAndParsed;
 
-  const preevalStageResult = eventEmitter.pair(
-    {
-      method: 'queue:transform:preeval',
-    },
-    () =>
-      runPreevalStage(
-        babel,
-        evalConfig,
-        pluginOptions,
-        code,
-        originalAst,
-        eventEmitter
-      )
+  const preevalStageResult = eventEmitter.perf('transform:preeval', () =>
+    runPreevalStage(
+      babel,
+      evalConfig,
+      pluginOptions,
+      code,
+      originalAst,
+      eventEmitter
+    )
   );
 
   const linariaMetadata = getLinariaMetadata(preevalStageResult.metadata);
@@ -121,10 +117,8 @@ export const prepareCode = (
     features: pluginOptions.features,
   };
 
-  const [, transformedCode, imports] = eventEmitter.pair(
-    {
-      method: 'queue:transform:evaluator',
-    },
+  const [, transformedCode, imports] = eventEmitter.perf(
+    'transform:evaluator',
     () =>
       evaluator(
         evalConfig,
@@ -148,7 +142,10 @@ export function* internalTransform(
   const { only, loadedAndParsed, log } = this.entrypoint;
   if (loadedAndParsed.evaluator === 'ignored') {
     log('is ignored');
-    return null;
+    return {
+      code: loadedAndParsed.code ?? '',
+      metadata: null,
+    };
   }
 
   log('>> (%o)', only);
@@ -169,7 +166,10 @@ export function* internalTransform(
 
   if (preparedCode === '') {
     log('is skipped');
-    return null;
+    return {
+      code: loadedAndParsed.code ?? '',
+      metadata: null,
+    };
   }
 
   if (imports !== null && imports.size > 0) {

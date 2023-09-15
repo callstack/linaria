@@ -24,8 +24,6 @@ export type PreevalOptions = Pick<
   'classNameSlug' | 'displayName' | 'evaluate' | 'features'
 > & { eventEmitter: EventEmitter };
 
-const onFinishCallbacks = new WeakMap<object, () => void>();
-
 export default function preeval(
   babel: Core,
   { eventEmitter = EventEmitter.dummy, ...options }: PreevalOptions
@@ -42,51 +40,34 @@ export default function preeval(
       const rootScope = file.scope;
       this.processors = [];
 
-      eventEmitter.pair(
-        {
-          method: 'queue:transform:preeval:processTemplate',
-        },
-        () => {
-          file.path.traverse({
-            Identifier: (p) => {
-              processTemplateExpression(p, file.opts, options, (processor) => {
-                processor.dependencies.forEach((dependency) => {
-                  if (dependency.ex.type === 'Identifier') {
-                    addIdentifierToLinariaPreval(rootScope, dependency.ex.name);
-                  }
-                });
-
-                processor.doEvaltimeReplacement();
-                this.processors.push(processor);
+      eventEmitter.perf('transform:preeval:processTemplate', () => {
+        file.path.traverse({
+          Identifier: (p) => {
+            processTemplateExpression(p, file.opts, options, (processor) => {
+              processor.dependencies.forEach((dependency) => {
+                if (dependency.ex.type === 'Identifier') {
+                  addIdentifierToLinariaPreval(rootScope, dependency.ex.name);
+                }
               });
-            },
-          });
-        }
-      );
+
+              processor.doEvaltimeReplacement();
+              this.processors.push(processor);
+            });
+          },
+        });
+      });
 
       if (
         isFeatureEnabled(options.features, 'dangerousCodeRemover', filename)
       ) {
         log('start', 'Strip all JSX and browser related stuff');
-        eventEmitter.pair(
-          {
-            method: 'queue:transform:preeval:removeDangerousCode',
-          },
-          () => removeDangerousCode(file.path)
+        eventEmitter.perf('transform:preeval:removeDangerousCode', () =>
+          removeDangerousCode(file.path)
         );
       }
-
-      onFinishCallbacks.set(
-        this,
-        eventEmitter.pair({
-          method: 'queue:transform:preeval:rest-transformations',
-        })
-      );
     },
     visitor: {},
     post(file: BabelFile) {
-      onFinishCallbacks.get(this)?.();
-
       const log = createCustomDebug('preeval', getFileIdx(file.opts.filename!));
 
       invalidateTraversalCache(file.path);

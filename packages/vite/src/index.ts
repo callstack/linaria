@@ -17,11 +17,11 @@ import {
 } from '@linaria/babel-preset';
 import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
 import { linariaLogger } from '@linaria/logger';
-import type { IPerfMeterOptions } from '@linaria/utils';
-import { createPerfMeter, getFileIdx, syncResolve } from '@linaria/utils';
+import type { IFileReporterOptions } from '@linaria/utils';
+import { createFileReporter, getFileIdx, syncResolve } from '@linaria/utils';
 
 type VitePluginOptions = {
-  debug?: IPerfMeterOptions | false | null | undefined;
+  debug?: IFileReporterOptions | false | null | undefined;
   exclude?: FilterPattern;
   include?: FilterPattern;
   preprocessor?: Preprocessor;
@@ -44,7 +44,7 @@ export default function linaria({
   let config: ResolvedConfig;
   let devServer: ViteDevServer;
 
-  const { emitter, onDone } = createPerfMeter(debug ?? false);
+  const { emitter, onDone } = createFileReporter(debug ?? false);
 
   // <dependency id, targets>
   const targets: { dependencies: string[]; id: string }[] = [];

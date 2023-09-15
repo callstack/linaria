@@ -1,7 +1,9 @@
 import type { ValueCache } from '@linaria/tags';
 
+import type { IEvaluateResult } from '../../evaluators';
 import evaluate from '../../evaluators';
 import hasLinariaPreval from '../../utils/hasLinariaPreval';
+import { isUnprocessedEntrypointError } from '../actions/UnprocessedEntrypointError';
 import type { IEvalAction, SyncScenarioForAction } from '../types';
 
 const wrap = <T>(fn: () => T): T | Error => {
@@ -25,7 +27,22 @@ export function* evalFile(
 
   log(`>> evaluate __linariaPreval`);
 
-  const evaluated = evaluate(this.services.cache, entrypoint);
+  let evaluated: IEvaluateResult | undefined;
+
+  while (evaluated === undefined) {
+    try {
+      evaluated = evaluate(this.services.cache, entrypoint);
+    } catch (e) {
+      if (isUnprocessedEntrypointError(e)) {
+        entrypoint.log(
+          'Evaluation has been aborted because one if the required files is not processed. Schedule reprocessing and repeat evaluation.'
+        );
+        yield ['processEntrypoint', e.entrypoint, undefined];
+      } else {
+        throw e;
+      }
+    }
+  }
 
   const linariaPreval = hasLinariaPreval(evaluated.value)
     ? evaluated.value.__linariaPreval

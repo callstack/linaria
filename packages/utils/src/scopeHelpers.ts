@@ -61,7 +61,24 @@ export function reference(
   binding.references = binding.referencePaths.length;
 }
 
-function isReferenced({ kind, referenced, referencePaths }: Binding) {
+function isReferenced(binding: Binding): boolean {
+  const { kind, referenced, referencePaths, path } = binding;
+
+  if (
+    path.isFunctionExpression() &&
+    path.key === 'init' &&
+    path.parentPath.isVariableDeclarator()
+  ) {
+    // It is a function expression in a variable declarator
+    const id = path.parentPath.get('id');
+    if (id.isIdentifier()) {
+      const idBinding = getBinding(id);
+      return idBinding ? isReferenced(idBinding) : true;
+    }
+
+    return true;
+  }
+
   if (!referenced) {
     return false;
   }
@@ -466,12 +483,12 @@ function removeWithRelated(paths: NodePath[]) {
 
   const affectedPaths = actions.map(getPathFromAction);
 
-  let referencedIdentifiers = findIdentifiers(affectedPaths, 'referenced');
+  let referencedIdentifiers = findIdentifiers(affectedPaths, 'reference');
   referencedIdentifiers.sort(
     (a, b) => a.node?.name.localeCompare(b.node?.name)
   );
 
-  const referencesOfBinding = findIdentifiers(affectedPaths, 'binding')
+  const referencesOfBinding = findIdentifiers(affectedPaths, 'declaration')
     .map((i) => (i.node && getScope(i).getBinding(i.node.name)) ?? null)
     .filter(isNotNull)
     .reduce(

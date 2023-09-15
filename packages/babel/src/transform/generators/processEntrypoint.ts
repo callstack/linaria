@@ -18,52 +18,21 @@ export function* processEntrypoint(
   const { only, log } = this.entrypoint;
   log('start processing (only: %s)', only);
 
-  if (this.entrypoint.supersededWith) {
-    log('entrypoint already superseded, rescheduling processing');
-    yield [
-      'processEntrypoint',
-      this.entrypoint.supersededWith,
-      undefined,
-      null,
-    ];
-    return;
-  }
+  this.entrypoint.assertNotSuperseded();
 
-  const abortController = new AbortController();
+  using abortSignal = this.createAbortSignal();
 
-  const onParentAbort = () => {
-    log('parent aborted, aborting processing');
-    abortController.abort();
-  };
+  yield ['explodeReexports', this.entrypoint, undefined, abortSignal];
+  const result = yield* this.getNext(
+    'transform',
+    this.entrypoint,
+    undefined,
+    abortSignal
+  );
 
-  if (this.abortSignal) {
-    this.abortSignal.addEventListener('abort', onParentAbort);
-  }
+  this.entrypoint.setTransformResult(result);
 
-  const unsubscribe = this.entrypoint.onSupersede(() => {
-    log('entrypoint superseded, aborting processing');
-    abortController.abort();
-  });
-
-  try {
-    yield ['explodeReexports', this.entrypoint, undefined, null];
-    const result = yield* this.getNext(
-      'transform',
-      this.entrypoint,
-      undefined,
-      abortController.signal
-    );
-    this.entrypoint.setTransformResult(result);
-  } finally {
-    this.abortSignal?.removeEventListener('abort', onParentAbort);
-    unsubscribe();
-  }
-
-  const { supersededWith } = this.entrypoint;
-  if (supersededWith) {
-    log('entrypoint superseded, rescheduling processing');
-    yield ['processEntrypoint', supersededWith, undefined, null];
-  }
+  this.entrypoint.assertNotSuperseded();
 
   log('entrypoint processing finished');
 }

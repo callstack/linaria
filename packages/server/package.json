@@ -33,8 +33,7 @@
     "postcss": "^8.3.11"
   },
   "devDependencies": {
-    "@types/dedent": "^0.7.0",
-    "dedent": "^0.7.0",
+    "dedent": "^1.5.1",
     "prettier": "^3.0.3"
   },
   "engines": {

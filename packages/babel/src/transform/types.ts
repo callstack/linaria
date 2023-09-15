@@ -49,6 +49,7 @@ export type AnyIteratorResult<TMode extends 'async' | 'sync', TResult> = {
 export interface IBaseAction<TAction extends ActionQueueItem, TResult, TData>
   extends IBaseNode {
   abortSignal: AbortSignal | null;
+  createAbortSignal: () => AbortSignal & Disposable;
   data: TData;
   entrypoint: Entrypoint;
   getNext: GetNext;
@@ -197,11 +198,7 @@ export interface IResolveImportsAction
 }
 
 export interface ITransformAction
-  extends IBaseAction<
-    ITransformAction,
-    ITransformFileResult | null,
-    undefined
-  > {
+  extends IBaseAction<ITransformAction, ITransformFileResult, undefined> {
   type: 'transform';
 }
 

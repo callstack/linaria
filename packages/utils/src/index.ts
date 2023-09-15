@@ -16,8 +16,13 @@ export {
   extractExpression,
 } from './collectTemplateDependencies';
 export { createId } from './createId';
+export { createFileReporter } from './debug/fileReporter';
 export { createPerfMeter } from './debug/perfMetter';
-export { EventEmitter } from './EventEmitter';
+export {
+  EventEmitter,
+  OnActionFinishArgs,
+  OnActionStartArgs,
+} from './EventEmitter';
 export { default as findIdentifiers, nonType } from './findIdentifiers';
 export { findPackageJSON } from './findPackageJSON';
 export { hasEvaluatorMetadata } from './hasEvaluatorMetadata';
@@ -61,6 +66,7 @@ export type {
   ISideEffectImport,
   IState,
 } from './collectExportsAndImports';
+export type { IFileReporterOptions } from './debug/fileReporter';
 export type { IPerfMeterOptions } from './debug/perfMetter';
 export type { OnEvent } from './EventEmitter';
 export type { IVariableContext } from './IVariableContext';

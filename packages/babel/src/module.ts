@@ -26,9 +26,7 @@ import { Entrypoint } from './transform/Entrypoint';
 import { getStack, isSuperSet } from './transform/Entrypoint.helpers';
 import type { IEntrypointDependency } from './transform/Entrypoint.types';
 import type { IEvaluatedEntrypoint } from './transform/EvaluatedEntrypoint';
-import { syncActionRunner } from './transform/actions/actionRunner';
-import { baseProcessingHandlers } from './transform/generators/baseProcessingHandlers';
-import { syncResolveImports } from './transform/generators/resolveImports';
+import { isUnprocessedEntrypointError } from './transform/actions/UnprocessedEntrypointError';
 import loadLinariaOptions from './transform/helpers/loadLinariaOptions';
 import { withDefaultServices } from './transform/helpers/withDefaultServices';
 import { createVmContext } from './vm/createVmContext';
@@ -106,13 +104,7 @@ function resolve(
   return resolved;
 }
 
-function assertDisposed(
-  entrypoint: Entrypoint | null
-): asserts entrypoint is Entrypoint {
-  invariant(entrypoint, 'Module is disposed');
-}
-
-class Module implements Disposable {
+class Module {
   public readonly callstack: string[] = [];
 
   public readonly debug: Debugger;
@@ -186,7 +178,7 @@ class Module implements Disposable {
         return entrypoint.exports;
       }
 
-      using m = new Module(entrypoint, this.cache, this);
+      const m = this.createChild(entrypoint);
       m.evaluate();
 
       return entrypoint.exports;
@@ -199,7 +191,7 @@ class Module implements Disposable {
 
   public resolve = resolve.bind(this);
 
-  protected entrypoint: Entrypoint | null;
+  #entrypointRef: WeakRef<Entrypoint>;
 
   constructor(
     entrypoint: Entrypoint,
@@ -207,7 +199,7 @@ class Module implements Disposable {
     parentModule?: Module,
     private moduleImpl: HiddenModuleMembers = DefaultModuleImplementation
   ) {
-    this.entrypoint = entrypoint;
+    this.#entrypointRef = new WeakRef(entrypoint);
     this.idx = entrypoint.idx;
     this.id = entrypoint.name;
     this.filename = entrypoint.name;
@@ -228,42 +220,37 @@ class Module implements Disposable {
   }
 
   public get exports() {
-    assertDisposed(this.entrypoint);
     return this.entrypoint.exports;
   }
 
   public set exports(value) {
-    assertDisposed(this.entrypoint);
-
     this.entrypoint.exports = value;
 
     this.debug('the whole exports was overridden with %O', value);
   }
 
-  [Symbol.dispose](): void {
-    assertDisposed(this.entrypoint);
-
-    this.debug('dispose');
-
-    this.entrypoint = null;
+  protected get entrypoint(): Entrypoint {
+    const entrypoint = this.#entrypointRef.deref();
+    invariant(entrypoint, `Module ${this.idx} is disposed`);
+    return entrypoint;
   }
 
   evaluate(): void {
-    assertDisposed(this.entrypoint);
-
     const { entrypoint } = this;
+    entrypoint.assertTransformed();
+
+    const cached = this.cache.get('entrypoints', entrypoint.name)!;
+    let evaluatedCreated = false;
     if (!entrypoint.supersededWith) {
       this.cache.add(
         'entrypoints',
         entrypoint.name,
         entrypoint.createEvaluated()
       );
+      evaluatedCreated = true;
     }
 
-    const source =
-      entrypoint.transformedCode ??
-      entrypoint.originalCode ??
-      entrypoint.initialCode;
+    const source = entrypoint.transformedCode;
 
     if (!source) {
       this.debug(`evaluate`, 'there is nothing to evaluate');
@@ -310,6 +297,16 @@ class Module implements Disposable {
 
       script.runInContext(context);
     } catch (e) {
+      this.isEvaluated = false;
+      if (evaluatedCreated) {
+        this.cache.add('entrypoints', entrypoint.name, cached);
+      }
+
+      if (isUnprocessedEntrypointError(e)) {
+        // It will be handled by evalFile scenario
+        throw e;
+      }
+
       if (e instanceof EvalError) {
         this.debug('%O', e);
 
@@ -330,8 +327,6 @@ class Module implements Disposable {
     only: string[],
     log: Debugger
   ): Entrypoint | IEvaluatedEntrypoint | null {
-    assertDisposed(this.entrypoint);
-
     const extension = path.extname(filename);
     if (extension !== '.json' && !this.extensions.includes(extension)) {
       return null;
@@ -397,14 +392,6 @@ class Module implements Disposable {
       },
     });
 
-    const syncResolve = (what: string, importer: string): string => {
-      return this.moduleImpl._resolveFilename(what, {
-        id: importer,
-        filename: importer,
-        paths: this.moduleImpl._nodeModulePaths(path.dirname(importer)),
-      });
-    };
-
     const pluginOptions = loadLinariaOptions({});
     const code = fs.readFileSync(filename, 'utf-8');
     const newEntrypoint = Entrypoint.createRoot(
@@ -427,20 +414,10 @@ class Module implements Disposable {
       return newEntrypoint;
     }
 
-    const action = newEntrypoint.createAction('processEntrypoint', undefined);
-    syncActionRunner(action, {
-      ...baseProcessingHandlers,
-      resolveImports() {
-        return syncResolveImports.call(this, syncResolve);
-      },
-    });
-
     return newEntrypoint;
   }
 
   resolveDependency = (id: string): IEntrypointDependency => {
-    assertDisposed(this.entrypoint);
-
     const cached = this.entrypoint.getDependency(id);
     invariant(!(cached instanceof Promise), 'Dependency is not resolved yet');
 
@@ -489,6 +466,10 @@ class Module implements Disposable {
       added.forEach((ext) => delete extensions[ext]);
     }
   };
+
+  protected createChild(entrypoint: Entrypoint): Module {
+    return new Module(entrypoint, this.cache, this, this.moduleImpl);
+  }
 }
 
 export default Module;

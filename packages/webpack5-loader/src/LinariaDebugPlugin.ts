@@ -1,7 +1,7 @@
 import type { Compiler } from 'webpack';
 
-import type { EventEmitter, IPerfMeterOptions } from '@linaria/utils';
-import { createPerfMeter } from '@linaria/utils';
+import type { EventEmitter, IFileReporterOptions } from '@linaria/utils';
+import { createFileReporter } from '@linaria/utils';
 
 export const sharedState: {
   emitter?: EventEmitter;
@@ -10,8 +10,8 @@ export const sharedState: {
 export class LinariaDebugPlugin {
   private readonly onDone: (root: string) => void;
 
-  constructor(options?: IPerfMeterOptions) {
-    const { emitter, onDone } = createPerfMeter(options ?? true);
+  constructor(options?: IFileReporterOptions) {
+    const { emitter, onDone } = createFileReporter(options ?? false);
     sharedState.emitter = emitter;
     this.onDone = onDone;
   }

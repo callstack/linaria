@@ -44,7 +44,7 @@ export function* getExports(
     services: { cache },
   } = this;
   const { loadedAndParsed } = entrypoint;
-  if (loadedAndParsed.evaluator === 'ignored') {
+  if (loadedAndParsed.ast === undefined) {
     return [];
   }
 
@@ -94,6 +94,8 @@ export function* getExports(
       result.push(...exports);
     }
   }
+
+  entrypoint.log(`exports: %o`, result);
 
   cache.add('exports', entrypoint.name, result);
 

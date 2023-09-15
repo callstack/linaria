@@ -81,14 +81,14 @@ function hoistVariableDeclarator(ex: NodePath<VariableDeclarator>) {
     return;
   }
 
-  const referencedIdentifiers = findIdentifiers([ex], 'referenced');
+  const referencedIdentifiers = findIdentifiers([ex], 'reference');
   referencedIdentifiers.forEach((identifier) => {
     if (identifier.isIdentifier()) {
       hoistIdentifier(identifier);
     }
   });
 
-  const bindingIdentifiers = findIdentifiers([ex], 'binding');
+  const bindingIdentifiers = findIdentifiers([ex], 'declaration');
 
   bindingIdentifiers.forEach((path) => {
     const newName = getUidInRootScope(path);
@@ -194,7 +194,7 @@ export function extractExpression(
     // we need to hoist all its referenced identifiers
 
     // Collect all referenced identifiers
-    findIdentifiers([ex], 'referenced').forEach((id) => {
+    findIdentifiers([ex], 'reference').forEach((id) => {
       if (!id.isIdentifier()) return;
 
       // Try to evaluate and inline them…

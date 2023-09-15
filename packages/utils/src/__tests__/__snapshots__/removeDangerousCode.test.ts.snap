@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`removeDangerousCode should remove \`window\` but keep \`setVersion\` function untouched 1`] = `
+"let _win = undefined;
+export function setVersion(packageName, packageVersion) {
+  if (typeof _win !== 'undefined') {
+    return null;
+  }
+}"
+`;
+
+exports[`removeDangerousCode should replace body of react component with null 1`] = `
+"export var Popup = /*#__PURE__*/function () {
+  var Popup = function Popup() {
+    return null;
+  };
+  Popup.displayName = 'Popup';
+  return Popup;
+}();"
+`;

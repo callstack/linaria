@@ -7,14 +7,15 @@ import type { Evaluator, StrictOptions } from '@linaria/utils';
 import type { Services } from './types';
 
 export interface IEntrypointCode {
-  ast: File;
+  readonly ast: File;
   code: string;
   evalConfig: TransformOptions;
   evaluator: Evaluator;
 }
 
 export interface IIgnoredEntrypoint {
-  code?: string;
+  readonly ast?: File;
+  readonly code?: string;
   evaluator: 'ignored';
   reason: 'extension' | 'rule';
 }

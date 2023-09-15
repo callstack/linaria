@@ -36,6 +36,7 @@ export type ParentEntrypoint = {
   log: Debugger;
   name: string;
   parent: ParentEntrypoint | null;
+  seqId: number;
 } | null;
 
 export type Dependencies = string[];

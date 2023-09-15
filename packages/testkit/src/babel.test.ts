@@ -15,8 +15,15 @@ import {
   Entrypoint,
 } from '@linaria/babel-preset';
 import { linariaLogger } from '@linaria/logger';
-import type { Evaluator, StrictOptions, OnEvent } from '@linaria/utils';
+import type {
+  Evaluator,
+  StrictOptions,
+  OnEvent,
+  OnActionStartArgs,
+  OnActionFinishArgs,
+} from '@linaria/utils';
 import { EventEmitter } from '@linaria/utils';
+import type { EntrypointEvent } from '@linaria/utils/types/EventEmitter';
 
 import serializer from './__utils__/linaria-snapshot-serializer';
 
@@ -119,7 +126,7 @@ async function transform(
       inputSourceMap: babelPartialConfig.inputSourceMap ?? undefined,
       pluginOptions: linariaConfig,
     },
-    emitter: eventEmitter,
+    eventEmitter,
   };
   const result = await linariaTransform(services, originalCode, asyncResolve);
 
@@ -147,6 +154,44 @@ async function transformFile(filename: string, opts: Options) {
 
 describe('strategy shaker', () => {
   const evaluator = require('@linaria/shaker').default;
+  let onEvent: jest.Mock<void, Parameters<OnEvent>>;
+  let onAction: jest.Mock<number, OnActionStartArgs | OnActionFinishArgs>;
+  let onEntrypointEvent: jest.Mock<
+    void,
+    [idx: number, timestamp: number, event: EntrypointEvent]
+  >;
+  let emitter: EventEmitter;
+
+  function hasNotBeenProcessed(filename: string) {
+    expect(onEntrypointEvent).toHaveBeenCalledWith(
+      expect.any(Number),
+      expect.any(Number),
+      expect.objectContaining({
+        filename,
+        type: 'created',
+      })
+    );
+
+    const entrypointId = onEntrypointEvent.mock.calls.find(
+      (call) => call[2].type === 'created' && call[2].filename === filename
+    )![0];
+
+    expect(onEntrypointEvent).not.toHaveBeenCalledWith(
+      entrypointId,
+      expect.any(Number),
+      expect.objectContaining({
+        type: 'actionCreated',
+        actionType: 'explodeReexports',
+      })
+    );
+  }
+
+  beforeEach(() => {
+    onEvent = jest.fn();
+    onAction = jest.fn();
+    onEntrypointEvent = jest.fn();
+    emitter = new EventEmitter(onEvent, onAction, onEntrypointEvent);
+  });
 
   it('transpiles styled template literal with object', async () => {
     const { code, metadata } = await transform(
@@ -2416,6 +2461,23 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('uses values from json', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { css } from '@linaria/core';
+      import sample from './__fixtures__/sample-data.json';
+
+      export const eyeColorClass = css\`
+        color: ${'${sample.eye_color}'};
+      \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('evaluates complex styles with functions and nested selectors', async () => {
     const { code, metadata } = await transform(
       dedent`
@@ -2554,8 +2616,6 @@ describe('strategy shaker', () => {
   });
 
   it('should ignore unused wildcard reexports', async () => {
-    const onEvent = jest.fn<void, Parameters<OnEvent>>();
-    const emitter = new EventEmitter(onEvent);
     const { code, metadata } = await transform(
       dedent`
       import { css } from "@linaria/core";
@@ -2573,11 +2633,15 @@ describe('strategy shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
 
+    const reexports = resolve(__dirname, './__fixtures__/reexports.js');
     const unusedFile = resolve(__dirname, './__fixtures__/bar.js');
-    expect(onEvent).not.toHaveBeenCalledWith(
-      expect.objectContaining({ file: unusedFile, action: 'processImports' }),
-      'single'
+    expect(onEntrypointEvent).toHaveBeenCalledWith(
+      expect.any(Number),
+      expect.any(Number),
+      expect.objectContaining({ filename: reexports, type: 'created' })
     );
+
+    hasNotBeenProcessed(unusedFile);
   });
 
   it('should not drop exported vars of renamed imports', async () => {
@@ -2736,9 +2800,6 @@ describe('strategy shaker', () => {
   });
 
   it('evaluates chain of reexports', async () => {
-    const onEvent = jest.fn<void, Parameters<OnEvent>>();
-    const emitter = new EventEmitter(onEvent);
-
     const { code, metadata } = await transform(
       dedent`
       import { styled } from '@linaria/react';
@@ -2758,20 +2819,9 @@ describe('strategy shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
 
-    expect(onEvent).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        file: resolve(__dirname, './__fixtures__/bar.js'),
-        action: 'processImports',
-      }),
-      'single'
-    );
-
-    expect(onEvent).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        file: resolve(__dirname, './__fixtures__/re-exports/empty.js'),
-        action: 'processImports',
-      }),
-      'single'
+    hasNotBeenProcessed(resolve(__dirname, './__fixtures__/bar.js'));
+    hasNotBeenProcessed(
+      resolve(__dirname, './__fixtures__/re-exports/empty.js')
     );
   });
 
@@ -3040,16 +3090,6 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
-  it('should process superseded entrypoint', async () => {
-    const { code, metadata } = await transformFile(
-      resolve(__dirname, './__fixtures__/superseded/index.js'),
-      [evaluator]
-    );
-
-    expect(code).toMatchSnapshot();
-    expect(metadata).toMatchSnapshot();
-  });
-
   xit('should shake out side effect because its definition uses DOM API', async () => {
     const { code, metadata } = await transform(
       dedent`
@@ -3202,9 +3242,6 @@ describe('strategy shaker', () => {
     it('two parallel chains of reexports', async () => {
       const cache = new TransformCacheCollection();
 
-      const onEvent = jest.fn<void, Parameters<OnEvent>>();
-      const emitter = new EventEmitter(onEvent);
-
       const files = {
         'source-1': dedent`
           import { styled } from '@linaria/react';
@@ -3237,20 +3274,13 @@ describe('strategy shaker', () => {
         expect(metadata).toMatchSnapshot();
       }
 
-      expect(onEvent).not.toHaveBeenCalledWith(
-        expect.objectContaining({
-          file: resolve(__dirname, './__fixtures__/re-exports/empty.js'),
-          action: 'processImports',
-        }),
-        'single'
+      hasNotBeenProcessed(
+        resolve(__dirname, './__fixtures__/re-exports/empty.js')
       );
     });
 
     it('multiple parallel chains of reexports', async () => {
       const cache = new TransformCacheCollection();
-
-      const onEvent = jest.fn<void, Parameters<OnEvent>>();
-      const emitter = new EventEmitter(onEvent);
 
       const tokens = ['foo', 'bar', 'bar1', 'bar2'];
 
