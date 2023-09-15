@@ -13,10 +13,19 @@ exports[`removeWithRelated should not delete params of functions 1`] = `
 }"
 `;
 
+exports[`removeWithRelated should not remove functions that are assigned to prototype 1`] = `
+"(function () {
+  function SomeClass() {}
+  SomeClass.prototype.foo = function foo() {};
+  SomeClass.prototype.bar = function bar() {};
+})();"
+`;
+
 exports[`removeWithRelated should not remove top-level functions with empty bodies 1`] = `
 "function testFn() {}
 export const testArrow1 = () => {};
-const testArrow2 = () => {};"
+const testArrow2 = () => {};
+export default function testDefaultFn() {}"
 `;
 
 exports[`removeWithRelated should remove node if it becomes invalid after removing its children 1`] = `""`;

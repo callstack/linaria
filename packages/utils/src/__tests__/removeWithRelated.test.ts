@@ -188,4 +188,20 @@ describe('removeWithRelated', () => {
 
     expect(code).toMatchSnapshot();
   });
+
+  it('should not remove functions that are assigned to prototype', () => {
+    const code = run`
+      (function() {
+        function SomeClass() {}
+
+        SomeClass.prototype.foo = function foo() {}
+
+        SomeClass.prototype.bar = function bar() {
+          /* remove */console.log(arg);
+        };
+      })();
+    `;
+
+    expect(code).toMatchSnapshot();
+  });
 });
