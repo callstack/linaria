@@ -60,8 +60,8 @@ export function* getExports(
   this.services.babel.traverse(loadedAndParsed.ast!, {
     Program(path) {
       const { exports, reexports } = collectExportsAndImports(path, 'disabled');
-      exports.forEach((e) => {
-        result.push(e.exported);
+      Object.keys(exports).forEach((token) => {
+        result.push(token);
       });
 
       reexports.forEach((e) => {

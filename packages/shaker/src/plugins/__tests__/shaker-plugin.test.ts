@@ -35,6 +35,9 @@ const keep =
       configFile: false,
       filename,
       presets,
+      sourceType: /(?:^|\*\/|;)\s*(?:export|import)\s/m.test(formattedCode)
+        ? 'module'
+        : 'script',
       plugins: [
         [
           shakerPlugin,
@@ -296,15 +299,6 @@ describe('shaker', () => {
   });
 
   it('deletes non-default exports when importing default export of a module with an __esModule: true property', () => {
-    /* without workaround, this will be transformed by shaker to:
-      const n = require('n');
-      const defaultExports = {
-        createContext: n.createContext
-      };
-      exports.default = defaultExports;
-
-      i.e, exports.createContext is deleted
-    */
     const { code } = keep(['default'])`
     const n = require('n');
     const defaultExports = { createContext: n.createContext }
