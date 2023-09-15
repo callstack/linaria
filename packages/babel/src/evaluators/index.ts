@@ -15,7 +15,7 @@ export default function evaluate(
   cache: TransformCacheCollection,
   entrypoint: Entrypoint
 ): IEvaluateResult {
-  using m = new Module(entrypoint, cache);
+  const m = new Module(entrypoint, cache);
 
   m.evaluate();
 

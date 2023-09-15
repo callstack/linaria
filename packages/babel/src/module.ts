@@ -104,19 +104,7 @@ function resolve(
   return resolved;
 }
 
-function assertNotDisposed(
-  entrypoint: Entrypoint | null,
-  log: Debugger
-): asserts entrypoint is Entrypoint {
-  try {
-    invariant(entrypoint, 'Module is disposed');
-  } catch (e) {
-    log('module is disposed');
-    throw e;
-  }
-}
-
-class Module implements Disposable {
+class Module {
   public readonly callstack: string[] = [];
 
   public readonly debug: Debugger;
@@ -190,7 +178,7 @@ class Module implements Disposable {
         return entrypoint.exports;
       }
 
-      using m = new Module(entrypoint, this.cache, this);
+      const m = this.createChild(entrypoint);
       m.evaluate();
 
       return entrypoint.exports;
@@ -203,7 +191,7 @@ class Module implements Disposable {
 
   public resolve = resolve.bind(this);
 
-  protected entrypoint: Entrypoint | null;
+  #entrypointRef: WeakRef<Entrypoint>;
 
   constructor(
     entrypoint: Entrypoint,
@@ -211,7 +199,7 @@ class Module implements Disposable {
     parentModule?: Module,
     private moduleImpl: HiddenModuleMembers = DefaultModuleImplementation
   ) {
-    this.entrypoint = entrypoint;
+    this.#entrypointRef = new WeakRef(entrypoint);
     this.idx = entrypoint.idx;
     this.id = entrypoint.name;
     this.filename = entrypoint.name;
@@ -232,29 +220,22 @@ class Module implements Disposable {
   }
 
   public get exports() {
-    assertNotDisposed(this.entrypoint, this.debug);
     return this.entrypoint.exports;
   }
 
   public set exports(value) {
-    assertNotDisposed(this.entrypoint, this.debug);
-
     this.entrypoint.exports = value;
 
     this.debug('the whole exports was overridden with %O', value);
   }
 
-  [Symbol.dispose](): void {
-    assertNotDisposed(this.entrypoint, this.debug);
-
-    this.debug('dispose');
-
-    this.entrypoint = null;
+  protected get entrypoint(): Entrypoint {
+    const entrypoint = this.#entrypointRef.deref();
+    invariant(entrypoint, `Module ${this.idx} is disposed`);
+    return entrypoint;
   }
 
   evaluate(): void {
-    assertNotDisposed(this.entrypoint, this.debug);
-
     const { entrypoint } = this;
     entrypoint.assertTransformed();
 
@@ -346,8 +327,6 @@ class Module implements Disposable {
     only: string[],
     log: Debugger
   ): Entrypoint | IEvaluatedEntrypoint | null {
-    assertNotDisposed(this.entrypoint, this.debug);
-
     const extension = path.extname(filename);
     if (extension !== '.json' && !this.extensions.includes(extension)) {
       return null;
@@ -439,8 +418,6 @@ class Module implements Disposable {
   }
 
   resolveDependency = (id: string): IEntrypointDependency => {
-    assertNotDisposed(this.entrypoint, this.debug);
-
     const cached = this.entrypoint.getDependency(id);
     invariant(!(cached instanceof Promise), 'Dependency is not resolved yet');
 
@@ -489,6 +466,10 @@ class Module implements Disposable {
       added.forEach((ext) => delete extensions[ext]);
     }
   };
+
+  protected createChild(entrypoint: Entrypoint): Module {
+    return new Module(entrypoint, this.cache, this, this.moduleImpl);
+  }
 }
 
 export default Module;
