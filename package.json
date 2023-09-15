@@ -28,7 +28,7 @@
     "@linaria/react": "workspace:^",
     "@linaria/server": "workspace:^",
     "babel-plugin-file-loader": "^1.1.1",
-    "dedent": "^0.7.0",
+    "dedent": "^1.5.1",
     "escape-html": "^1.0.3",
     "ignore-styles": "^5.0.1",
     "koa": "^2.7.0",

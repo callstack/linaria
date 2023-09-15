@@ -20,7 +20,7 @@ module.exports = {
   },
   plugins: [
     new LinariaDebugPlugin({
-      filename: 'linaria-debug.json',
+      dir: 'linaria-debug',
       print: true,
     }),
     new MiniCssExtractPlugin({ filename: 'styles.css' }),
