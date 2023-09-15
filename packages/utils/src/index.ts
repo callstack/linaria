@@ -60,7 +60,7 @@ export { valueToLiteral } from './valueToLiteral';
 export { default as JSXElementsRemover } from './visitors/JSXElementsRemover';
 
 export type {
-  IExport,
+  Exports,
   IImport,
   IReexport,
   ISideEffectImport,

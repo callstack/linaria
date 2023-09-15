@@ -23,6 +23,7 @@ import type {
   MemberExpression,
   ObjectExpression,
   ObjectPattern,
+  Program,
   StringLiteral,
   VariableDeclarator,
 } from '@babel/types';
@@ -49,10 +50,7 @@ export interface IImport {
   type: 'cjs' | 'dynamic' | 'esm';
 }
 
-export interface IExport {
-  exported: string | 'default' | '*'; // '*' means re-export all
-  local: NodePath;
-}
+export type Exports = Record<string | 'default' | '*', NodePath>; // '*' means re-export all
 
 export interface IReexport {
   exported: string | 'default' | '*';
@@ -62,11 +60,16 @@ export interface IReexport {
 }
 
 export interface IState {
+  deadExports: string[];
   exportRefs: Map<string, NodePath<MemberExpression>[]>;
-  exports: IExport[];
+  exports: Exports;
   imports: (IImport | ISideEffectImport)[];
   isEsModule: boolean;
   reexports: IReexport[];
+}
+
+interface ILocalState extends IState {
+  processedRequires: WeakSet<NodePath>;
 }
 
 export const sideEffectImport = (
@@ -88,21 +91,14 @@ const isType = (p: {
   ('importKind' in p.node && p.node.importKind === 'type') ||
   ('exportKind' in p.node && p.node.exportKind === 'type');
 
-type SpecifierTypes = ImportDeclaration['specifiers'][number];
-
-type Collector<T extends SpecifierTypes> = (
-  path: NodePath<T>,
-  source: string
-) => IImport[];
-
-type Collectors = {
-  [K in SpecifierTypes['type']]: Collector<
-    Extract<SpecifierTypes, { type: K }>
-  >;
-};
-
 // Force TypeScript to check, that we have implementation for every possible specifier
-const collectors: Collectors = {
+type SpecifierTypes = ImportDeclaration['specifiers'][number];
+const collectors: {
+  [K in SpecifierTypes['type']]: (
+    path: NodePath<SpecifierTypes & { type: K }>,
+    source: string
+  ) => IImport[];
+} = {
   ImportSpecifier(path: NodePath<ImportSpecifier>, source): IImport[] {
     if (isType(path)) return [];
     const imported = getValue(path.get('imported'));
@@ -129,7 +125,7 @@ const collectors: Collectors = {
 
 function collectFromImportDeclaration(
   path: NodePath<ImportDeclaration>,
-  state: IState
+  state: ILocalState
 ): void {
   // If importKind is specified, and it's not a value, ignore that import
   if (isType(path)) return;
@@ -141,10 +137,13 @@ function collectFromImportDeclaration(
     state.imports.push({ imported: 'side-effect', local: path, source });
   }
 
-  specifiers.forEach((specifier) => {
+  specifiers.forEach(<T extends SpecifierTypes>(specifier: NodePath<T>) => {
     if (specifier.isImportSpecifier() && isType(specifier)) return;
-    const { type } = specifier.node;
-    const collector = collectors[type] as Collector<SpecifierTypes>;
+
+    const collector = collectors[
+      specifier.node.type
+    ] as (typeof collectors)[T['type']];
+
     state.imports.push(...collector(specifier, source));
   });
 }
@@ -249,29 +248,29 @@ function importFromVariableDeclarator(
 
 function exportFromVariableDeclarator(
   path: NodePath<VariableDeclarator>
-): IExport[] {
+): Exports {
   const id = path.get('id');
   const init = path.get('init');
 
   // If there is no init expression, we can ignore this export
-  if (!init || !init.isExpression()) return [];
+  if (!init || !init.isExpression()) return {};
 
   if (id.isIdentifier()) {
     // It is `export const a = 1;`
-    return [
-      {
-        local: init,
-        exported: id.node.name,
-      },
-    ];
+    return {
+      [id.node.name]: init,
+    };
   }
 
   if (id.isObjectPattern()) {
     // It is `export const { a, ...rest } = obj;`
-    return whatIsDestructed(id).map((destructed) => ({
-      local: init,
-      exported: destructed.as.node.name,
-    }));
+    return whatIsDestructed(id).reduce<Exports>(
+      (acc, destructed) => ({
+        ...acc,
+        [destructed.as.node.name]: init,
+      }),
+      {}
+    );
   }
 
   // What else it can be?
@@ -281,10 +280,13 @@ function exportFromVariableDeclarator(
     id.node.type
   );
 
-  return [];
+  return {};
 }
 
-function collectFromDynamicImport(path: NodePath<Import>, state: IState): void {
+function collectFromDynamicImport(
+  path: NodePath<Import>,
+  state: ILocalState
+): void {
   const { parentPath: callExpression } = path;
   if (!callExpression.isCallExpression()) {
     // It's wrong `import`
@@ -377,8 +379,28 @@ function getImportExportTypeByInteropFunction(
   return undefined;
 }
 
-function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
+function isAlreadyProcessed(path: NodePath): boolean {
+  if (
+    path.isCallExpression() &&
+    path.get('callee').isIdentifier({ name: '__toCommonJS' })
+  ) {
+    // because its esbuild and we already processed all exports
+    return true;
+  }
+
+  return false;
+}
+
+function collectFromRequire(
+  path: NodePath<Identifier>,
+  state: ILocalState
+): void {
   if (!isRequire(path)) return;
+
+  // This method can be reached many times from multiple visitors for the same path
+  // So we need to check if we already processed it
+  if (state.processedRequires.has(path)) return;
+  state.processedRequires.add(path);
 
   const { parentPath: callExpression } = path;
   if (!callExpression.isCallExpression()) {
@@ -546,6 +568,25 @@ function collectFromRequire(path: NodePath<Identifier>, state: IState): void {
   }
 }
 
+function collectFromVariableDeclarator(
+  path: NodePath<VariableDeclarator>,
+  state: ILocalState
+): void {
+  let found = false;
+  path.traverse({
+    Identifier(identifierPath) {
+      if (isRequire(identifierPath)) {
+        collectFromRequire(identifierPath, state);
+        found = true;
+      }
+    },
+  });
+
+  if (found) {
+    path.skip();
+  }
+}
+
 function isChainOfVoidAssignment(
   path: NodePath<AssignmentExpression>
 ): boolean {
@@ -587,27 +628,96 @@ function getReturnValue(
 function getGetterValueFromDescriptor(
   descriptor: NodePath<ObjectExpression>
 ): NodePath<Expression> | undefined {
-  const getter = descriptor
+  const props = descriptor
     .get('properties')
-    .filter(isTypedNode('ObjectProperty'))
-    .find((p) => p.get('key').isIdentifier({ name: 'get' }));
+    .filter(isTypedNode('ObjectProperty'));
+
+  const getter = props.find((p) => p.get('key').isIdentifier({ name: 'get' }));
   const value = getter?.get('value');
 
   if (value?.isFunctionExpression() || value?.isArrowFunctionExpression()) {
     return getReturnValue(value);
   }
 
-  return undefined;
+  const valueProp = props.find((p) =>
+    p.get('key').isIdentifier({ name: 'value' })
+  );
+
+  const valueValue = valueProp?.get('value');
+
+  return valueValue?.isExpression() ? valueValue : undefined;
 }
 
-function collectFromExports(path: NodePath<Identifier>, state: IState): void {
+function addExport(path: NodePath, exported: string, state: ILocalState): void {
+  function getRelatedImport() {
+    if (path.isMemberExpression()) {
+      const object = path.get('object');
+      if (!object.isIdentifier()) {
+        return undefined;
+      }
+
+      const objectBinding = object.scope.getBinding(object.node.name);
+      if (!objectBinding) {
+        return undefined;
+      }
+
+      if (objectBinding.path.isVariableDeclarator()) {
+        collectFromVariableDeclarator(objectBinding.path, state);
+      }
+
+      const found = state.imports.find(
+        (i) =>
+          objectBinding.identifier === i.local.node ||
+          objectBinding.referencePaths.some((p) => i.local.isAncestor(p))
+      );
+
+      if (!found) {
+        return undefined;
+      }
+
+      const property = path.get('property');
+      let what = '*';
+      if (path.node.computed && property.isStringLiteral()) {
+        what = property.node.value;
+      } else if (!path.node.computed && property.isIdentifier()) {
+        what = property.node.name;
+      }
+
+      return {
+        import: { ...found, local: path },
+        what,
+      };
+    }
+
+    return undefined;
+  }
+
+  const relatedImport = getRelatedImport();
+  if (relatedImport) {
+    // eslint-disable-next-line no-param-reassign
+    state.reexports.push({
+      local: relatedImport.import.local,
+      imported: relatedImport.import.imported,
+      source: relatedImport.import.source,
+      exported,
+    });
+  } else {
+    // eslint-disable-next-line no-param-reassign
+    state.exports[exported] = path;
+  }
+}
+
+function collectFromExports(
+  path: NodePath<Identifier>,
+  state: ILocalState
+): void {
   if (!isExports(path)) return;
 
   if (path.parentPath.isMemberExpression({ object: path.node })) {
     // It is `exports.prop = …`
     const memberExpression = path.parentPath;
     const property = memberExpression.get('property');
-    if (!property.isIdentifier()) {
+    if (!property.isIdentifier() || memberExpression.node.computed) {
       return;
     }
 
@@ -649,7 +759,8 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
     }
 
     saveRef();
-    state.exports.push({ exported: property.node.name, local: right });
+    // eslint-disable-next-line no-param-reassign
+    state.exports[property.node.name] = right;
 
     return;
   }
@@ -679,7 +790,7 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
         const exported = prop.node.value;
         const local = getGetterValueFromDescriptor(descriptor);
         if (local) {
-          state.exports.push({ exported, local });
+          addExport(local, exported, state);
         }
       }
     } else if (
@@ -697,7 +808,7 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
        */
       const local = getGetterValueFromDescriptor(descriptor);
       if (local) {
-        state.exports.push({ exported: '*', local });
+        addExport(local, '*', state);
       }
     }
   }
@@ -705,7 +816,7 @@ function collectFromExports(path: NodePath<Identifier>, state: IState): void {
 
 function collectFromRequireOrExports(
   path: NodePath<Identifier>,
-  state: IState
+  state: ILocalState
 ): void {
   if (isRequire(path)) {
     collectFromRequire(path, state);
@@ -839,7 +950,7 @@ function unfoldNamespaceImport(
 
 function collectFromExportAllDeclaration(
   path: NodePath<ExportAllDeclaration>,
-  state: IState
+  state: ILocalState
 ): void {
   if (isType(path)) return;
   const source = path.get('source')?.node?.value;
@@ -859,7 +970,7 @@ function collectFromExportSpecifier(
     ExportSpecifier | ExportDefaultSpecifier | ExportNamespaceSpecifier
   >,
   source: string | undefined,
-  state: IState
+  state: ILocalState
 ): void {
   if (path.isExportSpecifier()) {
     const exported = getValue(path.get('exported'));
@@ -874,7 +985,8 @@ function collectFromExportSpecifier(
       });
     } else {
       const local = path.get('local');
-      state.exports.push({ local, exported });
+      // eslint-disable-next-line no-param-reassign
+      state.exports[exported] = local;
     }
 
     return;
@@ -911,7 +1023,7 @@ function collectFromExportSpecifier(
 
 function collectFromExportNamedDeclaration(
   path: NodePath<ExportNamedDeclaration>,
-  state: IState
+  state: ILocalState
 ): void {
   if (isType(path)) return;
 
@@ -926,38 +1038,46 @@ function collectFromExportNamedDeclaration(
   const declaration = path.get('declaration');
   if (declaration.isVariableDeclaration()) {
     declaration.get('declarations').forEach((declarator) => {
-      exportFromVariableDeclarator(declarator).forEach((prop) => {
-        // What is defined
-        state.exports.push(prop);
-      });
+      // eslint-disable-next-line no-param-reassign
+      state.exports = {
+        ...state.exports,
+        ...exportFromVariableDeclarator(declarator),
+      };
     });
+  }
+
+  if (declaration.isTSEnumDeclaration()) {
+    // eslint-disable-next-line no-param-reassign
+    state.exports[declaration.get('id').node.name] = declaration;
   }
 
   if (declaration.isFunctionDeclaration()) {
     const id = declaration.get('id');
     if (id.isIdentifier()) {
-      state.exports.push({
-        exported: id.node.name,
-        local: id,
-      });
+      // eslint-disable-next-line no-param-reassign
+      state.exports[id.node.name] = id;
     }
   }
 }
 
 function collectFromExportDefaultDeclaration(
   path: NodePath<ExportDefaultDeclaration>,
-  state: IState
+  state: ILocalState
 ): void {
   if (isType(path)) return;
 
-  const declaration = path.get('declaration');
-  state.exports.push({ exported: 'default', local: declaration });
+  // eslint-disable-next-line no-param-reassign
+  state.exports.default = path.get('declaration');
 }
 
 function collectFromAssignmentExpression(
   path: NodePath<AssignmentExpression>,
-  state: IState
+  state: ILocalState
 ): void {
+  if (isChainOfVoidAssignment(path)) {
+    return;
+  }
+
   const left = path.get('left');
   const right = path.get('right');
 
@@ -969,12 +1089,19 @@ function collectFromAssignmentExpression(
       exported = property.node.name;
     }
   } else if (isExports(left)) {
-    exported = '*'; // maybe
+    // module.exports = ...
+    if (!isAlreadyProcessed(right)) {
+      exported = 'default';
+    }
   }
 
   if (!exported) return;
 
-  if (!right.isCallExpression() || !isRequire(right.get('callee'))) return;
+  if (!right.isCallExpression() || !isRequire(right.get('callee'))) {
+    // eslint-disable-next-line no-param-reassign
+    state.exports[exported] = right;
+    return;
+  }
 
   const sourcePath = right.get('arguments')?.[0];
   const source = sourcePath.isStringLiteral()
@@ -983,6 +1110,11 @@ function collectFromAssignmentExpression(
   if (!source) return;
 
   // It is `exports.foo = require('./css');`
+
+  if (state.exports[exported]) {
+    // eslint-disable-next-line no-param-reassign
+    delete state.exports[exported];
+  }
 
   state.reexports.push({
     exported,
@@ -996,7 +1128,7 @@ function collectFromAssignmentExpression(
 
 function collectFromExportStarCall(
   path: NodePath<CallExpression>,
-  state: IState
+  state: ILocalState
 ) {
   const [requireCall, exports] = path.get('arguments');
   if (!isExports(exports)) return;
@@ -1018,7 +1150,7 @@ function collectFromExportStarCall(
   path.skip();
 }
 
-function collectFromMap(map: NodePath<ObjectExpression>, state: IState) {
+function collectFromMap(map: NodePath<ObjectExpression>, state: ILocalState) {
   const properties = map.get('properties');
   properties.forEach((property) => {
     if (!property.isObjectProperty()) return;
@@ -1033,16 +1165,13 @@ function collectFromMap(map: NodePath<ObjectExpression>, state: IState) {
     const returnValue = getReturnValue(value);
     if (!returnValue) return;
 
-    state.exports.push({
-      exported,
-      local: returnValue,
-    });
+    addExport(returnValue, exported, state);
   });
 }
 
 function collectFromEsbuildExportCall(
   path: NodePath<CallExpression>,
-  state: IState
+  state: ILocalState
 ) {
   const [sourceExports, map] = path.get('arguments');
   if (!sourceExports.isIdentifier({ name: 'source_exports' })) return;
@@ -1055,7 +1184,7 @@ function collectFromEsbuildExportCall(
 
 function collectFromEsbuildReExportCall(
   path: NodePath<CallExpression>,
-  state: IState
+  state: ILocalState
 ) {
   const [sourceExports, requireCall, exports] = path.get('arguments');
   if (!sourceExports.isIdentifier({ name: 'source_exports' })) return;
@@ -1079,7 +1208,7 @@ function collectFromEsbuildReExportCall(
 
 function collectFromSwcExportCall(
   path: NodePath<CallExpression>,
-  state: IState
+  state: ILocalState
 ) {
   const [exports, map] = path.get('arguments');
   if (!isExports(exports)) return;
@@ -1092,7 +1221,7 @@ function collectFromSwcExportCall(
 
 function collectFromCallExpression(
   path: NodePath<CallExpression>,
-  state: IState
+  state: ILocalState
 ) {
   const maybeExportStart = path.get('callee');
   if (!maybeExportStart.isIdentifier()) {
@@ -1127,15 +1256,17 @@ function collectFromCallExpression(
 }
 
 export function collectExportsAndImports(
-  path: NodePath,
+  path: NodePath<Program>,
   cacheMode: 'disabled' | 'force' | 'enabled' = 'enabled'
 ): IState {
-  const state: IState = {
+  const localState: ILocalState = {
+    deadExports: [],
     exportRefs: new Map(),
-    exports: [],
+    exports: {},
     imports: [],
     reexports: [],
-    isEsModule: false,
+    isEsModule: path.node.sourceType === 'module',
+    processedRequires: new WeakSet(),
   };
 
   const cache =
@@ -1144,7 +1275,7 @@ export function collectExportsAndImports(
       : undefined;
 
   if (cacheMode === 'enabled' && cache?.has(path)) {
-    return cache.get(path) ?? state;
+    return cache.get(path) ?? localState;
   }
 
   path.traverse(
@@ -1157,9 +1288,12 @@ export function collectExportsAndImports(
       ImportDeclaration: collectFromImportDeclaration,
       Import: collectFromDynamicImport,
       Identifier: collectFromRequireOrExports,
+      VariableDeclarator: collectFromVariableDeclarator,
     },
-    state
+    localState
   );
+
+  const { processedRequires, ...state } = localState;
 
   cache?.set(path, state);
 

@@ -1,6 +1,6 @@
 import type { BabelFile, PluginPass } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
-import type { File } from '@babel/types';
+import type { File, Program } from '@babel/types';
 import type { RawSourceMap } from 'source-map';
 
 import type { Debugger } from '@linaria/logger';
@@ -84,5 +84,5 @@ export type MissedBabelCoreTypes = {
   File: new (
     options: { filename: string },
     file: { ast: File; code: string }
-  ) => { path: NodePath<File> };
+  ) => { path: NodePath<Program> };
 };
