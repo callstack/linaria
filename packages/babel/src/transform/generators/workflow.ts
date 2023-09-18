@@ -1,9 +1,5 @@
 import { isAborted } from '../actions/AbortError';
-import type {
-  IWorkflowAction,
-  SyncScenarioForAction,
-  YieldArg,
-} from '../types';
+import type { IWorkflowAction, SyncScenarioForAction } from '../types';
 
 /**
  * The entry point for file processing. Sequentially calls `processEntrypoint`,
@@ -14,7 +10,7 @@ export function* workflow(
   this: IWorkflowAction
 ): SyncScenarioForAction<IWorkflowAction> {
   const { cache, options } = this.services;
-  const { entrypoint } = this;
+  let { entrypoint } = this;
 
   if (entrypoint.ignored) {
     return {
@@ -23,15 +19,26 @@ export function* workflow(
     };
   }
 
-  entrypoint.assertNotSuperseded();
+  let originalCode: string = '';
 
-  using abortSignal = null;
-  const { code: originalCode = '' } = entrypoint.loadedAndParsed;
+  do {
+    entrypoint = entrypoint.supersededWith ?? entrypoint;
+    originalCode = entrypoint.loadedAndParsed.code ?? '';
 
-  // *** 1st stage ***
+    // *** 1st stage ***
 
-  yield* this.getNext('processEntrypoint', entrypoint, undefined, abortSignal);
-  entrypoint.assertNotSuperseded();
+    try {
+      yield* this.getNext('processEntrypoint', entrypoint, undefined, null);
+    } catch (e) {
+      if (isAborted(e) && entrypoint.supersededWith) {
+        // Abort processing of this entrypoint and continue with the next one
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      throw e;
+    }
+  } while (entrypoint.supersededWith);
 
   // File is ignored or does not contain any tags. Return original code.
   if (!entrypoint.hasLinariaMetadata()) {
@@ -53,7 +60,7 @@ export function* workflow(
     'evalFile',
     entrypoint,
     undefined,
-    abortSignal
+    null
   );
 
   if (evalStageResult === null) {
@@ -73,7 +80,7 @@ export function* workflow(
     {
       valueCache,
     },
-    abortSignal
+    null
   );
 
   if (!collectStageResult.metadata) {
@@ -91,7 +98,7 @@ export function* workflow(
     {
       processors: collectStageResult.metadata.processors,
     },
-    abortSignal
+    null
   );
 
   return {
@@ -105,13 +112,3 @@ export function* workflow(
     sourceMap: collectStageResult.map,
   };
 }
-
-workflow.recover = (e: unknown, action: IWorkflowAction): YieldArg => {
-  if (isAborted(e) && action.entrypoint.supersededWith) {
-    action.entrypoint.log('aborting processing');
-    return ['workflow', action.entrypoint.supersededWith, undefined, null];
-  }
-
-  action.entrypoint.log(`Unhandled error: %O`, e);
-  throw e;
-};

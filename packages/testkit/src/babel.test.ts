@@ -3090,6 +3090,23 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should work with short-circuit imports', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { css } from "@linaria/core";
+        import { stringConstant } from "./__fixtures__/self-import";
+
+        export const StyledTitle = css\`
+          content: "${'${stringConstant}'}";
+        \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   xit('should shake out side effect because its definition uses DOM API', async () => {
     const { code, metadata } = await transform(
       dedent`
