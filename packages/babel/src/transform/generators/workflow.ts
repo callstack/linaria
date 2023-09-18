@@ -10,7 +10,7 @@ export function* workflow(
   this: IWorkflowAction
 ): SyncScenarioForAction<IWorkflowAction> {
   const { cache, options } = this.services;
-  let { entrypoint } = this;
+  const { entrypoint } = this;
 
   if (entrypoint.ignored) {
     return {
@@ -19,26 +19,24 @@ export function* workflow(
     };
   }
 
-  let originalCode: string = '';
-
-  do {
-    entrypoint = entrypoint.supersededWith ?? entrypoint;
-    originalCode = entrypoint.loadedAndParsed.code ?? '';
-
-    // *** 1st stage ***
-
-    try {
-      yield* this.getNext('processEntrypoint', entrypoint, undefined, null);
-    } catch (e) {
-      if (isAborted(e) && entrypoint.supersededWith) {
-        // Abort processing of this entrypoint and continue with the next one
-        // eslint-disable-next-line no-continue
-        continue;
-      }
-
-      throw e;
+  try {
+    yield* this.getNext('processEntrypoint', entrypoint, undefined, null);
+    entrypoint.assertNotSuperseded();
+  } catch (e) {
+    if (isAborted(e) && entrypoint.supersededWith) {
+      entrypoint.log('workflow aborted, schedule the next attempt');
+      return yield* this.getNext(
+        'workflow',
+        entrypoint.supersededWith,
+        undefined,
+        null
+      );
     }
-  } while (entrypoint.supersededWith);
+
+    throw e;
+  }
+
+  const originalCode = entrypoint.loadedAndParsed.code ?? '';
 
   // File is ignored or does not contain any tags. Return original code.
   if (!entrypoint.hasLinariaMetadata()) {

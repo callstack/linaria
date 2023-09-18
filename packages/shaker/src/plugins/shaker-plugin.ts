@@ -142,7 +142,7 @@ export default function shakerPlugin(
         'import-and-exports',
         [
           `imports: ${collected.imports.length} (side-effects: ${sideEffectImports.length})`,
-          `exports: ${collected.exports.length}`,
+          `exports: ${Object.values(collected.exports).length}`,
           `reexports: ${collected.reexports.length}`,
         ].join(', ')
       );
