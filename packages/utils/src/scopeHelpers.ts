@@ -186,7 +186,38 @@ const getPathFromAction = (action: RemoveAction | ReplaceAction) => {
   throw new Error(`Unknown action type: ${action[0]}`);
 };
 
+function isPrototypeAssignment(path: NodePath) {
+  if (!path.isAssignmentExpression()) {
+    return false;
+  }
+
+  const { left } = path.node;
+  if (!left) {
+    return false;
+  }
+
+  if (left.type !== 'MemberExpression') {
+    return false;
+  }
+
+  const { object, property } = left;
+  if (!object || !property) {
+    return false;
+  }
+
+  return (
+    object.type === 'MemberExpression' &&
+    object.property.type === 'Identifier' &&
+    object.property.name === 'prototype'
+  );
+}
+
 function canFunctionBeDelete(fnPath: NodePath<FunctionNode>) {
+  if (isPrototypeAssignment(fnPath.parentPath)) {
+    // It is a prototype assignment, we can't delete it since we can't find all usages
+    return false;
+  }
+
   const fnScope = fnPath.scope;
   const parentScope = fnScope.parent;
   if (parentScope.parent) {
@@ -494,6 +525,12 @@ function removeWithRelated(paths: NodePath[]) {
     .reduce(
       (acc, i) => [...acc, ...i.referencePaths.filter(nonType)],
       [] as NodePath[]
+    )
+    .filter(
+      (ref) =>
+        // Do not remove `export default function`
+        !ref.isExportDefaultDeclaration() ||
+        !ref.get('declaration').isFunctionDeclaration()
     );
 
   actions.forEach(applyAction);
