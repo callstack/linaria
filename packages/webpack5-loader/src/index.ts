@@ -66,13 +66,14 @@ const webpack5Loader: Loader = function webpack5LoaderPlugin(
   } = this.getOptions() || {};
 
   const outputFileName = this.resourcePath.replace(/\.[^.]+$/, extension);
+  const resolveModule = this.getResolve({ dependencyType: 'esm' });
 
   const asyncResolve = (token: string, importer: string): Promise<string> => {
     const context = path.isAbsolute(importer)
       ? path.dirname(importer)
       : path.join(process.cwd(), path.dirname(importer));
     return new Promise((resolve, reject) => {
-      this.resolve(context, token, (err, result) => {
+      resolveModule(context, token, (err, result) => {
         if (err) {
           reject(err);
         } else if (result) {
