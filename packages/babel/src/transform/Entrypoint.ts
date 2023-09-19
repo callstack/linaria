@@ -20,22 +20,23 @@ import type { Services, ActionTypes, ActionQueueItem } from './types';
 
 const EMPTY_FILE = '=== empty file ===';
 
-function ancestorOrSelf(
+function hasLoop(
   name: string,
-  parent: ParentEntrypoint
-): ParentEntrypoint | null {
-  if (parent.name === name) {
-    return parent;
+  parent: ParentEntrypoint,
+  processed: string[] = []
+): boolean {
+  if (parent.name === name || processed.includes(parent.name)) {
+    return true;
   }
 
   for (const p of parent.parent) {
-    const found = ancestorOrSelf(name, p);
+    const found = hasLoop(name, p, [...processed, parent.name]);
     if (found) {
       return found;
     }
   }
 
-  return null;
+  return false;
 }
 
 export class Entrypoint extends BaseEntrypoint {
@@ -215,12 +216,12 @@ export class Entrypoint extends BaseEntrypoint {
     }
 
     if (!changed && cached && !cached.evaluated) {
-      const isLoop = parent && ancestorOrSelf(name, parent) !== null;
+      const isLoop = parent && hasLoop(name, parent);
       if (isLoop) {
         parent.log('[createEntrypoint] %s is a loop', name);
       }
 
-      if (parent && !cached.parent.includes(parent)) {
+      if (parent && !cached.parent.map((p) => p.name).includes(parent.name)) {
         cached.parent.push(parent);
       }
 
