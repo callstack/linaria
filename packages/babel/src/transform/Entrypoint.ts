@@ -20,14 +20,19 @@ import type { Services, ActionTypes, ActionQueueItem } from './types';
 
 const EMPTY_FILE = '=== empty file ===';
 
-function ancestorOrSelf(name: string, parent: ParentEntrypoint) {
-  let next = parent;
-  while (next) {
-    if (next.name === name) {
-      return next;
-    }
+function ancestorOrSelf(
+  name: string,
+  parent: ParentEntrypoint
+): ParentEntrypoint | null {
+  if (parent.name === name) {
+    return parent;
+  }
 
-    next = next.parent;
+  for (const p of parent.parent) {
+    const found = ancestorOrSelf(name, p);
+    if (found) {
+      return found;
+    }
   }
 
   return null;
@@ -54,7 +59,7 @@ export class Entrypoint extends BaseEntrypoint {
 
   private constructor(
     services: Services,
-    parent: ParentEntrypoint,
+    parent: ParentEntrypoint[],
     public readonly initialCode: string | undefined,
     name: string,
     only: string[],
@@ -77,7 +82,7 @@ export class Entrypoint extends BaseEntrypoint {
         services,
         name,
         initialCode,
-        parent?.log ?? services.log,
+        parent[0]?.log ?? services.log,
         pluginOptions
       );
 
@@ -145,7 +150,7 @@ export class Entrypoint extends BaseEntrypoint {
    */
   protected static create(
     services: Services,
-    parent: ParentEntrypoint,
+    parent: ParentEntrypoint | null,
     name: string,
     only: string[],
     loadedCode: string | undefined,
@@ -180,7 +185,7 @@ export class Entrypoint extends BaseEntrypoint {
 
   private static innerCreate(
     services: Services,
-    parent: ParentEntrypoint,
+    parent: ParentEntrypoint | null,
     name: string,
     only: string[],
     loadedCode: string | undefined,
@@ -215,6 +220,10 @@ export class Entrypoint extends BaseEntrypoint {
         parent.log('[createEntrypoint] %s is a loop', name);
       }
 
+      if (parent && !cached.parent.includes(parent)) {
+        cached.parent.push(parent);
+      }
+
       if (isSuperSet(cached.only, mergedOnly)) {
         cached.log('is cached', name);
         return [isLoop ? 'loop' : 'cached', cached];
@@ -231,7 +240,7 @@ export class Entrypoint extends BaseEntrypoint {
 
     const newEntrypoint = new Entrypoint(
       services,
-      parent,
+      parent ? [parent] : [],
       loadedCode,
       name,
       mergedOnly,

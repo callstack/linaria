@@ -161,11 +161,11 @@ export abstract class BaseEntrypoint {
     public readonly generation: number,
     public readonly name: string,
     public readonly only: string[],
-    public readonly parent: ParentEntrypoint
+    public readonly parent: ParentEntrypoint[]
   ) {
     this.idx = getIdx(name);
     this.log =
-      parent?.log.extend(this.ref, '->') ?? services.log.extend(this.ref);
+      parent[0]?.log.extend(this.ref, '->') ?? services.log.extend(this.ref);
 
     let isExportsInherited = false;
     if (exports) {
@@ -189,7 +189,7 @@ export abstract class BaseEntrypoint {
       idx: this.idx,
       isExportsInherited,
       only,
-      parentId: parent?.seqId ?? null,
+      parentId: parent[0]?.seqId ?? null,
       type: 'created',
     });
   }

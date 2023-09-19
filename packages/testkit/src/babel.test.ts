@@ -3325,5 +3325,30 @@ describe('strategy shaker', () => {
         expect(metadata).toMatchSnapshot();
       }
     });
+
+    it('loop in evaluated files', async () => {
+      const cache = new TransformCacheCollection();
+
+      await expect(() =>
+        Promise.all(
+          ['AB', 'BA'].map((token) =>
+            transform(
+              dedent`
+              import { styled } from '@linaria/react';
+              import { ${token} } from "./__fixtures__/loop/${token.toLowerCase()}";
+
+              export const H1${token} = styled.h1\`
+                color: ${`\${${token}}`};
+              \`
+            `,
+              [evaluator],
+              cache,
+              emitter,
+              token
+            )
+          )
+        )
+      ).rejects.toThrowError(/reading 'toLowerCase'/);
+    });
   });
 });
