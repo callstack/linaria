@@ -246,14 +246,51 @@ function importFromVariableDeclarator(
   return [];
 }
 
+const findIIFE = (path: NodePath): NodePath<CallExpression> | null => {
+  if (path.isCallExpression() && path.get('callee').isFunctionExpression()) {
+    return path;
+  }
+
+  if (!path.parentPath) {
+    return null;
+  }
+
+  return findIIFE(path.parentPath);
+};
+
 function exportFromVariableDeclarator(
   path: NodePath<VariableDeclarator>
 ): Exports {
   const id = path.get('id');
   const init = path.get('init');
 
-  // If there is no init expression, we can ignore this export
-  if (!init || !init.isExpression()) return {};
+  // If there is no init and id is an identifier, we should find IIFE
+  if (!init.node && id.isIdentifier()) {
+    const binding = getScope(path).getBinding(id.node.name);
+    if (!binding) {
+      return {};
+    }
+
+    const iife = [
+      ...binding.referencePaths,
+      ...binding.constantViolations,
+      binding.path,
+    ]
+      .map(findIIFE)
+      .find(isNotNull);
+
+    if (!iife) {
+      return {};
+    }
+
+    return {
+      [id.node.name]: iife,
+    };
+  }
+
+  if (!init || !init.isExpression()) {
+    return {};
+  }
 
   if (id.isIdentifier()) {
     // It is `export const a = 1;`

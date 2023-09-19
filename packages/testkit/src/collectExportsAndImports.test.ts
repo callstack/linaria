@@ -22,6 +22,14 @@ function typescriptCommonJS(source: string): string {
   return result.outputText;
 }
 
+function typescriptES2022(source: string): string {
+  const result = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.ES2022 },
+  });
+
+  return result.outputText;
+}
+
 const withoutLocal = <T extends { local: NodePath }>({
   local,
   ...obj
@@ -103,6 +111,7 @@ const compilers: [name: string, compiler: (code: string) => string][] = [
   ['swcCommonJSes5', swcCommonJS('es5')],
   ['swcCommonJSes2015', swcCommonJS('es2015')],
   ['typescriptCommonJS', typescriptCommonJS],
+  ['typescriptES2022', typescriptES2022],
 ];
 
 function runWithCompiler(
