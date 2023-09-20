@@ -14,7 +14,7 @@ describe('createEntrypoint', () => {
     expect(entrypoint).toMatchObject({
       name: '/foo/bar.js',
       only: ['default'],
-      parent: null,
+      parents: [],
     });
   });
 

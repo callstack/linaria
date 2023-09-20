@@ -35,7 +35,7 @@ export type ParentEntrypoint = {
   evaluated: boolean;
   log: Debugger;
   name: string;
-  parent: ParentEntrypoint[];
+  parents: ParentEntrypoint[];
   seqId: number;
 };
 

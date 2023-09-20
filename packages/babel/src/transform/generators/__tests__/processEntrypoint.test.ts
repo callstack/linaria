@@ -44,7 +44,7 @@ describe('processEntrypoint', () => {
     expectIteratorReturnResult(gen.next(), undefined);
   });
 
-  it('should abort previously emitted actions if entrypoint was superseded', () => {
+  it('should abort previously emitted actions if entrypoint was superseded and emit a new processEntrypoint', () => {
     const fooBarDefault = createEntrypoint(services, '/foo/bar.js', [
       'default',
     ]);
@@ -68,14 +68,16 @@ describe('processEntrypoint', () => {
       false,
     ]);
 
-    createEntrypoint(services, '/foo/bar.js', ['named']);
+    const supersededWith = createEntrypoint(services, '/foo/bar.js', ['named']);
     expect(emittedSignals.map((signal) => signal?.aborted)).toEqual([
       true,
       true,
     ]);
 
-    expect(() => gen.next()).toThrow(/superseded/);
-    expectIteratorReturnResult(gen.next(), undefined);
+    const nextResult = gen.next();
+    expectIteratorYieldResult(nextResult);
+    expect(nextResult.value[0]).toBe('processEntrypoint');
+    expect(nextResult.value[1]).toBe(supersededWith);
   });
 
   it('should abort previously emitted actions if parent aborts', () => {
