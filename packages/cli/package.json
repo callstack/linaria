@@ -36,10 +36,13 @@
   },
   "dependencies": {
     "@babel/core": "^7.22.15",
+    "@discoveryjs/cli": "^2.6.0",
+    "@discoveryjs/discovery": "1.0.0-beta.78",
     "@linaria/babel-preset": "workspace:^",
     "@linaria/utils": "workspace:^",
     "glob": "^7.1.3",
     "mkdirp": "^0.5.1",
+    "n-readlines": "^1.0.1",
     "normalize-path": "^3.0.0",
     "yargs": "^17.5.0"
   },

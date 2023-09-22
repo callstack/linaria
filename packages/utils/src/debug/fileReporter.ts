@@ -111,8 +111,8 @@ export const createFileReporter = (
     path.join(options.dir, 'dependencies.jsonl')
   );
 
-  const entrypointStream = createWriteStream(
-    path.join(options.dir, 'entrypoint.jsonl')
+  const entrypointsStream = createWriteStream(
+    path.join(options.dir, 'entrypoints.jsonl')
   );
 
   const startedAt = performance.now();
@@ -205,7 +205,7 @@ export const createFileReporter = (
     timestamp,
     event
   ) => {
-    entrypointStream.write(
+    entrypointsStream.write(
       `${JSON.stringify([emitterId, timestamp, event])}\n`
     );
   };
