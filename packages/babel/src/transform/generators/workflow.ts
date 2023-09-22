@@ -1,9 +1,5 @@
 import { isAborted } from '../actions/AbortError';
-import type {
-  IWorkflowAction,
-  SyncScenarioForAction,
-  YieldArg,
-} from '../types';
+import type { IWorkflowAction, SyncScenarioForAction } from '../types';
 
 /**
  * The entry point for file processing. Sequentially calls `processEntrypoint`,
@@ -23,15 +19,24 @@ export function* workflow(
     };
   }
 
-  entrypoint.assertNotSuperseded();
+  try {
+    yield* this.getNext('processEntrypoint', entrypoint, undefined, null);
+    entrypoint.assertNotSuperseded();
+  } catch (e) {
+    if (isAborted(e) && entrypoint.supersededWith) {
+      entrypoint.log('workflow aborted, schedule the next attempt');
+      return yield* this.getNext(
+        'workflow',
+        entrypoint.supersededWith,
+        undefined,
+        null
+      );
+    }
 
-  using abortSignal = null;
-  const { code: originalCode = '' } = entrypoint.loadedAndParsed;
+    throw e;
+  }
 
-  // *** 1st stage ***
-
-  yield* this.getNext('processEntrypoint', entrypoint, undefined, abortSignal);
-  entrypoint.assertNotSuperseded();
+  const originalCode = entrypoint.loadedAndParsed.code ?? '';
 
   // File is ignored or does not contain any tags. Return original code.
   if (!entrypoint.hasLinariaMetadata()) {
@@ -53,7 +58,7 @@ export function* workflow(
     'evalFile',
     entrypoint,
     undefined,
-    abortSignal
+    null
   );
 
   if (evalStageResult === null) {
@@ -73,7 +78,7 @@ export function* workflow(
     {
       valueCache,
     },
-    abortSignal
+    null
   );
 
   if (!collectStageResult.metadata) {
@@ -91,7 +96,7 @@ export function* workflow(
     {
       processors: collectStageResult.metadata.processors,
     },
-    abortSignal
+    null
   );
 
   return {
@@ -105,13 +110,3 @@ export function* workflow(
     sourceMap: collectStageResult.map,
   };
 }
-
-workflow.recover = (e: unknown, action: IWorkflowAction): YieldArg => {
-  if (isAborted(e) && action.entrypoint.supersededWith) {
-    action.entrypoint.log('aborting processing');
-    return ['workflow', action.entrypoint.supersededWith, undefined, null];
-  }
-
-  action.entrypoint.log(`Unhandled error: %O`, e);
-  throw e;
-};

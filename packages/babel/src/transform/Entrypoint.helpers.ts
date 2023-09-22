@@ -227,10 +227,10 @@ export function getStack(entrypoint: ParentEntrypoint) {
 
   const stack = [entrypoint.name];
 
-  let { parent } = entrypoint;
-  while (parent) {
-    stack.push(parent.name);
-    parent = parent.parent;
+  let { parents } = entrypoint;
+  while (parents.length) {
+    stack.push(parents[0].name);
+    parents = parents[0].parents;
   }
 
   return stack;

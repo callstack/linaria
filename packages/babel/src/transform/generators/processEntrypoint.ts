@@ -1,9 +1,5 @@
 import { isAborted } from '../actions/AbortError';
-import type {
-  IProcessEntrypointAction,
-  SyncScenarioForAction,
-  YieldArg,
-} from '../types';
+import type { IProcessEntrypointAction, SyncScenarioForAction } from '../types';
 
 /**
  * The first stage of processing an entrypoint.
@@ -16,41 +12,38 @@ export function* processEntrypoint(
   this: IProcessEntrypointAction
 ): SyncScenarioForAction<IProcessEntrypointAction> {
   const { only, log } = this.entrypoint;
-  log('start processing (only: %s)', only);
+  log('start processing (only: %o)', only);
 
-  this.entrypoint.assertNotSuperseded();
+  try {
+    using abortSignal = this.createAbortSignal();
 
-  using abortSignal = this.createAbortSignal();
-
-  yield ['explodeReexports', this.entrypoint, undefined, abortSignal];
-  const result = yield* this.getNext(
-    'transform',
-    this.entrypoint,
-    undefined,
-    abortSignal
-  );
-
-  this.entrypoint.setTransformResult(result);
-
-  this.entrypoint.assertNotSuperseded();
-
-  log('entrypoint processing finished');
-}
-
-processEntrypoint.recover = (
-  e: unknown,
-  action: IProcessEntrypointAction
-): YieldArg => {
-  if (isAborted(e) && action.entrypoint.supersededWith) {
-    action.entrypoint.log('aborting processing');
-    return [
-      'processEntrypoint',
-      action.entrypoint.supersededWith,
+    yield ['explodeReexports', this.entrypoint, undefined, abortSignal];
+    const result = yield* this.getNext(
+      'transform',
+      this.entrypoint,
       undefined,
-      null,
-    ];
-  }
+      abortSignal
+    );
 
-  action.entrypoint.log(`Unhandled error: %O`, e);
-  throw e;
-};
+    this.entrypoint.assertNotSuperseded();
+
+    this.entrypoint.setTransformResult(result);
+
+    log('entrypoint processing finished');
+  } catch (e) {
+    if (isAborted(e) && this.entrypoint.supersededWith) {
+      log('processing aborted, schedule the next attempt');
+      yield* this.getNext(
+        'processEntrypoint',
+        this.entrypoint.supersededWith,
+        undefined,
+        null
+      );
+
+      return;
+    }
+
+    log(`Unhandled error: %O`, e);
+    throw e;
+  }
+}

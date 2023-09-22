@@ -20,17 +20,23 @@ import type { Services, ActionTypes, ActionQueueItem } from './types';
 
 const EMPTY_FILE = '=== empty file ===';
 
-function ancestorOrSelf(name: string, parent: ParentEntrypoint) {
-  let next = parent;
-  while (next) {
-    if (next.name === name) {
-      return next;
-    }
-
-    next = next.parent;
+function hasLoop(
+  name: string,
+  parent: ParentEntrypoint,
+  processed: string[] = []
+): boolean {
+  if (parent.name === name || processed.includes(parent.name)) {
+    return true;
   }
 
-  return null;
+  for (const p of parent.parents) {
+    const found = hasLoop(name, p, [...processed, parent.name]);
+    if (found) {
+      return found;
+    }
+  }
+
+  return false;
 }
 
 export class Entrypoint extends BaseEntrypoint {
@@ -54,7 +60,7 @@ export class Entrypoint extends BaseEntrypoint {
 
   private constructor(
     services: Services,
-    parent: ParentEntrypoint,
+    parents: ParentEntrypoint[],
     public readonly initialCode: string | undefined,
     name: string,
     only: string[],
@@ -69,7 +75,7 @@ export class Entrypoint extends BaseEntrypoint {
     protected readonly dependencies = new Map<string, IEntrypointDependency>(),
     generation = 1
   ) {
-    super(services, evaluatedOnly, exports, generation, name, only, parent);
+    super(services, evaluatedOnly, exports, generation, name, only, parents);
 
     this.loadedAndParsed =
       loadedAndParsed ??
@@ -77,7 +83,7 @@ export class Entrypoint extends BaseEntrypoint {
         services,
         name,
         initialCode,
-        parent?.log ?? services.log,
+        parents[0]?.log ?? services.log,
         pluginOptions
       );
 
@@ -145,7 +151,7 @@ export class Entrypoint extends BaseEntrypoint {
    */
   protected static create(
     services: Services,
-    parent: ParentEntrypoint,
+    parent: ParentEntrypoint | null,
     name: string,
     only: string[],
     loadedCode: string | undefined,
@@ -160,7 +166,7 @@ export class Entrypoint extends BaseEntrypoint {
               evaluated: parent.evaluated,
               log: parent.log,
               name: parent.name,
-              parent: parent.parent,
+              parents: parent.parents,
               seqId: parent.seqId,
             }
           : null,
@@ -180,7 +186,7 @@ export class Entrypoint extends BaseEntrypoint {
 
   private static innerCreate(
     services: Services,
-    parent: ParentEntrypoint,
+    parent: ParentEntrypoint | null,
     name: string,
     only: string[],
     loadedCode: string | undefined,
@@ -210,9 +216,13 @@ export class Entrypoint extends BaseEntrypoint {
     }
 
     if (!changed && cached && !cached.evaluated) {
-      const isLoop = parent && ancestorOrSelf(name, parent) !== null;
+      const isLoop = parent && hasLoop(name, parent);
       if (isLoop) {
         parent.log('[createEntrypoint] %s is a loop', name);
+      }
+
+      if (parent && !cached.parents.map((p) => p.name).includes(parent.name)) {
+        cached.parents.push(parent);
       }
 
       if (isSuperSet(cached.only, mergedOnly)) {
@@ -231,7 +241,7 @@ export class Entrypoint extends BaseEntrypoint {
 
     const newEntrypoint = new Entrypoint(
       services,
-      parent,
+      parent ? [parent] : [],
       loadedCode,
       name,
       mergedOnly,
@@ -341,7 +351,7 @@ export class Entrypoint extends BaseEntrypoint {
       this.generation + 1,
       this.name,
       this.only,
-      this.parent
+      this.parents
     );
   }
 
@@ -391,7 +401,7 @@ export class Entrypoint extends BaseEntrypoint {
         ? newOnlyOrEntrypoint
         : new Entrypoint(
             this.services,
-            this.parent,
+            this.parents,
             this.initialCode,
             this.name,
             newOnlyOrEntrypoint,

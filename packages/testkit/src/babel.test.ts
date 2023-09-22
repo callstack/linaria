@@ -3090,6 +3090,23 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should work with short-circuit imports', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { css } from "@linaria/core";
+        import { stringConstant } from "./__fixtures__/self-import";
+
+        export const StyledTitle = css\`
+          content: "${'${stringConstant}'}";
+        \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   xit('should shake out side effect because its definition uses DOM API', async () => {
     const { code, metadata } = await transform(
       dedent`
@@ -3307,6 +3324,31 @@ describe('strategy shaker', () => {
         expect(code).toMatchSnapshot();
         expect(metadata).toMatchSnapshot();
       }
+    });
+
+    it('loop in evaluated files', async () => {
+      const cache = new TransformCacheCollection();
+
+      await expect(() =>
+        Promise.all(
+          ['AB', 'BA'].map((token) =>
+            transform(
+              dedent`
+              import { styled } from '@linaria/react';
+              import { ${token} } from "./__fixtures__/loop/${token.toLowerCase()}";
+
+              export const H1${token} = styled.h1\`
+                color: ${`\${${token}}`};
+              \`
+            `,
+              [evaluator],
+              cache,
+              emitter,
+              token
+            )
+          )
+        )
+      ).rejects.toThrowError(/reading 'toLowerCase'/);
     });
   });
 });

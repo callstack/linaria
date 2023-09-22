@@ -1095,6 +1095,14 @@ function collectFromExportNamedDeclaration(
       state.exports[id.node.name] = id;
     }
   }
+
+  if (declaration.isClassDeclaration()) {
+    const id = declaration.get('id');
+    if (id.isIdentifier()) {
+      // eslint-disable-next-line no-param-reassign
+      state.exports[id.node.name] = id;
+    }
+  }
 }
 
 function collectFromExportDefaultDeclaration(

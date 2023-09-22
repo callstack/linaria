@@ -604,6 +604,18 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
       ]);
     });
 
+    it('class', () => {
+      const { exports } = run`
+        export class Foo {}
+      `;
+
+      expect(exports).toMatchObject([
+        {
+          exported: 'Foo',
+        },
+      ]);
+    });
+
     it('with destruction', () => {
       const { exports } = run`
         const obj = { a: 1, b: 2 };

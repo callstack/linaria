@@ -2635,6 +2635,20 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker should work with short-circuit imports 1`] = `"export const StyledTitle = "StyledTitle_s13jq05";"`;
+
+exports[`strategy shaker should work with short-circuit imports 2`] = `
+
+CSS:
+
+.StyledTitle_s13jq05 {
+  content: "2a";
+}
+
+Dependencies: ./__fixtures__/self-import
+
+`;
+
 exports[`strategy shaker should work with wildcard imports 1`] = `"export const square = "square_s13jq05";"`;
 
 exports[`strategy shaker should work with wildcard imports 2`] = `
