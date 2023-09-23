@@ -250,7 +250,7 @@ class Module {
       evaluatedCreated = true;
     }
 
-    const source = entrypoint.transformedCode;
+    const { transformedCode: source, pluginOptions } = entrypoint;
 
     if (!source) {
       this.debug(`evaluate`, 'there is nothing to evaluate');
@@ -277,14 +277,15 @@ class Module {
 
     const { context, teardown } = createVmContext(
       filename,
-      entrypoint.pluginOptions.features,
+      pluginOptions.features,
       {
         module: this,
         exports: entrypoint.exports,
         require: this.require,
         __linaria_dynamic_import: async (id: string) => this.require(id),
         __dirname: path.dirname(filename),
-      }
+      },
+      pluginOptions.overrideContext
     );
 
     try {
