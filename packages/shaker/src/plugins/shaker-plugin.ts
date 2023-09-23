@@ -59,6 +59,10 @@ function getBindingForExport(exportPath: NodePath): Binding | undefined {
     }
   }
 
+  if (exportPath.isFunctionDeclaration() || exportPath.isClassDeclaration()) {
+    return exportPath.scope.getBinding(exportPath.node.id!.name);
+  }
+
   return undefined;
 }
 

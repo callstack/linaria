@@ -17,6 +17,7 @@ const isGlobal = (id: NodePath<Identifier>): boolean => {
 };
 
 const forbiddenGlobals = new Set([
+  '$RefreshReg$',
   'XMLHttpRequest',
   'clearImmediate',
   'clearInterval',
