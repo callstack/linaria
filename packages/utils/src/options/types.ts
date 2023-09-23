@@ -1,3 +1,5 @@
+import type { Context as VmContext } from 'vm';
+
 import type { TransformOptions } from '@babel/core';
 import type { File } from '@babel/types';
 
@@ -68,6 +70,10 @@ export type StrictOptions = {
   features: FeatureFlags;
   highPriorityPlugins: string[];
   ignore?: RegExp;
+  overrideContext?: (
+    context: Partial<VmContext>,
+    filename: string
+  ) => Partial<VmContext>;
   rules: EvalRule[];
   tagResolver?: (source: string, tag: string) => string | null;
   variableNameConfig?: 'var' | 'dashes' | 'raw';

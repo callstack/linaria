@@ -37,11 +37,10 @@ const createServices = (partial: Partial<Services>): Services => {
 const filename = path.resolve(__dirname, './__fixtures__/test.js');
 
 const options: StrictOptions = {
+  babelOptions: {},
   displayName: false,
   evaluate: true,
   extensions: ['.cjs', '.js', '.jsx', '.ts', '.tsx'],
-  rules: [],
-  babelOptions: {},
   features: {
     dangerousCodeRemover: true,
     globalCache: true,
@@ -49,6 +48,11 @@ const options: StrictOptions = {
     softErrors: false,
   },
   highPriorityPlugins: [],
+  overrideContext: (context) => ({
+    ...context,
+    HighLevelAPI: () => "I'm a high level API",
+  }),
+  rules: [],
 };
 
 const createEntrypoint = (
@@ -294,6 +298,16 @@ it("doesn't have access to the process object", () => {
   `;
 
   expect(() => mod.evaluate()).toThrow('process.abort is not a function');
+});
+
+it('has access to a overridden context', () => {
+  const { mod } = create`
+    module.exports = HighLevelAPI();
+  `;
+
+  safeEvaluate(mod);
+
+  expect(mod.exports).toBe("I'm a high level API");
 });
 
 it('has access to NODE_ENV', () => {

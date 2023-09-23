@@ -175,6 +175,20 @@ module.exports = {
   - `unit` - the unit.
   - `valueSlug` - the value slug.
 
+
+- `overrideContext: (context: Partial<vm.Context>, filename: string) => Partial<vm.Context>`
+
+  A custom function to override the context used to evaluate modules. This can be used to add custom globals or override the default ones.
+    
+  ```js
+  module.exports = {
+    overrideContext: (context, filename) => ({
+      ...context,
+      HighLevelAPI: () => "I'm a high level API",
+    }),
+  };
+  ```
+
 - `rules: EvalRule[]`
 
   The set of rules that defines how the matched files will be transformed during the evaluation.

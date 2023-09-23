@@ -2,7 +2,7 @@ import * as vm from 'vm';
 
 import type { Window } from 'happy-dom';
 
-import type { FeatureFlags } from '@linaria/utils';
+import type { FeatureFlags, StrictOptions } from '@linaria/utils';
 import { isFeatureEnabled } from '@linaria/utils';
 
 import * as process from './process';
@@ -72,17 +72,24 @@ function createNothing() {
 export function createVmContext(
   filename: string,
   features: FeatureFlags<'happyDOM'>,
-  additionalContext: Partial<vm.Context>
+  additionalContext: Partial<vm.Context>,
+  overrideContext: StrictOptions['overrideContext'] = (i) => i
 ) {
   const isHappyDOMEnabled = isFeatureEnabled(features, 'happyDOM', filename);
 
   const { teardown, window } = isHappyDOMEnabled
     ? createHappyDOMWindow()
     : createNothing();
-  const baseContext = createBaseContext(window, {
-    __filename: filename,
-    ...additionalContext,
-  });
+  const baseContext = createBaseContext(
+    window,
+    overrideContext(
+      {
+        __filename: filename,
+        ...additionalContext,
+      },
+      filename
+    )
+  );
 
   const context = vm.createContext(baseContext);
 
