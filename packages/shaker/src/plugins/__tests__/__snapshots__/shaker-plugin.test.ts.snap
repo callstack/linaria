@@ -50,6 +50,12 @@ exports[`shaker should keep side-effects from modules 1`] = `
 export const a = 1;"
 `;
 
+exports[`shaker should not remove referenced export 1`] = `
+"export default class Media {}
+const _c = Media;
+export const __linariaPreval = {};"
+`;
+
 exports[`shaker should process array patterns 1`] = `
 "const [,, c] = array;
 export { c };"

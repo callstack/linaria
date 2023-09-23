@@ -435,4 +435,16 @@ describe('shaker', () => {
     expect(code).toMatchSnapshot();
     expect(metadata.imports.size).toBe(0);
   });
+
+  it('should not remove referenced export', () => {
+    const { code, metadata } = keep(['__linariaPreval'])`
+      export default class Media {
+      }
+      const _c = Media;
+      export const __linariaPreval = {};
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
+  });
 });
