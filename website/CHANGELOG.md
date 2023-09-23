@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.0.1
+
+### Patch Changes
+
+- @linaria/atomic@5.0.1
+- @linaria/core@5.0.1
+- @linaria/react@5.0.1
+
 ## 5.0.0
 
 ### Major Changes

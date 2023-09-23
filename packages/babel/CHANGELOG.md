@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.0.1
+
+### Patch Changes
+
+- 6fb6eb69: The new option, 'overrideContext,' allows the extension of the module evaluation context.
+- Updated dependencies [6fb6eb69]
+  - @linaria/shaker@5.0.1
+  - @linaria/utils@5.0.1
+  - @linaria/core@5.0.1
+  - @linaria/tags@5.0.1
+
 ## 5.0.0
 
 ### Major Changes

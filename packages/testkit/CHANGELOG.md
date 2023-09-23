@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.0.1
+
+### Patch Changes
+
+- Updated dependencies [6fb6eb69]
+- Updated dependencies [6fb6eb69]
+  - @linaria/babel-preset@5.0.1
+  - @linaria/shaker@5.0.1
+  - @linaria/react@5.0.1
+  - @linaria/tags@5.0.1
+
 ## 5.0.0
 
 ### Major Changes
