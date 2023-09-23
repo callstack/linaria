@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.0.1
+
+### Patch Changes
+
+- 6fb6eb69: Fixes error with $RefreshReg$ in webpack and resolves the issue with the shaker when default export is a function or class definition.
+- Updated dependencies [6fb6eb69]
+  - @linaria/utils@5.0.1
+
 ## 5.0.0
 
 ### Major Changes

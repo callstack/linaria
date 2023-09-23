@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.0.1
+
+### Patch Changes
+
+- Updated dependencies [6fb6eb69]
+  - @linaria/utils@5.0.1
+  - @linaria/tags@5.0.1
+
 ## 5.0.0
 
 ### Major Changes

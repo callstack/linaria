@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.0.1
+
+### Patch Changes
+
+- Updated dependencies [6fb6eb69]
+- Updated dependencies [6fb6eb69]
+  - @linaria/babel-preset@5.0.1
+  - @linaria/utils@5.0.1
+  - @linaria/vite@5.0.1
+
 ## 5.0.0
 
 ### Major Changes
