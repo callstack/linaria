@@ -1,5 +1,32 @@
 # Change Log
 
+## 5.0.0
+
+### Major Changes
+
+- 88e07613: Rewritten dependecny tree processing with support for wildcard re-exports.
+- cb853e14: All processing stages were merged into one generators-based processor. It allows the implementation of more complex workflows to support features like dynamic imports and re-exports.
+
+### Minor Changes
+
+- 9cb4143d: Refactoring of the 1st stage of transformation. It opens the road to processing wildcard reexports.
+- ae162f46: babelrc should not be used for preeval transformations (fixes #1308)
+
+### Patch Changes
+
+- b3ef8c1f: fix: add support for params in dynamic imports
+- f8b9bff5: Improved exports finder so it works with pure TS files and better detects transpiled reexports.
+- 63902332: The exports finder didn't support enums that were transpiled to esm by tsc. Fixed.
+- aa100453: In some cases, an asynchronous resolver could cause race conditions. Fixed.
+- 2a1e24a0: Upgrade TypeScript to 5.2
+- 16320d71: Prototype methods assignments cannot be deleted safely, so it is replaced with a dummy function.
+- Updated dependencies [9cb4143d]
+- Updated dependencies [88e07613]
+- Updated dependencies [9bb782d0]
+- Updated dependencies [2a1e24a0]
+- Updated dependencies [cb853e14]
+  - @linaria/logger@5.0.0
+
 ## 4.5.3
 
 ### Patch Changes

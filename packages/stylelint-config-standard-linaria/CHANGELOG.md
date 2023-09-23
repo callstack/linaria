@@ -1,5 +1,25 @@
 # Change Log
 
+## 5.0.0
+
+### Major Changes
+
+- 88e07613: Rewritten dependecny tree processing with support for wildcard re-exports.
+- cb853e14: All processing stages were merged into one generators-based processor. It allows the implementation of more complex workflows to support features like dynamic imports and re-exports.
+
+### Minor Changes
+
+- 9cb4143d: Refactoring of the 1st stage of transformation. It opens the road to processing wildcard reexports.
+
+### Patch Changes
+
+- 2a1e24a0: Upgrade TypeScript to 5.2
+- Updated dependencies [9cb4143d]
+- Updated dependencies [88e07613]
+- Updated dependencies [2a1e24a0]
+- Updated dependencies [cb853e14]
+  - @linaria/postcss-linaria@5.0.0
+
 ## 4.5.1
 
 ### Patch Changes
