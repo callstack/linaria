@@ -8,20 +8,20 @@
 
 
 Timings:
-  Total: 4226ms
+  Total: 8989ms
 
   By method:
-    createEntrypoint: 262ms
-    parseFile: 22ms
-    transform:evaluator: 56ms
-    transform:preeval: 226ms
-    transform:preeval:processTemplate: 87ms
-    transform:preeval:removeDangerousCode: 24ms
+    createEntrypoint: 391ms
+    parseFile: 33ms
+    transform:evaluator: 129ms
+    transform:preeval: 428ms
+    transform:preeval:processTemplate: 176ms
+    transform:preeval:removeDangerousCode: 57ms
 
 Memory usage: {
-  rss: 203096064,
-  heapTotal: 135675904,
-  heapUsed: 102068920,
+  rss: 202878976,
+  heapTotal: 136462336,
+  heapUsed: 102080424,
   external: 3501164,
   arrayBuffers: 1027885
 }
@@ -49,9 +49,9 @@ cacheable modules 148 KiB (javascript) 62.6 KiB (asset) 2.7 KiB (css/mini-extrac
       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Hero.jsx[39m[22m 1.35 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/index.jsx[39m[22m 311 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Container.js[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.76.0 compiled [1m[32msuccessfully[39m[22m in 3800 ms
+webpack 5.76.0 compiled [1m[32msuccessfully[39m[22m in 8396 ms
 
 > linaria-website@4.5.4 build:server /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
 
-Successfully compiled 11 files with Babel (1202ms).
+Successfully compiled 11 files with Babel (2038ms).
