@@ -1,5 +1,12 @@
 # Change Log
 
+## 5.0.2
+
+### Patch Changes
+
+- Updated dependencies [38796a57]
+  - @linaria/babel-preset@5.0.2
+
 ## 5.0.1
 
 ### Patch Changes

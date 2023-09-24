@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.0.2
+
+### Patch Changes
+
+- 38796a57: For some reason, happy-dom setups context with undefined values when it is run on Stackblitz. Fixed with the workaround. (fixes #1345)
+
 ## 5.0.1
 
 ### Patch Changes
