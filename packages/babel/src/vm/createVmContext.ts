@@ -10,7 +10,8 @@ import * as process from './process';
 const NOOP = () => {};
 
 function createWindow(): Window {
-  const HappyWindow = require('happy-dom').Window;
+  const { Window, GlobalWindow } = require('happy-dom');
+  const HappyWindow = GlobalWindow || Window;
   const win = new HappyWindow();
 
   // TODO: browser doesn't expose Buffer, but a lot of dependencies use it
@@ -43,7 +44,7 @@ function createBaseContext(
   baseContext.setInterval = NOOP;
   baseContext.setTimeout = NOOP;
 
-  // eslint-disable-next-line
+  // eslint-disable-next-line guard-for-in,no-restricted-syntax
   for (const key in additionalContext) {
     baseContext[key] = additionalContext[key];
   }
