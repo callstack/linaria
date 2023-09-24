@@ -1,5 +1,12 @@
 # Change Log
 
+## 5.0.2
+
+### Patch Changes
+
+- @linaria/webpack4-loader@5.0.2
+- @linaria/webpack5-loader@5.0.2
+
 ## 5.0.1
 
 ### Patch Changes
