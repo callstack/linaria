@@ -552,11 +552,20 @@ function staticEvaluate(path: NodePath | null | undefined): void {
     }
   }
 
-  if (
-    path.isIfStatement() &&
-    path.get('test').isBooleanLiteral({ value: false })
-  ) {
-    applyAction(['remove', path]);
+  if (path.isIfStatement()) {
+    const test = path.get('test');
+    if (!test.isBooleanLiteral()) {
+      return;
+    }
+
+    const { consequent, alternate } = path.node;
+    if (test.node.value) {
+      applyAction(['replace', path, consequent]);
+    } else if (alternate) {
+      applyAction(['replace', path, alternate]);
+    } else {
+      applyAction(['remove', path]);
+    }
   }
 }
 

@@ -122,4 +122,30 @@ describe('removeDangerousCode', () => {
 
     expect(result).toMatchSnapshot();
   });
+
+  it('should simplify if statement', () => {
+    const result = run`
+      if (typeof window !== 'undefined') {
+        console.log('it is browser');
+      }
+
+      if (typeof window === 'undefined') {
+        console.log('it is not browser');
+      }
+
+      if (typeof window === 'undefined') {
+        console.log('it is not browser');
+      } else {
+        console.log('it is browser');
+      }
+
+      if (typeof window !== 'undefined') {
+        console.log('it is browser');
+      } else {
+        console.log('it is not browser');
+      }
+    `;
+
+    expect(result).toMatchSnapshot();
+  });
 });

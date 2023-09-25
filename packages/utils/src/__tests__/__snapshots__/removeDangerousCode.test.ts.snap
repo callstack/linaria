@@ -11,7 +11,7 @@ export function setVersion(packageName, packageVersion) {
 
 exports[`removeDangerousCode should remove code under is-it-browser checks 1`] = `
 "let method;
-if (true) {
+{
   console.log('it is not browser');
 }
 export function testFn(arg) {
@@ -32,6 +32,18 @@ exports[`removeDangerousCode should replace body of react component with null 1`
 exports[`removeDangerousCode should simplify OR expression 1`] = `
 "export function getHostname(opts) {
   return opts.hostname;
+}"
+`;
+
+exports[`removeDangerousCode should simplify if statement 1`] = `
+"{
+  console.log('it is not browser');
+}
+{
+  console.log('it is not browser');
+}
+{
+  console.log('it is not browser');
 }"
 `;
 
