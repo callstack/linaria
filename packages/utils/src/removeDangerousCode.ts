@@ -3,7 +3,7 @@ import type { Identifier, Program } from '@babel/types';
 
 import { nonType } from './findIdentifiers';
 import { isUnnecessaryReactCall } from './isUnnecessaryReactCall';
-import { removeWithRelated } from './scopeHelpers';
+import { applyAction, removeWithRelated } from './scopeHelpers';
 import JSXElementsRemover from './visitors/JSXElementsRemover';
 
 const isGlobal = (id: NodePath<Identifier>): boolean => {
@@ -16,26 +16,35 @@ const isGlobal = (id: NodePath<Identifier>): boolean => {
   return !scope.hasBinding(name) && scope.hasGlobal(name);
 };
 
+const ssrCheckFields = new Set([
+  'document',
+  'location',
+  'navigator',
+  'sessionStorage',
+  'localStorage',
+  'window',
+]);
+
 const forbiddenGlobals = new Set([
+  ...ssrCheckFields,
   '$RefreshReg$',
   'XMLHttpRequest',
   'clearImmediate',
   'clearInterval',
   'clearTimeout',
-  'document',
   'fetch',
-  'localStorage',
-  'location',
   'navigator',
-  'sessionStorage',
   'setImmediate',
   'setInterval',
   'setTimeout',
-  'window',
 ]);
 
 const isBrowserGlobal = (id: NodePath<Identifier>) => {
   return forbiddenGlobals.has(id.node.name) && isGlobal(id);
+};
+
+const isSSRCheckField = (id: NodePath<Identifier>) => {
+  return ssrCheckFields.has(id.node.name) && isGlobal(id);
 };
 
 const getPropertyName = (path: NodePath): string | null => {
@@ -132,6 +141,24 @@ export const removeDangerousCode = (programPath: NodePath<Program>) => {
         } else if (isGlobal(p)) {
           state.globals.push(p);
         }
+      },
+
+      // Since we can use happy-dom, typical SSR checks may not work as expected.
+      // We need to detect them and replace with an "undefined" literal.
+      UnaryExpression(p) {
+        if (p.node.operator !== 'typeof') {
+          return;
+        }
+        const arg = p.get('argument');
+        if (!arg.isIdentifier() || !isSSRCheckField(arg)) {
+          return;
+        }
+
+        applyAction([
+          'replace',
+          p,
+          { type: 'StringLiteral', value: 'undefined' },
+        ]);
       },
     },
     {

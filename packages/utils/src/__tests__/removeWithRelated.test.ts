@@ -98,7 +98,7 @@ describe('removeWithRelated', () => {
     expect(code).toMatchSnapshot();
   });
 
-  it('should keep logical expression', () => {
+  it('should optimize logical expression', () => {
     const code = run`
       const a = 1;
       /* remove */const b = 2;

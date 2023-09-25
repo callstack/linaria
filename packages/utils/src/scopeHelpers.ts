@@ -279,6 +279,20 @@ export function findActionForNode(
     }
   }
 
+  if (parent.isConditionalExpression()) {
+    if (path.key === 'test') {
+      return ['replace', parent, parent.node.alternate];
+    }
+
+    if (path.key === 'consequent') {
+      return ['replace', path, { type: 'Identifier', name: 'undefined' }];
+    }
+
+    if (path.key === 'alternate') {
+      return ['replace', path, { type: 'Identifier', name: 'undefined' }];
+    }
+  }
+
   if (parent.isLogicalExpression({ operator: '&&' })) {
     return [
       'replace',
@@ -287,6 +301,14 @@ export function findActionForNode(
         type: 'BooleanLiteral',
         value: false,
       },
+    ];
+  }
+
+  if (parent.isLogicalExpression({ operator: '||' })) {
+    return [
+      'replace',
+      parent,
+      path.key === 'left' ? parent.node.right : parent.node.left,
     ];
   }
 
@@ -481,9 +503,77 @@ function removeUnreferenced(items: NodePath<Identifier | JSXIdentifier>[]) {
   return result;
 }
 
+function getNodeForValue(value: unknown): Node | undefined {
+  if (typeof value === 'string') {
+    return {
+      type: 'StringLiteral',
+      value,
+    };
+  }
+
+  if (typeof value === 'number') {
+    return {
+      type: 'NumericLiteral',
+      value,
+    };
+  }
+
+  if (typeof value === 'boolean') {
+    return {
+      type: 'BooleanLiteral',
+      value,
+    };
+  }
+
+  if (value === null) {
+    return {
+      type: 'NullLiteral',
+    };
+  }
+
+  if (value === undefined) {
+    return {
+      type: 'Identifier',
+      name: 'undefined',
+    };
+  }
+
+  return undefined;
+}
+
+function staticEvaluate(path: NodePath | null | undefined): void {
+  if (!path) return;
+  const evaluated = path.evaluate();
+  if (evaluated.confident) {
+    const node = getNodeForValue(evaluated.value);
+    if (node) {
+      applyAction(['replace', path, node]);
+      return;
+    }
+  }
+
+  if (path.isIfStatement()) {
+    const test = path.get('test');
+    if (!test.isBooleanLiteral()) {
+      return;
+    }
+
+    const { consequent, alternate } = path.node;
+    if (test.node.value) {
+      applyAction(['replace', path, consequent]);
+    } else if (alternate) {
+      applyAction(['replace', path, alternate]);
+    } else {
+      applyAction(['remove', path]);
+    }
+  }
+}
+
 function applyAction(action: ReplaceAction | RemoveAction) {
   mutate(action[1], (p) => {
     if (isRemoved(p)) return;
+
+    const parent = p.parentPath;
 
     if (action[0] === 'remove') {
       p.remove();
@@ -492,6 +582,8 @@ function applyAction(action: ReplaceAction | RemoveAction) {
     if (action[0] === 'replace') {
       p.replaceWith(action[2]);
     }
+
+    staticEvaluate(parent);
   });
 }
 
