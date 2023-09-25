@@ -64,4 +64,34 @@ describe('removeDangerousCode', () => {
 
     expect(result).toMatchSnapshot();
   });
+
+  it('should simplify ternary operator', () => {
+    expect(run`
+      export function getHostname(opts) {
+        return typeof location !== "undefined" ? location.hostname : "localhost";
+      }
+    `).toMatchSnapshot();
+
+    expect(run`
+      export function getHostname(opts) {
+        return location.hostname ? "location.hostname" : "localhost";
+      }
+    `).toMatchSnapshot();
+
+    expect(run`
+      export function getHostname(opts) {
+        return typeof location === "undefined" ? "localhost" : location.hostname;
+      }
+    `).toMatchSnapshot();
+  });
+
+  it('should simplify OR expression', () => {
+    const result = run`
+      export function getHostname(opts) {
+        return opts.hostname || location.hostname;
+      }
+    `;
+
+    expect(result).toMatchSnapshot();
+  });
 });

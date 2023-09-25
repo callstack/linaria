@@ -18,3 +18,27 @@ exports[`removeDangerousCode should replace body of react component with null 1`
   return Popup;
 }();"
 `;
+
+exports[`removeDangerousCode should simplify OR expression 1`] = `
+"export function getHostname(opts) {
+  return opts.hostname;
+}"
+`;
+
+exports[`removeDangerousCode should simplify ternary operator 1`] = `
+"export function getHostname(opts) {
+  return typeof location !== "undefined" ? undefined : "localhost";
+}"
+`;
+
+exports[`removeDangerousCode should simplify ternary operator 2`] = `
+"export function getHostname(opts) {
+  return "localhost";
+}"
+`;
+
+exports[`removeDangerousCode should simplify ternary operator 3`] = `
+"export function getHostname(opts) {
+  return typeof location === "undefined" ? "localhost" : undefined;
+}"
+`;

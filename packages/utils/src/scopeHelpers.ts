@@ -279,6 +279,20 @@ export function findActionForNode(
     }
   }
 
+  if (parent.isConditionalExpression()) {
+    if (path.key === 'test') {
+      return ['replace', parent, parent.node.alternate];
+    }
+
+    if (path.key === 'consequent') {
+      return ['replace', path, { type: 'Identifier', name: 'undefined' }];
+    }
+
+    if (path.key === 'alternate') {
+      return ['replace', path, { type: 'Identifier', name: 'undefined' }];
+    }
+  }
+
   if (parent.isLogicalExpression({ operator: '&&' })) {
     return [
       'replace',
@@ -287,6 +301,14 @@ export function findActionForNode(
         type: 'BooleanLiteral',
         value: false,
       },
+    ];
+  }
+
+  if (parent.isLogicalExpression({ operator: '||' })) {
+    return [
+      'replace',
+      parent,
+      path.key === 'left' ? parent.node.right : parent.node.left,
     ];
   }
 
