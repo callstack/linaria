@@ -503,9 +503,68 @@ function removeUnreferenced(items: NodePath<Identifier | JSXIdentifier>[]) {
   return result;
 }
 
+function getNodeForValue(value: unknown): Node | undefined {
+  if (typeof value === 'string') {
+    return {
+      type: 'StringLiteral',
+      value,
+    };
+  }
+
+  if (typeof value === 'number') {
+    return {
+      type: 'NumericLiteral',
+      value,
+    };
+  }
+
+  if (typeof value === 'boolean') {
+    return {
+      type: 'BooleanLiteral',
+      value,
+    };
+  }
+
+  if (value === null) {
+    return {
+      type: 'NullLiteral',
+    };
+  }
+
+  if (value === undefined) {
+    return {
+      type: 'Identifier',
+      name: 'undefined',
+    };
+  }
+
+  return undefined;
+}
+
+function staticEvaluate(path: NodePath | null | undefined): void {
+  if (!path) return;
+  const evaluated = path.evaluate();
+  if (evaluated.confident) {
+    const node = getNodeForValue(evaluated.value);
+    if (node) {
+      applyAction(['replace', path, node]);
+      return;
+    }
+  }
+
+  if (
+    path.isIfStatement() &&
+    path.get('test').isBooleanLiteral({ value: false })
+  ) {
+    applyAction(['remove', path]);
+  }
+}
+
 function applyAction(action: ReplaceAction | RemoveAction) {
   mutate(action[1], (p) => {
     if (isRemoved(p)) return;
+
+    const parent = p.parentPath;
 
     if (action[0] === 'remove') {
       p.remove();
@@ -514,6 +573,8 @@ function applyAction(action: ReplaceAction | RemoveAction) {
     if (action[0] === 'replace') {
       p.replaceWith(action[2]);
     }
+
+    staticEvaluate(parent);
   });
 }
 

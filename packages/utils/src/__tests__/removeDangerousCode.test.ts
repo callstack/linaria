@@ -80,7 +80,13 @@ describe('removeDangerousCode', () => {
 
     expect(run`
       export function getHostname(opts) {
-        return typeof location === "undefined" ? "localhost" : location.hostname;
+        return opts ? "localhost" : location.hostname;
+      }
+    `).toMatchSnapshot();
+
+    expect(run`
+      export function getHostname(opts) {
+        return opts ? location.hostname : "localhost";
       }
     `).toMatchSnapshot();
   });
@@ -89,6 +95,28 @@ describe('removeDangerousCode', () => {
     const result = run`
       export function getHostname(opts) {
         return opts.hostname || location.hostname;
+      }
+    `;
+
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should remove code under is-it-browser checks', () => {
+    const result = run`
+      let method;
+
+      if (typeof window !== 'undefined') {
+        console.log('it is browser');
+        method = window.fetch;
+      }
+
+      if (typeof window === 'undefined') {
+        console.log('it is not browser');
+        method = fetch;
+      }
+
+      export function testFn(arg) {
+        method(arg);
       }
     `;
 

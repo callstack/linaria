@@ -9,6 +9,16 @@ export function setVersion(packageName, packageVersion) {
 }"
 `;
 
+exports[`removeDangerousCode should remove code under is-it-browser checks 1`] = `
+"let method;
+if (true) {
+  console.log('it is not browser');
+}
+export function testFn(arg) {
+  method(arg);
+}"
+`;
+
 exports[`removeDangerousCode should replace body of react component with null 1`] = `
 "export var Popup = /*#__PURE__*/function () {
   var Popup = function Popup() {
@@ -27,7 +37,7 @@ exports[`removeDangerousCode should simplify OR expression 1`] = `
 
 exports[`removeDangerousCode should simplify ternary operator 1`] = `
 "export function getHostname(opts) {
-  return typeof location !== "undefined" ? undefined : "localhost";
+  return "localhost";
 }"
 `;
 
@@ -39,6 +49,12 @@ exports[`removeDangerousCode should simplify ternary operator 2`] = `
 
 exports[`removeDangerousCode should simplify ternary operator 3`] = `
 "export function getHostname(opts) {
-  return typeof location === "undefined" ? "localhost" : undefined;
+  return opts ? "localhost" : undefined;
+}"
+`;
+
+exports[`removeDangerousCode should simplify ternary operator 4`] = `
+"export function getHostname(opts) {
+  return opts ? undefined : "localhost";
 }"
 `;
