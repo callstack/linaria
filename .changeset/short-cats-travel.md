@@ -4,4 +4,4 @@
 '@linaria/utils': patch
 ---
 
-`babelrc` feature flag.
+`useBabelConfigs` feature flag.

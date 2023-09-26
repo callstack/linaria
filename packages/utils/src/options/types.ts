@@ -51,11 +51,11 @@ export type EvalRule = {
 export type FeatureFlag = boolean | string | string[];
 
 type AllFeatureFlags = {
-  babelrc: FeatureFlag;
   dangerousCodeRemover: FeatureFlag;
   globalCache: FeatureFlag;
   happyDOM: FeatureFlag;
   softErrors: FeatureFlag;
+  useBabelConfigs: FeatureFlag;
 };
 
 export type FeatureFlags<

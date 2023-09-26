@@ -2837,7 +2837,7 @@ describe('strategy shaker', () => {
           evaluator,
           {
             features: {
-              babelrc: false,
+              useBabelConfigs: false,
             },
           },
         ]

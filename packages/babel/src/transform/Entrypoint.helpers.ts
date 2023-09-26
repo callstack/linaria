@@ -101,8 +101,18 @@ function buildConfigs(
     commonOptions
   );
 
+  const useBabelConfigs = isFeatureEnabled(
+    pluginOptions.features,
+    'useBabelConfigs',
+    name
+  );
+
+  if (!useBabelConfigs) {
+    rawConfig.configFile = false;
+  }
+
   const parseConfig = loadBabelOptions(babel, name, {
-    babelrc: isFeatureEnabled(pluginOptions.features, 'babelrc', name),
+    babelrc: useBabelConfigs,
     ...rawConfig,
   });
 

@@ -42,11 +42,11 @@ const options: StrictOptions = {
   evaluate: true,
   extensions: ['.cjs', '.js', '.jsx', '.ts', '.tsx'],
   features: {
-    babelrc: true,
     dangerousCodeRemover: true,
     globalCache: true,
     happyDOM: true,
     softErrors: false,
+    useBabelConfigs: true,
   },
   highPriorityPlugins: [],
   overrideContext: (context) => ({
