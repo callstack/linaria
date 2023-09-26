@@ -25,10 +25,10 @@ const getPresets = (extension: Extension) => {
 
 const keep =
   (only: string[], extension: Extension = 'js') =>
-  (code: TemplateStringsArray) => {
+  (code: TemplateStringsArray, ...args: string[]) => {
     const presets = getPresets(extension);
     const filename = join(__dirname, `source.${extension}`);
-    const formattedCode = dedent(code);
+    const formattedCode = dedent(code, ...args);
 
     const transformed = transformSync(formattedCode, {
       babelrc: false,
@@ -442,6 +442,23 @@ describe('shaker', () => {
       }
       const _c = Media;
       export const __linariaPreval = {};
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
+  });
+
+  it('should not remove exports in declarators', () => {
+    const { code, metadata } = keep(['cell', 'cellFrozen'])`
+      exports.__esModule = true;
+      exports.cellFrozenClassname = exports.cellFrozen = exports.cellClassname = exports.cell = void 0;
+      const cell = exports.cell = "cj343x07-0-0-beta-39";
+      const cellClassname = exports.cellClassname = \`rdg-cell ${'${cell}'}\`;
+      const cellFrozen = exports.cellFrozen = "csofj7r7-0-0-beta-39";
+      const cellFrozenClassname = exports.cellFrozenClassname = \`rdg-cell-frozen ${'${cellFrozen}'}\`;
+      exports.__linariaPreval = {};
+
+      exports.classes = { cellClassname };
     `;
 
     expect(code).toMatchSnapshot();

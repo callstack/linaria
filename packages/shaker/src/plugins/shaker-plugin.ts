@@ -82,7 +82,18 @@ function rearrangeExports(
   const rootScope = root.scope;
   exportRefs.forEach((refs, name) => {
     if (refs.length <= 1) {
-      return;
+      if (refs.length === 1) {
+        // Maybe exports is assigned to another variable?
+        const declarator = refs[0].findParent((p) =>
+          p.isVariableDeclarator()
+        ) as NodePath<VariableDeclarator> | undefined;
+
+        if (!declarator) {
+          return;
+        }
+      } else {
+        return;
+      }
     }
 
     const uid = rootScope.generateUid(name);
@@ -98,6 +109,10 @@ function rearrangeExports(
       const [replaced] = ref.replaceWith(t.identifier(uid));
       if (replaced.isBindingIdentifier()) {
         rootScope.registerConstantViolation(replaced);
+        if (replaced.parentPath?.parentPath?.isVariableDeclarator()) {
+          // This is `const foo = exports.foo = "value"` case
+          reference(replaced, replaced, true);
+        }
       } else {
         reference(replaced);
       }
@@ -160,7 +175,7 @@ export default function shakerPlugin(
         collected.exports
       );
 
-      Object.values(collected.exports).forEach((local) => {
+      Object.values(exports).forEach((local) => {
         if (local.isAssignmentExpression()) {
           const left = local.get('left');
           if (left.isIdentifier()) {
@@ -213,6 +228,9 @@ export default function shakerPlugin(
       }
 
       if (!onlyExportsSet.has('*')) {
+        // __esModule should be kept alive
+        onlyExportsSet.add('__esModule');
+
         const aliveExports = new Set<NodePath>();
         const importNames = collected.imports.map(({ imported }) => imported);
 
@@ -238,7 +256,22 @@ export default function shakerPlugin(
           }
         });
 
-        const isAllExportsFound = aliveExports.size === onlyExportsSet.size;
+        const exportToPath = new Map<string, NodePath>();
+        Object.entries(exports).forEach(([exported, local]) => {
+          exportToPath.set(exported, local);
+        });
+
+        collected.reexports.forEach((exp) => {
+          exportToPath.set(exp.exported, exp.local);
+        });
+
+        const notFoundExports = [...onlyExportsSet].filter(
+          (exp) =>
+            exp !== '__esModule' && !aliveExports.has(exportToPath.get(exp)!)
+        );
+        exportToPath.clear();
+
+        const isAllExportsFound = notFoundExports.length === 0;
         if (!isAllExportsFound && ifUnknownExport !== 'ignore') {
           if (ifUnknownExport === 'error') {
             throw new Error(
@@ -285,12 +318,17 @@ export default function shakerPlugin(
 
         const deleted = new Set<NodePath>();
 
-        const dereferenced: NodePath<Identifier>[] = [];
+        let dereferenced: NodePath<Identifier>[] = [];
         let changed = true;
         while (changed && deleted.size < forDeleting.length) {
           changed = false;
           // eslint-disable-next-line no-restricted-syntax
           for (const path of forDeleting) {
+            if (deleted.has(path)) {
+              // eslint-disable-next-line no-continue
+              continue;
+            }
+
             const binding = getBindingForExport(path);
             const action = findActionForNode(path);
             const parent = action?.[1];
@@ -317,14 +355,16 @@ export default function shakerPlugin(
               changed = true;
             }
           }
-        }
 
-        dereferenced.forEach((path) => {
-          // If path is still alive, we need to reference it back
-          if (!isRemoved(path)) {
-            reference(path);
-          }
-        });
+          dereferenced.forEach((path) => {
+            // If path is still alive, we need to reference it back
+            if (!isRemoved(path)) {
+              reference(path);
+            }
+          });
+
+          dereferenced = [];
+        }
       }
 
       this.imports = withoutRemoved(collected.imports);

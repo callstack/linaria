@@ -668,6 +668,22 @@ function mutate<T extends NodePath>(path: T, fn: (p: T) => NodePath[] | void) {
         'name' in declared[0] &&
         declared[0].name === binding.identifier.name
       ) {
+        const init = assignment.get('init');
+        if (!Array.isArray(init) && init?.isAssignmentExpression()) {
+          // `const a = b = 1` → `b = 1`
+          assignment.parentPath?.replaceWith({
+            type: 'ExpressionStatement',
+            expression: init.node,
+          });
+
+          const left = init.get('left');
+          if (left.isIdentifier()) {
+            // If it was forcefully referenced in the shaker
+            dereference(left);
+          }
+
+          return;
+        }
         // Only one identifier is declared, so we can remove the whole declaration
         forDeleting.push(assignment);
         return;
