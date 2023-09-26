@@ -53,6 +53,7 @@ export default function loadLinariaOptions(
     globalCache: true,
     happyDOM: true,
     softErrors: false,
+    useBabelConfigs: true,
   };
 
   const options: StrictOptions = {

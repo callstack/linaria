@@ -61,3 +61,10 @@ The `happyDOM` is enabled by default. This feature enables usage of https://gith
 # `softErrors` Feature
 
 The `softErrors` is disabled by default. It is designed to provide a more lenient evaluation of styles and values that are interpolated in styles. This flag is useful for debugging and prevents the build from failing even if some files cannot be processed with Linaria.
+
+
+# 'useBabelConfigs' Feature
+
+The `useBabelConfigs` feature is enabled by default. If it is enabled, Linaria will try to resolve the `.babelrc` file for each processed file. Otherwise, it will use the default Babel configuration from `babelOptions` in the configuration.
+
+Please note that the default value of `useBabelConfigs` will be changed to `false` in the next major release.

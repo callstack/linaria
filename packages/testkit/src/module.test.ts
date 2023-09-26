@@ -46,6 +46,7 @@ const options: StrictOptions = {
     globalCache: true,
     happyDOM: true,
     softErrors: false,
+    useBabelConfigs: true,
   },
   highPriorityPlugins: [],
   overrideContext: (context) => ({

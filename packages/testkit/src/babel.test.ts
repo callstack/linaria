@@ -17,10 +17,10 @@ import {
 import { linariaLogger } from '@linaria/logger';
 import type {
   Evaluator,
-  StrictOptions,
   OnEvent,
   OnActionStartArgs,
   OnActionFinishArgs,
+  FeatureFlags,
 } from '@linaria/utils';
 import { EventEmitter } from '@linaria/utils';
 import type { EntrypointEvent } from '@linaria/utils/types/EventEmitter';
@@ -31,9 +31,13 @@ expect.addSnapshotSerializer(serializer);
 
 const dirName = __dirname;
 
+type PartialOptions = Partial<Omit<PluginOptions, 'features'>> & {
+  features?: Partial<FeatureFlags>;
+};
+
 type Options = [
   evaluator: Evaluator,
-  linariaConfig?: Partial<StrictOptions>,
+  linariaConfig?: PartialOptions,
   extension?: 'js' | 'ts' | 'jsx' | 'tsx',
   filename?: string,
   babelConfig?: babel.TransformOptions,
@@ -63,7 +67,7 @@ const getPresets = (extension: 'js' | 'ts' | 'jsx' | 'tsx') => {
 
 const getLinariaConfig = (
   evaluator: Evaluator,
-  linariaConfig: Partial<StrictOptions>,
+  linariaConfig: PartialOptions,
   presets: PluginItem[],
   stage?: Stage
 ): PluginOptions =>
@@ -2823,6 +2827,23 @@ describe('strategy shaker', () => {
     hasNotBeenProcessed(
       resolve(__dirname, './__fixtures__/re-exports/empty.js')
     );
+  });
+
+  it('should fail because babelrc options is disabled', async () => {
+    const fn = () =>
+      transformFile(
+        resolve(__dirname, './__fixtures__/with-babelrc/index.js'),
+        [
+          evaluator,
+          {
+            features: {
+              useBabelConfigs: false,
+            },
+          },
+        ]
+      );
+
+    expect(fn).rejects.toThrowError(`Cannot find module '_/re-exports'`);
   });
 
   it('respects module-resolver plugin and show waring', async () => {

@@ -55,6 +55,7 @@ type AllFeatureFlags = {
   globalCache: FeatureFlag;
   happyDOM: FeatureFlag;
   softErrors: FeatureFlag;
+  useBabelConfigs: FeatureFlag;
 };
 
 export type FeatureFlags<
