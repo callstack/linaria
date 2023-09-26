@@ -268,14 +268,14 @@ importers:
   examples/webpack5:
     dependencies:
       linaria-website:
-        specifier: workspace:^4.1.8
+        specifier: workspace:^
         version: link:../../website
     devDependencies:
       '@babel/core':
         specifier: ^7.22.15
         version: 7.22.15
       '@linaria/webpack5-loader':
-        specifier: workspace:^4.1.8
+        specifier: workspace:^
         version: link:../../packages/webpack5-loader
       babel-loader:
         specifier: ^9.1.0
