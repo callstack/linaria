@@ -249,6 +249,12 @@ export function findActionForNode(
     return ['remove', path];
   }
 
+  if (parent.isClassDeclaration() || parent.isClassExpression()) {
+    if (path.key === 'body') {
+      return ['replace', path, { type: 'ClassBody', body: [] }];
+    }
+  }
+
   if (parent.isFunction()) {
     if (path.listKey === 'params') {
       // Do not remove params of functions

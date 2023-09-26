@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`removeDangerousCode should not remove class 1`] = `"class Test {}"`;
+
 exports[`removeDangerousCode should remove \`window\` but keep \`setVersion\` function untouched 1`] = `
 "let _win = undefined;
 export function setVersion(packageName, packageVersion) {
