@@ -148,4 +148,16 @@ describe('removeDangerousCode', () => {
 
     expect(result).toMatchSnapshot();
   });
+
+  it('should not remove class', () => {
+    const result = run`
+      class Test {
+        constructor() {
+          window.fetch();
+        }
+      }
+    `;
+
+    expect(result).toMatchSnapshot();
+  });
 });
