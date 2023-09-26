@@ -11,6 +11,7 @@ import {
   buildOptions,
   getFileIdx,
   getPluginKey,
+  isFeatureEnabled,
   loadBabelOptions,
 } from '@linaria/utils';
 
@@ -101,7 +102,7 @@ function buildConfigs(
   );
 
   const parseConfig = loadBabelOptions(babel, name, {
-    babelrc: true,
+    babelrc: isFeatureEnabled(pluginOptions.features, 'babelrc', name),
     ...rawConfig,
   });
 

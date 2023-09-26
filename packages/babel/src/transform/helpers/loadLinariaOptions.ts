@@ -49,6 +49,7 @@ export default function loadLinariaOptions(
       : explorerSync.search();
 
   const defaultFeatures: FeatureFlags = {
+    babelrc: true,
     dangerousCodeRemover: true,
     globalCache: true,
     happyDOM: true,
