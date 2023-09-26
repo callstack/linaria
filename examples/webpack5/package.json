@@ -5,11 +5,11 @@
   "license": "MIT",
   "main": "index.js",
   "dependencies": {
-    "linaria-website": "workspace:^4.1.8"
+    "linaria-website": "workspace:^"
   },
   "devDependencies": {
     "@babel/core": "^7.22.15",
-    "@linaria/webpack5-loader": "workspace:^4.1.8",
+    "@linaria/webpack5-loader": "workspace:^",
     "babel-loader": "^9.1.0",
     "cross-env": "^7.0.3",
     "css-hot-loader": "^1.4.4",

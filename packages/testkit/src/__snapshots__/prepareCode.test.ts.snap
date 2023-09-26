@@ -3,7 +3,9 @@
 exports[`prepareCode Testing transformation for dynamic-import: code 1`] = `
 ""use strict";
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.foo = foo;
 function foo(onImport) {
   __linaria_dynamic_import("./foo").then(onImport);
@@ -17,7 +19,9 @@ exports[`prepareCode Testing transformation for dynamic-import: metadata 1`] = `
 exports[`prepareCode Testing transformation for dynamic-import-param: code 1`] = `
 ""use strict";
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.foo = foo;
 function foo(locale, onImport) {
   __linaria_dynamic_import("./foo/" + locale).then(onImport);
