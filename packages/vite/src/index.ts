@@ -4,11 +4,13 @@
  * returns transformed code without template literals and attaches generated source maps
  */
 
+import { existsSync } from 'fs';
 import path from 'path';
 
 import { createFilter } from '@rollup/pluginutils';
 import type { FilterPattern } from '@rollup/pluginutils';
 import type { ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite';
+import { optimizeDeps } from 'vite';
 
 import {
   transform,
@@ -129,6 +131,10 @@ export default function linaria({
             // \0 is a special character in Rollup that tells Rollup to not include this in the bundle
             // https://rollupjs.org/guide/en/#outputexports
             return null;
+          }
+
+          if (!existsSync(resolvedId)) {
+            await optimizeDeps(config);
           }
 
           return resolvedId;
