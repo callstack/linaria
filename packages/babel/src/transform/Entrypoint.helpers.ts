@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { dirname, extname } from 'path';
+import { dirname, extname, isAbsolute } from 'path';
 
 import type { TransformOptions, PluginItem } from '@babel/core';
 import type { File } from '@babel/types';
@@ -169,7 +169,11 @@ export function loadAndParse(
 
     return {
       get code() {
-        return loadedCode ?? readFileSync(name, 'utf-8');
+        if (isAbsolute(name)) {
+          return loadedCode ?? readFileSync(name, 'utf-8');
+        }
+
+        return ''; // it is a built-in module
       },
       evaluator: 'ignored',
       reason: 'extension',
