@@ -3074,6 +3074,25 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should work with built-in modules', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { css } from "@linaria/core";
+        import { URL } from "url";
+
+        const url = (new URL("https://example.com")).toString();
+
+        export const square = css\`
+          background: url(${'${url}'});
+        \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('should process module.exports = require(…)', async () => {
     const { code, metadata } = await transform(
       dedent`

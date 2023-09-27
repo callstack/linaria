@@ -2615,6 +2615,20 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker should work with built-in modules 1`] = `"export const square = "square_s13jq05";"`;
+
+exports[`strategy shaker should work with built-in modules 2`] = `
+
+CSS:
+
+.square_s13jq05 {
+  background: url(https://example.com/);
+}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker should work with generated classnames as selectors 1`] = `
 "export const text = "text_t13jq05";
 export const square = "square_s1vhermz";"
