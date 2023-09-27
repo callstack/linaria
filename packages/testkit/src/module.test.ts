@@ -15,27 +15,6 @@ import { linariaLogger } from '@linaria/logger';
 import type { StrictOptions } from '@linaria/utils';
 import { EventEmitter } from '@linaria/utils';
 
-const createServices = (partial: Partial<Services>): Services => {
-  const loadAndParseFn: LoadAndParseFn = (services, name, loadedCode) => ({
-    ast: services.babel.parseSync(loadedCode ?? '')!,
-    code: loadedCode!,
-    evaluator: jest.fn(),
-    evalConfig: {},
-  });
-
-  return {
-    babel,
-    cache: new TransformCacheCollection(),
-    loadAndParseFn,
-    log: linariaLogger,
-    eventEmitter: EventEmitter.dummy,
-    options: {} as Services['options'],
-    ...partial,
-  };
-};
-
-const filename = path.resolve(__dirname, './__fixtures__/test.js');
-
 const options: StrictOptions = {
   babelOptions: {},
   displayName: false,
@@ -56,13 +35,38 @@ const options: StrictOptions = {
   rules: [],
 };
 
+const filename = path.resolve(__dirname, './__fixtures__/test.js');
+
+const createServices = (partial: Partial<Services>): Services => {
+  const loadAndParseFn: LoadAndParseFn = (services, name, loadedCode) => ({
+    get ast() {
+      return services.babel.parseSync(loadedCode ?? '')!;
+    },
+    code: loadedCode!,
+    evaluator: jest.fn(),
+    evalConfig: {},
+  });
+
+  return {
+    babel,
+    cache: new TransformCacheCollection(),
+    loadAndParseFn,
+    log: linariaLogger,
+    eventEmitter: EventEmitter.dummy,
+    options: {
+      filename,
+      pluginOptions: options,
+    },
+    ...partial,
+  };
+};
+
 const createEntrypoint = (
+  services: Services,
   name: string,
   only: string[],
-  code: string,
-  cache: TransformCacheCollection = new TransformCacheCollection()
+  code: string
 ) => {
-  const services = createServices({ cache });
   const entrypoint = Entrypoint.createRoot(services, name, only, code, options);
 
   if (entrypoint.ignored) {
@@ -80,13 +84,14 @@ const createEntrypoint = (
 const create = (strings: TemplateStringsArray, ...expressions: unknown[]) => {
   const code = dedent(strings, ...expressions);
   const cache = new TransformCacheCollection();
-  const entrypoint = createEntrypoint(filename, ['*'], code, cache);
-  const mod = new Module(entrypoint, cache);
+  const services = createServices({ cache });
+  const entrypoint = createEntrypoint(services, filename, ['*'], code);
+  const mod = new Module(services, entrypoint);
 
   return {
-    cache,
     entrypoint,
     mod,
+    services,
   };
 };
 
@@ -171,14 +176,14 @@ it('requires .json files', () => {
 });
 
 it('returns module from the cache', () => {
-  const { entrypoint, mod, cache } = create``;
+  const { entrypoint, mod, services } = create``;
 
   const id = './sample-data.json';
 
   expect(safeRequire(mod, id)).toBe(safeRequire(mod, id));
 
-  const res1 = safeRequire(new Module(entrypoint, cache), id);
-  const res2 = safeRequire(new Module(entrypoint, cache), id);
+  const res1 = safeRequire(new Module(services, entrypoint), id);
+  const res2 = safeRequire(new Module(services, entrypoint), id);
 
   expect(res1).toBe(res2);
 });
@@ -238,15 +243,15 @@ it('should reread module from disk when it is in codeCache but not in resolveCac
 it('clears modules from the cache', () => {
   const id = './sample-data.json';
 
-  const { entrypoint, mod, cache } = create``;
+  const { entrypoint, mod, services } = create``;
   const result = safeRequire(mod, id);
 
-  expect(safeRequire(new Module(entrypoint, cache), id)).toBe(result);
+  expect(safeRequire(new Module(services, entrypoint), id)).toBe(result);
 
-  const dep = new Module(entrypoint, cache).resolve(id);
-  cache.invalidateForFile(dep);
+  const dep = new Module(services, entrypoint).resolve(id);
+  services.cache.invalidateForFile(dep);
 
-  expect(safeRequire(new Module(entrypoint, cache), id)).not.toBe(result);
+  expect(safeRequire(new Module(services, entrypoint), id)).not.toBe(result);
 });
 
 it('exports the path for non JS/JSON files', () => {

@@ -21,14 +21,13 @@ import { invariant } from 'ts-invariant';
 import type { Debugger } from '@linaria/logger';
 
 import './utils/dispose-polyfill';
-import { TransformCacheCollection } from './cache';
+import type { TransformCacheCollection } from './cache';
 import { Entrypoint } from './transform/Entrypoint';
 import { getStack, isSuperSet } from './transform/Entrypoint.helpers';
 import type { IEntrypointDependency } from './transform/Entrypoint.types';
 import type { IEvaluatedEntrypoint } from './transform/EvaluatedEntrypoint';
 import { isUnprocessedEntrypointError } from './transform/actions/UnprocessedEntrypointError';
-import loadLinariaOptions from './transform/helpers/loadLinariaOptions';
-import { withDefaultServices } from './transform/helpers/withDefaultServices';
+import type { Services } from './transform/types';
 import { createVmContext } from './vm/createVmContext';
 
 type HiddenModuleMembers = {
@@ -191,14 +190,17 @@ class Module {
 
   public resolve = resolve.bind(this);
 
+  private cache: TransformCacheCollection;
+
   #entrypointRef: WeakRef<Entrypoint>;
 
   constructor(
+    private services: Services,
     entrypoint: Entrypoint,
-    private cache = new TransformCacheCollection(),
     parentModule?: Module,
     private moduleImpl: HiddenModuleMembers = DefaultModuleImplementation
   ) {
+    this.cache = services.cache;
     this.#entrypointRef = new WeakRef(entrypoint);
     this.idx = entrypoint.idx;
     this.id = entrypoint.name;
@@ -386,21 +388,13 @@ class Module {
 
     // If code wasn't extracted from cache, it indicates that we were unable
     // to process some of the imports on stage1. Let's try to reprocess.
-    const services = withDefaultServices({
-      cache: this.cache,
-      options: {
-        filename,
-      },
-    });
-
-    const pluginOptions = loadLinariaOptions({});
     const code = fs.readFileSync(filename, 'utf-8');
     const newEntrypoint = Entrypoint.createRoot(
-      services,
+      this.services,
       filename,
       only,
       code,
-      pluginOptions
+      this.services.options.pluginOptions
     );
 
     if (newEntrypoint.evaluated) {
@@ -469,7 +463,7 @@ class Module {
   };
 
   protected createChild(entrypoint: Entrypoint): Module {
-    return new Module(entrypoint, this.cache, this, this.moduleImpl);
+    return new Module(this.services, entrypoint, this, this.moduleImpl);
   }
 }
 

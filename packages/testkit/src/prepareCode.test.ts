@@ -60,7 +60,7 @@ describe('prepareCode', () => {
       const sourceCode = restLines.join('\n');
       const services = withDefaultServices({
         babel,
-        options: { root, filename: inputFilePath },
+        options: { root, filename: inputFilePath, pluginOptions },
       });
       const entrypoint = Entrypoint.createRoot(
         services,

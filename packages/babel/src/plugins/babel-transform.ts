@@ -6,6 +6,7 @@ import { syncResolve } from '@linaria/utils';
 import type { Core } from '../babel';
 import { TransformCacheCollection } from '../cache';
 import { transformSync } from '../transform';
+import loadLinariaOptions from '../transform/helpers/loadLinariaOptions';
 import type { ICollectAction, SyncScenarioForAction } from '../transform/types';
 import type { IPluginState, PluginOptions } from '../types';
 
@@ -40,6 +41,8 @@ export default function babelTransform(
 
       debug('babel-transform:start', file.opts.filename);
 
+      const pluginOptions = loadLinariaOptions(options);
+
       transformSync(
         {
           babel,
@@ -48,7 +51,7 @@ export default function babelTransform(
             filename: file.opts.filename!,
             root: file.opts.root ?? undefined,
             inputSourceMap: file.opts.inputSourceMap ?? undefined,
-            pluginOptions: options,
+            pluginOptions,
           },
         },
         file.code,

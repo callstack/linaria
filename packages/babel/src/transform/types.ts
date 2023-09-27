@@ -2,7 +2,12 @@ import type { BabelFileResult } from '@babel/core';
 
 import type { Debugger } from '@linaria/logger';
 import type { ValueCache } from '@linaria/tags';
-import type { EventEmitter, Artifact, LinariaMetadata } from '@linaria/utils';
+import type {
+  EventEmitter,
+  Artifact,
+  LinariaMetadata,
+  StrictOptions,
+} from '@linaria/utils';
 
 import type { Core } from '../babel';
 import type { TransformCacheCollection } from '../cache';
@@ -23,7 +28,9 @@ export type Services = {
   eventEmitter: EventEmitter;
   loadAndParseFn: LoadAndParseFn;
   log: Debugger;
-  options: Options;
+  options: Options & {
+    pluginOptions: StrictOptions;
+  };
 };
 
 export interface IBaseNode {

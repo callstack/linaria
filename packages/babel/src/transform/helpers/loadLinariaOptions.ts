@@ -23,7 +23,7 @@ const searchPlaces = [
 
 const explorerSync = cosmiconfigSync('linaria', { searchPlaces });
 
-type PartialOptions = Partial<Omit<PluginOptions, 'features'>> & {
+export type PartialOptions = Partial<Omit<PluginOptions, 'features'>> & {
   features?: Partial<FeatureFlags>;
 };
 
