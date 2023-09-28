@@ -55,7 +55,7 @@ export default function linaria({
           throw new Error(`Cannot resolve ${token}`);
         }
 
-        return result.path;
+        return result.path.replace(/\\/g, path.posix.sep);
       };
 
       build.onResolve({ filter: /\.linaria\.css$/ }, (args) => {

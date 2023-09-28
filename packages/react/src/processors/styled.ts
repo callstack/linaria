@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { dirname, join, sep } from 'path';
+import { dirname, join, posix } from 'path';
 
 import type {
   CallExpression,
@@ -107,8 +107,11 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
 
               if (mask) {
                 const packageDir = dirname(importedPkg);
-                const normalizedMask = mask.replace(/\//g, sep);
-                const fullMask = join(packageDir, normalizedMask);
+                // Masks for minimatch should always use POSIX slashes
+                const fullMask = join(packageDir, mask).replace(
+                  /\\/g,
+                  posix.sep
+                );
                 const fileWithComponent = require.resolve(importedFrom, {
                   paths: [dirname(this.context.filename!)],
                 });
