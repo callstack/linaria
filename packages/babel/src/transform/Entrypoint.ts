@@ -1,7 +1,5 @@
 import { invariant } from 'ts-invariant';
 
-import type { StrictOptions } from '@linaria/utils';
-
 import type { ParentEntrypoint, ITransformFileResult } from '../types';
 
 import { BaseEntrypoint } from './BaseEntrypoint';
@@ -64,7 +62,6 @@ export class Entrypoint extends BaseEntrypoint {
     public readonly initialCode: string | undefined,
     name: string,
     only: string[],
-    public readonly pluginOptions: StrictOptions,
     exports: Record<string | symbol, unknown> | undefined,
     evaluatedOnly: string[],
     loadedAndParsed?: IEntrypointCode | IIgnoredEntrypoint,
@@ -83,8 +80,7 @@ export class Entrypoint extends BaseEntrypoint {
         services,
         name,
         initialCode,
-        parents[0]?.log ?? services.log,
-        pluginOptions
+        parents[0]?.log ?? services.log
       );
 
     if (this.loadedAndParsed.code !== undefined) {
@@ -121,17 +117,9 @@ export class Entrypoint extends BaseEntrypoint {
     services: Services,
     name: string,
     only: string[],
-    loadedCode: string | undefined,
-    pluginOptions: StrictOptions
+    loadedCode: string | undefined
   ): Entrypoint {
-    const created = Entrypoint.create(
-      services,
-      null,
-      name,
-      only,
-      loadedCode,
-      pluginOptions
-    );
+    const created = Entrypoint.create(services, null, name, only, loadedCode);
     invariant(created !== 'loop', 'loop detected');
 
     return created;
@@ -154,8 +142,7 @@ export class Entrypoint extends BaseEntrypoint {
     parent: ParentEntrypoint | null,
     name: string,
     only: string[],
-    loadedCode: string | undefined,
-    pluginOptions: StrictOptions
+    loadedCode: string | undefined
   ): Entrypoint | 'loop' {
     const { cache, eventEmitter } = services;
     return eventEmitter.perf('createEntrypoint', () => {
@@ -172,8 +159,7 @@ export class Entrypoint extends BaseEntrypoint {
           : null,
         name,
         only,
-        loadedCode,
-        pluginOptions
+        loadedCode
       );
 
       if (status !== 'cached') {
@@ -189,8 +175,7 @@ export class Entrypoint extends BaseEntrypoint {
     parent: ParentEntrypoint | null,
     name: string,
     only: string[],
-    loadedCode: string | undefined,
-    pluginOptions: StrictOptions
+    loadedCode: string | undefined
   ): ['loop' | 'created' | 'cached', Entrypoint] {
     const { cache } = services;
 
@@ -245,7 +230,6 @@ export class Entrypoint extends BaseEntrypoint {
       loadedCode,
       name,
       mergedOnly,
-      pluginOptions,
       exports,
       evaluatedOnly,
       undefined,
@@ -330,14 +314,7 @@ export class Entrypoint extends BaseEntrypoint {
     only: string[],
     loadedCode?: string
   ): Entrypoint | 'loop' {
-    return Entrypoint.create(
-      this.services,
-      this,
-      name,
-      only,
-      loadedCode,
-      this.pluginOptions
-    );
+    return Entrypoint.create(this.services, this, name, only, loadedCode);
   }
 
   public createEvaluated() {
@@ -405,7 +382,6 @@ export class Entrypoint extends BaseEntrypoint {
             this.initialCode,
             this.name,
             newOnlyOrEntrypoint,
-            this.pluginOptions,
             this.exports,
             this.evaluatedOnly,
             this.loadedAndParsed,

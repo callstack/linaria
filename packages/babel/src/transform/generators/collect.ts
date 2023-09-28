@@ -17,7 +17,7 @@ export function* collect(
   const { babel, options } = this.services;
   const { valueCache } = this.data;
   const { entrypoint } = this;
-  const { loadedAndParsed, name, pluginOptions } = entrypoint;
+  const { loadedAndParsed, name } = entrypoint;
 
   if (loadedAndParsed.evaluator === 'ignored') {
     throw new Error('entrypoint was ignored');
@@ -27,7 +27,7 @@ export function* collect(
     [
       collectorPlugin,
       {
-        ...pluginOptions,
+        ...options.pluginOptions,
         values: valueCache,
       },
     ],

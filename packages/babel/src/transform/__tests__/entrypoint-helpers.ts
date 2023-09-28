@@ -1,7 +1,6 @@
 import * as babel from '@babel/core';
 import type { File } from '@babel/types';
 
-import type { StrictOptions } from '@linaria/utils';
 import { EventEmitter } from '@linaria/utils';
 
 import { TransformCacheCollection } from '../../cache';
@@ -70,13 +69,7 @@ export const createEntrypoint = (
   only: string[],
   code?: string
 ) => {
-  const entrypoint = Entrypoint.createRoot(
-    services,
-    name,
-    only,
-    code,
-    services.options.pluginOptions as StrictOptions
-  );
+  const entrypoint = Entrypoint.createRoot(services, name, only, code);
 
   if (entrypoint.ignored) {
     throw new Error('entrypoint was ignored');

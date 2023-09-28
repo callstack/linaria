@@ -16,7 +16,11 @@ import { buildOptions, getPluginKey } from '@linaria/utils';
 import type { Core } from '../../babel';
 import { getLinariaMetadata } from '../../utils/withLinariaMetadata';
 import type { Entrypoint } from '../Entrypoint';
-import type { ITransformAction, SyncScenarioForAction } from '../types';
+import type {
+  ITransformAction,
+  Services,
+  SyncScenarioForAction,
+} from '../types';
 
 const EMPTY_FILE = '=== empty file ===';
 
@@ -66,10 +70,9 @@ function runPreevalStage(
 }
 
 type PrepareCodeFn = (
-  babel: Core,
+  services: Services,
   item: Entrypoint,
-  originalAst: File,
-  eventEmitter: EventEmitter
+  originalAst: File
 ) => [
   code: string,
   imports: Map<string, string[]> | null,
@@ -77,18 +80,19 @@ type PrepareCodeFn = (
 ];
 
 export const prepareCode = (
-  babel: Core,
+  services: Services,
   item: Entrypoint,
-  originalAst: File,
-  eventEmitter: EventEmitter
+  originalAst: File
 ): ReturnType<PrepareCodeFn> => {
-  const { log, pluginOptions, only, loadedAndParsed } = item;
+  const { log, only, loadedAndParsed } = item;
   if (loadedAndParsed.evaluator === 'ignored') {
     log('is ignored');
     return [loadedAndParsed.code ?? '', null, null];
   }
 
   const { code, evalConfig, evaluator } = loadedAndParsed;
+  const { options, babel, eventEmitter } = services;
+  const { pluginOptions } = options;
 
   const preevalStageResult = eventEmitter.perf('transform:preeval', () =>
     runPreevalStage(
@@ -138,7 +142,6 @@ export function* internalTransform(
   this: ITransformAction,
   prepareFn: PrepareCodeFn
 ): SyncScenarioForAction<ITransformAction> {
-  const { babel, eventEmitter } = this.services;
   const { only, loadedAndParsed, log } = this.entrypoint;
   if (loadedAndParsed.evaluator === 'ignored') {
     log('is ignored');
@@ -151,10 +154,9 @@ export function* internalTransform(
   log('>> (%o)', only);
 
   const [preparedCode, imports, metadata] = prepareFn(
-    babel,
+    this.services,
     this.entrypoint,
-    loadedAndParsed.ast,
-    eventEmitter
+    loadedAndParsed.ast
   );
 
   if (loadedAndParsed.code === preparedCode) {

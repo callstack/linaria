@@ -31,7 +31,7 @@ export function* evalFile(
 
   while (evaluated === undefined) {
     try {
-      evaluated = evaluate(this.services.cache, entrypoint);
+      evaluated = evaluate(this.services, entrypoint);
     } catch (e) {
       if (isUnprocessedEntrypointError(e)) {
         entrypoint.log(

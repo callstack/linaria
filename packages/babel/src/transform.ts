@@ -20,6 +20,7 @@ import {
   asyncResolveImports,
   syncResolveImports,
 } from './transform/generators/resolveImports';
+import type { PartialOptions } from './transform/helpers/loadLinariaOptions';
 import loadLinariaOptions from './transform/helpers/loadLinariaOptions';
 import { withDefaultServices } from './transform/helpers/withDefaultServices';
 import type {
@@ -29,9 +30,11 @@ import type {
 } from './transform/types';
 import type { Result } from './types';
 
-type RequiredServices = 'options';
-type PartialServices = Partial<Omit<Services, RequiredServices>> &
-  Pick<Services, RequiredServices>;
+type PartialServices = Partial<Omit<Services, 'options'>> & {
+  options: Omit<Services['options'], 'pluginOptions'> & {
+    pluginOptions?: PartialOptions;
+  };
+};
 
 type AllHandlers<TMode extends 'async' | 'sync'> = Handlers<TMode>;
 
@@ -41,9 +44,15 @@ export function transformSync(
   syncResolve: (what: string, importer: string, stack: string[]) => string,
   customHandlers: Partial<AllHandlers<'sync'>> = {}
 ): Result {
-  const services = withDefaultServices(partialServices);
-  const { options } = services;
+  const { options } = partialServices;
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
+  const services = withDefaultServices({
+    ...partialServices,
+    options: {
+      ...options,
+      pluginOptions,
+    },
+  });
 
   if (
     !isFeatureEnabled(pluginOptions.features, 'globalCache', options.filename)
@@ -56,8 +65,7 @@ export function transformSync(
     services,
     options.filename,
     ['__linariaPreval'],
-    originalCode,
-    pluginOptions
+    originalCode
   );
 
   if (entrypoint.ignored) {
@@ -111,8 +119,14 @@ export default async function transform(
   customHandlers: Partial<AllHandlers<'sync'>> = {}
 ): Promise<Result> {
   const { options } = partialServices;
-  const services = withDefaultServices(partialServices);
   const pluginOptions = loadLinariaOptions(options.pluginOptions);
+  const services = withDefaultServices({
+    ...partialServices,
+    options: {
+      ...options,
+      pluginOptions,
+    },
+  });
 
   if (
     !isFeatureEnabled(pluginOptions.features, 'globalCache', options.filename)
@@ -133,8 +147,7 @@ export default async function transform(
     services,
     options.filename,
     ['__linariaPreval'],
-    originalCode,
-    pluginOptions
+    originalCode
   );
 
   if (entrypoint.ignored) {
