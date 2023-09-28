@@ -1,5 +1,25 @@
 # Change Log
 
+## 5.0.3
+
+### Patch Changes
+
+- 5f216d3b: Fix for lost `pluginOptions` in some entrypoints.
+- 727dc2bd: fix: add caller settings to loadBabelOptions()
+- 25ba1344: `useBabelConfigs` feature flag.
+- 5f216d3b: `pluginOptions` could be lost during processing.
+- Updated dependencies [5f216d3b]
+- Updated dependencies [1e889937]
+- Updated dependencies [4992c14d]
+- Updated dependencies [15fa87a5]
+- Updated dependencies [1e889937]
+- Updated dependencies [25ba1344]
+- Updated dependencies [5f216d3b]
+  - @linaria/babel-preset@5.0.3
+  - @linaria/react@5.0.2
+  - @linaria/shaker@5.0.2
+  - @linaria/tags@5.0.2
+
 ## 5.0.2
 
 ### Patch Changes

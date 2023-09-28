@@ -1,5 +1,21 @@
 # Change Log
 
+## 5.0.2
+
+### Patch Changes
+
+- 1e889937: fix: make StyledProcessor work on Windows
+- Updated dependencies [4992c14d]
+- Updated dependencies [70000ec8]
+- Updated dependencies [1e889937]
+- Updated dependencies [5a32f4fd]
+- Updated dependencies [727dc2bd]
+- Updated dependencies [25ba1344]
+- Updated dependencies [5a32f4fd]
+  - @linaria/utils@5.0.2
+  - @linaria/tags@5.0.2
+  - @linaria/core@5.0.2
+
 ## 5.0.1
 
 ### Patch Changes

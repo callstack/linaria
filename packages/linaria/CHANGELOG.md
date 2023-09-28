@@ -1,5 +1,23 @@
 # Change Log
 
+## 5.0.3
+
+### Patch Changes
+
+- Updated dependencies [5f216d3b]
+- Updated dependencies [1e889937]
+- Updated dependencies [4992c14d]
+- Updated dependencies [15fa87a5]
+- Updated dependencies [25ba1344]
+- Updated dependencies [5f216d3b]
+  - @linaria/babel-preset@5.0.3
+  - @linaria/react@5.0.2
+  - @linaria/shaker@5.0.2
+  - @linaria/rollup@5.0.3
+  - @linaria/stylelint@5.0.3
+  - @linaria/webpack4-loader@5.0.3
+  - @linaria/core@5.0.2
+
 ## 5.0.2
 
 ### Patch Changes

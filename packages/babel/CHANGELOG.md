@@ -1,5 +1,25 @@
 # Change Log
 
+## 5.0.3
+
+### Patch Changes
+
+- 5f216d3b: Fix for lost `pluginOptions` in some entrypoints.
+- 15fa87a5: Fix an ENOENT error for built-in modules. Fixes #1353.
+- 25ba1344: `useBabelConfigs` feature flag.
+- 5f216d3b: `pluginOptions` could be lost during processing.
+- Updated dependencies [4992c14d]
+- Updated dependencies [70000ec8]
+- Updated dependencies [1e889937]
+- Updated dependencies [5a32f4fd]
+- Updated dependencies [727dc2bd]
+- Updated dependencies [25ba1344]
+- Updated dependencies [5a32f4fd]
+  - @linaria/shaker@5.0.2
+  - @linaria/utils@5.0.2
+  - @linaria/tags@5.0.2
+  - @linaria/core@5.0.2
+
 ## 5.0.2
 
 ### Patch Changes
