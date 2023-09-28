@@ -661,13 +661,13 @@ Dependencies: NA
 `;
 
 exports[`strategy shaker does not strip istanbul coverage sequences 1`] = `
-"function cov_2dr9r1nt95() {
-  var path = "/home/user/project/file.js";
-  var hash = "36a1bd3d459d3717fbdf9bd0068161503f8053a5";
+"function cov___HASH__() {
+  var path = "__PATH__";
+  var hash = "__HASH__";
   var global = new Function("return this")();
   var gcv = "__coverage__";
   var coverageData = {
-    path: "/home/user/project/file.js",
+    path: "__PATH__",
     statementMap: {
       "0": {
         start: {
@@ -699,7 +699,7 @@ exports[`strategy shaker does not strip istanbul coverage sequences 1`] = `
     f: {},
     b: {},
     _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
-    hash: "36a1bd3d459d3717fbdf9bd0068161503f8053a5"
+    hash: "__HASH__"
   };
   var coverage = global[gcv] || (global[gcv] = {});
   if (!coverage[path] || coverage[path].hash !== hash) {
@@ -708,13 +708,13 @@ exports[`strategy shaker does not strip istanbul coverage sequences 1`] = `
   var actualCoverage = coverage[path];
   {
     // @ts-ignore
-    cov_2dr9r1nt95 = function () {
+    cov___HASH__ = function () {
       return actualCoverage;
     };
   }
   return actualCoverage;
 }
-cov_2dr9r1nt95();
+cov___HASH__();
 export const titleClass = "titleClass_t13jq05";"
 `;
 

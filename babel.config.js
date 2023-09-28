@@ -54,7 +54,7 @@ module.exports = {
       /**
        * only react and core packages are targeted to be run in the browser
        */
-      test: /\/packages\/(?:atomic|core|react)\/(?!src\/processors\/)/,
+      test: /[\\/]packages[\\/](?:atomic|core|react)[\\/](?!src[\\/]processors[\\/])/,
       presets: ['@babel/preset-react'],
       env: {
         legacy: {
@@ -81,7 +81,7 @@ module.exports = {
       /**
        * we have to transpile JSX in tests
        */
-      test: /\/(__tests__|__fixtures__|packages\/teskit\/src)\//,
+      test: /[\\/](__tests__|__fixtures__|packages[\\/]teskit[\\/]src)[\\/]/,
       presets: ['@babel/preset-react'],
     },
   ],

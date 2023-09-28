@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { readFileSync } from 'fs';
-import { dirname, join, resolve } from 'path';
+import { dirname, join, resolve, sep } from 'path';
 
 import * as babel from '@babel/core';
 import type { PluginItem } from '@babel/core';
@@ -87,7 +87,7 @@ const getLinariaConfig = (
         },
       },
       {
-        test: /\/node_modules\/(?!@linaria)/,
+        test: /[\\/]node_modules[\\/](?!@linaria)/,
         action: 'ignore',
       },
     ],
@@ -1001,7 +1001,10 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
@@ -1520,7 +1523,10 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
@@ -1724,7 +1730,10 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
@@ -1749,7 +1758,10 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
@@ -1774,7 +1786,10 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
@@ -2045,7 +2060,10 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
@@ -2117,13 +2135,20 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
   });
 
   it('does not strip istanbul coverage sequences', async () => {
+    const cwd =
+      process.platform === 'win32'
+        ? 'C:\\Users\\project'
+        : '/home/user/project';
     const withIstanbul = await babel.transformAsync(
       dedent`
       import { css } from './custom-css-tag';
@@ -2134,7 +2159,7 @@ describe('strategy shaker', () => {
       \`;
       `,
       {
-        cwd: '/home/user/project',
+        cwd,
         filename: 'file.js',
         plugins: [
           [
@@ -2143,7 +2168,7 @@ describe('strategy shaker', () => {
               ...babel,
               assertVersion: () => {},
             }),
-            { cwd: '/home/user/project' },
+            { cwd },
           ],
         ],
       }
@@ -2166,7 +2191,13 @@ describe('strategy shaker', () => {
       },
     ]);
 
-    expect(code).toMatchSnapshot();
+    // The output is different on Windows & POSIX-like system
+    const normalizedCode = code
+      .replace(/(cov_)\w+([\s(])/g, `$1__HASH__$2`)
+      .replace(/(hash\s?[:=]\s")\w+(")/g, `$1__HASH__$2`)
+      .replace(/(path\s?[:=]\s")[\w:\\/.]+(")/g, `$1__PATH__$2`);
+
+    expect(normalizedCode).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
 
