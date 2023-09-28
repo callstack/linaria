@@ -7,7 +7,11 @@ import type { Core } from '../babel';
 import { TransformCacheCollection } from '../cache';
 import { transformSync } from '../transform';
 import loadLinariaOptions from '../transform/helpers/loadLinariaOptions';
-import type { ICollectAction, SyncScenarioForAction } from '../transform/types';
+import type {
+  ICollectAction,
+  Services,
+  SyncScenarioForAction,
+} from '../transform/types';
 import type { IPluginState, PluginOptions } from '../types';
 
 import { collector } from './collector';
@@ -26,7 +30,8 @@ export default function babelTransform(
         this: ICollectAction
       ): SyncScenarioForAction<ICollectAction> {
         const { valueCache } = this.data;
-        const { loadedAndParsed, pluginOptions } = this.entrypoint;
+        const { loadedAndParsed } = this.entrypoint;
+        const { pluginOptions } = this.services.options;
         if (loadedAndParsed.evaluator === 'ignored') {
           throw new Error('entrypoint was ignored');
         }

@@ -153,10 +153,13 @@ export function loadAndParse(
   services: Services,
   name: string,
   loadedCode: string | undefined,
-  log: Debugger,
-  pluginOptions: StrictOptions
+  log: Debugger
 ): IEntrypointCode | IIgnoredEntrypoint {
-  const { babel, eventEmitter } = services;
+  const {
+    babel,
+    eventEmitter,
+    options: { pluginOptions },
+  } = services;
 
   const extension = extname(name);
 

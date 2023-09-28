@@ -65,8 +65,7 @@ export function transformSync(
     services,
     options.filename,
     ['__linariaPreval'],
-    originalCode,
-    pluginOptions
+    originalCode
   );
 
   if (entrypoint.ignored) {
@@ -148,8 +147,7 @@ export default async function transform(
     services,
     options.filename,
     ['__linariaPreval'],
-    originalCode,
-    pluginOptions
+    originalCode
   );
 
   if (entrypoint.ignored) {

@@ -216,7 +216,7 @@ class Module {
       this.callstack = [entrypoint.name];
     }
 
-    this.extensions = entrypoint.pluginOptions.extensions;
+    this.extensions = services.options.pluginOptions.extensions;
 
     this.debug('init', entrypoint.name);
   }
@@ -252,7 +252,8 @@ class Module {
       evaluatedCreated = true;
     }
 
-    const { transformedCode: source, pluginOptions } = entrypoint;
+    const { transformedCode: source } = entrypoint;
+    const { pluginOptions } = this.services.options;
 
     if (!source) {
       this.debug(`evaluate`, 'there is nothing to evaluate');
@@ -393,8 +394,7 @@ class Module {
       this.services,
       filename,
       only,
-      code,
-      this.services.options.pluginOptions
+      code
     );
 
     if (newEntrypoint.evaluated) {
