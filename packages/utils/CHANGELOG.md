@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.0.2
+
+### Patch Changes
+
+- 4992c14d: Fix an issue with Shaker when CJS export is assigned to a const. Fixes #1348.
+- 70000ec8: The code remover should not delete classes if the last member was deleted.
+- 5a32f4fd: The code remover is trained to handle logical and ternary expressions. Fixes #1310.
+- 727dc2bd: fix: add caller settings to loadBabelOptions()
+- 25ba1344: `useBabelConfigs` feature flag.
+- 5a32f4fd: Browser-specific code can now be wrapped in `if (typeof window !== 'undefined') { /* will be deleted */ }`.
+
 ## 5.0.0
 
 ### Major Changes
