@@ -67,7 +67,7 @@ const createEntrypoint = (
   only: string[],
   code: string
 ) => {
-  const entrypoint = Entrypoint.createRoot(services, name, only, code, options);
+  const entrypoint = Entrypoint.createRoot(services, name, only, code);
 
   if (entrypoint.ignored) {
     throw new Error('entrypoint was ignored');
