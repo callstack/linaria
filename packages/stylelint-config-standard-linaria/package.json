@@ -1,6 +1,6 @@
 {
   "name": "@linaria/stylelint-config-standard-linaria",
-  "version": "4.5.0",
+  "version": "5.0.0",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "css",
@@ -43,7 +43,7 @@
     "stylelint-config-standard": "^28.0.0"
   },
   "engines": {
-    "node": "^12.16.0 || >=13.7.0"
+    "node": ">=16.0.0"
   },
   "publishConfig": {
     "access": "public"

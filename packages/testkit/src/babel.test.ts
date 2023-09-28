@@ -1,5 +1,6 @@
+/* eslint-disable no-restricted-syntax */
 import { readFileSync } from 'fs';
-import { dirname, join, resolve } from 'path';
+import { dirname, join, resolve, sep } from 'path';
 
 import * as babel from '@babel/core';
 import type { PluginItem } from '@babel/core';
@@ -10,8 +11,19 @@ import type { PluginOptions, Stage } from '@linaria/babel-preset';
 import {
   transform as linariaTransform,
   loadLinariaOptions,
+  TransformCacheCollection,
+  Entrypoint,
 } from '@linaria/babel-preset';
-import type { Evaluator, StrictOptions } from '@linaria/utils';
+import { linariaLogger } from '@linaria/logger';
+import type {
+  Evaluator,
+  OnEvent,
+  OnActionStartArgs,
+  OnActionFinishArgs,
+  FeatureFlags,
+} from '@linaria/utils';
+import { EventEmitter } from '@linaria/utils';
+import type { EntrypointEvent } from '@linaria/utils/types/EventEmitter';
 
 import serializer from './__utils__/linaria-snapshot-serializer';
 
@@ -19,11 +31,16 @@ expect.addSnapshotSerializer(serializer);
 
 const dirName = __dirname;
 
+type PartialOptions = Partial<Omit<PluginOptions, 'features'>> & {
+  features?: Partial<FeatureFlags>;
+};
+
 type Options = [
   evaluator: Evaluator,
-  linariaConfig?: Partial<StrictOptions>,
+  linariaConfig?: PartialOptions,
   extension?: 'js' | 'ts' | 'jsx' | 'tsx',
-  babelConfig?: babel.TransformOptions
+  filename?: string,
+  babelConfig?: babel.TransformOptions,
 ];
 
 const asyncResolve = (what: string, importer: string, stack: string[]) => {
@@ -50,7 +67,7 @@ const getPresets = (extension: 'js' | 'ts' | 'jsx' | 'tsx') => {
 
 const getLinariaConfig = (
   evaluator: Evaluator,
-  linariaConfig: Partial<StrictOptions>,
+  linariaConfig: PartialOptions,
   presets: PluginItem[],
   stage?: Stage
 ): PluginOptions =>
@@ -70,23 +87,31 @@ const getLinariaConfig = (
         },
       },
       {
-        test: /\/node_modules\/(?!@linaria)/,
+        test: /[\\/]node_modules[\\/](?!@linaria)/,
         action: 'ignore',
       },
     ],
+    features: {
+      softErrors: false,
+    },
     stage,
     ...linariaConfig,
   });
 
-async function transform(originalCode: string, opts: Options) {
+async function transform(
+  originalCode: string,
+  opts: Options,
+  cache?: TransformCacheCollection,
+  eventEmitter?: EventEmitter,
+  filename = 'source'
+) {
   const [
     evaluator,
     linariaPartialConfig = {},
     extension = 'js',
+    fullFilename = join(dirName, `${filename}.${extension}`),
     babelPartialConfig = {},
   ] = opts;
-
-  const filename = join(dirName, `source.${extension}`);
 
   const presets = getPresets(extension);
   const linariaConfig = getLinariaConfig(
@@ -96,15 +121,18 @@ async function transform(originalCode: string, opts: Options) {
     'collect'
   );
 
-  const result = await linariaTransform(
-    originalCode,
-    {
-      filename: babelPartialConfig.filename ?? filename,
+  const services = {
+    babel,
+    cache,
+    options: {
+      filename: babelPartialConfig.filename ?? fullFilename,
+      root: babelPartialConfig.root ?? undefined,
+      inputSourceMap: babelPartialConfig.inputSourceMap ?? undefined,
       pluginOptions: linariaConfig,
     },
-    asyncResolve,
-    babelPartialConfig
-  );
+    eventEmitter,
+  };
+  const result = await linariaTransform(services, originalCode, asyncResolve);
 
   return {
     code: result.code,
@@ -118,26 +146,56 @@ async function transform(originalCode: string, opts: Options) {
 }
 
 async function transformFile(filename: string, opts: Options) {
-  const [
-    evaluator,
-    linariaPartialConfig = {},
-    extension = 'js',
-    babelPartialConfig = {},
-  ] = opts;
+  const [evaluator, linariaPartialConfig = {}, extension = 'js'] = opts;
   const code = readFileSync(filename, 'utf8');
   return transform(code, [
     evaluator,
     linariaPartialConfig,
     extension,
-    {
-      ...babelPartialConfig,
-      filename,
-    },
+    filename,
   ]);
 }
 
 describe('strategy shaker', () => {
   const evaluator = require('@linaria/shaker').default;
+  let onEvent: jest.Mock<void, Parameters<OnEvent>>;
+  let onAction: jest.Mock<number, OnActionStartArgs | OnActionFinishArgs>;
+  let onEntrypointEvent: jest.Mock<
+    void,
+    [idx: number, timestamp: number, event: EntrypointEvent]
+  >;
+  let emitter: EventEmitter;
+
+  function hasNotBeenProcessed(filename: string) {
+    expect(onEntrypointEvent).toHaveBeenCalledWith(
+      expect.any(Number),
+      expect.any(Number),
+      expect.objectContaining({
+        filename,
+        type: 'created',
+      })
+    );
+
+    const entrypointId = onEntrypointEvent.mock.calls.find(
+      (call) => call[2].type === 'created' && call[2].filename === filename
+    )![0];
+
+    expect(onEntrypointEvent).not.toHaveBeenCalledWith(
+      entrypointId,
+      expect.any(Number),
+      expect.objectContaining({
+        type: 'actionCreated',
+        actionType: 'explodeReexports',
+      })
+    );
+  }
+
+  beforeEach(() => {
+    onEvent = jest.fn();
+    onAction = jest.fn();
+    onEntrypointEvent = jest.fn();
+    emitter = new EventEmitter(onEvent, onAction, onEntrypointEvent);
+  });
 
   it('transpiles styled template literal with object', async () => {
     const { code, metadata } = await transform(
@@ -943,7 +1001,10 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
@@ -1462,7 +1523,10 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
@@ -1666,7 +1730,10 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
@@ -1691,7 +1758,10 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
@@ -1716,7 +1786,10 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
@@ -1987,7 +2060,10 @@ describe('strategy shaker', () => {
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
@@ -2012,14 +2088,7 @@ describe('strategy shaker', () => {
         font-size: 14px;
       \`;
       `,
-      [
-        evaluator,
-        {},
-        'js',
-        {
-          filename: join(dirName, 'FancyName.js'),
-        },
-      ]
+      [evaluator, {}, 'js', join(dirName, 'FancyName.js')]
     );
 
     expect(code).toMatchSnapshot();
@@ -2035,14 +2104,7 @@ describe('strategy shaker', () => {
         font-size: 14px;
       \`;
       `,
-      [
-        evaluator,
-        {},
-        'js',
-        {
-          filename: join(dirName, 'FancyName/index.js'),
-        },
-      ]
+      [evaluator, {}, 'js', join(dirName, 'FancyName/index.js')]
     )!;
 
     expect(code).toMatchSnapshot();
@@ -2067,21 +2129,26 @@ describe('strategy shaker', () => {
             extensions: [''],
           },
           'js',
-          {
-            filename: join(dirName, '/.js'),
-          },
+          join(dirName, '/.js'),
         ]
       );
     } catch (e) {
       expect(
         stripAnsi(
-          (e as { message: string }).message.replace(dirName, '<<DIRNAME>>')
+          (e as { message: string }).message.replace(
+            dirName + sep,
+            '<<DIRNAME>>/'
+          )
         )
       ).toMatchSnapshot();
     }
   });
 
   it('does not strip istanbul coverage sequences', async () => {
+    const cwd =
+      process.platform === 'win32'
+        ? 'C:\\Users\\project'
+        : '/home/user/project';
     const withIstanbul = await babel.transformAsync(
       dedent`
       import { css } from './custom-css-tag';
@@ -2092,7 +2159,7 @@ describe('strategy shaker', () => {
       \`;
       `,
       {
-        cwd: '/home/user/project',
+        cwd,
         filename: 'file.js',
         plugins: [
           [
@@ -2101,7 +2168,7 @@ describe('strategy shaker', () => {
               ...babel,
               assertVersion: () => {},
             }),
-            { cwd: '/home/user/project' },
+            { cwd },
           ],
         ],
       }
@@ -2124,7 +2191,13 @@ describe('strategy shaker', () => {
       },
     ]);
 
-    expect(code).toMatchSnapshot();
+    // The output is different on Windows & POSIX-like system
+    const normalizedCode = code
+      .replace(/(cov_)\w+([\s(])/g, `$1__HASH__$2`)
+      .replace(/(hash\s?[:=]\s")\w+(")/g, `$1__HASH__$2`)
+      .replace(/(path\s?[:=]\s")[\w:\\/.]+(")/g, `$1__PATH__$2`);
+
+    expect(normalizedCode).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
 
@@ -2423,6 +2496,23 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('uses values from json', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { css } from '@linaria/core';
+      import sample from './__fixtures__/sample-data.json';
+
+      export const eyeColorClass = css\`
+        color: ${'${sample.eye_color}'};
+      \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('evaluates complex styles with functions and nested selectors', async () => {
     const { code, metadata } = await transform(
       dedent`
@@ -2560,6 +2650,35 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('should ignore unused wildcard reexports', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { css } from "@linaria/core";
+      import { foo1 } from "./__fixtures__/reexports";
+
+      export const square = css\`
+        color: ${'${foo1}'};
+      \`;
+    `,
+      [evaluator],
+      undefined,
+      emitter
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+
+    const reexports = resolve(__dirname, './__fixtures__/reexports.js');
+    const unusedFile = resolve(__dirname, './__fixtures__/bar.js');
+    expect(onEntrypointEvent).toHaveBeenCalledWith(
+      expect.any(Number),
+      expect.any(Number),
+      expect.objectContaining({ filename: reexports, type: 'created' })
+    );
+
+    hasNotBeenProcessed(unusedFile);
+  });
+
   it('should not drop exported vars of renamed imports', async () => {
     const { code, metadata } = await transform(
       dedent`
@@ -2571,6 +2690,41 @@ describe('strategy shaker', () => {
       export const square = css\`
         color: ${'${bar3("thing")}'};
       \`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should process unary expressions in interpolation', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { css } from "@linaria/core";
+
+      let size = 1337;
+      size += 0;
+
+      export const class1 = css\`width:${'${+size}'}px;\`;
+      export const class2 = css\`width:${'${size}'}px;\`;
+    `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  xit('should process bindings in interpolation', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { css } from "@linaria/core";
+
+      let size = 1337;
+
+      export const class1 = css\`width:${'${size = 1}'}px;\`;
+      export const class2 = css\`width:${'${size}'}px;\`;
     `,
       [evaluator]
     );
@@ -2661,13 +2815,13 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
-  it('evaluates chain of reexports', async () => {
+  it('should process circular imports', async () => {
     const { code, metadata } = await transform(
       dedent`
       import { styled } from '@linaria/react';
-      import { fooStyles } from "./__fixtures__/re-exports";
+      import { fooStyles } from "./__fixtures__/circular-imports";
 
-      const value = fooStyles.foo;
+      const value = fooStyles.constBar;
 
       export const H1 = styled.h1\`
         color: ${'${value}'};
@@ -2680,12 +2834,93 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
-  it('respects module-resolver plugin', async () => {
+  it('evaluates chain of reexports', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+      import { styled } from '@linaria/react';
+      import { fooStyles } from "./__fixtures__/re-exports";
+
+      const value = fooStyles.foo;
+
+      export const H1 = styled.h1\`
+        color: ${'${value}'};
+      \`
+      `,
+      [evaluator],
+      undefined,
+      emitter
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+
+    hasNotBeenProcessed(resolve(__dirname, './__fixtures__/bar.js'));
+    hasNotBeenProcessed(
+      resolve(__dirname, './__fixtures__/re-exports/empty.js')
+    );
+  });
+
+  it('should fail because babelrc options is disabled', async () => {
+    const fn = () =>
+      transformFile(
+        resolve(__dirname, './__fixtures__/with-babelrc/index.js'),
+        [
+          evaluator,
+          {
+            features: {
+              useBabelConfigs: false,
+            },
+          },
+        ]
+      );
+
+    expect(fn).rejects.toThrowError(`Cannot find module '_/re-exports'`);
+  });
+
+  it('respects module-resolver plugin and show waring', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
     const { code, metadata } = await transformFile(
       resolve(__dirname, './__fixtures__/with-babelrc/index.js'),
       [evaluator]
     );
 
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'This works for now but will be an error in the future'
+      )
+    );
+    warn.mockRestore();
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it("respects module-resolver plugin and don't show waring", async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const { code, metadata } = await transformFile(
+      resolve(__dirname, './__fixtures__/with-babelrc/index.js'),
+      [
+        evaluator,
+        {
+          babelOptions: {
+            plugins: [
+              [
+                'module-resolver',
+                {
+                  alias: {
+                    _: './src/__fixtures__',
+                  },
+                },
+              ],
+            ],
+          },
+        },
+      ]
+    );
+
+    expect(warn).toHaveBeenCalledTimes(0);
+    warn.mockRestore();
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
@@ -2787,12 +3022,12 @@ describe('strategy shaker', () => {
   it('should not eval wrapped component from a non-linaria library', async () => {
     const { code, metadata } = await transform(
       dedent`
-      import { styled } from "@linaria/react";
-      import { connect } from "./__fixtures__/linaria-ui-library/hocs";
-      import { Title } from "./__fixtures__/non-linaria-ui-library/index";
+        import { styled } from "@linaria/react";
+        import { connect } from "./__fixtures__/linaria-ui-library/hocs";
+        import { Title } from "./__fixtures__/non-linaria-ui-library/index";
 
-      export const StyledTitle = styled(connect(Title))\`\`;
-    `,
+        export const StyledTitle = styled(connect(Title))\`\`;
+      `,
       [evaluator]
     );
 
@@ -2803,25 +3038,388 @@ describe('strategy shaker', () => {
   it('should not import types', async () => {
     const { code, metadata } = await transform(
       dedent`
-      import { styled } from "@linaria/react";
-      import { Title } from "./__fixtures__/linaria-ui-library/components/index";
-      import { ComponentType } from "./__fixtures__/linaria-ui-library/types";
+        import { styled } from "@linaria/react";
+        import { Title } from "./__fixtures__/linaria-ui-library/components/index";
+        import { ComponentType } from "./__fixtures__/linaria-ui-library/types";
 
-      const map = new Map<string, ComponentType>()
-        .set('Title', Title);
+        const map = new Map<string, ComponentType>()
+          .set('Title', Title);
 
-      const Gate = (props: { type: ComponentType, className: string }) => {
-        const { className, type } = props;
-        const Component = map.get(type);
-        return <Component className={className}/>;
-      };
+        const Gate = (props: { type: ComponentType, className: string }) => {
+          const { className, type } = props;
+          const Component = map.get(type);
+          return <Component className={className}/>;
+        };
 
-      export const StyledTitle = styled(Gate)\`\`;
-    `,
+        export const StyledTitle = styled(Gate)\`\`;
+      `,
       [evaluator, {}, 'tsx']
     );
 
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
+  });
+
+  it('should shake out identifiers that are referenced only in types', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { styled } from "@linaria/react";
+        import * as yup from "yup";
+        import { Form } from "./__fixtures__/linaria-ui-library/components/index";
+
+        const validationSchema = yup.object();
+        type IModel = yup.InferType<typeof validationSchema>;
+
+        const Editor = () => {
+          const initial: IModel = {};
+          return <Form schema={validationSchema} data={initial} />;
+        };
+
+        export const StyledEditor = styled(Editor)\`\`;
+      `,
+      [evaluator, {}, 'tsx']
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should process dynamic require', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { css } from "@linaria/core";
+
+        const url = "./__fixtures__/FOO";
+        const foo2 = require(url.toLowerCase()).foo2;
+
+        export const square = css\`
+          div:before {
+            content: ${'${foo2}'};
+          }
+        \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should work with built-in modules', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { css } from "@linaria/core";
+        import { URL } from "url";
+
+        const url = (new URL("https://example.com")).toString();
+
+        export const square = css\`
+          background: url(${'${url}'});
+        \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should process module.exports = require(…)', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { css } from "@linaria/core";
+
+        const mod = require("./__fixtures__/module-reexport");
+
+        export const square = css\`
+          div:before {
+            content: ${'${mod.foo}'};
+          }
+        \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should import react as namespace', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { styled } from "@linaria/react";
+        import * as React from "react";
+
+        const Cmp = React.memo(() => null);
+
+        export const StyledTitle = styled(Cmp)\`\`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should work with short-circuit imports', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { css } from "@linaria/core";
+        import { stringConstant } from "./__fixtures__/self-import";
+
+        export const StyledTitle = css\`
+          content: "${'${stringConstant}'}";
+        \`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  xit('should shake out side effect because its definition uses DOM API', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+        import { css } from "@linaria/core";
+        import { runNearFramePaint } from "./__fixtures__/runNearFramePaint";
+
+        runNearFramePaint(() => {
+          // Do something
+        });
+
+        export const text = css\`\`;
+      `,
+      [evaluator]
+    );
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  describe('cache', () => {
+    const getCachedExports = (
+      cache: TransformCacheCollection,
+      filename: string
+    ) => {
+      const cachedFoo = cache.get('entrypoints', filename);
+      if (!cachedFoo?.evaluated) {
+        throw new Error('Expected entrypoint to be evaluated');
+      }
+
+      const result: Record<string | symbol, unknown> = {};
+      Object.keys(cachedFoo.exports).forEach((key) => {
+        result[key] = cachedFoo.exports[key];
+      });
+
+      return result;
+    };
+
+    it('should cache evaluation', async () => {
+      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+      const cache = new TransformCacheCollection();
+      const { code, metadata } = await transform(
+        dedent`
+          import { css } from "@linaria/core";
+          import { foo1, foo2 } from "./__fixtures__/foo";
+
+          export const text = css\`font-size: ${'${foo1}'}\`;
+          `,
+        [evaluator],
+        cache
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+
+      const exports = getCachedExports(cache, filename);
+      expect(exports.foo1).toBe('foo1');
+      expect(exports.foo2).toBe(undefined); // foo2 is not used and should not be evaluated
+    });
+
+    const createCacheFor = async (
+      filename: string,
+      exports: Record<string, string>
+    ) => {
+      const fooContent = readFileSync(filename, 'utf-8');
+      const cache = new TransformCacheCollection();
+      cache.invalidateIfChanged(filename, fooContent);
+
+      const only = Object.keys(exports);
+      const exportsProxy = Entrypoint.createExports(linariaLogger);
+      only.forEach((key) => {
+        exportsProxy[key] = exports[key];
+      });
+
+      cache.add('entrypoints', filename, {
+        evaluated: true,
+        evaluatedOnly: only,
+        generation: 1,
+        exports: exportsProxy,
+        ignored: false,
+        log: linariaLogger,
+        only,
+      });
+
+      return cache;
+    };
+
+    it('should use cached value', async () => {
+      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+      const cache = await createCacheFor(filename, { foo1: 'cached-foo1' });
+
+      const { code, metadata } = await transform(
+        dedent`
+          import { css } from "@linaria/core";
+          import { foo1 } from "./__fixtures__/foo";
+
+          export const text = css\`font-size: ${'${foo1}'}\`;
+          `,
+        [evaluator],
+        cache
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+
+    it('should use partially cached value', async () => {
+      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+      const cache = await createCacheFor(filename, { foo1: 'cached-foo1' });
+
+      const { code, metadata } = await transform(
+        dedent`
+          import { css } from "@linaria/core";
+          import { foo1, foo2 } from "./__fixtures__/foo";
+
+          export const text = css\`font-size: ${'${foo1 + foo2}'}\`;
+          `,
+        [evaluator],
+        cache
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+
+    // it('should use cached value even if only part of it is required', async () => {
+    it('should use cached value even if only part is required', async () => {
+      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+      const cache = await createCacheFor(filename, {
+        foo1: 'cached-foo1',
+        foo2: 'cached-foo2',
+      });
+
+      const { code, metadata } = await transform(
+        dedent`
+          import { css } from "@linaria/core";
+          import { foo1 } from "./__fixtures__/foo";
+
+          export const text = css\`font-size: ${'${foo1}'}\`;
+          `,
+        [evaluator],
+        cache
+      );
+
+      expect(code).toMatchSnapshot();
+      expect(metadata).toMatchSnapshot();
+    });
+  });
+
+  describe('concurrent', () => {
+    it('two parallel chains of reexports', async () => {
+      const cache = new TransformCacheCollection();
+
+      const files = {
+        'source-1': dedent`
+          import { styled } from '@linaria/react';
+          import { fooStyles } from "./__fixtures__/re-exports";
+
+          const value = fooStyles.foo;
+
+          export const H1 = styled.h1\`
+            color: ${'${value}'};
+          \`
+        `,
+        'source-2': dedent`
+          import { styled } from '@linaria/react';
+          import { bar2 } from "./__fixtures__/re-exports";
+
+          export const H1 = styled.h1\`
+            color: ${'${bar2}'};
+          \`
+        `,
+      };
+
+      const results = await Promise.all(
+        Object.entries(files).map(([filename, content]) =>
+          transform(content, [evaluator], cache, emitter, filename)
+        )
+      );
+
+      for (const { code, metadata } of results) {
+        expect(code).toMatchSnapshot();
+        expect(metadata).toMatchSnapshot();
+      }
+
+      hasNotBeenProcessed(
+        resolve(__dirname, './__fixtures__/re-exports/empty.js')
+      );
+    });
+
+    it('multiple parallel chains of reexports', async () => {
+      const cache = new TransformCacheCollection();
+
+      const tokens = ['foo', 'bar', 'bar1', 'bar2'];
+
+      const results = await Promise.all(
+        tokens.map((token) =>
+          transform(
+            dedent`
+              import { styled } from '@linaria/react';
+              import { ${token} } from "./__fixtures__/re-exports";
+
+              export const H1${token} = styled.h1\`
+                color: ${`\${${token}}`};
+              \`
+            `,
+            [evaluator],
+            cache,
+            emitter,
+            token
+          )
+        )
+      );
+
+      for (const { code, metadata } of results) {
+        expect(code).toMatchSnapshot();
+        expect(metadata).toMatchSnapshot();
+      }
+    });
+
+    it('loop in evaluated files', async () => {
+      const cache = new TransformCacheCollection();
+
+      await expect(() =>
+        Promise.all(
+          ['AB', 'BA'].map((token) =>
+            transform(
+              dedent`
+              import { styled } from '@linaria/react';
+              import { ${token} } from "./__fixtures__/loop/${token.toLowerCase()}";
+
+              export const H1${token} = styled.h1\`
+                color: ${`\${${token}}`};
+              \`
+            `,
+              [evaluator],
+              cache,
+              emitter,
+              token
+            )
+          )
+        )
+      ).rejects.toThrowError(/reading 'toLowerCase'/);
+    });
   });
 });

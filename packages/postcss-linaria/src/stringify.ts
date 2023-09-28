@@ -136,34 +136,6 @@ class LinariaStringifier extends Stringifier {
   }
 
   /** @inheritdoc */
-  public override root(node: Root): void {
-    this.builder(node.raws.codeBefore ?? '', node, 'start');
-
-    this.body(node);
-
-    // Here we want to recover any previously removed JS indentation
-    // if possible. Otherwise, we use the `after` string as-is.
-    const after = node.raws.linariaAfter ?? node.raws.after;
-    if (after) {
-      this.builder(after);
-    }
-
-    this.builder(node.raws.codeAfter ?? '', node, 'end');
-  }
-
-  public override rule(node: Rule): void {
-    let value = this.rawValue(node, 'selector');
-    if (value.includes(placeholderText)) {
-      const expressionStrings = node.root().raws.linariaTemplateExpressions;
-      value = substitutePlaceholders(value, expressionStrings);
-    }
-    this.block(node, value);
-    if (node.raws.ownSemicolon) {
-      this.builder(node.raws.ownSemicolon, node, 'end');
-    }
-  }
-
-  /** @inheritdoc */
   public override raw(
     node: AnyNode,
     own: string,
@@ -189,6 +161,34 @@ class LinariaStringifier extends Stringifier {
     }
 
     return super.rawValue(node, prop);
+  }
+
+  /** @inheritdoc */
+  public override root(node: Root): void {
+    this.builder(node.raws.codeBefore ?? '', node, 'start');
+
+    this.body(node);
+
+    // Here we want to recover any previously removed JS indentation
+    // if possible. Otherwise, we use the `after` string as-is.
+    const after = node.raws.linariaAfter ?? node.raws.after;
+    if (after) {
+      this.builder(after);
+    }
+
+    this.builder(node.raws.codeAfter ?? '', node, 'end');
+  }
+
+  public override rule(node: Rule): void {
+    let value = this.rawValue(node, 'selector');
+    if (value.includes(placeholderText)) {
+      const expressionStrings = node.root().raws.linariaTemplateExpressions;
+      value = substitutePlaceholders(value, expressionStrings);
+    }
+    this.block(node, value);
+    if (node.raws.ownSemicolon) {
+      this.builder(node.raws.ownSemicolon, node, 'end');
+    }
   }
 }
 

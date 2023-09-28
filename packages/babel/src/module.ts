@@ -16,25 +16,27 @@ import NativeModule from 'module';
 import path from 'path';
 import vm from 'vm';
 
-import type { BabelFileResult } from '@babel/core';
+import { invariant } from 'ts-invariant';
 
-import type { CustomDebug } from '@linaria/logger';
-import { createCustomDebug } from '@linaria/logger';
-import type { BaseProcessor } from '@linaria/tags';
-import type { StrictOptions } from '@linaria/utils';
-import { getFileIdx } from '@linaria/utils';
+import type { Debugger } from '@linaria/logger';
 
-import { TransformCacheCollection } from './cache';
-import * as process from './process';
-import type { ITransformFileResult } from './types';
+import './utils/dispose-polyfill';
+import type { TransformCacheCollection } from './cache';
+import { Entrypoint } from './transform/Entrypoint';
+import { getStack, isSuperSet } from './transform/Entrypoint.helpers';
+import type { IEntrypointDependency } from './transform/Entrypoint.types';
+import type { IEvaluatedEntrypoint } from './transform/EvaluatedEntrypoint';
+import { isUnprocessedEntrypointError } from './transform/actions/UnprocessedEntrypointError';
+import type { Services } from './transform/types';
+import { createVmContext } from './vm/createVmContext';
 
 type HiddenModuleMembers = {
-  _extensions: { [key: string]: () => void };
-  _nodeModulePaths(filename: string): string[];
+  _extensions: Record<string, () => void>;
   _resolveFilename: (
     id: string,
-    options: { id: string; filename: string; paths: string[] }
+    options: { filename: string; id: string; paths: string[] }
   ) => string;
+  _nodeModulePaths(filename: string): string[];
 };
 
 export const DefaultModuleImplementation = NativeModule as typeof NativeModule &
@@ -78,209 +80,350 @@ const builtins = {
   zlib: true,
 };
 
-const VALUES = Symbol('values');
-
-const isProxy = (
-  obj: unknown
-): obj is { [VALUES]: Record<string | symbol, unknown> } =>
-  typeof obj === 'object' && obj !== null && VALUES in obj;
-
 const NOOP = () => {};
 
-const padStart = (num: number, len: number) =>
-  num.toString(10).padStart(len, '0');
+function getUncached(cached: string | string[], test: string[]): string[] {
+  const cachedSet = new Set(
+    typeof cached === 'string' ? cached.split(',') : cached
+  );
 
-const hasKey = <TKey extends string | symbol>(
-  obj: unknown,
-  key: TKey
-): obj is Record<TKey, unknown> =>
-  (typeof obj === 'object' || typeof obj === 'function') &&
-  obj !== null &&
-  key in obj;
+  if (cachedSet.has('*')) {
+    return [];
+  }
+
+  return test.filter((t) => !cachedSet.has(t));
+}
+
+function resolve(
+  this: { resolveDependency: (id: string) => IEntrypointDependency },
+  id: string
+): string {
+  const { resolved } = this.resolveDependency(id);
+  invariant(resolved, `Unable to resolve "${id}"`);
+  return resolved;
+}
 
 class Module {
-  #isEvaluated = false;
+  public readonly callstack: string[] = [];
 
-  #exports: Record<string, unknown> | unknown;
+  public readonly debug: Debugger;
 
-  #lazyValues: Map<string | symbol, () => unknown>;
+  public readonly dependencies: string[];
 
-  readonly idx: number;
+  public readonly extensions: string[];
 
-  id: string;
+  public readonly filename: string;
 
-  filename: string;
+  public id: string;
 
-  options: StrictOptions;
+  public readonly idx: string;
 
-  imports: Map<string, string[]> | null;
+  public readonly ignored: boolean;
 
-  // paths: string[];
+  public isEvaluated: boolean = false;
 
-  extensions: string[];
+  public readonly parentIsIgnored: boolean;
 
-  dependencies: string[] | null;
+  public require: {
+    (id: string): unknown;
+    ensure: () => void;
+    resolve: (id: string) => string;
+  } = Object.assign(
+    (id: string) => {
+      if (id in builtins) {
+        // The module is in the allowed list of builtin node modules
+        // Ideally we should prevent importing them, but webpack polyfills some
+        // So we check for the list of polyfills to determine which ones to support
+        if (builtins[id as keyof typeof builtins]) {
+          this.debug('require', `builtin '${id}'`);
+          return require(id);
+        }
 
-  tagProcessors: BaseProcessor[] = [];
+        return null;
+      }
 
-  transform: ((text: string) => BabelFileResult | null) | null;
+      // Resolve module id (and filename) relatively to parent module
+      const dependency = this.resolveDependency(id);
+      if (dependency.resolved === id && !path.isAbsolute(id)) {
+        // The module is a builtin node modules, but not in the allowed list
+        throw new Error(
+          `Unable to import "${id}". Importing Node builtins is not supported in the sandbox.`
+        );
+      }
 
-  debug: CustomDebug;
+      invariant(
+        dependency.resolved,
+        `Dependency ${dependency.source} cannot be resolved`
+      );
 
-  readonly #resolveCache: Map<string, string>;
+      this.dependencies.push(id);
 
-  readonly #codeCache: Map<
-    string,
+      this.debug('require', `${id} -> ${dependency.resolved}`);
+
+      const entrypoint = this.getEntrypoint(
+        dependency.resolved,
+        dependency.only,
+        this.debug
+      );
+
+      if (entrypoint === null) {
+        return dependency.resolved;
+      }
+
+      if (
+        entrypoint.evaluated ||
+        isSuperSet(entrypoint.evaluatedOnly, dependency.only)
+      ) {
+        return entrypoint.exports;
+      }
+
+      const m = this.createChild(entrypoint);
+      m.evaluate();
+
+      return entrypoint.exports;
+    },
     {
-      imports: Map<string, string[]> | null;
-      only: string[];
-      result: ITransformFileResult;
+      ensure: NOOP,
+      resolve: resolve.bind(this),
     }
-  >;
+  );
 
-  readonly #evalCache: Map<string, Module>;
+  public resolve = resolve.bind(this);
+
+  private cache: TransformCacheCollection;
+
+  #entrypointRef: WeakRef<Entrypoint>;
 
   constructor(
-    filename: string,
-    options: StrictOptions,
-    cache = new TransformCacheCollection(),
-    private debuggerDepth = 0,
-    private parentModule?: Module,
+    private services: Services,
+    entrypoint: Entrypoint,
+    parentModule?: Module,
     private moduleImpl: HiddenModuleMembers = DefaultModuleImplementation
   ) {
-    this.idx = getFileIdx(filename);
-    this.id = filename;
-    this.filename = filename;
-    this.options = options;
-    this.imports = null;
-    this.dependencies = null;
-    this.transform = null;
-    this.debug = createCustomDebug('module', this.idx);
+    this.cache = services.cache;
+    this.#entrypointRef = new WeakRef(entrypoint);
+    this.idx = entrypoint.idx;
+    this.id = entrypoint.name;
+    this.filename = entrypoint.name;
+    this.dependencies = [];
+    this.debug = entrypoint.log.extend('module');
+    this.parentIsIgnored = parentModule?.ignored ?? false;
+    this.ignored = entrypoint.ignored ?? this.parentIsIgnored;
 
-    this.#resolveCache = cache.resolveCache;
-    this.#codeCache = cache.codeCache;
-    this.#evalCache = cache.evalCache;
+    if (parentModule) {
+      this.callstack = [entrypoint.name, ...parentModule.callstack];
+    } else {
+      this.callstack = [entrypoint.name];
+    }
 
-    this.#lazyValues = new Map();
+    this.extensions = services.options.pluginOptions.extensions;
 
-    const exports: Record<string | symbol, unknown> = {};
-
-    this.#exports = new Proxy(exports, {
-      get: (target, key) => {
-        if (key === VALUES) {
-          const values: Record<string | symbol, unknown> = {};
-          this.#lazyValues.forEach((v, k) => {
-            values[k] = v();
-          });
-
-          return values;
-        }
-        let value: unknown;
-        if (this.#lazyValues.has(key)) {
-          value = this.#lazyValues.get(key)?.();
-        } else {
-          // Support Object.prototype methods on `exports`
-          // e.g `exports.hasOwnProperty`
-          value = Reflect.get(target, key);
-        }
-
-        if (value === undefined && this.#lazyValues.has('default')) {
-          const defaultValue = this.#lazyValues.get('default')?.();
-          if (hasKey(defaultValue, key)) {
-            this.debug(
-              'evaluated',
-              '⚠️  %s has been found in `default`. It indicates that ESM to CJS conversion of %s went wrong.',
-              key,
-              filename
-            );
-            value = defaultValue[key];
-          }
-        }
-
-        this.debug('evaluated', 'get %s: %o', key, value);
-        return value;
-      },
-      has: (target, key) => {
-        if (key === VALUES) return true;
-        return this.#lazyValues.has(key);
-      },
-      ownKeys: () => {
-        return Array.from(this.#lazyValues.keys());
-      },
-      set: (target, key, value) => {
-        if (value !== undefined) {
-          if (key !== '__esModule') {
-            this.debug('evaluated', 'set %s: %o', key, value);
-          }
-
-          this.#lazyValues.set(key, () => value);
-        }
-
-        return true;
-      },
-      defineProperty: (target, key, descriptor) => {
-        const { value } = descriptor;
-        if (value !== undefined) {
-          this.#lazyValues.set(key, () => value);
-
-          if (key !== '__esModule') {
-            this.debug(
-              'evaluated',
-              'defineProperty %s with value %o',
-              key,
-              value
-            );
-          }
-
-          this.#lazyValues.set(key, () => value);
-
-          return true;
-        }
-
-        if ('get' in descriptor) {
-          this.#lazyValues.set(key, descriptor.get!);
-          this.debug('evaluated', 'defineProperty %s with getter', key);
-        }
-
-        return true;
-      },
-      getOwnPropertyDescriptor: (target, key) => {
-        if (this.#lazyValues.has(key))
-          return {
-            enumerable: true,
-            configurable: true,
-          };
-
-        return undefined;
-      },
-    });
-
-    this.extensions = options.extensions;
-    this.debug('init', filename);
+    this.debug('init', entrypoint.name);
   }
 
   public get exports() {
-    return this.#exports;
+    return this.entrypoint.exports;
   }
 
   public set exports(value) {
-    if (isProxy(value)) {
-      this.#exports = value[VALUES];
-    } else {
-      this.#exports = value;
-    }
+    this.entrypoint.exports = value;
 
-    this.debug(
-      'evaluated',
-      'the whole exports was overridden with %O',
-      this.#exports
-    );
+    this.debug('the whole exports was overridden with %O', value);
   }
 
-  resolve = (id: string) => {
-    const resolveCacheKey = `${this.filename} -> ${id}`;
-    if (this.#resolveCache.has(resolveCacheKey)) {
-      return this.#resolveCache.get(resolveCacheKey)!;
+  protected get entrypoint(): Entrypoint {
+    const entrypoint = this.#entrypointRef.deref();
+    invariant(entrypoint, `Module ${this.idx} is disposed`);
+    return entrypoint;
+  }
+
+  evaluate(): void {
+    const { entrypoint } = this;
+    entrypoint.assertTransformed();
+
+    const cached = this.cache.get('entrypoints', entrypoint.name)!;
+    let evaluatedCreated = false;
+    if (!entrypoint.supersededWith) {
+      this.cache.add(
+        'entrypoints',
+        entrypoint.name,
+        entrypoint.createEvaluated()
+      );
+      evaluatedCreated = true;
+    }
+
+    const { transformedCode: source } = entrypoint;
+    const { pluginOptions } = this.services.options;
+
+    if (!source) {
+      this.debug(`evaluate`, 'there is nothing to evaluate');
+      return;
+    }
+
+    if (this.isEvaluated) {
+      this.debug('evaluate', `is already evaluated`);
+      return;
+    }
+
+    this.debug('evaluate');
+    this.debug.extend('source')('%s', source);
+
+    this.isEvaluated = true;
+
+    const { filename } = this;
+
+    if (/\.json$/.test(filename)) {
+      // For JSON files, parse it to a JS object similar to Node
+      this.exports = JSON.parse(source);
+      return;
+    }
+
+    const { context, teardown } = createVmContext(
+      filename,
+      pluginOptions.features,
+      {
+        module: this,
+        exports: entrypoint.exports,
+        require: this.require,
+        __linaria_dynamic_import: async (id: string) => this.require(id),
+        __dirname: path.dirname(filename),
+      },
+      pluginOptions.overrideContext
+    );
+
+    try {
+      const script = new vm.Script(
+        `(function (exports) { ${source}\n})(exports);`,
+        {
+          filename,
+        }
+      );
+
+      script.runInContext(context);
+    } catch (e) {
+      this.isEvaluated = false;
+      if (evaluatedCreated) {
+        this.cache.add('entrypoints', entrypoint.name, cached);
+      }
+
+      if (isUnprocessedEntrypointError(e)) {
+        // It will be handled by evalFile scenario
+        throw e;
+      }
+
+      if (e instanceof EvalError) {
+        this.debug('%O', e);
+
+        throw e;
+      }
+
+      this.debug('%O\n%O', e, this.callstack);
+      throw new EvalError(
+        `${(e as Error).message} in${this.callstack.join('\n| ')}\n`
+      );
+    } finally {
+      teardown();
+    }
+  }
+
+  getEntrypoint(
+    filename: string,
+    only: string[],
+    log: Debugger
+  ): Entrypoint | IEvaluatedEntrypoint | null {
+    const extension = path.extname(filename);
+    if (extension !== '.json' && !this.extensions.includes(extension)) {
+      return null;
+    }
+
+    const entrypoint = this.cache.get('entrypoints', filename);
+    if (entrypoint && isSuperSet(entrypoint.evaluatedOnly ?? [], only)) {
+      log('✅ file has been already evaluated');
+      return entrypoint;
+    }
+
+    if (entrypoint?.ignored) {
+      log(
+        '✅ file has been ignored during prepare stage. Original code will be used'
+      );
+      return entrypoint;
+    }
+
+    if (this.ignored) {
+      log(
+        '✅ one of the parent files has been ignored during prepare stage. Original code will be used'
+      );
+
+      const newEntrypoint = this.entrypoint.createChild(
+        filename,
+        ['*'],
+        fs.readFileSync(filename, 'utf-8')
+      );
+
+      if (newEntrypoint === 'loop') {
+        const stack = getStack(this.entrypoint);
+        throw new Error(
+          `Circular dependency detected: ${stack.join(' -> ')} -> ${filename}`
+        );
+      }
+
+      return newEntrypoint;
+    }
+
+    // Requested file can be already prepared for evaluation on the stage 1
+    if (only && entrypoint) {
+      const uncachedExports = getUncached(entrypoint.only ?? [], only);
+      if (uncachedExports.length === 0) {
+        log('✅ ready for evaluation');
+        return entrypoint;
+      }
+
+      log(
+        '❌ file has been processed during prepare stage but %o is not evaluated yet (evaluated: %o)',
+        uncachedExports,
+        entrypoint.only
+      );
+    } else {
+      log('❌ file has not been processed during prepare stage');
+    }
+
+    // If code wasn't extracted from cache, it indicates that we were unable
+    // to process some of the imports on stage1. Let's try to reprocess.
+    const code = fs.readFileSync(filename, 'utf-8');
+    const newEntrypoint = Entrypoint.createRoot(
+      this.services,
+      filename,
+      only,
+      code
+    );
+
+    if (newEntrypoint.evaluated) {
+      log('✅ file has been already evaluated');
+      return newEntrypoint;
+    }
+
+    if (newEntrypoint.ignored) {
+      log(
+        '✅ file has been ignored during prepare stage. Original code will be used'
+      );
+      return newEntrypoint;
+    }
+
+    return newEntrypoint;
+  }
+
+  resolveDependency = (id: string): IEntrypointDependency => {
+    const cached = this.entrypoint.getDependency(id);
+    invariant(!(cached instanceof Promise), 'Dependency is not resolved yet');
+
+    if (cached) {
+      return cached;
+    }
+
+    if (!this.ignored) {
+      this.debug(
+        '❌ import has not been resolved during prepare stage. Fallback to Node.js resolver'
+      );
     }
 
     const extensions = this.moduleImpl._extensions;
@@ -302,203 +445,25 @@ class Module {
 
       const { filename } = this;
 
-      return this.moduleImpl._resolveFilename(id, {
+      const resolved = this.moduleImpl._resolveFilename(id, {
         id: filename,
         filename,
         paths: this.moduleImpl._nodeModulePaths(path.dirname(filename)),
       });
+
+      return {
+        source: id,
+        only: ['*'],
+        resolved,
+      };
     } finally {
       // Cleanup the extensions we added to restore previous behaviour
       added.forEach((ext) => delete extensions[ext]);
     }
   };
 
-  require: {
-    (id: string): unknown;
-    resolve: (id: string) => string;
-    ensure: () => void;
-  } = Object.assign(
-    (id: string) => {
-      if (id in builtins) {
-        // The module is in the allowed list of builtin node modules
-        // Ideally we should prevent importing them, but webpack polyfills some
-        // So we check for the list of polyfills to determine which ones to support
-        if (builtins[id as keyof typeof builtins]) {
-          this.debug('require', `builtin '${id}'`);
-          return require(id);
-        }
-
-        return null;
-      }
-
-      // Resolve module id (and filename) relatively to parent module
-      const resolved = this.resolve(id);
-      const [filename, onlyList] = resolved.split('\0');
-      if (filename === id && !path.isAbsolute(id)) {
-        // The module is a builtin node modules, but not in the allowed list
-        throw new Error(
-          `Unable to import "${id}". Importing Node builtins is not supported in the sandbox.`
-        );
-      }
-
-      this.dependencies?.push(id);
-
-      let m: Module;
-
-      this.debug('require', `${id} -> ${filename}`);
-
-      if (this.#evalCache.has(filename)) {
-        m = this.#evalCache.get(filename)!;
-        this.debug('eval-cache', '✅ %r has been gotten from cache', {
-          namespace: `module:${padStart(m.idx, 5)}`,
-        });
-      } else {
-        this.debug('eval-cache', `➕ %r is going to be initialized`, {
-          namespace: `module:${padStart(getFileIdx(filename), 5)}`,
-        });
-        // Create the module if cached module is not available
-        m = new Module(
-          filename,
-          this.options,
-          {
-            codeCache: this.#codeCache,
-            evalCache: this.#evalCache,
-            resolveCache: this.#resolveCache,
-          },
-          this.debuggerDepth + 1,
-          this
-        );
-        m.transform = this.transform;
-
-        // Store it in cache at this point with, otherwise
-        // we would end up in infinite loop with cyclic dependencies
-        this.#evalCache.set(filename, m);
-      }
-
-      const extension = path.extname(filename);
-      if (extension === '.json' || this.extensions.includes(extension)) {
-        let code: string | undefined;
-        // Requested file can be already prepared for evaluation on the stage 1
-        if (onlyList && this.#codeCache.has(filename)) {
-          const cached = this.#codeCache.get(filename);
-          const only = onlyList
-            .split(',')
-            .filter((token) => !m.#lazyValues.has(token));
-          const cachedOnly = new Set(cached?.only ?? []);
-          const isMatched =
-            cachedOnly.has('*') ||
-            (only && only.every((token) => cachedOnly.has(token)));
-          if (cached && isMatched) {
-            m.debug('code-cache', '✅');
-            code = cached.result.code;
-          } else {
-            m.debug(
-              'code-cache',
-              '%o is missing (%o were cached)',
-              only?.filter((token) => !cachedOnly.has(token)) ?? [],
-              [...cachedOnly.values()]
-            );
-          }
-        } else if (m.#isEvaluated) {
-          m.debug(
-            'code-cache',
-            '✅ not in the code cache, but is already evaluated'
-          );
-        } else {
-          // If code wasn't extracted from cache, read it from the file system
-          // TODO: transpile the file
-          m.debug(
-            'code-cache',
-            '❌ file has not been processed during prepare stage'
-          );
-          code = fs.readFileSync(filename, 'utf-8');
-        }
-
-        if (code) {
-          if (/\.json$/.test(filename)) {
-            // For JSON files, parse it to a JS object similar to Node
-            m.exports = JSON.parse(code);
-            m.#isEvaluated = true;
-          } else {
-            // For JS/TS files, evaluate the module
-            m.evaluate(code);
-          }
-        }
-      } else {
-        // For non JS/JSON requires, just export the id
-        // This is to support importing assets in webpack
-        // The module will be resolved by css-loader
-        m.exports = filename;
-        m.#isEvaluated = true;
-      }
-
-      return m.exports;
-    },
-    {
-      ensure: NOOP,
-      resolve: this.resolve,
-    }
-  );
-
-  evaluate(source: string): void {
-    if (!source) {
-      this.debug(`evaluate`, 'there is nothing to evaluate');
-    }
-
-    if (this.#isEvaluated) {
-      this.debug('evaluate', `is already evaluated`);
-      return;
-    }
-
-    this.debug('evaluate', `\n${source}`);
-
-    this.#isEvaluated = true;
-
-    const { filename } = this;
-
-    const context = vm.createContext({
-      clearImmediate: NOOP,
-      clearInterval: NOOP,
-      clearTimeout: NOOP,
-      setImmediate: NOOP,
-      setInterval: NOOP,
-      setTimeout: NOOP,
-      global,
-      process,
-      module: this,
-      exports: this.#exports,
-      require: this.require,
-      __filename: filename,
-      __dirname: path.dirname(filename),
-    });
-
-    try {
-      const script = new vm.Script(
-        `(function (exports) { ${source}\n})(exports);`,
-        {
-          filename,
-        }
-      );
-
-      script.runInContext(context);
-      return;
-    } catch (e) {
-      if (e instanceof EvalError) {
-        throw e;
-      }
-
-      const callstack: string[] = ['', filename];
-      let module = this.parentModule;
-      while (module) {
-        callstack.push(module.filename);
-        module = module.parentModule;
-      }
-
-      this.debug('evaluate:error', '%O\n%O', e, callstack);
-      throw new EvalError(
-        `${(e as Error).message} in${callstack.join('\n| ')}\n`
-      );
-    }
+  protected createChild(entrypoint: Entrypoint): Module {
+    return new Module(this.services, entrypoint, this, this.moduleImpl);
   }
 }
 

@@ -4,7 +4,9 @@ import type { PluginItem } from '@babel/core';
 import { transformSync } from '@babel/core';
 import dedent from 'dedent';
 
-import shakerPlugin, { hasShakerMetadata } from '../shaker-plugin';
+import { hasEvaluatorMetadata } from '@linaria/utils';
+
+import shakerPlugin from '../shaker-plugin';
 
 type Extension = 'js' | 'ts' | 'jsx' | 'tsx';
 
@@ -23,16 +25,19 @@ const getPresets = (extension: Extension) => {
 
 const keep =
   (only: string[], extension: Extension = 'js') =>
-  (code: TemplateStringsArray) => {
+  (code: TemplateStringsArray, ...args: string[]) => {
     const presets = getPresets(extension);
     const filename = join(__dirname, `source.${extension}`);
-    const formattedCode = dedent(code);
+    const formattedCode = dedent(code, ...args);
 
     const transformed = transformSync(formattedCode, {
       babelrc: false,
       configFile: false,
       filename,
       presets,
+      sourceType: /(?:^|\*\/|;)\s*(?:export|import)\s/m.test(formattedCode)
+        ? 'module'
+        : 'script',
       plugins: [
         [
           shakerPlugin,
@@ -46,14 +51,14 @@ const keep =
     if (
       !transformed ||
       !transformed.code ||
-      !hasShakerMetadata(transformed.metadata)
+      !hasEvaluatorMetadata(transformed.metadata)
     ) {
       throw new Error(`${filename} has no shaker metadata`);
     }
 
     return {
       code: transformed.code,
-      metadata: transformed.metadata.__linariaShaker,
+      metadata: transformed.metadata.linariaEvaluator,
     };
   };
 
@@ -225,7 +230,7 @@ describe('shaker', () => {
     `;
 
     expect(code).toMatchInlineSnapshot(`
-      "import foo from \\"foo\\";
+      "import foo from "foo";
       export const {
         Alive,
         Dead
@@ -283,7 +288,7 @@ describe('shaker', () => {
       const defaultExports = {
         createContext: n.createContext
       };
-      Object.defineProperty(exports, \\"createContext\\", {
+      Object.defineProperty(exports, "createContext", {
         enumerable: !0,
         get: function () {
           return n.createContext;
@@ -294,15 +299,6 @@ describe('shaker', () => {
   });
 
   it('deletes non-default exports when importing default export of a module with an __esModule: true property', () => {
-    /* without workaround, this will be transformed by shaker to:
-      const n = require('n');
-      const defaultExports = {
-        createContext: n.createContext
-      };
-      exports.default = defaultExports;
-
-      i.e, exports.createContext is deleted
-    */
     const { code } = keep(['default'])`
     const n = require('n');
     const defaultExports = { createContext: n.createContext }
@@ -323,10 +319,10 @@ describe('shaker', () => {
       const defaultExports = {
         createContext: n.createContext
       };
-      Object.defineProperty(exports, \\"__esModule\\", {
+      Object.defineProperty(exports, "__esModule", {
         value: true
       });
-      Object.defineProperty(exports, \\"createContext\\", {
+      Object.defineProperty(exports, "createContext", {
         enumerable: !0,
         get: function () {}
       });
@@ -434,6 +430,35 @@ describe('shaker', () => {
       function a(flag) { return (a = function(flag) { flag ? 1 : 2 }) }
       export function b() { return a(1) }
       export function c() {};
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
+  });
+
+  it('should not remove referenced export', () => {
+    const { code, metadata } = keep(['__linariaPreval'])`
+      export default class Media {
+      }
+      const _c = Media;
+      export const __linariaPreval = {};
+    `;
+
+    expect(code).toMatchSnapshot();
+    expect(metadata.imports.size).toBe(0);
+  });
+
+  it('should not remove exports in declarators', () => {
+    const { code, metadata } = keep(['cell', 'cellFrozen'])`
+      exports.__esModule = true;
+      exports.cellFrozenClassname = exports.cellFrozen = exports.cellClassname = exports.cell = void 0;
+      const cell = exports.cell = "cj343x07-0-0-beta-39";
+      const cellClassname = exports.cellClassname = \`rdg-cell ${'${cell}'}\`;
+      const cellFrozen = exports.cellFrozen = "csofj7r7-0-0-beta-39";
+      const cellFrozenClassname = exports.cellFrozenClassname = \`rdg-cell-frozen ${'${cellFrozen}'}\`;
+      exports.__linariaPreval = {};
+
+      exports.classes = { cellClassname };
     `;
 
     expect(code).toMatchSnapshot();

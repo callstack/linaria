@@ -1,6 +1,6 @@
 {
   "name": "@linaria/rollup",
-  "version": "4.5.1",
+  "version": "5.0.2",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",
@@ -41,7 +41,7 @@
     "@linaria/logger": "workspace:^",
     "@linaria/utils": "workspace:^",
     "@linaria/vite": "workspace:^",
-    "@rollup/pluginutils": "^4.1.0"
+    "@rollup/pluginutils": "^5.0.4"
   },
   "devDependencies": {
     "rollup": "^3.11.0"
@@ -50,7 +50,7 @@
     "rollup": "1.20.0||^2.0.0||^3.0.0"
   },
   "engines": {
-    "node": "^12.16.0 || >=13.7.0"
+    "node": ">=16.0.0"
   },
   "publishConfig": {
     "access": "public"

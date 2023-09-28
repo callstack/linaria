@@ -4,6 +4,14 @@ import type { Rules, ValueCache } from '@linaria/tags';
 import { TaggedTemplateProcessor } from '@linaria/tags';
 
 export default class CssProcessor extends TaggedTemplateProcessor {
+  public override get asSelector(): string {
+    return this.className;
+  }
+
+  public override get value(): StringLiteral {
+    return this.astService.stringLiteral(this.className);
+  }
+
   // eslint-disable-next-line class-methods-use-this
   public override addInterpolation(
     node: unknown,
@@ -40,13 +48,5 @@ export default class CssProcessor extends TaggedTemplateProcessor {
     };
 
     return rules;
-  }
-
-  public override get asSelector(): string {
-    return this.className;
-  }
-
-  public override get value(): StringLiteral {
-    return this.astService.stringLiteral(this.className);
   }
 }

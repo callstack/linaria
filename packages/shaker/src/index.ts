@@ -1,62 +1,94 @@
-import type { TransformOptions } from '@babel/core';
+import type { TransformOptions, PluginItem } from '@babel/core';
 
-import { buildOptions, loadBabelOptions } from '@linaria/utils';
 import type { Evaluator } from '@linaria/utils';
-
-import { hasShakerMetadata } from './plugins/shaker-plugin';
+import { getPluginKey, hasEvaluatorMetadata } from '@linaria/utils';
 
 export { default as shakerPlugin } from './plugins/shaker-plugin';
 
-const configCache = new Map<string, TransformOptions>();
-const getShakerConfig = (only: string[] | null): TransformOptions => {
-  const sortedOnly = [...(only ?? [])];
-  sortedOnly.sort();
-  const key = sortedOnly.join('\0');
-  if (configCache.has(key)) {
-    return configCache.get(key)!;
+const hasKeyInList = (plugin: PluginItem, list: string[]): boolean => {
+  const pluginKey = getPluginKey(plugin);
+  return pluginKey ? list.some((i) => pluginKey.includes(i)) : false;
+};
+
+const safeResolve = (id: string, paths: (string | null)[]): string | null => {
+  try {
+    return require.resolve(id, {
+      paths: paths.filter((i) => i !== null) as string[],
+    });
+  } catch {
+    return null;
+  }
+};
+
+const shaker: Evaluator = (
+  evalConfig,
+  ast,
+  code,
+  { highPriorityPlugins, ...config },
+  babel
+) => {
+  const preShakePlugins =
+    evalConfig.plugins?.filter((i) => hasKeyInList(i, highPriorityPlugins)) ??
+    [];
+
+  const plugins = [
+    ...preShakePlugins,
+    [require.resolve('./plugins/shaker-plugin'), config],
+    ...(evalConfig.plugins ?? []).filter(
+      (i) => !hasKeyInList(i, highPriorityPlugins)
+    ),
+  ];
+
+  const hasCommonjsPlugin = evalConfig.plugins?.some(
+    (i) => getPluginKey(i) === 'transform-modules-commonjs'
+  );
+
+  if (!hasCommonjsPlugin) {
+    plugins.push(require.resolve('@babel/plugin-transform-modules-commonjs'));
   }
 
-  const config = {
-    ast: true,
+  if (
+    evalConfig.filename?.endsWith('.ts') ||
+    evalConfig.filename?.endsWith('.tsx')
+  ) {
+    const hasTypescriptPlugin = evalConfig.plugins?.some(
+      (i) => getPluginKey(i) === 'transform-typescript'
+    );
+
+    if (!hasTypescriptPlugin) {
+      const preset = safeResolve('@babel/preset-typescript', [
+        evalConfig.filename,
+      ]);
+      const plugin = safeResolve('@babel/plugin-transform-typescript', [
+        evalConfig.filename,
+        preset,
+      ]);
+
+      if (plugin) {
+        plugins.push(plugin);
+      }
+    }
+  }
+
+  const transformOptions: TransformOptions = {
+    ...evalConfig,
     caller: {
       name: 'linaria',
     },
-    targets: {
-      node: 'current',
-      esmodules: false,
-    },
-    plugins: [
-      [
-        require.resolve('./plugins/shaker-plugin'),
-        {
-          onlyExports: sortedOnly,
-        },
-      ],
-      require.resolve('@babel/plugin-transform-modules-commonjs'),
-    ],
+    plugins,
   };
 
-  configCache.set(key, config);
-  return config;
-};
+  const transformed = babel.transformFromAstSync(ast, code, transformOptions);
 
-const shaker: Evaluator = (filename, options, text, only, babel) => {
-  const transformOptions = loadBabelOptions(
-    babel,
-    filename,
-    buildOptions(options?.babelOptions, getShakerConfig(only))
-  );
-
-  const transformed = babel.transformSync(text, {
-    ...transformOptions,
-    filename,
-  });
-
-  if (!transformed || !hasShakerMetadata(transformed.metadata)) {
-    throw new Error(`${filename} has no shaker metadata`);
+  if (!transformed || !hasEvaluatorMetadata(transformed.metadata)) {
+    throw new Error(`${evalConfig.filename} has no shaker metadata`);
   }
 
-  return [transformed.code ?? '', transformed.metadata.__linariaShaker.imports];
+  return [
+    transformed.ast!,
+    transformed.code ?? '',
+    transformed.metadata.linariaEvaluator.imports,
+  ];
 };
 
 export default shaker;

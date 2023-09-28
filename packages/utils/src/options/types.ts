@@ -1,4 +1,7 @@
+import type { Context as VmContext } from 'vm';
+
 import type { TransformOptions } from '@babel/core';
+import type { File } from '@babel/types';
 
 import type { IVariableContext } from '../IVariableContext';
 import type { Core } from '../babel';
@@ -20,13 +23,24 @@ export type ClassNameFn = (
 
 export type VariableNameFn = (context: IVariableContext) => string;
 
+export type EvaluatorConfig = {
+  features: StrictOptions['features'];
+  highPriorityPlugins: string[];
+  onlyExports: string[];
+};
+
 export type Evaluator = (
-  filename: string,
-  options: StrictOptions,
-  text: string,
-  only: string[] | null,
+  evalConfig: TransformOptions,
+  ast: File,
+  code: string,
+  config: EvaluatorConfig,
   babel: Core
-) => [string, Map<string, string[]> | null];
+) => [
+  ast: File,
+  code: string,
+  imports: Map<string, string[]> | null,
+  exports?: string[] | null,
+];
 
 export type EvalRule = {
   action: Evaluator | 'ignore' | string;
@@ -34,13 +48,33 @@ export type EvalRule = {
   test?: RegExp | ((path: string, code: string) => boolean);
 };
 
+export type FeatureFlag = boolean | string | string[];
+
+type AllFeatureFlags = {
+  dangerousCodeRemover: FeatureFlag;
+  globalCache: FeatureFlag;
+  happyDOM: FeatureFlag;
+  softErrors: FeatureFlag;
+  useBabelConfigs: FeatureFlag;
+};
+
+export type FeatureFlags<
+  TOnly extends keyof AllFeatureFlags = keyof AllFeatureFlags,
+> = Pick<AllFeatureFlags, TOnly>;
+
 export type StrictOptions = {
   babelOptions: TransformOptions;
   classNameSlug?: string | ClassNameFn;
   displayName: boolean;
   evaluate: boolean;
   extensions: string[];
+  features: FeatureFlags;
+  highPriorityPlugins: string[];
   ignore?: RegExp;
+  overrideContext?: (
+    context: Partial<VmContext>,
+    filename: string
+  ) => Partial<VmContext>;
   rules: EvalRule[];
   tagResolver?: (source: string, tag: string) => string | null;
   variableNameConfig?: 'var' | 'dashes' | 'raw';

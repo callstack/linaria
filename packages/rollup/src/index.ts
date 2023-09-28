@@ -23,22 +23,23 @@ import type { Plugin as VitePlugin } from '@linaria/vite';
 import vitePlugin from '@linaria/vite';
 
 type RollupPluginOptions = {
-  include?: string | string[];
   exclude?: string | string[];
-  sourceMap?: boolean;
+  include?: string | string[];
   preprocessor?: Preprocessor;
+  sourceMap?: boolean;
 } & Partial<PluginOptions>;
 
 export default function linaria({
-  include,
   exclude,
-  sourceMap,
+  include,
   preprocessor,
+  sourceMap,
   ...rest
 }: RollupPluginOptions = {}): Plugin {
   const filter = createFilter(include, exclude);
   const cssLookup: { [key: string]: string } = {};
   const cache = new TransformCacheCollection();
+  const emptyConfig = {};
 
   const plugin: Plugin = {
     name: 'linaria',
@@ -93,16 +94,21 @@ export default function linaria({
         throw new Error(`Could not resolve ${what}`);
       };
 
-      const result = await transform(
-        code,
-        {
+      const transformServices = {
+        options: {
           filename: id,
+          root: process.cwd(),
           preprocessor,
           pluginOptions: rest,
         },
+        cache,
+      };
+
+      const result = await transform(
+        transformServices,
+        code,
         asyncResolve,
-        {},
-        cache
+        emptyConfig
       );
 
       if (!result.cssText) return;
@@ -143,17 +149,18 @@ export default function linaria({
     ownKeys() {
       // Rollup doesn't ask config about its own keys, so it is Vite.
       vite = vitePlugin({
-        include,
         exclude,
-        sourceMap,
+        include,
         preprocessor,
+        sourceMap,
         ...rest,
       });
 
       vite = {
         ...vite,
         buildStart() {
-          this.warn(
+          // eslint-disable-next-line no-console
+          console.warn(
             'You are trying to use @linaria/rollup with Vite. The support for Vite in @linaria/rollup is deprecated and will be removed in the next major release. Please use @linaria/vite instead.'
           );
         },

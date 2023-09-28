@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "compilerOptions": { "paths": {}, "rootDir": "src/", "types": ["jest", "node"] },
+  "compilerOptions": { "paths": {}, "rootDir": "src/", "types": ["node"] },
   "references": [
     { "path": "../core" },
     { "path": "../logger" },

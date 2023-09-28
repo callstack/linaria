@@ -22,6 +22,14 @@ function typescriptCommonJS(source: string): string {
   return result.outputText;
 }
 
+function typescriptES2022(source: string): string {
+  const result = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.ES2022 },
+  });
+
+  return result.outputText;
+}
+
 const withoutLocal = <T extends { local: NodePath }>({
   local,
   ...obj
@@ -73,6 +81,10 @@ function babelCommonJS(source: string): string {
   return result?.code ?? '';
 }
 
+function asIs(source: string): string {
+  return source;
+}
+
 function babelNode16(source: string): string {
   const result = babel.transformSync(source, {
     babelrc: false,
@@ -92,21 +104,28 @@ function babelNode16(source: string): string {
 }
 
 const compilers: [name: string, compiler: (code: string) => string][] = [
-  ['as is', babelNode16],
+  ['as is', asIs],
+  ['babel', babelNode16],
   ['babelCommonJS', babelCommonJS],
   ['esbuildCommonJS', esbuildCommonJS],
   ['swcCommonJSes5', swcCommonJS('es5')],
   ['swcCommonJSes2015', swcCommonJS('es2015')],
   ['typescriptCommonJS', typescriptCommonJS],
+  ['typescriptES2022', typescriptES2022],
 ];
 
-function runWithCompiler(compiler: (code: string) => string, code: string) {
+function runWithCompiler(
+  compiler: (code: string) => string,
+  code: string,
+  compilerName: string
+) {
   const compiled = compiler(code);
   const filename = join(__dirname, 'source.ts');
 
   const ast = babel.parse(compiled, {
     babelrc: false,
     filename,
+    presets: ['@babel/preset-typescript'],
   })!;
 
   const file = new File({ filename }, { code, ast });
@@ -128,28 +147,50 @@ function runWithCompiler(compiler: (code: string) => string, code: string) {
     return a.imported.localeCompare(b.imported);
   };
 
+  const evaluateOrSource = (path: NodePath) => {
+    const evaluated = path.evaluate() as {
+      confident: boolean;
+      deopt?: NodePath;
+      value: any;
+    };
+    if (evaluated.confident) {
+      return evaluated.value;
+    }
+
+    if (evaluated.deopt?.isVariableDeclarator()) {
+      const evaluatedInit = evaluated.deopt.get('init').evaluate();
+      if (evaluatedInit.confident) {
+        return evaluatedInit.value;
+      }
+    }
+
+    return generator(path.node).code;
+  };
+
   return {
     exports:
-      collected?.exports
-        .map(({ local, ...i }) => ({
-          ...i,
-          local: generator(local.node).code,
+      Object.entries(collected?.exports ?? {})
+        .map(([exported, local]) => ({
+          exported,
+          local: evaluateOrSource(local),
         }))
         .sort((a, b) => a.exported.localeCompare(b.exported)) ?? [],
     imports:
       collected?.imports
         .map(({ local, ...i }) => ({
           ...i,
-          local: generator(local.node).code,
+          local: evaluateOrSource(local),
         }))
         .sort(sortImports) ?? [],
-    reexports: collected?.reexports ?? [],
+    reexports: collected?.reexports.sort(sortImports) ?? [],
+    compilerName,
+    compiled,
   };
 }
 
 describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
   const run = (code: TemplateStringsArray) =>
-    runWithCompiler(compiler, dedent(code));
+    runWithCompiler(compiler, dedent(code), name);
 
   describe('import', () => {
     it('default', () => {
@@ -524,6 +565,18 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
       ]);
     });
 
+    it('module.exports =', () => {
+      const { exports } = run`
+        module.exports = 42;
+      `;
+
+      expect(exports).toMatchObject([
+        {
+          exported: 'default',
+        },
+      ]);
+    });
+
     it('with declaration', () => {
       const { exports } = run`
         export const a = 1, b = 2;
@@ -535,6 +588,30 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
         },
         {
           exported: 'b',
+        },
+      ]);
+    });
+
+    it('enum', () => {
+      const { exports } = run`
+        export enum E { A, B, C }
+      `;
+
+      expect(exports).toMatchObject([
+        {
+          exported: 'E',
+        },
+      ]);
+    });
+
+    it('class', () => {
+      const { exports } = run`
+        export class Foo {}
+      `;
+
+      expect(exports).toMatchObject([
+        {
+          exported: 'Foo',
         },
       ]);
     });
@@ -575,6 +652,34 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
         },
       ]);
     });
+
+    it('with defineProperty with value', () => {
+      const { exports } = run`
+        Object.defineProperty(exports, 'a', {
+          value: 1,
+        });
+      `;
+
+      expect(exports).toMatchObject([
+        {
+          exported: 'a',
+        },
+      ]);
+    });
+
+    it('with defineProperty with getter', () => {
+      const { exports } = run`
+        Object.defineProperty(exports, 'a', {
+          get: () => 1,
+        });
+      `;
+
+      expect(exports).toMatchObject([
+        {
+          exported: 'a',
+        },
+      ]);
+    });
   });
 
   describe('re-export', () => {
@@ -584,23 +689,15 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
         export default from "unknown-package";
       `;
 
-      if (reexports.length) {
-        expect(reexports.map(withoutLocal)).toMatchObject([
-          {
-            imported: 'default',
-            exported: 'default',
-            source: 'unknown-package',
-          },
-        ]);
-        expect(exports).toHaveLength(0);
-        expect(imports).toHaveLength(0);
-      } else {
-        expect(reexports).toHaveLength(0);
-        expect(exports).toMatchObject([
-          {
-            exported: 'default',
-          },
-        ]);
+      expect(reexports.map(withoutLocal)).toMatchObject([
+        {
+          imported: 'default',
+          exported: 'default',
+          source: 'unknown-package',
+        },
+      ]);
+      expect(exports).toHaveLength(0);
+      if (imports.length) {
         expect(imports).toMatchObject([
           {
             source: 'unknown-package',
@@ -615,23 +712,15 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
         export { token } from "unknown-package";
       `;
 
-      if (reexports.length) {
-        expect(reexports.map(withoutLocal)).toMatchObject([
-          {
-            imported: 'token',
-            exported: 'token',
-            source: 'unknown-package',
-          },
-        ]);
-        expect(exports).toHaveLength(0);
-        expect(imports).toHaveLength(0);
-      } else {
-        expect(reexports).toHaveLength(0);
-        expect(exports).toMatchObject([
-          {
-            exported: 'token',
-          },
-        ]);
+      expect(reexports.map(withoutLocal)).toMatchObject([
+        {
+          imported: 'token',
+          exported: 'token',
+          source: 'unknown-package',
+        },
+      ]);
+      expect(exports).toHaveLength(0);
+      if (imports.length) {
         expect(imports).toMatchObject([
           {
             source: 'unknown-package',
@@ -646,23 +735,15 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
         export { token as renamed } from "unknown-package";
       `;
 
-      if (reexports.length) {
-        expect(reexports.map(withoutLocal)).toMatchObject([
-          {
-            imported: 'token',
-            exported: 'renamed',
-            source: 'unknown-package',
-          },
-        ]);
-        expect(exports).toHaveLength(0);
-        expect(imports).toHaveLength(0);
-      } else {
-        expect(reexports).toHaveLength(0);
-        expect(exports).toMatchObject([
-          {
-            exported: 'renamed',
-          },
-        ]);
+      expect(reexports.map(withoutLocal)).toMatchObject([
+        {
+          imported: 'token',
+          exported: 'renamed',
+          source: 'unknown-package',
+        },
+      ]);
+      expect(exports).toHaveLength(0);
+      if (imports.length) {
         expect(imports).toMatchObject([
           {
             source: 'unknown-package',
@@ -708,26 +789,52 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
         export * from "unknown-package";
       `;
 
-      if (reexports.length) {
-        expect(reexports.map(withoutLocal)).toMatchObject([
-          {
-            imported: '*',
-            exported: '*',
-            source: 'unknown-package',
-          },
-        ]);
-        expect(exports).toHaveLength(0);
-        expect(imports).toHaveLength(0);
-      } else {
-        expect(reexports).toHaveLength(0);
-        expect(exports).toMatchObject([
-          {
-            exported: '*',
-          },
-        ]);
+      expect(reexports.map(withoutLocal)).toMatchObject([
+        {
+          imported: '*',
+          exported: '*',
+          source: 'unknown-package',
+        },
+      ]);
+      expect(exports).toHaveLength(0);
+      if (imports.length) {
         expect(imports).toMatchObject([
           {
             source: 'unknown-package',
+            imported: '*',
+          },
+        ]);
+      }
+    });
+
+    it('multiple export all', () => {
+      const { exports, imports, reexports } = run`
+        export * from "unknown-package-1";
+        export * from "unknown-package-2";
+      `;
+
+      expect(reexports.map(withoutLocal)).toMatchObject([
+        {
+          imported: '*',
+          exported: '*',
+          source: 'unknown-package-1',
+        },
+        {
+          imported: '*',
+          exported: '*',
+          source: 'unknown-package-2',
+        },
+      ]);
+      expect(exports).toHaveLength(0);
+
+      if (imports.length) {
+        expect(imports).toMatchObject([
+          {
+            source: 'unknown-package-1',
+            imported: '*',
+          },
+          {
+            source: 'unknown-package-2',
             imported: '*',
           },
         ]);
@@ -764,83 +871,31 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
         export default 123;
       `;
 
-      if (reexports.length === 3) {
-        // If all re-exports are supported
-        expect(reexports.map(withoutLocal)).toMatchObject([
-          {
-            imported: 'syncResolve',
-            exported: 'syncResolve',
-            source: './asyncResolveFallback',
-          },
-          {
-            imported: '*',
-            exported: '*',
-            source: './collectExportsAndImports',
-          },
-          {
-            imported: 'default',
-            exported: 'isUnnecessaryReactCall',
-            source: './isUnnecessaryReactCall',
-          },
-        ]);
-        expect(exports).toMatchObject([
-          {
-            exported: 'default',
-            local: '123',
-          },
-        ]);
-        expect(imports).toHaveLength(0);
-      } else if (reexports.length === 1) {
-        // If only wildcard re-export is supported
-        expect(reexports.map(withoutLocal)).toMatchObject([
-          {
-            imported: '*',
-            exported: '*',
-            source: './collectExportsAndImports',
-          },
-        ]);
-        expect(exports).toMatchObject([
-          {
-            exported: 'default',
-          },
-          {
-            exported: 'isUnnecessaryReactCall',
-          },
-          {
-            exported: 'syncResolve',
-          },
-        ]);
-        expect(imports).toMatchObject([
-          {
-            imported: 'default',
-            source: './isUnnecessaryReactCall',
-          },
-          {
-            imported: 'syncResolve',
-            source: './asyncResolveFallback',
-          },
-        ]);
-      } else {
-        // If all re-exports were transpiled to CommonJS (babel)
-        expect(reexports).toHaveLength(0);
-        expect(exports).toMatchObject([
-          {
-            exported: '*',
-            local: '_collectExportsAndImports[key]',
-          },
-          {
-            exported: 'default',
-            local: '_default',
-          },
-          {
-            exported: 'isUnnecessaryReactCall',
-            local: '_isUnnecessaryReactCall.default',
-          },
-          {
-            exported: 'syncResolve',
-            local: '_asyncResolveFallback.syncResolve',
-          },
-        ]);
+      expect(reexports.map(withoutLocal)).toMatchObject([
+        {
+          imported: '*',
+          exported: '*',
+          source: './collectExportsAndImports',
+        },
+        {
+          imported: 'default',
+          exported: 'isUnnecessaryReactCall',
+          source: './isUnnecessaryReactCall',
+        },
+        {
+          imported: 'syncResolve',
+          exported: 'syncResolve',
+          source: './asyncResolveFallback',
+        },
+      ]);
+      expect(exports).toMatchObject([
+        {
+          exported: 'default',
+          local: 123,
+        },
+      ]);
+
+      if (imports.length === 3) {
         expect(imports).toMatchObject([
           {
             imported: '*',
@@ -855,6 +910,18 @@ describe.each(compilers)('collectExportsAndImports (%s)', (name, compiler) => {
           {
             imported: 'syncResolve',
             local: '_asyncResolveFallback.syncResolve',
+            source: './asyncResolveFallback',
+          },
+        ]);
+      } else if (imports.length === 2) {
+        // If wildcard re-export is supported natively
+        expect(imports).toMatchObject([
+          {
+            imported: 'default',
+            source: './isUnnecessaryReactCall',
+          },
+          {
+            imported: 'syncResolve',
             source: './asyncResolveFallback',
           },
         ]);

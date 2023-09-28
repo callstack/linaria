@@ -42,6 +42,10 @@ export default class MakeStylesProcessor extends BaseProcessor {
     throw new Error('The result of makeStyles cannot be used as a selector.');
   }
 
+  public override get value(): Expression {
+    return this.astService.nullLiteral();
+  }
+
   public override build(valueCache: ValueCache) {
     const slots = valueCache.get(this.#slotsExpName) as StylesBySlots<string>;
     [this.#cssClassMap, this.#cssRulesByBucket] =
@@ -98,10 +102,6 @@ export default class MakeStylesProcessor extends BaseProcessor {
       cssRulesByBucket,
     ]);
     this.replacer(stylesCall, true);
-  }
-
-  public override get value(): Expression {
-    return this.astService.nullLiteral();
   }
 
   public override toString(): string {

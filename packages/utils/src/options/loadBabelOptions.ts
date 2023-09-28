@@ -23,7 +23,15 @@ export default function loadBabelOptions(
     babel.loadOptions({
       ...overrides,
       filename,
-      caller: { name: 'linaria' },
+      caller: {
+        name: 'linaria',
+
+        // Indicates for @babel/preset-env to support all ESM syntax and avoid transforms before it's needed
+        supportsStaticESM: true,
+        supportsDynamicImport: true,
+        supportsTopLevelAwait: true,
+        supportsExportNamespaceFrom: true,
+      },
     }) ?? {};
 
   fileCache.set(filename, babelOptions);

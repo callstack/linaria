@@ -3,7 +3,13 @@ import { join } from 'path';
 
 import * as babel from '@babel/core';
 
-import { prepareCode } from '@linaria/babel-preset';
+import {
+  Entrypoint,
+  loadLinariaOptions,
+  parseFile,
+  prepareCode,
+  withDefaultServices,
+} from '@linaria/babel-preset';
 
 const testCasesDir = join(__dirname, '__fixtures__', 'prepare-code-test-cases');
 
@@ -18,7 +24,8 @@ const rules = [
   },
 ];
 
-const pluginOptions = {
+const pluginOptions = loadLinariaOptions({
+  configFile: false,
   rules,
   babelOptions: {
     babelrc: false,
@@ -29,7 +36,7 @@ const pluginOptions = {
       '@babel/preset-typescript',
     ],
   },
-};
+});
 
 const extensions = ['ts', 'tsx', 'js', 'jsx'];
 
@@ -49,15 +56,29 @@ describe('prepareCode', () => {
         .split(',')
         .map((s) => s.trim());
 
-      const [transformedCode, imports, metadata] = prepareCode(
+      const sourceCode = restLines.join('\n');
+      const services = withDefaultServices({
         babel,
+        options: { root, filename: inputFilePath, pluginOptions },
+      });
+      const entrypoint = Entrypoint.createRoot(
+        services,
         inputFilePath,
-        restLines.join('\n'),
         only,
-        {
-          root,
-          pluginOptions,
-        }
+        sourceCode
+      );
+
+      if (entrypoint.ignored) {
+        throw new Error('Ignored');
+      }
+      const ast = parseFile(babel, inputFilePath, sourceCode, {
+        root,
+      });
+
+      const [transformedCode, imports, metadata] = prepareCode(
+        services,
+        entrypoint,
+        ast
       );
 
       expect(transformedCode).toMatchSnapshot('code');

@@ -1,5 +1,73 @@
 # Change Log
 
+## 5.0.1
+
+### Patch Changes
+
+- Updated dependencies [6fb6eb69]
+  - @linaria/utils@5.0.1
+
+## 5.0.0
+
+### Major Changes
+
+- 88e07613: Rewritten dependecny tree processing with support for wildcard re-exports.
+- cb853e14: All processing stages were merged into one generators-based processor. It allows the implementation of more complex workflows to support features like dynamic imports and re-exports.
+
+### Minor Changes
+
+- 9cb4143d: Refactoring of the 1st stage of transformation. It opens the road to processing wildcard reexports.
+- ae162f46: babelrc should not be used for preeval transformations (fixes #1308)
+
+### Patch Changes
+
+- f8b9bff5: Improved exports finder so it works with pure TS files and better detects transpiled reexports.
+- 2a1e24a0: Upgrade TypeScript to 5.2
+- Updated dependencies [9cb4143d]
+- Updated dependencies [ae162f46]
+- Updated dependencies [88e07613]
+- Updated dependencies [b3ef8c1f]
+- Updated dependencies [f8b9bff5]
+- Updated dependencies [63902332]
+- Updated dependencies [aa100453]
+- Updated dependencies [9bb782d0]
+- Updated dependencies [2a1e24a0]
+- Updated dependencies [16320d71]
+- Updated dependencies [cb853e14]
+  - @linaria/logger@5.0.0
+  - @linaria/utils@5.0.0
+
+## 4.5.3
+
+### Patch Changes
+
+- Updated dependencies [10bcd241]
+  - @linaria/utils@4.5.3
+
+## 4.5.2
+
+### Patch Changes
+
+- e59bf809: Shaker mistakenly counts references in types as valuable and keeps referenced variables alive.
+- ae3727f9: Fix the issues with processing files that are supposed to be parsed with their respective Babel config.
+- Updated dependencies [79557248]
+- Updated dependencies [b191f543]
+- Updated dependencies [e59bf809]
+- Updated dependencies [520ba8da]
+- Updated dependencies [ae3727f9]
+- Updated dependencies [dca076ef]
+  - @linaria/utils@4.5.2
+
+## 4.5.1
+
+### Patch Changes
+
+- 85e74df6: Fix: type imports without `type` annotation may lead to an unexpected increase in the evaluated codebase.
+- 1bf5c5b8: The cache has been improved, which should address the build time issues for Webpack 4/5 and resolve HMR-related problems for Vite. Fixes #1199, #1265 and maybe some more.
+- Updated dependencies [85e74df6]
+- Updated dependencies [1bf5c5b8]
+  - @linaria/utils@4.5.1
+
 ## 4.5.0
 
 ### Minor Changes

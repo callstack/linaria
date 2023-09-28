@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`shaker should delete import 1`] = `"export const Alive = \\"\\";"`;
+exports[`shaker should delete import 1`] = `"export const Alive = "";"`;
 
 exports[`shaker should handle __importDefault 1`] = `
 "var __importDefault = this && this.__importDefault || function (mod) {
@@ -50,6 +50,27 @@ exports[`shaker should keep side-effects from modules 1`] = `
 export const a = 1;"
 `;
 
+exports[`shaker should not remove exports in declarators 1`] = `
+"var _cellFrozenClassname;
+var _cellFrozen;
+var _cell;
+exports.__esModule = true;
+exports.cellFrozenClassname = exports.cellFrozen = exports.cellClassname = exports.cell = void 0;
+const cell = _cell = "cj343x07-0-0-beta-39";
+_cellClassname = \`rdg-cell \${cell}\`;
+const cellFrozen = _cellFrozen = "csofj7r7-0-0-beta-39";
+const cellFrozenClassname = _cellFrozenClassname = \`rdg-cell-frozen \${cellFrozen}\`;
+exports.cell = _cell;
+exports.cellFrozen = _cellFrozen;
+exports.cellFrozenClassname = _cellFrozenClassname;"
+`;
+
+exports[`shaker should not remove referenced export 1`] = `
+"export default class Media {}
+const _c = Media;
+export const __linariaPreval = {};"
+`;
+
 exports[`shaker should process array patterns 1`] = `
 "const [,, c] = array;
 export { c };"
@@ -80,10 +101,10 @@ exports[`shaker should process transpiled enums 1`] = `
 exports.Kind = void 0;
 var Kind;
 (function (Kind) {
-  Kind[\\"DEFAULT\\"] = \\"default\\";
-  Kind[\\"TRANSPARENT\\"] = \\"transparent\\";
-  Kind[\\"RED\\"] = \\"red\\";
-  Kind[\\"BLACK\\"] = \\"black\\";
+  Kind["DEFAULT"] = "default";
+  Kind["TRANSPARENT"] = "transparent";
+  Kind["RED"] = "red";
+  Kind["BLACK"] = "black";
 })(Kind = _Kind || (_Kind = {}));
 export const defaultValue = Kind.DEFAULT;
 exports.Kind = _Kind;"
@@ -108,7 +129,7 @@ exports.b = _a;"
 
 exports[`shaker should shake if __linariaPreval required but not exported 1`] = `
 "import 'regenerator-runtime/runtime.js';
-export { Input } from \\"./Input\\";"
+export { Input } from "./Input";"
 `;
 
 exports[`shaker should throw out unused referenced exports 1`] = `"exports.defaultValue = 20;"`;

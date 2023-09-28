@@ -7,8 +7,8 @@ type CollectResult = {
 };
 
 interface ClassnameModifiers {
-  ignoredClasses?: string[];
   blockedClasses?: string[];
+  ignoredClasses?: string[];
 }
 
 /**

@@ -1,6 +1,6 @@
 {
   "name": "@linaria/server",
-  "version": "4.5.0",
+  "version": "5.0.0",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "css",
@@ -33,12 +33,11 @@
     "postcss": "^8.3.11"
   },
   "devDependencies": {
-    "@types/dedent": "^0.7.0",
-    "dedent": "^0.7.0",
-    "prettier": "^2.7.1"
+    "dedent": "^1.5.1",
+    "prettier": "^3.0.3"
   },
   "engines": {
-    "node": "^12.16.0 || >=13.7.0"
+    "node": ">=16.0.0"
   },
   "publishConfig": {
     "access": "public"

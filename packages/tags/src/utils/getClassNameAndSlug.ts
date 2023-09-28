@@ -1,4 +1,4 @@
-import { basename, dirname, extname, relative, sep } from 'path';
+import { basename, dirname, extname, relative, sep, posix } from 'path';
 
 import { debug } from '@linaria/logger';
 import type { ClassNameSlugVars } from '@linaria/utils';
@@ -14,10 +14,12 @@ export default function getClassNameAndSlug(
   options: IOptions,
   context: IFileContext
 ): { className: string; slug: string } {
-  const relativeFilename =
+  const relativeFilename = (
     context.root && context.filename
       ? relative(context.root, context.filename)
-      : context.filename ?? 'unknown';
+      : context.filename ?? 'unknown'
+  ).replace(/\\/g, posix.sep);
+
   // Custom properties need to start with a letter, so we prefix the slug
   // Also use append the index of the class to the filename for uniqueness in the file
   const slug = toValidCSSIdentifier(

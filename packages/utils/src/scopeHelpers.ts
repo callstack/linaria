@@ -57,11 +57,28 @@ export function reference(
   }
 
   binding.referenced = true;
-  binding.references += 1;
   binding.referencePaths.push(referencePath ?? path);
+  binding.references = binding.referencePaths.length;
 }
 
-function isReferenced({ kind, referenced, referencePaths }: Binding) {
+function isReferenced(binding: Binding): boolean {
+  const { kind, referenced, referencePaths, path } = binding;
+
+  if (
+    path.isFunctionExpression() &&
+    path.key === 'init' &&
+    path.parentPath.isVariableDeclarator()
+  ) {
+    // It is a function expression in a variable declarator
+    const id = path.parentPath.get('id');
+    if (id.isIdentifier()) {
+      const idBinding = getBinding(id);
+      return idBinding ? isReferenced(idBinding) : true;
+    }
+
+    return true;
+  }
+
   if (!referenced) {
     return false;
   }
@@ -130,8 +147,9 @@ export function dereference(
     );
   }
 
+  const nonTypeReferences = binding.referencePaths.filter(nonType);
   binding.referenced =
-    binding.referencePaths.length + referencesInConstantViolations.length > 0;
+    nonTypeReferences.length + referencesInConstantViolations.length > 0;
 
   return binding;
 }
@@ -168,7 +186,38 @@ const getPathFromAction = (action: RemoveAction | ReplaceAction) => {
   throw new Error(`Unknown action type: ${action[0]}`);
 };
 
+function isPrototypeAssignment(path: NodePath) {
+  if (!path.isAssignmentExpression()) {
+    return false;
+  }
+
+  const { left } = path.node;
+  if (!left) {
+    return false;
+  }
+
+  if (left.type !== 'MemberExpression') {
+    return false;
+  }
+
+  const { object, property } = left;
+  if (!object || !property) {
+    return false;
+  }
+
+  return (
+    object.type === 'MemberExpression' &&
+    object.property.type === 'Identifier' &&
+    object.property.name === 'prototype'
+  );
+}
+
 function canFunctionBeDelete(fnPath: NodePath<FunctionNode>) {
+  if (isPrototypeAssignment(fnPath.parentPath)) {
+    // It is a prototype assignment, we can't delete it since we can't find all usages
+    return false;
+  }
+
   const fnScope = fnPath.scope;
   const parentScope = fnScope.parent;
   if (parentScope.parent) {
@@ -198,6 +247,12 @@ export function findActionForNode(
   if (parent.isProgram()) {
     // Do not delete Program node
     return ['remove', path];
+  }
+
+  if (parent.isClassDeclaration() || parent.isClassExpression()) {
+    if (path.key === 'body') {
+      return ['replace', path, { type: 'ClassBody', body: [] }];
+    }
   }
 
   if (parent.isFunction()) {
@@ -230,6 +285,20 @@ export function findActionForNode(
     }
   }
 
+  if (parent.isConditionalExpression()) {
+    if (path.key === 'test') {
+      return ['replace', parent, parent.node.alternate];
+    }
+
+    if (path.key === 'consequent') {
+      return ['replace', path, { type: 'Identifier', name: 'undefined' }];
+    }
+
+    if (path.key === 'alternate') {
+      return ['replace', path, { type: 'Identifier', name: 'undefined' }];
+    }
+  }
+
   if (parent.isLogicalExpression({ operator: '&&' })) {
     return [
       'replace',
@@ -238,6 +307,14 @@ export function findActionForNode(
         type: 'BooleanLiteral',
         value: false,
       },
+    ];
+  }
+
+  if (parent.isLogicalExpression({ operator: '||' })) {
+    return [
+      'replace',
+      parent,
+      path.key === 'left' ? parent.node.right : parent.node.left,
     ];
   }
 
@@ -343,7 +420,7 @@ export function findActionForNode(
     return findActionForNode(parent);
   }
 
-  if (!path.listKey) {
+  if (!path.listKey && path.key) {
     const field = NODE_FIELDS[parent.type][path.key];
     if (!validateField(parent.node, path.key as string, null, field)) {
       // The parent node isn't valid without this field, so we should remove it also.
@@ -432,9 +509,77 @@ function removeUnreferenced(items: NodePath<Identifier | JSXIdentifier>[]) {
   return result;
 }
 
+function getNodeForValue(value: unknown): Node | undefined {
+  if (typeof value === 'string') {
+    return {
+      type: 'StringLiteral',
+      value,
+    };
+  }
+
+  if (typeof value === 'number') {
+    return {
+      type: 'NumericLiteral',
+      value,
+    };
+  }
+
+  if (typeof value === 'boolean') {
+    return {
+      type: 'BooleanLiteral',
+      value,
+    };
+  }
+
+  if (value === null) {
+    return {
+      type: 'NullLiteral',
+    };
+  }
+
+  if (value === undefined) {
+    return {
+      type: 'Identifier',
+      name: 'undefined',
+    };
+  }
+
+  return undefined;
+}
+
+function staticEvaluate(path: NodePath | null | undefined): void {
+  if (!path) return;
+  const evaluated = path.evaluate();
+  if (evaluated.confident) {
+    const node = getNodeForValue(evaluated.value);
+    if (node) {
+      applyAction(['replace', path, node]);
+      return;
+    }
+  }
+
+  if (path.isIfStatement()) {
+    const test = path.get('test');
+    if (!test.isBooleanLiteral()) {
+      return;
+    }
+
+    const { consequent, alternate } = path.node;
+    if (test.node.value) {
+      applyAction(['replace', path, consequent]);
+    } else if (alternate) {
+      applyAction(['replace', path, alternate]);
+    } else {
+      applyAction(['remove', path]);
+    }
+  }
+}
+
 function applyAction(action: ReplaceAction | RemoveAction) {
   mutate(action[1], (p) => {
     if (isRemoved(p)) return;
+
+    const parent = p.parentPath;
 
     if (action[0] === 'remove') {
       p.remove();
@@ -443,6 +588,8 @@ function applyAction(action: ReplaceAction | RemoveAction) {
     if (action[0] === 'replace') {
       p.replaceWith(action[2]);
     }
+
+    staticEvaluate(parent);
   });
 }
 
@@ -465,17 +612,23 @@ function removeWithRelated(paths: NodePath[]) {
 
   const affectedPaths = actions.map(getPathFromAction);
 
-  let referencedIdentifiers = findIdentifiers(affectedPaths, 'referenced');
-  referencedIdentifiers.sort((a, b) =>
-    a.node?.name.localeCompare(b.node?.name)
+  let referencedIdentifiers = findIdentifiers(affectedPaths, 'reference');
+  referencedIdentifiers.sort(
+    (a, b) => a.node?.name.localeCompare(b.node?.name)
   );
 
-  const referencesOfBinding = findIdentifiers(affectedPaths, 'binding')
+  const referencesOfBinding = findIdentifiers(affectedPaths, 'declaration')
     .map((i) => (i.node && getScope(i).getBinding(i.node.name)) ?? null)
     .filter(isNotNull)
     .reduce(
       (acc, i) => [...acc, ...i.referencePaths.filter(nonType)],
       [] as NodePath[]
+    )
+    .filter(
+      (ref) =>
+        // Do not remove `export default function`
+        !ref.isExportDefaultDeclaration() ||
+        !ref.get('declaration').isFunctionDeclaration()
     );
 
   actions.forEach(applyAction);
@@ -515,6 +668,22 @@ function mutate<T extends NodePath>(path: T, fn: (p: T) => NodePath[] | void) {
         'name' in declared[0] &&
         declared[0].name === binding.identifier.name
       ) {
+        const init = assignment.get('init');
+        if (!Array.isArray(init) && init?.isAssignmentExpression()) {
+          // `const a = b = 1` → `b = 1`
+          assignment.parentPath?.replaceWith({
+            type: 'ExpressionStatement',
+            expression: init.node,
+          });
+
+          const left = init.get('left');
+          if (left.isIdentifier()) {
+            // If it was forcefully referenced in the shaker
+            dereference(left);
+          }
+
+          return;
+        }
         // Only one identifier is declared, so we can remove the whole declaration
         forDeleting.push(assignment);
         return;

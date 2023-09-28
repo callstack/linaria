@@ -10,7 +10,7 @@ import loaderUtils from 'loader-utils';
 import type { RawSourceMap } from 'source-map';
 
 import type { Result } from '@linaria/babel-preset';
-import { transform } from '@linaria/babel-preset';
+import { transform, TransformCacheCollection } from '@linaria/babel-preset';
 import { debug } from '@linaria/logger';
 
 import { getCacheInstance } from './cache';
@@ -28,6 +28,8 @@ const castSourceMap = <T extends { version: number } | { version: string }>(
     : undefined;
 
 const outputCssLoader = require.resolve('./outputCssLoader');
+
+const cache = new TransformCacheCollection();
 
 export default function webpack4Loader(
   this: LoaderContext,
@@ -67,16 +69,18 @@ export default function webpack4Loader(
     });
   };
 
-  transform(
-    content.toString(),
-    {
+  const transformServices = {
+    options: {
       filename: this.resourcePath,
       inputSourceMap: inputSourceMap ?? undefined,
-      pluginOptions: rest,
+      root: process.cwd(),
       preprocessor,
+      pluginOptions: rest,
     },
-    asyncResolve
-  ).then(
+    cache,
+  };
+
+  transform(transformServices, content.toString(), asyncResolve).then(
     async (result: Result) => {
       if (result.cssText) {
         let { cssText } = result;

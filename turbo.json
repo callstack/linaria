@@ -28,7 +28,8 @@
       "dependsOn": ["^build"]
     },
     "test:dts": {
-      "dependsOn": ["build:declarations", "^build:declarations"]
+      "dependsOn": ["build:declarations", "^build:declarations"],
+      "cache": false
     },
     "typecheck": {
       "dependsOn": ["build:declarations", "^build:declarations"]

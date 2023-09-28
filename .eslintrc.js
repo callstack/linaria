@@ -1,3 +1,11 @@
+const noRestrictedSyntax =
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  require('eslint-config-airbnb-base/rules/style').rules[
+    'no-restricted-syntax'
+  ].filter(
+    (rule) => typeof rule === 'string' || rule.selector !== 'ForOfStatement'
+  );
+
 // Workaround for https://github.com/import-js/eslint-plugin-import/issues/1810
 const noUnresolved = ['error', { ignore: ['@linaria/*'] }];
 
@@ -8,11 +16,13 @@ const memberOrder = [
       memberTypes: [
         // Index signature
         'signature',
+        'call-signature',
 
         // Fields
         'public-static-field',
         'protected-static-field',
         'private-static-field',
+        '#private-static-field',
 
         'public-decorated-field',
         'protected-decorated-field',
@@ -21,14 +31,15 @@ const memberOrder = [
         'public-instance-field',
         'protected-instance-field',
         'private-instance-field',
+        '#private-instance-field',
 
         'public-abstract-field',
         'protected-abstract-field',
-        'private-abstract-field',
 
         'public-field',
         'protected-field',
         'private-field',
+        '#private-field',
 
         'static-field',
         'instance-field',
@@ -38,6 +49,9 @@ const memberOrder = [
 
         'field',
 
+        // Static initialization
+        'static-initialization',
+
         // Constructors
         'public-constructor',
         'protected-constructor',
@@ -45,10 +59,42 @@ const memberOrder = [
 
         'constructor',
 
+        // Getters & Setters
+        ['public-static-get', 'public-static-set'],
+        ['protected-static-get', 'protected-static-set'],
+        ['private-static-get', 'private-static-set'],
+        ['#private-static-get', '#private-static-set'],
+
+        ['public-decorated-get', 'public-decorated-set'],
+        ['protected-decorated-get', 'protected-decorated-set'],
+        ['private-decorated-get', 'private-decorated-set'],
+
+        ['public-instance-get', 'public-instance-set'],
+        ['protected-instance-get', 'protected-instance-set'],
+        ['private-instance-get', 'private-instance-set'],
+        ['#private-instance-get', '#private-instance-set'],
+
+        ['public-abstract-get', 'public-abstract-set'],
+        ['protected-abstract-get', 'protected-abstract-set'],
+
+        ['public-get', 'public-set'],
+        ['protected-get', 'protected-set'],
+        ['private-get', 'private-set'],
+        ['#private-get', '#private-set'],
+
+        ['static-get', 'static-set'],
+        ['instance-get', 'instance-set'],
+        ['abstract-get', 'abstract-set'],
+
+        ['decorated-get', 'decorated-set'],
+
+        ['get', 'set'],
+
         // Methods
         'public-static-method',
         'protected-static-method',
         'private-static-method',
+        '#private-static-method',
 
         'public-decorated-method',
         'protected-decorated-method',
@@ -57,14 +103,15 @@ const memberOrder = [
         'public-instance-method',
         'protected-instance-method',
         'private-instance-method',
+        '#private-instance-method',
 
         'public-abstract-method',
         'protected-abstract-method',
-        'private-abstract-method',
 
         'public-method',
         'protected-method',
         'private-method',
+        '#private-method',
 
         'static-method',
         'instance-method',
@@ -159,6 +206,7 @@ module.exports = {
           'error',
           { prefer: 'type-imports' },
         ],
+        '@typescript-eslint/member-ordering': memberOrder,
 
         // TODO
         '@typescript-eslint/ban-ts-comment': 0,
@@ -168,13 +216,12 @@ module.exports = {
         'global-require': 0,
         'import/no-dynamic-require': 0,
         'no-underscore-dangle': 0,
+        'no-restricted-syntax': noRestrictedSyntax,
       },
     },
     {
       files: ['**/processors/**/*.ts'],
-      rules: {
-        '@typescript-eslint/member-ordering': memberOrder,
-      },
+      rules: {},
     },
     {
       files: ['*.js', '*.jsx'],

@@ -1,10 +1,14 @@
-export * from './BaseProcessor';
+export { BaseProcessor } from './BaseProcessor';
+export type {
+  Expression,
+  TagSource,
+  ProcessorParams,
+  TailProcessorParams,
+} from './BaseProcessor';
 export * from './types';
 export { buildSlug } from './utils/buildSlug';
-export { default as isSerializable } from './utils/isSerializable';
-export * from './utils/types';
-export * from './utils/validateParams';
-export { default as BaseProcessor } from './BaseProcessor';
+export type { IOptions, IFileContext } from './utils/types';
+export { isValidParams, validateParams } from './utils/validateParams';
+export type { MapParams, ParamConstraints } from './utils/validateParams';
 export { default as TaggedTemplateProcessor } from './TaggedTemplateProcessor';
-export { default as hasMeta } from './utils/hasMeta';
 export { default as toValidCSSIdentifier } from './utils/toValidCSSIdentifier';

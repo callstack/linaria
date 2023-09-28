@@ -1,8 +1,8 @@
 import type { NodePath } from '@babel/core';
-import type { CallExpression } from '@babel/types';
+import type { CallExpression, Program } from '@babel/types';
 
 import type { IImport, ISideEffectImport } from './collectExportsAndImports';
-import collectExportsAndImports from './collectExportsAndImports';
+import { collectExportsAndImports } from './collectExportsAndImports';
 import { getScope } from './getScope';
 
 function getCallee(p: NodePath<CallExpression>) {
@@ -97,8 +97,10 @@ function isClassicReactRuntime(
   return false;
 }
 
-export default function isUnnecessaryReactCall(path: NodePath<CallExpression>) {
-  const programPath = path.findParent((p) => p.isProgram());
+export function isUnnecessaryReactCall(path: NodePath<CallExpression>) {
+  const programPath = path.findParent((p) => p.isProgram()) as
+    | NodePath<Program>
+    | undefined;
   if (!programPath) {
     return false;
   }

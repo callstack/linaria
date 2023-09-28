@@ -1,31 +1,140 @@
 import path from 'path';
 
+import * as babel from '@babel/core';
 import dedent from 'dedent';
 
+import type { LoadAndParseFn, Services } from '@linaria/babel-preset';
 import {
   DefaultModuleImplementation,
+  Entrypoint,
+  isUnprocessedEntrypointError,
   Module,
   TransformCacheCollection,
 } from '@linaria/babel-preset';
+import { linariaLogger } from '@linaria/logger';
 import type { StrictOptions } from '@linaria/utils';
-
-function getFileName() {
-  return path.resolve(__dirname, './__fixtures__/test.js');
-}
+import { EventEmitter } from '@linaria/utils';
 
 const options: StrictOptions = {
+  babelOptions: {},
   displayName: false,
   evaluate: true,
   extensions: ['.cjs', '.js', '.jsx', '.ts', '.tsx'],
+  features: {
+    dangerousCodeRemover: true,
+    globalCache: true,
+    happyDOM: true,
+    softErrors: false,
+    useBabelConfigs: true,
+  },
+  highPriorityPlugins: [],
+  overrideContext: (context) => ({
+    ...context,
+    HighLevelAPI: () => "I'm a high level API",
+  }),
   rules: [],
-  babelOptions: {},
 };
 
-it('creates module for JS files', () => {
-  const filename = '/foo/bar/test.js';
-  const mod = new Module(filename, options);
+const filename = path.resolve(__dirname, './__fixtures__/test.js');
 
-  mod.evaluate('module.exports = () => 42');
+const createServices = (partial: Partial<Services>): Services => {
+  const loadAndParseFn: LoadAndParseFn = (services, name, loadedCode) => ({
+    get ast() {
+      return services.babel.parseSync(loadedCode ?? '')!;
+    },
+    code: loadedCode!,
+    evaluator: jest.fn(),
+    evalConfig: {},
+  });
+
+  return {
+    babel,
+    cache: new TransformCacheCollection(),
+    loadAndParseFn,
+    log: linariaLogger,
+    eventEmitter: EventEmitter.dummy,
+    options: {
+      filename,
+      pluginOptions: options,
+    },
+    ...partial,
+  };
+};
+
+const createEntrypoint = (
+  services: Services,
+  name: string,
+  only: string[],
+  code: string
+) => {
+  const entrypoint = Entrypoint.createRoot(services, name, only, code);
+
+  if (entrypoint.ignored) {
+    throw new Error('entrypoint was ignored');
+  }
+
+  entrypoint.setTransformResult({
+    code,
+    metadata: null,
+  });
+
+  return entrypoint;
+};
+
+const create = (strings: TemplateStringsArray, ...expressions: unknown[]) => {
+  const code = dedent(strings, ...expressions);
+  const cache = new TransformCacheCollection();
+  const services = createServices({ cache });
+  const entrypoint = createEntrypoint(services, filename, ['*'], code);
+  const mod = new Module(services, entrypoint);
+
+  return {
+    entrypoint,
+    mod,
+    services,
+  };
+};
+
+function safeEvaluate(m: Module): void {
+  try {
+    return m.evaluate();
+  } catch (e) {
+    if (isUnprocessedEntrypointError(e)) {
+      e.entrypoint.setTransformResult({
+        code: e.entrypoint.loadedAndParsed.code ?? '',
+        metadata: null,
+      });
+
+      return safeEvaluate(m);
+    }
+
+    throw e;
+  }
+}
+
+function safeRequire(m: Module, id: string): unknown {
+  try {
+    return m.require(id);
+  } catch (e) {
+    if (isUnprocessedEntrypointError(e)) {
+      e.entrypoint.setTransformResult({
+        code: e.entrypoint.loadedAndParsed.code ?? '',
+        metadata: null,
+      });
+
+      return safeRequire(m, id);
+    }
+
+    throw e;
+  }
+}
+
+it('creates module for JS files', () => {
+  const { mod } = create`
+    module.exports = () => 42;
+  `;
+
+  safeEvaluate(mod);
 
   expect((mod.exports as any)()).toBe(42);
   expect(mod.id).toBe(filename);
@@ -33,79 +142,75 @@ it('creates module for JS files', () => {
 });
 
 it('requires .js files', () => {
-  const mod = new Module(getFileName(), options);
-
-  mod.evaluate(dedent`
+  const { mod } = create`
     const answer = require('./sample-script');
 
     module.exports = 'The answer is ' + answer;
-  `);
+  `;
+
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe('The answer is 42');
 });
 
 it('requires .cjs files', () => {
-  const mod = new Module(getFileName(), options);
-
-  mod.evaluate(dedent`
+  const { mod } = create`
     const answer = require('./sample-script.cjs');
 
     module.exports = 'The answer is ' + answer;
-  `);
+  `;
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe('The answer is 42');
 });
 
 it('requires .json files', () => {
-  const mod = new Module(getFileName(), options);
-
-  mod.evaluate(dedent`
+  const { mod } = create`
     const data = require('./sample-data.json');
 
     module.exports = 'Our saviour, ' + data.name;
-  `);
+  `;
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe('Our saviour, Luke Skywalker');
 });
 
 it('returns module from the cache', () => {
-  const filename = getFileName();
-  const cache = new TransformCacheCollection();
-  const mod = new Module(filename, options, cache);
+  const { entrypoint, mod, services } = create``;
+
   const id = './sample-data.json';
 
-  expect(mod.require(id)).toBe(mod.require(id));
+  expect(safeRequire(mod, id)).toBe(safeRequire(mod, id));
 
-  const res1 = new Module(filename, options, cache).require(id);
-  const res2 = new Module(filename, options, cache).require(id);
+  const res1 = safeRequire(new Module(services, entrypoint), id);
+  const res2 = safeRequire(new Module(services, entrypoint), id);
 
   expect(res1).toBe(res2);
 });
 
 it('should use cached version from the codeCache', () => {
-  const filename = getFileName();
-  const cache = new TransformCacheCollection();
-  const mod = new Module(filename, options, cache);
-  const resolved = require.resolve('./__fixtures__/objectExport.js');
-
-  cache.resolveCache.set(
-    `${filename} -> ./objectExport`,
-    `${resolved}\0margin`
-  );
-
-  cache.codeCache.set(resolved, {
-    only: ['margin'],
-    imports: null,
-    result: {
-      code: 'module.exports = { margin: 1 };',
-    },
-  });
-
-  mod.evaluate(dedent`
+  const { entrypoint, mod } = create`
     const margin = require('./objectExport').margin;
 
     module.exports = 'Imported value is ' + margin;
-  `);
+  `;
+
+  const resolved = require.resolve('./__fixtures__/objectExport.js');
+  entrypoint.addDependency({
+    only: ['margin'],
+    resolved,
+    source: './objectExport',
+  });
+
+  entrypoint.createChild(
+    resolved,
+    ['margin'],
+    dedent`
+      module.exports = { margin: 1 };
+    `
+  );
+
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe('Imported value is 1');
 });
@@ -115,44 +220,42 @@ it('should reread module from disk when it is in codeCache but not in resolveCac
   // module was already required by another module, and its code was cached.
   // In this case, we should not use the cached code, but reread the file.
 
-  const filename = getFileName();
-  const cache = new TransformCacheCollection();
-  const mod = new Module(filename, options, cache);
-  const resolved = require.resolve('./__fixtures__/objectExport.js');
-
-  cache.codeCache.set(resolved, {
-    only: ['margin'],
-    imports: null,
-    result: {
-      code: 'module.exports = { margin: 1 };',
-    },
-  });
-
-  mod.evaluate(dedent`
+  const { entrypoint, mod } = create`
     const margin = require('./objectExport').margin;
 
     module.exports = 'Imported value is ' + margin;
-  `);
+  `;
+
+  const resolved = require.resolve('./__fixtures__/objectExport.js');
+  entrypoint.createChild(
+    resolved,
+    ['margin'],
+    dedent`
+    module.exports = { margin: 1 };
+  `
+  );
+
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe('Imported value is 5');
 });
 
 it('clears modules from the cache', () => {
-  const filename = getFileName();
-  const cache = new TransformCacheCollection();
   const id = './sample-data.json';
 
-  const result = new Module(filename, options, cache).require(id);
+  const { entrypoint, mod, services } = create``;
+  const result = safeRequire(mod, id);
 
-  expect(new Module(filename, options, cache).require(id)).toBe(result);
+  expect(safeRequire(new Module(services, entrypoint), id)).toBe(result);
 
-  cache.evalCache.clear();
+  const dep = new Module(services, entrypoint).resolve(id);
+  services.cache.invalidateForFile(dep);
 
-  expect(new Module(filename, options, cache).require(id)).not.toBe(result);
+  expect(safeRequire(new Module(services, entrypoint), id)).not.toBe(result);
 });
 
 it('exports the path for non JS/JSON files', () => {
-  const mod = new Module(getFileName(), options);
+  const { mod } = create``;
 
   expect(mod.require('./sample-asset.png')).toBe(
     path.join(__dirname, '__fixtures__', 'sample-asset.png')
@@ -160,19 +263,19 @@ it('exports the path for non JS/JSON files', () => {
 });
 
 it('returns module when requiring mocked builtin node modules', () => {
-  const mod = new Module(getFileName(), options);
+  const { mod } = create``;
 
   expect(mod.require('path')).toBe(require('path'));
 });
 
 it('returns null when requiring empty builtin node modules', () => {
-  const mod = new Module(getFileName(), options);
+  const { mod } = create``;
 
   expect(mod.require('fs')).toBe(null);
 });
 
 it('throws when requiring unmocked builtin node modules', () => {
-  const mod = new Module(getFileName(), options);
+  const { mod } = create``;
 
   expect(() => mod.require('perf_hooks')).toThrow(
     'Unable to import "perf_hooks". Importing Node builtins is not supported in the sandbox.'
@@ -180,51 +283,55 @@ it('throws when requiring unmocked builtin node modules', () => {
 });
 
 it('has access to the global object', () => {
-  const mod = new Module(getFileName(), options);
-
-  expect(() =>
-    mod.evaluate(dedent`
+  const { mod } = create`
     new global.Set();
-  `)
-  ).not.toThrow();
+  `;
+
+  expect(() => mod.evaluate()).not.toThrow();
 });
 
 it('has access to Object prototype methods on `exports`', () => {
-  const mod = new Module(getFileName(), options);
-
-  expect(() =>
-    mod.evaluate(dedent`
+  const { mod } = create`
     exports.hasOwnProperty('keyss');
-  `)
-  ).not.toThrow();
+  `;
+
+  expect(() => mod.evaluate()).not.toThrow();
 });
 
 it("doesn't have access to the process object", () => {
-  const mod = new Module(getFileName(), options);
-
-  expect(() =>
-    mod.evaluate(dedent`
+  const { mod } = create`
     module.exports = process.abort();
-  `)
-  ).toThrow('process.abort is not a function');
+  `;
+
+  expect(() => mod.evaluate()).toThrow('process.abort is not a function');
+});
+
+it('has access to a overridden context', () => {
+  const { mod } = create`
+    module.exports = HighLevelAPI();
+  `;
+
+  safeEvaluate(mod);
+
+  expect(mod.exports).toBe("I'm a high level API");
 });
 
 it('has access to NODE_ENV', () => {
-  const mod = new Module(getFileName(), options);
+  const { mod } = create`
+    module.exports = process.env.NODE_ENV;
+  `;
 
-  mod.evaluate(dedent`
-  module.exports = process.env.NODE_ENV;
-  `);
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe(process.env.NODE_ENV);
 });
 
 it('has require.resolve available', () => {
-  const mod = new Module(getFileName(), options);
+  const { mod } = create`
+    module.exports = require.resolve('./sample-script');
+  `;
 
-  mod.evaluate(dedent`
-  module.exports = require.resolve('./sample-script');
-  `);
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe(
     path.resolve(path.dirname(mod.filename), 'sample-script.js')
@@ -232,85 +339,11 @@ it('has require.resolve available', () => {
 });
 
 it('has require.ensure available', () => {
-  const mod = new Module(getFileName(), options);
+  const { mod } = create`
+    require.ensure(['./sample-script']);
+  `;
 
-  expect(() =>
-    mod.evaluate(dedent`
-  require.ensure(['./sample-script']);
-  `)
-  ).not.toThrow();
-});
-
-it('has __filename available', () => {
-  const mod = new Module(getFileName(), options);
-
-  mod.evaluate(dedent`
-  module.exports = __filename;
-  `);
-
-  expect(mod.exports).toBe(mod.filename);
-});
-
-it('has __dirname available', () => {
-  const mod = new Module(getFileName(), options);
-
-  mod.evaluate(dedent`
-  module.exports = __dirname;
-  `);
-
-  expect(mod.exports).toBe(path.dirname(mod.filename));
-});
-
-it('has setTimeout, clearTimeout available', () => {
-  const mod = new Module(getFileName(), options);
-
-  expect(() =>
-    mod.evaluate(dedent`
-  const x = setTimeout(() => {
-    console.log('test');
-  },0);
-
-  clearTimeout(x);
-  `)
-  ).not.toThrow();
-});
-
-it('has setInterval, clearInterval available', () => {
-  const mod = new Module(getFileName(), options);
-
-  expect(() =>
-    mod.evaluate(dedent`
-  const x = setInterval(() => {
-    console.log('test');
-  }, 1000);
-
-  clearInterval(x);
-  `)
-  ).not.toThrow();
-});
-
-it('has setImmediate, clearImmediate available', () => {
-  const mod = new Module(getFileName(), options);
-
-  expect(() =>
-    mod.evaluate(dedent`
-  const x = setImmediate(() => {
-    console.log('test');
-  });
-
-  clearImmediate(x);
-  `)
-  ).not.toThrow();
-});
-
-it('has global objects available without referencing global', () => {
-  const mod = new Module(getFileName(), options);
-
-  expect(() =>
-    mod.evaluate(dedent`
-  const x = new Set();
-  `)
-  ).not.toThrow();
+  expect(() => mod.evaluate()).not.toThrow();
 });
 
 it('changes resolve behaviour on overriding _resolveFilename', () => {
@@ -318,14 +351,14 @@ it('changes resolve behaviour on overriding _resolveFilename', () => {
     .spyOn(DefaultModuleImplementation, '_resolveFilename')
     .mockImplementation((id) => (id === 'foo' ? 'bar' : id));
 
-  const mod = new Module(getFileName(), options);
+  const { mod } = create`
+    module.exports = [
+      require.resolve('foo'),
+      require.resolve('test'),
+    ];
+  `;
 
-  mod.evaluate(dedent`
-  module.exports = [
-    require.resolve('foo'),
-    require.resolve('test'),
-  ];
-  `);
+  safeEvaluate(mod);
 
   expect(mod.exports).toEqual(['bar', 'test']);
   expect(resolveFilename).toHaveBeenCalledTimes(2);
@@ -339,20 +372,25 @@ it('should resolve from the cache', () => {
     '_resolveFilename'
   );
 
-  const cache = new TransformCacheCollection();
-  const filename = getFileName();
+  const { mod, entrypoint } = create`
+    module.exports = [
+      require.resolve('foo'),
+      require.resolve('test'),
+    ];
+  `;
 
-  cache.resolveCache.set(`${filename} -> foo`, 'resolved foo');
-  cache.resolveCache.set(`${filename} -> test`, 'resolved test');
+  entrypoint.addDependency({
+    only: ['*'],
+    resolved: 'resolved foo',
+    source: 'foo',
+  });
+  entrypoint.addDependency({
+    only: ['*'],
+    resolved: 'resolved test',
+    source: 'test',
+  });
 
-  const mod = new Module(filename, options, cache);
-
-  mod.evaluate(dedent`
-  module.exports = [
-    require.resolve('foo'),
-    require.resolve('test'),
-  ];
-  `);
+  safeEvaluate(mod);
 
   expect(mod.exports).toEqual(['resolved foo', 'resolved test']);
   expect(resolveFilename).toHaveBeenCalledTimes(0);
@@ -361,10 +399,12 @@ it('should resolve from the cache', () => {
 });
 
 it('correctly processes export declarations in strict mode', () => {
-  const filename = '/foo/bar/test.js';
-  const mod = new Module(filename, options);
+  const { mod } = create`
+    "use strict";
+    exports = module.exports = () => 42
+  `;
 
-  mod.evaluate('"use strict"; exports = module.exports = () => 42');
+  safeEvaluate(mod);
 
   expect((mod.exports as any)()).toBe(42);
   expect(mod.id).toBe(filename);
@@ -372,13 +412,115 @@ it('correctly processes export declarations in strict mode', () => {
 });
 
 it('export * compiled by typescript to commonjs works', () => {
-  const mod = new Module(getFileName(), options);
-
-  mod.evaluate(dedent`
+  const { mod } = create`
     const { foo } = require('./ts-compiled-re-exports');
 
     module.exports = foo;
-  `);
+  `;
+
+  safeEvaluate(mod);
 
   expect(mod.exports).toBe('foo');
+});
+
+describe('globals', () => {
+  it.each([{ name: 'Timeout' }, { name: 'Interval' }, { name: 'Immediate' }])(
+    `has set$name, clear$name available`,
+    (i) => {
+      const { mod } = create`
+        const x = set${i.name}(() => {
+          console.log('test');
+        },0);
+
+        clear${i.name}(x);
+      `;
+
+      expect(() => mod.evaluate()).not.toThrow();
+    }
+  );
+
+  it('has global objects available without referencing global', () => {
+    const { mod } = create`
+      const x = new Set();
+    `;
+
+    expect(() => mod.evaluate()).not.toThrow();
+  });
+});
+
+describe('definable globals', () => {
+  it('has __filename available', () => {
+    const { mod } = create`
+      module.exports = __filename;
+    `;
+
+    safeEvaluate(mod);
+
+    expect(mod.exports).toBe(mod.filename);
+  });
+
+  it('has __dirname available', () => {
+    const { mod } = create`
+      module.exports = __dirname;
+    `;
+
+    safeEvaluate(mod);
+
+    expect(mod.exports).toBe(path.dirname(mod.filename));
+  });
+});
+
+describe('DOM', () => {
+  it('should have DOM globals available', () => {
+    const { mod } = create`
+      module.exports = {
+        document: typeof document,
+        window: typeof window,
+        global: typeof global,
+      };
+    `;
+
+    safeEvaluate(mod);
+
+    expect(mod.exports).toEqual({
+      document: 'object',
+      window: 'object',
+      global: 'object',
+    });
+  });
+
+  it('should have DOM APIs available', () => {
+    const { mod } = create`
+      const handler = () => {}
+
+      document.addEventListener('click', handler);
+      document.removeEventListener('click', handler);
+
+      window.addEventListener('click', handler);
+      window.removeEventListener('click', handler);
+    `;
+
+    expect(() => mod.evaluate()).not.toThrow();
+  });
+
+  it('supports DOM manipulations', () => {
+    const { mod } = create`
+      const el = document.createElement('div');
+      el.setAttribute('id', 'test');
+
+      document.body.appendChild(el);
+
+      module.exports = {
+        html: document.body.innerHTML,
+        tagName: el.tagName.toLowerCase()
+      };
+    `;
+
+    safeEvaluate(mod);
+
+    expect(mod.exports).toEqual({
+      html: '<div id="test"></div>',
+      tagName: 'div',
+    });
+  });
 });

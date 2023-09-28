@@ -1,6 +1,6 @@
 {
   "name": "@linaria/extractor",
-  "version": "4.5.0",
+  "version": "5.0.0",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",
@@ -32,7 +32,7 @@
     "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
   "engines": {
-    "node": "^12.16.0 || >=13.7.0"
+    "node": ">=16.0.0"
   },
   "publishConfig": {
     "access": "public"

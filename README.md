@@ -141,7 +141,7 @@ See [Basics](/docs/BASICS.md) for a detailed information about the syntax.
 
 ## Demo
 
-[![Edit Linaria Demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/2x93v25p3j)
+[![Edit Linaria Demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/linaria-react-vite-ts-qyj5xd)
 
 ## Documentation
 

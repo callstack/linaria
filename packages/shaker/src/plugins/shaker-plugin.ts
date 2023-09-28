@@ -9,13 +9,14 @@ import type {
 } from '@babel/types';
 
 import { createCustomDebug } from '@linaria/logger';
-import type { IExport, IReexport, IState } from '@linaria/utils';
+import type { Exports, IMetadata, IState } from '@linaria/utils';
 import {
   applyAction,
   collectExportsAndImports,
   dereference,
   findActionForNode,
   getFileIdx,
+  invalidateTraversalCache,
   isRemoved,
   reference,
   removeWithRelated,
@@ -27,27 +28,14 @@ import shouldKeepSideEffect from './utils/shouldKeepSideEffect';
 type Core = typeof core;
 
 export interface IShakerOptions {
-  keepSideEffects?: boolean;
   ifUnknownExport?: 'error' | 'ignore' | 'reexport-all' | 'skip-shaking';
+  keepSideEffects?: boolean;
   onlyExports: string[];
-}
-
-export interface IShakerMetadata {
-  imports: Map<string, string[]>;
-}
-
-export interface IMetadata {
-  __linariaShaker: IShakerMetadata;
 }
 
 interface NodeWithName {
   name: string;
 }
-
-export const hasShakerMetadata = (
-  metadata: object | undefined
-): metadata is IMetadata =>
-  metadata !== undefined && '__linariaShaker' in metadata;
 
 function getBindingForExport(exportPath: NodePath): Binding | undefined {
   if (exportPath.isIdentifier()) {
@@ -71,6 +59,10 @@ function getBindingForExport(exportPath: NodePath): Binding | undefined {
     }
   }
 
+  if (exportPath.isFunctionDeclaration() || exportPath.isClassDeclaration()) {
+    return exportPath.scope.getBinding(exportPath.node.id!.name);
+  }
+
   return undefined;
 }
 
@@ -81,13 +73,27 @@ function rearrangeExports(
   { types: t }: Core,
   root: NodePath<Program>,
   exportRefs: Map<string, NodePath<MemberExpression>[]>,
-  exports: IExport[]
-): IExport[] {
-  let rearranged = [...exports];
+  exports: Exports
+): Exports {
+  const rearranged = {
+    ...exports,
+  };
+
   const rootScope = root.scope;
   exportRefs.forEach((refs, name) => {
     if (refs.length <= 1) {
-      return;
+      if (refs.length === 1) {
+        // Maybe exports is assigned to another variable?
+        const declarator = refs[0].findParent((p) =>
+          p.isVariableDeclarator()
+        ) as NodePath<VariableDeclarator> | undefined;
+
+        if (!declarator) {
+          return;
+        }
+      } else {
+        return;
+      }
     }
 
     const uid = rootScope.generateUid(name);
@@ -103,6 +109,10 @@ function rearrangeExports(
       const [replaced] = ref.replaceWith(t.identifier(uid));
       if (replaced.isBindingIdentifier()) {
         rootScope.registerConstantViolation(replaced);
+        if (replaced.parentPath?.parentPath?.isVariableDeclarator()) {
+          // This is `const foo = exports.foo = "value"` case
+          reference(replaced, replaced, true);
+        }
       } else {
         reference(replaced);
       }
@@ -122,14 +132,7 @@ function rearrangeExports(
     const local = pushed.get('expression.right') as NodePath<Identifier>;
     reference(local);
 
-    rearranged = rearranged.map((exp) =>
-      exp.exported === name
-        ? {
-            ...exp,
-            local,
-          }
-        : exp
-    );
+    rearranged[name] = local;
   });
 
   return rearranged;
@@ -158,7 +161,7 @@ export default function shakerPlugin(
         'import-and-exports',
         [
           `imports: ${collected.imports.length} (side-effects: ${sideEffectImports.length})`,
-          `exports: ${collected.exports.length}`,
+          `exports: ${Object.values(collected.exports).length}`,
           `reexports: ${collected.reexports.length}`,
         ].join(', ')
       );
@@ -172,10 +175,7 @@ export default function shakerPlugin(
         collected.exports
       );
 
-      const findExport = (name: string) =>
-        exports.find((i) => i.exported === name);
-
-      collected.exports.forEach(({ local }) => {
+      Object.values(exports).forEach((local) => {
         if (local.isAssignmentExpression()) {
           const left = local.get('left');
           if (left.isIdentifier()) {
@@ -186,8 +186,8 @@ export default function shakerPlugin(
         }
       });
 
-      const hasLinariaPreval = findExport('__linariaPreval') !== undefined;
-      const hasDefault = findExport('default') !== undefined;
+      const hasLinariaPreval = exports.__linariaPreval !== undefined;
+      const hasDefault = exports.default !== undefined;
 
       // If __linariaPreval is not exported, we can remove it from onlyExports
       if (onlyExportsSet.has('__linariaPreval') && !hasLinariaPreval) {
@@ -197,8 +197,9 @@ export default function shakerPlugin(
       if (onlyExportsSet.size === 0) {
         // Fast-lane: if there are no exports to keep, we can just shake out the whole file
         this.imports = [];
-        this.exports = [];
+        this.exports = {};
         this.reexports = [];
+        this.deadExports = Object.keys(exports);
 
         file.path.get('body').forEach((p) => {
           p.remove();
@@ -222,38 +223,55 @@ export default function shakerPlugin(
         this.imports = collected.imports;
         this.exports = exports;
         this.reexports = collected.reexports;
+        this.deadExports = [];
         return;
       }
 
       if (!onlyExportsSet.has('*')) {
-        const aliveExports = new Set<IExport | IReexport>();
+        // __esModule should be kept alive
+        onlyExportsSet.add('__esModule');
+
+        const aliveExports = new Set<NodePath>();
         const importNames = collected.imports.map(({ imported }) => imported);
 
-        exports.forEach((exp) => {
-          if (onlyExportsSet.has(exp.exported)) {
-            aliveExports.add(exp);
+        Object.entries(exports).forEach(([exported, local]) => {
+          if (onlyExportsSet.has(exported)) {
+            aliveExports.add(local);
           } else if (
-            importNames.includes((exp.local.node as NodeWithName).name || '')
+            importNames.includes((local.node as NodeWithName).name || '')
           ) {
-            aliveExports.add(exp);
-          } else if (
-            [...aliveExports].some((liveExp) => liveExp.local === exp.local)
-          ) {
+            aliveExports.add(local);
+          } else if ([...aliveExports].some((alive) => alive === local)) {
             // It's possible to export multiple values from a single variable initializer, e.g
             // export const { foo, bar } = baz();
             // We need to treat all of them as used if any of them are used, since otherwise
             // we'll attempt to delete the baz() call
-            aliveExports.add(exp);
+            aliveExports.add(local);
           }
         });
 
         collected.reexports.forEach((exp) => {
           if (onlyExportsSet.has(exp.exported)) {
-            aliveExports.add(exp);
+            aliveExports.add(exp.local);
           }
         });
 
-        const isAllExportsFound = aliveExports.size === onlyExportsSet.size;
+        const exportToPath = new Map<string, NodePath>();
+        Object.entries(exports).forEach(([exported, local]) => {
+          exportToPath.set(exported, local);
+        });
+
+        collected.reexports.forEach((exp) => {
+          exportToPath.set(exp.exported, exp.local);
+        });
+
+        const notFoundExports = [...onlyExportsSet].filter(
+          (exp) =>
+            exp !== '__esModule' && !aliveExports.has(exportToPath.get(exp)!)
+        );
+        exportToPath.clear();
+
+        const isAllExportsFound = notFoundExports.length === 0;
         if (!isAllExportsFound && ifUnknownExport !== 'ignore') {
           if (ifUnknownExport === 'error') {
             throw new Error(
@@ -263,15 +281,13 @@ export default function shakerPlugin(
 
           if (ifUnknownExport === 'reexport-all') {
             // If there are unknown exports, we have keep alive all re-exports.
-            exports.forEach((exp) => {
-              if (exp.exported === '*') {
-                aliveExports.add(exp);
-              }
-            });
+            if (exports['*'] !== undefined) {
+              aliveExports.add(exports['*']);
+            }
 
             collected.reexports.forEach((exp) => {
               if (exp.exported === '*') {
-                aliveExports.add(exp);
+                aliveExports.add(exp.local);
               }
             });
           }
@@ -280,14 +296,16 @@ export default function shakerPlugin(
             this.imports = collected.imports;
             this.exports = exports;
             this.reexports = collected.reexports;
+            this.deadExports = [];
 
             return;
           }
         }
 
-        const forDeleting = [...exports, ...collected.reexports]
-          .filter((exp) => !aliveExports.has(exp))
-          .map((exp) => exp.local);
+        const forDeleting = [
+          ...Object.values(exports),
+          ...collected.reexports.map((i) => i.local),
+        ].filter((exp) => !aliveExports.has(exp));
 
         if (!keepSideEffects && !importedAsSideEffect) {
           // Remove all imports that don't import something explicitly and should not be kept
@@ -300,12 +318,17 @@ export default function shakerPlugin(
 
         const deleted = new Set<NodePath>();
 
-        const dereferenced: NodePath<Identifier>[] = [];
+        let dereferenced: NodePath<Identifier>[] = [];
         let changed = true;
         while (changed && deleted.size < forDeleting.length) {
           changed = false;
           // eslint-disable-next-line no-restricted-syntax
           for (const path of forDeleting) {
+            if (deleted.has(path)) {
+              // eslint-disable-next-line no-continue
+              continue;
+            }
+
             const binding = getBindingForExport(path);
             const action = findActionForNode(path);
             const parent = action?.[1];
@@ -332,26 +355,49 @@ export default function shakerPlugin(
               changed = true;
             }
           }
-        }
 
-        dereferenced.forEach((path) => {
-          // If path is still alive, we need to reference it back
-          if (!isRemoved(path)) {
-            reference(path);
-          }
-        });
+          dereferenced.forEach((path) => {
+            // If path is still alive, we need to reference it back
+            if (!isRemoved(path)) {
+              reference(path);
+            }
+          });
+
+          dereferenced = [];
+        }
       }
 
       this.imports = withoutRemoved(collected.imports);
-      this.exports = withoutRemoved(exports);
+      this.exports = {};
+      this.deadExports = [];
+
+      Object.entries(exports).forEach(([exported, local]) => {
+        if (isRemoved(local)) {
+          this.deadExports.push(exported);
+        } else {
+          this.exports[exported] = local;
+        }
+      });
+
       this.reexports = withoutRemoved(collected.reexports);
     },
     visitor: {},
     post(file: BabelFile) {
       const log = createCustomDebug('shaker', getFileIdx(file.opts.filename!));
 
+      const processedImports = new Set<string>();
       const imports = new Map<string, string[]>();
-      this.imports.forEach(({ imported, source }) => {
+      const addImport = ({
+        imported,
+        source,
+      }: {
+        imported: string;
+        source: string;
+      }) => {
+        if (processedImports.has(`${source}:${imported}`)) {
+          return;
+        }
+
         if (!imports.has(source)) {
           imports.set(source, []);
         }
@@ -359,22 +405,21 @@ export default function shakerPlugin(
         if (imported) {
           imports.get(source)!.push(imported);
         }
-      });
 
-      this.reexports.forEach(({ imported, source }) => {
-        if (!imports.has(source)) {
-          imports.set(source, []);
-        }
+        processedImports.add(`${source}:${imported}`);
+      };
 
-        imports.get(source)!.push(imported);
-      });
+      this.imports.forEach(addImport);
+      this.reexports.forEach(addImport);
 
       log('end', `remaining imports: %O`, imports);
 
       // eslint-disable-next-line no-param-reassign
-      (file.metadata as IMetadata).__linariaShaker = {
+      (file.metadata as IMetadata).linariaEvaluator = {
         imports,
       };
+
+      invalidateTraversalCache(file.path);
     },
   };
 }

@@ -1,8 +1,8 @@
 export interface IVariableContext {
   componentName: string;
   componentSlug: string;
-  precedingCss: string;
   index: number;
+  precedingCss: string;
   processor: string;
   source: string;
   unit: string;

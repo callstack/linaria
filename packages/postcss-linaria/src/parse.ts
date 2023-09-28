@@ -20,7 +20,7 @@ import { createPlaceholder } from './util';
 const generateStyleTextWithExpressionPlaceholders = (
   node: TaggedTemplateExpression,
   sourceAsString: string
-): { styleText: string; expressionStrings: string[] } => {
+): { expressionStrings: string[]; styleText: string } => {
   let styleText = '';
   const expressionStrings: string[] = [];
 

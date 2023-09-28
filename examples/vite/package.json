@@ -11,9 +11,9 @@
   "devDependencies": {
     "@linaria/shaker": "workspace:^",
     "@linaria/vite": "workspace:^",
-    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-node-resolve": "^15.2.1",
     "@vitejs/plugin-react": "^2.1.0",
-    "vite": "^3.1.8"
+    "vite": "^3.2.7"
   },
   "scripts": {
     "build": "vite build"

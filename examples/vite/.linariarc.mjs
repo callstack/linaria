@@ -13,7 +13,7 @@ module.exports = {
                     return false;
                 }
 
-                return /(?:^|\n|;)\s*(?:export|import)\s+/.test(code);
+                return /(?:^|\*\/|;)\s*(?:export|import)\s/m.test(code);
             },
             action: require.resolve('@linaria/shaker'),
         },

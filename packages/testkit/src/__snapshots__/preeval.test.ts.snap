@@ -2,13 +2,13 @@
 
 exports[`preeval should keep getGlobal but remove window-related code 1`] = `
 "function getGlobal() {
-  if (typeof globalThis !== \\"undefined\\") {
+  if (typeof globalThis !== "undefined") {
     return globalThis;
   }
-  if (typeof global !== \\"undefined\\") {
+  if (typeof global !== "undefined") {
     return global;
   }
-  if (typeof self !== \\"undefined\\") {
+  if (typeof self !== "undefined") {
     return self;
   }
   return mockGlobal;

@@ -1,7 +1,7 @@
 export interface ICache {
   get: (key: string) => Promise<string>;
-  set: (key: string, value: string) => Promise<void>;
   getDependencies?: (key: string) => Promise<string[]>;
+  set: (key: string, value: string) => Promise<void>;
   setDependencies?: (key: string, value: string[]) => Promise<void>;
 }
 
@@ -16,13 +16,13 @@ class MemoryCache implements ICache {
     return Promise.resolve(this.cache.get(key) ?? '');
   }
 
+  public getDependencies(key: string): Promise<string[]> {
+    return Promise.resolve(this.dependenciesCache.get(key) ?? []);
+  }
+
   public set(key: string, value: string): Promise<void> {
     this.cache.set(key, value);
     return Promise.resolve();
-  }
-
-  public getDependencies(key: string): Promise<string[]> {
-    return Promise.resolve(this.dependenciesCache.get(key) ?? []);
   }
 
   public setDependencies(key: string, value: string[]): Promise<void> {

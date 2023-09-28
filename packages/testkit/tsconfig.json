@@ -1,9 +1,19 @@
 {
   "extends": "../../tsconfig.json",
   "exclude": [
+    // Contains broken code that should not be type-checked
+    "src/__fixtures__/prepare-code-test-cases/dynamic-import/input.ts",
+    "src/__fixtures__/prepare-code-test-cases/dynamic-import-param/input.ts",
+    "src/__fixtures__/prepare-code-test-cases/for-debug/input.ts",
+    "src/__fixtures__/linaria-ui-library/types.ts",
+
     "node_modules"
   ],
-  "compilerOptions": { "paths": {}, "rootDir": "src/", "types": ["jest", "node"] },
+  "compilerOptions": {
+    "paths": {},
+    "rootDir": "src/",
+    "types": ["jest", "node"]
+  },
   "references": [
     { "path": "../babel" },
     { "path": "../core" },

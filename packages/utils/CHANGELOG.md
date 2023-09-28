@@ -1,5 +1,56 @@
 # Change Log
 
+## 5.0.0
+
+### Major Changes
+
+- 88e07613: Rewritten dependecny tree processing with support for wildcard re-exports.
+- cb853e14: All processing stages were merged into one generators-based processor. It allows the implementation of more complex workflows to support features like dynamic imports and re-exports.
+
+### Minor Changes
+
+- 9cb4143d: Refactoring of the 1st stage of transformation. It opens the road to processing wildcard reexports.
+- ae162f46: babelrc should not be used for preeval transformations (fixes #1308)
+
+### Patch Changes
+
+- b3ef8c1f: fix: add support for params in dynamic imports
+- f8b9bff5: Improved exports finder so it works with pure TS files and better detects transpiled reexports.
+- 63902332: The exports finder didn't support enums that were transpiled to esm by tsc. Fixed.
+- aa100453: In some cases, an asynchronous resolver could cause race conditions. Fixed.
+- 2a1e24a0: Upgrade TypeScript to 5.2
+- 16320d71: Prototype methods assignments cannot be deleted safely, so it is replaced with a dummy function.
+- Updated dependencies [9cb4143d]
+- Updated dependencies [88e07613]
+- Updated dependencies [9bb782d0]
+- Updated dependencies [2a1e24a0]
+- Updated dependencies [cb853e14]
+  - @linaria/logger@5.0.0
+
+## 4.5.3
+
+### Patch Changes
+
+- 10bcd241: Fix for "The expression evaluated to 'undefined'" in Webpack (fixes #1300 and #1287)
+
+## 4.5.2
+
+### Patch Changes
+
+- 79557248: Nothing has changed. Just moved some utils and types from babel to utils package.
+- b191f543: New option `features` for fine-tuning the build and evaluation process.
+- e59bf809: Shaker mistakenly counts references in types as valuable and keeps referenced variables alive.
+- 520ba8da: Debug mode for CLI, Webpack 5 and Vite. When enabled, prints brief perf report to console and information about processed dependency tree to the specified file.
+- ae3727f9: Fix the issues with processing files that are supposed to be parsed with their respective Babel config.
+- dca076ef: All references in unary operators should be treated as references, not as bindings. That fixes usages of `+exp` in interpolations.
+
+## 4.5.1
+
+### Patch Changes
+
+- 85e74df6: Fix: type imports without `type` annotation may lead to an unexpected increase in the evaluated codebase.
+- 1bf5c5b8: The cache has been improved, which should address the build time issues for Webpack 4/5 and resolve HMR-related problems for Vite. Fixes #1199, #1265 and maybe some more.
+
 ## 4.5.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@linaria/babel-plugin-interop",
-  "version": "4.5.0",
+  "version": "5.0.0",
   "homepage": "https://github.com/callstack/linaria/tree/master/packages/interop#readme",
   "repository": "git@github.com:callstack/linaria.git",
   "license": "MIT",
@@ -26,15 +26,15 @@
     "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.2",
-    "@babel/traverse": "^7.20.1",
-    "@babel/types": "^7.20.2",
-    "@types/babel__core": "^7.1.19",
-    "@types/babel__traverse": "^7.17.1",
-    "dedent": "^0.7.0"
+    "@babel/core": "^7.22.15",
+    "@babel/traverse": "^7.22.15",
+    "@babel/types": "^7.22.15",
+    "@types/babel__core": "^7.20.1",
+    "@types/babel__traverse": "^7.20.1",
+    "dedent": "^1.5.1"
   },
   "engines": {
-    "node": "^12.16.0 || >=13.7.0"
+    "node": ">=16.0.0"
   },
   "publishConfig": {
     "access": "public"

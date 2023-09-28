@@ -1,29 +1,49 @@
 import type { NodePath } from '@babel/traverse';
-import type { Node, Identifier, JSXIdentifier } from '@babel/types';
+import type {
+  Node,
+  Identifier,
+  JSXIdentifier,
+  UnaryExpression,
+} from '@babel/types';
 
 import { getScope } from './getScope';
 
-type FindType = 'binding' | 'both' | 'referenced';
+type FindType = 'any' | 'binding' | 'declaration' | 'reference';
 
-function isInVoid(path: NodePath): boolean {
-  return path.parentPath?.isUnaryExpression({ operator: 'void' }) ?? false;
+function isInUnary<T extends NodePath>(
+  path: T
+): path is T & { parentPath: NodePath<UnaryExpression> } {
+  return path.parentPath?.isUnaryExpression() ?? false;
+}
+
+// It's possible for non-strict mode code to have variable deletions.
+function isInDelete(path: { parentPath: NodePath<UnaryExpression> }): boolean {
+  return path.parentPath.node.operator === 'delete';
 }
 
 function isBindingIdentifier(path: NodePath): path is NodePath<Identifier> {
-  return path.isBindingIdentifier() && !isInVoid(path);
+  return path.isBindingIdentifier() && (!isInUnary(path) || isInDelete(path));
 }
 
 function isReferencedIdentifier(
   path: NodePath
 ): path is NodePath<Identifier | JSXIdentifier> {
-  return path.isReferencedIdentifier() || isInVoid(path);
+  return (
+    path.isReferencedIdentifier() || (isInUnary(path) && !isInDelete(path))
+  );
 }
 
-// For some reasons, `isBindingIdentifier` returns true for identifiers inside `void` expressions.
-const checkers: Record<FindType, (ex: NodePath) => boolean> = {
+// For some reasons, `isBindingIdentifier` returns true for identifiers inside unary expressions.
+const checkers: Record<
+  FindType,
+  (ex: NodePath<Identifier | JSXIdentifier>) => boolean
+> = {
+  any: (ex) => isBindingIdentifier(ex) || isReferencedIdentifier(ex),
   binding: (ex) => isBindingIdentifier(ex),
-  both: (ex) => isBindingIdentifier(ex) || isReferencedIdentifier(ex),
-  referenced: (ex) => isReferencedIdentifier(ex),
+  declaration: (ex) =>
+    isBindingIdentifier(ex) &&
+    ex.scope.getBinding(ex.node.name)?.identifier === ex.node,
+  reference: (ex) => isReferencedIdentifier(ex),
 };
 
 export function nonType(path: NodePath): boolean {
@@ -39,7 +59,7 @@ export function nonType(path: NodePath): boolean {
 
 export default function findIdentifiers(
   expressions: NodePath<Node | null | undefined>[],
-  type: FindType = 'referenced'
+  type: FindType = 'reference'
 ): NodePath<Identifier | JSXIdentifier>[] {
   const identifiers: NodePath<Identifier | JSXIdentifier>[] = [];
 
@@ -56,7 +76,7 @@ export default function findIdentifiers(
         return;
       }
 
-      if (type === 'referenced' && ex.isAncestor(binding.path)) {
+      if (type === 'reference' && ex.isAncestor(binding.path)) {
         // This identifier is declared inside the expression. We don't need it.
         return;
       }

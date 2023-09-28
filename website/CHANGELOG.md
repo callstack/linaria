@@ -1,5 +1,61 @@
 # Change Log
 
+## 5.0.1
+
+### Patch Changes
+
+- @linaria/atomic@5.0.1
+- @linaria/core@5.0.1
+- @linaria/react@5.0.1
+
+## 5.0.0
+
+### Major Changes
+
+- 88e07613: Rewritten dependecny tree processing with support for wildcard re-exports.
+- cb853e14: All processing stages were merged into one generators-based processor. It allows the implementation of more complex workflows to support features like dynamic imports and re-exports.
+
+### Patch Changes
+
+- 2a1e24a0: Upgrade TypeScript to 5.2
+- Updated dependencies [9cb4143d]
+- Updated dependencies [88e07613]
+- Updated dependencies [2a1e24a0]
+- Updated dependencies [cb853e14]
+  - @linaria/atomic@5.0.0
+  - @linaria/core@5.0.0
+  - @linaria/react@5.0.0
+  - @linaria/server@5.0.0
+
+## 4.5.4
+
+### Patch Changes
+
+- @linaria/atomic@4.5.4
+- @linaria/core@4.5.4
+- @linaria/react@4.5.4
+
+## 4.5.3
+
+### Patch Changes
+
+- e59bf809: Shaker mistakenly counts references in types as valuable and keeps referenced variables alive.
+- 520ba8da: Debug mode for CLI, Webpack 5 and Vite. When enabled, prints brief perf report to console and information about processed dependency tree to the specified file.
+- Updated dependencies [79557248]
+- Updated dependencies [e59bf809]
+  - @linaria/atomic@4.5.3
+  - @linaria/core@4.5.3
+  - @linaria/react@4.5.3
+
+## 4.5.2
+
+### Patch Changes
+
+- 1bf5c5b8: The cache has been improved, which should address the build time issues for Webpack 4/5 and resolve HMR-related problems for Vite. Fixes #1199, #1265 and maybe some more.
+  - @linaria/atomic@4.5.2
+  - @linaria/core@4.5.2
+  - @linaria/react@4.5.2
+
 ## 4.5.1
 
 ### Patch Changes

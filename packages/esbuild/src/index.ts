@@ -11,12 +11,16 @@ import type { Plugin, TransformOptions, Loader } from 'esbuild';
 import { transformSync } from 'esbuild';
 
 import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
-import { slugify, transform } from '@linaria/babel-preset';
+import {
+  slugify,
+  transform,
+  TransformCacheCollection,
+} from '@linaria/babel-preset';
 
 type EsbuildPluginOptions = {
-  sourceMap?: boolean;
-  preprocessor?: Preprocessor;
   esbuildOptions?: TransformOptions;
+  preprocessor?: Preprocessor;
+  sourceMap?: boolean;
 } & Partial<PluginOptions>;
 
 const nodeModulesRegex = /^(?:.*[\\/])?node_modules(?:[\\/].*)?$/;
@@ -28,6 +32,7 @@ export default function linaria({
   ...rest
 }: EsbuildPluginOptions = {}): Plugin {
   let options = esbuildOptions;
+  const cache = new TransformCacheCollection();
   return {
     name: 'linaria',
     setup(build) {
@@ -50,7 +55,7 @@ export default function linaria({
           throw new Error(`Cannot resolve ${token}`);
         }
 
-        return result.path;
+        return result.path.replace(/\\/g, path.posix.sep);
       };
 
       build.onResolve({ filter: /\.linaria\.css$/ }, (args) => {
@@ -103,15 +108,17 @@ export default function linaria({
           code += `/*# sourceMappingURL=data:application/json;base64,${esbuildMap}*/`;
         }
 
-        const result = await transform(
-          code,
-          {
+        const transformServices = {
+          options: {
             filename: args.path,
+            root: process.cwd(),
             preprocessor,
             pluginOptions: rest,
           },
-          asyncResolve
-        );
+          cache,
+        };
+
+        const result = await transform(transformServices, code, asyncResolve);
 
         if (!result.cssText) {
           return {

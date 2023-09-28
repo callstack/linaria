@@ -46,24 +46,8 @@ const asyncResolve = (
   importer: string,
   stack: string[]
 ): Promise<string> => {
-  const where = [importer, ...stack].map((p) => path.dirname(p));
-  const resolved = safeResolve(what, where);
-  if (!(resolved instanceof Error)) {
-    return Promise.resolve(resolved);
-  }
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const suffix of suffixes) {
-    const resolvedWithSuffix = safeResolve(what + suffix, where);
-    if (resolvedWithSuffix instanceof Error) {
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-
-    return Promise.resolve(resolvedWithSuffix);
-  }
-
-  throw resolved;
+  const resolved = syncResolve(what, importer, stack);
+  return Promise.resolve(resolved);
 };
 
 export default asyncResolve;

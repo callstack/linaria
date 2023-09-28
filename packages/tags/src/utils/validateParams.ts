@@ -26,7 +26,7 @@ type GetParamByName<T> = T extends '*'
 // MapParams iteratively maps the input ParamConstraints to their corresponding Param types.
 export type MapParams<
   TNames extends ParamConstraints,
-  TRes extends Param[] = []
+  TRes extends Param[] = [],
 > = TNames extends [infer THead, ...infer TTail] // If TNames is a non-empty tuple.
   ? THead extends '...' // If the first element in the tuple is '...'.
     ? [...TRes, ...Params] // Append all Params to the result tuple.

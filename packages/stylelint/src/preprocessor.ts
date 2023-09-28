@@ -1,35 +1,35 @@
 import stripAnsi from 'strip-ansi';
 
 import { transform } from '@linaria/babel-preset';
-import type { Replacement } from '@linaria/babel-preset';
+import type { Replacements } from '@linaria/utils';
 import { asyncResolveFallback } from '@linaria/utils';
 
 type Errors = {
   [key: string]:
     | {
-        name?: string;
         code?: string;
-        message: string;
-        pos?: number;
         loc?: {
-          line: number;
           column: number;
+          line: number;
         };
+        message: string;
+        name?: string;
+        pos?: number;
       }
     | null
     | undefined;
 };
 
 type Cache = {
-  [key: string]: Replacement[] | null | undefined;
+  [key: string]: Replacements | null | undefined;
 };
 
 type Warning = {
-  rule?: string;
-  text: string;
-  severity: 'error' | 'warning';
-  line: number;
   column: number;
+  line: number;
+  rule?: string;
+  severity: 'error' | 'warning';
+  text: string;
 };
 
 type LintResult = {
@@ -38,8 +38,8 @@ type LintResult = {
 };
 
 interface IPosition {
-  line: number;
   column: number;
+  line: number;
 }
 
 interface ISourceOffset {
@@ -57,12 +57,16 @@ function preprocessor() {
     async code(input: string, filename: string) {
       let result;
 
+      const transformServices = {
+        options: {
+          filename,
+        },
+      };
+
       try {
         result = await transform(
+          transformServices,
           input,
-          {
-            filename,
-          },
           asyncResolveFallback
         );
 

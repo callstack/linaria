@@ -1,5 +1,111 @@
 # Change Log
 
+## 5.0.2
+
+### Patch Changes
+
+- Updated dependencies [38796a57]
+  - @linaria/babel-preset@5.0.2
+  - @linaria/rollup@5.0.2
+  - @linaria/stylelint@5.0.2
+  - @linaria/webpack4-loader@5.0.2
+
+## 5.0.1
+
+### Patch Changes
+
+- Updated dependencies [6fb6eb69]
+- Updated dependencies [6fb6eb69]
+  - @linaria/babel-preset@5.0.1
+  - @linaria/shaker@5.0.1
+  - @linaria/rollup@5.0.1
+  - @linaria/stylelint@5.0.1
+  - @linaria/webpack4-loader@5.0.1
+  - @linaria/core@5.0.1
+  - @linaria/react@5.0.1
+
+## 5.0.0
+
+### Major Changes
+
+- 88e07613: Rewritten dependecny tree processing with support for wildcard re-exports.
+- cb853e14: All processing stages were merged into one generators-based processor. It allows the implementation of more complex workflows to support features like dynamic imports and re-exports.
+
+### Minor Changes
+
+- 9cb4143d: Refactoring of the 1st stage of transformation. It opens the road to processing wildcard reexports.
+
+### Patch Changes
+
+- 2a1e24a0: Upgrade TypeScript to 5.2
+- Updated dependencies [9cb4143d]
+- Updated dependencies [ae162f46]
+- Updated dependencies [88e07613]
+- Updated dependencies [715dc93c]
+- Updated dependencies [b3ef8c1f]
+- Updated dependencies [144995f0]
+- Updated dependencies [f8b9bff5]
+- Updated dependencies [8a5d734b]
+- Updated dependencies [aa100453]
+- Updated dependencies [ea1444f6]
+- Updated dependencies [9bb782d0]
+- Updated dependencies [2a1e24a0]
+- Updated dependencies [cb853e14]
+- Updated dependencies [e042f96d]
+  - @linaria/babel-preset@5.0.0
+  - @linaria/core@5.0.0
+  - @linaria/extractor@5.0.0
+  - @linaria/react@5.0.0
+  - @linaria/rollup@5.0.0
+  - @linaria/server@5.0.0
+  - @linaria/shaker@5.0.0
+  - @linaria/stylelint@5.0.0
+  - @linaria/webpack4-loader@5.0.0
+
+## 4.5.4
+
+### Patch Changes
+
+- Updated dependencies [10bcd241]
+  - @linaria/babel-preset@4.5.4
+  - @linaria/rollup@4.5.4
+  - @linaria/stylelint@4.5.4
+  - @linaria/webpack4-loader@4.5.4
+  - @linaria/core@4.5.4
+  - @linaria/react@4.5.4
+  - @linaria/shaker@4.5.3
+
+## 4.5.3
+
+### Patch Changes
+
+- Updated dependencies [79557248]
+- Updated dependencies [b191f543]
+- Updated dependencies [e59bf809]
+- Updated dependencies [520ba8da]
+- Updated dependencies [ae3727f9]
+  - @linaria/babel-preset@4.5.3
+  - @linaria/core@4.5.3
+  - @linaria/react@4.5.3
+  - @linaria/stylelint@4.5.3
+  - @linaria/shaker@4.5.2
+  - @linaria/rollup@4.5.3
+  - @linaria/webpack4-loader@4.5.3
+
+## 4.5.2
+
+### Patch Changes
+
+- Updated dependencies [85e74df6]
+- Updated dependencies [1bf5c5b8]
+  - @linaria/shaker@4.5.1
+  - @linaria/babel-preset@4.5.2
+  - @linaria/rollup@4.5.2
+  - @linaria/webpack4-loader@4.5.2
+  - @linaria/core@4.5.2
+  - @linaria/react@4.5.2
+  - @linaria/stylelint@4.5.2
+
 ## 4.5.1
 
 ### Patch Changes

@@ -4,11 +4,13 @@
  * returns transformed code without template literals and attaches generated source maps
  */
 
+import { existsSync } from 'fs';
 import path from 'path';
 
 import { createFilter } from '@rollup/pluginutils';
 import type { FilterPattern } from '@rollup/pluginutils';
 import type { ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite';
+import { optimizeDeps } from 'vite';
 
 import {
   transform,
@@ -16,19 +18,22 @@ import {
   TransformCacheCollection,
 } from '@linaria/babel-preset';
 import type { PluginOptions, Preprocessor } from '@linaria/babel-preset';
-import { createCustomDebug } from '@linaria/logger';
-import { getFileIdx, syncResolve } from '@linaria/utils';
+import { linariaLogger } from '@linaria/logger';
+import type { IFileReporterOptions } from '@linaria/utils';
+import { createFileReporter, getFileIdx, syncResolve } from '@linaria/utils';
 
 type VitePluginOptions = {
-  include?: FilterPattern;
+  debug?: IFileReporterOptions | false | null | undefined;
   exclude?: FilterPattern;
-  sourceMap?: boolean;
+  include?: FilterPattern;
   preprocessor?: Preprocessor;
+  sourceMap?: boolean;
 } & Partial<PluginOptions>;
 
 export { Plugin };
 
 export default function linaria({
+  debug,
   include,
   exclude,
   sourceMap,
@@ -41,13 +46,17 @@ export default function linaria({
   let config: ResolvedConfig;
   let devServer: ViteDevServer;
 
+  const { emitter, onDone } = createFileReporter(debug ?? false);
+
   // <dependency id, targets>
-  const targets: { id: string; dependencies: string[] }[] = [];
+  const targets: { dependencies: string[]; id: string }[] = [];
   const cache = new TransformCacheCollection();
-  const { codeCache, evalCache } = cache;
   return {
     name: 'linaria',
     enforce: 'post',
+    buildEnd() {
+      onDone(process.cwd());
+    },
     configResolved(resolvedConfig: ResolvedConfig) {
       config = resolvedConfig;
     },
@@ -80,15 +89,13 @@ export default function linaria({
 
       // eslint-disable-next-line no-restricted-syntax
       for (const depId of deps) {
-        codeCache.delete(depId);
-        evalCache.delete(depId);
+        cache.invalidateForFile(depId);
       }
-      const modules = affected
+
+      return affected
         .map((target) => devServer.moduleGraph.getModuleById(target.id))
         .concat(ctx.modules)
         .filter((m): m is ModuleNode => !!m);
-
-      return modules;
     },
     async transform(code: string, url: string) {
       const [id] = url.split('?', 1);
@@ -97,9 +104,9 @@ export default function linaria({
       if (url.includes('node_modules') || !filter(url) || id in cssLookup)
         return;
 
-      const log = createCustomDebug('rollup', getFileIdx(id));
+      const log = linariaLogger.extend('vite');
 
-      log('rollup-init', id);
+      log('Vite transform', getFileIdx(id));
 
       const asyncResolve = async (
         what: string,
@@ -112,11 +119,11 @@ export default function linaria({
             // If module is marked as external, Rollup will not resolve it,
             // so we need to resolve it ourselves with default resolver
             const resolvedId = syncResolve(what, importer, stack);
-            log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
+            log("resolve ✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
             return resolvedId;
           }
 
-          log('resolve', "✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
+          log("resolve ✅ '%s'@'%s -> %O\n%s", what, importer, resolved);
           // Vite adds param like `?v=667939b3` to cached modules
           const resolvedId = resolved.id.split('?', 1)[0];
 
@@ -126,29 +133,29 @@ export default function linaria({
             return null;
           }
 
+          if (!existsSync(resolvedId)) {
+            await optimizeDeps(config);
+          }
+
           return resolvedId;
         }
 
-        log('resolve', "❌ '%s'@'%s", what, importer);
+        log("resolve ❌ '%s'@'%s", what, importer);
         throw new Error(`Could not resolve ${what}`);
       };
 
-      // TODO: Vite surely has some already transformed modules, solid
-      // why would we transform it again?
-      // We could provide some thing like `pretransform` and ask Vite to return transformed module
-      // (module.transformResult)
-      // So we don't need to duplicate babel plugins.
-      const result = await transform(
-        code,
-        {
+      const transformServices = {
+        options: {
           filename: id,
+          root: process.cwd(),
           preprocessor,
           pluginOptions: rest,
         },
-        asyncResolve,
-        {},
-        cache
-      );
+        cache,
+        eventEmitter: emitter,
+      };
+
+      const result = await transform(transformServices, code, asyncResolve);
 
       let { cssText, dependencies } = result;
 

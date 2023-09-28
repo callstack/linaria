@@ -1,9 +1,11 @@
 import type { TemplateElement, Expression, SourceLocation } from '@babel/types';
 
+import type { ExpressionValue } from '@linaria/utils';
+import { ValueType } from '@linaria/utils';
+
 import type { TailProcessorParams } from './BaseProcessor';
-import BaseProcessor from './BaseProcessor';
-import type { ExpressionValue, ValueCache, Rules, Params } from './types';
-import { ValueType } from './types';
+import { BaseProcessor } from './BaseProcessor';
+import type { ValueCache, Rules, Params } from './types';
 import templateProcessor from './utils/templateProcessor';
 import { validateParams } from './utils/validateParams';
 
@@ -53,6 +55,10 @@ export default abstract class TaggedTemplateProcessor extends BaseProcessor {
     }
   }
 
+  public override toString(): string {
+    return `${super.toString()}\`…\``;
+  }
+
   /**
    * It is called for each resolved expression in a template literal.
    * @param node
@@ -73,8 +79,4 @@ export default abstract class TaggedTemplateProcessor extends BaseProcessor {
     cssText: string,
     loc?: SourceLocation | null
   ): Rules;
-
-  public override toString(): string {
-    return `${super.toString()}\`…\``;
-  }
 }

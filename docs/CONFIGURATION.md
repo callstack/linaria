@@ -175,6 +175,20 @@ module.exports = {
   - `unit` - the unit.
   - `valueSlug` - the value slug.
 
+
+- `overrideContext: (context: Partial<vm.Context>, filename: string) => Partial<vm.Context>`
+
+  A custom function to override the context used to evaluate modules. This can be used to add custom globals or override the default ones.
+    
+  ```js
+  module.exports = {
+    overrideContext: (context, filename) => ({
+      ...context,
+      HighLevelAPI: () => "I'm a high level API",
+    }),
+  };
+  ```
+
 - `rules: EvalRule[]`
 
   The set of rules that defines how the matched files will be transformed during the evaluation.
@@ -208,7 +222,7 @@ module.exports = {
           return false;
         }
         
-        return /\b(?:export|import)\b/.test(code);
+        return /(?:^|\*\/|;)\s*(?:export|import)\s/m.test(code);
       },
       action: require.resolve('@linaria/shaker'),
     }
@@ -267,6 +281,10 @@ module.exports = {
 - `babelOptions: Object`
 
   If you need to specify custom babel configuration, you can pass them here. These babel options will be used by Linaria when parsing and evaluating modules.
+
+- `features: Record<string, FeatureFlag>`
+
+  A map of feature flags to enable/disable. See [Feature Flags](./FEATURE_FLAGS.md##feature-flags) for more information.
 
 ## `@linaria/babel-preset`
 

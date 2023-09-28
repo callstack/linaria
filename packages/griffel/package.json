@@ -1,6 +1,6 @@
 {
   "name": "@linaria/griffel",
-  "version": "4.5.1",
+  "version": "5.0.1",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "css",
@@ -44,10 +44,10 @@
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
-    "@babel/types": "^7.20.2"
+    "@babel/types": "^7.22.15"
   },
   "engines": {
-    "node": "^12.16.0 || >=13.7.0"
+    "node": ">=16.0.0"
   },
   "publishConfig": {
     "access": "public"

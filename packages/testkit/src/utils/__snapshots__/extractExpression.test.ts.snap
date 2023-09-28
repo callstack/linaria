@@ -10,7 +10,7 @@ function foo() {
 `;
 
 exports[`extractExpression should hoist functions 1`] = `
-"let a = \\"foo\\";
+"let a = "foo";
 let fn = obj => obj.className ?? '';
 const _exp = /*#__PURE__*/() => a + fn({
   className: 'bar'
@@ -21,7 +21,7 @@ function foo() {
 `;
 
 exports[`extractExpression should ignore types 1`] = `
-"let a = \\"foo\\";
+"let a = "foo";
 let fn = (obj: Props) => obj.className ?? '';
 const _exp = /*#__PURE__*/() => a + fn({
   className: 'bar'

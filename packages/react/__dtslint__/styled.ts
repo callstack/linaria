@@ -13,7 +13,7 @@ function isExtends<C, T>(arg1?: C, arg2?: T): C extends T ? 'extends' : never {
 }
 
 const Fabric =
-  <T>(): React.FC<T> =>
+  <T extends React.HTMLAttributes<'div'>>(): React.FC<T> =>
   (props) =>
     React.createElement('div', props);
 
@@ -28,22 +28,22 @@ const StyledDiv = styled.div``;
 isExtends<typeof StyledDiv, React.FC<React.DetailedHTMLProps<any, any>>>();
 
 const A = (): React.ReactElement => React.createElement('div', null);
-// $ExpectError
+// @ts-expect-error
 styled(A)``;
 
 // foo is not a valid property of div
-// $ExpectError
+// @ts-expect-error
 React.createElement(StyledDiv, { foo: 'foo' });
 
 const ReStyledDiv = styled(StyledDiv)<{ foo: string }>``;
 React.createElement(ReStyledDiv, { foo: 'foo' });
 
 // component should have className property
-// $ExpectError
+// @ts-expect-error
 styled(Fabric<{ a: string }>())``;
 
 // className property should be string
-// $ExpectError
+// @ts-expect-error
 styled(Fabric<{ className: number }>())``;
 
 const SimplestComponent = styled(Fabric<{ className: string }>())``;
@@ -52,8 +52,10 @@ isExtends<typeof SimplestComponent, React.FC<{ className: string }>>();
 
 styled(Fabric<{ className: string }>())`
   // component should have style property
-  // $ExpectError
-  color: ${() => 'red'};
+  color: ${
+    // @ts-expect-error
+    () => 'red'
+  };
 `;
 
 styled(Fabric<{ className: string }>())`
@@ -65,8 +67,11 @@ styled(Fabric<{ className: string }>())`
 
 styled(Fabric<{ className: string }>())`
   // it looks like the previous test, but it references a non-linaria component
-  // $ExpectError
-  & > ${Header} {
+  &
+    > ${
+      // @ts-expect-error
+      Header
+    } {
     color: red;
   }
 `;
@@ -77,11 +82,13 @@ styled(Fabric<{ className: string; style: {} }>())`
 
 styled(Fabric<{ className: string; style: {} }>())`
   // color should be defined in props
-  // $ExpectError
-  color: ${(props) => props.color};
+  color: ${
+    // @ts-expect-error
+    (props) => props.color
+  };
 `;
 
-styled(Fabric<{ className: string; style: {}; color: 'red' | 'blue' }>())`
+styled(Fabric<{ className: string; color: 'red' | 'blue'; style: {} }>())`
   & > ${SimplestComponent} {
     color: ${(props) => props.color};
   }
@@ -154,7 +161,7 @@ styled.a`
   const Grid: React.FC<GridProps & { className?: string }> = () => null;
 
   // Type 'false' is not assignable to type 'true'
-  // $ExpectError
+  // @ts-expect-error
   React.createElement(Grid, { container: false, spacing: 8 });
 
   React.createElement(Grid, { container: true, spacing: 8 });
@@ -172,10 +179,9 @@ styled.a`
     title: string;
   }
 
-  const Flow = <TProps extends BaseProps>(Cmp: React.FC<TProps>) =>
-    styled(Cmp)`
-      display: flow;
-    `;
+  const Flow = <TProps extends BaseProps>(Cmp: React.FC<TProps>) => styled(Cmp)`
+    display: flow;
+  `;
 
   const Component: React.FC<ComponentProps> = (props) =>
     React.createElement('div', props);

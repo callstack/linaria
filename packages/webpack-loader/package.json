@@ -1,6 +1,6 @@
 {
   "name": "@linaria/webpack-loader",
-  "version": "4.5.1",
+  "version": "5.0.2",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "babel",
@@ -36,7 +36,7 @@
     "@linaria/webpack5-loader": "workspace:^"
   },
   "engines": {
-    "node": "^12.16.0 || >=13.7.0"
+    "node": ">=16.0.0"
   },
   "publishConfig": {
     "access": "public"
