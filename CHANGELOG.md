@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.0.2
+
+### Patch Changes
+
+- Updated dependencies [1e889937]
+  - @linaria/react@5.0.2
+  - @linaria/atomic@5.0.2
+  - @linaria/core@5.0.2
+
 ## 5.0.1
 
 ### Patch Changes
