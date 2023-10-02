@@ -139,7 +139,7 @@ function styled(tag: any): any {
   if (process.env.NODE_ENV === 'test') {
     // eslint-disable-next-line no-plusplus
     mockedClass += `mocked-styled-${idx++}`;
-    if (tag?.__linaria?.className) {
+    if (tag && tag.__linaria && tag.__linaria.className) {
       mockedClass += ` ${tag.__linaria.className}`;
     }
   }
