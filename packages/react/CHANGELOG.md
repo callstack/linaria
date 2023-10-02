@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.0.3
+
+### Patch Changes
+
+- 4b083b7c: Fix compatibility with Webpack 4.
+
 ## 5.0.2
 
 ### Patch Changes

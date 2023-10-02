@@ -1,5 +1,12 @@
 # Change Log
 
+## 5.0.3
+
+### Patch Changes
+
+- Updated dependencies [4b083b7c]
+  - @linaria/react@5.0.3
+
 ## 5.0.2
 
 ### Patch Changes
