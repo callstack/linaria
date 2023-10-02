@@ -1,27 +1,27 @@
 
-> linaria-website@5.0.2 build /home/runner/work/linaria/linaria/website
+> linaria-website@5.0.3 build /home/runner/work/linaria/linaria/website
 > pnpm build:client && pnpm build:server
 
 
-> linaria-website@5.0.2 build:client /home/runner/work/linaria/linaria/website
+> linaria-website@5.0.3 build:client /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production webpack
 
 
 Timings:
-  Total: 8465ms
+  Total: 8648ms
 
   By method:
-    createEntrypoint: 500ms
-    parseFile: 49ms
-    transform:evaluator: 113ms
-    transform:preeval: 419ms
-    transform:preeval:processTemplate: 153ms
-    transform:preeval:removeDangerousCode: 91ms
+    createEntrypoint: 508ms
+    parseFile: 39ms
+    transform:evaluator: 166ms
+    transform:preeval: 360ms
+    transform:preeval:processTemplate: 147ms
+    transform:preeval:removeDangerousCode: 69ms
 
 Memory usage: {
-  rss: 200884224,
-  heapTotal: 134369280,
-  heapUsed: 100639960,
+  rss: 202477568,
+  heapTotal: 135155712,
+  heapUsed: 101246432,
   external: 3511539,
   arrayBuffers: 1027951
 }
@@ -49,9 +49,9 @@ cacheable modules 148 KiB (javascript) 62.6 KiB (asset) 2.7 KiB (css/mini-extrac
       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Hero.jsx[39m[22m 1.35 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/index.jsx[39m[22m 311 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Container.js[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.76.0 compiled [1m[32msuccessfully[39m[22m in 7544 ms
+webpack 5.76.0 compiled [1m[32msuccessfully[39m[22m in 7792 ms
 
-> linaria-website@5.0.2 build:server /home/runner/work/linaria/linaria/website
+> linaria-website@5.0.3 build:server /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
 
-Successfully compiled 11 files with Babel (1527ms).
+Successfully compiled 11 files with Babel (1509ms).
