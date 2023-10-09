@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.0.4
+
+### Patch Changes
+
+- e25e91ff: Fixed detection of export/import statements. Fixes #1367
+- Updated dependencies [e25e91ff]
+  - @linaria/shaker@5.0.3
+
 ## 5.0.3
 
 ### Patch Changes

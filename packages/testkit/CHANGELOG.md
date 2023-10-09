@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.0.5
+
+### Patch Changes
+
+- Updated dependencies [e25e91ff]
+  - @linaria/babel-preset@5.0.4
+  - @linaria/shaker@5.0.3
+
 ## 5.0.4
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.0.3
+
+### Patch Changes
+
+- e25e91ff: Fixed detection of export/import statements. Fixes #1367
+
 ## 5.0.2
 
 ### Patch Changes
