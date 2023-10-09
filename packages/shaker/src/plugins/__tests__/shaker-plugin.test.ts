@@ -35,7 +35,7 @@ const keep =
       configFile: false,
       filename,
       presets,
-      sourceType: /(?:^|\*\/|;)\s*(?:export|import)\s/m.test(formattedCode)
+      sourceType: /(?:^|\*\/|;|})\s*(?:export|import)\s/m.test(formattedCode)
         ? 'module'
         : 'script',
       plugins: [
