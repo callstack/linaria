@@ -56,12 +56,13 @@
     "@linaria/utils": "workspace:^",
     "known-css-properties": "^0.24.0",
     "postcss": "^8.4.31",
-    "stylis": "^3.5.4",
+    "stylis": "^4.3.0",
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
     "@babel/types": "^7.22.15",
-    "@types/node": "^17.0.39"
+    "@types/node": "^17.0.39",
+    "@types/stylis": "^4.2.1"
   },
   "peerDependencies": {
     "react": ">=16"

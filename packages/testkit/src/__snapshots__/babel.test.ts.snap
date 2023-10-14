@@ -96,8 +96,8 @@ exports[`strategy shaker compiles atomic css with at-rules and property prioriti
 
 CSS:
 
-@media (max-width:500px){.atm_1h9nsec_idpfg4.atm_1h9nsec_idpfg4{padding:0;}}
-@media (min-width:300px){.atm_7xgmf7_14y27yu.atm_7xgmf7_14y27yu.atm_7xgmf7_14y27yu:hover{padding-top:5px;}}
+@media (max-width: 500px){.atm_1h9nsec_idpfg4.atm_1h9nsec_idpfg4{padding:0;}}
+@media (min-width: 300px){.atm_7xgmf7_14y27yu.atm_7xgmf7_14y27yu.atm_7xgmf7_14y27yu:hover{padding-top:5px;}}
 .atm_ci1k5c_i2wt44.atm_ci1k5c_i2wt44:enabled{padding-left:6px;}
 .atm_le_1v6z61t.atm_le_1v6z61t{padding-bottom:7px;}
 
@@ -116,8 +116,8 @@ exports[`strategy shaker compiles atomic css with at-rules and pseudo classes 2`
 
 CSS:
 
-@media (max-width:500px){.atm_1apu8aw_13q2bts.atm_1apu8aw_13q2bts{background:blue;}}
-@media (min-width:300px){.atm_1yli2by_1cnho6b.atm_1yli2by_1cnho6b:hover{background:purple;}}
+@media (max-width: 500px){.atm_1apu8aw_13q2bts.atm_1apu8aw_13q2bts{background:blue;}}
+@media (min-width: 300px){.atm_1yli2by_1cnho6b.atm_1yli2by_1cnho6b:hover{background:purple;}}
 .atm_1hwwax4_1osqo2v:enabled{width:100%;}
 .atm_26_5scuol{background:red;}
 .atm_e2_12xxubj{height:100px;}
@@ -1483,7 +1483,7 @@ exports[`strategy shaker handles interpolation in css function followed by unit 
 CSS:
 
 .atm_tr_18309cv{transform:rotate(var(--y6125t));}
-.atm_vy_1783zgq{width:200;px;}
+.atm_vy_1783zgq{width:200 px;}
 
 Dependencies: NA
 
