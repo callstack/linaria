@@ -4,7 +4,7 @@
  * It uses CSS code from template literals and evaluated values of lazy dependencies stored in ValueCache.
  */
 
-import type { TemplateElement, SourceLocation } from '@babel/types';
+import type { TemplateElement } from '@babel/types';
 
 import type { ExpressionValue, Replacements } from '@linaria/utils';
 import { hasMeta, ValueType } from '@linaria/utils';
@@ -37,30 +37,24 @@ export default function templateProcessor(
   let cssText = '';
 
   let item: TemplateElement | ExpressionValue | undefined;
-  let lastTemplateElementLocation: SourceLocation | null | undefined;
   // eslint-disable-next-line no-cond-assign
   while ((item = template.shift())) {
     if ('type' in item) {
       // It's a template element
       cssText += item.value.cooked;
-      lastTemplateElementLocation = item.loc;
       continue;
     }
 
     // It's an expression
     const { ex } = item;
 
-    const { end } = ex.loc!;
+    const { start, end } = ex.loc!;
     const beforeLength = cssText.length;
 
     // The location will be end of the current string to start of next string
     const next = template[0] as TemplateElement; // template[0] is the next template element
     const loc = {
-      // +1 because an expression location always shows 1 column before
-      start: {
-        line: lastTemplateElementLocation!.end.line,
-        column: lastTemplateElementLocation!.end.column + 1,
-      },
+      start,
       end: next
         ? { line: next.loc!.start.line, column: next.loc!.start.column }
         : { line: end.line, column: end.column + 1 },
