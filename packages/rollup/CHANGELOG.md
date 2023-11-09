@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.0.4
+
+### Patch Changes
+
+- Updated dependencies [e25e91ff]
+  - @linaria/babel-preset@5.0.4
+  - @linaria/vite@5.0.4
+
 ## 5.0.3
 
 ### Patch Changes
