@@ -1457,7 +1457,8 @@ CSS:
   width: calc(2 * var(--t13jq05-3));
   height: var(--t13jq05-4);
   grid-template-columns: var(--t13jq05-5) 1fr 1fr var(--t13jq05-5);
-  border-radius: var(--t13jq05-6)
+  border-radius: var(--t13jq05-6);
+  padding: 10px;
 }
 
 Dependencies: NA
