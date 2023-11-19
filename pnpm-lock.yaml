@@ -263,6 +263,8 @@ importers:
         specifier: ^0.4.54
         version: 0.4.54(vite@3.2.7)
 
+  examples/vpssr-linaria-solid/dist/server: {}
+
   examples/webpack5:
     dependencies:
       linaria-website:
