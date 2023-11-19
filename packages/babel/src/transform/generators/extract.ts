@@ -2,14 +2,20 @@ import path from 'path';
 
 import type { Mapping } from 'source-map';
 import { SourceMapGenerator } from 'source-map';
-import stylis from 'stylis';
+import {
+  compile,
+  serialize,
+  stringify,
+  middleware,
+  prefixer,
+  namespace,
+} from 'stylis';
 
 import type { Replacements, Rules } from '@linaria/utils';
 
 import type { Options, PreprocessorFn } from '../../types';
 import type { IExtractAction, SyncScenarioForAction } from '../types';
 
-const STYLIS_DECLARATION = 1;
 const posixSep = path.posix.sep;
 
 export function transformUrl(
@@ -32,6 +38,33 @@ export function transformUrl(
   return relative.split(platformPath.sep).join(posixSep);
 }
 
+function createStylisPreprocessor(options: Options) {
+  function stylisPreprocess(selector: string, text: string): string {
+    return serialize(
+      compile(`${selector} {${text}}\n`),
+      middleware([
+        (element: { return: string; type: string; value: string }) => {
+          const { outputFilename } = options;
+          if (element.type === 'decl' && outputFilename) {
+            // When writing to a file, we need to adjust the relative paths inside url(..) expressions.
+            // It'll allow css-loader to resolve an imported asset properly.
+            // eslint-disable-next-line no-param-reassign
+            element.return = element.value.replace(
+              /\b(url\((["']?))(\.[^)]+?)(\2\))/g,
+              (match, p1, p2, p3, p4) =>
+                p1 + transformUrl(p3, outputFilename, options.filename) + p4
+            );
+          }
+        },
+        namespace,
+        prefixer,
+        stringify,
+      ])
+    );
+  }
+  return stylisPreprocess;
+}
+
 function extractCssFromAst(
   rules: Rules,
   originalCode: string,
@@ -52,22 +85,7 @@ function extractCssFromAst(
         break;
       case 'stylis':
       default:
-        stylis.use(null)((context, decl) => {
-          const { outputFilename } = options;
-          if (context === STYLIS_DECLARATION && outputFilename) {
-            // When writing to a file, we need to adjust the relative paths inside url(..) expressions
-            // It'll allow css-loader to resolve an imported asset properly
-            return decl.replace(
-              /\b(url\((["']?))(\.[^)]+?)(\2\))/g,
-              (match, p1, p2, p3, p4) =>
-                p1 + transformUrl(p3, outputFilename, options.filename) + p4
-            );
-          }
-
-          return decl;
-        });
-
-        preprocessor = stylis;
+        preprocessor = createStylisPreprocessor(options);
     }
   }
 

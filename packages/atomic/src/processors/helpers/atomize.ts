@@ -1,7 +1,7 @@
 import { all as knownProperties } from 'known-css-properties';
 import type { Document, AtRule, Container, Rule } from 'postcss';
 import postcss from 'postcss';
-import stylis from 'stylis';
+import { compile, serialize, stringify } from 'stylis';
 
 import { slugify } from '@linaria/utils';
 
@@ -38,10 +38,6 @@ const parseCss = (cssText: string) => {
 };
 
 export default function atomize(cssText: string, hasPriority = false) {
-  stylis.set({
-    prefix: false,
-    keyframe: false,
-  });
   const atomicRules: {
     className?: string;
     cssText: string;
@@ -109,7 +105,8 @@ export default function atomize(cssText: string, hasPriority = false) {
       getPropertyPriority(decl.prop) +
       (hasAtRule ? 1 : 0) +
       (hasPriority ? 1 : 0);
-    const processedCss = stylis(`.${className}`.repeat(propertyPriority), css);
+    const selector = `.${className}`.repeat(propertyPriority);
+    const processedCss = serialize(compile(`${selector} {${css}}`), stringify);
 
     atomicRules.push({
       property: atomicProperty.join(' '),
