@@ -138,6 +138,11 @@ export const parse: Parser<Root | Document> = (
           extractedStyles.add(path.node);
         }
       }
+      if (path.node.tag.type === 'CallExpression') {
+        if (path.node.tag.callee.name === 'styled') {
+          extractedStyles.add(path.node);
+        }
+      }
     },
   });
 
