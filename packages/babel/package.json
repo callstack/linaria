@@ -37,7 +37,7 @@
     "@babel/generator": "^7.22.15",
     "@babel/helper-module-imports": "^7.22.15",
     "@babel/template": "^7.22.15",
-    "@babel/traverse": "^7.22.15",
+    "@babel/traverse": "^7.23.2",
     "@babel/types": "^7.22.15",
     "@linaria/core": "workspace:^",
     "@linaria/logger": "workspace:^",

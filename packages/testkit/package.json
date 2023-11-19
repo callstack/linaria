@@ -23,7 +23,7 @@
   "dependencies": {
     "@babel/core": "^7.22.15",
     "@babel/generator": "^7.22.15",
-    "@babel/traverse": "^7.22.15",
+    "@babel/traverse": "^7.23.2",
     "@linaria/babel-preset": "workspace:^",
     "@linaria/extractor": "workspace:^",
     "@linaria/react": "workspace:^",
