@@ -47,10 +47,10 @@
     "@babel/types": "^7.22.15",
     "@types/babel__generator": "^7.6.4",
     "@types/babel__traverse": "^7.20.1",
-    "postcss": "^8.3.11"
+    "postcss": "^8.4.31"
   },
   "peerDependencies": {
-    "postcss": "^8.3.11"
+    "postcss": "^8.4.31"
   },
   "engines": {
     "node": ">=16.0.0"

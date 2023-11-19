@@ -55,7 +55,7 @@
     "@linaria/tags": "workspace:^",
     "@linaria/utils": "workspace:^",
     "known-css-properties": "^0.24.0",
-    "postcss": "^8.3.11",
+    "postcss": "^8.4.31",
     "stylis": "^3.5.4",
     "ts-invariant": "^0.10.3"
   },

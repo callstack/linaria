@@ -30,7 +30,7 @@
     "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
-    "postcss": "^8.3.11"
+    "postcss": "^8.4.31"
   },
   "devDependencies": {
     "dedent": "^1.5.1",
