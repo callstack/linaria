@@ -43,7 +43,7 @@ const isRuleSet = (sourceAsString: string, indexAfterExpression: number) => {
   let hasColonOutsideOfExpression = possibleRuleset.includes(':');
   if (hasFuncInExpression) {
     hasColonOutsideOfExpression =
-      possibleRuleset.lastIndexOf(':', indexOfOpenParenthesis) > 0 &&
+      possibleRuleset.lastIndexOf(':', indexOfOpenParenthesis) > 0 ||
       possibleRuleset.indexOf(':', indexOfClosedParenthesis) > 0;
   }
 
@@ -54,7 +54,7 @@ const isRuleSet = (sourceAsString: string, indexAfterExpression: number) => {
   );
 };
 
-export const placeholderText = 'pcss-lin';
+export const placeholderText = 'pcss_lin';
 
 export const createPlaceholder = (
   i: number,
