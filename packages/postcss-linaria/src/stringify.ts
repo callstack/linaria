@@ -83,6 +83,18 @@ class LinariaStringifier extends Stringifier {
     super(wrappedBuilder);
   }
 
+  public override atrule(node: AtRule, semicolon?: boolean) {
+    const { params } = node;
+
+    const expressionStrings = node.root().raws.linariaTemplateExpressions;
+    if (params.includes(placeholderText)) {
+      // eslint-disable-next-line no-param-reassign
+      node.params = substitutePlaceholders(params, expressionStrings);
+    }
+
+    super.atrule(node, semicolon);
+  }
+
   /** @inheritdoc */
   public override comment(node: Comment): void {
     const placeholderPattern = new RegExp(`^${placeholderText}:\\d+$`);
