@@ -7,8 +7,8 @@
     "linaria-website": "workspace:^"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.15",
-    "@babel/preset-react": "^7.22.15",
+    "@babel/core": "^7.23.5",
+    "@babel/preset-react": "^7.23.3",
     "@linaria/rollup": "workspace:^",
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-commonjs": "^25.0.4",

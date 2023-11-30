@@ -1,12 +1,13 @@
 import type { SourceLocation } from '@babel/types';
+import type { Rules, ValueCache } from '@wyw-in-js/processor-utils';
+import { logger, hasEvalMeta } from '@wyw-in-js/shared';
 
-import { debug } from '@linaria/logger';
 import type { IProps } from '@linaria/react/processors/styled';
 import StyledProcessor from '@linaria/react/processors/styled';
-import type { Rules, ValueCache } from '@linaria/tags';
-import { hasMeta } from '@linaria/utils';
 
 import atomize from './helpers/atomize';
+
+const debug = logger.extend('AtomicStyledProcessor');
 
 export default class AtomicStyledProcessor extends StyledProcessor {
   #classes: string | undefined;
@@ -33,7 +34,7 @@ export default class AtomicStyledProcessor extends StyledProcessor {
         ? null
         : valueCache.get(this.component.node.name);
 
-    const atomicRules = atomize(cssText, hasMeta(wrappedValue));
+    const atomicRules = atomize(cssText, hasEvalMeta(wrappedValue));
     atomicRules.forEach((rule) => {
       // eslint-disable-next-line no-param-reassign
       rules[rule.cssText] = {
@@ -44,10 +45,7 @@ export default class AtomicStyledProcessor extends StyledProcessor {
         atom: true,
       };
 
-      debug(
-        'evaluator:template-processor:extracted-atomic-rule',
-        `\n${rule.cssText}`
-      );
+      debug('extracted-atomic-rule:\n%s', rule.cssText);
     });
 
     this.#classes = atomicRules

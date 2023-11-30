@@ -42,7 +42,7 @@
     "processors/",
     "types/"
   ],
-  "linaria": {
+  "wyw-in-js": {
     "tags": {
       "css": "./dist/processors/css.js"
     }
@@ -58,16 +58,15 @@
     "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
-    "@linaria/logger": "workspace:^",
-    "@linaria/tags": "workspace:^",
-    "@linaria/utils": "workspace:^"
+    "@wyw-in-js/processor-utils": "^0.1.1"
   },
   "devDependencies": {
-    "@babel/traverse": "^7.23.2",
-    "@babel/types": "^7.22.15",
-    "@types/babel__core": "^7.20.1",
-    "@types/babel__traverse": "^7.20.1",
-    "@types/node": "^17.0.39"
+    "@babel/traverse": "^7.23.5",
+    "@babel/types": "^7.23.5",
+    "@types/babel__core": "^7.20.5",
+    "@types/babel__traverse": "^7.20.4",
+    "@types/node": "^17.0.39",
+    "@wyw-in-js/shared": "^0.1.1"
   },
   "engines": {
     "node": ">=16.0.0"

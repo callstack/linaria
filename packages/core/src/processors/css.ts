@@ -1,7 +1,6 @@
 import type { SourceLocation, StringLiteral } from '@babel/types';
-
-import type { Rules, ValueCache } from '@linaria/tags';
-import { TaggedTemplateProcessor } from '@linaria/tags';
+import type { Rules, ValueCache } from '@wyw-in-js/processor-utils';
+import { TaggedTemplateProcessor } from '@wyw-in-js/processor-utils';
 
 export default class CssProcessor extends TaggedTemplateProcessor {
   public override get asSelector(): string {

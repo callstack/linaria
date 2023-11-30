@@ -7,29 +7,37 @@ import type {
   ObjectExpression,
   SourceLocation,
   StringLiteral,
+  Identifier,
 } from '@babel/types';
-import { minimatch } from 'minimatch';
-import html from 'react-html-attributes';
-
-import type {
-  Params,
-  Rules,
-  TailProcessorParams,
-  ValueCache,
-  WrappedNode,
-} from '@linaria/tags';
 import {
   buildSlug,
   TaggedTemplateProcessor,
   validateParams,
   toValidCSSIdentifier,
-} from '@linaria/tags';
-import type { IVariableContext } from '@linaria/utils';
-import { findPackageJSON, hasMeta, slugify, ValueType } from '@linaria/utils';
+} from '@wyw-in-js/processor-utils';
+import type {
+  Params,
+  Rules,
+  TailProcessorParams,
+  ValueCache,
+} from '@wyw-in-js/processor-utils';
+import type { IVariableContext } from '@wyw-in-js/shared';
+import {
+  findPackageJSON,
+  hasEvalMeta,
+  slugify,
+  ValueType,
+} from '@wyw-in-js/shared';
+import { minimatch } from 'minimatch';
+import html from 'react-html-attributes';
 
 const isNotNull = <T>(x: T | null): x is T => x !== null;
 
 const allTagsSet = new Set([...html.elements.html, html.elements.svg]);
+
+export type WrappedNode =
+  | string
+  | { node: Identifier; nonLinaria?: true; source: string };
 
 export interface IProps {
   atomic?: boolean;
@@ -99,7 +107,8 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
 
             if (importedPkg) {
               const packageJSON = JSON.parse(readFileSync(importedPkg, 'utf8'));
-              let mask: string | undefined = packageJSON?.linaria?.components;
+              let mask: string | undefined =
+                packageJSON?.['wyw-in-js']?.components;
               if (importedPkg === selfPkg && mask === undefined) {
                 // If mask is not specified for the local package, all components are treated as styled.
                 mask = '**/*';
@@ -171,7 +180,7 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
         t.stringLiteral(this.displayName)
       ),
       t.objectProperty(
-        t.stringLiteral('__linaria'),
+        t.stringLiteral('__wyw_meta'),
         t.objectExpression([
           t.objectProperty(
             t.stringLiteral('className'),
@@ -255,9 +264,9 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
       typeof this.component === 'string' || this.component.nonLinaria
         ? null
         : valueCache.get(this.component.node.name);
-    while (hasMeta(value)) {
-      selector += `.${value.__linaria.className}`;
-      value = value.__linaria.extends;
+    while (hasEvalMeta(value)) {
+      selector += `.${value.__wyw_meta.className}`;
+      value = value.__wyw_meta.extends;
     }
 
     rules[selector] = {

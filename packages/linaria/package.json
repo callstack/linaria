@@ -30,7 +30,7 @@
     "lib/",
     "esm/"
   ],
-  "linaria": {
+  "wyw-in-js": {
     "tags": {
       "css": "@linaria/core/processors/css",
       "styled": "@linaria/react/processors/styled"

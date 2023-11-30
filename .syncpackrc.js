@@ -61,7 +61,7 @@ module.exports = {
     'workspaces',
     'binary',
 
-    'linaria',
+    'wyw-in-js',
 
     'scripts',
     'betterScripts',

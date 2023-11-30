@@ -36,7 +36,7 @@
     "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
-    "@babel/core": "^7.22.15",
+    "@babel/core": "^7.23.5",
     "@linaria/babel-preset": "workspace:^",
     "@linaria/utils": "workspace:^"
   },
