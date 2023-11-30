@@ -138,7 +138,7 @@ export const parse: Parser<Root | Document> = (
           extractedStyles.add(path.node);
         }
       }
-      
+
       if (
         path.node.tag.type === 'CallExpression' &&
         path.node.tag.callee.type === 'Identifier'
