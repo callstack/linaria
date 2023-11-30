@@ -8,21 +8,21 @@
 
 
 Timings:
-  Total: 3020ms
+  Total: 7163ms
 
   By method:
-    createEntrypoint: 200ms
-    parseFile: 20ms
-    transform:evaluator: 57ms
-    transform:preeval: 144ms
-    transform:preeval:processTemplate: 69ms
-    transform:preeval:removeDangerousCode: 18ms
+    createEntrypoint: 623ms
+    parseFile: 50ms
+    transform:evaluator: 219ms
+    transform:preeval: 464ms
+    transform:preeval:processTemplate: 235ms
+    transform:preeval:removeDangerousCode: 63ms
 
 Memory usage: {
-  rss: 199618560,
-  heapTotal: 136962048,
-  heapUsed: 102696352,
-  external: 3519988,
+  rss: 202952704,
+  heapTotal: 136724480,
+  heapUsed: 102624568,
+  external: 3569174,
   arrayBuffers: 1036075
 }
 assets by info 63.5 KiB [1m[32m[immutable][39m[22m
@@ -49,9 +49,9 @@ cacheable modules 148 KiB (javascript) 62.6 KiB (asset) 3.76 KiB (css/mini-extra
       css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Hero.jsx[39m[22m 1.83 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/index.jsx[39m[22m 356 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.1_webpack@5.76.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../packages/webpack5-loader/lib/outputCssLoader.js?cacheProvider=![1m./src/components/Container.js[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.76.0 compiled [1m[32msuccessfully[39m[22m in 2753 ms
+webpack 5.76.0 compiled [1m[32msuccessfully[39m[22m in 6449 ms
 
 > linaria-website@5.0.3 build:server /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
 
-Successfully compiled 11 files with Babel (892ms).
+Successfully compiled 11 files with Babel (1461ms).
