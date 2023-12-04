@@ -52,7 +52,7 @@
     "@babel/preset-typescript": "^7.23.3",
     "@changesets/cli": "^2.22.0",
     "@commitlint/config-conventional": "^8.3.4",
-    "@definitelytyped/dtslint": "^0.0.197",
+    "@definitelytyped/dtslint": "^0.0.176",
     "@types/jest": "^28.1.0",
     "@types/node": "^17.0.39",
     "@typescript-eslint/eslint-plugin": "^6.6.0",
