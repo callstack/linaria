@@ -47,7 +47,7 @@ importers:
         specifier: ^8.3.4
         version: 8.3.6
       '@definitelytyped/dtslint':
-        specifier: 0.0.176
+        specifier: ^0.0.176
         version: 0.0.176(typescript@5.2.2)
       '@types/jest':
         specifier: ^28.1.0
