@@ -41,10 +41,9 @@
   "devDependencies": {
     "@babel/cli": "^7.23.4",
     "@babel/core": "^7.23.5",
-    "@linaria/babel-preset": "workspace:^",
-    "@linaria/shaker": "workspace:^",
     "@linaria/stylelint": "workspace:^",
-    "@linaria/webpack5-loader": "workspace:^",
+    "@wyw-in-js/babel-preset": "^0.2.0",
+    "@wyw-in-js/webpack-loader": "^0.2.0",
     "babel-loader": "^8.2.5",
     "babel-plugin-module-resolver": "^4.1.0",
     "cross-env": "^7.0.3",

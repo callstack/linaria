@@ -1,3 +1,3 @@
-import { slugify } from '@linaria/utils';
+import { slugify } from '@wyw-in-js/shared';
 
 export default slugify;

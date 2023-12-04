@@ -3,7 +3,7 @@ module.exports = {
   env: {
     server: {
       presets: [
-        require.resolve('@linaria/babel-preset'),
+        require.resolve('@wyw-in-js/babel-preset'),
         ['@babel/preset-env', { targets: { node: 12 } }],
       ],
       plugins: [

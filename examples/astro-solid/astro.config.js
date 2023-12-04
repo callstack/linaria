@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 import astro_solid from '@astrojs/solid-js';
-import vite_linaria from '@linaria/vite';
+import vite_wyw from '@wyw-in-js/vite';
 import vite_inspect from 'vite-plugin-inspect';
 
 export default defineConfig({
@@ -17,7 +17,7 @@ export default defineConfig({
   },
   vite: {
     plugins: [
-      vite_linaria({
+      vite_wyw({
         displayName: true,
         classNameSlug: (hash, title, args) => `${args.dir}_${title}_${hash}`,
         babelOptions: {

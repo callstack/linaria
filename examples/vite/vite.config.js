@@ -1,4 +1,4 @@
-import linaria from '@linaria/vite';
+import wyw from '@wyw-in-js/vite';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
@@ -9,7 +9,7 @@ export default defineConfig(({ command }) => ({
     nodeResolve({
       extensions: ['.jsx', '.js'],
     }),
-    linaria({
+    wyw({
       include: ['**/*.{js,jsx}'],
       babelOptions: {
         presets: ['@babel/preset-react'],

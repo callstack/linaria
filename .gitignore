@@ -10,7 +10,6 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-**/linaria-debug
 
 # Runtime data
 pids
@@ -73,6 +72,9 @@ build/
 tsconfig.tsbuildinfo
 
 .linaria-cache
+.wyw-cache
 
 # debug
 *.debug.ts
+**/linaria-debug
+**/wyw-debug

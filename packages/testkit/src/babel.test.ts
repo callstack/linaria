@@ -137,7 +137,7 @@ async function transform(
   return {
     code: result.code,
     metadata: {
-      linaria: {
+      wywInJS: {
         rules: result.rules,
         dependencies: result.dependencies,
       },
@@ -2931,29 +2931,6 @@ describe('strategy shaker', () => {
   it('handles complex component', async () => {
     const { code, metadata } = await transformFile(
       resolve(__dirname, './__fixtures__/complex-component.js'),
-      [evaluator]
-    );
-
-    expect(code).toMatchSnapshot();
-    expect(metadata).toMatchSnapshot();
-  });
-
-  it('should process griffel makeStyles', async () => {
-    const { code, metadata } = await transform(
-      dedent`
-        import { makeStyles } from '@linaria/griffel';
-
-        export const useStyles = makeStyles({
-          root: {
-            display: 'flex',
-
-            ':hover': { color: 'red' },
-            ':focus': { ':hover': { color: 'blue' } },
-
-            '& .foo': { ':hover': { color: 'green' } },
-          },
-        });
-      `,
       [evaluator]
     );
 

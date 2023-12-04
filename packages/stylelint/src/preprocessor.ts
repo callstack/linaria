@@ -1,8 +1,7 @@
+import type { Replacements } from '@wyw-in-js/shared';
+import { asyncResolveFallback } from '@wyw-in-js/shared';
+import { transform } from '@wyw-in-js/transform';
 import stripAnsi from 'strip-ansi';
-
-import { transform } from '@linaria/babel-preset';
-import type { Replacements } from '@linaria/utils';
-import { asyncResolveFallback } from '@linaria/utils';
 
 type Errors = {
   [key: string]:

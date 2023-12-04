@@ -1,4 +1,4 @@
-import linaria from '@linaria/rollup';
+import wyw from '@wyw-in-js/rollup';
 import { babel } from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import image from '@rollup/plugin-image';
@@ -13,7 +13,7 @@ export default {
   },
   plugins: [
     image(),
-    linaria({
+    wyw({
       sourceMap: process.env.NODE_ENV !== 'production',
     }),
     css({
