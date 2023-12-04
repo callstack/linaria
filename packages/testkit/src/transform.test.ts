@@ -2,17 +2,16 @@
 
 import path from 'path';
 
+import { asyncResolveFallback } from '@wyw-in-js/shared';
+import { shaker, transform, transformUrl } from '@wyw-in-js/transform';
 import dedent from 'dedent';
-
-import { transform, transformUrl } from '@linaria/babel-preset';
-import { asyncResolveFallback } from '@linaria/utils';
 
 const outputFilename = './.linaria-cache/test.css';
 
 const rules = [
   {
     test: () => true,
-    action: require('@linaria/shaker').default,
+    action: shaker,
   },
 ];
 
