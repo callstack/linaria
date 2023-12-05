@@ -51,32 +51,15 @@ yarn add @linaria/core @linaria/react @linaria/babel-preset
 
 ## Setup
 
-Linaria currently supports webpack and Rollup to extract the CSS at build time. To configure your bundler, check the following guides:
+Linaria is now built on top of [wyw-in-js.dev](https://wyw-in-js.dev/). It supports various bundlers to extract the CSS at build time. To configure your bundler, check the following guides on the wyw-in-js.dev site:
 
-- [webpack](/docs/BUNDLERS_INTEGRATION.md#webpack)
-- [esbuild](/docs/BUNDLERS_INTEGRATION.md#esbuild)
-- [Rollup](/docs/BUNDLERS_INTEGRATION.md#rollup)
-- [Vite](/docs/BUNDLERS_INTEGRATION.md#vite)
-- [Svelte](/docs/BUNDLERS_INTEGRATION.md#svelte)
+- [webpack](https://wyw-in-js.dev/bundlers/webpack)
+- [esbuild](https://wyw-in-js.dev/bundlers/esbuild)
+- [Rollup](https://wyw-in-js.dev/bundlers/rollup)
+- [Vite](https://wyw-in-js.dev/bundlers/vite)
+- [Svelte](https://wyw-in-js.dev/bundlers/svelte)
 
-Or configure Linaria with one of the following integrations:
-
-- [Preact](/docs/CONFIGURATION.md#preact)
-- [Gatsby](/docs/CONFIGURATION.md#gatsby)
-
-Optionally, add the `@linaria` preset to your Babel configuration at the end of the presets list to avoid errors when importing the components in your server code or tests:
-
-```json
-{
-  "presets": [
-    "@babel/preset-env",
-    "@babel/preset-react",
-    "@linaria"
-  ]
-}
-```
-
-See [Configuration](/docs/CONFIGURATION.md) to customize how Linaria processes your files.
+See [Configuration](https://wyw-in-js.dev/configuration) to customize how Linaria processes your files.
 
 ## Syntax
 
