@@ -7,6 +7,7 @@ import type {
   Builder,
   Declaration,
   Rule,
+  AtRule,
 } from 'postcss';
 import Stringifier from 'postcss/lib/stringifier';
 
@@ -23,7 +24,8 @@ const substitutePlaceholders = (
   const values = stringWithPlaceholders.split(' ');
   const temp: string[] = [];
   values.forEach((val) => {
-    let [, expressionIndexString] = val.split(placeholderText);
+    let [prefix, expressionIndexString] = val.split(placeholderText);
+    prefix = prefix.replace(/(\.|--|\/\*)$/, '');
     // if the val is 'pcss-lin10px', need to remove the px to get the placeholder number
     let suffix = '';
     while (
@@ -43,7 +45,7 @@ const substitutePlaceholders = (
       !Number.isNaN(expressionIndex) &&
       expressions[expressionIndex];
     if (expression) {
-      temp.push(expression + suffix);
+      temp.push(prefix + expression + suffix);
     } else {
       temp.push(val);
     }
@@ -79,6 +81,18 @@ class LinariaStringifier extends Stringifier {
       }
     };
     super(wrappedBuilder);
+  }
+
+  public override atrule(node: AtRule, semicolon?: boolean) {
+    const { params } = node;
+
+    const expressionStrings = node.root().raws.linariaTemplateExpressions;
+    if (params.includes(placeholderText)) {
+      // eslint-disable-next-line no-param-reassign
+      node.params = substitutePlaceholders(params, expressionStrings);
+    }
+
+    super.atrule(node, semicolon);
   }
 
   /** @inheritdoc */
