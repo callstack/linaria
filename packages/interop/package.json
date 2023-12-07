@@ -1,6 +1,6 @@
 {
   "name": "@linaria/babel-plugin-interop",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "homepage": "https://github.com/callstack/linaria/tree/master/packages/interop#readme",
   "repository": "git@github.com:callstack/linaria.git",
   "license": "MIT",
