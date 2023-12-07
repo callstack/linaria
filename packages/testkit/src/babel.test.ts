@@ -4,26 +4,26 @@ import { dirname, join, resolve, sep } from 'path';
 
 import * as babel from '@babel/core';
 import type { PluginItem } from '@babel/core';
-import dedent from 'dedent';
-import stripAnsi from 'strip-ansi';
-
-import type { PluginOptions, Stage } from '@linaria/babel-preset';
+import { logger } from '@wyw-in-js/shared';
+import type { Evaluator, FeatureFlags } from '@wyw-in-js/shared';
 import {
-  transform as linariaTransform,
-  loadLinariaOptions,
-  TransformCacheCollection,
   Entrypoint,
-} from '@linaria/babel-preset';
-import { linariaLogger } from '@linaria/logger';
+  EventEmitter,
+  TransformCacheCollection,
+  loadWywOptions,
+  shaker,
+  transform as wywTransform,
+} from '@wyw-in-js/transform';
 import type {
-  Evaluator,
+  EntrypointEvent,
   OnEvent,
   OnActionStartArgs,
   OnActionFinishArgs,
-  FeatureFlags,
-} from '@linaria/utils';
-import { EventEmitter } from '@linaria/utils';
-import type { EntrypointEvent } from '@linaria/utils/types/EventEmitter';
+  PluginOptions,
+  Stage,
+} from '@wyw-in-js/transform';
+import dedent from 'dedent';
+import stripAnsi from 'strip-ansi';
 
 import serializer from './__utils__/linaria-snapshot-serializer';
 
@@ -71,7 +71,7 @@ const getLinariaConfig = (
   presets: PluginItem[],
   stage?: Stage
 ): PluginOptions =>
-  loadLinariaOptions({
+  loadWywOptions({
     babelOptions: {
       presets,
       plugins: [],
@@ -132,14 +132,16 @@ async function transform(
     },
     eventEmitter,
   };
-  const result = await linariaTransform(services, originalCode, asyncResolve);
+  const result = await wywTransform(services, originalCode, asyncResolve);
 
   return {
+    cssText: result.cssText,
     code: result.code,
     metadata: {
-      linaria: {
+      wywInJS: {
         rules: result.rules,
         dependencies: result.dependencies,
+        cssText: result.cssText,
       },
     },
   };
@@ -157,7 +159,7 @@ async function transformFile(filename: string, opts: Options) {
 }
 
 describe('strategy shaker', () => {
-  const evaluator = require('@linaria/shaker').default;
+  const evaluator = shaker;
   let onEvent: jest.Mock<void, Parameters<OnEvent>>;
   let onAction: jest.Mock<number, OnActionStartArgs | OnActionFinishArgs>;
   let onEntrypointEvent: jest.Mock<
@@ -209,6 +211,25 @@ describe('strategy shaker', () => {
       [evaluator]
     );
 
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should apply stylis', async () => {
+    const { cssText, code, metadata } = await transform(
+      dedent`
+    import { styled } from '@linaria/react';
+
+    export const Title = styled.h1\`
+      && > span {
+        display:flex;
+      }
+    \`;
+    `,
+      [evaluator]
+    );
+
+    expect(cssText).toMatchSnapshot();
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });
@@ -2938,29 +2959,6 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
-  it('should process griffel makeStyles', async () => {
-    const { code, metadata } = await transform(
-      dedent`
-        import { makeStyles } from '@linaria/griffel';
-
-        export const useStyles = makeStyles({
-          root: {
-            display: 'flex',
-
-            ':hover': { color: 'red' },
-            ':focus': { ':hover': { color: 'blue' } },
-
-            '& .foo': { ':hover': { color: 'green' } },
-          },
-        });
-      `,
-      [evaluator]
-    );
-
-    expect(code).toMatchSnapshot();
-    expect(metadata).toMatchSnapshot();
-  });
-
   it('should eval component from a linaria library', async () => {
     const { code, metadata } = await transform(
       dedent`
@@ -3249,7 +3247,7 @@ describe('strategy shaker', () => {
       cache.invalidateIfChanged(filename, fooContent);
 
       const only = Object.keys(exports);
-      const exportsProxy = Entrypoint.createExports(linariaLogger);
+      const exportsProxy = Entrypoint.createExports(logger);
       only.forEach((key) => {
         exportsProxy[key] = exports[key];
       });
@@ -3260,7 +3258,7 @@ describe('strategy shaker', () => {
         generation: 1,
         exports: exportsProxy,
         ignored: false,
-        log: linariaLogger,
+        log: logger,
         only,
       });
 

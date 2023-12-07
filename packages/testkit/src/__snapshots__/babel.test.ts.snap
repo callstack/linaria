@@ -1912,7 +1912,7 @@ CSS:
 
 .source0_s13jq05 {opacity:5;}
 
-Dependencies: react
+Dependencies: NA
 
 `;
 
@@ -2083,6 +2083,34 @@ CSS:
 }
 
 Dependencies: ../re-exports
+
+`;
+
+exports[`strategy shaker should apply stylis 1`] = `
+".Title_t13jq05.Title_t13jq05>span{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}
+"
+`;
+
+exports[`strategy shaker should apply stylis 2`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: "Title",
+  class: "Title_t13jq05",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker should apply stylis 3`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  && > span {
+    display:flex;
+  }
+}
+
+Dependencies: NA
 
 `;
 
@@ -2512,32 +2540,6 @@ CSS:
 }
 
 Dependencies: ./__fixtures__/foo
-
-`;
-
-exports[`strategy shaker should process griffel makeStyles 1`] = `
-"import { __styles as _styles } from "@griffel/react";
-export const useStyles = /*#__PURE__*/_styles({
-  root: {
-    mc9l5x: "f22iagw",
-    Bi91k9c: "faf35ka",
-    Bb9khzn: "f17t1d3d",
-    Btk3f3y: "fh8e7tb"
-  }
-}, {
-  d: [".f22iagw{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}", ".fh8e7tb .foo:hover{color:green;}"],
-  h: [".faf35ka:hover{color:red;}"],
-  f: [".f17t1d3d:focus:hover{color:blue;}"]
-});"
-`;
-
-exports[`strategy shaker should process griffel makeStyles 2`] = `
-
-CSS:
-
-
-
-Dependencies: NA
 
 `;
 

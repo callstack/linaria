@@ -5,5 +5,5 @@
     "rootDir": "src/",
     "types": ["node"]
   },
-  "references": [{ "path": "../logger" }, { "path": "../utils" }]
+  "references": []
 }

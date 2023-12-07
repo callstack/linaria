@@ -1,11 +1,11 @@
-import type { StyledMeta } from '@linaria/utils';
+import type { WYWEvalMeta } from '@wyw-in-js/shared';
 
 import type { CSSProperties } from './CSSProperties';
 import type { LinariaClassName } from './cx';
 
 type CSS = (
   strings: TemplateStringsArray,
-  ...exprs: Array<string | number | CSSProperties | StyledMeta>
+  ...exprs: Array<string | number | CSSProperties | WYWEvalMeta>
 ) => LinariaClassName;
 
 let idx = 0;

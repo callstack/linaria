@@ -1,9 +1,8 @@
+import { slugify } from '@wyw-in-js/shared';
 import { all as knownProperties } from 'known-css-properties';
 import type { Document, AtRule, Container, Rule } from 'postcss';
 import postcss from 'postcss';
 import { compile, serialize, stringify } from 'stylis';
-
-import { slugify } from '@linaria/utils';
 
 import { getPropertyPriority } from './propertyPriority';
 

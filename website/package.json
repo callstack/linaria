@@ -22,7 +22,7 @@
     "start": "webpack serve"
   },
   "dependencies": {
-    "@babel/runtime": "^7.22.15",
+    "@babel/runtime": "^7.23.5",
     "@linaria/atomic": "workspace:^",
     "@linaria/core": "workspace:^",
     "@linaria/react": "workspace:^",
@@ -39,12 +39,11 @@
     "react-dom": "^16.14.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.22.15",
-    "@babel/core": "^7.22.15",
-    "@linaria/babel-preset": "workspace:^",
-    "@linaria/shaker": "workspace:^",
+    "@babel/cli": "^7.23.4",
+    "@babel/core": "^7.23.5",
     "@linaria/stylelint": "workspace:^",
-    "@linaria/webpack5-loader": "workspace:^",
+    "@wyw-in-js/babel-preset": "^0.2.2",
+    "@wyw-in-js/webpack-loader": "^0.2.2",
     "babel-loader": "^8.2.5",
     "babel-plugin-module-resolver": "^4.1.0",
     "cross-env": "^7.0.3",

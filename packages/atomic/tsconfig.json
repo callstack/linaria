@@ -5,5 +5,5 @@
     "rootDir": "src/",
     "types": ["node"]
   },
-  "references": [{ "path": "../core" }, { "path": "../logger" }, { "path": "../react" }, { "path": "../utils" }]
+  "references": [{ "path": "../core" }, { "path": "../react" }]
 }

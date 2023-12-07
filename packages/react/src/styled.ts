@@ -6,11 +6,11 @@
  * - injects CSS variables used to define dynamic styles based on props
  */
 import validAttr from '@emotion/is-prop-valid';
+import type { WYWEvalMeta } from '@wyw-in-js/shared';
 import React from 'react';
 
 import { cx } from '@linaria/core';
 import type { CSSProperties } from '@linaria/core';
-import type { StyledMeta } from '@linaria/utils';
 
 export type NoInfer<A> = [A][A extends any ? 0 : never];
 
@@ -139,8 +139,8 @@ function styled(tag: any): any {
   if (process.env.NODE_ENV === 'test') {
     // eslint-disable-next-line no-plusplus
     mockedClass += `mocked-styled-${idx++}`;
-    if (tag && tag.__linaria && tag.__linaria.className) {
-      mockedClass += ` ${tag.__linaria.className}`;
+    if (tag && tag.__wyw_meta && tag.__wyw_meta.className) {
+      mockedClass += ` ${tag.__wyw_meta.className}`;
     }
   }
 
@@ -205,7 +205,7 @@ function styled(tag: any): any {
         filteredProps.style = style;
       }
 
-      if ((tag as any).__linaria && tag !== component) {
+      if ((tag as any).__wyw_meta && tag !== component) {
         // If the underlying tag is a styled component, forward the `as` prop
         // Otherwise the styles from the underlying component will be ignored
         filteredProps.as = component;
@@ -227,7 +227,7 @@ function styled(tag: any): any {
     (Result as any).displayName = options.name;
 
     // These properties will be read by the babel plugin for interpolation
-    (Result as any).__linaria = {
+    (Result as any).__wyw_meta = {
       className: options.class || mockedClass,
       extends: tag,
     };
@@ -236,12 +236,12 @@ function styled(tag: any): any {
   };
 }
 
-export type StyledComponent<T> = StyledMeta &
+export type StyledComponent<T> = WYWEvalMeta &
   ([T] extends [React.FunctionComponent<any>]
     ? T
     : React.FunctionComponent<T & { as?: React.ElementType }>);
 
-type StaticPlaceholder = string | number | CSSProperties | StyledMeta;
+type StaticPlaceholder = string | number | CSSProperties | WYWEvalMeta;
 
 export type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
   TAdditionalProps = Record<never, unknown>,
@@ -263,7 +263,7 @@ type ComponentStyledTagWithoutInterpolation<TOrigCmp> = (
     | StaticPlaceholder
     | ((props: 'The target component should have a style prop') => never)
   >
-) => StyledMeta & TOrigCmp;
+) => WYWEvalMeta & TOrigCmp;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
@@ -273,7 +273,7 @@ type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
     | ((props: NoInfer<OwnProps & TTrgProps>) => string | number)
   >
 ) => keyof OwnProps extends never
-  ? StyledMeta & TOrigCmp
+  ? WYWEvalMeta & TOrigCmp
   : StyledComponent<OwnProps & TTrgProps>;
 
 export type StyledJSXIntrinsics = {

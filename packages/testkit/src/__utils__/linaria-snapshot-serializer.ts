@@ -1,5 +1,5 @@
-import { withLinariaMetadata } from '@linaria/babel-preset';
-import type { LinariaMetadata } from '@linaria/utils';
+import type { WYWTransformMetadata } from '@wyw-in-js/transform';
+import { withTransformMetadata } from '@wyw-in-js/transform';
 
 type Serializer<T> = {
   serialize: (value: T) => string;
@@ -7,20 +7,20 @@ type Serializer<T> = {
 };
 
 export default {
-  test: withLinariaMetadata,
-  serialize: ({ linaria }) => `
+  test: withTransformMetadata,
+  serialize: ({ wywInJS }) => `
 CSS:
 
-${Object.keys(linaria.rules ?? {})
+${Object.keys(wywInJS.rules ?? {})
   .map((selector) =>
-    linaria.rules[selector].atom
-      ? linaria.rules[selector].cssText
-      : `${selector} {${linaria.rules[selector].cssText}}`
+    wywInJS.rules[selector].atom
+      ? wywInJS.rules[selector].cssText
+      : `${selector} {${wywInJS.rules[selector].cssText}}`
   )
   .join('\n')}
 
 Dependencies: ${
-    linaria.dependencies?.length ? linaria.dependencies.join(', ') : 'NA'
+    wywInJS.dependencies?.length ? wywInJS.dependencies.join(', ') : 'NA'
   }
 `,
-} as Serializer<{ linaria: LinariaMetadata & { rules?: any } }>;
+} as Serializer<{ wywInJS: WYWTransformMetadata & { rules?: any } }>;

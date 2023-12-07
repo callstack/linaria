@@ -18,7 +18,7 @@ Please note, that `@babel/core` is a peer dependency of all loaders. Do not forg
 
 ### webpack
 
-To use Linaria with webpack, in your webpack config, add `@linaria/webpack-loader` under `module.rules`:
+To use Linaria with webpack, in your webpack config, add `@wyw-in-js/webpack-loader` under `module.rules`:
 
 ```js
 {
@@ -26,7 +26,7 @@ To use Linaria with webpack, in your webpack config, add `@linaria/webpack-loade
   use: [
     { loader: 'babel-loader' },
     {
-      loader: '@linaria/webpack-loader',
+      loader: '@wyw-in-js/webpack-loader',
       options: {
         sourceMap: process.env.NODE_ENV !== 'production',
       },
@@ -35,7 +35,7 @@ To use Linaria with webpack, in your webpack config, add `@linaria/webpack-loade
 }
 ```
 
-Make sure that `@linaria/webpack-loader` is included after `babel-loader`.
+Make sure that `@wyw-in-js/webpack-loader` is included after `babel-loader`.
 
 In order to have your styles extracted, you'll also need to use **css-loader** and **MiniCssExtractPlugin**. First, install them:
 
@@ -131,7 +131,7 @@ module.exports = {
         use: [
           { loader: 'babel-loader' },
           {
-            loader: '@linaria/webpack-loader',
+            loader: '@wyw-in-js/webpack-loader',
             options: { sourceMap: dev },
           },
         ],
@@ -166,7 +166,7 @@ You can copy this file to your project if you are starting from scratch.
 To install the dependencies used in the example config, run:
 
 ```sh
-yarn add --dev webpack webpack-cli webpack-dev-server mini-css-extract-plugin css-loader file-loader babel-loader @linaria/webpack-loader
+yarn add --dev webpack webpack-cli webpack-dev-server mini-css-extract-plugin css-loader file-loader babel-loader @wyw-in-js/webpack-loader
 ```
 
 You can now run the dev server by running `webpack-dev-server` and build the files by running `webpack`.
@@ -227,7 +227,7 @@ You can pass options to the loader like so:
 
 ```js
 {
-  loader: '@linaria/webpack-loader',
+  loader: '@wyw-in-js/webpack-loader',
   options: {
     sourceMap: false,
   },
@@ -239,13 +239,13 @@ You can pass options to the loader like so:
 To use Linaria with esbuild, you don't need to install any external package since esbuild handles CSS by itself:
 
 ```sh
-yarn add --dev @linaria/esbuild
+yarn add --dev @wyw-in-js/esbuild
 ```
 
 Then add it to your esbuild config:
 
 ```js
-import linaria from '@linaria/esbuild';
+import linaria from '@wyw-in-js/esbuild';
 import esbuild from 'esbuild';
 
 const prod = process.env.NODE_ENV === 'production';
@@ -270,13 +270,13 @@ esbuild
 To use Linaria with Rollup, you need to use it together with a plugin which handles CSS files, such as `rollup-plugin-css-only`:
 
 ```sh
-yarn add --dev rollup-plugin-css-only @linaria/rollup
+yarn add --dev rollup-plugin-css-only @wyw-in-js/rollup
 ```
 
 Then add them to your `rollup.config.js`:
 
 ```js
-import linaria from '@linaria/rollup';
+import linaria from '@wyw-in-js/rollup';
 import css from 'rollup-plugin-css-only';
 
 export default {
@@ -294,7 +294,7 @@ export default {
 If you are using [@rollup/plugin-babel](https://github.com/rollup/plugins/tree/master/packages/babel) as well, ensure the linaria plugin is declared earlier in the `plugins` array than your babel plugin.
 
 ```js
-import linaria from '@linaria/rollup';
+import linaria from '@wyw-in-js/rollup';
 import css from 'rollup-plugin-css-only';
 import babel from '@rollup/plugin-babel';
 
@@ -314,17 +314,17 @@ export default {
 
 ### Vite
 
-~~Since Vite supports Rollup plugin~~ Since Vite provides more features and flexibility, Linaria has a separate plugin for it `@linaria/vite`. Vite handles CSS by itself, you don't need a css plugin.
+~~Since Vite supports Rollup plugin~~ Since Vite provides more features and flexibility, Linaria has a separate plugin for it `@wyw-in-js/vite`. Vite handles CSS by itself, you don't need a css plugin.
 
 ```sh
-yarn add --dev @linaria/vite
+yarn add --dev @wyw-in-js/vite
 ```
 
 Then add them to your `vite.config.js`:
 
 ```js
 import { defineConfig } from 'vite';
-import linaria from '@linaria/vite';
+import linaria from '@wyw-in-js/vite';
 
 export default defineConfig(() => ({
   // ...
@@ -336,7 +336,7 @@ If you are using language features that requires a babel transform (such as type
 
 ```js
 import { defineConfig } from 'vite';
-import linaria from '@linaria/vite';
+import linaria from '@wyw-in-js/vite';
 
 // example to support typescript syntax:
 export default defineConfig(() => ({
@@ -368,7 +368,7 @@ Install `rollup-plugin-css-only` and update `rollup.config.js`
 ```js
 import svelte from 'rollup-plugin-svelte';
 import css from 'rollup-plugin-css-only'; // for CSS bundling
-import linaria from '@linaria/rollup';
+import linaria from '@wyw-in-js/rollup';
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -402,7 +402,7 @@ Update `webpack.config.js` with the following:
 const prod = process.env.NODE_ENV === 'production';
 
 const linariaLoader = {
-  loader: '@linaria/webpack-loader',
+  loader: '@wyw-in-js/webpack-loader',
   options: {
     sourceMap: !prod,
   },

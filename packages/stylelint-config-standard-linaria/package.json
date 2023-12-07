@@ -23,12 +23,6 @@
     "processors/",
     "types/"
   ],
-  "linaria": {
-    "tags": {
-      "css": "./lib/processors/css.js",
-      "styled": "./lib/processors/styled.js"
-    }
-  },
   "scripts": {
     "build": "pnpm build:lib && pnpm build:esm && pnpm build:declarations",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",

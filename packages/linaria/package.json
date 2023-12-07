@@ -30,7 +30,7 @@
     "lib/",
     "esm/"
   ],
-  "linaria": {
+  "wyw-in-js": {
     "tags": {
       "css": "@linaria/core/processors/css",
       "styled": "@linaria/react/processors/styled"
@@ -45,15 +45,9 @@
     "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
-    "@linaria/babel-preset": "workspace:^",
     "@linaria/core": "workspace:^",
-    "@linaria/extractor": "workspace:^",
     "@linaria/react": "workspace:^",
-    "@linaria/rollup": "workspace:^",
-    "@linaria/server": "workspace:^",
-    "@linaria/shaker": "workspace:^",
-    "@linaria/stylelint": "workspace:^",
-    "@linaria/webpack4-loader": "workspace:^"
+    "@linaria/server": "workspace:^"
   },
   "engines": {
     "node": ">=16.0.0"

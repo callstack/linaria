@@ -1,10 +1,12 @@
 import type { SourceLocation } from '@babel/types';
+import type { Rules, ValueCache } from '@wyw-in-js/processor-utils';
+import { logger } from '@wyw-in-js/shared';
 
 import CssProcessor from '@linaria/core/processors/css';
-import { debug } from '@linaria/logger';
-import type { Rules, ValueCache } from '@linaria/tags';
 
 import atomize from './helpers/atomize';
+
+const debug = logger.extend('AtomicCssProcessor');
 
 export default class AtomicCssProcessor extends CssProcessor {
   #classes: string | undefined;
@@ -39,10 +41,7 @@ export default class AtomicCssProcessor extends CssProcessor {
         atom: true,
       };
 
-      debug(
-        'evaluator:template-processor:extracted-atomic-rule',
-        `\n${rule.cssText}`
-      );
+      debug('extracted-atomic-rule:\n%s', rule.cssText);
     });
 
     this.#classes = atomicRules

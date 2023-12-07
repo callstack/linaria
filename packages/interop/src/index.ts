@@ -25,7 +25,7 @@ export default (
 
     const original = path.node;
     path.replaceWithSourceString(
-      "(i => i && i.__linaria ? '.' + i.__linaria.className : i)('placeholder')"
+      "(i => i && i.__wyw_meta ? '.' + i.__wyw_meta.className : i)('placeholder')"
     );
 
     const args = path.get('arguments');

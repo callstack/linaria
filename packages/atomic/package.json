@@ -35,7 +35,7 @@
     "processors/",
     "types/"
   ],
-  "linaria": {
+  "wyw-in-js": {
     "tags": {
       "css": "./dist/processors/css.js",
       "styled": "./dist/processors/styled.js"
@@ -50,17 +50,16 @@
   },
   "dependencies": {
     "@linaria/core": "workspace:^",
-    "@linaria/logger": "workspace:^",
     "@linaria/react": "workspace:^",
-    "@linaria/tags": "workspace:^",
-    "@linaria/utils": "workspace:^",
+    "@wyw-in-js/processor-utils": "^0.2.2",
+    "@wyw-in-js/shared": "^0.2.2",
     "known-css-properties": "^0.24.0",
     "postcss": "^8.4.31",
     "stylis": "^4.3.0",
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
-    "@babel/types": "^7.22.15",
+    "@babel/types": "^7.23.5",
     "@types/node": "^17.0.39",
     "@types/stylis": "^4.2.1"
   },

@@ -6,4 +6,4 @@ export type {
   Styled,
 } from './styled';
 export type { CSSProperties } from '@linaria/core';
-export type { StyledMeta } from '@linaria/utils';
+export type { WYWEvalMeta } from '@wyw-in-js/shared';
