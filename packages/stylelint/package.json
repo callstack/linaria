@@ -1,6 +1,6 @@
 {
   "name": "@linaria/stylelint",
-  "version": "5.0.4",
+  "version": "6.0.0",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "css",
