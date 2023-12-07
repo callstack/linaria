@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
   },
-  "wyw-in-js": {
+  "linaria": {
     "components": "components/**/*"
   }
 }

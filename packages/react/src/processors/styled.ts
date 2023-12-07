@@ -107,8 +107,7 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
 
             if (importedPkg) {
               const packageJSON = JSON.parse(readFileSync(importedPkg, 'utf8'));
-              let mask: string | undefined =
-                packageJSON?.['wyw-in-js']?.components;
+              let mask: string | undefined = packageJSON?.linaria?.components;
               if (importedPkg === selfPkg && mask === undefined) {
                 // If mask is not specified for the local package, all components are treated as styled.
                 mask = '**/*';

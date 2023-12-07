@@ -1912,7 +1912,7 @@ CSS:
 
 .source0_s13jq05 {opacity:5;}
 
-Dependencies: react
+Dependencies: NA
 
 `;
 
@@ -2083,6 +2083,34 @@ CSS:
 }
 
 Dependencies: ../re-exports
+
+`;
+
+exports[`strategy shaker should apply stylis 1`] = `
+".Title_t13jq05.Title_t13jq05>span{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}
+"
+`;
+
+exports[`strategy shaker should apply stylis 2`] = `
+"import { styled } from '@linaria/react';
+export const Title = /*#__PURE__*/styled('h1')({
+  name: "Title",
+  class: "Title_t13jq05",
+  propsAsIs: false
+});"
+`;
+
+exports[`strategy shaker should apply stylis 3`] = `
+
+CSS:
+
+.Title_t13jq05 {
+  && > span {
+    display:flex;
+  }
+}
+
+Dependencies: NA
 
 `;
 

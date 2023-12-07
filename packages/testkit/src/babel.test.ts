@@ -135,11 +135,13 @@ async function transform(
   const result = await wywTransform(services, originalCode, asyncResolve);
 
   return {
+    cssText: result.cssText,
     code: result.code,
     metadata: {
       wywInJS: {
         rules: result.rules,
         dependencies: result.dependencies,
+        cssText: result.cssText,
       },
     },
   };
@@ -209,6 +211,25 @@ describe('strategy shaker', () => {
       [evaluator]
     );
 
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('should apply stylis', async () => {
+    const { cssText, code, metadata } = await transform(
+      dedent`
+    import { styled } from '@linaria/react';
+
+    export const Title = styled.h1\`
+      && > span {
+        display:flex;
+      }
+    \`;
+    `,
+      [evaluator]
+    );
+
+    expect(cssText).toMatchSnapshot();
     expect(code).toMatchSnapshot();
     expect(metadata).toMatchSnapshot();
   });

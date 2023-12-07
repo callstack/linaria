@@ -6,20 +6,20 @@
 
 The main breaking change is that all tooling has been moved from the `@linaria` scope to the `@wyw-in-js` scope. This means that you will need to update your dependencies as follows:
 
-- `@linaria/vite` -> `@wyw-in-js/vite`
-- `@linaria/cli` -> `@wyw-in-js/cli`
-- `@linaria/babel-preset` -> `@wyw-in-js/babel-preset`
-
-However, the `atomic`, `core`, and `styled` imports remain in the `@linaria` scope.
-
-Additionally, support for Webpack v4 has been dropped. The webpack plugins have been renamed:
-
-- `@linaria/webpack4-loader` has been discontinued
-- `@linaria/webpack5-loader` has been renamed to `@wyw-in-js/webpack-loader`
+| Old | New
+| --- | ---
+|@linaria/babel-preset | @wyw-in-js/babel-preset
+|@linaria/cli | @wyw-in-js/cli
+|@linaria/esbuild | @wyw-in-js/esbuild
+|@linaria/rollup | @wyw-in-js/rollup
+|@linaria/shaker | discontinued
+|@linaria/vite | @wyw-in-js/vite
+|@linaria/webpack4-loader | discontinued
+|@linaria/webpack5-loader | @wyw-in-js/webpack-loader
 
 There is no longer a need to install `@linaria/shaker` as it is now part of `@wyw-in-js/transform`, which will be installed automatically with the bundler plugins.
 
-The configuration file has been renamed from `linariarc` to `wyw-in-jsrc`.
+The configuration file has been renamed from `linaria.config.js` (`linariarc`) to `wyw-in-js.config.js` (`.wyw-in-jsrc`).
 
 ## For Custom Processor Developers
 

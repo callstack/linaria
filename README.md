@@ -40,13 +40,13 @@ Zero-runtime CSS in JS library.
 ## Installation
 
 ```sh
-npm install @linaria/core @linaria/react @linaria/babel-preset
+npm install @linaria/core @linaria/react @wyw-in-js/babel-preset
 ```
 
 or
 
 ```sh
-yarn add @linaria/core @linaria/react @linaria/babel-preset
+yarn add @linaria/core @linaria/react @wyw-in-js/babel-preset
 ```
 
 ## Setup
