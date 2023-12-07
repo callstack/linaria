@@ -1,7 +1,7 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { join } = require('path'); // eslint-disable-line import/no-extraneous-dependencies
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { LinariaDebugPlugin } = require('@linaria/webpack5-loader');
+const { WYWinJSDebugPlugin } = require('@wyw-in-js/webpack-loader');
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -19,8 +19,8 @@ module.exports = {
     emitOnErrors: false,
   },
   plugins: [
-    new LinariaDebugPlugin({
-      dir: 'linaria-debug',
+    new WYWinJSDebugPlugin({
+      dir: 'wyw-debug',
       print: true,
     }),
     new MiniCssExtractPlugin({ filename: 'styles.css' }),
@@ -50,7 +50,7 @@ module.exports = {
         use: [
           { loader: 'babel-loader' },
           {
-            loader: require.resolve('@linaria/webpack5-loader'),
+            loader: require.resolve('@wyw-in-js/webpack-loader'),
             options: { sourceMap: dev },
           },
         ],
