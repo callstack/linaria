@@ -1,5 +1,4 @@
 ---
-'@linaria/tags': patch
 '@linaria/testkit': patch
 ---
 

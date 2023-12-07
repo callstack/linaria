@@ -1,6 +1,5 @@
 ---
 '@linaria/atomic': major
-'@linaria/babel-preset': major
 '@linaria/testkit': major
 ---
 
