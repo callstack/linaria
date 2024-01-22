@@ -14,12 +14,5 @@
     "rootDir": "src/",
     "types": ["jest", "node"]
   },
-  "references": [
-    { "path": "../babel" },
-    { "path": "../core" },
-    { "path": "../logger" },
-    { "path": "../react" },
-    { "path": "../shaker" },
-    { "path": "../utils" }
-  ]
+  "references": [{ "path": "../core" }, { "path": "../react" }]
 }

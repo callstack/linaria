@@ -30,8 +30,8 @@
     "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
-    "@wyw-in-js/shared": "^0.2.2",
-    "@wyw-in-js/transform": "^0.2.2",
+    "@wyw-in-js/shared": "^0.2.3",
+    "@wyw-in-js/transform": "^0.2.3",
     "strip-ansi": "^5.2.0"
   },
   "devDependencies": {
