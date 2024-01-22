@@ -9,7 +9,7 @@
     "linaria-website": "workspace:^"
   },
   "devDependencies": {
-    "@wyw-in-js/vite": "^0.2.2",
+    "@wyw-in-js/vite": "^0.2.3",
     "@rollup/plugin-node-resolve": "^15.2.1",
     "@vitejs/plugin-react": "^2.1.0",
     "vite": "^3.2.7"
