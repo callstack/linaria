@@ -9,7 +9,6 @@
 "esbuild-example": patch
 "rollup-example": patch
 "vite-example": patch
-"vpssr-linaria-solid-example": patch
 "webpack5-example": patch
 ---
 
