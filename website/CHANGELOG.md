@@ -1,5 +1,21 @@
 # Change Log
 
+## 6.1.0
+
+### Minor Changes
+
+- 8ba655d3: Bump wyw-in-js to 0.4.0. The full list of changes https://github.com/Anber/wyw-in-js/compare/%40wyw-in-js/transform%400.2.3...%40wyw-in-js/transform%400.4.0
+
+### Patch Changes
+
+- 8d4ebd33: chore: bump @wyw-in-js/\* packages
+- Updated dependencies [8d4ebd33]
+- Updated dependencies [8ba655d3]
+  - @linaria/atomic@6.1.0
+  - @linaria/core@6.1.0
+  - @linaria/react@6.1.0
+  - @linaria/server@6.1.0
+
 ## 6.0.0
 
 ### Major Changes
