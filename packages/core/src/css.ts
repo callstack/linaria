@@ -1,7 +1,7 @@
-import type { WYWEvalMeta } from '@wyw-in-js/shared';
-
 import type { CSSProperties } from './CSSProperties';
 import type { LinariaClassName } from './cx';
+
+type WYWEvalMeta = { __wyw_meta: unknown }; // simplified version of WYWEvalMeta from @wyw-in-js/shared
 
 type CSS = (
   strings: TemplateStringsArray,
