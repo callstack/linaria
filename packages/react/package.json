@@ -60,8 +60,8 @@
   "dependencies": {
     "@emotion/is-prop-valid": "^1.2.0",
     "@linaria/core": "workspace:^",
-    "@wyw-in-js/processor-utils": "^0.2.3",
-    "@wyw-in-js/shared": "^0.2.3",
+    "@wyw-in-js/processor-utils": "^0.4.0",
+    "@wyw-in-js/shared": "^0.4.0",
     "minimatch": "^9.0.3",
     "react-html-attributes": "^1.4.6",
     "ts-invariant": "^0.10.3"

@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@linaria/core": "workspace:^",
-    "@wyw-in-js/vite": "^0.2.3",
+    "@wyw-in-js/vite": "^0.4.0",
     "babel-preset-solid": "^1.6.2",
     "compression": "^1.7.4",
     "express": "^4.18.2",
