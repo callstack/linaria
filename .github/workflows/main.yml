@@ -11,7 +11,7 @@ jobs:
     name: label issues and pull requests
     steps:
       - name: check-out-repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: labeler
         uses: jayu/super-labeler-action@develop
