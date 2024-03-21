@@ -1,13 +1,13 @@
 # Configuration
 
-Linaria can be customized using a JavaScript, JSON or YAML file. This can be in form of:
+Linaria uses [WyW-in-JS](https://wyw-in-js.dev) under the hood and can be customized using a JavaScript, JSON or YAML file. This can be in form of:
 
-- `linaria.config.js` JS file exporting the object (recommended).
-- `linaria` property in a `package.json` file.
-- `.linariarc` file with JSON or YAML syntax.
-- `.linariarc.json`, `.linariarc.yaml`, `.linariarc.yml`, or `.linariarc.js` file.
+- `wyw-in-js.config.js` JS file exporting the object (recommended).
+- `wyw-in-js` property in a `package.json` file.
+- `.wyw-in-jsrc` file with JSON or YAML syntax.
+- `.wyw-in-jsrc.json`, `.wyw-in-jsrc.yaml`, `.wyw-in-jsrc.yml`, or `.wyw-in-jsrc.js` file.
 
-Example `linaria.config.js`:
+Example `wyw-in-js.config.js`:
 
 ```js
 module.exports = {
