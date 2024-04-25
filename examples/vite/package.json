@@ -12,7 +12,7 @@
     "@wyw-in-js/vite": "^0.4.0",
     "@rollup/plugin-node-resolve": "^15.2.1",
     "@vitejs/plugin-react": "^2.1.0",
-    "vite": "^3.2.8"
+    "vite": "^3.2.10"
   },
   "scripts": {
     "build": "vite build"
