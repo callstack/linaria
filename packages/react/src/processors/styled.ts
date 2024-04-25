@@ -30,6 +30,7 @@ import {
 } from '@wyw-in-js/shared';
 import { minimatch } from 'minimatch';
 import html from 'react-html-attributes';
+import { sync as resolveSync } from 'resolve';
 
 const isNotNull = <T>(x: T | null): x is T => x !== null;
 
@@ -100,17 +101,16 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
 
           // Check if at least one used identifier is a Linaria component.
           const isSomeMatched = value.importedFrom.some((importedFrom) => {
-            const importedPkg = findPackageJSON(
-              importedFrom,
-              this.context.filename
-            );
+            const importedPkg =
+              // If package.json is not found, assume it's a local package
+              findPackageJSON(importedFrom, this.context.filename) ?? selfPkg;
 
             if (importedPkg) {
               const packageJSON = JSON.parse(readFileSync(importedPkg, 'utf8'));
-              let mask: string | undefined = packageJSON?.linaria?.components;
+              const mask: string | undefined = packageJSON?.linaria?.components;
               if (importedPkg === selfPkg && mask === undefined) {
                 // If mask is not specified for the local package, all components are treated as styled.
-                mask = '**/*';
+                return true;
               }
 
               if (mask) {
@@ -120,11 +120,23 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
                   /\\/g,
                   posix.sep
                 );
-                const fileWithComponent = require.resolve(importedFrom, {
-                  paths: [dirname(this.context.filename!)],
-                });
 
-                return minimatch(fileWithComponent, fullMask);
+                try {
+                  const fileWithComponent = resolveSync(importedFrom, {
+                    basedir: dirname(this.context.filename!),
+                    extensions: this.options.extensions,
+                  });
+
+                  return minimatch(fileWithComponent, fullMask);
+                } catch (e) {
+                  // It means that resolver can't find the file.
+                  // eslint-disable-next-line no-console
+                  console.warn(
+                    `Can't resolve ${importedFrom} from ${this.context.filename}. If ${value.source} is another styled component, it should be resolvable with default Node.js resolver. If it's not, please exclude it from the linaria.components mask in package.json.`
+                  );
+
+                  return false;
+                }
               }
             }
 
