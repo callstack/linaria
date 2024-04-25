@@ -30,6 +30,7 @@ import {
 } from '@wyw-in-js/shared';
 import { minimatch } from 'minimatch';
 import html from 'react-html-attributes';
+import { sync as resolveSync } from 'resolve';
 
 const isNotNull = <T>(x: T | null): x is T => x !== null;
 
@@ -121,8 +122,9 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
                 );
 
                 try {
-                  const fileWithComponent = require.resolve(importedFrom, {
-                    paths: [dirname(this.context.filename!)],
+                  const fileWithComponent = resolveSync(importedFrom, {
+                    basedir: dirname(this.context.filename!),
+                    extensions: this.options.extensions,
                   });
 
                   return minimatch(fileWithComponent, fullMask);
