@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.2.0
+
+### Minor Changes
+
+- fd60b5de: Fix for extending imported component #1378
+
 ## 6.1.0
 
 ### Minor Changes
