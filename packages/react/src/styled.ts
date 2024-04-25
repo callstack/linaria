@@ -6,11 +6,12 @@
  * - injects CSS variables used to define dynamic styles based on props
  */
 import validAttr from '@emotion/is-prop-valid';
-import type { WYWEvalMeta } from '@wyw-in-js/shared';
 import React from 'react';
 
 import { cx } from '@linaria/core';
 import type { CSSProperties } from '@linaria/core';
+
+type WYWEvalMeta = { __wyw_meta: unknown }; // simplified version of WYWEvalMeta from @wyw-in-js/shared
 
 export type NoInfer<A> = [A][A extends any ? 0 : never];
 
