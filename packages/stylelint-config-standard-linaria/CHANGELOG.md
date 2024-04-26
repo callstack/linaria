@@ -1,5 +1,16 @@
 # Change Log
 
+## 6.2.0
+
+### Minor Changes
+
+- a3dcee2e: Update wyw-in-js to 0.5.3
+
+### Patch Changes
+
+- Updated dependencies [a3dcee2e]
+  - @linaria/postcss-linaria@6.2.0
+
 ## 6.1.0
 
 ### Minor Changes

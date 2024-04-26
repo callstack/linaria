@@ -1,5 +1,12 @@
 # Change Log
 
+## 6.2.1
+
+### Patch Changes
+
+- Updated dependencies [a3dcee2e]
+  - @linaria/core@6.2.0
+
 ## 6.2.0
 
 ### Minor Changes

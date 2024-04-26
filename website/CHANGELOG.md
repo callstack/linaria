@@ -1,5 +1,19 @@
 # Change Log
 
+## 6.2.0
+
+### Minor Changes
+
+- a3dcee2e: Update wyw-in-js to 0.5.3
+
+### Patch Changes
+
+- Updated dependencies [a3dcee2e]
+  - @linaria/atomic@6.2.0
+  - @linaria/core@6.2.0
+  - @linaria/server@6.2.0
+  - @linaria/react@6.2.1
+
 ## 6.1.1
 
 ### Patch Changes
