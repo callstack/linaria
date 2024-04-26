@@ -1,6 +1,6 @@
 {
   "name": "@linaria/testkit",
-  "version": "6.1.1",
+  "version": "6.2.0",
   "private": true,
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
