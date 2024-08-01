@@ -128,7 +128,7 @@ function styled<
 >(
   componentWithoutStyle: TConstructor & Component<TProps>
 ): ComponentStyledTagWithoutInterpolation<TConstructor>;
-function styled<TName extends keyof JSX.IntrinsicElements>(
+function styled<TName extends keyof React.JSX.IntrinsicElements>(
   tag: TName
 ): HtmlStyledTag<TName>;
 function styled(
@@ -244,7 +244,7 @@ export type StyledComponent<T> = WYWEvalMeta &
 
 type StaticPlaceholder = string | number | CSSProperties | WYWEvalMeta;
 
-export type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
+export type HtmlStyledTag<TName extends keyof React.JSX.IntrinsicElements> = <
   TAdditionalProps = Record<never, unknown>,
 >(
   strings: TemplateStringsArray,
@@ -253,10 +253,10 @@ export type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
     | ((
         // Without Omit here TS tries to infer TAdditionalProps
         // from a component passed for interpolation
-        props: JSX.IntrinsicElements[TName] & Omit<TAdditionalProps, never>
+        props: React.JSX.IntrinsicElements[TName] & Omit<TAdditionalProps, never>
       ) => string | number)
   >
-) => StyledComponent<JSX.IntrinsicElements[TName] & TAdditionalProps>;
+) => StyledComponent<React.JSX.IntrinsicElements[TName] & TAdditionalProps>;
 
 type ComponentStyledTagWithoutInterpolation<TOrigCmp> = (
   strings: TemplateStringsArray,
@@ -278,14 +278,14 @@ type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
   : StyledComponent<OwnProps & TTrgProps>;
 
 export type StyledJSXIntrinsics = {
-  readonly [P in keyof JSX.IntrinsicElements]: HtmlStyledTag<P>;
+  readonly [P in keyof React.JSX.IntrinsicElements]: HtmlStyledTag<P>;
 };
 
 export type Styled = typeof styled & StyledJSXIntrinsics;
 
 export default (process.env.NODE_ENV !== 'production'
   ? new Proxy(styled, {
-      get(o, prop: keyof JSX.IntrinsicElements) {
+      get(o, prop: keyof React.JSX.IntrinsicElements) {
         return o(prop);
       },
     })
