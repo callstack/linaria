@@ -259,8 +259,6 @@ importers:
         specifier: ^0.4.54
         version: 0.4.54(vite@3.2.10)
 
-  examples/vpssr-linaria-solid/dist/server: {}
-
   examples/webpack5:
     dependencies:
       linaria-website:
@@ -4932,8 +4930,8 @@ packages:
       typescript: 5.2.2
       unist-util-visit: 4.1.1
       vfile: 5.3.6
-      vite: 3.2.7(@types/node@17.0.39)
-      vitefu: 0.2.3(vite@3.2.7)
+      vite: 3.2.10(@types/node@17.0.39)
+      vitefu: 0.2.3(vite@3.2.10)
       yargs-parser: 21.1.1
       zod: 3.19.1
     transitivePeerDependencies:
@@ -11258,6 +11256,7 @@ packages:
 
   /npmlog@4.1.2:
     resolution: {integrity: sha512-2uUqazuKlTaSI/dC8AzicUck7+IrEaOnN/e0jd3Xtt1KcGpwx30v50mL7oPyr/h9bL3E4aZccVwpwP+5W9Vjkg==}
+    deprecated: This package is no longer supported.
     requiresBuild: true
     dependencies:
       are-we-there-yet: 1.1.7
@@ -14699,6 +14698,17 @@ packages:
     dependencies:
       vite: 3.2.10(@types/node@17.0.39)
     dev: false
+
+  /vitefu@0.2.3(vite@3.2.10):
+    resolution: {integrity: sha512-75l7TTuU8isAhz1QFtNKjDkqjxvndfMC1AfIMjJ0ZQ59ZD0Ow9QOIsJJX16Wv9PS8f+zMzp6fHy5cCbKG/yVUQ==}
+    peerDependencies:
+      vite: ^3.0.0 || ^4.0.0
+    peerDependenciesMeta:
+      vite:
+        optional: true
+    dependencies:
+      vite: 3.2.10(@types/node@17.0.39)
+    dev: true
 
   /vitefu@0.2.3(vite@3.2.7):
     resolution: {integrity: sha512-75l7TTuU8isAhz1QFtNKjDkqjxvndfMC1AfIMjJ0ZQ59ZD0Ow9QOIsJJX16Wv9PS8f+zMzp6fHy5cCbKG/yVUQ==}
