@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { readFileSync } from 'fs';
+import { stripVTControlCharacters as stripAnsi } from 'node:util';
 import { dirname, join, resolve, sep } from 'path';
 
 import * as babel from '@babel/core';
@@ -23,7 +24,6 @@ import type {
   Stage,
 } from '@wyw-in-js/transform';
 import dedent from 'dedent';
-import stripAnsi from 'strip-ansi';
 
 import serializer from './__utils__/linaria-snapshot-serializer';
 

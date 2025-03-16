@@ -32,7 +32,6 @@
     "debug": "^4.3.4",
     "dedent": "^1.5.1",
     "esbuild": "^0.15.16",
-    "strip-ansi": "^5.2.0",
     "typescript": "^5.2.2"
   },
   "devDependencies": {
@@ -57,7 +56,7 @@
     "ts-jest": "^29.1.1"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=16.11.0"
   },
   "publishConfig": {
     "access": "public"

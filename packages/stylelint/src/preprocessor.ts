@@ -1,7 +1,8 @@
+import { stripVTControlCharacters as stripAnsi } from 'node:util';
+
 import type { Replacements } from '@wyw-in-js/shared';
 import { asyncResolveFallback } from '@wyw-in-js/shared';
 import { transform } from '@wyw-in-js/transform';
-import stripAnsi from 'strip-ansi';
 
 type Errors = {
   [key: string]:
