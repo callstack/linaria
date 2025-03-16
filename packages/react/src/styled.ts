@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * This file contains an runtime version of `styled` component. Responsibilities of the component are:
+ * This file contains a runtime version of `styled` component. Responsibilities of the component are:
  * - returns ReactElement based on HTML tag used with `styled` or custom React Component
  * - injects classNames for the returned component
  * - injects CSS variables used to define dynamic styles based on props
  */
 import validAttr from '@emotion/is-prop-valid';
-import React from 'react';
+import { createElement, forwardRef } from 'react';
+import type React from 'react';
 
 import { cx } from '@linaria/core';
 import type { CSSProperties } from '@linaria/core';
@@ -106,7 +107,25 @@ interface IProps {
   style?: Record<string, string>;
 }
 
+// React <19
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {}
+  }
+}
+
+// React >=19
+declare module 'react' {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {}
+  }
+}
+
 let idx = 0;
+
+type IntrinsicElements = React.JSX.IntrinsicElements & JSX.IntrinsicElements;
 
 // Components with props are not allowed
 function styled(
@@ -128,7 +147,7 @@ function styled<
 >(
   componentWithoutStyle: TConstructor & Component<TProps>
 ): ComponentStyledTagWithoutInterpolation<TConstructor>;
-function styled<TName extends keyof JSX.IntrinsicElements>(
+function styled<TName extends keyof IntrinsicElements>(
   tag: TName
 ): HtmlStyledTag<TName>;
 function styled(
@@ -211,13 +230,13 @@ function styled(tag: any): any {
         // Otherwise the styles from the underlying component will be ignored
         filteredProps.as = component;
 
-        return React.createElement(tag, filteredProps);
+        return createElement(tag, filteredProps);
       }
-      return React.createElement(component, filteredProps);
+      return createElement(component, filteredProps);
     };
 
-    const Result = React.forwardRef
-      ? React.forwardRef(render)
+    const Result = forwardRef
+      ? forwardRef(render)
       : // React.forwardRef won't available on older React versions and in Preact
         // Fallback to a innerRef prop in that case
         (props: any) => {
@@ -244,7 +263,7 @@ export type StyledComponent<T> = WYWEvalMeta &
 
 type StaticPlaceholder = string | number | CSSProperties | WYWEvalMeta;
 
-export type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
+export type HtmlStyledTag<TName extends keyof IntrinsicElements> = <
   TAdditionalProps = Record<never, unknown>,
 >(
   strings: TemplateStringsArray,
@@ -253,10 +272,10 @@ export type HtmlStyledTag<TName extends keyof JSX.IntrinsicElements> = <
     | ((
         // Without Omit here TS tries to infer TAdditionalProps
         // from a component passed for interpolation
-        props: JSX.IntrinsicElements[TName] & Omit<TAdditionalProps, never>
+        props: IntrinsicElements[TName] & Omit<TAdditionalProps, never>
       ) => string | number)
   >
-) => StyledComponent<JSX.IntrinsicElements[TName] & TAdditionalProps>;
+) => StyledComponent<IntrinsicElements[TName] & TAdditionalProps>;
 
 type ComponentStyledTagWithoutInterpolation<TOrigCmp> = (
   strings: TemplateStringsArray,
@@ -278,14 +297,14 @@ type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
   : StyledComponent<OwnProps & TTrgProps>;
 
 export type StyledJSXIntrinsics = {
-  readonly [P in keyof JSX.IntrinsicElements]: HtmlStyledTag<P>;
+  readonly [P in keyof IntrinsicElements]: HtmlStyledTag<P>;
 };
 
 export type Styled = typeof styled & StyledJSXIntrinsics;
 
 export default (process.env.NODE_ENV !== 'production'
   ? new Proxy(styled, {
-      get(o, prop: keyof JSX.IntrinsicElements) {
+      get(o, prop: keyof IntrinsicElements) {
         return o(prop);
       },
     })
