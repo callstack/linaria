@@ -7,11 +7,23 @@ export default (/** @type import('vite').ConfigEnv */ { mode }) => {
   /** @type import('vite').UserConfig */
   const config = {
     plugins: [
-      vite_wyw({
-        babelOptions: {
-          presets: ['solid'],
-        },
-      }),
+      {
+        ...vite_wyw({
+          babelOptions: {
+            presets: [
+              'solid',
+              [
+                '@babel/preset-typescript',
+                {
+                  isTSX: true,
+                  allExtensions: true,
+                },
+              ],
+            ],
+          },
+        }),
+        enforce: 'pre',
+      },
       vite_solid({
         dev: dev,
         hot: dev,

@@ -51,8 +51,8 @@
   "dependencies": {
     "@linaria/core": "workspace:^",
     "@linaria/react": "workspace:^",
-    "@wyw-in-js/processor-utils": "^0.5.3",
-    "@wyw-in-js/shared": "^0.5.3",
+    "@wyw-in-js/processor-utils": "^0.6.0",
+    "@wyw-in-js/shared": "^0.6.0",
     "known-css-properties": "^0.24.0",
     "postcss": "^8.4.31",
     "stylis": "^4.3.0",

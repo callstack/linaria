@@ -7,7 +7,7 @@
     "linaria-website": "workspace:^"
   },
   "devDependencies": {
-    "@wyw-in-js/esbuild": "^0.5.3",
+    "@wyw-in-js/esbuild": "^0.6.0",
     "esbuild": "^0.15.16"
   },
   "scripts": {
