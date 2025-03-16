@@ -10,7 +10,7 @@
     "@linaria/core": "workspace:^",
     "@wyw-in-js/vite": "^0.6.0",
     "astro": "^1.6.10",
-    "solid-js": "^1.6.2",
+    "solid-js": "^1.9.4",
     "vite": "^3",
     "vite-plugin-inspect": "^0.7.33"
   },
