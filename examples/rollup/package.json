@@ -13,7 +13,7 @@
     "@rollup/plugin-commonjs": "^25.0.4",
     "@rollup/plugin-image": "^3.0.2",
     "@rollup/plugin-node-resolve": "^15.2.1",
-    "@wyw-in-js/rollup": "^0.5.3",
+    "@wyw-in-js/rollup": "^0.6.0",
     "rollup": "^3.29.5",
     "rollup-plugin-css-only": "^4.3.0"
   },
