@@ -1,5 +1,20 @@
 # Change Log
 
+## 6.3.0
+
+### Minor Changes
+
+- 281ca4f5: The new version of wyw-in-js, with the support of a configurable code remover, can help prevent compilation errors and improve build time.
+
+### Patch Changes
+
+- Updated dependencies [bd8d45fd]
+- Updated dependencies [281ca4f5]
+  - @linaria/react@6.3.0
+  - @linaria/atomic@6.3.0
+  - @linaria/core@6.3.0
+  - @linaria/server@6.3.0
+
 ## 6.2.0
 
 ### Minor Changes
