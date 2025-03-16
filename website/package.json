@@ -31,7 +31,7 @@
     "dedent": "^1.5.1",
     "escape-html": "^1.0.3",
     "ignore-styles": "^5.0.1",
-    "koa": "^2.7.0",
+    "koa": "^2.15.4",
     "koa-compress": "^3.0.0",
     "koa-router": "^7.4.0",
     "koa-send": "^5.0.0",
