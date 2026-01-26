@@ -107,16 +107,7 @@ interface IProps {
   style?: Record<string, string>;
 }
 
-// React <19
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace JSX {
-    interface IntrinsicElements {}
-  }
-}
-
-// React >=19
-declare module 'react' {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {}
@@ -125,7 +116,16 @@ declare module 'react' {
 
 let idx = 0;
 
-type IntrinsicElements = React.JSX.IntrinsicElements & JSX.IntrinsicElements;
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+type ReactIntrinsicElements = typeof import('react') extends {
+  JSX: { IntrinsicElements: infer T };
+}
+  ? T
+  : never;
+
+type IntrinsicElements = [ReactIntrinsicElements] extends [never]
+  ? JSX.IntrinsicElements
+  : ReactIntrinsicElements;
 
 // Components with props are not allowed
 function styled(

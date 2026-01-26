@@ -53,7 +53,7 @@
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
     "build:dist": "tsup --format cjs,esm",
     "test": "jest --config ../../jest.config.js --rootDir .",
-    "test:dts": "dtslint --localTs ../../node_modules/typescript/lib __dtslint__",
+    "test:dts": "dtslint --localTs ../../node_modules/typescript/lib __dtslint__ && dtslint --localTs ../../node_modules/typescript/lib __dtslint-react17__",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
   },
