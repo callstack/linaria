@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { css } from '@linaria/core';
 
-import { styled } from '../src';
+import { styled } from '..';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function isExtends<C, T>(arg1?: C, arg2?: T): C extends T ? 'extends' : never {
