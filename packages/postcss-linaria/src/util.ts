@@ -54,7 +54,7 @@ const isRuleSet = (sourceAsString: string, indexAfterExpression: number) => {
   );
 };
 
-export const placeholderText = 'pcss_lin';
+export const placeholderText = 'pcss-lin';
 
 export const createPlaceholder = (
   i: number,

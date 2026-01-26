@@ -1,3 +1,5 @@
+import { resolve } from 'path';
+
 import stylelint, { type Config } from 'stylelint';
 
 // importing from the package would create circular dependency
@@ -7,6 +9,11 @@ import config from '../../stylelint-config-standard-linaria/src';
 
 // note: need to run pnpm install to pick up updates from any parse/stringify changes
 describe('stylelint', () => {
+  const configBasedir = resolve(
+    __dirname,
+    '../../stylelint-config-standard-linaria'
+  );
+
   it('should not error with valid syntax', async () => {
     const source = `
       css\`
@@ -26,6 +33,7 @@ describe('stylelint', () => {
     const result = await stylelint.lint({
       code: source,
       config: config as Config,
+      configBasedir,
     });
 
     expect(result.errored).toEqual(false);
@@ -46,6 +54,7 @@ describe('stylelint', () => {
         },
       } as Config,
       fix: true,
+      configBasedir,
     });
     expect(result.errored).toEqual(false);
     expect(result.output).toMatchInlineSnapshot(`
@@ -71,6 +80,7 @@ describe('stylelint', () => {
         },
       } as Config,
       fix: true,
+      configBasedir,
     });
     expect(result.errored).toEqual(false);
     expect(result.output).toMatchInlineSnapshot(`
@@ -97,6 +107,7 @@ describe('stylelint', () => {
         },
       } as Config,
       fix: true,
+      configBasedir,
     });
     expect(result.output).toMatchInlineSnapshot(`
       "
@@ -124,6 +135,7 @@ describe('stylelint', () => {
           indentation: 4,
         },
       } as Config,
+      configBasedir,
     });
 
     expect(result.errored).toEqual(false);

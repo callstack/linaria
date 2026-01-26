@@ -9,7 +9,8 @@ const correctLocation = (
   loc: Position,
   baseIndentations: Map<number, number>,
   sourceAsString: string,
-  prefixOffsets?: { lines: number; offset: number }
+  prefixOffsets?: { lines: number; offset: number },
+  kind: 'start' | 'end' = 'start'
 ): Position => {
   if (!node.quasi.loc || !node.quasi.range) {
     return loc;
@@ -19,7 +20,7 @@ const correctLocation = (
   const nodeLoc = node.quasi.loc;
   const nodeOffset = node.quasi.range[0];
   let lineOffset = nodeLoc.start.line - 1;
-  let newOffset = loc.offset + nodeOffset + 1;
+  let newOffset = loc.offset + nodeOffset + (kind === 'start' ? 1 : 0);
   let currentLine = 1;
   let columnOffset = nodeLoc.start.column + 1;
 
@@ -276,7 +277,8 @@ export function locationCorrectionWalker(
         node.source.start,
         baseIndentations,
         sourceAsString,
-        root.raws.linariaPrefixOffsets
+        root.raws.linariaPrefixOffsets,
+        'start'
       );
     }
     if (node.source?.end) {
@@ -285,7 +287,8 @@ export function locationCorrectionWalker(
         node.source.end,
         baseIndentations,
         sourceAsString,
-        root.raws.linariaPrefixOffsets
+        root.raws.linariaPrefixOffsets,
+        'end'
       );
     }
   };
