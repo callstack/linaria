@@ -116,16 +116,16 @@ declare global {
 
 let idx = 0;
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-type ReactIntrinsicElements = typeof import('react') extends {
-  JSX: { IntrinsicElements: infer T };
-}
-  ? T
-  : never;
+type GlobalJSXIntrinsicElements = JSX.IntrinsicElements;
 
-type IntrinsicElements = [ReactIntrinsicElements] extends [never]
-  ? JSX.IntrinsicElements
-  : ReactIntrinsicElements;
+declare module 'react' {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements extends GlobalJSXIntrinsicElements {}
+  }
+}
+
+type IntrinsicElements = React.JSX.IntrinsicElements;
 
 // Components with props are not allowed
 function styled(
