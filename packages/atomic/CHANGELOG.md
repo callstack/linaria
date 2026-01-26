@@ -1,5 +1,27 @@
 # Change Log
 
+## 7.0.0
+
+### Major Changes
+
+- ab11ebb7: BREAKING: bump `@wyw-in-js/*` dependencies to `^1.0.0` (stable).
+
+  This release updates Linaria's build-time evaluation engine (WyW). See https://wyw-in-js.dev/stability for practical guidance and common pitfalls.
+
+  Notes:
+
+  - Linaria 7 requires Node.js 20+ (aligned with WyW 1.x).
+  - If you import JSON from code that is evaluated by WyW, add `.json` to `extensions` and ensure `.json` is ignored by evaluation rules (so it's parsed as JSON, not by Babel).
+  - Rollup users: WyW 1.x serializes `transform()` by default (`serializeTransform: true`). If you hit Rollup "Unexpected early exit" (unresolved plugin promises / deadlock during resolve), set `serializeTransform: false` (see `examples/rollup/rollup.config.mjs`).
+  - WyW 1.x promotes fully-statically-evaluatable modules to `only: ['*']` and can re-evaluate modules when cached exports are incomplete (cached export values might not be reused).
+
+### Patch Changes
+
+- Updated dependencies [ab11ebb7]
+- Updated dependencies [654d8590]
+  - @linaria/core@7.0.0
+  - @linaria/react@7.0.0
+
 ## 6.3.0
 
 ### Minor Changes
