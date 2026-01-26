@@ -65,6 +65,8 @@ See [Configuration](https://wyw-in-js.dev/configuration) to customize how Linari
 
 Linaria relies on WyW (`@wyw-in-js/*`) to evaluate your modules at build time and extract CSS. If you hit issues like slow builds, invalidation storms, or unexpected code being executed during the build, it’s usually related to the WyW evaluation model and how your modules are structured.
 
+Linaria 7 requires Node.js `>=20` (WyW 1.x enforces this via `engines`).
+
 See https://wyw-in-js.dev/stability for practical guidance and common pitfalls.
 
 ## Syntax

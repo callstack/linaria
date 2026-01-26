@@ -50,7 +50,7 @@
     "@linaria/server": "workspace:^"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=20.0.0"
   },
   "publishConfig": {
     "access": "public"
