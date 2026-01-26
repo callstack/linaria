@@ -15,6 +15,13 @@ const rules = [
   },
 ];
 
+const basePluginOptions = {
+  features: {
+    happyDOM: false,
+  },
+  rules,
+};
+
 describe('transformUrl', () => {
   type TransformUrlArgs = Parameters<typeof transformUrl>;
   const dataset: Record<string, TransformUrlArgs> = {
@@ -64,7 +71,7 @@ it('rewrites a relative path in url() declarations', async () => {
         filename: './test.js',
         outputFilename: './.linaria-cache/test.css',
         pluginOptions: {
-          rules,
+          ...basePluginOptions,
         },
       },
     },
@@ -90,7 +97,7 @@ it('rewrites multiple relative paths in url() declarations', async () => {
         filename: './test.js',
         outputFilename,
         pluginOptions: {
-          rules,
+          ...basePluginOptions,
         },
       },
     },
@@ -117,7 +124,7 @@ it("doesn't rewrite an absolute path in url() declarations", async () => {
         filename: './test.js',
         outputFilename,
         pluginOptions: {
-          rules,
+          ...basePluginOptions,
         },
       },
     },
@@ -144,7 +151,7 @@ it('respects passed babel options', async () => {
           filename: './test.js',
           outputFilename,
           pluginOptions: {
-            rules,
+            ...basePluginOptions,
             babelOptions: {
               babelrc: false,
               configFile: false,
@@ -171,7 +178,7 @@ it('respects passed babel options', async () => {
           filename: './test.js',
           outputFilename,
           pluginOptions: {
-            rules,
+            ...basePluginOptions,
             babelOptions: {
               babelrc: false,
               configFile: false,
@@ -206,7 +213,7 @@ it("doesn't throw due to duplicate preset", async () => {
           filename: './test.js',
           outputFilename,
           pluginOptions: {
-            rules,
+            ...basePluginOptions,
             babelOptions: {
               babelrc: false,
               configFile: false,
@@ -241,7 +248,7 @@ it('should return transformed code even when file only contains unused linaria c
         filename: './test.js',
         outputFilename,
         pluginOptions: {
-          rules,
+          ...basePluginOptions,
         },
       },
     },

@@ -61,6 +61,12 @@ Linaria is now built on top of [wyw-in-js.dev](https://wyw-in-js.dev/). It suppo
 
 See [Configuration](https://wyw-in-js.dev/configuration) to customize how Linaria processes your files.
 
+## Stability
+
+Linaria relies on WyW (`@wyw-in-js/*`) to evaluate your modules at build time and extract CSS. If you hit issues like slow builds, invalidation storms, or unexpected code being executed during the build, it’s usually related to the WyW evaluation model and how your modules are structured.
+
+See https://wyw-in-js.dev/stability for practical guidance and common pitfalls.
+
 ## Syntax
 
 Linaria can be used with any framework, with additional helpers for React. The basic syntax looks like this:

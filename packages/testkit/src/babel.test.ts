@@ -70,12 +70,25 @@ const getLinariaConfig = (
   linariaConfig: PartialOptions,
   presets: PluginItem[],
   stage?: Stage
-): PluginOptions =>
-  loadWywOptions({
+): PluginOptions => {
+  const { features: customFeatures, ...restConfig } = linariaConfig;
+
+  return loadWywOptions({
     babelOptions: {
       presets,
       plugins: [],
     },
+    extensions: [
+      '.cjs',
+      '.cts',
+      '.js',
+      '.jsx',
+      '.mjs',
+      '.mts',
+      '.ts',
+      '.tsx',
+      '.json',
+    ],
     displayName: true,
     rules: [
       {
@@ -90,13 +103,20 @@ const getLinariaConfig = (
         test: /[\\/]node_modules[\\/](?!@linaria)/,
         action: 'ignore',
       },
+      {
+        test: /\.json$/,
+        action: 'ignore',
+      },
     ],
     features: {
+      ...customFeatures,
+      happyDOM: false,
       softErrors: false,
     },
     stage,
-    ...linariaConfig,
+    ...restConfig,
   });
+};
 
 async function transform(
   originalCode: string,
@@ -3217,15 +3237,17 @@ describe('strategy shaker', () => {
     };
 
     it('should cache evaluation', async () => {
-      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+      const filename = require.resolve(
+        join(dirName, './__fixtures__/foo-nonstatic')
+      );
       const cache = new TransformCacheCollection();
       const { code, metadata } = await transform(
         dedent`
           import { css } from "@linaria/core";
-          import { foo1, foo2 } from "./__fixtures__/foo";
+          import { foo1, foo2 } from "./__fixtures__/foo-nonstatic";
 
           export const text = css\`font-size: ${'${foo1}'}\`;
-          `,
+        `,
         [evaluator],
         cache
       );
@@ -3235,7 +3257,29 @@ describe('strategy shaker', () => {
 
       const exports = getCachedExports(cache, filename);
       expect(exports.foo1).toBe('foo1');
-      expect(exports.foo2).toBe(undefined); // foo2 is not used and should not be evaluated
+      expect(exports.foo2).toBe(undefined);
+    });
+
+    it('promotes statically evaluatable modules to "*"', async () => {
+      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+      const cache = new TransformCacheCollection();
+
+      await transform(
+        dedent`
+          import { css } from "@linaria/core";
+          import { foo1 } from "./__fixtures__/foo";
+
+          export const text = css\`font-size: ${'${foo1}'}\`;
+        `,
+        [evaluator],
+        cache
+      );
+
+      const cachedFoo = cache.get('entrypoints', filename);
+      expect(cachedFoo?.evaluatedOnly).toContain('*');
+
+      const exports = getCachedExports(cache, filename);
+      expect(exports.foo2).toBe('foo2');
     });
 
     const createCacheFor = async (
@@ -3253,6 +3297,7 @@ describe('strategy shaker', () => {
       });
 
       cache.add('entrypoints', filename, {
+        dependencies: new Map(),
         evaluated: true,
         evaluatedOnly: only,
         generation: 1,
@@ -3266,16 +3311,18 @@ describe('strategy shaker', () => {
     };
 
     it('should use cached value', async () => {
-      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+      const filename = require.resolve(
+        join(dirName, './__fixtures__/foo-nonstatic')
+      );
       const cache = await createCacheFor(filename, { foo1: 'cached-foo1' });
 
       const { code, metadata } = await transform(
         dedent`
           import { css } from "@linaria/core";
-          import { foo1 } from "./__fixtures__/foo";
+          import { foo1 } from "./__fixtures__/foo-nonstatic";
 
           export const text = css\`font-size: ${'${foo1}'}\`;
-          `,
+        `,
         [evaluator],
         cache
       );
@@ -3284,28 +3331,35 @@ describe('strategy shaker', () => {
       expect(metadata).toMatchSnapshot();
     });
 
-    it('should use partially cached value', async () => {
-      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+    it('should reprocess module when cached exports are incomplete', async () => {
+      const filename = require.resolve(
+        join(dirName, './__fixtures__/foo-nonstatic')
+      );
       const cache = await createCacheFor(filename, { foo1: 'cached-foo1' });
 
       const { code, metadata } = await transform(
         dedent`
           import { css } from "@linaria/core";
-          import { foo1, foo2 } from "./__fixtures__/foo";
+          import { foo1, foo2 } from "./__fixtures__/foo-nonstatic";
 
           export const text = css\`font-size: ${'${foo1 + foo2}'}\`;
-          `,
+        `,
         [evaluator],
         cache
       );
 
       expect(code).toMatchSnapshot();
       expect(metadata).toMatchSnapshot();
+
+      const exports = getCachedExports(cache, filename);
+      expect(exports.foo1).toBe('foo1');
+      expect(exports.foo2).toBe('foo2');
     });
 
-    // it('should use cached value even if only part of it is required', async () => {
     it('should use cached value even if only part is required', async () => {
-      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+      const filename = require.resolve(
+        join(dirName, './__fixtures__/foo-nonstatic')
+      );
       const cache = await createCacheFor(filename, {
         foo1: 'cached-foo1',
         foo2: 'cached-foo2',
@@ -3314,10 +3368,10 @@ describe('strategy shaker', () => {
       const { code, metadata } = await transform(
         dedent`
           import { css } from "@linaria/core";
-          import { foo1 } from "./__fixtures__/foo";
+          import { foo1 } from "./__fixtures__/foo-nonstatic";
 
           export const text = css\`font-size: ${'${foo1}'}\`;
-          `,
+        `,
         [evaluator],
         cache
       );

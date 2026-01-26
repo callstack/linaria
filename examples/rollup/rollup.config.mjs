@@ -15,6 +15,8 @@ export default {
     image(),
     wyw({
       sourceMap: process.env.NODE_ENV !== 'production',
+      // Rollup can deadlock when WyW resolves imports during transform.
+      serializeTransform: false,
     }),
     css({
       output: 'styles.css',

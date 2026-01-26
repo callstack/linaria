@@ -1,5 +1,16 @@
 # Migration Guide
 
+# 7.x from 6.x
+
+## For Users
+
+Linaria 7 updates the WyW toolchain (`@wyw-in-js/*`) to `^1.0.0` (stable). This affects build-time evaluation (CSS extraction) and can surface previously hidden issues in evaluated modules.
+
+- Review https://wyw-in-js.dev/stability for the evaluation model, common pitfalls, and performance guidance.
+- If you rely on WyW cache internals, note that WyW 1.x can promote fully-statically-evaluatable modules to `only: ['*']` and may re-evaluate modules when cached exports are incomplete.
+- If you import JSON from code that is evaluated by WyW, add `.json` to `extensions` and ensure `.json` is ignored by evaluation rules (so it's parsed as JSON, not by Babel).
+- Rollup users on WyW 1.0.6: if you hit Rollup "Unexpected early exit" (unresolved plugin promises), try `serializeTransform: false` in the WyW Rollup plugin config.
+
 # 6.x from 5.x, 4.x, 3.x
 
 ## For Users
