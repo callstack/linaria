@@ -26,7 +26,7 @@ function Header() {
     title: "GitHub"
   }, "GitHub"))));
 }
-const _exp = /*#__PURE__*/() => _Container.default;
+const _exp = () => _Container.default;
 const NavBar = /*#__PURE__*/(0, _react.styled)(_exp())({
   name: "NavBar",
   class: "n11jhqd8",
