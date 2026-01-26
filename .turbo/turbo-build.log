@@ -24,23 +24,23 @@
 
 
 Timings:
-  Total: 3493ms
+  Total: 3362ms
 
   By method:
-    createEntrypoint: 248ms
-    parseFile: 19ms
-    transform:evaluator: 70ms
-    transform:preeval: 128ms
-    transform:preeval:importMetaEnv: 0ms
-    transform:preeval:processTemplate: 44ms
-    transform:preeval:removeDangerousCode: 23ms
+    createEntrypoint: 210ms
+    parseFile: 17ms
+    transform:evaluator: 61ms
+    transform:preeval: 114ms
+    transform:preeval:importMetaEnv: 1ms
+    transform:preeval:processTemplate: 42ms
+    transform:preeval:removeDangerousCode: 22ms
 
 Memory usage: {
-  rss: 224722944,
-  heapTotal: 159854592,
-  heapUsed: 132467536,
-  external: 3995160,
-  arrayBuffers: 1117150
+  rss: 234835968,
+  heapTotal: 156651520,
+  heapUsed: 124482272,
+  external: 5664115,
+  arrayBuffers: 1685507
 }
 assets by info 63.5 KiB [1m[32m[immutable][39m[22m
   asset [1m[32mc9d5cf961634b7622bef.png[39m[22m 59.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/code-sample-v4.png] (auxiliary name: app)
@@ -66,9 +66,11 @@ cacheable modules 148 KiB (javascript) 62.6 KiB (asset) 3.7 KiB (css/mini-extrac
       css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.98.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@1.0.6_webpack@5.98.0/node_modules/@wyw-in-js/webpack-loader/lib/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/components/Hero.jsx?wyw=wyw-in-js.css[39m[22m 1.82 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.98.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@1.0.6_webpack@5.98.0/node_modules/@wyw-in-js/webpack-loader/lib/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/index.jsx?wyw=wyw-in-js.css[39m[22m 316 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.98.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@1.0.6_webpack@5.98.0/node_modules/@wyw-in-js/webpack-loader/lib/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/components/Container.js?wyw=wyw-in-js.css[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.98.0 compiled [1m[32msuccessfully[39m[22m in 3212 ms
+webpack 5.98.0 compiled [1m[32msuccessfully[39m[22m in 3089 ms
 
 > linaria-website@6.3.0 build:server /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production BABEL_ENV=server babel src --out-dir build
 
-Successfully compiled 11 files with Babel (982ms).
+(node:2934) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Successfully compiled 11 files with Babel (916ms).
