@@ -1,5 +1,11 @@
 # Change Log
 
+## 7.0.1
+
+### Patch Changes
+
+- b3331e45: Fix `styled.<tag>` typings in environments where only the React JSX runtime types are available (e.g. `jsx: react-jsx`).
+
 ## 7.0.0
 
 ### Major Changes
