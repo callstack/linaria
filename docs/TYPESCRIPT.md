@@ -168,6 +168,6 @@ Whenever a wrapper uses dynamic values in template expressions, Linaria requires
 
 ## See Also
 
-- [General API docs](https://github.com/callstack/linaria/blob/master/docs/API.md)
+- [General API docs](./API.md)
 - [Type definition tests](https://github.com/callstack/linaria/blob/master/packages/react/__dtslint__/styled.ts)
 - [Conditional Types in the TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html)
