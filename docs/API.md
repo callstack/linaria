@@ -66,7 +66,9 @@ Unlike the [`classnames`](https://www.npmjs.com/package/classnames) library, thi
 
 ### `styled`
 
-Helper to build React components. It allows you to write your components in a similar syntax as [`styled-components`](https://www.styled-components.com/):
+Helper to build React components. It allows you to write your components in a similar syntax as [`styled-components`](https://www.styled-components.com/).
+
+[Typescript documentation and examples](./TYPESCRIPT.md) for the `styled` API is also available.
 
 The syntax is similar to the `css` tag. Additionally, you can use function interpolations that receive the component's props:
 
