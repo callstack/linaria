@@ -4,10 +4,10 @@ import { stripVTControlCharacters as stripAnsi } from 'node:util';
 import { dirname, join, resolve, sep } from 'path';
 
 import * as babel from '@babel/core';
-import type { PluginItem } from '@babel/core';
 import { logger } from '@wyw-in-js/shared';
 import type { Evaluator, FeatureFlags } from '@wyw-in-js/shared';
 import {
+  disposeEvalBroker,
   Entrypoint,
   EventEmitter,
   TransformCacheCollection,
@@ -17,9 +17,11 @@ import {
 } from '@wyw-in-js/transform';
 import type {
   EntrypointEvent,
+  IEvaluatedEntrypoint,
   OnEvent,
   OnActionStartArgs,
   OnActionFinishArgs,
+  Options as WywTransformOptions,
   PluginOptions,
   Stage,
 } from '@wyw-in-js/transform';
@@ -35,12 +37,18 @@ type PartialOptions = Partial<Omit<PluginOptions, 'features'>> & {
   features?: Partial<FeatureFlags>;
 };
 
+type TransformInvocationOptions = {
+  filename?: string;
+  inputSourceMap?: WywTransformOptions['inputSourceMap'];
+  root?: string;
+};
+
 type Options = [
   evaluator: Evaluator,
   linariaConfig?: PartialOptions,
   extension?: 'js' | 'ts' | 'jsx' | 'tsx',
   filename?: string,
-  babelConfig?: babel.TransformOptions,
+  transformOptions?: TransformInvocationOptions,
 ];
 
 const asyncResolve = (what: string, importer: string, stack: string[]) => {
@@ -52,32 +60,16 @@ const asyncResolve = (what: string, importer: string, stack: string[]) => {
   }
 };
 
-const getPresets = (extension: 'js' | 'ts' | 'jsx' | 'tsx') => {
-  const presets: PluginItem[] = [];
-  if (extension === 'ts' || extension === 'tsx') {
-    presets.push(require.resolve('@babel/preset-typescript'));
-  }
-
-  if (extension === 'jsx' || extension === 'tsx') {
-    presets.push(require.resolve('@babel/preset-react'));
-  }
-
-  return presets;
-};
+const cachesForCleanup = new Set<TransformCacheCollection>();
 
 const getLinariaConfig = (
   evaluator: Evaluator,
   linariaConfig: PartialOptions,
-  presets: PluginItem[],
   stage?: Stage
 ): PluginOptions => {
   const { features: customFeatures, ...restConfig } = linariaConfig;
 
   return loadWywOptions({
-    babelOptions: {
-      presets,
-      plugins: [],
-    },
     extensions: [
       '.cjs',
       '.cts',
@@ -93,11 +85,6 @@ const getLinariaConfig = (
     rules: [
       {
         action: evaluator,
-        babelOptions: {
-          plugins: [
-            require.resolve('@babel/plugin-transform-modules-commonjs'),
-          ],
-        },
       },
       {
         test: /[\\/]node_modules[\\/](?!@linaria)/,
@@ -130,24 +117,23 @@ async function transform(
     linariaPartialConfig = {},
     extension = 'js',
     fullFilename = join(dirName, `${filename}.${extension}`),
-    babelPartialConfig = {},
+    transformOptions = {},
   ] = opts;
 
-  const presets = getPresets(extension);
+  const cacheStore = cache ?? new TransformCacheCollection();
+  cachesForCleanup.add(cacheStore);
   const linariaConfig = getLinariaConfig(
     evaluator,
     linariaPartialConfig,
-    presets,
     'collect'
   );
 
   const services = {
-    babel,
-    cache,
+    cache: cacheStore,
     options: {
-      filename: babelPartialConfig.filename ?? fullFilename,
-      root: babelPartialConfig.root ?? undefined,
-      inputSourceMap: babelPartialConfig.inputSourceMap ?? undefined,
+      filename: transformOptions.filename ?? fullFilename,
+      root: transformOptions.root ?? undefined,
+      inputSourceMap: transformOptions.inputSourceMap ?? undefined,
       pluginOptions: linariaConfig,
     },
     eventEmitter,
@@ -166,6 +152,13 @@ async function transform(
     },
   };
 }
+
+afterEach(() => {
+  cachesForCleanup.forEach((cacheStore) => {
+    disposeEvalBroker(cacheStore);
+  });
+  cachesForCleanup.clear();
+});
 
 async function transformFile(filename: string, opts: Options) {
   const [evaluator, linariaPartialConfig = {}, extension = 'js'] = opts;
@@ -607,7 +600,7 @@ describe('strategy shaker', () => {
       [
         evaluator,
         {
-          evaluate: false,
+          eval: { strategy: 'static' },
         },
         'ts',
       ]
@@ -632,7 +625,7 @@ describe('strategy shaker', () => {
       [
         evaluator,
         {
-          evaluate: false,
+          eval: { strategy: 'static' },
         },
         'ts',
       ]
@@ -2904,42 +2897,17 @@ describe('strategy shaker', () => {
     );
   });
 
-  it('should fail because babelrc options is disabled', async () => {
+  it('requires explicit resolver config for aliased specifiers', async () => {
     const fn = () =>
       transformFile(
         resolve(__dirname, './__fixtures__/with-babelrc/index.js'),
-        [
-          evaluator,
-          {
-            features: {
-              useBabelConfigs: false,
-            },
-          },
-        ]
+        [evaluator]
       );
 
     expect(fn).rejects.toThrowError(`Cannot find module '_/re-exports'`);
   });
 
-  it('respects module-resolver plugin and show waring', async () => {
-    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
-
-    const { code, metadata } = await transformFile(
-      resolve(__dirname, './__fixtures__/with-babelrc/index.js'),
-      [evaluator]
-    );
-
-    expect(warn).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'This works for now but will be an error in the future'
-      )
-    );
-    warn.mockRestore();
-    expect(code).toMatchSnapshot();
-    expect(metadata).toMatchSnapshot();
-  });
-
-  it("respects module-resolver plugin and don't show waring", async () => {
+  it('respects explicit wyw config file custom resolver', async () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
     const { code, metadata } = await transformFile(
@@ -2947,17 +2915,41 @@ describe('strategy shaker', () => {
       [
         evaluator,
         {
-          babelOptions: {
-            plugins: [
-              [
-                'module-resolver',
-                {
-                  alias: {
-                    _: './src/__fixtures__',
-                  },
-                },
-              ],
-            ],
+          configFile: resolve(
+            __dirname,
+            './__fixtures__/with-babelrc/wyw-in-js.config.cjs'
+          ),
+        },
+      ]
+    );
+
+    expect(warn).toHaveBeenCalledTimes(0);
+    warn.mockRestore();
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
+  it('respects inline hybrid custom resolver without config file fallback', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const { code, metadata } = await transformFile(
+      resolve(__dirname, './__fixtures__/with-babelrc/index.js'),
+      [
+        evaluator,
+        {
+          eval: {
+            resolver: 'hybrid',
+            customResolver: async (specifier) => {
+              if (!specifier.startsWith('_/')) {
+                return null;
+              }
+
+              return {
+                id: require.resolve(
+                  resolve(__dirname, `./__fixtures__/${specifier.slice(2)}`)
+                ),
+              };
+            },
           },
         },
       ]
@@ -3260,14 +3252,16 @@ describe('strategy shaker', () => {
       expect(exports.foo2).toBe(undefined);
     });
 
-    it('promotes statically evaluatable modules to "*"', async () => {
-      const filename = require.resolve(join(dirName, './__fixtures__/foo'));
+    it('resolves fully serializable static modules without eval cache materialization', async () => {
+      const filename = require.resolve(
+        join(dirName, './__fixtures__/foo-static')
+      );
       const cache = new TransformCacheCollection();
 
       await transform(
         dedent`
           import { css } from "@linaria/core";
-          import { foo1 } from "./__fixtures__/foo";
+          import { foo1 } from "./__fixtures__/foo-static";
 
           export const text = css\`font-size: ${'${foo1}'}\`;
         `,
@@ -3276,10 +3270,7 @@ describe('strategy shaker', () => {
       );
 
       const cachedFoo = cache.get('entrypoints', filename);
-      expect(cachedFoo?.evaluatedOnly).toContain('*');
-
-      const exports = getCachedExports(cache, filename);
-      expect(exports.foo2).toBe('foo2');
+      expect(cachedFoo).toBeUndefined();
     });
 
     const createCacheFor = async (
@@ -3296,16 +3287,27 @@ describe('strategy shaker', () => {
         exportsProxy[key] = exports[key];
       });
 
-      cache.add('entrypoints', filename, {
+      const cachedEntrypoint: IEvaluatedEntrypoint = {
         dependencies: new Map(),
         evaluated: true,
         evaluatedOnly: only,
         generation: 1,
         exports: exportsProxy,
+        hasTransformResult: false,
+        hasWywMetadata: false,
         ignored: false,
+        invalidationDependencies: new Map(),
+        invalidateOnDependencyChange: new Set(),
         log: logger,
+        name: filename,
         only,
-      });
+        parents: [],
+        preevalResult: null,
+        seqId: -1,
+        transformResultCode: null,
+      };
+
+      cache.add('entrypoints', filename, cachedEntrypoint);
 
       return cache;
     };
@@ -3474,7 +3476,7 @@ describe('strategy shaker', () => {
             )
           )
         )
-      ).rejects.toThrowError(/reading 'toLowerCase'/);
+      ).rejects.toThrowError(/does not provide an export named/);
     });
   });
 });

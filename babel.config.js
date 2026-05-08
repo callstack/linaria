@@ -19,6 +19,8 @@ const commonJSTargets = {
   node: '12',
 };
 
+const transformImportMeta = require('./babel-plugins/transform-import-meta.cjs');
+
 module.exports = {
   presets: ['@babel/preset-typescript'],
   plugins: ['@babel/plugin-proposal-explicit-resource-management'],
@@ -47,6 +49,7 @@ module.exports = {
         ],
         '@babel/preset-typescript',
       ],
+      plugins: [transformImportMeta],
     },
   },
   overrides: [

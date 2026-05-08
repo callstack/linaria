@@ -1,14 +1,6 @@
 import { readFileSync } from 'fs';
 import { dirname, join, posix } from 'path';
 
-import type {
-  CallExpression,
-  Expression,
-  ObjectExpression,
-  SourceLocation,
-  StringLiteral,
-  Identifier,
-} from '@babel/types';
 import {
   buildSlug,
   TaggedTemplateProcessor,
@@ -16,8 +8,14 @@ import {
   toValidCSSIdentifier,
 } from '@wyw-in-js/processor-utils';
 import type {
+  CallExpression,
+  Expression,
+  Identifier,
+  ObjectExpression,
   Params,
   Rules,
+  SourceLocation,
+  StringLiteral,
   TailProcessorParams,
   ValueCache,
 } from '@wyw-in-js/processor-utils';
@@ -99,6 +97,13 @@ type StaticStyledValue = {
   displayName: string;
 };
 
+type RawStringLiteral = StringLiteral & {
+  extra: {
+    raw: string;
+    rawValue: string;
+  };
+};
+
 const staticClassSelector = (className: string): string => `.${className}`;
 
 const isStaticStyledValue = (value: unknown): value is StaticStyledValue => {
@@ -139,7 +144,7 @@ const staticSelectorsFromProcessorValue = (
   return [];
 };
 
-const singleQuotedStringLiteral = (value: string): StringLiteral => ({
+const singleQuotedStringLiteral = (value: string): RawStringLiteral => ({
   type: 'StringLiteral',
   value,
   extra: {

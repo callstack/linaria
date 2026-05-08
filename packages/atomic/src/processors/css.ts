@@ -1,5 +1,8 @@
-import type { SourceLocation } from '@babel/types';
-import type { Rules, ValueCache } from '@wyw-in-js/processor-utils';
+import type {
+  Rules,
+  SourceLocation,
+  ValueCache,
+} from '@wyw-in-js/processor-utils';
 import { logger } from '@wyw-in-js/shared';
 
 import CssProcessor from '@linaria/core/processors/css';

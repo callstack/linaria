@@ -141,10 +141,10 @@ it("doesn't rewrite an absolute path in url() declarations", async () => {
   expect(cssText).toMatchSnapshot();
 });
 
-it('respects passed babel options', async () => {
+it('parses JSX according to Oxc filename semantics', async () => {
   expect.assertions(2);
 
-  await expect(() =>
+  await expect(
     transform(
       {
         options: {
@@ -152,11 +152,6 @@ it('respects passed babel options', async () => {
           outputFilename,
           pluginOptions: {
             ...basePluginOptions,
-            babelOptions: {
-              babelrc: false,
-              configFile: false,
-              presets: [['@babel/preset-env', { loose: true }]],
-            },
           },
         },
       },
@@ -167,26 +162,16 @@ it('respects passed babel options', async () => {
         `,
       asyncResolveFallback
     )
-  ).rejects.toThrow(
-    /Support for the experimental syntax 'jsx' isn't currently enabled/
-  );
+  ).rejects.toThrow(/Unexpected (JSX expression|token)/);
 
-  await expect(() =>
+  await expect(
     transform(
       {
         options: {
-          filename: './test.js',
+          filename: './test.jsx',
           outputFilename,
           pluginOptions: {
             ...basePluginOptions,
-            babelOptions: {
-              babelrc: false,
-              configFile: false,
-              presets: [
-                ['@babel/preset-env', { loose: true }],
-                '@babel/preset-react',
-              ],
-            },
           },
         },
       },
@@ -200,45 +185,11 @@ it('respects passed babel options', async () => {
       `,
       asyncResolveFallback
     )
-  ).not.toThrow('Unexpected token');
-});
-
-it("doesn't throw due to duplicate preset", async () => {
-  expect.assertions(1);
-
-  expect(() =>
-    transform(
-      {
-        options: {
-          filename: './test.js',
-          outputFilename,
-          pluginOptions: {
-            ...basePluginOptions,
-            babelOptions: {
-              babelrc: false,
-              configFile: false,
-              presets: [require.resolve('@linaria/babel-preset')],
-              plugins: [
-                require.resolve('@babel/plugin-transform-modules-commonjs'),
-              ],
-            },
-          },
-        },
-      },
-      dedent`
-      import { styled } from '@linaria/react';
-
-      const Title = styled.h1\` color: blue; \`;
-
-      const Article = styled.article\`
-        ${'${Title}'} {
-          font-size: 16px;
-        }
-      \`;
-      `,
-      asyncResolveFallback
-    )
-  ).not.toThrow('Duplicate plugin/preset detected');
+  ).resolves.toEqual(
+    expect.objectContaining({
+      cssText: expect.stringContaining('background-image'),
+    })
+  );
 });
 
 it('should return transformed code even when file only contains unused linaria code', async () => {
