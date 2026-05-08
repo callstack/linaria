@@ -48,6 +48,97 @@ export interface IProps {
   vars?: Record<string, Expression[]>;
 }
 
+type StaticSerializableValue = {
+  kind: 'serializable';
+  value: unknown;
+};
+
+type StaticClassNameValue = {
+  className: string;
+  kind: 'class-name';
+  value?: unknown;
+};
+
+type StaticSelectorChainValue = {
+  className: string;
+  kind: 'selector-chain';
+  selectors: string[];
+  value: StaticStyledValue;
+};
+
+type StaticOpaqueComponentValue = {
+  className?: string;
+  kind: 'opaque-component';
+  value?: unknown;
+};
+
+type StaticRuntimeCallbackValue = {
+  kind: 'runtime-callback';
+  value?: unknown;
+};
+
+type StaticUnresolvedValue = {
+  details?: Readonly<Record<string, unknown>>;
+  kind: 'unresolved';
+  reason: string;
+};
+
+type StaticProcessorValue =
+  | StaticClassNameValue
+  | StaticOpaqueComponentValue
+  | StaticRuntimeCallbackValue
+  | StaticSelectorChainValue
+  | StaticSerializableValue
+  | StaticUnresolvedValue;
+
+type StaticStyledValue = {
+  __wyw_meta: {
+    className: string;
+    extends: StaticStyledValue | null;
+  };
+  displayName: string;
+};
+
+const staticClassSelector = (className: string): string => `.${className}`;
+
+const isStaticStyledValue = (value: unknown): value is StaticStyledValue => {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const meta = (value as { __wyw_meta?: unknown }).__wyw_meta;
+  return (
+    typeof meta === 'object' &&
+    meta !== null &&
+    typeof (meta as { className?: unknown }).className === 'string' &&
+    ('extends' in meta
+      ? (meta as { extends?: unknown }).extends === null ||
+        isStaticStyledValue((meta as { extends?: unknown }).extends)
+      : false)
+  );
+};
+
+const staticStyledValueFromProcessorValue = (
+  value: StaticProcessorValue
+): StaticStyledValue | null =>
+  value.kind === 'selector-chain' && isStaticStyledValue(value.value)
+    ? value.value
+    : null;
+
+const staticSelectorsFromProcessorValue = (
+  value: StaticProcessorValue
+): string[] => {
+  if (value.kind === 'selector-chain') {
+    return value.selectors;
+  }
+
+  if (value.kind === 'class-name') {
+    return [staticClassSelector(value.className)];
+  }
+
+  return [];
+};
+
 const singleQuotedStringLiteral = (value: string): StringLiteral => ({
   type: 'StringLiteral',
   value,
@@ -290,6 +381,54 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
     return rules;
   }
 
+  public getStaticValue(): StaticProcessorValue {
+    if (typeof this.component !== 'string' && !this.component.nonLinaria) {
+      return {
+        details: {
+          component: this.component.source,
+        },
+        kind: 'unresolved',
+        reason: 'styled-target-static-value-required',
+      };
+    }
+
+    return this.createStaticSelectorValue(null);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public resolveStaticInterpolation(
+    _interpolation: unknown,
+    value: StaticProcessorValue
+  ): StaticProcessorValue | null {
+    const selectors = staticSelectorsFromProcessorValue(value);
+    if (selectors.length === 0) {
+      return null;
+    }
+
+    return {
+      kind: 'serializable',
+      value: selectors.join(''),
+    };
+  }
+
+  public resolveStaticTagTarget(
+    target: StaticProcessorValue
+  ): StaticProcessorValue | null {
+    if (
+      target.kind === 'opaque-component' ||
+      target.kind === 'runtime-callback'
+    ) {
+      return this.createStaticSelectorValue(null);
+    }
+
+    const extendsValue = staticStyledValueFromProcessorValue(target);
+    if (!extendsValue && target.kind !== 'class-name') {
+      return null;
+    }
+
+    return this.createStaticSelectorValue(extendsValue);
+  }
+
   public override toString(): string {
     const res = (arg: string) => `${this.tagSourceCode()}(${arg})\`…\``;
 
@@ -302,6 +441,32 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
     }
 
     return res(this.component.source);
+  }
+
+  protected createStaticSelectorValue(
+    extendsValue: StaticStyledValue | null
+  ): StaticSelectorChainValue {
+    const ownSelector = staticClassSelector(this.className);
+    const selectors = [ownSelector];
+    let current = extendsValue;
+
+    while (current) {
+      selectors.push(staticClassSelector(current.__wyw_meta.className));
+      current = current.__wyw_meta.extends;
+    }
+
+    return {
+      className: this.className,
+      kind: 'selector-chain',
+      selectors,
+      value: {
+        displayName: this.displayName,
+        __wyw_meta: {
+          className: this.className,
+          extends: extendsValue,
+        },
+      },
+    };
   }
 
   protected getCustomVariableId(

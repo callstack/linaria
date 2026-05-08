@@ -2,6 +2,12 @@ import type { SourceLocation, StringLiteral } from '@babel/types';
 import type { Rules, ValueCache } from '@wyw-in-js/processor-utils';
 import { TaggedTemplateProcessor } from '@wyw-in-js/processor-utils';
 
+type StaticClassNameValue = {
+  className: string;
+  kind: 'class-name';
+  value: string;
+};
+
 export default class CssProcessor extends TaggedTemplateProcessor {
   public override get asSelector(): string {
     return this.className;
@@ -47,5 +53,13 @@ export default class CssProcessor extends TaggedTemplateProcessor {
     };
 
     return rules;
+  }
+
+  public getStaticValue(): StaticClassNameValue {
+    return {
+      className: this.className,
+      kind: 'class-name',
+      value: this.className,
+    };
   }
 }
