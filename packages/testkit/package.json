@@ -39,7 +39,7 @@
     "@babel/plugin-syntax-typescript": "^7.23.3",
     "@babel/plugin-transform-modules-commonjs": "^7.23.3",
     "@babel/preset-typescript": "^7.23.3",
-    "@babel/runtime": "^7.23.5",
+    "@babel/runtime": "^7.26.10",
     "@babel/types": "^7.23.5",
     "@linaria/atomic": "workspace:^",
     "@linaria/core": "workspace:^",
