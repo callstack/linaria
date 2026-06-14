@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.23.5",
-    "@wyw-in-js/webpack-loader": "2.0.0-alpha.1",
+    "@wyw-in-js/webpack-loader": "2.0.0",
     "babel-loader": "^9.1.0",
     "cross-env": "^7.0.3",
     "css-hot-loader": "^1.4.4",

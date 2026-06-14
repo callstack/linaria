@@ -148,7 +148,7 @@ const Container = styled.h1`
 
 We support this usage because it allows you to use a library such as [polished.js](https://polished.js.org) which outputs object based styles along with Linaria.
 
-If you've configured the plugin to evaluate expressions with `evaluate: true` (default), any dynamic expressions we encounter will be evaluated during the build-time in a sandbox, and the result will be included in the CSS. Since these expressions are evaluated at build time in Node, you cannot use any browser specific APIs or any API which is only available in runtime. Access to Node native modules such as `fs` is also not allowed inside the sandbox to prevent malicious scripts. In addition, to achieve consistent build output, you should also avoid doing any side effects in these expressions and keep them pure.
+By default, Linaria uses WyW's `eval.strategy: "hybrid"` mode. WyW first tries to resolve values statically from Linaria processor metadata, `staticBindings`, and statically resolvable imports. If a value cannot be proven statically, WyW falls back to build-time evaluation and includes the result in the generated CSS. Since fallback evaluation runs in Node.js, you cannot use browser-specific APIs, runtime-only globals, or Node native modules such as `fs`. To keep build output consistent, avoid side effects in evaluated expressions and keep them pure.
 
 You might want to skip evaluating a certain interpolation if you're using a browser API, a global variable which is only available at runtime, or a module which breaks when evaluating in the sandbox for some reason. To skip evaluating an interpolation, you can always wrap it in a function, like so:
 
@@ -162,13 +162,13 @@ But keep in mind that if you're doing SSR for your app, this won't work with SSR
 
 ### Evaluators
 
-Linaria can use different strategies for evaluating the interpolated values.
-Currently, we have two built-in strategies:
+Linaria relies on WyW strategies for resolving interpolated values:
 
-- `extractor` was the default strategy in `1.x` version. It takes an interpolated expression, finds all the referenced identifiers, gets all its declarations, repeats cycle for all identifiers in found declarations, and then constructs a new tree of statements from all found declarations. It's a pretty simple strategy, but it significantly changes an evaluated code and doesn't work for non-primitive js-constructions.
-- `shaker` was introduced as an option in `1.4` and became the default in `2.0` version. In contrast to `extractor`, `shaker` tries to find all irrelevant code and cuts it out of the file. As a result, interpolated values can be defined without any restrictions.
+- `hybrid` is the default in Linaria 8 / WyW 2. It resolves statically provable values without starting the evaluator, then falls back to evaluator execution for unresolved dynamic values.
+- `execute` uses evaluator-only behavior and is the compatibility escape hatch for projects that depend on build-time side effects or exact import execution order.
+- `static` is a strict validation mode that rejects fallback to evaluator execution.
 
-If an interpolated value or one of its dependencies is imported from another module, that module will be also processed with an evaluator (the implementation of evaluator will be chosen by matching `rules` from [the Linaria config](./CONFIGURATION.md#options)).
+If an interpolated value or one of its dependencies is imported from another module, WyW processes that module according to the configured strategy. In `hybrid` mode, the imported value may be resolved statically; otherwise WyW falls back to the evaluator selected by matching `rules` from [the Linaria config](./CONFIGURATION.md#options).
 
 Sometimes it can be useful to implement your own strategy (it can be just a mocked version of some heavy or browser-only library). You can do it by implementing `Evaluator` function:
 

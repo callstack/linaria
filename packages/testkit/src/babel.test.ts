@@ -51,6 +51,9 @@ type Options = [
   transformOptions?: TransformInvocationOptions,
 ];
 
+const normalizeCodeForSnapshot = (code: string) =>
+  code.replace(/\r\n/g, '\n').replace(/[\r\n]+$/, '');
+
 const asyncResolve = (what: string, importer: string, stack: string[]) => {
   const where = [importer, ...stack].map((p) => dirname(p));
   try {
@@ -142,7 +145,7 @@ async function transform(
 
   return {
     cssText: result.cssText,
-    code: result.code,
+    code: normalizeCodeForSnapshot(result.code),
     metadata: {
       wywInJS: {
         rules: result.rules,

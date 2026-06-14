@@ -1,5 +1,32 @@
 # Migration Guide
 
+# 8.x from 7.x
+
+## For Users
+
+Linaria 8 updates the WyW toolchain (`@wyw-in-js/*`) to `2.0.0` stable. This is a major release because WyW 2 changes the build-time evaluation pipeline and raises the minimum Node.js version.
+
+- Linaria 8 requires Node.js 22+ (aligned with WyW 2.x `engines`).
+- The default evaluation mode is WyW's `eval.strategy: "hybrid"`. It resolves statically provable values first using Linaria processor static semantics, `staticBindings`, and statically resolvable imports, then falls back to the evaluator for values that cannot be proven statically.
+- Top-level `evaluate` config should be migrated to `eval.strategy`. Use `execute` for evaluator-only compatibility, keep the default `hybrid` for static-first resolution with evaluator fallback, or use `static` to reject evaluator fallback.
+- If your project relies on build-time side effects or on the exact order in which evaluated imports execute, compare the generated CSS/JS output after upgrading and use `eval.strategy: "execute"` where evaluator-only behavior is required.
+- CSS rule emission order can change for cascade ties with identical specificity. WyW 2 uses the Oxc/static-first pipeline and can preserve or process imports differently, so make precedence explicit through selector specificity, composition, or source structure where order matters.
+- Review https://wyw-in-js.dev/migration/v2 and https://wyw-in-js.dev/stability for the WyW 2 evaluation model, debugging notes, and performance guidance.
+
+Example evaluator-only compatibility config:
+
+```js
+module.exports = {
+  eval: {
+    strategy: 'execute',
+  },
+};
+```
+
+## For Custom Processor Developers
+
+Linaria processors now expose WyW 2 static evaluation semantics. Custom processors that integrate with WyW's static-first path should implement the optional static processor contract in `@wyw-in-js/processor-utils`; unresolved values can still fall back to the evaluator in `hybrid` mode.
+
 # 7.x from 6.x
 
 ## For Users
