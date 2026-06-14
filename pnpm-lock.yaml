@@ -492,8 +492,8 @@ importers:
         specifier: 2.0.0
         version: 2.0.0
       '@wyw-in-js/transform':
-        specifier: 2.0.1
-        version: 2.0.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(typescript@5.2.2)
+        specifier: 2.0.2
+        version: 2.0.2(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(typescript@5.2.2)
     devDependencies:
       '@types/node':
         specifier: ^17.0.39
@@ -535,8 +535,8 @@ importers:
         specifier: 2.0.0
         version: 2.0.0
       '@wyw-in-js/transform':
-        specifier: 2.0.1
-        version: 2.0.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(typescript@5.2.2)
+        specifier: 2.0.2
+        version: 2.0.2(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(typescript@5.2.2)
       debug:
         specifier: ^4.3.4
         version: 4.3.4
@@ -1883,6 +1883,9 @@ packages:
     resolution: {integrity: sha512-tPKQNMPuXgvdOn2/Lg9HNfUvjYVGolt04Hp03f5hAk878uwOLikN+JzeLY0HcVgKgFl9Hs3EIqpu3WX27XNhnw==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
 
+  '@jridgewell/gen-mapping@0.3.13':
+    resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
+
   '@jridgewell/gen-mapping@0.3.3':
     resolution: {integrity: sha512-HLhSWOLRi875zjjMG/r+Nv0oCW8umGb0BgEhyX3dDX3egwZtB8PqLnjz3yedt8R5StBrzcg4aBpnh8UA9D1BoQ==}
     engines: {node: '>=6.0.0'}
@@ -1896,6 +1899,10 @@ packages:
 
   '@jridgewell/resolve-uri@3.1.1':
     resolution: {integrity: sha512-dSYZh7HhCDtCKm4QakX0xFpsRDqjjtZf/kjI/v3T3Nwt5r8/qz/M19F9ySyOqU94SXBmeG9ttTul+YnR4LOxFA==}
+    engines: {node: '>=6.0.0'}
+
+  '@jridgewell/resolve-uri@3.1.2':
+    resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
     engines: {node: '>=6.0.0'}
 
   '@jridgewell/set-array@1.1.2':
@@ -1915,11 +1922,17 @@ packages:
   '@jridgewell/sourcemap-codec@1.4.15':
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
 
+  '@jridgewell/sourcemap-codec@1.5.5':
+    resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
+
   '@jridgewell/trace-mapping@0.3.20':
     resolution: {integrity: sha512-R8LcPeWZol2zR8mmH3JeKQ6QRCFb7XgUhV9ZlGhHLGyg4wpPiPZNQOOWhFZhxKw8u//yTbNGI42Bx/3paXEQ+Q==}
 
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
+
+  '@jridgewell/trace-mapping@0.3.31':
+    resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
   '@leichtgewicht/ip-codec@2.0.4':
     resolution: {integrity: sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==}
@@ -1935,12 +1948,6 @@ packages:
 
   '@marionebl/sander@0.6.1':
     resolution: {integrity: sha512-7f3zZddAk92G1opoX/glbDO6YbrzmMAJAw0RJAcvunnV7sR4L9llyBUAABptKoF1Jf37UQ1QTJy5p2H4J4rBNA==}
-
-  '@napi-rs/wasm-runtime@1.1.4':
-    resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
-    peerDependencies:
-      '@emnapi/core': ^1.7.1
-      '@emnapi/runtime': ^1.7.1
 
   '@napi-rs/wasm-runtime@1.1.5':
     resolution: {integrity: sha512-AWPoBRJ9tsnVhor4sjO7rkni+7p+2IAEFj6cx06UgP10jkQHqay/36uRV/bFkgrh18D9vb4cr8Q0Pthskgzy+Q==}
@@ -2586,9 +2593,6 @@ packages:
     resolution: {integrity: sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==}
     engines: {node: '>= 6'}
 
-  '@tybys/wasm-util@0.10.1':
-    resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
-
   '@tybys/wasm-util@0.10.2':
     resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
 
@@ -3045,8 +3049,8 @@ packages:
     resolution: {integrity: sha512-SGO2e3DnKfqh/82qtoaP/Vhm0/zvtV7XKsvrjZHmJK7NOIZdNx4y7hCXWi3KTWT7BlbOTRbtjcyoQuVthdDkCw==}
     engines: {node: '>=22.0.0'}
 
-  '@wyw-in-js/transform@2.0.1':
-    resolution: {integrity: sha512-sZm7ZdrIQlQicS99c14DvUclbvJ2JfdLgtbdzPcb19V7299uZmEflsp4lyPp4ZKzspAIccR16obwqfbmht7hmQ==}
+  '@wyw-in-js/transform@2.0.2':
+    resolution: {integrity: sha512-OGC5ymd+N7k/eXwxX3nYbPo7v7CJ0+NAv48dcr7xoD4EUhYELDzdFPIoQQNSFmCdzJ720ch1eeBMmR/47HlHLw==}
     engines: {node: '>=22.0.0'}
 
   '@wyw-in-js/vite@2.0.0':
@@ -3464,6 +3468,9 @@ packages:
 
   brace-expansion@1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
+
+  brace-expansion@1.1.15:
+    resolution: {integrity: sha512-EwOCDEex4quD37XhqM3omwtMoJjr//isUZz1JopUNWms+4Z2ViyM/k1YIRePpoVNnQhENnxtFjLaxNHrT7xIUg==}
 
   brace-expansion@2.0.1:
     resolution: {integrity: sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==}
@@ -6560,6 +6567,9 @@ packages:
 
   minimatch@3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
+
+  minimatch@3.1.5:
+    resolution: {integrity: sha512-VgjWUsnnT6n+NUk6eZq77zeFdpW2LWDzP6zFGrCbHXiYNul5Dzqk2HHQ5uFH2DNW5Xbp8+jVzaeNt94ssEEl4w==}
 
   minimatch@5.1.6:
     resolution: {integrity: sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==}
@@ -10593,6 +10603,11 @@ snapshots:
       '@types/yargs': 17.0.24
       chalk: 4.1.2
 
+  '@jridgewell/gen-mapping@0.3.13':
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/trace-mapping': 0.3.31
+
   '@jridgewell/gen-mapping@0.3.3':
     dependencies:
       '@jridgewell/set-array': 1.1.2
@@ -10607,10 +10622,12 @@ snapshots:
 
   '@jridgewell/remapping@2.3.5':
     dependencies:
-      '@jridgewell/gen-mapping': 0.3.8
-      '@jridgewell/trace-mapping': 0.3.25
+      '@jridgewell/gen-mapping': 0.3.13
+      '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/resolve-uri@3.1.1': {}
+
+  '@jridgewell/resolve-uri@3.1.2': {}
 
   '@jridgewell/set-array@1.1.2': {}
 
@@ -10628,6 +10645,8 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.4.15': {}
 
+  '@jridgewell/sourcemap-codec@1.5.5': {}
+
   '@jridgewell/trace-mapping@0.3.20':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.1
@@ -10637,6 +10656,11 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
+
+  '@jridgewell/trace-mapping@0.3.31':
+    dependencies:
+      '@jridgewell/resolve-uri': 3.1.2
+      '@jridgewell/sourcemap-codec': 1.5.5
 
   '@leichtgewicht/ip-codec@2.0.4': {}
 
@@ -10663,13 +10687,6 @@ snapshots:
       graceful-fs: 4.2.11
       mkdirp: 0.5.6
       rimraf: 2.7.1
-
-  '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
-    dependencies:
-      '@emnapi/core': 1.10.0
-      '@emnapi/runtime': 1.10.0
-      '@tybys/wasm-util': 0.10.1
-    optional: true
 
   '@napi-rs/wasm-runtime@1.1.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
@@ -10880,7 +10897,7 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.10.0
       '@emnapi/runtime': 1.10.0
-      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@napi-rs/wasm-runtime': 1.1.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     optional: true
 
   '@oxc-transform/binding-win32-arm64-msvc@0.131.0':
@@ -11131,11 +11148,6 @@ snapshots:
       '@swc/core-win32-x64-msvc': 1.3.20
 
   '@tootallnate/once@1.1.2': {}
-
-  '@tybys/wasm-util@0.10.1':
-    dependencies:
-      tslib: 2.6.2
-    optional: true
 
   '@tybys/wasm-util@0.10.2':
     dependencies:
@@ -11743,7 +11755,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@wyw-in-js/transform@2.0.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(typescript@5.2.2)':
+  '@wyw-in-js/transform@2.0.2(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(typescript@5.2.2)':
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@wyw-in-js/processor-utils': 2.0.0
@@ -11793,7 +11805,7 @@ snapshots:
     dependencies:
       '@wyw-in-js/shared': 2.0.0
       '@wyw-in-js/transform': 2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
-      webpack: 5.98.0(@swc/core@1.3.20)(esbuild@0.18.20)(webpack-cli@5.0.0)
+      webpack: 5.98.0(@swc/core@1.3.20)(esbuild@0.18.20)(webpack-cli@4.9.2)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -12350,6 +12362,11 @@ snapshots:
       balanced-match: 1.0.2
       concat-map: 0.0.1
 
+  brace-expansion@1.1.15:
+    dependencies:
+      balanced-match: 1.0.2
+      concat-map: 0.0.1
+
   brace-expansion@2.0.1:
     dependencies:
       balanced-match: 1.0.2
@@ -12849,7 +12866,7 @@ snapshots:
       postcss-modules-values: 4.0.0(postcss@8.4.31)
       postcss-value-parser: 4.2.0
       semver: 7.5.4
-      webpack: 5.98.0(@swc/core@1.3.20)(esbuild@0.18.20)(webpack-cli@5.0.0)
+      webpack: 5.98.0(@swc/core@1.3.20)(esbuild@0.18.20)(webpack-cli@4.9.2)
 
   css-select@4.3.0:
     dependencies:
@@ -14062,7 +14079,7 @@ snapshots:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 3.1.2
+      minimatch: 3.1.5
       once: 1.4.0
       path-is-absolute: 1.0.1
 
@@ -15997,7 +16014,7 @@ snapshots:
   mini-css-extract-plugin@2.7.0(webpack@5.98.0):
     dependencies:
       schema-utils: 4.0.0
-      webpack: 5.98.0(@swc/core@1.3.20)(esbuild@0.18.20)(webpack-cli@5.0.0)
+      webpack: 5.98.0(@swc/core@1.3.20)(esbuild@0.18.20)(webpack-cli@4.9.2)
 
   mini-svg-data-uri@1.4.4: {}
 
@@ -16006,6 +16023,10 @@ snapshots:
   minimatch@3.1.2:
     dependencies:
       brace-expansion: 1.1.11
+
+  minimatch@3.1.5:
+    dependencies:
+      brace-expansion: 1.1.15
 
   minimatch@5.1.6:
     dependencies:
@@ -17870,7 +17891,7 @@ snapshots:
       schema-utils: 4.3.0
       serialize-javascript: 6.0.2
       terser: 5.39.0
-      webpack: 5.98.0(@swc/core@1.3.20)(esbuild@0.18.20)(webpack-cli@5.0.0)
+      webpack: 5.98.0(@swc/core@1.3.20)(esbuild@0.18.20)(webpack-cli@4.9.2)
     optionalDependencies:
       '@swc/core': 1.3.20
       esbuild: 0.18.20
