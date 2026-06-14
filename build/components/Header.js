@@ -29,21 +29,21 @@ function Header() {
 const _exp = () => _Container.default;
 const NavBar = /*#__PURE__*/(0, _react.styled)(_exp())({
   name: "NavBar",
-  class: "n11jhqd8",
+  class: "nyobs4n",
   propsAsIs: true
 });
 const LogoImage = /*#__PURE__*/(0, _react.styled)('img')({
   name: "LogoImage",
-  class: "l2h01z2",
+  class: "l1epk533",
   propsAsIs: false
 });
 const Links = /*#__PURE__*/(0, _react.styled)('ul')({
   name: "Links",
-  class: "lkd2pf6",
+  class: "l1pcbkb7",
   propsAsIs: false
 });
 const LinkItem = /*#__PURE__*/(0, _react.styled)('a')({
   name: "LinkItem",
-  class: "l6fgol",
+  class: "l1pdmbl",
   propsAsIs: false
 });

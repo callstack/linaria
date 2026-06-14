@@ -20,41 +20,41 @@ function Hero() {
 }
 const HeroContainer = /*#__PURE__*/(0, _react.styled)('main')({
   name: "HeroContainer",
-  class: "h1tylktb",
+  class: "hxwxvp7",
   propsAsIs: false
 });
 const Row = /*#__PURE__*/(0, _react.styled)('div')({
   name: "Row",
-  class: "r1f6r3fj",
+  class: "rb67u9s",
   propsAsIs: false
 });
 const LeftColumn = /*#__PURE__*/(0, _react.styled)('div')({
   name: "LeftColumn",
-  class: "la3rybj",
+  class: "l1qaax7y",
   propsAsIs: false
 });
 const RightColumn = /*#__PURE__*/(0, _react.styled)('div')({
   name: "RightColumn",
-  class: "rw75u8k",
+  class: "rg5wq9k",
   propsAsIs: false
 });
 const Heading = /*#__PURE__*/(0, _react.styled)('h1')({
   name: "Heading",
-  class: "h8pe7ne",
+  class: "h1aabxkw",
   propsAsIs: false
 });
 const Description = /*#__PURE__*/(0, _react.styled)('p')({
   name: "Description",
-  class: "dimtlf9",
+  class: "d125axcd",
   propsAsIs: false
 });
 const Button = /*#__PURE__*/(0, _react.styled)('button')({
   name: "Button",
-  class: "b1gqb1d3",
+  class: "btjyyyo",
   propsAsIs: false
 });
 const CodeSample = /*#__PURE__*/(0, _react.styled)('img')({
   name: "CodeSample",
-  class: "cyne737",
+  class: "csfzl5o",
   propsAsIs: false
 });

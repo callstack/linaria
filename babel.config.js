@@ -4,7 +4,7 @@ module.exports = {
     server: {
       presets: [
         require.resolve('@wyw-in-js/babel-preset'),
-        ['@babel/preset-env', { targets: { node: 12 } }],
+        ['@babel/preset-env', { targets: { node: 22 } }],
       ],
       plugins: [
         [

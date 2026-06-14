@@ -4,7 +4,7 @@ import { media } from '../styles/utils';
 import Container from './Container';
 
 import codeSample from '../../assets/code-sample-v4.png';
-import linariaLogomark from '../../assets/linaria-logomark.svg';
+import linariaLogomark from '../../assets/linaria-logomark.svg?url';
 
 export default function Hero() {
   return (
