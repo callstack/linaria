@@ -1,1 +1,1 @@
-var Padding = (exports.Padding = 4);
+export const Padding = 4;

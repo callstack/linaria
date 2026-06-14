@@ -3,7 +3,7 @@ export const breakpoints = {
   large: 1024,
 };
 
-export const media = Object.keys(breakpoints).reduce((acc, item) => {
-  acc[item] = `@media screen and (min-width: ${breakpoints[item]}px)`;
-  return acc;
-}, {});
+export const media = {
+  medium: `@media screen and (min-width: ${breakpoints.medium}px)`,
+  large: `@media screen and (min-width: ${breakpoints.large}px)`,
+};

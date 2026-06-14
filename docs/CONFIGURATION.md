@@ -11,16 +11,22 @@ Example `wyw-in-js.config.js`:
 
 ```js
 module.exports = {
-  evaluate: true,
+  eval: {
+    strategy: 'hybrid',
+  },
   displayName: false,
 };
 ```
 
 ## Options
 
-- `evaluate: boolean` (default: `true`):
+- `eval.strategy: "hybrid" | "execute" | "static"` (default: `"hybrid"`):
 
-  Enabling this will evaluate dynamic expressions in the CSS. You need to enable this if you want to use imported variables in the CSS or interpolate other components. Enabling this also ensures that your styled components wrapping other styled components will have the correct specificity and override styles properly.
+  Controls how WyW resolves values used in CSS interpolations. The recommended default, `"hybrid"`, uses static-first resolution: WyW first tries to prove values from Linaria processor static semantics, `staticBindings`, and statically resolvable imports, then falls back to the evaluator for values that cannot be proven statically.
+
+  Use `"execute"` when you need evaluator-only compatibility, for example while migrating code that relies on build-time side effects or exact import execution order. Use `"static"` as a strict validation mode when fallback to the evaluator should be rejected. The older top-level `evaluate` option should be migrated to `eval.strategy` in Linaria 8 / WyW 2.
+
+  Evaluated values are included in the generated CSS. Since fallback evaluation runs at build time in Node.js, avoid browser-only APIs, unavailable runtime globals, Node native modules such as `fs`, and side effects in evaluated expressions.
 
 - `displayName: boolean` (default: `false`):
 
@@ -445,7 +451,9 @@ module.exports = {
     [
       '@linaria',
       {
-        evaluate: true,
+        eval: {
+          strategy: 'hybrid',
+        },
         displayName: process.env.NODE_ENV !== 'production',
       },
     ],

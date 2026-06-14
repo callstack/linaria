@@ -1,5 +1,8 @@
-import type { SourceLocation } from '@babel/types';
-import type { Rules, ValueCache } from '@wyw-in-js/processor-utils';
+import type {
+  Rules,
+  SourceLocation,
+  ValueCache,
+} from '@wyw-in-js/processor-utils';
 import { logger, hasEvalMeta } from '@wyw-in-js/shared';
 
 import type { IProps } from '@linaria/react/processors/styled';

@@ -18,10 +18,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        node-version: [20.x, 22.x]
+        node-version: [22.x, 24.x]
         include:
           - os: windows-latest
-            node-version: 20.x
+            node-version: 22.x
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -51,10 +51,10 @@ jobs:
       - name: Install and prepare
         run: pnpm install --frozen-lockfile --strict-peer-dependencies
       - name: ESLint
-        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '20.x'
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '22.x'
         run: pnpm lint
       - name: TSLint
-        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '20.x'
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '22.x'
         run: pnpm turbo run test:dts
       - name: Tests
         run: pnpm turbo run test
