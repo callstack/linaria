@@ -65,7 +65,7 @@ See [Configuration](https://wyw-in-js.dev/configuration) to customize how Linari
 
 Linaria relies on WyW (`@wyw-in-js/*`) to evaluate your modules at build time and extract CSS. If you hit issues like slow builds, invalidation storms, or unexpected code being executed during the build, it’s usually related to the WyW evaluation model and how your modules are structured.
 
-Linaria 8 requires Node.js `>=22` (WyW 2.x enforces this via `engines`). WyW 2 defaults to `eval.strategy: "hybrid"`, so statically provable values are resolved before falling back to the evaluator for dynamic values.
+Linaria 8 requires Node.js `>=22.12.0` (aligned with the WyW 2 / Oxc dependency graph). WyW 2 defaults to `eval.strategy: "hybrid"`, so statically provable values are resolved before falling back to the evaluator for dynamic values.
 
 If your build depends on evaluator-only side effects or exact CSS rule order ties, review the Linaria 8 migration notes in [docs/MIGRATION_GUIDE.md](./docs/MIGRATION_GUIDE.md).
 

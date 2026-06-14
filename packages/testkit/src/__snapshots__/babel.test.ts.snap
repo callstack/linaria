@@ -2363,8 +2363,8 @@ Dependencies: NA
 exports[`strategy shaker should process \`css\` calls referencing other \`css\` calls inside components 1`] = `
 "import React from 'react';
 export function Component() {
-  const outer = "outer_o1vhermz";
-  const inner = "inner_i1egpet8";
+  const outer = "outer_o13jq05";
+  const inner = "inner_i1vhermz";
   return React.createElement("div", {
     className: outer
   },
@@ -2382,15 +2382,12 @@ exports[`strategy shaker should process \`css\` calls referencing other \`css\` 
 
 CSS:
 
-._outer__13jq05 {
+.outer_o13jq05 {
     color: red;
   }
-.outer_o1vhermz {
-    color: red;
-  }
-.inner_i1egpet8 {
+.inner_i1vhermz {
     color: green;
-    .outer_o1vhermz:hover & {
+    .outer_o13jq05:hover & {
       color: blue;
     }
   }

@@ -31,13 +31,13 @@
   },
   "dependencies": {
     "@wyw-in-js/shared": "2.0.0",
-    "@wyw-in-js/transform": "2.0.0"
+    "@wyw-in-js/transform": "2.0.1"
   },
   "devDependencies": {
     "@types/node": "^17.0.39"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "publishConfig": {
     "access": "public"

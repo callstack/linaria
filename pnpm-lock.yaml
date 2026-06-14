@@ -143,7 +143,7 @@ importers:
     devDependencies:
       '@astrojs/solid-js':
         specifier: ^1.2.3
-        version: 1.2.3(@babel/core@7.23.5)(solid-js@1.6.2)(vite@3.2.7(@types/node@25.0.10)(terser@5.39.0))
+        version: 1.2.3(@babel/core@7.23.5)(solid-js@1.6.2)(vite@3.2.7(@types/node@25.9.3)(terser@5.39.0))
       '@babel/core':
         specifier: ^7.23.5
         version: 7.23.5
@@ -152,19 +152,19 @@ importers:
         version: link:../../packages/core
       '@wyw-in-js/vite':
         specifier: 2.0.0
-        version: 2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(vite@3.2.7(@types/node@25.0.10)(terser@5.39.0))
+        version: 2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(vite@3.2.7(@types/node@25.9.3)(terser@5.39.0))
       astro:
         specifier: ^1.6.10
-        version: 1.6.10(@types/node@25.0.10)(terser@5.39.0)
+        version: 1.6.10(@types/node@25.9.3)(terser@5.39.0)
       solid-js:
         specifier: ^1.6.2
         version: 1.6.2
       vite:
         specifier: ^3
-        version: 3.2.7(@types/node@25.0.10)(terser@5.39.0)
+        version: 3.2.7(@types/node@25.9.3)(terser@5.39.0)
       vite-plugin-inspect:
         specifier: ^0.7.33
-        version: 0.7.33(rollup@3.29.5)(vite@3.2.7(@types/node@25.0.10)(terser@5.39.0))
+        version: 0.7.33(rollup@3.29.5)(vite@3.2.7(@types/node@25.9.3)(terser@5.39.0))
 
   examples/esbuild:
     dependencies:
@@ -224,13 +224,13 @@ importers:
         version: 15.2.1(rollup@3.29.5)
       '@vitejs/plugin-react':
         specifier: ^2.1.0
-        version: 2.1.0(vite@3.2.10(@types/node@25.0.10)(terser@5.39.0))
+        version: 2.1.0(vite@3.2.10(@types/node@25.9.3)(terser@5.39.0))
       '@wyw-in-js/vite':
         specifier: 2.0.0
-        version: 2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(vite@3.2.10(@types/node@25.0.10)(terser@5.39.0))
+        version: 2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(vite@3.2.10(@types/node@25.9.3)(terser@5.39.0))
       vite:
         specifier: ^3.2.10
-        version: 3.2.10(@types/node@25.0.10)(terser@5.39.0)
+        version: 3.2.10(@types/node@25.9.3)(terser@5.39.0)
 
   examples/vpssr-linaria-solid:
     dependencies:
@@ -239,7 +239,7 @@ importers:
         version: link:../../packages/core
       '@wyw-in-js/vite':
         specifier: 2.0.0
-        version: 2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(vite@3.2.10(@types/node@25.0.10)(terser@5.39.0))
+        version: 2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(vite@3.2.10(@types/node@25.9.3)(terser@5.39.0))
       babel-preset-solid:
         specifier: ^1.6.2
         version: 1.6.3(@babel/core@7.23.5)
@@ -257,13 +257,13 @@ importers:
         version: 1.6.2
       vite:
         specifier: ^3.2.10
-        version: 3.2.10(@types/node@25.0.10)(terser@5.39.0)
+        version: 3.2.10(@types/node@25.9.3)(terser@5.39.0)
       vite-plugin-solid:
         specifier: ^2.4.0
-        version: 2.4.0(solid-js@1.6.2)(vite@3.2.10(@types/node@25.0.10)(terser@5.39.0))
+        version: 2.4.0(solid-js@1.6.2)(vite@3.2.10(@types/node@25.9.3)(terser@5.39.0))
       vite-plugin-ssr:
         specifier: ^0.4.54
-        version: 0.4.54(vite@3.2.10(@types/node@25.0.10)(terser@5.39.0))
+        version: 0.4.54(vite@3.2.10(@types/node@25.9.3)(terser@5.39.0))
 
   examples/vpssr-linaria-solid/dist/server: {}
 
@@ -492,8 +492,8 @@ importers:
         specifier: 2.0.0
         version: 2.0.0
       '@wyw-in-js/transform':
-        specifier: 2.0.0
-        version: 2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+        specifier: 2.0.1
+        version: 2.0.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(typescript@5.2.2)
     devDependencies:
       '@types/node':
         specifier: ^17.0.39
@@ -535,8 +535,8 @@ importers:
         specifier: 2.0.0
         version: 2.0.0
       '@wyw-in-js/transform':
-        specifier: 2.0.0
-        version: 2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+        specifier: 2.0.1
+        version: 2.0.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(typescript@5.2.2)
       debug:
         specifier: ^4.3.4
         version: 4.3.4
@@ -1942,6 +1942,12 @@ packages:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
 
+  '@napi-rs/wasm-runtime@1.1.5':
+    resolution: {integrity: sha512-AWPoBRJ9tsnVhor4sjO7rkni+7p+2IAEFj6cx06UgP10jkQHqay/36uRV/bFkgrh18D9vb4cr8Q0Pthskgzy+Q==}
+    peerDependencies:
+      '@emnapi/core': ^1.7.1
+      '@emnapi/runtime': ^1.7.1
+
   '@nicolo-ribaudo/chokidar-2@2.1.8-no-fsevents.3':
     resolution: {integrity: sha512-s88O1aVtXftvp5bCPB7WnmXc5IwOZZ7YPuwNPt+GtOOXpPvad1LfbmjYv+qII7zP6RU2QGnqve27dnLycEnyEQ==}
 
@@ -2583,6 +2589,9 @@ packages:
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
 
+  '@tybys/wasm-util@0.10.2':
+    resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
+
   '@types/acorn@4.0.6':
     resolution: {integrity: sha512-veQTnWP+1D/xbxVrPC3zHnCZRjSrKfhbMUlEA43iMZLu7EsnTtkJklIuwrCPbOi8YkvDQAiW05VQQFvvz9oieQ==}
 
@@ -2708,6 +2717,9 @@ packages:
 
   '@types/node@25.0.10':
     resolution: {integrity: sha512-zWW5KPngR/yvakJgGOmZ5vTBemDoSqF3AcV/LrO5u5wTWyEAVVh+IT39G4gtyAkh3CtTZs8aX/yRM82OfzHJRg==}
+
+  '@types/node@25.9.3':
+    resolution: {integrity: sha512-603BddQMv3pUcr4U2dhujk83N2tTDVr/34wII2B6bJy6g+8WD6yUb11jszNs0gdi4PesVWl7ABt8nYMVpnLUcg==}
 
   '@types/normalize-package-data@2.4.1':
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
@@ -3031,6 +3043,10 @@ packages:
 
   '@wyw-in-js/transform@2.0.0':
     resolution: {integrity: sha512-SGO2e3DnKfqh/82qtoaP/Vhm0/zvtV7XKsvrjZHmJK7NOIZdNx4y7hCXWi3KTWT7BlbOTRbtjcyoQuVthdDkCw==}
+    engines: {node: '>=22.0.0'}
+
+  '@wyw-in-js/transform@2.0.1':
+    resolution: {integrity: sha512-sZm7ZdrIQlQicS99c14DvUclbvJ2JfdLgtbdzPcb19V7299uZmEflsp4lyPp4ZKzspAIccR16obwqfbmht7hmQ==}
     engines: {node: '>=22.0.0'}
 
   '@wyw-in-js/vite@2.0.0':
@@ -3452,6 +3468,9 @@ packages:
   brace-expansion@2.0.1:
     resolution: {integrity: sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==}
 
+  brace-expansion@2.1.1:
+    resolution: {integrity: sha512-WR1cURNjuvBLMZBMbqM0UoE+WAfdUcEV1ccD8PVBVOI+Z3ND4+SZbN8RsfT2bMuG1qwz5RFvPukSZm5fF2D5eA==}
+
   braces@3.0.2:
     resolution: {integrity: sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==}
     engines: {node: '>=8'}
@@ -3478,6 +3497,10 @@ packages:
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
+
+  buffer-image-size@0.6.4:
+    resolution: {integrity: sha512-nEh+kZOPY1w+gcCMobZ6ETUp9WfibndnosbpwB1iJk/8Gt5ZF2bhS6+B6bPYz424KtwsR6Rflc3tCz1/ghX2dQ==}
+    engines: {node: '>=4.0'}
 
   buffer@5.7.1:
     resolution: {integrity: sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==}
@@ -3891,6 +3914,15 @@ packages:
     resolution: {integrity: sha512-3rTMnFJA1tCOPwRxtgF4wd7Ab2qvDbL8jX+3smjIbS4HlZBagTlpERbdN7iAbWlrfxE3M8c27kTwTawQ7st+OQ==}
     engines: {node: '>=14'}
 
+  cosmiconfig@8.3.6:
+    resolution: {integrity: sha512-kcZ6+W5QzcJ3P1Mt+83OUv/oHFqZHIx8DuxG6eZ5RGMERoLqp4BuGjhHLYGK+Kf5XVkQvqBSmAy/nGWN3qDgEA==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      typescript: '>=4.9.5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   create-error-class@3.0.2:
     resolution: {integrity: sha512-gYTKKexFO3kh200H1Nit76sRwRtOY32vQd3jpAQKpLtZqyNsSQNfI4N7o3eP2wUjV35pTWKRYqFUDBvUha/Pkw==}
     engines: {node: '>=0.10.0'}
@@ -4242,6 +4274,10 @@ packages:
 
   entities@4.5.0:
     resolution: {integrity: sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==}
+    engines: {node: '>=0.12'}
+
+  entities@7.0.1:
+    resolution: {integrity: sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==}
     engines: {node: '>=0.12'}
 
   envinfo@7.8.1:
@@ -5137,6 +5173,10 @@ packages:
   handle-thing@2.0.1:
     resolution: {integrity: sha512-9Qn4yBxelxoh2Ow62nP+Ka/kMnOXRi8BXnRaUwezLNhqelnN49xKz4F/dPP8OYLxLxq6JDtZb2i9XznUQbNPTg==}
 
+  happy-dom@20.10.3:
+    resolution: {integrity: sha512-Hjdiy8RziuCcn5z04QI/rlsNuQoG8P0xxjgvsSMpi89cvIXIOcucQtiHS1yHSShxoBcSCeYqAskINmTiy/mlfw==}
+    engines: {node: '>=20.0.0'}
+
   happy-dom@20.3.7:
     resolution: {integrity: sha512-sb5IzoRl1WJKsUSRe+IloJf3z1iDq5PQ7Yk/ULMsZ5IAQEs9ZL7RsFfiKBXU7nK9QmO+iz0e59EH8r8jexTZ/g==}
     engines: {node: '>=20.0.0'}
@@ -5383,6 +5423,10 @@ packages:
 
   import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
+    engines: {node: '>=6'}
+
+  import-fresh@3.3.1:
+    resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
     engines: {node: '>=6'}
 
   import-lazy@2.1.0:
@@ -5944,6 +5988,10 @@ packages:
 
   js-yaml@4.1.0:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
+    hasBin: true
+
+  js-yaml@4.2.0:
+    resolution: {integrity: sha512-ePWsvanv0DWuDRsW8dnt+R4jQ31SCRCQ7hhNcPXZPsoBZiemuZNYGf7adZdqX2D86j6rvKp3RpCxVTSb8WQlOw==}
     hasBin: true
 
   jsbn@0.1.1:
@@ -6523,6 +6571,10 @@ packages:
 
   minimatch@9.0.5:
     resolution: {integrity: sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==}
+    engines: {node: '>=16 || 14 >=14.17'}
+
+  minimatch@9.0.9:
+    resolution: {integrity: sha512-OBwBN9AL4dqmETlpS2zasx+vTeWclWzkblfZk7KTA5j3jeOONz/tRCnZomUyvNg83wL5Zv9Ss6HMJXAgL8R2Yg==}
     engines: {node: '>=16 || 14 >=14.17'}
 
   minimist-options@3.0.2:
@@ -7780,6 +7832,10 @@ packages:
     resolution: {integrity: sha512-l3BikUxvPOcn5E74dZiq5BGsTb5yEwhaTSzccU6t4sDOH8NWJCstKO5QT2CvtFoK6F0saL7p9xHAqHOlCPJygA==}
     engines: {node: '>= 8'}
 
+  source-map@0.7.6:
+    resolution: {integrity: sha512-i5uvt8C3ikiWeNZSVZNWcfZPItFQOsYTUAOkcUPGd8DqDy1uOUikjt5dG+uRlwyvR108Fb9DOd4GvXfT0N2/uQ==}
+    engines: {node: '>= 12'}
+
   source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
@@ -7992,6 +8048,9 @@ packages:
 
   stylis@4.3.0:
     resolution: {integrity: sha512-E87pIogpwUsUwXw7dNyU4QDjdgVMy52m+XEOPEKUn161cCzWjjhPSQhByfd1CcNvrOLnXQ6OnnZDwnJrz/Z4YQ==}
+
+  stylis@4.4.0:
+    resolution: {integrity: sha512-5Z9ZpRzfuH6l/UAvCPAPUo3665Nk2wLaZU3x+TLHKVzIz33+sbJqbtrYoC3KD4/uVOr2Zp+L0LySezP9OHV9yA==}
 
   sucrase@3.34.0:
     resolution: {integrity: sha512-70/LQEZ07TEcxiU2dz51FKaE6hCTWC6vr7FOk3Gr0U60C3shtAN+H+BFr9XlYe5xqf3RA8nrc+VIwzCfnxuXJw==}
@@ -8247,6 +8306,9 @@ packages:
   tslib@2.6.2:
     resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
 
+  tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
   tslint@5.14.0:
     resolution: {integrity: sha512-IUla/ieHVnB8Le7LdQFRGlVJid2T/gaJe5VkjzRVSRR6pA2ODYrnfR1hmxi+5+au9l50jBwpbBL34txgv4NnTQ==}
     engines: {node: '>=4.8.0'}
@@ -8403,6 +8465,9 @@ packages:
 
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
+
+  undici-types@7.24.6:
+    resolution: {integrity: sha512-WRNW+sJgj5OBN4/0JpHFqtqzhpbnV0GuB+OozA9gCL7a993SmU+1JBZCzLNxYsbMfIeDL+lTsphD5jN5N+n0zg==}
 
   unherit@3.0.1:
     resolution: {integrity: sha512-akOOQ/Yln8a2sgcLj4U0Jmx0R5jpIg2IUyRrWOzmEbjBtGzBdHtSeFKgoEcoH4KYIG/Pb8GQ/BwtYm0GCq1Sqg==}
@@ -8901,6 +8966,18 @@ packages:
       utf-8-validate:
         optional: true
 
+  ws@8.21.0:
+    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
   ws@8.7.0:
     resolution: {integrity: sha512-c2gsP0PRwcLFzUiA8Mkr37/MI7ilIlHQxaEAtd0uNMbVMoy8puJyafRlm0bV9MbGSabUPeLrRRaqIBcFcA2Pqg==}
     engines: {node: '>=10.0.0'}
@@ -9051,11 +9128,11 @@ snapshots:
     dependencies:
       prismjs: 1.29.0
 
-  '@astrojs/solid-js@1.2.3(@babel/core@7.23.5)(solid-js@1.6.2)(vite@3.2.7(@types/node@25.0.10)(terser@5.39.0))':
+  '@astrojs/solid-js@1.2.3(@babel/core@7.23.5)(solid-js@1.6.2)(vite@3.2.7(@types/node@25.9.3)(terser@5.39.0))':
     dependencies:
       babel-preset-solid: 1.6.3(@babel/core@7.23.5)
       solid-js: 1.6.2
-      vitefu: 0.2.3(vite@3.2.7(@types/node@25.0.10)(terser@5.39.0))
+      vitefu: 0.2.3(vite@3.2.7(@types/node@25.9.3)(terser@5.39.0))
     transitivePeerDependencies:
       - '@babel/core'
       - vite
@@ -10594,6 +10671,13 @@ snapshots:
       '@tybys/wasm-util': 0.10.1
     optional: true
 
+  '@napi-rs/wasm-runtime@1.1.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
+    dependencies:
+      '@emnapi/core': 1.10.0
+      '@emnapi/runtime': 1.10.0
+      '@tybys/wasm-util': 0.10.2
+    optional: true
+
   '@nicolo-ribaudo/chokidar-2@2.1.8-no-fsevents.3':
     optional: true
 
@@ -10665,7 +10749,7 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.10.0
       '@emnapi/runtime': 1.10.0
-      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@napi-rs/wasm-runtime': 1.1.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     optional: true
 
   '@oxc-parser/binding-win32-arm64-msvc@0.131.0':
@@ -10729,7 +10813,7 @@ snapshots:
 
   '@oxc-resolver/binding-wasm32-wasi@11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@napi-rs/wasm-runtime': 1.1.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -11053,6 +11137,11 @@ snapshots:
       tslib: 2.6.2
     optional: true
 
+  '@tybys/wasm-util@0.10.2':
+    dependencies:
+      tslib: 2.8.1
+    optional: true
+
   '@types/acorn@4.0.6':
     dependencies:
       '@types/estree': 1.0.8
@@ -11205,6 +11294,10 @@ snapshots:
   '@types/node@25.0.10':
     dependencies:
       undici-types: 7.16.0
+
+  '@types/node@25.9.3':
+    dependencies:
+      undici-types: 7.24.6
 
   '@types/normalize-package-data@2.4.1': {}
 
@@ -11448,7 +11541,7 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-react@2.1.0(vite@3.2.10(@types/node@25.0.10)(terser@5.39.0))':
+  '@vitejs/plugin-react@2.1.0(vite@3.2.10(@types/node@25.9.3)(terser@5.39.0))':
     dependencies:
       '@babel/core': 7.23.5
       '@babel/plugin-transform-react-jsx': 7.23.4(@babel/core@7.23.5)
@@ -11457,7 +11550,7 @@ snapshots:
       '@babel/plugin-transform-react-jsx-source': 7.18.6(@babel/core@7.23.5)
       magic-string: 0.26.7
       react-refresh: 0.14.0
-      vite: 3.2.10(@types/node@25.0.10)(terser@5.39.0)
+      vite: 3.2.10(@types/node@25.9.3)(terser@5.39.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -11650,11 +11743,33 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@wyw-in-js/vite@2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(vite@3.2.10(@types/node@25.0.10)(terser@5.39.0))':
+  '@wyw-in-js/transform@2.0.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(typescript@5.2.2)':
+    dependencies:
+      '@jridgewell/remapping': 2.3.5
+      '@wyw-in-js/processor-utils': 2.0.0
+      '@wyw-in-js/shared': 2.0.0
+      cosmiconfig: 8.3.6(typescript@5.2.2)
+      happy-dom: 20.10.3
+      minimatch: 9.0.9
+      oxc-parser: 0.131.0
+      oxc-resolver: 11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      oxc-transform: 0.131.0
+      source-map: 0.7.6
+      stylis: 4.4.0
+      ts-invariant: 0.10.3
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
+      - bufferutil
+      - supports-color
+      - typescript
+      - utf-8-validate
+
+  '@wyw-in-js/vite@2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(vite@3.2.10(@types/node@25.9.3)(terser@5.39.0))':
     dependencies:
       '@wyw-in-js/shared': 2.0.0
       '@wyw-in-js/transform': 2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
-      vite: 3.2.10(@types/node@25.0.10)(terser@5.39.0)
+      vite: 3.2.10(@types/node@25.9.3)(terser@5.39.0)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -11662,11 +11777,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@wyw-in-js/vite@2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(vite@3.2.7(@types/node@25.0.10)(terser@5.39.0))':
+  '@wyw-in-js/vite@2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(vite@3.2.7(@types/node@25.9.3)(terser@5.39.0))':
     dependencies:
       '@wyw-in-js/shared': 2.0.0
       '@wyw-in-js/transform': 2.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
-      vite: 3.2.7(@types/node@25.0.10)(terser@5.39.0)
+      vite: 3.2.7(@types/node@25.9.3)(terser@5.39.0)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -11912,7 +12027,7 @@ snapshots:
 
   astral-regex@2.0.0: {}
 
-  astro@1.6.10(@types/node@25.0.10)(terser@5.39.0):
+  astro@1.6.10(@types/node@25.9.3)(terser@5.39.0):
     dependencies:
       '@astrojs/compiler': 0.29.17
       '@astrojs/language-server': 0.28.3
@@ -11971,8 +12086,8 @@ snapshots:
       typescript: 5.2.2
       unist-util-visit: 4.1.1
       vfile: 5.3.6
-      vite: 3.2.7(@types/node@25.0.10)(terser@5.39.0)
-      vitefu: 0.2.3(vite@3.2.7(@types/node@25.0.10)(terser@5.39.0))
+      vite: 3.2.7(@types/node@25.9.3)(terser@5.39.0)
+      vitefu: 0.2.3(vite@3.2.7(@types/node@25.9.3)(terser@5.39.0))
       yargs-parser: 21.1.1
       zod: 3.19.1
     transitivePeerDependencies:
@@ -12239,6 +12354,10 @@ snapshots:
     dependencies:
       balanced-match: 1.0.2
 
+  brace-expansion@2.1.1:
+    dependencies:
+      balanced-match: 1.0.2
+
   braces@3.0.2:
     dependencies:
       fill-range: 7.0.1
@@ -12270,6 +12389,10 @@ snapshots:
       node-int64: 0.4.0
 
   buffer-from@1.1.2: {}
+
+  buffer-image-size@0.6.4:
+    dependencies:
+      '@types/node': 17.0.39
 
   buffer@5.7.1:
     dependencies:
@@ -12669,6 +12792,15 @@ snapshots:
       parse-json: 5.2.0
       path-type: 4.0.0
 
+  cosmiconfig@8.3.6(typescript@5.2.2):
+    dependencies:
+      import-fresh: 3.3.1
+      js-yaml: 4.2.0
+      parse-json: 5.2.0
+      path-type: 4.0.0
+    optionalDependencies:
+      typescript: 5.2.2
+
   create-error-class@3.0.2:
     dependencies:
       capture-stack-trace: 1.0.1
@@ -12979,6 +13111,8 @@ snapshots:
   entities@2.2.0: {}
 
   entities@4.5.0: {}
+
+  entities@7.0.1: {}
 
   envinfo@7.8.1: {}
 
@@ -14038,6 +14172,19 @@ snapshots:
 
   handle-thing@2.0.1: {}
 
+  happy-dom@20.10.3:
+    dependencies:
+      '@types/node': 25.9.3
+      '@types/whatwg-mimetype': 3.0.2
+      '@types/ws': 8.18.1
+      buffer-image-size: 0.6.4
+      entities: 7.0.1
+      whatwg-mimetype: 3.0.0
+      ws: 8.21.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   happy-dom@20.3.7:
     dependencies:
       '@types/node': 25.0.10
@@ -14355,6 +14502,11 @@ snapshots:
       resolve-from: 3.0.0
 
   import-fresh@3.3.0:
+    dependencies:
+      parent-module: 1.0.1
+      resolve-from: 4.0.0
+
+  import-fresh@3.3.1:
     dependencies:
       parent-module: 1.0.1
       resolve-from: 4.0.0
@@ -15039,6 +15191,10 @@ snapshots:
       esprima: 4.0.1
 
   js-yaml@4.1.0:
+    dependencies:
+      argparse: 2.0.1
+
+  js-yaml@4.2.0:
     dependencies:
       argparse: 2.0.1
 
@@ -15862,6 +16018,10 @@ snapshots:
   minimatch@9.0.5:
     dependencies:
       brace-expansion: 2.0.1
+
+  minimatch@9.0.9:
+    dependencies:
+      brace-expansion: 2.1.1
 
   minimist-options@3.0.2:
     dependencies:
@@ -17311,6 +17471,8 @@ snapshots:
 
   source-map@0.7.4: {}
 
+  source-map@0.7.6: {}
+
   source-map@0.8.0-beta.0:
     dependencies:
       whatwg-url: 7.1.0
@@ -17584,6 +17746,8 @@ snapshots:
 
   stylis@4.3.0: {}
 
+  stylis@4.4.0: {}
+
   sucrase@3.34.0:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.3
@@ -17850,6 +18014,9 @@ snapshots:
 
   tslib@2.6.2: {}
 
+  tslib@2.8.1:
+    optional: true
+
   tslint@5.14.0(typescript@5.2.2):
     dependencies:
       babel-code-frame: 6.26.0
@@ -18013,6 +18180,8 @@ snapshots:
       which-boxed-primitive: 1.0.2
 
   undici-types@7.16.0: {}
+
+  undici-types@7.24.6: {}
 
   unherit@3.0.1: {}
 
@@ -18207,7 +18376,7 @@ snapshots:
       unist-util-stringify-position: 3.0.2
       vfile-message: 3.1.3
 
-  vite-plugin-inspect@0.7.33(rollup@3.29.5)(vite@3.2.7(@types/node@25.0.10)(terser@5.39.0)):
+  vite-plugin-inspect@0.7.33(rollup@3.29.5)(vite@3.2.7(@types/node@25.9.3)(terser@5.39.0)):
     dependencies:
       '@antfu/utils': 0.7.5
       '@rollup/pluginutils': 5.0.4(rollup@3.29.5)
@@ -18216,12 +18385,12 @@ snapshots:
       open: 9.1.0
       picocolors: 1.0.0
       sirv: 2.0.3
-      vite: 3.2.7(@types/node@25.0.10)(terser@5.39.0)
+      vite: 3.2.7(@types/node@25.9.3)(terser@5.39.0)
     transitivePeerDependencies:
       - rollup
       - supports-color
 
-  vite-plugin-solid@2.4.0(solid-js@1.6.2)(vite@3.2.10(@types/node@25.0.10)(terser@5.39.0)):
+  vite-plugin-solid@2.4.0(solid-js@1.6.2)(vite@3.2.10(@types/node@25.9.3)(terser@5.39.0)):
     dependencies:
       '@babel/core': 7.23.5
       '@babel/preset-typescript': 7.23.3(@babel/core@7.23.5)
@@ -18229,12 +18398,12 @@ snapshots:
       merge-anything: 5.1.4
       solid-js: 1.6.2
       solid-refresh: 0.4.1(solid-js@1.6.2)
-      vite: 3.2.10(@types/node@25.0.10)(terser@5.39.0)
-      vitefu: 0.1.1(vite@3.2.10(@types/node@25.0.10)(terser@5.39.0))
+      vite: 3.2.10(@types/node@25.9.3)(terser@5.39.0)
+      vitefu: 0.1.1(vite@3.2.10(@types/node@25.9.3)(terser@5.39.0))
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-ssr@0.4.54(vite@3.2.10(@types/node@25.0.10)(terser@5.39.0)):
+  vite-plugin-ssr@0.4.54(vite@3.2.10(@types/node@25.9.3)(terser@5.39.0)):
     dependencies:
       '@brillout/import': 0.2.1
       '@brillout/json-serializer': 0.5.3
@@ -18245,37 +18414,37 @@ snapshots:
       picocolors: 1.0.0
       resolve: 1.22.8
       symlink-dir: 5.1.0
-      vite: 3.2.10(@types/node@25.0.10)(terser@5.39.0)
+      vite: 3.2.10(@types/node@25.9.3)(terser@5.39.0)
 
-  vite@3.2.10(@types/node@25.0.10)(terser@5.39.0):
+  vite@3.2.10(@types/node@25.9.3)(terser@5.39.0):
     dependencies:
       esbuild: 0.15.16
       postcss: 8.4.31
       resolve: 1.22.8
       rollup: 2.79.1
     optionalDependencies:
-      '@types/node': 25.0.10
+      '@types/node': 25.9.3
       fsevents: 2.3.3
       terser: 5.39.0
 
-  vite@3.2.7(@types/node@25.0.10)(terser@5.39.0):
+  vite@3.2.7(@types/node@25.9.3)(terser@5.39.0):
     dependencies:
       esbuild: 0.15.16
       postcss: 8.4.31
       resolve: 1.22.8
       rollup: 2.79.1
     optionalDependencies:
-      '@types/node': 25.0.10
+      '@types/node': 25.9.3
       fsevents: 2.3.3
       terser: 5.39.0
 
-  vitefu@0.1.1(vite@3.2.10(@types/node@25.0.10)(terser@5.39.0)):
+  vitefu@0.1.1(vite@3.2.10(@types/node@25.9.3)(terser@5.39.0)):
     optionalDependencies:
-      vite: 3.2.10(@types/node@25.0.10)(terser@5.39.0)
+      vite: 3.2.10(@types/node@25.9.3)(terser@5.39.0)
 
-  vitefu@0.2.3(vite@3.2.7(@types/node@25.0.10)(terser@5.39.0)):
+  vitefu@0.2.3(vite@3.2.7(@types/node@25.9.3)(terser@5.39.0)):
     optionalDependencies:
-      vite: 3.2.7(@types/node@25.0.10)(terser@5.39.0)
+      vite: 3.2.7(@types/node@25.9.3)(terser@5.39.0)
 
   vscode-css-languageservice@6.1.1:
     dependencies:
@@ -18618,6 +18787,8 @@ snapshots:
       signal-exit: 3.0.7
 
   ws@8.19.0: {}
+
+  ws@8.21.0: {}
 
   ws@8.7.0: {}
 
