@@ -272,6 +272,37 @@ it('provides linaria component className for composition as last item in props.c
   expect(tree.toJSON()).toMatchSnapshot();
 });
 
+it('omits CSS variables with nullish runtime values', () => {
+  const Test = styled('div')({
+    name: 'TestComponent',
+    class: 'abcdefg',
+    vars: {
+      color: [(props: { color?: string }) => props.color],
+      missing: [(props: { missing?: string }) => props.missing],
+      nullable: [() => null],
+      width: [12, 'px'],
+      height: [() => undefined, 'px'],
+      zero: [0],
+      empty: [''],
+    },
+  });
+
+  const tree = renderer.create(
+    <Test color="tomato" style={{ marginTop: '4px' }}>
+      This is a test
+    </Test>
+  );
+  const json = tree.toJSON();
+
+  expect(json.props.style).toEqual({
+    '--color': 'tomato',
+    '--width': '12px',
+    '--zero': '0',
+    '--empty': '',
+    marginTop: '4px',
+  });
+});
+
 it('throws when using as tag for template literal', () => {
   // styled uses process.env.NODE_ENV to determine if it's running in a test environment
   const nodeEnv = process.env.NODE_ENV;

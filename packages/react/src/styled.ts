@@ -22,6 +22,8 @@ type Component<TProps> =
 
 type Has<T, TObj> = [T] extends [TObj] ? T : T & TObj;
 
+type CSSVariableValue = string | number | null | void;
+
 type Options = {
   atomic?: boolean;
   class: string;
@@ -29,7 +31,7 @@ type Options = {
   propsAsIs: boolean;
   vars?: {
     [key: string]: [
-      string | number | ((props: unknown) => string | number),
+      CSSVariableValue | ((props: unknown) => CSSVariableValue),
       string | void,
     ];
   };
@@ -209,9 +211,11 @@ function styled(tag: any): any {
           const unit = variable[1] || '';
           const value = typeof result === 'function' ? result(props) : result;
 
-          warnIfInvalid(value, options.name);
+          if (value != null) {
+            warnIfInvalid(value, options.name);
 
-          style[`--${name}`] = `${value}${unit}`;
+            style[`--${name}`] = `${value}${unit}`;
+          }
         }
 
         const ownStyle = filteredProps.style || {};
