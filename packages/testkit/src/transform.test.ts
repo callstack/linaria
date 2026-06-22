@@ -141,34 +141,44 @@ it("doesn't rewrite an absolute path in url() declarations", async () => {
   expect(cssText).toMatchSnapshot();
 });
 
-it('parses JSX according to Oxc filename semantics', async () => {
-  expect.assertions(2);
-
-  await expect(
-    transform(
-      {
-        options: {
-          filename: './test.js',
-          outputFilename,
-          pluginOptions: {
-            ...basePluginOptions,
+it.each(['./test.js', './test.jsx'])(
+  'parses JSX in %s before downstream JSX transforms run',
+  async (filename) => {
+    await expect(
+      transform(
+        {
+          options: {
+            filename,
+            outputFilename,
+            pluginOptions: {
+              ...basePluginOptions,
+            },
           },
         },
-      },
-      dedent`
+        dedent`
         import { css } from '@linaria/core';
 
-        export const error = <jsx />;
+        export const element = <jsx />;
+        export const title = css\`
+          background-image: url(/assets/test.jpg);
+        \`;
         `,
-      asyncResolveFallback
-    )
-  ).rejects.toThrow(/Unexpected (JSX expression|token)/);
+        asyncResolveFallback
+      )
+    ).resolves.toEqual(
+      expect.objectContaining({
+        cssText: expect.stringContaining('background-image'),
+      })
+    );
+  }
+);
 
+it('does not parse JSX in TypeScript without JSX syntax enabled', async () => {
   await expect(
     transform(
       {
         options: {
-          filename: './test.jsx',
+          filename: './test.ts',
           outputFilename,
           pluginOptions: {
             ...basePluginOptions,
@@ -179,16 +189,11 @@ it('parses JSX according to Oxc filename semantics', async () => {
       import { css } from '@linaria/core';
 
       export const error = <jsx />;
-      export const title = css\`
-        background-image: url(/assets/test.jpg);
-      \`;
       `,
       asyncResolveFallback
     )
-  ).resolves.toEqual(
-    expect.objectContaining({
-      cssText: expect.stringContaining('background-image'),
-    })
+  ).rejects.toThrow(
+    /Expected `>` but found `\/`|Unexpected (JSX expression|token)/
   );
 });
 
