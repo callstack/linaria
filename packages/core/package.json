@@ -58,7 +58,7 @@
     "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
-    "@wyw-in-js/processor-utils": "2.0.0"
+    "@wyw-in-js/processor-utils": "2.1.0"
   },
   "devDependencies": {
     "@babel/traverse": "^7.23.5",
