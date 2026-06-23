@@ -260,10 +260,36 @@ function styled(tag: any): any {
   };
 }
 
+type FunctionComponentStatic<
+  TProps,
+  TKey extends PropertyKey,
+> = TKey extends keyof React.FunctionComponent<TProps>
+  ? React.FunctionComponent<TProps>[TKey]
+  : never;
+
+type StyledComponentWithAs<TProps> = {
+  <TAs extends keyof IntrinsicElements>(
+    props: TProps & { as: TAs } & IntrinsicElements[TAs],
+    context?: any
+  ): ReturnType<React.FunctionComponent>;
+  (
+    props: TProps & { as?: React.ElementType },
+    context?: any
+  ): ReturnType<React.FunctionComponent<TProps>>;
+  contextTypes?: FunctionComponentStatic<TProps, 'contextTypes'>;
+  defaultProps?: FunctionComponentStatic<
+    TProps & { as?: React.ElementType },
+    'defaultProps'
+  >;
+  displayName?: FunctionComponentStatic<TProps, 'displayName'>;
+  propTypes?: FunctionComponentStatic<
+    TProps & { as?: React.ElementType },
+    'propTypes'
+  >;
+};
+
 export type StyledComponent<T> = WYWEvalMeta &
-  ([T] extends [React.FunctionComponent<any>]
-    ? T
-    : React.FunctionComponent<T & { as?: React.ElementType }>);
+  ([T] extends [React.FunctionComponent<any>] ? T : StyledComponentWithAs<T>);
 
 type StaticPlaceholder = string | number | CSSProperties | WYWEvalMeta;
 

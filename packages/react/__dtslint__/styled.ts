@@ -27,6 +27,12 @@ const StyledDiv = styled.div``;
 // $ExpectType "extends"
 isExtends<typeof StyledDiv, React.FC<React.DetailedHTMLProps<any, any>>>();
 
+const StyledButton = styled.button``;
+StyledButton({ as: 'a', href: '/' });
+StyledButton.defaultProps = { as: 'a' };
+// @ts-expect-error href requires an anchor-like target
+StyledButton({ href: '/' });
+
 const A = (): React.ReactElement => React.createElement('div', null);
 // @ts-expect-error
 styled(A)``;
