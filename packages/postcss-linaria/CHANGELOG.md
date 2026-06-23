@@ -1,5 +1,11 @@
 # Change Log
 
+## 8.0.1
+
+### Patch Changes
+
+- b8877315: Mark extracted template CSS roots as `template-literal` so Stylelint 14 rules can lint top-level declarations.
+
 ## 8.0.0
 
 ### Major Changes

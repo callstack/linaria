@@ -1,5 +1,11 @@
 # Change Log
 
+## 8.0.1
+
+### Patch Changes
+
+- 63840d6b: Update WyW dependencies to 2.1.0.
+
 ## 8.0.0
 
 ### Major Changes
