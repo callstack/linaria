@@ -1859,6 +1859,38 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('adds specificity when wrapping a lazy component', async () => {
+    const { metadata } = await transform(
+      dedent`
+      import { styled } from '@linaria/react';
+
+      const lazy = (ctor) => ({
+        $$typeof: Symbol.for('react.lazy'),
+        _ctor: ctor,
+        _status: -1,
+        _result: null,
+      });
+
+      const Title = styled.h1\`
+        color: red;
+      \`;
+
+      const LazyTitle = lazy(() => Promise.resolve({ default: Title }));
+
+      export const BlueTitle = styled(LazyTitle)\`
+        color: blue;
+      \`;
+      `,
+      [evaluator]
+    );
+
+    const selector = Object.keys(metadata.wywInJS.rules ?? {}).find((rule) =>
+      rule.startsWith('.BlueTitle_')
+    );
+
+    expect(selector).toMatch(/^(\.BlueTitle_[^.]+)\1$/);
+  });
+
   it('handles indirect wrapping another styled component', async () => {
     const { code, metadata } = await transform(
       dedent`

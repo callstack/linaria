@@ -106,6 +106,16 @@ type RawStringLiteral = StringLiteral & {
 
 const staticClassSelector = (className: string): string => `.${className}`;
 
+const isReactLazyValue = (value: unknown): boolean => {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  return (
+    (value as { $$typeof?: unknown }).$$typeof === Symbol.for('react.lazy')
+  );
+};
+
 const isStaticStyledValue = (value: unknown): value is StaticStyledValue => {
   if (typeof value !== 'object' || value === null) {
     return false;
@@ -374,6 +384,10 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
     while (hasEvalMeta(value)) {
       selector += `.${value.__wyw_meta.className}`;
       value = value.__wyw_meta.extends;
+    }
+
+    if (isReactLazyValue(value)) {
+      selector += `.${this.className}`;
     }
 
     rules[selector] = {
