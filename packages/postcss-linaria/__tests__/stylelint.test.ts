@@ -6,6 +6,7 @@ import stylelint, { type Config } from 'stylelint';
 // so just import the config directly here
 // eslint-disable-next-line import/no-relative-packages
 import config from '../../stylelint-config-standard-linaria/src';
+import postcssLinaria from '../src';
 
 // note: need to run pnpm install to pick up updates from any parse/stringify changes
 describe('stylelint', () => {
@@ -116,6 +117,37 @@ describe('stylelint', () => {
               .foo { \${expr2}: black; }
             \`;"
     `);
+  });
+
+  it('should lint top-level declarations as template literal CSS', async () => {
+    const source = `
+import { css } from '@linaria/core';
+
+const responsiveWidth = css\`
+test: 1px;
+\`;
+`;
+    const result = await stylelint.lint({
+      code: source,
+      config: {
+        ...config,
+        customSyntax: postcssLinaria,
+        rules: {
+          ...config.rules,
+          'property-no-unknown': true,
+        },
+      } as Config,
+      configBasedir,
+    });
+
+    expect(result.errored).toEqual(true);
+    expect(result.results[0]?.warnings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          rule: 'property-no-unknown',
+        }),
+      ])
+    );
   });
 
   it('should be compatible with indentation rule', async () => {
