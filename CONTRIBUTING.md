@@ -18,10 +18,10 @@ The core team works directly on GitHub and all work is public.
 
 1. Run `pnpm bootstrap` to setup the development environment.
 
-1. When working on the code, you can use the watch mode to watch and compiles changed files:
+1. When working on a package, you can use that package's watch script to watch and compile changed files:
 
    ```sh
-   pnpm watch
+   pnpm --filter @linaria/react watch
    ```
 
 1. If you've added code that should be tested, add tests.
