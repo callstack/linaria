@@ -122,7 +122,7 @@ module.exports = {
   `;
   ```
 
-- `classNameSlug: string | ((hash: string, title: string, args: ClassNameSlugVars) => string)` (default: `default`):
+- `classNameSlug: string | ((hash: string, title: string, args: ClassNameSlugVars) => string)` (default: generated from the class hash, with the display name prefix when `displayName` is enabled):
 
   Using this will provide an interface to customize the output of the CSS class name. Example:
 
@@ -154,13 +154,13 @@ module.exports = {
   - `hash`: The hash of the content.
   - `title`: The name of the class.
 
-- `variableNameSlug: string | ((context: IVariableContext) => string)` (default: `default`):
+- `variableNameSlug: string | ((context: IVariableContext) => string)` (default: Linaria-generated variable id):
 
   Using this will provide an interface to customize the output of the CSS variable name. Example:
 
       variableNameSlug: '[componentName]-[valueSlug]-[index]',
 
-  Would generate a variable name such as `--Title-absdjfsdf-0` instead of the `@react/styled`'s default `--absdjfsdf-0`.
+  Would generate a variable name such as `--Title-absdjfsdf-0` instead of the `@linaria/react`'s default `--absdjfsdf-0`.
 
   You may also use a function to define the slug. The function will be evaluated at build time and must return a string:
 
