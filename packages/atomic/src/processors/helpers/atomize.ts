@@ -97,7 +97,16 @@ export default function atomize(cssText: string, hasPriority = false) {
 
     const css = root.toString();
     const propertySlug = hashProperty([...atomicProperty].join(';'));
-    const valueSlug = slugify(decl.value);
+    // The `!important` flag lives in `decl.important`, not `decl.value`, but
+    // it is preserved in the emitted cssText — so it must participate in the
+    // value hash. Otherwise `color: red` and `color: red !important` in
+    // different files mint the same class name with divergent rule bodies,
+    // and the importance leaks between unrelated users of the atom. It must
+    // NOT go into the property slug: `cx` deduplicates atoms by property
+    // slug, and both declarations still target the same property.
+    const valueSlug = slugify(
+      decl.important ? `${decl.value} !important` : decl.value
+    );
     const className = `atm_${propertySlug}_${valueSlug}`;
 
     const propertyPriority =

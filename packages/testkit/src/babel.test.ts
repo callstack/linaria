@@ -1201,6 +1201,39 @@ describe('strategy shaker', () => {
     expect(metadata).toMatchSnapshot();
   });
 
+  it('compiles atomic css with !important', async () => {
+    const { code, metadata } = await transform(
+      dedent`
+    /* @flow */
+
+    import { css } from '@linaria/atomic';
+
+    const x = css\`
+      color: red;
+    \`;
+
+    const y = css\`
+      color: red !important;
+    \`;
+
+    console.log(x, y);
+
+      `,
+      [evaluator]
+    );
+
+    // Declarations differing only in importance must not share an atom: the
+    // flag is preserved in the emitted rule body, so a shared class name
+    // would leak !important to every user of the non-important atom.
+    const xClasses = code.match(/const x = ["']([^"']+)["']/)?.[1];
+    const yClasses = code.match(/const y = ["']([^"']+)["']/)?.[1];
+    expect(xClasses).toBeTruthy();
+    expect(xClasses).not.toBe(yClasses);
+
+    expect(code).toMatchSnapshot();
+    expect(metadata).toMatchSnapshot();
+  });
+
   it('compiles atomic css with at-rules and pseudo classes', async () => {
     const { code, metadata } = await transform(
       dedent`
