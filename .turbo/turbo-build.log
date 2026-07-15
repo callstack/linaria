@@ -22,37 +22,37 @@
 > linaria-website@6.3.3 build:client /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production webpack
 
-(node:3588) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(node:3826) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 
 Timings:
-  Total: 2517ms
+  Total: 3346ms
 
   By method:
-    createEntrypoint: 1ms
+    createEntrypoint: 2ms
     transform:emitCommonJS: 1ms
-    transform:evalFile: 336ms
-    transform:evaluator: 4ms
-    transform:preeval: 36ms
+    transform:evalFile: 439ms
+    transform:evaluator: 6ms
+    transform:preeval: 49ms
     transform:preeval:importMetaEnv: 0ms
-    transform:preeval:processTemplate: 31ms
-    transform:preeval:processTemplate:deps: 4ms
-    transform:preeval:processTemplate:imports: 18ms
+    transform:preeval:processTemplate: 41ms
+    transform:preeval:processTemplate:deps: 6ms
+    transform:preeval:processTemplate:imports: 23ms
     transform:preeval:processTemplate:imports:analysis: 1ms
-    transform:preeval:processTemplate:imports:lookup: 17ms
-    transform:preeval:processTemplate:processors: 4ms
-    transform:preeval:processTemplate:reparse: 0ms
-    transform:preeval:processTemplate:usages: 0ms
+    transform:preeval:processTemplate:imports:lookup: 21ms
+    transform:preeval:processTemplate:processors: 5ms
+    transform:preeval:processTemplate:reparse: 1ms
+    transform:preeval:processTemplate:usages: 1ms
     transform:preeval:processTemplate:usedNames: 0ms
-    transform:preeval:removeDangerousCode: 5ms
-    transform:preeval:staticMetadata: 1ms
+    transform:preeval:removeDangerousCode: 6ms
+    transform:preeval:staticMetadata: 2ms
 
 Memory usage: {
-  rss: 237670400,
+  rss: 239431680,
   heapTotal: 135737344,
-  heapUsed: 105728872,
-  external: 3840349,
-  arrayBuffers: 1019927
+  heapUsed: 105588392,
+  external: 3829706,
+  arrayBuffers: 1003543
 }
 assets by info 63.5 KiB [1m[32m[immutable][39m[22m
   asset [1m[32mc9d5cf961634b7622bef.png[39m[22m 59.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/code-sample-v4.png] (auxiliary name: app)
@@ -78,15 +78,15 @@ cacheable modules 148 KiB (javascript) 62.6 KiB (asset) 3.75 KiB (css/mini-extra
       css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.98.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.1.0_typescript@5.2.2_webpack@5.98.0/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/components/Hero.jsx?wyw=wyw-in-js.css[39m[22m 1.85 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.98.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.1.0_typescript@5.2.2_webpack@5.98.0/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/index.jsx?wyw=wyw-in-js.css[39m[22m 316 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.98.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.1.0_typescript@5.2.2_webpack@5.98.0/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/components/Container.js?wyw=wyw-in-js.css[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.98.0 compiled [1m[32msuccessfully[39m[22m in 2302 ms
+webpack 5.98.0 compiled [1m[32msuccessfully[39m[22m in 3059 ms
 
 > linaria-website@6.3.3 build:server /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production babel src --out-dir build-jsx --config-file ./babel.server-jsx.config.js && cross-env NODE_ENV=production BABEL_ENV=server babel build-jsx --out-dir build && del-cli build-jsx
 
-(node:3652) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(node:3891) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-Successfully compiled 11 files with Babel (142ms).
-(node:3680) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+Successfully compiled 11 files with Babel (182ms).
+(node:3919) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:3680) [WYW_BABEL_PRESET_COMPATIBILITY] DeprecationWarning: [wyw-in-js] @wyw-in-js/babel-preset is a deprecated compatibility wrapper around the Oxc-backed transform. Prefer bundler integrations or the transform() API for new setups.
-Successfully compiled 11 files with Babel (2288ms).
+(node:3919) [WYW_BABEL_PRESET_COMPATIBILITY] DeprecationWarning: [wyw-in-js] @wyw-in-js/babel-preset is a deprecated compatibility wrapper around the Oxc-backed transform. Prefer bundler integrations or the transform() API for new setups.
+Successfully compiled 11 files with Babel (3120ms).
