@@ -143,7 +143,7 @@ importers:
     devDependencies:
       '@astrojs/solid-js':
         specifier: ^1.2.3
-        version: 1.2.3(@babel/core@7.23.5)(solid-js@1.6.2)(vite@3.2.7(@types/node@26.0.0)(terser@5.39.0))
+        version: 1.2.3(@babel/core@7.23.5)(solid-js@1.9.4)(vite@3.2.7(@types/node@26.0.0)(terser@5.39.0))
       '@babel/core':
         specifier: ^7.23.5
         version: 7.23.5
@@ -157,8 +157,8 @@ importers:
         specifier: ^1.6.10
         version: 1.6.10(@types/node@26.0.0)(terser@5.39.0)
       solid-js:
-        specifier: ^1.6.2
-        version: 1.6.2
+        specifier: ^1.9.4
+        version: 1.9.4
       vite:
         specifier: ^3
         version: 3.2.7(@types/node@26.0.0)(terser@5.39.0)
@@ -253,19 +253,17 @@ importers:
         specifier: ^2.0.2
         version: 2.0.3
       solid-js:
-        specifier: ^1.6.2
-        version: 1.6.2
+        specifier: ^1.9.4
+        version: 1.9.4
       vite:
         specifier: ^3.2.10
         version: 3.2.10(@types/node@26.0.0)(terser@5.39.0)
       vite-plugin-solid:
         specifier: ^2.4.0
-        version: 2.4.0(solid-js@1.6.2)(vite@3.2.10(@types/node@26.0.0)(terser@5.39.0))
+        version: 2.4.0(solid-js@1.9.4)(vite@3.2.10(@types/node@26.0.0)(terser@5.39.0))
       vite-plugin-ssr:
         specifier: ^0.4.54
         version: 0.4.54(vite@3.2.10(@types/node@26.0.0)(terser@5.39.0))
-
-  examples/vpssr-linaria-solid/dist/server: {}
 
   examples/webpack5:
     dependencies:
@@ -2925,6 +2923,7 @@ packages:
 
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
+    deprecated: Potential CWE-502 - Update to 1.3.1 or higher
 
   '@vitejs/plugin-react@2.1.0':
     resolution: {integrity: sha512-am6rPyyU3LzUYne3Gd9oj9c4Rzbq5hQnuGXSMT6Gujq45Il/+bunwq3lrB7wghLkiF45ygMwft37vgJ/NE8IAA==}
@@ -3981,6 +3980,9 @@ packages:
 
   csstype@3.1.0:
     resolution: {integrity: sha512-uX1KG+x9h5hIJsaKR9xHUeUraxf8IODOwq9JLNPq6BwB04a/xgpq3rcx47l5BZu5zBPlgD342tdke3Hom/nJRA==}
+
+  csstype@3.2.3:
+    resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
   csv-generate@3.4.3:
     resolution: {integrity: sha512-w/T+rqR0vwvHqWs/1ZyMDWtHHSJaN06klRqJXBEpDJaM/+dZkso0OKh1VcuuYvK3XM53KysVNq8Ko/epCK8wOw==}
@@ -5090,6 +5092,7 @@ packages:
   git-raw-commits@2.0.11:
     resolution: {integrity: sha512-VnctFhw+xfj8Va1xtfEqCUD2XDrbAPSJx+hSrE5K7fGdjZruW7XV+QOrN7LF/RJyvspRiD2I0asWsxFp0ya26A==}
     engines: {node: '>=10'}
+    deprecated: Deprecated and no longer maintained. Use @conventional-changelog/git-client instead.
     hasBin: true
 
   github-slugger@1.5.0:
@@ -7713,6 +7716,16 @@ packages:
   serialize-javascript@6.0.2:
     resolution: {integrity: sha512-Saa1xPByTTq2gdeFZYLLo+RFE35NHZkAbqZeWNd3BpzppeVisAqpDjcp8dyf6uIvEqJRd46jemmyA4iFIeVk8g==}
 
+  seroval-plugins@1.5.5:
+    resolution: {integrity: sha512-+BDhqYM6CEn3x09v44dpa9p6974FuUB2dxk+Ctn04k0cO1Zt6QODTXfmEZK0eBaTe/fJBvP4NMGuNJ+R8T+QMg==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      seroval: ^1.0
+
+  seroval@1.5.5:
+    resolution: {integrity: sha512-bSjOuPcwPKLSJNhr9+bZxA20nQxVle5J5MNsYRVE6cIg7KpRLXGupymePavu0jrxlPiPsr4xGZSB8yUY2sH2sw==}
+    engines: {node: '>=10'}
+
   serve-index@1.9.1:
     resolution: {integrity: sha512-pXHfKNP4qujrtteMrSBb0rc8HJ9Ms/GrXwcUtUtD5s4ewDJI8bT3Cz2zTVRMKtri49pLx2e0Ya8ziP5Ya2pZZw==}
     engines: {node: '>= 0.8.0'}
@@ -7809,8 +7822,8 @@ packages:
   sockjs@0.3.24:
     resolution: {integrity: sha512-GJgLTZ7vYb/JtPSSZ10hsOYIvEYsjbNU+zPdIHcUaWVNUEPivzxku31865sSSud0Da0W4lEeOPlmw93zLQchuQ==}
 
-  solid-js@1.6.2:
-    resolution: {integrity: sha512-AZBsj+Yn1xliniTTeuQKG9V7VQVkQ8lZmSKvBjpcVSoZeF7nvt/N5f7Kcsx6QSufioa2YgvBjkIiA0cM0qhotw==}
+  solid-js@1.9.4:
+    resolution: {integrity: sha512-ipQl8FJ31bFUoBNScDQTG3BjN6+9Rg+Q+f10bUbnO6EOTTf5NGerJeHc7wyu5I4RMHEl/WwZwUmy/PTRgxxZ8g==}
 
   solid-refresh@0.4.1:
     resolution: {integrity: sha512-v3tD/OXQcUyXLrWjPW1dXZyeWwP7/+GQNs8YTL09GBq+5FguA6IejJWUvJDrLIA4M0ho9/5zK2e9n+uy+4488g==}
@@ -8599,11 +8612,12 @@ packages:
 
   uuid@3.4.0:
     resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
-    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uvu@0.5.6:
@@ -9120,10 +9134,10 @@ snapshots:
     dependencies:
       prismjs: 1.29.0
 
-  '@astrojs/solid-js@1.2.3(@babel/core@7.23.5)(solid-js@1.6.2)(vite@3.2.7(@types/node@26.0.0)(terser@5.39.0))':
+  '@astrojs/solid-js@1.2.3(@babel/core@7.23.5)(solid-js@1.9.4)(vite@3.2.7(@types/node@26.0.0)(terser@5.39.0))':
     dependencies:
       babel-preset-solid: 1.6.3(@babel/core@7.23.5)
-      solid-js: 1.6.2
+      solid-js: 1.9.4
       vitefu: 0.2.3(vite@3.2.7(@types/node@26.0.0)(terser@5.39.0))
     transitivePeerDependencies:
       - '@babel/core'
@@ -12851,6 +12865,8 @@ snapshots:
   cssesc@3.0.0: {}
 
   csstype@3.1.0: {}
+
+  csstype@3.2.3: {}
 
   csv-generate@3.4.3: {}
 
@@ -17292,6 +17308,12 @@ snapshots:
     dependencies:
       randombytes: 2.1.0
 
+  seroval-plugins@1.5.5(seroval@1.5.5):
+    dependencies:
+      seroval: 1.5.5
+
+  seroval@1.5.5: {}
+
   serve-index@1.9.1:
     dependencies:
       accepts: 1.3.8
@@ -17413,16 +17435,18 @@ snapshots:
       uuid: 8.3.2
       websocket-driver: 0.7.4
 
-  solid-js@1.6.2:
+  solid-js@1.9.4:
     dependencies:
-      csstype: 3.1.0
+      csstype: 3.2.3
+      seroval: 1.5.5
+      seroval-plugins: 1.5.5(seroval@1.5.5)
 
-  solid-refresh@0.4.1(solid-js@1.6.2):
+  solid-refresh@0.4.1(solid-js@1.9.4):
     dependencies:
       '@babel/generator': 7.23.5
       '@babel/helper-module-imports': 7.22.15
       '@babel/types': 7.23.5
-      solid-js: 1.6.2
+      solid-js: 1.9.4
 
   sort-keys@1.1.2:
     dependencies:
@@ -18361,14 +18385,14 @@ snapshots:
       - rollup
       - supports-color
 
-  vite-plugin-solid@2.4.0(solid-js@1.6.2)(vite@3.2.10(@types/node@26.0.0)(terser@5.39.0)):
+  vite-plugin-solid@2.4.0(solid-js@1.9.4)(vite@3.2.10(@types/node@26.0.0)(terser@5.39.0)):
     dependencies:
       '@babel/core': 7.23.5
       '@babel/preset-typescript': 7.23.3(@babel/core@7.23.5)
       babel-preset-solid: 1.6.3(@babel/core@7.23.5)
       merge-anything: 5.1.4
-      solid-js: 1.6.2
-      solid-refresh: 0.4.1(solid-js@1.6.2)
+      solid-js: 1.9.4
+      solid-refresh: 0.4.1(solid-js@1.9.4)
       vite: 3.2.10(@types/node@26.0.0)(terser@5.39.0)
       vitefu: 0.1.1(vite@3.2.10(@types/node@26.0.0)(terser@5.39.0))
     transitivePeerDependencies:
