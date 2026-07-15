@@ -15,6 +15,13 @@ const rules = [
   },
 ];
 
+const basePluginOptions = {
+  features: {
+    happyDOM: false,
+  },
+  rules,
+};
+
 describe('transformUrl', () => {
   type TransformUrlArgs = Parameters<typeof transformUrl>;
   const dataset: Record<string, TransformUrlArgs> = {
@@ -64,7 +71,7 @@ it('rewrites a relative path in url() declarations', async () => {
         filename: './test.js',
         outputFilename: './.linaria-cache/test.css',
         pluginOptions: {
-          rules,
+          ...basePluginOptions,
         },
       },
     },
@@ -90,7 +97,7 @@ it('rewrites multiple relative paths in url() declarations', async () => {
         filename: './test.js',
         outputFilename,
         pluginOptions: {
-          rules,
+          ...basePluginOptions,
         },
       },
     },
@@ -117,7 +124,7 @@ it("doesn't rewrite an absolute path in url() declarations", async () => {
         filename: './test.js',
         outputFilename,
         pluginOptions: {
-          rules,
+          ...basePluginOptions,
         },
       },
     },
@@ -134,52 +141,47 @@ it("doesn't rewrite an absolute path in url() declarations", async () => {
   expect(cssText).toMatchSnapshot();
 });
 
-it('respects passed babel options', async () => {
-  expect.assertions(2);
-
-  await expect(() =>
-    transform(
-      {
-        options: {
-          filename: './test.js',
-          outputFilename,
-          pluginOptions: {
-            rules,
-            babelOptions: {
-              babelrc: false,
-              configFile: false,
-              presets: [['@babel/preset-env', { loose: true }]],
+it.each(['./test.js', './test.jsx'])(
+  'parses JSX in %s before downstream JSX transforms run',
+  async (filename) => {
+    await expect(
+      transform(
+        {
+          options: {
+            filename,
+            outputFilename,
+            pluginOptions: {
+              ...basePluginOptions,
             },
           },
         },
-      },
-      dedent`
+        dedent`
         import { css } from '@linaria/core';
 
-        export const error = <jsx />;
+        export const element = <jsx />;
+        export const title = css\`
+          background-image: url(/assets/test.jpg);
+        \`;
         `,
-      asyncResolveFallback
-    )
-  ).rejects.toThrow(
-    /Support for the experimental syntax 'jsx' isn't currently enabled/
-  );
+        asyncResolveFallback
+      )
+    ).resolves.toEqual(
+      expect.objectContaining({
+        cssText: expect.stringContaining('background-image'),
+      })
+    );
+  }
+);
 
-  await expect(() =>
+it('does not parse JSX in TypeScript without JSX syntax enabled', async () => {
+  await expect(
     transform(
       {
         options: {
-          filename: './test.js',
+          filename: './test.ts',
           outputFilename,
           pluginOptions: {
-            rules,
-            babelOptions: {
-              babelrc: false,
-              configFile: false,
-              presets: [
-                ['@babel/preset-env', { loose: true }],
-                '@babel/preset-react',
-              ],
-            },
+            ...basePluginOptions,
           },
         },
       },
@@ -187,51 +189,12 @@ it('respects passed babel options', async () => {
       import { css } from '@linaria/core';
 
       export const error = <jsx />;
-      export const title = css\`
-        background-image: url(/assets/test.jpg);
-      \`;
       `,
       asyncResolveFallback
     )
-  ).not.toThrow('Unexpected token');
-});
-
-it("doesn't throw due to duplicate preset", async () => {
-  expect.assertions(1);
-
-  expect(() =>
-    transform(
-      {
-        options: {
-          filename: './test.js',
-          outputFilename,
-          pluginOptions: {
-            rules,
-            babelOptions: {
-              babelrc: false,
-              configFile: false,
-              presets: [require.resolve('@linaria/babel-preset')],
-              plugins: [
-                require.resolve('@babel/plugin-transform-modules-commonjs'),
-              ],
-            },
-          },
-        },
-      },
-      dedent`
-      import { styled } from '@linaria/react';
-
-      const Title = styled.h1\` color: blue; \`;
-
-      const Article = styled.article\`
-        ${'${Title}'} {
-          font-size: 16px;
-        }
-      \`;
-      `,
-      asyncResolveFallback
-    )
-  ).not.toThrow('Duplicate plugin/preset detected');
+  ).rejects.toThrow(
+    /Expected `>` but found `\/`|Unexpected (JSX expression|token)/
+  );
 });
 
 it('should return transformed code even when file only contains unused linaria code', async () => {
@@ -241,7 +204,7 @@ it('should return transformed code even when file only contains unused linaria c
         filename: './test.js',
         outputFilename,
         pluginOptions: {
-          rules,
+          ...basePluginOptions,
         },
       },
     },

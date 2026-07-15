@@ -172,6 +172,11 @@ export const parse: Parser<Root | Document> = (
       map: false,
     }) as Root;
 
+    if (root.source) {
+      (root.source as typeof root.source & { lang?: string }).lang =
+        'template-literal';
+    }
+
     root.raws.linariaPrefixOffsets = prefixOffsets;
     root.raws.linariaTemplateExpressions = expressionStrings;
     root.raws.linariaBaseIndentations = baseIndentations;

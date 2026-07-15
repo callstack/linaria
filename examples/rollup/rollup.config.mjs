@@ -15,6 +15,16 @@ export default {
     image(),
     wyw({
       sourceMap: process.env.NODE_ENV !== 'production',
+      eval: {
+        strategy: 'static',
+      },
+      staticBindings: {
+        '../../assets/linaria-logomark.svg?url': {
+          default: '../../assets/linaria-logomark.svg',
+        },
+      },
+      // Rollup can deadlock when WyW resolves imports during transform.
+      serializeTransform: false,
     }),
     css({
       output: 'styles.css',

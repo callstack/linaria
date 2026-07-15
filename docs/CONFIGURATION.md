@@ -11,16 +11,22 @@ Example `wyw-in-js.config.js`:
 
 ```js
 module.exports = {
-  evaluate: true,
+  eval: {
+    strategy: 'hybrid',
+  },
   displayName: false,
 };
 ```
 
 ## Options
 
-- `evaluate: boolean` (default: `true`):
+- `eval.strategy: "hybrid" | "execute" | "static"` (default: `"hybrid"`):
 
-  Enabling this will evaluate dynamic expressions in the CSS. You need to enable this if you want to use imported variables in the CSS or interpolate other components. Enabling this also ensures that your styled components wrapping other styled components will have the correct specificity and override styles properly.
+  Controls how WyW resolves values used in CSS interpolations. The recommended default, `"hybrid"`, uses static-first resolution: WyW first tries to prove values from Linaria processor static semantics, `staticBindings`, and statically resolvable imports, then falls back to the evaluator for values that cannot be proven statically.
+
+  Use `"execute"` when you need evaluator-only compatibility, for example while migrating code that relies on build-time side effects or exact import execution order. Use `"static"` as a strict validation mode when fallback to the evaluator should be rejected. The older top-level `evaluate` option should be migrated to `eval.strategy` in Linaria 8 / WyW 2.
+
+  Evaluated values are included in the generated CSS. Since fallback evaluation runs at build time in Node.js, avoid browser-only APIs, unavailable runtime globals, Node native modules such as `fs`, and side effects in evaluated expressions.
 
 - `displayName: boolean` (default: `false`):
 
@@ -116,7 +122,7 @@ module.exports = {
   `;
   ```
 
-- `classNameSlug: string | ((hash: string, title: string, args: ClassNameSlugVars) => string)` (default: `default`):
+- `classNameSlug: string | ((hash: string, title: string, args: ClassNameSlugVars) => string)` (default: generated from the class hash, with the display name prefix when `displayName` is enabled):
 
   Using this will provide an interface to customize the output of the CSS class name. Example:
 
@@ -148,13 +154,13 @@ module.exports = {
   - `hash`: The hash of the content.
   - `title`: The name of the class.
 
-- `variableNameSlug: string | ((context: IVariableContext) => string)` (default: `default`):
+- `variableNameSlug: string | ((context: IVariableContext) => string)` (default: Linaria-generated variable id):
 
   Using this will provide an interface to customize the output of the CSS variable name. Example:
 
       variableNameSlug: '[componentName]-[valueSlug]-[index]',
 
-  Would generate a variable name such as `--Title-absdjfsdf-0` instead of the `@react/styled`'s default `--absdjfsdf-0`.
+  Would generate a variable name such as `--Title-absdjfsdf-0` instead of the `@linaria/react`'s default `--absdjfsdf-0`.
 
   You may also use a function to define the slug. The function will be evaluated at build time and must return a string:
 
@@ -445,7 +451,9 @@ module.exports = {
     [
       '@linaria',
       {
-        evaluate: true,
+        eval: {
+          strategy: 'hybrid',
+        },
         displayName: process.env.NODE_ENV !== 'production',
       },
     ],

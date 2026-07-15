@@ -1,6 +1,6 @@
 {
   "name": "@linaria/react",
-  "version": "6.3.0",
+  "version": "8.0.0",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "css",
@@ -53,15 +53,15 @@
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
     "build:dist": "tsup --format cjs,esm",
     "test": "jest --config ../../jest.config.js --rootDir .",
-    "test:dts": "dtslint --localTs ../../node_modules/typescript/lib __dtslint__",
+    "test:dts": "dtslint --localTs ../../node_modules/typescript/lib __dtslint__ && dtslint --localTs ../../node_modules/typescript/lib __dtslint-react17__",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.2.0",
     "@linaria/core": "workspace:^",
-    "@wyw-in-js/processor-utils": "^0.6.0",
-    "@wyw-in-js/shared": "^0.6.0",
+    "@wyw-in-js/processor-utils": "2.1.0",
+    "@wyw-in-js/shared": "2.1.0",
     "minimatch": "^9.0.3",
     "react-html-attributes": "^1.4.6",
     "resolve": "^1.22.8",
@@ -79,7 +79,7 @@
     "react": ">=16"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=22.12.0"
   },
   "publishConfig": {
     "access": "public"

@@ -51,6 +51,8 @@
     "@changesets/cli": "^2.22.0",
     "@commitlint/config-conventional": "^8.3.4",
     "@definitelytyped/dtslint": "^0.0.176",
+    "@emnapi/core": "^1.10.0",
+    "@emnapi/runtime": "^1.10.0",
     "@types/jest": "^28.1.0",
     "@types/node": "^17.0.39",
     "@types/resolve": "^1.20.6",
@@ -82,7 +84,7 @@
     "typescript": "^5.2.2"
   },
   "engines": {
-    "node": ">=16.0.0",
+    "node": ">=22.12.0",
     "pnpm": "^9.0.0"
   },
   "packageManager": "pnpm@9.15.9+sha256.cf86a7ad764406395d4286a6d09d730711720acc6d93e9dce9ac7ac4dc4a28a7"

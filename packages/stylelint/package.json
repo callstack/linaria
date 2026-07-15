@@ -1,6 +1,6 @@
 {
   "name": "@linaria/stylelint",
-  "version": "6.3.0",
+  "version": "8.0.0",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "css",
@@ -30,14 +30,14 @@
     "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
-    "@wyw-in-js/shared": "^0.6.0",
-    "@wyw-in-js/transform": "^0.6.0"
+    "@wyw-in-js/shared": "2.1.0",
+    "@wyw-in-js/transform": "2.1.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.39"
   },
   "engines": {
-    "node": ">=16.11.0"
+    "node": ">=22.12.0"
   },
   "publishConfig": {
     "access": "public"

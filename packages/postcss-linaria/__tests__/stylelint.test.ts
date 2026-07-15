@@ -1,12 +1,20 @@
+import { resolve } from 'path';
+
 import stylelint, { type Config } from 'stylelint';
 
 // importing from the package would create circular dependency
 // so just import the config directly here
 // eslint-disable-next-line import/no-relative-packages
 import config from '../../stylelint-config-standard-linaria/src';
+import postcssLinaria from '../src';
 
 // note: need to run pnpm install to pick up updates from any parse/stringify changes
 describe('stylelint', () => {
+  const configBasedir = resolve(
+    __dirname,
+    '../../stylelint-config-standard-linaria'
+  );
+
   it('should not error with valid syntax', async () => {
     const source = `
       css\`
@@ -26,6 +34,7 @@ describe('stylelint', () => {
     const result = await stylelint.lint({
       code: source,
       config: config as Config,
+      configBasedir,
     });
 
     expect(result.errored).toEqual(false);
@@ -46,6 +55,7 @@ describe('stylelint', () => {
         },
       } as Config,
       fix: true,
+      configBasedir,
     });
     expect(result.errored).toEqual(false);
     expect(result.output).toMatchInlineSnapshot(`
@@ -71,6 +81,7 @@ describe('stylelint', () => {
         },
       } as Config,
       fix: true,
+      configBasedir,
     });
     expect(result.errored).toEqual(false);
     expect(result.output).toMatchInlineSnapshot(`
@@ -97,6 +108,7 @@ describe('stylelint', () => {
         },
       } as Config,
       fix: true,
+      configBasedir,
     });
     expect(result.output).toMatchInlineSnapshot(`
       "
@@ -105,6 +117,37 @@ describe('stylelint', () => {
               .foo { \${expr2}: black; }
             \`;"
     `);
+  });
+
+  it('should lint top-level declarations as template literal CSS', async () => {
+    const source = `
+import { css } from '@linaria/core';
+
+const responsiveWidth = css\`
+test: 1px;
+\`;
+`;
+    const result = await stylelint.lint({
+      code: source,
+      config: {
+        ...config,
+        customSyntax: postcssLinaria,
+        rules: {
+          ...config.rules,
+          'property-no-unknown': true,
+        },
+      } as Config,
+      configBasedir,
+    });
+
+    expect(result.errored).toEqual(true);
+    expect(result.results[0]?.warnings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          rule: 'property-no-unknown',
+        }),
+      ])
+    );
   });
 
   it('should be compatible with indentation rule', async () => {
@@ -124,6 +167,7 @@ describe('stylelint', () => {
           indentation: 4,
         },
       } as Config,
+      configBasedir,
     });
 
     expect(result.errored).toEqual(false);

@@ -28,9 +28,7 @@ Atomic CSS is a way of writing CSS such that each CSS rule has exactly one decla
 
 ## Usage in Linaria
 
-Atomic styles can be enabled in the linaria config by providing an `atomizer` function (see [configuration](./CONFIGURATION.md) for details).
-
-Once enabled, it is possible to write atomic styles by importing the `css` template literal from `@linaria/atomic`:
+Atomic styles do not require a separate config option. Use them by importing the `css` template literal from `@linaria/atomic`:
 
 ```tsx
 import { cx } from '@linaria/core';

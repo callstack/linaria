@@ -1,1 +1,1 @@
-export {};
+export const unused = 'unused';

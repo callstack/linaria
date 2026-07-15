@@ -1,6 +1,6 @@
 {
   "name": "@linaria/testkit",
-  "version": "6.3.0",
+  "version": "7.0.2",
   "private": true,
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
@@ -17,7 +17,7 @@
   "repository": "git@github.com:callstack/linaria.git",
   "license": "MIT",
   "scripts": {
-    "test": "jest --config ./jest.config.js --rootDir .",
+    "test": "jest --config ../../jest.config.js --rootDir .",
     "typecheck": "tsc --noEmit --composite false"
   },
   "dependencies": {
@@ -26,9 +26,9 @@
     "@babel/traverse": "^7.23.5",
     "@linaria/react": "workspace:^",
     "@swc/core": "^1.3.20",
-    "@wyw-in-js/processor-utils": "^0.6.0",
-    "@wyw-in-js/shared": "^0.6.0",
-    "@wyw-in-js/transform": "^0.6.0",
+    "@wyw-in-js/processor-utils": "2.1.0",
+    "@wyw-in-js/shared": "2.1.0",
+    "@wyw-in-js/transform": "2.1.0",
     "debug": "^4.3.4",
     "dedent": "^1.5.1",
     "esbuild": "^0.15.16",
@@ -39,7 +39,7 @@
     "@babel/plugin-syntax-typescript": "^7.23.3",
     "@babel/plugin-transform-modules-commonjs": "^7.23.3",
     "@babel/preset-typescript": "^7.23.3",
-    "@babel/runtime": "^7.23.5",
+    "@babel/runtime": "^7.26.10",
     "@babel/types": "^7.23.5",
     "@linaria/atomic": "workspace:^",
     "@linaria/core": "workspace:^",
@@ -56,7 +56,7 @@
     "ts-jest": "^29.1.1"
   },
   "engines": {
-    "node": ">=16.11.0"
+    "node": ">=22.12.0"
   },
   "publishConfig": {
     "access": "public"

@@ -22,6 +22,8 @@ type Component<TProps> =
 
 type Has<T, TObj> = [T] extends [TObj] ? T : T & TObj;
 
+type CSSVariableValue = string | number | null | void;
+
 type Options = {
   atomic?: boolean;
   class: string;
@@ -29,7 +31,7 @@ type Options = {
   propsAsIs: boolean;
   vars?: {
     [key: string]: [
-      string | number | ((props: unknown) => string | number),
+      CSSVariableValue | ((props: unknown) => CSSVariableValue),
       string | void,
     ];
   };
@@ -107,16 +109,7 @@ interface IProps {
   style?: Record<string, string>;
 }
 
-// React <19
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace JSX {
-    interface IntrinsicElements {}
-  }
-}
-
-// React >=19
-declare module 'react' {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {}
@@ -125,7 +118,16 @@ declare module 'react' {
 
 let idx = 0;
 
-type IntrinsicElements = React.JSX.IntrinsicElements & JSX.IntrinsicElements;
+type GlobalJSXIntrinsicElements = JSX.IntrinsicElements;
+
+declare module 'react' {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements extends GlobalJSXIntrinsicElements {}
+  }
+}
+
+type IntrinsicElements = React.JSX.IntrinsicElements;
 
 // Components with props are not allowed
 function styled(
@@ -209,9 +211,11 @@ function styled(tag: any): any {
           const unit = variable[1] || '';
           const value = typeof result === 'function' ? result(props) : result;
 
-          warnIfInvalid(value, options.name);
+          if (value != null) {
+            warnIfInvalid(value, options.name);
 
-          style[`--${name}`] = `${value}${unit}`;
+            style[`--${name}`] = `${value}${unit}`;
+          }
         }
 
         const ownStyle = filteredProps.style || {};
@@ -256,10 +260,36 @@ function styled(tag: any): any {
   };
 }
 
+type FunctionComponentStatic<
+  TProps,
+  TKey extends PropertyKey,
+> = TKey extends keyof React.FunctionComponent<TProps>
+  ? React.FunctionComponent<TProps>[TKey]
+  : never;
+
+type StyledComponentWithAs<TProps> = {
+  <TAs extends keyof IntrinsicElements>(
+    props: TProps & { as: TAs } & IntrinsicElements[TAs],
+    context?: any
+  ): ReturnType<React.FunctionComponent>;
+  (
+    props: TProps & { as?: React.ElementType },
+    context?: any
+  ): ReturnType<React.FunctionComponent<TProps>>;
+  contextTypes?: FunctionComponentStatic<TProps, 'contextTypes'>;
+  defaultProps?: FunctionComponentStatic<
+    TProps & { as?: React.ElementType },
+    'defaultProps'
+  >;
+  displayName?: FunctionComponentStatic<TProps, 'displayName'>;
+  propTypes?: FunctionComponentStatic<
+    TProps & { as?: React.ElementType },
+    'propTypes'
+  >;
+};
+
 export type StyledComponent<T> = WYWEvalMeta &
-  ([T] extends [React.FunctionComponent<any>]
-    ? T
-    : React.FunctionComponent<T & { as?: React.ElementType }>);
+  ([T] extends [React.FunctionComponent<any>] ? T : StyledComponentWithAs<T>);
 
 type StaticPlaceholder = string | number | CSSProperties | WYWEvalMeta;
 

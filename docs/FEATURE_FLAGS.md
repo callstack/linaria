@@ -65,6 +65,4 @@ The `softErrors` is disabled by default. It is designed to provide a more lenien
 
 # 'useBabelConfigs' Feature
 
-The `useBabelConfigs` feature is enabled by default. If it is enabled, Linaria will try to resolve the `.babelrc` file for each processed file. Otherwise, it will use the default Babel configuration from `babelOptions` in the configuration.
-
-Please note that the default value of `useBabelConfigs` will be changed to `false` in the next major release.
+Linaria 8 uses the WyW 2 static-first pipeline and no longer treats Babel configs or Babel resolver plugins as an implicit module-resolution fallback during evaluation. If evaluated code imports aliased specifiers, configure WyW resolution explicitly with `eval.customResolver`, `eval.resolver`, or `staticBindings`.

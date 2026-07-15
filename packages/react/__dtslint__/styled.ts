@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { css } from '@linaria/core';
 
-import { styled } from '../src';
+import { styled } from '..';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function isExtends<C, T>(arg1?: C, arg2?: T): C extends T ? 'extends' : never {
@@ -26,6 +26,12 @@ const Generic = <T>(
 const StyledDiv = styled.div``;
 // $ExpectType "extends"
 isExtends<typeof StyledDiv, React.FC<React.DetailedHTMLProps<any, any>>>();
+
+const StyledButton = styled.button``;
+StyledButton({ as: 'a', href: '/' });
+StyledButton.defaultProps = { as: 'a' };
+// @ts-expect-error href requires an anchor-like target
+StyledButton({ href: '/' });
 
 const A = (): React.ReactElement => React.createElement('div', null);
 // @ts-expect-error

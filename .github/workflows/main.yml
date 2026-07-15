@@ -5,16 +5,21 @@ on:
   pull_request:
     types: [opened, edited, reopened, ready_for_review, synchronize]
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 jobs:
   labeler:
     runs-on: ubuntu-latest
     name: label issues and pull requests
     steps:
       - name: check-out-repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: labeler
-        uses: jayu/super-labeler-action@develop
+        uses: jayu/super-labeler-action@e0d24c761fc20458dafd9f3951698e94b1822657 # develop
         env:
           ACTIONS_STEP_DEBUG: ${{ secrets.ACTIONS_STEP_DEBUG }}
         with:

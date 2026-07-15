@@ -24,6 +24,9 @@
     "@linaria/react#test": {
       "dependsOn": ["@linaria/core#build"]
     },
+    "@linaria/postcss-linaria#test": {
+      "dependsOn": ["@linaria/postcss-linaria#build"]
+    },
     "@linaria/testkit#test": {
       "dependsOn": ["^build"]
     },

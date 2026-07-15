@@ -9,14 +9,14 @@
   },
   "devDependencies": {
     "@babel/core": "^7.23.5",
-    "@wyw-in-js/webpack-loader": "^0.6.0",
+    "@wyw-in-js/webpack-loader": "2.1.0",
     "babel-loader": "^9.1.0",
     "cross-env": "^7.0.3",
     "css-hot-loader": "^1.4.4",
     "css-loader": "^6.7.2",
     "file-loader": "^6.2.0",
     "mini-css-extract-plugin": "^2.7.0",
-    "webpack": "^5.94.0",
+    "webpack": "^5.104.1",
     "webpack-cli": "^5.0.0"
   },
   "scripts": {

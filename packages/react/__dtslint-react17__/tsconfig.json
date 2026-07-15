@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "lib": ["es6"],
+    "target": "ES2015",
+    "jsx": "react-jsx",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "types": [],
+    "noEmit": true,
+    "baseUrl": "./",
+    "paths": {
+      "react": ["./stubs/react17.d.ts"],
+      "react/jsx-runtime": ["./stubs/jsx-runtime.d.ts"],
+      "react/jsx-dev-runtime": ["./stubs/jsx-runtime.d.ts"]
+    }
+  }
+}

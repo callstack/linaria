@@ -1,5 +1,34 @@
 # Change Log
 
+## 6.3.3
+
+### Patch Changes
+
+- Updated dependencies [9d49bef8]
+  - @linaria/atomic@8.0.0
+  - @linaria/core@8.0.0
+  - @linaria/react@8.0.0
+  - @linaria/server@8.0.0
+
+## 6.3.2
+
+### Patch Changes
+
+- Updated dependencies [b3331e45]
+  - @linaria/react@7.0.1
+  - @linaria/atomic@7.0.1
+
+## 6.3.1
+
+### Patch Changes
+
+- Updated dependencies [ab11ebb7]
+- Updated dependencies [654d8590]
+  - @linaria/atomic@7.0.0
+  - @linaria/core@7.0.0
+  - @linaria/react@7.0.0
+  - @linaria/server@7.0.0
+
 ## 6.3.0
 
 ### Minor Changes
