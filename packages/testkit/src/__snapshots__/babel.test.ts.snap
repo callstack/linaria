@@ -85,6 +85,25 @@ Dependencies: NA
 
 `;
 
+exports[`strategy shaker compiles atomic css with !important 1`] = `
+"/* @flow */
+
+const x = "atm_7l_5scuol";
+const y = "atm_7l_gn1xdo";
+console.log(x, y);"
+`;
+
+exports[`strategy shaker compiles atomic css with !important 2`] = `
+
+CSS:
+
+.atm_7l_5scuol{color:red;}
+.atm_7l_gn1xdo{color:red!important;}
+
+Dependencies: NA
+
+`;
+
 exports[`strategy shaker compiles atomic css with at-rules and property priorities 1`] = `
 "/* @flow */
 
