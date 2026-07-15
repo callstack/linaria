@@ -22,24 +22,24 @@
 > linaria-website@6.3.3 build:client /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production webpack
 
-(node:3807) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(node:3810) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 
 Timings:
-  Total: 3321ms
+  Total: 3399ms
 
   By method:
     createEntrypoint: 2ms
     transform:emitCommonJS: 1ms
-    transform:evalFile: 412ms
+    transform:evalFile: 429ms
     transform:evaluator: 6ms
-    transform:preeval: 47ms
+    transform:preeval: 49ms
     transform:preeval:importMetaEnv: 0ms
-    transform:preeval:processTemplate: 40ms
+    transform:preeval:processTemplate: 42ms
     transform:preeval:processTemplate:deps: 5ms
-    transform:preeval:processTemplate:imports: 23ms
+    transform:preeval:processTemplate:imports: 25ms
     transform:preeval:processTemplate:imports:analysis: 1ms
-    transform:preeval:processTemplate:imports:lookup: 22ms
+    transform:preeval:processTemplate:imports:lookup: 23ms
     transform:preeval:processTemplate:processors: 5ms
     transform:preeval:processTemplate:reparse: 0ms
     transform:preeval:processTemplate:usages: 1ms
@@ -48,9 +48,9 @@ Timings:
     transform:preeval:staticMetadata: 2ms
 
 Memory usage: {
-  rss: 250597376,
-  heapTotal: 143339520,
-  heapUsed: 109648152,
+  rss: 252305408,
+  heapTotal: 143601664,
+  heapUsed: 109740336,
   external: 4186336,
   arrayBuffers: 1341862
 }
@@ -78,15 +78,15 @@ cacheable modules 148 KiB (javascript) 62.6 KiB (asset) 3.75 KiB (css/mini-extra
       css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.1.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/components/Hero.jsx?wyw=wyw-in-js.css[39m[22m 1.85 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.1.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/index.jsx?wyw=wyw-in-js.css[39m[22m 316 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.1.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/components/Container.js?wyw=wyw-in-js.css[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.104.1 compiled [1m[32msuccessfully[39m[22m in 2977 ms
+webpack 5.104.1 compiled [1m[32msuccessfully[39m[22m in 3048 ms
 
 > linaria-website@6.3.3 build:server /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production babel src --out-dir build-jsx --config-file ./babel.server-jsx.config.js && cross-env NODE_ENV=production BABEL_ENV=server babel build-jsx --out-dir build && del-cli build-jsx
 
-(node:3871) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(node:3874) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-Successfully compiled 11 files with Babel (179ms).
-(node:3899) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+Successfully compiled 11 files with Babel (191ms).
+(node:3902) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:3899) [WYW_BABEL_PRESET_COMPATIBILITY] DeprecationWarning: [wyw-in-js] @wyw-in-js/babel-preset is a deprecated compatibility wrapper around the Oxc-backed transform. Prefer bundler integrations or the transform() API for new setups.
-Successfully compiled 11 files with Babel (3068ms).
+(node:3902) [WYW_BABEL_PRESET_COMPATIBILITY] DeprecationWarning: [wyw-in-js] @wyw-in-js/babel-preset is a deprecated compatibility wrapper around the Oxc-backed transform. Prefer bundler integrations or the transform() API for new setups.
+Successfully compiled 11 files with Babel (3067ms).
