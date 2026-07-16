@@ -151,8 +151,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/core
       '@wyw-in-js/vite':
-        specifier: 2.1.0
-        version: 2.1.0(typescript@5.2.2)(vite@3.2.7(@types/node@26.1.1)(terser@5.49.0))
+        specifier: 2.1.5
+        version: 2.1.5(typescript@5.2.2)(vite@3.2.7(@types/node@26.1.1)(terser@5.49.0))
       astro:
         specifier: ^1.6.10
         version: 1.6.10(@types/node@26.1.1)(terser@5.49.0)
@@ -173,8 +173,8 @@ importers:
         version: link:../../website
     devDependencies:
       '@wyw-in-js/esbuild':
-        specifier: 2.1.0
-        version: 2.1.0(esbuild@0.15.16)(typescript@5.2.2)
+        specifier: 2.1.5
+        version: 2.1.5(esbuild@0.15.16)(typescript@5.2.2)
       esbuild:
         specifier: ^0.15.16
         version: 0.15.16
@@ -204,8 +204,8 @@ importers:
         specifier: ^15.2.1
         version: 15.2.1(rollup@4.56.0)
       '@wyw-in-js/rollup':
-        specifier: 2.1.0
-        version: 2.1.0(rollup@4.56.0)(typescript@5.2.2)
+        specifier: 2.1.5
+        version: 2.1.5(rollup@4.56.0)(typescript@5.2.2)
       rollup:
         specifier: ^4.0.0
         version: 4.56.0
@@ -226,8 +226,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0(vite@3.2.10(@types/node@26.1.1)(terser@5.49.0))
       '@wyw-in-js/vite':
-        specifier: 2.1.0
-        version: 2.1.0(typescript@5.2.2)(vite@3.2.10(@types/node@26.1.1)(terser@5.49.0))
+        specifier: 2.1.5
+        version: 2.1.5(typescript@5.2.2)(vite@3.2.10(@types/node@26.1.1)(terser@5.49.0))
       vite:
         specifier: ^3.2.10
         version: 3.2.10(@types/node@26.1.1)(terser@5.49.0)
@@ -238,8 +238,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/core
       '@wyw-in-js/vite':
-        specifier: 2.1.0
-        version: 2.1.0(typescript@5.2.2)(vite@3.2.10(@types/node@26.1.1)(terser@5.49.0))
+        specifier: 2.1.5
+        version: 2.1.5(typescript@5.2.2)(vite@3.2.10(@types/node@26.1.1)(terser@5.49.0))
       babel-preset-solid:
         specifier: ^1.6.2
         version: 1.6.3(@babel/core@7.23.5)
@@ -275,8 +275,8 @@ importers:
         specifier: ^7.23.5
         version: 7.23.5
       '@wyw-in-js/webpack-loader':
-        specifier: 2.1.0
-        version: 2.1.0(typescript@5.2.2)(webpack@5.104.1)
+        specifier: 2.1.5
+        version: 2.1.5(typescript@5.2.2)(webpack@5.104.1)
       babel-loader:
         specifier: ^9.1.0
         version: 9.1.0(@babel/core@7.23.5)(webpack@5.104.1)
@@ -457,8 +457,8 @@ importers:
         specifier: 2.1.0
         version: 2.1.0
       '@wyw-in-js/transform':
-        specifier: 2.1.0
-        version: 2.1.0(typescript@5.2.2)
+        specifier: 2.1.5
+        version: 2.1.5(typescript@5.2.2)
     devDependencies:
       '@types/node':
         specifier: ^17.0.39
@@ -488,8 +488,8 @@ importers:
         specifier: 2.1.0
         version: 2.1.0
       '@wyw-in-js/transform':
-        specifier: 2.1.0
-        version: 2.1.0(typescript@5.2.2)
+        specifier: 2.1.5
+        version: 2.1.5(typescript@5.2.2)
       dedent:
         specifier: ^1.5.1
         version: 1.5.1
@@ -583,11 +583,11 @@ importers:
         specifier: workspace:^
         version: link:../packages/stylelint
       '@wyw-in-js/babel-preset':
-        specifier: 2.1.0
-        version: 2.1.0(typescript@5.2.2)
+        specifier: 2.1.5
+        version: 2.1.5(typescript@5.2.2)
       '@wyw-in-js/webpack-loader':
-        specifier: 2.1.0
-        version: 2.1.0(typescript@5.2.2)(webpack@5.104.1)
+        specifier: 2.1.5
+        version: 2.1.5(typescript@5.2.2)(webpack@5.104.1)
       babel-loader:
         specifier: ^8.2.5
         version: 8.2.5(@babel/core@7.23.5)(webpack@5.104.1)
@@ -1824,10 +1824,6 @@ packages:
     resolution: {integrity: sha512-HLhSWOLRi875zjjMG/r+Nv0oCW8umGb0BgEhyX3dDX3egwZtB8PqLnjz3yedt8R5StBrzcg4aBpnh8UA9D1BoQ==}
     engines: {node: '>=6.0.0'}
 
-  '@jridgewell/gen-mapping@0.3.8':
-    resolution: {integrity: sha512-imAbBGkb+ebQyxKgzv5Hu2nmROxoDOXHh80evxdoXNOrvAnVx7zimzc1Oo5h9RlfV4vPXaE2iM5pOFbvOCClWA==}
-    engines: {node: '>=6.0.0'}
-
   '@jridgewell/remapping@2.3.5':
     resolution: {integrity: sha512-LI9u/+laYG4Ds1TDKSJW2YPrIlcVYOwi2fUC6xB43lueCjgxV4lffOCZCtYFiH6TNOX+tQKXx97T4IKHbhyHEQ==}
 
@@ -1841,10 +1837,6 @@ packages:
 
   '@jridgewell/set-array@1.1.2':
     resolution: {integrity: sha512-xnkseuNADM0gt2bs+BvhO0p78Mk762YnZdsuzFV018NoG1Sj1SCQvpSqa7XUaTam5vAGasABV9qXASMKnFMwMw==}
-    engines: {node: '>=6.0.0'}
-
-  '@jridgewell/set-array@1.2.1':
-    resolution: {integrity: sha512-R8gLRTZeyp03ymzP/6Lil/28tGeGEzhx1q2k703KGWRAI1VdvPIXdG70VJc2pAMw3NA6JKL5hhFu1sJX0Mnn/A==}
     engines: {node: '>=6.0.0'}
 
   '@jridgewell/source-map@0.3.11':
@@ -2821,9 +2813,6 @@ packages:
   '@types/node@17.0.39':
     resolution: {integrity: sha512-JDU3YLlnPK3WDao6/DlXLOgSNpG13ct+CwIO17V8q0/9fWJyeMJJ/VyZ1lv8kDprihvZMydzVwf0tQOqGiY2Nw==}
 
-  '@types/node@26.0.0':
-    resolution: {integrity: sha512-vf2YFi1iY9lHGwNJMs01biZFbKJkrZR1T6/MlzjhJLPdntOHLhTrDSnSVcdtvjihi4VQNlrFRIxLsDBlQpAipA==}
-
   '@types/node@26.1.1':
     resolution: {integrity: sha512-nxAkRSVkN1Y0JC1W8ky/fTfkGsMmcrRsbx+3XoZE+rMOX71kLYTV7fLXpqud1GpbpP5TuffXFqfX7fH2GgZREw==}
 
@@ -3133,12 +3122,12 @@ packages:
       webpack-dev-server:
         optional: true
 
-  '@wyw-in-js/babel-preset@2.1.0':
-    resolution: {integrity: sha512-ZMME3gq0sdw+DFbnhAu+kgMQOJF9ZMlzUJ/+5CX7njgkIm2v3fAp+5rBoEAWQHePJTGfcdq59qAtc0ewXwrL9g==}
+  '@wyw-in-js/babel-preset@2.1.5':
+    resolution: {integrity: sha512-iuHaMj35ypB6hqbW8E3af/+qGEaOzkZXnwdpcQYv614T1sZcYc1FZn+TZ+KEp3Py26ENnC261oL5Aji3FgH/SA==}
     engines: {node: '>=22.0.0'}
 
-  '@wyw-in-js/esbuild@2.1.0':
-    resolution: {integrity: sha512-tGuQb6vZz05N6WelQ52dBmQpVo3m+lQ6r712y04r1AvALp38XNtvCOpdsOfoxWctZeXfAKO/pGAoK97/tkx4mg==}
+  '@wyw-in-js/esbuild@2.1.5':
+    resolution: {integrity: sha512-9Z3vmTCBBfbwRjlzcGiSYtXUZrc/LBX3pJIrSBh+sExRYMrnsDoQCELy7XwydomWUvLb64RNIGT0h26WFPmr+Q==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       esbuild: '>=0.12.0'
@@ -3147,8 +3136,8 @@ packages:
     resolution: {integrity: sha512-ksNUkSYIV1vTLwFv+H0R2YcmtERTYKHs+ZuNiBlyJca2t3q5+0OMiS3ZBPSftQEwYSXBW54m15+39qgSQEyTBQ==}
     engines: {node: '>=22.0.0'}
 
-  '@wyw-in-js/rollup@2.1.0':
-    resolution: {integrity: sha512-8ogcs3eE5yKdbtNubnbdYbV6NXCKUWeHcJXauEFx4EWnJ+76FEmtYv9aOiU4d+ZiAE1z2i43pG0U5RBLMjh1mQ==}
+  '@wyw-in-js/rollup@2.1.5':
+    resolution: {integrity: sha512-VGo0EIjwb9ZXgu7uDPbHtJJU8Lt+qdt/+dj+MO7KCwCu8GGUr1YcFzd93rxQpZL6o1YagYEdQLL4yTPqn3laIg==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       rollup: 1.20.0||^2.0.0||^3.0.0||^4.0.0
@@ -3157,18 +3146,18 @@ packages:
     resolution: {integrity: sha512-mh7qtjVrhebafRZWgmat9Aidqbo6SiEtdv0eAMG5n3d8L01FMvz70OAYyXCt7r+2GCAtvfZXsyf1gS8NLZmaRQ==}
     engines: {node: '>=22.0.0'}
 
-  '@wyw-in-js/transform@2.1.0':
-    resolution: {integrity: sha512-9qeRhcac+k2wziyK1SdssEVP+h0q/mZlgDSwkp8InwAewIom/+WiupLbbLJvP0lA1op2zrcG9ucdgVOrIrVyyQ==}
+  '@wyw-in-js/transform@2.1.5':
+    resolution: {integrity: sha512-Qm3+smjirRJLnjXrnOk1Bg8SHkS9qbXAz+4m6Ux0sWK0NjBcqqj6Om3wVmki3cBpn9EUqu2777b4ZmYHdnAmSQ==}
     engines: {node: '>=22.0.0'}
 
-  '@wyw-in-js/vite@2.1.0':
-    resolution: {integrity: sha512-NZX6PV27Gh7z58tuGOH68yWjlB0myG8X/ninjbADQ1aWijnIB/l2RNXIoJz/N00juFQk+IpCi8qELscm5Xq3+g==}
+  '@wyw-in-js/vite@2.1.5':
+    resolution: {integrity: sha512-xnxSbyeinz8vh/OYKi3Ztr91AmjRv/KfaTTY//fw3FmsB73NtZIeEgvS6dMX3MubKQ/LjhNQs//40tUPi3NA7Q==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       vite: '>=3.2.7'
 
-  '@wyw-in-js/webpack-loader@2.1.0':
-    resolution: {integrity: sha512-c2f1VHBhmsoqJ62LjYb8pemxJ44JEZOEcCuimd5UaY5WbHyGberEUdesmEqMAUCwmTsjCaecT+zFUPdl1ZDtIg==}
+  '@wyw-in-js/webpack-loader@2.1.5':
+    resolution: {integrity: sha512-J+UzoOWNJ3XH/0Jv3e6AI40EsqfDpVWfQw+PDRGDMxHEQl9RacZQE02+pGdOOv+hfVPnq49eeFfVq9rQ2jqeTA==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       webpack: ^5.76.0
@@ -9262,18 +9251,6 @@ packages:
     resolution: {integrity: sha512-7KxauUdBmSdWnmpaGFg+ppNjKF8uNLry8LyzjauQDOVONfFLNKrKvQOxZ/VuTIcS/gge/YNahf5RIIQWTSarlg==}
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
 
-  ws@8.21.0:
-    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-
   ws@8.21.1:
     resolution: {integrity: sha512-+0NTnW77fFN/DjQi6k/Sq/Yvk4Sgajw7urW8V+asjXnRgDs9gyGkdb7EzgfhA4goXsRIZKE28fzIXBHEzhuiWw==}
     engines: {node: '>=10.0.0'}
@@ -10487,7 +10464,7 @@ snapshots:
 
   '@commitlint/resolve-extends@8.3.6':
     dependencies:
-      import-fresh: 3.3.0
+      import-fresh: 3.3.1
       lodash: 4.17.21
       resolve-from: 5.0.0
       resolve-global: 1.0.0
@@ -10927,12 +10904,6 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.4.15
       '@jridgewell/trace-mapping': 0.3.20
 
-  '@jridgewell/gen-mapping@0.3.8':
-    dependencies:
-      '@jridgewell/set-array': 1.2.1
-      '@jridgewell/sourcemap-codec': 1.5.5
-      '@jridgewell/trace-mapping': 0.3.31
-
   '@jridgewell/remapping@2.3.5':
     dependencies:
       '@jridgewell/gen-mapping': 0.3.13
@@ -10944,8 +10915,6 @@ snapshots:
 
   '@jridgewell/set-array@1.1.2': {}
 
-  '@jridgewell/set-array@1.2.1': {}
-
   '@jridgewell/source-map@0.3.11':
     dependencies:
       '@jridgewell/gen-mapping': 0.3.13
@@ -10953,7 +10922,7 @@ snapshots:
 
   '@jridgewell/source-map@0.3.2':
     dependencies:
-      '@jridgewell/gen-mapping': 0.3.8
+      '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/sourcemap-codec@1.4.15': {}
@@ -11854,14 +11823,9 @@ snapshots:
 
   '@types/node@17.0.39': {}
 
-  '@types/node@26.0.0':
-    dependencies:
-      undici-types: 8.3.0
-
   '@types/node@26.1.1':
     dependencies:
       undici-types: 8.3.0
-    optional: true
 
   '@types/normalize-package-data@2.4.1': {}
 
@@ -12246,21 +12210,21 @@ snapshots:
       webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.4.31)(webpack-cli@5.0.0)
       webpack-cli: 5.0.0(webpack@5.104.1)
 
-  '@wyw-in-js/babel-preset@2.1.0(typescript@5.2.2)':
+  '@wyw-in-js/babel-preset@2.1.5(typescript@5.2.2)':
     dependencies:
       '@babel/core': 7.23.5
       '@wyw-in-js/shared': 2.1.0
-      '@wyw-in-js/transform': 2.1.0(typescript@5.2.2)
+      '@wyw-in-js/transform': 2.1.5(typescript@5.2.2)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - typescript
       - utf-8-validate
 
-  '@wyw-in-js/esbuild@2.1.0(esbuild@0.15.16)(typescript@5.2.2)':
+  '@wyw-in-js/esbuild@2.1.5(esbuild@0.15.16)(typescript@5.2.2)':
     dependencies:
       '@wyw-in-js/shared': 2.1.0
-      '@wyw-in-js/transform': 2.1.0(typescript@5.2.2)
+      '@wyw-in-js/transform': 2.1.5(typescript@5.2.2)
       esbuild: 0.15.16
       oxc-transform: 0.131.0
     transitivePeerDependencies:
@@ -12275,11 +12239,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@wyw-in-js/rollup@2.1.0(rollup@4.56.0)(typescript@5.2.2)':
+  '@wyw-in-js/rollup@2.1.5(rollup@4.56.0)(typescript@5.2.2)':
     dependencies:
       '@rollup/pluginutils': 5.4.0(rollup@4.56.0)
       '@wyw-in-js/shared': 2.1.0
-      '@wyw-in-js/transform': 2.1.0(typescript@5.2.2)
+      '@wyw-in-js/transform': 2.1.5(typescript@5.2.2)
       rollup: 4.56.0
     transitivePeerDependencies:
       - bufferutil
@@ -12295,7 +12259,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@wyw-in-js/transform@2.1.0(typescript@5.2.2)':
+  '@wyw-in-js/transform@2.1.5(typescript@5.2.2)':
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@wyw-in-js/processor-utils': 2.1.0
@@ -12315,10 +12279,10 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@wyw-in-js/vite@2.1.0(typescript@5.2.2)(vite@3.2.10(@types/node@26.1.1)(terser@5.49.0))':
+  '@wyw-in-js/vite@2.1.5(typescript@5.2.2)(vite@3.2.10(@types/node@26.1.1)(terser@5.49.0))':
     dependencies:
       '@wyw-in-js/shared': 2.1.0
-      '@wyw-in-js/transform': 2.1.0(typescript@5.2.2)
+      '@wyw-in-js/transform': 2.1.5(typescript@5.2.2)
       vite: 3.2.10(@types/node@26.1.1)(terser@5.49.0)
     transitivePeerDependencies:
       - bufferutil
@@ -12326,10 +12290,10 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@wyw-in-js/vite@2.1.0(typescript@5.2.2)(vite@3.2.7(@types/node@26.1.1)(terser@5.49.0))':
+  '@wyw-in-js/vite@2.1.5(typescript@5.2.2)(vite@3.2.7(@types/node@26.1.1)(terser@5.49.0))':
     dependencies:
       '@wyw-in-js/shared': 2.1.0
-      '@wyw-in-js/transform': 2.1.0(typescript@5.2.2)
+      '@wyw-in-js/transform': 2.1.5(typescript@5.2.2)
       vite: 3.2.7(@types/node@26.1.1)(terser@5.49.0)
     transitivePeerDependencies:
       - bufferutil
@@ -12337,10 +12301,10 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@wyw-in-js/webpack-loader@2.1.0(typescript@5.2.2)(webpack@5.104.1)':
+  '@wyw-in-js/webpack-loader@2.1.5(typescript@5.2.2)(webpack@5.104.1)':
     dependencies:
       '@wyw-in-js/shared': 2.1.0
-      '@wyw-in-js/transform': 2.1.0(typescript@5.2.2)
+      '@wyw-in-js/transform': 2.1.5(typescript@5.2.2)
       webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.4.31)(webpack-cli@5.0.0)
     transitivePeerDependencies:
       - bufferutil
@@ -12496,7 +12460,7 @@ snapshots:
   anymatch@3.1.3:
     dependencies:
       normalize-path: 3.0.0
-      picomatch: 2.3.1
+      picomatch: 2.3.2
 
   aproba@1.2.0:
     optional: true
@@ -13687,7 +13651,7 @@ snapshots:
   dot-case@3.0.4:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   dot-prop@3.0.0:
     dependencies:
@@ -14871,13 +14835,13 @@ snapshots:
 
   happy-dom@20.10.6:
     dependencies:
-      '@types/node': 26.0.0
+      '@types/node': 26.1.1
       '@types/whatwg-mimetype': 3.0.2
       '@types/ws': 8.18.1
       buffer-image-size: 0.6.4
       entities: 7.0.1
       whatwg-mimetype: 3.0.0
-      ws: 8.21.0
+      ws: 8.21.1
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -15833,7 +15797,7 @@ snapshots:
       chalk: 4.1.2
       ci-info: 3.8.0
       graceful-fs: 4.2.11
-      picomatch: 2.3.1
+      picomatch: 2.3.2
 
   jest-util@29.7.0:
     dependencies:
@@ -17203,7 +17167,7 @@ snapshots:
   pascal-case@3.1.2:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   path-browserify@1.0.1: {}
 
@@ -17608,7 +17572,7 @@ snapshots:
 
   readdirp@3.6.0:
     dependencies:
-      picomatch: 2.3.1
+      picomatch: 2.3.2
 
   recast@0.20.5:
     dependencies:
@@ -18785,7 +18749,7 @@ snapshots:
 
   ts-invariant@0.10.3:
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   ts-toolbelt@9.6.0: {}
 
@@ -19613,8 +19577,6 @@ snapshots:
     dependencies:
       imurmurhash: 0.1.4
       signal-exit: 3.0.7
-
-  ws@8.21.0: {}
 
   ws@8.21.1: {}
 

@@ -1,8 +1,8 @@
 ---
-'@linaria/atomic': patch
-'@linaria/core': patch
-'@linaria/react': patch
-'@linaria/stylelint': patch
+'@linaria/atomic': minor
+'@linaria/core': minor
+'@linaria/react': minor
+'@linaria/stylelint': minor
 ---
 
-Update WyW dependencies to 2.1.0.
+Update WyW dependencies to 2.1.5.
