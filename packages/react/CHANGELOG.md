@@ -1,5 +1,21 @@
 # Change Log
 
+## 8.1.0
+
+### Minor Changes
+
+- 63840d6b: Update WyW dependencies to 2.1.5.
+
+### Patch Changes
+
+- 45539fd0: Remove package dependencies that are no longer used by Linaria.
+- 77647195: Omit dynamic CSS custom properties when a runtime interpolation returns `null` or `undefined`.
+- be435e47: Increase selector specificity when styling React.lazy targets so wrapper styles can override lazy-loaded component CSS.
+- 74a417b2: Add typing for intrinsic props selected through the polymorphic `as` prop on styled components.
+- Updated dependencies [45539fd0]
+- Updated dependencies [63840d6b]
+  - @linaria/core@8.1.0
+
 ## 8.0.0
 
 ### Major Changes

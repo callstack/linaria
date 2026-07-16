@@ -2,10 +2,22 @@
   "$schema": "https://unpkg.com/@changesets/config@2.0.0/schema.json",
   "changelog": "@changesets/cli/changelog",
   "commit": false,
-  "fixed": [],
+  "fixed": [
+    [
+      "@linaria/atomic",
+      "@linaria/babel-plugin-interop",
+      "@linaria/core",
+      "@linaria/postcss-linaria",
+      "@linaria/react",
+      "@linaria/server",
+      "@linaria/stylelint",
+      "@linaria/stylelint-config-standard-linaria",
+      "linaria"
+    ]
+  ],
   "linked": [],
   "access": "restricted",
   "baseBranch": "master",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": ["@linaria/testkit", "linaria-website"]
 }

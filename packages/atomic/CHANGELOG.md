@@ -1,5 +1,23 @@
 # Change Log
 
+## 8.1.0
+
+### Minor Changes
+
+- 63840d6b: Update WyW dependencies to 2.1.5.
+
+### Patch Changes
+
+- ac9f7997: Include the `!important` flag in atomic class name hashing. Previously, declarations differing only in importance (e.g. `color: red` and `color: red !important` in different files) produced the same `atm_*` class name while the emitted rule bodies differed, so whichever copy of the rule was loaded applied to every user of the atom — leaking `!important` to unrelated components and defeating their inline-style and cascade overrides. The flag now participates in the value slug (not the property slug, so `cx` deduplication semantics are unchanged), giving each variant its own class.
+- 45539fd0: Remove package dependencies that are no longer used by Linaria.
+- Updated dependencies [45539fd0]
+- Updated dependencies [77647195]
+- Updated dependencies [be435e47]
+- Updated dependencies [74a417b2]
+- Updated dependencies [63840d6b]
+  - @linaria/core@8.1.0
+  - @linaria/react@8.1.0
+
 ## 8.0.0
 
 ### Major Changes
