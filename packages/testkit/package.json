@@ -24,7 +24,7 @@
     "@babel/core": "^7.23.5",
     "@linaria/react": "workspace:^",
     "@wyw-in-js/shared": "2.1.0",
-    "@wyw-in-js/transform": "2.1.0",
+    "@wyw-in-js/transform": "2.1.5",
     "dedent": "^1.5.1",
     "typescript": "^5.2.2"
   },
