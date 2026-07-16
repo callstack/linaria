@@ -6,7 +6,7 @@
   "type": "module",
   "devDependencies": {
     "@astrojs/solid-js": "^1.2.3",
-    "@babel/core": "^7.23.5",
+    "@babel/core": "^7.29.6",
     "@linaria/core": "workspace:^",
     "@wyw-in-js/vite": "2.1.5",
     "astro": "^1.6.10",
