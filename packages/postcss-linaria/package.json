@@ -33,14 +33,12 @@
     "watch": "pnpm build:lib --watch & pnpm build:esm --watch & pnpm build:declarations --watch"
   },
   "dependencies": {
-    "@babel/generator": "^7.23.5",
     "@babel/parser": "^7.23.5",
     "@babel/traverse": "^7.23.5",
     "stylelint": "^14.11.0"
   },
   "devDependencies": {
     "@babel/types": "^7.23.5",
-    "@types/babel__generator": "^7.6.7",
     "@types/babel__traverse": "^7.20.4",
     "postcss": "^8.4.31"
   },
