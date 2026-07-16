@@ -7,7 +7,7 @@ exports.default = Header;
 var _react = require("@linaria/react");
 var _react2 = _interopRequireDefault(require("react"));
 var _Container = _interopRequireDefault(require("./Container"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 const logo = "/dist/1cc849b6b5e35d5ae2a527b0c2926958.svg";
 function Header() {
   return /*#__PURE__*/_react2.default.createElement(NavBar, null, /*#__PURE__*/_react2.default.createElement(LogoImage, {

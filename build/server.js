@@ -14,14 +14,14 @@ var _react = _interopRequireDefault(require("react"));
 var _server2 = _interopRequireDefault(require("react-dom/server"));
 var _serve = _interopRequireDefault(require("../serve.config"));
 var _App = _interopRequireDefault(require("./components/App"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 const cache = {};
 const css = _fs.default.readFileSync(_path.default.join(__dirname, '../dist/styles.css'), 'utf8');
 const app = new _koa.default();
 const router = new _koaRouter.default();
 app.use((0, _koaCompress.default)());
 router.get('/', async ctx => {
-  const html = _server2.default.renderToStaticMarkup( /*#__PURE__*/_react.default.createElement(_App.default, null));
+  const html = _server2.default.renderToStaticMarkup(/*#__PURE__*/_react.default.createElement(_App.default, null));
   const {
     critical,
     other

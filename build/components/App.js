@@ -8,7 +8,7 @@ var _react = _interopRequireDefault(require("react"));
 var _atomic = require("@linaria/atomic");
 var _Header = _interopRequireDefault(require("./Header"));
 var _Hero = _interopRequireDefault(require("./Hero"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 const Page = "atm_26_1u0dmv0 atm_7l_u67f1s atm_j6_1kxcs5u atm_sy_12yic89";
 function Index() {
   return /*#__PURE__*/_react.default.createElement("div", {
