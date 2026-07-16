@@ -1,5 +1,12 @@
 # Change Log
 
+## 8.1.0
+
+### Patch Changes
+
+- 45539fd0: Remove package dependencies that are no longer used by Linaria.
+- b8877315: Mark extracted template CSS roots as `template-literal` so Stylelint 14 rules can lint top-level declarations.
+
 ## 8.0.0
 
 ### Major Changes

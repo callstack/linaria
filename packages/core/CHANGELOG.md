@@ -1,5 +1,15 @@
 # Change Log
 
+## 8.1.0
+
+### Minor Changes
+
+- 63840d6b: Update WyW dependencies to 2.1.5.
+
+### Patch Changes
+
+- 45539fd0: Remove package dependencies that are no longer used by Linaria.
+
 ## 8.0.0
 
 ### Major Changes
