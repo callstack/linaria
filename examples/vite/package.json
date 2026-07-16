@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.2.1",
-    "@vitejs/plugin-react": "^2.1.0",
+    "@vitejs/plugin-react": "^4.7.0",
     "@wyw-in-js/vite": "2.1.5",
     "vite": "^6.4.3"
   },
