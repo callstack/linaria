@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.23.4",
-    "@babel/core": "^7.23.5",
+    "@babel/core": "^7.29.6",
     "@linaria/stylelint": "workspace:^",
     "@wyw-in-js/babel-preset": "2.1.5",
     "@wyw-in-js/webpack-loader": "2.1.5",

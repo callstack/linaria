@@ -21,7 +21,7 @@
     "typecheck": "tsc --noEmit --composite false"
   },
   "dependencies": {
-    "@babel/core": "^7.23.5",
+    "@babel/core": "^7.29.6",
     "@linaria/react": "workspace:^",
     "@wyw-in-js/shared": "2.1.0",
     "@wyw-in-js/transform": "2.1.5",
