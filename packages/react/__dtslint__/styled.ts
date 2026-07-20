@@ -32,6 +32,8 @@ StyledButton({ as: 'a', href: '/' });
 StyledButton.defaultProps = { as: 'a' };
 // @ts-expect-error href requires an anchor-like target
 StyledButton({ href: '/' });
+// @ts-expect-error href is not a button property
+StyledButton({ as: 'button', href: '/' });
 
 const A = (): React.ReactElement => React.createElement('div', null);
 // @ts-expect-error

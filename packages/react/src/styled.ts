@@ -267,9 +267,14 @@ type FunctionComponentStatic<
   ? React.FunctionComponent<TProps>[TKey]
   : never;
 
+// Avoid materializing every intrinsic element's props while TypeScript inspects
+// an unresolved polymorphic component. A concrete `as` still selects its props.
+type IntrinsicElementProps<TName extends keyof IntrinsicElements> =
+  keyof IntrinsicElements extends TName ? unknown : IntrinsicElements[TName];
+
 type StyledComponentWithAs<TProps> = {
   <TAs extends keyof IntrinsicElements>(
-    props: TProps & { as: TAs } & IntrinsicElements[TAs],
+    props: TProps & { as: TAs } & NoInfer<IntrinsicElementProps<TAs>>,
     context?: any
   ): ReturnType<React.FunctionComponent>;
   (
