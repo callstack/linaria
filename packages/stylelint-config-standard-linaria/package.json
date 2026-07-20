@@ -1,6 +1,6 @@
 {
   "name": "@linaria/stylelint-config-standard-linaria",
-  "version": "8.1.0",
+  "version": "8.1.1",
   "description": "Blazing fast zero-runtime CSS in JS library",
   "keywords": [
     "css",
