@@ -7,3 +7,5 @@ const Button = styled.button``;
 <Button as="a" href="/" />;
 // @ts-expect-error href requires an anchor-like target
 <Button href="/" />;
+// @ts-expect-error href is not a button property
+<Button as="button" href="/" />;
