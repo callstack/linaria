@@ -1,5 +1,12 @@
 # Change Log
 
+## 8.1.1
+
+### Patch Changes
+
+- 08bb5fd1: Reduce TypeScript memory usage for polymorphic `as` props while preserving intrinsic element prop inference.
+  - @linaria/core@8.1.1
+
 ## 8.1.0
 
 ### Minor Changes
