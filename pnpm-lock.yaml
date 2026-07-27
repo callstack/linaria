@@ -265,8 +265,6 @@ importers:
         specifier: ^0.4.54
         version: 0.4.54(vite@3.2.11(@types/node@26.1.1)(terser@5.49.0))
 
-  examples/vpssr-linaria-solid/dist/server: {}
-
   examples/webpack5:
     dependencies:
       linaria-website:
@@ -322,8 +320,8 @@ importers:
         specifier: ^0.24.0
         version: 0.24.0
       postcss:
-        specifier: ^8.4.31
-        version: 8.4.31
+        specifier: ^8.5.18
+        version: 8.5.19
       react:
         specifier: '>=16'
         version: 16.14.0
@@ -400,8 +398,8 @@ importers:
         specifier: ^7.20.4
         version: 7.20.4
       postcss:
-        specifier: ^8.4.31
-        version: 8.4.31
+        specifier: ^8.5.18
+        version: 8.5.19
 
   packages/react:
     dependencies:
@@ -443,8 +441,8 @@ importers:
   packages/server:
     dependencies:
       postcss:
-        specifier: ^8.4.31
-        version: 8.4.31
+        specifier: ^8.5.18
+        version: 8.5.19
     devDependencies:
       dedent:
         specifier: ^1.5.1
@@ -11066,9 +11064,9 @@ snapshots:
     dependencies:
       find-up: 4.1.0
 
-  '@csstools/selector-specificity@2.0.2(postcss-selector-parser@6.0.10)(postcss@8.4.31)':
+  '@csstools/selector-specificity@2.0.2(postcss-selector-parser@6.0.10)(postcss@8.5.19)':
     dependencies:
-      postcss: 8.4.31
+      postcss: 8.5.19
       postcss-selector-parser: 6.0.10
 
   '@definitelytyped/dts-critic@0.0.176(typescript@5.2.2)':
@@ -18167,9 +18165,9 @@ snapshots:
 
   postcss-resolve-nested-selector@0.1.1: {}
 
-  postcss-safe-parser@6.0.0(postcss@8.4.31):
+  postcss-safe-parser@6.0.0(postcss@8.5.19):
     dependencies:
-      postcss: 8.4.31
+      postcss: 8.5.19
 
   postcss-selector-parser@6.0.10:
     dependencies:
@@ -19369,7 +19367,7 @@ snapshots:
 
   stylelint@14.11.0:
     dependencies:
-      '@csstools/selector-specificity': 2.0.2(postcss-selector-parser@6.0.10)(postcss@8.4.31)
+      '@csstools/selector-specificity': 2.0.2(postcss-selector-parser@6.0.10)(postcss@8.5.19)
       balanced-match: 2.0.0
       colord: 2.9.3
       cosmiconfig: 7.0.1
@@ -19392,10 +19390,10 @@ snapshots:
       micromatch: 4.0.5
       normalize-path: 3.0.0
       picocolors: 1.0.0
-      postcss: 8.4.31
+      postcss: 8.5.19
       postcss-media-query-parser: 0.2.3
       postcss-resolve-nested-selector: 0.1.1
-      postcss-safe-parser: 6.0.0(postcss@8.4.31)
+      postcss-safe-parser: 6.0.0(postcss@8.5.19)
       postcss-selector-parser: 6.0.10
       postcss-value-parser: 4.2.0
       resolve-from: 5.0.0
