@@ -129,4 +129,59 @@ export const sourceWithExpression = {
       \${expr4}
     \`;
   `,
+  multilineValueInParens: `
+    const expr1 = 'gray';
+    const expr2 = 'transparent';
+    css\`
+      .foo {
+        background: linear-gradient(
+          0deg,
+          \${expr1} 20%,
+          \${expr2}
+        )
+      }
+    \`;
+  `,
+  multilineValueInNestedParens: `
+    const expr1 = '10px';
+    const expr2 = '20px';
+    css\`
+      .foo {
+        width: calc(
+          100% - max(
+            \${expr1},
+            \${expr2}
+          )
+        )
+      }
+    \`;
+  `,
+  multilineAtRuleParams: `
+    const expr = '(min-width: 100px)';
+    css\`
+      @media screen and
+        \${expr} {
+        .foo { color: black; }
+      }
+    \`;
+  `,
+  multilineAtRuleParamsLeadingExpression: `
+    const expr = 'screen';
+    css\`
+      @media \${expr} and
+        (min-width: 100px) {
+        .foo { color: black; }
+      }
+    \`;
+  `,
+  atRuleExpressionInAfterName: `
+    const expr = 'screen';
+    css\`
+      @media
+        \${expr} and
+        (min-width: 100px) {
+        .foo { color: black; }
+      }
+    \`;
+  `,
 };

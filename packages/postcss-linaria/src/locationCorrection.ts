@@ -221,6 +221,21 @@ function computeBeforeAfter(
     node.raws.linariaBetween = corrected;
   }
 
+  if (
+    node.type === 'atrule' &&
+    typeof node.raws.afterName === 'string' &&
+    node.raws.afterName.includes('\n') &&
+    node.source?.start
+  ) {
+    const corrected = computeCorrectedString(
+      node.raws.afterName,
+      node.source.start.line,
+      baseIndentations
+    );
+
+    node.raws.linariaAfterName = corrected;
+  }
+
   if (node.type === 'rule' && node.selector.includes('\n')) {
     const rawValue = computeCorrectedRawValue(
       node,
@@ -235,7 +250,18 @@ function computeBeforeAfter(
   }
 
   if (node.type === 'decl' && node.value.includes('\n')) {
-    const rawValue = computeCorrectedRawValue(node, 'value', baseIndentations);
+    // PostCSS strips comments out of `value` but keeps them in `raws.value.raw`.
+    // A comment placeholder ends up inside the value when the declaration spans
+    // lines within parentheses, so read the raw form: taking `value` here drops
+    // the placeholder and the interpolation cannot be restored on stringify.
+    const rawSource = node.raws.value?.raw ?? node.value;
+    const rawValue = node.source?.start
+      ? computeCorrectedString(
+          rawSource,
+          node.source.start.line,
+          baseIndentations
+        )
+      : null;
 
     if (rawValue !== null) {
       (node.raws as unknown as Record<string, unknown>).linariaValue = rawValue;

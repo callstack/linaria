@@ -13,6 +13,11 @@ import Stringifier from 'postcss/lib/stringifier';
 
 import { placeholderText } from './util';
 
+const commentPlaceholderPattern = new RegExp(
+  `/\\*\\s*${placeholderText}:(\\d+)\\s*\\*/`,
+  'g'
+);
+
 const substitutePlaceholders = (
   stringWithPlaceholders: string,
   expressions: string[]
@@ -21,7 +26,15 @@ const substitutePlaceholders = (
     return stringWithPlaceholders;
   }
 
-  const values = stringWithPlaceholders.split(' ');
+  // A comment placeholder reaches this point when it sits inside a declaration
+  // value rather than standing on its own as a comment node. The scan below
+  // splits on spaces, which cannot see it: the delimiters are separate tokens.
+  const substituted = stringWithPlaceholders.replace(
+    commentPlaceholderPattern,
+    (match, index: string) => expressions[Number(index)] ?? match
+  );
+
+  const values = substituted.split(' ');
   const temp: string[] = [];
   values.forEach((val) => {
     let [prefix, expressionIndexString] = val.split(placeholderText);
@@ -84,12 +97,36 @@ class LinariaStringifier extends Stringifier {
   }
 
   public override atrule(node: AtRule, semicolon?: boolean) {
-    const { params } = node;
-
+    // Unlike `decl` and `rule`, this method hands the params back to
+    // `super.atrule`, which re-reads them through `rawValue`, and that prefers
+    // `raws.linariaParams`. Substituting into `node.params` alone is therefore
+    // discarded whenever the params span several lines, so read and write the
+    // same place the stringifier will.
+    const params = this.rawValue(node, 'params');
     const expressionStrings = node.root().raws.linariaTemplateExpressions;
+
     if (params.includes(placeholderText)) {
+      const substituted = substitutePlaceholders(params, expressionStrings);
+
+      if (node.raws.linariaParams === undefined) {
+        // eslint-disable-next-line no-param-reassign
+        node.params = substituted;
+      } else {
+        // eslint-disable-next-line no-param-reassign
+        node.raws.linariaParams = substituted;
+      }
+    }
+
+    // `super.atrule` reads `raws.afterName` straight off the node instead of
+    // going through `raw()`, so both the re-indented form and any placeholder
+    // substitution have to be written back onto it here. An interpolation on
+    // the line after the at-rule name lands in this raw rather than the params.
+    const afterName = node.raws.linariaAfterName ?? node.raws.afterName;
+    if (typeof afterName === 'string') {
       // eslint-disable-next-line no-param-reassign
-      node.params = substitutePlaceholders(params, expressionStrings);
+      node.raws.afterName = afterName.includes(placeholderText)
+        ? substitutePlaceholders(afterName, expressionStrings)
+        : afterName;
     }
 
     super.atrule(node, semicolon);
