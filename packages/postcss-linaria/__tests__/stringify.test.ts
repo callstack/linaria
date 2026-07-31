@@ -16,6 +16,11 @@ const {
   declarationMultipleValues,
   declarationMixedValues,
   combo,
+  multilineValueInParens,
+  multilineValueInNestedParens,
+  multilineAtRuleParams,
+  multilineAtRuleParamsLeadingExpression,
+  atRuleExpressionInAfterName,
 } = sourceWithExpression;
 
 describe('stringify', () => {
@@ -79,6 +84,62 @@ describe('stringify', () => {
       const output = ast.toString(syntax);
       expect(output).toEqual(source);
     });
+
+    // https://github.com/callstack/linaria/issues/1494. An expression alone on
+    // its own line gets a comment placeholder, and PostCSS keeps that comment
+    // only in `raws.value.raw`. Reading `value` instead used to drop it.
+    it('should stringify an expression on its own line inside a parenthesised value', () => {
+      const { source, ast } = createTestAst(multilineValueInParens);
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+
+    it('should stringify expressions inside nested parenthesised values', () => {
+      const { source, ast } = createTestAst(multilineValueInNestedParens);
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+
+    // `super.atrule` re-reads the params through `rawValue`, so substituting
+    // into `node.params` alone used to be discarded for multi-line params.
+    it('should stringify an expression at the end of multi-line at-rule params', () => {
+      const { source, ast } = createTestAst(multilineAtRuleParams);
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+
+    it('should stringify an expression at the start of multi-line at-rule params', () => {
+      const { source, ast } = createTestAst(
+        multilineAtRuleParamsLeadingExpression
+      );
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+
+    // An expression on the line right after the at-rule name lands in the
+    // `afterName` raw instead of the params, and `super.atrule` emits that raw
+    // verbatim without going through `raw()`.
+    it('should stringify an expression that lands in the at-rule afterName raw', () => {
+      const { source, ast } = createTestAst(atRuleExpressionInAfterName);
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+  });
+
+  // A newline inside `afterName` needs its base indentation restored just like
+  // `before`, `between`, and the params do, expressions or not.
+  it('should keep the indentation of a wrapped at-rule prelude', () => {
+    const { source, ast } = createTestAst(`
+      css\`
+        @media
+          screen and (min-width: 100px) {
+          .foo { color: hotpink; }
+        }
+      \`;
+    `);
+
+    const output = ast.toString(syntax);
+    expect(output).toEqual(source);
   });
 
   it('should stringify basic CSS', () => {
