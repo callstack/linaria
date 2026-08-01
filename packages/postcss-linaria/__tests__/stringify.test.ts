@@ -21,6 +21,9 @@ const {
   multilineAtRuleParams,
   multilineAtRuleParamsLeadingExpression,
   atRuleExpressionInAfterName,
+  adjacentSelectorExpressions,
+  adjacentValueExpressions,
+  adjacentExpressionsWithDoubleDigitIndex,
 } = sourceWithExpression;
 
 describe('stringify', () => {
@@ -121,6 +124,26 @@ describe('stringify', () => {
     // verbatim without going through `raw()`.
     it('should stringify an expression that lands in the at-rule afterName raw', () => {
       const { source, ast } = createTestAst(atRuleExpressionInAfterName);
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+
+    it('should stringify adjacent expressions within a selector', () => {
+      const { source, ast } = createTestAst(adjacentSelectorExpressions);
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+
+    it('should stringify adjacent expressions within a declaration value', () => {
+      const { source, ast } = createTestAst(adjacentValueExpressions);
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+
+    it('should stringify adjacent expressions when an index is two digits', () => {
+      const { source, ast } = createTestAst(
+        adjacentExpressionsWithDoubleDigitIndex
+      );
       const output = ast.toString(syntax);
       expect(output).toEqual(source);
     });

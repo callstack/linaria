@@ -18,6 +18,15 @@ const commentPlaceholderPattern = new RegExp(
   'g'
 );
 
+// Matches one placeholder occurrence, together with the synthetic marker
+// (`.` or `--`) `createPlaceholder` may have prefixed it with to keep it
+// parseable in its original context. Global so that adjacent placeholders,
+// as in an attribute selector like `[${a}][${b}]`, are all substituted.
+const placeholderOccurrencePattern = new RegExp(
+  `(?:\\.|--)?${placeholderText}(\\d+)`,
+  'g'
+);
+
 const substitutePlaceholders = (
   stringWithPlaceholders: string,
   expressions: string[]
@@ -27,43 +36,22 @@ const substitutePlaceholders = (
   }
 
   // A comment placeholder reaches this point when it sits inside a declaration
-  // value rather than standing on its own as a comment node. The scan below
-  // splits on spaces, which cannot see it: the delimiters are separate tokens.
+  // value rather than standing on its own as a comment node. Its `pcss-lin:0`
+  // form has a colon where the pattern below expects the index, so it needs
+  // its own pass.
   const substituted = stringWithPlaceholders.replace(
     commentPlaceholderPattern,
     (match, index: string) => expressions[Number(index)] ?? match
   );
 
-  const values = substituted.split(' ');
-  const temp: string[] = [];
-  values.forEach((val) => {
-    let [prefix, expressionIndexString] = val.split(placeholderText);
-    prefix = prefix.replace(/(\.|--|\/\*)$/, '');
-    // if the val is 'pcss-lin10px', need to remove the px to get the placeholder number
-    let suffix = '';
-    while (
-      Number.isNaN(Number(expressionIndexString)) &&
-      expressionIndexString &&
-      expressionIndexString.length > 0
-    ) {
-      suffix = expressionIndexString[expressionIndexString.length - 1] + suffix;
-      expressionIndexString = expressionIndexString.slice(
-        0,
-        expressionIndexString.length - 1
-      );
+  // if a match is 'pcss-lin10px', the greedy digit capture leaves the 'px' alone
+  return substituted.replace(
+    placeholderOccurrencePattern,
+    (match, indexString: string) => {
+      const expression = expressions[Number(indexString)];
+      return expression ?? match;
     }
-    const expressionIndex = Number(expressionIndexString);
-    const expression =
-      expressions &&
-      !Number.isNaN(expressionIndex) &&
-      expressions[expressionIndex];
-    if (expression) {
-      temp.push(prefix + expression + suffix);
-    } else {
-      temp.push(val);
-    }
-  });
-  return temp.join(' ');
+  );
 };
 
 /**
