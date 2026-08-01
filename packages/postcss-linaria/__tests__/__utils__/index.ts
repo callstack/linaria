@@ -184,4 +184,43 @@ export const sourceWithExpression = {
       }
     \`;
   `,
+  adjacentSelectorExpressions: `
+    const firstAttribute = 'data-visible';
+    const secondAttribute = 'data-has-content';
+    css\`
+      .foo {
+        &[\${firstAttribute}][\${secondAttribute}] {
+          display: block;
+        }
+      }
+    \`;
+  `,
+  adjacentValueExpressions: `
+    const expr1 = '10px';
+    const expr2 = '5px';
+    css\`
+      .foo {
+        margin: \${expr1}\${expr2};
+      }
+    \`;
+  `,
+  adjacentExpressionsWithDoubleDigitIndex: `
+    css\`
+        .filler { color: \${x}; }
+        .filler { color: \${x}; }
+        .filler { color: \${x}; }
+        .filler { color: \${x}; }
+        .filler { color: \${x}; }
+        .filler { color: \${x}; }
+        .filler { color: \${x}; }
+        .filler { color: \${x}; }
+        .filler { color: \${x}; }
+        .filler { color: \${x}; }
+        .foo {
+          &[\${x}][\${x}] {
+            display: block;
+          }
+        }
+    \`;
+  `,
 };
