@@ -298,6 +298,44 @@ describe('stringify', () => {
     expect(output).toEqual(source);
   });
 
+  // https://github.com/callstack/linaria/issues/1502. The whitespace before a
+  // trailing comment is not line indentation and must not grow on each pass.
+  it('should keep whitespace before a trailing comment unchanged', () => {
+    const source = `
+export const style = {
+  a: css\`
+    color: red; /* c */
+  \`,
+};
+`;
+
+    let current = source;
+    for (let pass = 0; pass < 3; pass += 1) {
+      const { ast } = createTestAst(current);
+      current = ast.toString(syntax);
+      expect(current).toEqual(source);
+    }
+  });
+
+  it('should keep indentation inside a multi-line comment unchanged', () => {
+    const source = `
+export const style = {
+  a: css\`
+    /* first line
+       second line */
+    color: red;
+  \`,
+};
+`;
+
+    let current = source;
+    for (let pass = 0; pass < 3; pass += 1) {
+      const { ast } = createTestAst(current);
+      current = ast.toString(syntax);
+      expect(current).toEqual(source);
+    }
+  });
+
   // Not the same as the placeholder cases above: these have no interpolations.
   it('should keep a comment inside a multi-line selector', () => {
     const { source, ast } = createTestAst(`

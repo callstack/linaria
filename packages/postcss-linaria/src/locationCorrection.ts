@@ -178,18 +178,35 @@ function computeBeforeAfter(
   node: Document | Root | ChildNode,
   baseIndentations: Map<number, number>
 ): void {
+  const { before } = node.raws;
   if (
-    node.raws.before &&
-    (node.raws.before.includes('\n') || node.parent?.type === 'root') &&
+    before &&
+    (before.includes('\n') ||
+      (node.parent?.type === 'root' &&
+        node.source?.start &&
+        node.source.start.column === before.length + 1)) &&
     node.source?.start
   ) {
-    const numBeforeLines = node.raws.before.split('\n').length - 1;
+    const numBeforeLines = before.split('\n').length - 1;
     const corrected = computeCorrectedString(
-      node.raws.before,
+      before,
       node.source.start.line - numBeforeLines,
       baseIndentations
     );
     node.raws.linariaBefore = corrected;
+  }
+
+  if (
+    node.type === 'comment' &&
+    node.text.includes('\n') &&
+    node.source?.start
+  ) {
+    const corrected = computeCorrectedString(
+      node.text,
+      node.source.start.line,
+      baseIndentations
+    );
+    node.raws.linariaText = corrected;
   }
 
   if (

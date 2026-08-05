@@ -174,7 +174,14 @@ class LinariaStringifier extends Stringifier {
       'left',
       this.raw(node, 'left', 'commentLeft')
     );
-    const text = escapeNodeField(node, 'text', node.text);
+    const text = escapeNodeField(
+      node,
+      'text',
+      typeof node.raws.linariaText === 'string' &&
+        isOriginalField(node, 'text', node.text)
+        ? node.raws.linariaText
+        : node.text
+    );
     const right = escapeRawField(
       node,
       'right',
