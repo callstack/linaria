@@ -60,6 +60,21 @@ describe('stringify', () => {
       expect(output).toEqual(source);
     });
 
+    // https://github.com/callstack/linaria/issues/1501. A dot written in the
+    // source must not be mistaken for the synthetic dot `createPlaceholder`
+    // adds when an interpolation needs to remain parseable as a selector.
+    it('should preserve a leading dot before a selector expression', () => {
+      const { source, ast } = createTestAst(`
+        const a = 'some-class';
+        css\`
+          .\${a} { color: red; }
+        \`;
+      `);
+
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+
     it('should stringify a declaration property expression', () => {
       const { source, ast } = createTestAst(declarationProperty);
       const output = ast.toString(syntax);
