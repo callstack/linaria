@@ -91,6 +91,9 @@ export const isOriginalField = (
   return originalState !== undefined && originalState.fields[name] === value;
 };
 
+export const getOriginalField = (node: AnyNode, name: string): unknown =>
+  originalStates.get(node)?.fields[name];
+
 export const isOriginalRaw = (
   node: AnyNode,
   name: string,
