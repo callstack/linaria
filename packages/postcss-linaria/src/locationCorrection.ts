@@ -138,7 +138,11 @@ function computeCorrectedString(
 }
 
 /**
- * Computes the re-indented value of a given node's raw value
+ * Computes the re-indented value of a given node's raw value.
+ *
+ * Reads `raws[key].raw` rather than the property itself: PostCSS strips
+ * comments out of `selector`, `value` and `params`, and a comment placeholder
+ * there is all that is left of an interpolation classified as a ruleset.
  * @param {T} node Node to re-indent raw value of
  * @param {string} key Raw value key to re-indent
  * @param {Map=} baseIndentations Indentation map
@@ -146,10 +150,11 @@ function computeCorrectedString(
  */
 function computeCorrectedRawValue<T extends AnyNode>(
   node: T,
-  key: keyof T,
+  key: 'selector' | 'value' | 'params',
   baseIndentations?: Map<number, number>
 ): string | null {
-  const value = node[key];
+  const raws = node.raws as Record<string, { raw?: string } | undefined>;
+  const value = raws[key]?.raw ?? node[key as keyof T];
 
   if (typeof value !== 'string' || !node.source?.start) {
     return null;
@@ -250,18 +255,7 @@ function computeBeforeAfter(
   }
 
   if (node.type === 'decl' && node.value.includes('\n')) {
-    // PostCSS strips comments out of `value` but keeps them in `raws.value.raw`.
-    // A comment placeholder ends up inside the value when the declaration spans
-    // lines within parentheses, so read the raw form: taking `value` here drops
-    // the placeholder and the interpolation cannot be restored on stringify.
-    const rawSource = node.raws.value?.raw ?? node.value;
-    const rawValue = node.source?.start
-      ? computeCorrectedString(
-          rawSource,
-          node.source.start.line,
-          baseIndentations
-        )
-      : null;
+    const rawValue = computeCorrectedRawValue(node, 'value', baseIndentations);
 
     if (rawValue !== null) {
       (node.raws as unknown as Record<string, unknown>).linariaValue = rawValue;

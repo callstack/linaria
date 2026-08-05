@@ -24,6 +24,8 @@ const {
   adjacentSelectorExpressions,
   adjacentValueExpressions,
   adjacentExpressionsWithDoubleDigitIndex,
+  multilineSelectorWithMidlineExpression,
+  multilineAtRuleParamsMidlineExpression,
 } = sourceWithExpression;
 
 describe('stringify', () => {
@@ -147,6 +149,22 @@ describe('stringify', () => {
       const output = ast.toString(syntax);
       expect(output).toEqual(source);
     });
+
+    it('should stringify a multiline selector with an expression mid-selector', () => {
+      const { source, ast } = createTestAst(
+        multilineSelectorWithMidlineExpression
+      );
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
+
+    it('should stringify an expression in the middle of multi-line at-rule params', () => {
+      const { source, ast } = createTestAst(
+        multilineAtRuleParamsMidlineExpression
+      );
+      const output = ast.toString(syntax);
+      expect(output).toEqual(source);
+    });
   });
 
   // A newline inside `afterName` needs its base indentation restored just like
@@ -256,6 +274,37 @@ describe('stringify', () => {
         /* random comment about this line */
         .foo {
           color: hotpink; 
+        }
+      \`;
+    `);
+
+    const output = ast.toString(syntax);
+
+    expect(output).toEqual(source);
+  });
+
+  // Not the same as the placeholder cases above: these have no interpolations.
+  it('should keep a comment inside a multi-line selector', () => {
+    const { source, ast } = createTestAst(`
+      css\`
+        .foo,
+          /* about .bar */ .bar {
+          color: hotpink;
+        }
+      \`;
+    `);
+
+    const output = ast.toString(syntax);
+
+    expect(output).toEqual(source);
+  });
+
+  it('should keep a comment inside multi-line at-rule params', () => {
+    const { source, ast } = createTestAst(`
+      css\`
+        @media screen
+          and /* only wide ones */ (min-width: 100px) {
+          .foo { color: hotpink; }
         }
       \`;
     `);
