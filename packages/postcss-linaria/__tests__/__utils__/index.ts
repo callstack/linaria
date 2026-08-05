@@ -223,4 +223,27 @@ export const sourceWithExpression = {
         }
     \`;
   `,
+  multilineSelectorWithMidlineExpression: `
+    const styles = { parent: 'p', child: 'c' };
+    css\`
+      .foo {
+        &:hover {
+          ~ .\${styles.parent}
+            .\${styles.child} {
+            text-decoration: underline;
+          }
+        }
+      }
+    \`;
+  `,
+  multilineAtRuleParamsMidlineExpression: `
+    const expr = 'print';
+    css\`
+      @media screen
+        and \${expr}
+        and (min-width: 100px) {
+        .foo { color: black; }
+      }
+    \`;
+  `,
 };
