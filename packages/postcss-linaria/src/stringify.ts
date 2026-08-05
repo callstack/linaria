@@ -11,6 +11,7 @@ import type {
 } from 'postcss';
 import Stringifier from 'postcss/lib/stringifier';
 
+import { isOriginalField, isOriginalRaw } from './originalState';
 import { placeholderText } from './util';
 
 const commentPlaceholderPattern = new RegExp(
@@ -26,6 +27,23 @@ const placeholderOccurrencePattern = new RegExp(
   `(?:\\.|--)?${placeholderText}(\\d+)`,
   'g'
 );
+
+// The parse phase feeds the template's raw text into PostCSS, so backslashes
+// that survive the round trip are already written the way the source writes
+// them. A backtick is the only character that still needs attention: an
+// unescaped one would end the surrounding template literal. A run of
+// backslashes before it is even when the backtick is bare.
+const backtickPattern = /(\\*)`/g;
+
+const escapeBacktick = (value: string): string =>
+  value.replace(backtickPattern, (_match, backslashes: string) =>
+    backslashes.length % 2 === 0 ? `${backslashes}\\\`` : `${backslashes}\``
+  );
+
+const escapeChangedField = (value: string): string =>
+  value.replace(/\\/g, '\\\\').replace(/`/g, '\\`');
+
+const rawValueFields = new Set(['params', 'selector', 'value']);
 
 const substitutePlaceholders = (
   stringWithPlaceholders: string,
@@ -54,115 +72,117 @@ const substitutePlaceholders = (
   );
 };
 
+const escapeNodeField = (
+  node: AnyNode,
+  name: string,
+  value: string
+): string => {
+  const currentValue = (node as unknown as Record<string, unknown>)[name];
+  const currentRaw = (node.raws as Record<string, unknown>)[name];
+  const isSourceDerived =
+    isOriginalField(node, name, currentValue) &&
+    (!rawValueFields.has(name) || isOriginalRaw(node, name, currentRaw));
+  return isSourceDerived ? escapeBacktick(value) : escapeChangedField(value);
+};
+
+const escapeRawField = (node: AnyNode, name: string, value: string): string => {
+  const currentValue = (node.raws as Record<string, unknown>)[name];
+  return isOriginalRaw(node, name, currentValue)
+    ? escapeBacktick(value)
+    : escapeChangedField(value);
+};
+
+const restoreExpressions = (node: AnyNode, value: string): string =>
+  substitutePlaceholders(value, node.root().raws.linariaTemplateExpressions);
+
 /**
  * Stringifies PostCSS nodes while taking interpolated expressions
  * into account.
  */
 class LinariaStringifier extends Stringifier {
-  /** @inheritdoc */
-  public constructor(builder: Builder) {
-    const wrappedBuilder: Builder = (
-      str: string,
-      node?: AnyNode,
-      type?: 'start' | 'end'
-    ): void => {
-      // We purposely ignore the root node since the only thing we should
-      // be stringifying here is already JS (before/after raws) so likely
-      // already contains backticks on purpose.
-      //
-      // Similarly, if there is no node, we're probably stringifying
-      // pure JS which never contained any CSS. Or something really weird
-      // we don't want to touch anyway.
-      //
-      // For everything else, we want to escape backticks.
-      if (!node || node?.type === 'root') {
-        builder(str, node, type);
-      } else {
-        builder(str.replace(/\\/g, '\\\\').replace(/`/g, '\\`'), node, type);
-      }
-    };
-    super(wrappedBuilder);
+  public override atrule(node: AtRule, semicolon?: boolean): void {
+    let name = `@${escapeNodeField(node, 'name', node.name)}`;
+    const params = node.params
+      ? escapeNodeField(node, 'params', this.rawValue(node, 'params'))
+      : '';
+
+    const afterName = isOriginalRaw(node, 'afterName', node.raws.afterName)
+      ? node.raws.linariaAfterName ?? node.raws.afterName
+      : node.raws.afterName;
+    if (typeof afterName === 'string') {
+      name += escapeRawField(node, 'afterName', afterName);
+    } else if (params) {
+      name += ' ';
+    }
+
+    if (node.nodes) {
+      this.block(node, name + params);
+    } else {
+      const between = escapeRawField(node, 'between', node.raws.between || '');
+      const end = between + (semicolon ? ';' : '');
+      this.builder(restoreExpressions(node, name + params + end), node);
+    }
   }
 
-  public override atrule(node: AtRule, semicolon?: boolean) {
-    // Unlike `decl` and `rule`, this method hands the params back to
-    // `super.atrule`, which re-reads them through `rawValue`, and that prefers
-    // `raws.linariaParams`. Substituting into `node.params` alone is therefore
-    // discarded whenever the params span several lines, so read and write the
-    // same place the stringifier will.
-    const params = this.rawValue(node, 'params');
-    const expressionStrings = node.root().raws.linariaTemplateExpressions;
+  public override block(node: AtRule | Rule, start: string): void {
+    const between = escapeRawField(
+      node,
+      'between',
+      this.raw(node, 'between', 'beforeOpen')
+    );
+    this.builder(
+      restoreExpressions(node, `${start}${between}{`),
+      node,
+      'start'
+    );
 
-    if (params.includes(placeholderText)) {
-      const substituted = substitutePlaceholders(params, expressionStrings);
-
-      if (node.raws.linariaParams === undefined) {
-        // eslint-disable-next-line no-param-reassign
-        node.params = substituted;
-      } else {
-        // eslint-disable-next-line no-param-reassign
-        node.raws.linariaParams = substituted;
-      }
+    let after: string;
+    if (node.nodes?.length) {
+      this.body(node);
+      after = this.raw(node, 'after', undefined);
+    } else {
+      after = this.raw(node, 'after', 'emptyBody');
     }
 
-    // `super.atrule` reads `raws.afterName` straight off the node instead of
-    // going through `raw()`, so both the re-indented form and any placeholder
-    // substitution have to be written back onto it here. An interpolation on
-    // the line after the at-rule name lands in this raw rather than the params.
-    const afterName = node.raws.linariaAfterName ?? node.raws.afterName;
-    if (typeof afterName === 'string') {
-      // eslint-disable-next-line no-param-reassign
-      node.raws.afterName = afterName.includes(placeholderText)
-        ? substitutePlaceholders(afterName, expressionStrings)
-        : afterName;
-    }
-
-    super.atrule(node, semicolon);
+    if (after) this.builder(after);
+    this.builder('}', node, 'end');
   }
 
   /** @inheritdoc */
   public override comment(node: Comment): void {
-    const placeholderPattern = new RegExp(`^${placeholderText}:\\d+$`);
-    if (placeholderPattern.test(node.text)) {
-      const [, expressionIndexString] = node.text.split(':');
-      const expressionIndex = Number(expressionIndexString);
-      const root = node.root();
-      const expressionStrings = root.raws.linariaTemplateExpressions;
-
-      if (expressionStrings && !Number.isNaN(expressionIndex)) {
-        const expression = expressionStrings[expressionIndex];
-
-        if (expression) {
-          this.builder(expression, node);
-          return;
-        }
-      }
-    }
-
-    super.comment(node);
+    const left = escapeRawField(
+      node,
+      'left',
+      this.raw(node, 'left', 'commentLeft')
+    );
+    const text = escapeNodeField(node, 'text', node.text);
+    const right = escapeRawField(
+      node,
+      'right',
+      this.raw(node, 'right', 'commentRight')
+    );
+    const value = `/*${left}${text}${right}*/`;
+    this.builder(restoreExpressions(node, value), node);
   }
 
-  public override decl(node: Declaration, semicolon: boolean): void {
-    const between = this.raw(node, 'between', 'colon');
-    let { prop } = node;
-    const expressionStrings = node.root().raws.linariaTemplateExpressions;
-    if (prop.includes(placeholderText)) {
-      prop = substitutePlaceholders(prop, expressionStrings);
-    }
-
-    let value = this.rawValue(node, 'value');
-    if (value.includes(placeholderText)) {
-      value = substitutePlaceholders(value, expressionStrings);
-    }
-
+  /** @inheritdoc */
+  public override decl(node: Declaration, semicolon?: boolean): void {
+    const prop = escapeNodeField(node, 'prop', node.prop);
+    const between = escapeRawField(
+      node,
+      'between',
+      this.raw(node, 'between', 'colon')
+    );
+    const value = escapeNodeField(node, 'value', this.rawValue(node, 'value'));
     let string = prop + between + value;
 
     if (node.important) {
-      string += node.raws.important || ' !important';
+      const important = node.raws.important || ' !important';
+      string += escapeRawField(node, 'important', important);
     }
 
     if (semicolon) string += ';';
-    this.builder(string, node);
+    this.builder(restoreExpressions(node, string), node);
   }
 
   /** @inheritdoc */
@@ -180,13 +200,28 @@ class LinariaStringifier extends Stringifier {
     own: string,
     detect: string | undefined
   ): string {
-    if (own === 'before' && node.raws.before && node.raws.linariaBefore) {
+    if (
+      own === 'before' &&
+      node.raws.before &&
+      node.raws.linariaBefore &&
+      isOriginalRaw(node, own, node.raws.before)
+    ) {
       return node.raws.linariaBefore;
     }
-    if (own === 'after' && node.raws.after && node.raws.linariaAfter) {
+    if (
+      own === 'after' &&
+      node.raws.after &&
+      node.raws.linariaAfter &&
+      isOriginalRaw(node, own, node.raws.after)
+    ) {
       return node.raws.linariaAfter;
     }
-    if (own === 'between' && node.raws.between && node.raws.linariaBetween) {
+    if (
+      own === 'between' &&
+      node.raws.between &&
+      node.raws.linariaBetween &&
+      isOriginalRaw(node, own, node.raws.between)
+    ) {
       return node.raws.linariaBetween;
     }
     return super.raw(node, own, detect);
@@ -195,7 +230,13 @@ class LinariaStringifier extends Stringifier {
   /** @inheritdoc */
   public override rawValue(node: AnyNode, prop: string): string {
     const linariaProp = `linaria${prop[0]?.toUpperCase()}${prop.slice(1)}`;
-    if (Object.prototype.hasOwnProperty.call(node.raws, linariaProp)) {
+    const currentValue = (node as unknown as Record<string, unknown>)[prop];
+    const currentRaw = (node.raws as Record<string, unknown>)[prop];
+    if (
+      Object.prototype.hasOwnProperty.call(node.raws, linariaProp) &&
+      isOriginalField(node, prop, currentValue) &&
+      isOriginalRaw(node, prop, currentRaw)
+    ) {
       return `${node.raws[linariaProp]}`;
     }
 
@@ -219,14 +260,19 @@ class LinariaStringifier extends Stringifier {
   }
 
   public override rule(node: Rule): void {
-    let value = this.rawValue(node, 'selector');
-    if (value.includes(placeholderText)) {
-      const expressionStrings = node.root().raws.linariaTemplateExpressions;
-      value = substitutePlaceholders(value, expressionStrings);
-    }
-    this.block(node, value);
+    const selector = escapeNodeField(
+      node,
+      'selector',
+      this.rawValue(node, 'selector')
+    );
+    this.block(node, selector);
     if (node.raws.ownSemicolon) {
-      this.builder(node.raws.ownSemicolon, node, 'end');
+      const ownSemicolon = escapeRawField(
+        node,
+        'ownSemicolon',
+        node.raws.ownSemicolon
+      );
+      this.builder(restoreExpressions(node, ownSemicolon), node, 'end');
     }
   }
 }
