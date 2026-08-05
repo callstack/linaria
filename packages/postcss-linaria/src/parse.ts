@@ -7,6 +7,7 @@ import { Document, Input } from 'postcss';
 import postcssParse from 'postcss/lib/parse';
 
 import { locationCorrectionWalker } from './locationCorrection';
+import { captureOriginalState } from './originalState';
 import { createPlaceholder } from './util';
 
 // This function returns
@@ -196,7 +197,11 @@ export const parse: Parser<Root | Document> = (
     (root as Root & { document: Document }).document = doc;
     const walker = locationCorrectionWalker(node, sourceAsString);
     walker(root);
-    root.walk(walker);
+    root.walk((child) => {
+      walker(child);
+      captureOriginalState(child);
+    });
+    captureOriginalState(root);
     doc.nodes.push(root);
 
     currentOffset = node.quasi.range[1] - 1;

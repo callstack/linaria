@@ -492,6 +492,69 @@ describe('stringify', () => {
     );
   });
 
+  // https://github.com/callstack/linaria/issues/1497. Backslashes inside a
+  // template used to be doubled on every pass, so the file grew a new layer of
+  // escaping each time `--fix` ran over it.
+  it('should keep backslashes inside a template unchanged, however often it runs', () => {
+    const source = `
+      css\`
+        .foo {
+          &:before {
+            content: '\\u2022';
+            color: red;
+          }
+        }
+      \`;
+    `;
+
+    let current = source;
+    for (let pass = 0; pass < 3; pass += 1) {
+      const { ast } = createTestAst(current);
+      current = ast.toString(syntax);
+      expect(current).toEqual(source);
+    }
+  });
+
+  it('should leave JavaScript expressions unchanged', () => {
+    const source = `
+      css\`
+        &:checked ~ \${\`.\${bodyStyle}\`}::before {
+          content: \${'\\u2022'};
+        }
+      \`;
+    `;
+
+    let current = source;
+    for (let pass = 0; pass < 3; pass += 1) {
+      const { ast } = createTestAst(current);
+      current = ast.toString(syntax);
+      expect(current).toEqual(source);
+    }
+  });
+
+  it('should escape a backtick a rule introduces exactly once', () => {
+    const { ast } = createTestAst(`
+      css\`.foo { color: hotpink; }\`;
+    `);
+
+    const root = ast.nodes[0] as Root;
+    const rule = root.nodes[0] as Rule;
+    const colour = rule.nodes[0] as Declaration;
+    colour.raws.between = ': /*`*/';
+
+    const escaped = ast.toString(syntax);
+    expect(escaped).toEqual(
+      `
+      css\`.foo { color: /*\\\`*/hotpink; }\`;
+    `
+    );
+
+    // Reading that output back and writing it out again must not add another
+    // layer of escaping to the backtick the first pass already escaped.
+    const { ast: reparsed } = createTestAst(escaped);
+    expect(reparsed.toString(syntax)).toEqual(escaped);
+  });
+
   it('should not escape unrelated backslashes', () => {
     const { ast } = createTestAst(`
       const foo = 'abc\\def';
