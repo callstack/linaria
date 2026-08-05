@@ -79,7 +79,8 @@ const substitutePlaceholders = (
       // Without parser metadata, preserve the historical behaviour. With it,
       // remove only a marker the parser itself added; an otherwise identical
       // `.` or `--` from the source belongs in the output.
-      return placeholderPrefix === undefined || matchedPrefix === placeholderPrefix
+      return placeholderPrefix === undefined ||
+        matchedPrefix === placeholderPrefix
         ? expression
         : matchedPrefix + expression;
     }
