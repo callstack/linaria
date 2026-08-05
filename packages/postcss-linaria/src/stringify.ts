@@ -47,7 +47,8 @@ const rawValueFields = new Set(['params', 'selector', 'value']);
 
 const substitutePlaceholders = (
   stringWithPlaceholders: string,
-  expressions: string[]
+  expressions: string[],
+  expressionPlaceholderPrefixes?: string[]
 ) => {
   if (!stringWithPlaceholders.includes(placeholderText) || !expressions) {
     return stringWithPlaceholders;
@@ -66,8 +67,21 @@ const substitutePlaceholders = (
   return substituted.replace(
     placeholderOccurrencePattern,
     (match, indexString: string) => {
-      const expression = expressions[Number(indexString)];
-      return expression ?? match;
+      const index = Number(indexString);
+      const expression = expressions[index];
+      if (expression === undefined) {
+        return match;
+      }
+
+      const matchedPrefix = match.slice(0, match.indexOf(placeholderText));
+      const placeholderPrefix = expressionPlaceholderPrefixes?.[index];
+
+      // Without parser metadata, preserve the historical behaviour. With it,
+      // remove only a marker the parser itself added; an otherwise identical
+      // `.` or `--` from the source belongs in the output.
+      return placeholderPrefix === undefined || matchedPrefix === placeholderPrefix
+        ? expression
+        : matchedPrefix + expression;
     }
   );
 };
@@ -93,7 +107,11 @@ const escapeRawField = (node: AnyNode, name: string, value: string): string => {
 };
 
 const restoreExpressions = (node: AnyNode, value: string): string =>
-  substitutePlaceholders(value, node.root().raws.linariaTemplateExpressions);
+  substitutePlaceholders(
+    value,
+    node.root().raws.linariaTemplateExpressions,
+    node.root().raws.linariaTemplateExpressionPrefixes
+  );
 
 /**
  * Stringifies PostCSS nodes while taking interpolated expressions

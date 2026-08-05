@@ -8,7 +8,7 @@ import postcssParse from 'postcss/lib/parse';
 
 import { locationCorrectionWalker } from './locationCorrection';
 import { captureOriginalState } from './originalState';
-import { createPlaceholder } from './util';
+import { createPlaceholder, placeholderText } from './util';
 
 // This function returns
 // 1) styleText with placeholders for the expressions.
@@ -21,8 +21,13 @@ import { createPlaceholder } from './util';
 const generateStyleTextWithExpressionPlaceholders = (
   node: TaggedTemplateExpression,
   sourceAsString: string
-): { expressionStrings: string[]; styleText: string } => {
+): {
+  expressionPlaceholderPrefixes: string[];
+  expressionStrings: string[];
+  styleText: string;
+} => {
   let styleText = '';
+  const expressionPlaceholderPrefixes: string[] = [];
   const expressionStrings: string[] = [];
 
   for (let i = 0; i < node.quasi.quasis.length; i++) {
@@ -37,16 +42,24 @@ const generateStyleTextWithExpressionPlaceholders = (
           template.range[1],
           nextTemplate.range[0]
         );
-        styleText += createPlaceholder(
+        const placeholder = createPlaceholder(
           i,
           sourceAsString,
           nextTemplate.range[0]
+        );
+        styleText += placeholder;
+        expressionPlaceholderPrefixes.push(
+          placeholder.slice(0, placeholder.indexOf(placeholderText))
         );
         expressionStrings.push(exprText);
       }
     }
   }
-  return { styleText, expressionStrings };
+  return {
+    styleText,
+    expressionStrings,
+    expressionPlaceholderPrefixes,
+  };
 };
 
 const getDeindentedStyleTextAndOffsets = (
@@ -162,7 +175,11 @@ export const parse: Parser<Root | Document> = (
 
     const startIndex = node.quasi.range[0] + 1;
 
-    const { styleText, expressionStrings } =
+    const {
+      styleText,
+      expressionStrings,
+      expressionPlaceholderPrefixes,
+    } =
       generateStyleTextWithExpressionPlaceholders(node, sourceAsString);
 
     const { deindentedStyleText, prefixOffsets, baseIndentations } =
@@ -180,6 +197,8 @@ export const parse: Parser<Root | Document> = (
 
     root.raws.linariaPrefixOffsets = prefixOffsets;
     root.raws.linariaTemplateExpressions = expressionStrings;
+    root.raws.linariaTemplateExpressionPrefixes =
+      expressionPlaceholderPrefixes;
     root.raws.linariaBaseIndentations = baseIndentations;
     // TODO: remove this if stylelint/stylelint#5767 ever gets fixed,
     // or they drop the indentation rule. Their indentation rule depends on
