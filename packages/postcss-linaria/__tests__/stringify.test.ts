@@ -585,6 +585,65 @@ export const style = {
     }
   });
 
+  // https://github.com/callstack/linaria/issues/1508. A fixer can change one
+  // part of a field while retaining a source-derived escape elsewhere in it.
+  it('should preserve source backslashes in a declaration changed by a fixer', () => {
+    const { ast } = createTestAst(`
+      css\`
+        .foo {
+          content: '\\u2022';
+        }
+      \`;
+    `);
+    const root = ast.nodes[0] as Root;
+    const rule = root.nodes[0] as Rule;
+    const content = rule.nodes[0] as Declaration;
+
+    content.value = content.value.replace(/'/g, '"');
+
+    expect(ast.toString(syntax)).toEqual(
+      `
+      css\`
+        .foo {
+          content: "\\u2022";
+        }
+      \`;
+    `
+    );
+  });
+
+  it('should distinguish retained and introduced backslashes in a changed selector', () => {
+    const { ast } = createTestAst(`
+      css\`.foo\\:bar { color: hotpink; }\`;
+    `);
+    const root = ast.nodes[0] as Root;
+    const rule = root.nodes[0] as Rule;
+
+    rule.selector = `.new\\#qux${rule.selector.replace('.foo', '.baz')}`;
+
+    expect(ast.toString(syntax)).toEqual(
+      `
+      css\`.new\\\\#qux.baz\\:bar { color: hotpink; }\`;
+    `
+    );
+  });
+
+  it('should escape duplicate backslashes conservatively when their origin is ambiguous', () => {
+    const { ast } = createTestAst(`
+      css\`.foo\\:bar { color: hotpink; }\`;
+    `);
+    const root = ast.nodes[0] as Root;
+    const rule = root.nodes[0] as Rule;
+
+    rule.selector = `.new\\:qux${rule.selector.replace('.foo', '.baz')}`;
+
+    expect(ast.toString(syntax)).toEqual(
+      `
+      css\`.new\\\\:qux.baz\\\\:bar { color: hotpink; }\`;
+    `
+    );
+  });
+
   it('should escape a backtick a rule introduces exactly once', () => {
     const { ast } = createTestAst(`
       css\`.foo { color: hotpink; }\`;

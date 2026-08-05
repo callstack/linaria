@@ -11,7 +11,11 @@ import type {
 } from 'postcss';
 import Stringifier from 'postcss/lib/stringifier';
 
-import { isOriginalField, isOriginalRaw } from './originalState';
+import {
+  getOriginalField,
+  isOriginalField,
+  isOriginalRaw,
+} from './originalState';
 import { placeholderText } from './util';
 
 const commentPlaceholderPattern = new RegExp(
@@ -40,8 +44,130 @@ const escapeBacktick = (value: string): string =>
     backslashes.length % 2 === 0 ? `${backslashes}\\\`` : `${backslashes}\``
   );
 
-const escapeChangedField = (value: string): string =>
-  value.replace(/\\/g, '\\\\').replace(/`/g, '\\`');
+interface FieldToken {
+  isEscape: boolean;
+  value: string;
+}
+
+const fieldTokenPattern =
+  /\\(?:[0-9a-fA-F]{1,6}[ \t\r\n\f]?|[\s\S])|[^\\]+|\\$/g;
+const maxTrackedTokenComparisons = 65_536;
+
+const tokenizeField = (value: string): FieldToken[] =>
+  Array.from(value.matchAll(fieldTokenPattern), ([token]) => ({
+    isEscape: token.startsWith('\\'),
+    value: token,
+  }));
+
+const tokensEqual = (
+  first: FieldToken | undefined,
+  second: FieldToken | undefined
+): boolean =>
+  first !== undefined &&
+  second !== undefined &&
+  first.isEscape === second.isEscape &&
+  first.value === second.value;
+
+const countEscapeTokens = (tokens: FieldToken[]): Map<string, number> =>
+  tokens.reduce((counts, token) => {
+    if (token.isEscape) {
+      counts.set(token.value, (counts.get(token.value) ?? 0) + 1);
+    }
+    return counts;
+  }, new Map<string, number>());
+
+// A fixer exposes only its complete before/after strings. Comparing CSS escape
+// tokens plus their unchanged neighbouring chunks identifies retained escapes
+// without a character-sized diff. If an escape's count changes, its occurrences
+// are ambiguous and remain fixer-owned. The bound prevents pathological fields
+// with thousands of escapes from allocating a large LCS table; those safely
+// fall back to treating every escape as fixer-owned.
+const findRetainedEscapeTokens = (
+  original: FieldToken[],
+  changed: FieldToken[]
+): boolean[] => {
+  const retained = new Array<boolean>(changed.length).fill(false);
+  if (original.length * changed.length > maxTrackedTokenComparisons) {
+    return retained;
+  }
+
+  const originalEscapeCounts = countEscapeTokens(original);
+  const changedEscapeCounts = countEscapeTokens(changed);
+  const unambiguousEscapes = new Set<string>();
+  originalEscapeCounts.forEach((count, escape) => {
+    if (changedEscapeCounts.get(escape) === count) {
+      unambiguousEscapes.add(escape);
+    }
+  });
+
+  const columns = changed.length + 1;
+  const lengths = new Uint16Array((original.length + 1) * columns);
+  for (
+    let originalIndex = original.length - 1;
+    originalIndex >= 0;
+    originalIndex -= 1
+  ) {
+    for (
+      let changedIndex = changed.length - 1;
+      changedIndex >= 0;
+      changedIndex -= 1
+    ) {
+      const index = originalIndex * columns + changedIndex;
+      lengths[index] = tokensEqual(
+        original[originalIndex],
+        changed[changedIndex]
+      )
+        ? (lengths[index + columns + 1] ?? 0) + 1
+        : Math.max(lengths[index + columns] ?? 0, lengths[index + 1] ?? 0);
+    }
+  }
+
+  let originalIndex = 0;
+  let changedIndex = 0;
+  while (originalIndex < original.length && changedIndex < changed.length) {
+    const originalToken = original[originalIndex];
+    const changedToken = changed[changedIndex];
+    if (tokensEqual(originalToken, changedToken)) {
+      retained[changedIndex] =
+        changedToken?.isEscape === true &&
+        unambiguousEscapes.has(changedToken.value);
+      originalIndex += 1;
+      changedIndex += 1;
+    } else if (
+      (lengths[(originalIndex + 1) * columns + changedIndex] ?? 0) >=
+      (lengths[originalIndex * columns + changedIndex + 1] ?? 0)
+    ) {
+      originalIndex += 1;
+    } else {
+      changedIndex += 1;
+    }
+  }
+
+  return retained;
+};
+
+const escapeChangedField = (value: string, originalValue?: string): string => {
+  if (
+    originalValue === undefined ||
+    !originalValue.includes('\\') ||
+    !value.includes('\\')
+  ) {
+    return value.replace(/\\/g, '\\\\').replace(/`/g, '\\`');
+  }
+
+  const originalTokens = tokenizeField(originalValue);
+  const changedTokens = tokenizeField(value);
+  const retained = findRetainedEscapeTokens(originalTokens, changedTokens);
+  const escaped = changedTokens
+    .map((token, index) =>
+      token.isEscape && !retained[index]
+        ? token.value.replace(/\\/g, '\\\\')
+        : token.value
+    )
+    .join('');
+
+  return escapeBacktick(escaped);
+};
 
 const rawValueFields = new Set(['params', 'selector', 'value']);
 
@@ -93,11 +219,19 @@ const escapeNodeField = (
   value: string
 ): string => {
   const currentValue = (node as unknown as Record<string, unknown>)[name];
+  const originalValue = getOriginalField(node, name);
   const currentRaw = (node.raws as Record<string, unknown>)[name];
   const isSourceDerived =
     isOriginalField(node, name, currentValue) &&
     (!rawValueFields.has(name) || isOriginalRaw(node, name, currentRaw));
-  return isSourceDerived ? escapeBacktick(value) : escapeChangedField(value);
+  if (isSourceDerived) return escapeBacktick(value);
+
+  return escapeChangedField(
+    value,
+    typeof originalValue === 'string' && currentValue === value
+      ? originalValue
+      : undefined
+  );
 };
 
 const escapeRawField = (node: AnyNode, name: string, value: string): string => {
