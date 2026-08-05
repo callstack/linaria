@@ -175,11 +175,7 @@ export const parse: Parser<Root | Document> = (
 
     const startIndex = node.quasi.range[0] + 1;
 
-    const {
-      styleText,
-      expressionStrings,
-      expressionPlaceholderPrefixes,
-    } =
+    const { styleText, expressionStrings, expressionPlaceholderPrefixes } =
       generateStyleTextWithExpressionPlaceholders(node, sourceAsString);
 
     const { deindentedStyleText, prefixOffsets, baseIndentations } =
@@ -197,8 +193,7 @@ export const parse: Parser<Root | Document> = (
 
     root.raws.linariaPrefixOffsets = prefixOffsets;
     root.raws.linariaTemplateExpressions = expressionStrings;
-    root.raws.linariaTemplateExpressionPrefixes =
-      expressionPlaceholderPrefixes;
+    root.raws.linariaTemplateExpressionPrefixes = expressionPlaceholderPrefixes;
     root.raws.linariaBaseIndentations = baseIndentations;
     // TODO: remove this if stylelint/stylelint#5767 ever gets fixed,
     // or they drop the indentation rule. Their indentation rule depends on
