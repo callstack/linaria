@@ -1,5 +1,5 @@
-{"filename":"src/index.jsx","needCount":1,"needRequestCount":1,"runtimeDependencyCount":1,"staticValueCount":0,"type":"staticPlan","unresolvedCount":1,"usageCount":1,"datetime":"2026-08-10T14:57:18.925Z"}
-{"filename":"src/components/App.jsx","needCount":0,"needRequestCount":0,"runtimeDependencyCount":0,"staticValueCount":0,"type":"staticPlan","unresolvedCount":0,"usageCount":1,"datetime":"2026-08-10T14:57:19.260Z"}
-{"filename":"src/components/Header.jsx","needCount":3,"needRequestCount":3,"runtimeDependencyCount":3,"staticValueCount":0,"type":"staticPlan","unresolvedCount":4,"usageCount":4,"datetime":"2026-08-10T14:57:19.345Z"}
-{"filename":"src/components/Hero.jsx","needCount":3,"needRequestCount":3,"runtimeDependencyCount":2,"staticValueCount":0,"type":"staticPlan","unresolvedCount":5,"usageCount":8,"datetime":"2026-08-10T14:57:19.441Z"}
-{"filename":"src/components/Container.js","needCount":0,"needRequestCount":0,"runtimeDependencyCount":0,"staticValueCount":0,"type":"staticPlan","unresolvedCount":0,"usageCount":1,"datetime":"2026-08-10T14:57:19.457Z"}
+{"filename":"src/index.jsx","needCount":1,"needRequestCount":1,"runtimeDependencyCount":1,"staticValueCount":0,"type":"staticPlan","unresolvedCount":1,"usageCount":1,"datetime":"2026-08-10T16:34:11.576Z"}
+{"filename":"src/components/App.jsx","needCount":0,"needRequestCount":0,"runtimeDependencyCount":0,"staticValueCount":0,"type":"staticPlan","unresolvedCount":0,"usageCount":1,"datetime":"2026-08-10T16:34:11.919Z"}
+{"filename":"src/components/Header.jsx","needCount":3,"needRequestCount":3,"runtimeDependencyCount":3,"staticValueCount":0,"type":"staticPlan","unresolvedCount":4,"usageCount":4,"datetime":"2026-08-10T16:34:12.004Z"}
+{"filename":"src/components/Hero.jsx","needCount":3,"needRequestCount":3,"runtimeDependencyCount":2,"staticValueCount":0,"type":"staticPlan","unresolvedCount":5,"usageCount":8,"datetime":"2026-08-10T16:34:12.096Z"}
+{"filename":"src/components/Container.js","needCount":0,"needRequestCount":0,"runtimeDependencyCount":0,"staticValueCount":0,"type":"staticPlan","unresolvedCount":0,"usageCount":1,"datetime":"2026-08-10T16:34:12.113Z"}
