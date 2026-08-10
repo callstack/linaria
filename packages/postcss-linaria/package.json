@@ -34,13 +34,13 @@
   },
   "dependencies": {
     "@babel/parser": "^7.23.5",
-    "@babel/traverse": "^7.23.5",
-    "stylelint": "^14.11.0"
+    "@babel/traverse": "^7.23.5"
   },
   "devDependencies": {
     "@babel/types": "^7.23.5",
     "@types/babel__traverse": "^7.20.4",
-    "postcss": "^8.4.31"
+    "postcss": "^8.4.31",
+    "stylelint": "^14.11.0"
   },
   "peerDependencies": {
     "postcss": "^8.4.31"
