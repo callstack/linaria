@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "name": "@linaria/core/css",
+  "implementation": "../dist/processors/css.js",
+  "tags": ["css"],
+  "semantics": {
+    "kind": "css-template",
+    "outputs": ["class-name", "css-text"],
+    "runtimeDependencies": "explicit",
+    "staticInterpolations": [
+      "serializable",
+      "class-name",
+      "selector-chain"
+    ]
+  }
+}

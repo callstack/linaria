@@ -38,7 +38,7 @@
   "wyw-in-js": {
     "tags": {
       "css": "./dist/processors/css.js",
-      "styled": "./dist/processors/styled.js"
+      "styled": "./processors/styled.processor.json"
     }
   },
   "scripts": {

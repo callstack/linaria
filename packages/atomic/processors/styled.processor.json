@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "name": "@linaria/atomic/styled",
+  "implementation": "../dist/processors/styled.js",
+  "tags": ["styled"],
+  "semantics": {
+    "kind": "styled-target",
+    "targets": ["class-name", "selector-chain", "opaque-component"]
+  }
+}
