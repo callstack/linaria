@@ -1004,7 +1004,8 @@ Dependencies: ./__fixtures__/enums
 
 exports[`strategy shaker evaluates interpolations with sequence expression 1`] = `
 "import { styled } from '@linaria/react';
-const _exp = () => ((0, () => "blue"));
+let external = 0;
+const _exp = () => ((external, () => "blue"));
 export const Title = /*#__PURE__*/styled('h1')({
   name: "Title",
   class: "Title_t13jq05",
@@ -1421,7 +1422,7 @@ CSS:
   color: blue;
 }
 
-Dependencies: NA
+Dependencies: @linaria/react
 
 `;
 
@@ -2418,7 +2419,7 @@ Dependencies: NA
 exports[`strategy shaker should process \`css\` calls with complex interpolation inside components 1`] = `
 "import React from 'react';
 export function Component() {
-  const className = "className_c1egpet8";
+  const className = "className_c1vhermz";
   return React.createElement("div", {
     className: className
   });
@@ -2430,12 +2431,9 @@ exports[`strategy shaker should process \`css\` calls with complex interpolation
 CSS:
 
 .cell_c13jq05 {
-      opacity: 0;
-    }
-.cell_c1vhermz {
-      opacity: 0;
-    }
-.className_c1egpet8 {
+    opacity: 0;
+  }
+.className_c1vhermz {
     opacity: 0.5;
     font-size: 42
     font-size: 42
@@ -2480,7 +2478,7 @@ import {styled} from '@linaria/react';
 export function Component() {
   const MyComponent = /*#__PURE__*/styled('h1')({
     name: "MyComponent",
-    class: "MyComponent_mvc9xb3",
+    class: "MyComponent_m1egpet8",
     propsAsIs: false
   });
   return React.createElement(MyComponent);
@@ -2495,12 +2493,9 @@ CSS:
   opacity: 0.5
 }
 .cell_c1vhermz {
-      opacity: 0;
-    }
-.cell_c1egpet8 {
-      opacity: 0;
-    }
-.MyComponent_mvc9xb3 {
+    opacity: 0;
+  }
+.MyComponent_m1egpet8 {
     opacity: 0.5;
 
     &:hover .cell_c1vhermz {
