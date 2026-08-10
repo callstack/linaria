@@ -1,5 +1,18 @@
 # Change Log
 
+## 8.2.0
+
+### Patch Changes
+
+- Updated dependencies [d3b131dc]
+- Updated dependencies [c7b0360e]
+- Updated dependencies [cc438354]
+- Updated dependencies [ee377a44]
+- Updated dependencies [832c1f88]
+- Updated dependencies [f3871e64]
+- Updated dependencies [d28a5a88]
+  - @linaria/postcss-linaria@8.2.0
+
 ## 8.1.1
 
 ### Patch Changes

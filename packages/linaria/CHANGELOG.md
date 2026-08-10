@@ -1,5 +1,15 @@
 # Change Log
 
+## 8.2.0
+
+### Patch Changes
+
+- Updated dependencies [0ddc4d6b]
+- Updated dependencies [dcc996a4]
+  - @linaria/core@8.2.0
+  - @linaria/react@8.2.0
+  - @linaria/server@8.2.0
+
 ## 8.1.1
 
 ### Patch Changes

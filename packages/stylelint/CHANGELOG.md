@@ -1,5 +1,11 @@
 # Change Log
 
+## 8.2.0
+
+### Minor Changes
+
+- dcc996a4: Update WyW dependencies to 2.4.0.
+
 ## 8.1.1
 
 ## 8.1.0
