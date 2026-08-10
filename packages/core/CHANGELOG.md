@@ -1,5 +1,15 @@
 # Change Log
 
+## 8.2.0
+
+### Minor Changes
+
+- dcc996a4: Update WyW dependencies to 2.4.0.
+
+### Patch Changes
+
+- 0ddc4d6b: Declare built-in WyW semantics for the `css` and `styled` processors so static processor values can be resolved without evaluating their modules. Atomic `styled` uses the same target semantics, while atomic `css` keeps its post-extraction JS contract.
+
 ## 8.1.1
 
 ## 8.1.0

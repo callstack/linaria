@@ -1,5 +1,49 @@
 # Change Log
 
+## 8.2.0
+
+### Patch Changes
+
+- d3b131dc: Preserve source escapes within fields changed by fixers
+
+  When a fixer changes part of a selector or declaration value, the stringifier now compares the original and changed CSS escape tokens. Retained source backslashes remain unchanged, while backslashes added by the fixer are still escaped for the surrounding JavaScript template (#1508).
+
+- c7b0360e: Keep comment indentation stable through `stylelint --fix`
+
+  Indented templates no longer add their base indentation before trailing comments or remove it from continuation lines inside multi-line comments. Repeated parse/stringify passes now preserve both forms byte-for-byte (#1502).
+
+- cc438354: Fix interpolations and comments being dropped from multi-line selectors and at-rule params
+
+  An interpolation that continues a selector onto the next line looks like a ruleset, so it gets a comment placeholder. PostCSS keeps that comment only in `raws.selector.raw`, and the re-indented selector was read from `selector`, so `~ .${styles.parent}` came out as `~ .` on any `stylelint --fix`. Multi-line at-rule params had the same problem via `raws.params.raw`.
+
+  The same defect was fixed for `decl.value` in the previous release (#1494); the selector and params paths were missed. All three now read the raw form through `computeCorrectedRawValue`.
+
+  Hand-written comments were dropped by the same code path, so a comment inside a multi-line selector or multi-line at-rule params now survives too, interpolations or not.
+
+- ee377a44: Stop `stylelint --fix` from rewriting templates it should leave alone
+
+  Backslashes inside a template were doubled on the way out and doubled again on every later run (#1497). Restored `${...}` expressions were passed through the same CSS escaping, so a backtick inside an expression was escaped and could leave the JavaScript unparseable.
+
+  The parser now records each source-derived field before Stylelint rules run. The stringifier leaves backslashes in unchanged fields alone, retains the existing escaping for fields written by fixers, and restores interpolation placeholders only after escaping. The complete JavaScript expression source therefore stays unchanged, and repeated parse/stringify passes are idempotent.
+
+  Fixers can continue to write CSS values with their normal escaping; the stringifier still translates those values into safe JavaScript template source.
+
+- 832c1f88: Preserve source prefixes before interpolations
+
+  The parser now records whether it added a synthetic `.` or `--` to keep an interpolation parseable. The stringifier removes only that recorded marker, so `stylelint --fix` no longer drops a real leading dot from selectors such as `.\${className}` (#1501).
+
+- f3871e64: Fix adjacent interpolations being mangled by `stylelint --fix`
+
+  `substitutePlaceholders` split each whitespace-separated token on the placeholder marker and only read the first two parts, so a token holding more than one interpolation — an attribute selector like `&[${a}][${b}]`, or a value like `margin: ${a}${b}` — silently lost everything from the second interpolation onward, corrupting the output into invalid CSS (#1498).
+
+- d28a5a88: Fix interpolations and indentation being mangled by `stylelint --fix`
+
+  An interpolation alone on its own line gets a comment placeholder. Inside a parenthesised value PostCSS keeps that comment only in `raws.value.raw`, and the re-indented value was read from `value`, so the placeholder was gone by the time the stringifier ran, and the interpolation with it (#1494).
+
+  Multi-line at-rule params were corrupted rather than dropped: `super.atrule` re-reads params through `rawValue`, so substituting into `node.params` was discarded and `@media screen and ${query}` came out as `@media screen and .pcss-lin0`. An interpolation on the line after the at-rule name lands in the `afterName` raw and was emitted verbatim for the same reason.
+
+  A newline inside `afterName` also never had its base indentation restored, so a wrapped at-rule prelude lost its leading whitespace on any fix, templates with no interpolations at all included.
+
 ## 8.1.1
 
 ## 8.1.0
