@@ -2398,17 +2398,17 @@ describe('strategy shaker', () => {
         opacity: 0.5,
       };
 
+      const classes = {
+        value: 0.2,
+        cell: css\`
+          opacity: 0;
+        \`,
+      };
+
+      const classes2 = classes;
+      const referencedExternalDep = externalDep
+
       export function Component() {
-        const classes = {
-          value: 0.2,
-          cell: css\`
-            opacity: 0;
-          \`,
-        };
-
-        const classes2 = classes;
-        const referencedExternalDep = externalDep
-
         const className = css\`
           opacity: ${'${globalObj.opacity}'};
           font-size: ${'${externalDep}'}
@@ -2477,16 +2477,16 @@ describe('strategy shaker', () => {
           opacity: ${'${globalObj.opacity}'}
         \`
 
+        const classes = {
+          value: 0.2,
+          cell: css\`
+            opacity: 0;
+          \`,
+        };
+
+        const classes2 = classes;
+
         export function Component() {
-          const classes = {
-            value: 0.2,
-            cell: css\`
-              opacity: 0;
-            \`,
-          };
-
-          const classes2 = classes;
-
           const MyComponent = styled.h1\`
             opacity: ${'${globalObj.opacity}'};
 
