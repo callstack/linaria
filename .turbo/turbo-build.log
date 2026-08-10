@@ -24,36 +24,36 @@
 
 
 Timings:
-  Total: 2753ms
+  Total: 2584ms
 
   By method:
-    createEntrypoint: 1ms
-    transform:collect:applyProcessors: 14ms
-    transform:collect:applyProcessors:cleanup: 8ms
+    createEntrypoint: 2ms
+    transform:collect:applyProcessors: 13ms
+    transform:collect:applyProcessors:cleanup: 6ms
     transform:collect:applyProcessors:processors: 6ms
     transform:collect:normalize: 3ms
     transform:collect:processorRuntime: 3ms
     transform:collect:sourceMap: 1ms
     transform:emitCommonJS: 1ms
-    transform:evalFile: 333ms
-    transform:evaluator: 10ms
+    transform:evalFile: 309ms
+    transform:evaluator: 8ms
     transform:preeval: 42ms
     transform:preeval:importMetaEnv: 0ms
-    transform:preeval:processTemplate: 40ms
-    transform:preeval:processTemplate:deps: 7ms
-    transform:preeval:processTemplate:imports: 18ms
+    transform:preeval:processTemplate: 39ms
+    transform:preeval:processTemplate:deps: 6ms
+    transform:preeval:processTemplate:imports: 19ms
     transform:preeval:processTemplate:imports:analysis: 1ms
-    transform:preeval:processTemplate:imports:lookup: 16ms
+    transform:preeval:processTemplate:imports:lookup: 18ms
     transform:preeval:processTemplate:processors: 4ms
     transform:preeval:processTemplate:usages: 0ms
     transform:preeval:processTemplate:usedNames: 0ms
-    transform:preeval:removeDangerousCode: 5ms
-    transform:preeval:staticMetadata: 2ms
+    transform:preeval:removeDangerousCode: 3ms
+    transform:preeval:staticMetadata: 1ms
 
 Memory usage: {
-  rss: 260124672,
-  heapTotal: 146190336,
-  heapUsed: 112277304,
+  rss: 260030464,
+  heapTotal: 146452480,
+  heapUsed: 112415432,
   external: 4207075,
   arrayBuffers: 1341094
 }
@@ -81,12 +81,12 @@ cacheable modules 148 KiB (javascript) 62.6 KiB (asset) 3.75 KiB (css/mini-extra
       css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.4.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/components/Hero.jsx?wyw=wyw-in-js.css[39m[22m 1.85 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.4.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/index.jsx?wyw=wyw-in-js.css[39m[22m 316 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.4.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/components/Container.js?wyw=wyw-in-js.css[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.104.1 compiled [1m[32msuccessfully[39m[22m in 2492 ms
+webpack 5.104.1 compiled [1m[32msuccessfully[39m[22m in 2317 ms
 
 > linaria-website@6.3.3 build:server /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production babel src --out-dir build-jsx --config-file ./babel.server-jsx.config.js && cross-env NODE_ENV=production BABEL_ENV=server babel build-jsx --out-dir build && del-cli build-jsx
 
-Successfully compiled 11 files with Babel (166ms).
-(node:3679) [WYW_BABEL_PRESET_COMPATIBILITY] DeprecationWarning: [wyw-in-js] @wyw-in-js/babel-preset is a deprecated compatibility wrapper around the Oxc-backed transform. Prefer bundler integrations or the transform() API for new setups.
+Successfully compiled 11 files with Babel (161ms).
+(node:3818) [WYW_BABEL_PRESET_COMPATIBILITY] DeprecationWarning: [wyw-in-js] @wyw-in-js/babel-preset is a deprecated compatibility wrapper around the Oxc-backed transform. Prefer bundler integrations or the transform() API for new setups.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-Successfully compiled 11 files with Babel (2532ms).
+Successfully compiled 11 files with Babel (2519ms).
