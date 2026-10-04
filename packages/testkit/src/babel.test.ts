@@ -2972,7 +2972,7 @@ describe('strategy shaker', () => {
         [evaluator]
       );
 
-    expect(fn).rejects.toThrowError(`Cannot find module '_/re-exports'`);
+    await expect(fn).rejects.toThrowError(`Cannot find module '_/re-exports'`);
   });
 
   it('respects explicit wyw config file custom resolver', async () => {
