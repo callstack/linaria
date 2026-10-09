@@ -9,10 +9,19 @@ type Serializer<T> = {
 };
 
 const fixturesRoot = resolve(__dirname, '..');
+// Modules of other workspace packages, such as `@linaria/core`, are listed by
+// absolute path; write them relative to the repository to keep snapshots
+// portable between machines.
+const repositoryRoot = resolve(__dirname, '../../../..');
 
 const formatDependency = (dependency: string): string => {
   if (!dependency.startsWith(fixturesRoot)) {
-    return dependency;
+    return dependency.startsWith(repositoryRoot)
+      ? `<repository>/${relative(repositoryRoot, dependency).replace(
+          /\\/g,
+          '/'
+        )}`
+      : dependency;
   }
 
   const relativeDependency = `./${relative(fixturesRoot, dependency).replace(
