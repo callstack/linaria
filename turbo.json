@@ -19,16 +19,20 @@
       "cache": false
     },
     "@linaria/atomic#test": {
-      "dependsOn": ["@linaria/core#build", "@linaria/react#build"]
+      "dependsOn": ["@linaria/core#build", "@linaria/react#build"],
+      "cache": false
     },
     "@linaria/react#test": {
-      "dependsOn": ["@linaria/core#build"]
+      "dependsOn": ["@linaria/core#build"],
+      "cache": false
     },
     "@linaria/postcss-linaria#test": {
-      "dependsOn": ["@linaria/postcss-linaria#build"]
+      "dependsOn": ["@linaria/postcss-linaria#build"],
+      "cache": false
     },
     "@linaria/testkit#test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "cache": false
     },
     "test:dts": {
       "dependsOn": ["build:declarations", "^build:declarations"],
