@@ -447,7 +447,7 @@ CSS:
   color: foo;
 }
 
-Dependencies: ./__fixtures__/re-exports
+Dependencies: ./__fixtures__/re-exports, ./__fixtures__/re-exports/empty, ./__fixtures__/re-exports/foo, ./__fixtures__/re-exports/constants, ./__fixtures__/bar
 
 `;
 
@@ -468,7 +468,7 @@ CSS:
   color: bar;
 }
 
-Dependencies: ./__fixtures__/re-exports
+Dependencies: ./__fixtures__/re-exports, ./__fixtures__/re-exports/empty, ./__fixtures__/re-exports/foo, ./__fixtures__/re-exports/constants, ./__fixtures__/bar
 
 `;
 
@@ -489,7 +489,7 @@ CSS:
   color: bar1;
 }
 
-Dependencies: ./__fixtures__/re-exports
+Dependencies: ./__fixtures__/re-exports, ./__fixtures__/re-exports/empty, ./__fixtures__/re-exports/foo, ./__fixtures__/re-exports/constants, ./__fixtures__/bar
 
 `;
 
@@ -510,7 +510,7 @@ CSS:
   color: bar2;
 }
 
-Dependencies: ./__fixtures__/re-exports
+Dependencies: ./__fixtures__/re-exports, ./__fixtures__/re-exports/empty, ./__fixtures__/re-exports/foo, ./__fixtures__/re-exports/constants, ./__fixtures__/bar
 
 `;
 
@@ -531,7 +531,7 @@ CSS:
   color: foo;
 }
 
-Dependencies: ./__fixtures__/re-exports
+Dependencies: ./__fixtures__/re-exports, ./__fixtures__/re-exports/empty, ./__fixtures__/re-exports/foo, ./__fixtures__/re-exports/constants, ./__fixtures__/bar
 
 `;
 
@@ -552,7 +552,7 @@ CSS:
   color: bar2;
 }
 
-Dependencies: ./__fixtures__/re-exports
+Dependencies: ./__fixtures__/re-exports, ./__fixtures__/re-exports/empty, ./__fixtures__/re-exports/foo, ./__fixtures__/re-exports/constants, ./__fixtures__/bar
 
 `;
 
@@ -811,7 +811,7 @@ CSS:
   color: foo;
 }
 
-Dependencies: ./__fixtures__/re-exports
+Dependencies: ./__fixtures__/re-exports, ./__fixtures__/re-exports/empty, ./__fixtures__/re-exports/foo, ./__fixtures__/re-exports/constants, ./__fixtures__/bar
 
 `;
 
@@ -1422,7 +1422,7 @@ CSS:
   color: blue;
 }
 
-Dependencies: @linaria/react
+Dependencies: @linaria/react, <repository>/packages/core/dist/index.js
 
 `;
 
@@ -2065,7 +2065,7 @@ CSS:
   color: foo;
 }
 
-Dependencies: _/re-exports
+Dependencies: _/re-exports, ./__fixtures__/re-exports/empty, ./__fixtures__/re-exports/foo, ./__fixtures__/re-exports/constants, ./__fixtures__/bar
 
 `;
 
@@ -2086,7 +2086,7 @@ CSS:
   color: foo;
 }
 
-Dependencies: _/re-exports
+Dependencies: _/re-exports, ./__fixtures__/re-exports/empty, ./__fixtures__/re-exports/foo, ./__fixtures__/re-exports/constants, ./__fixtures__/bar
 
 `;
 
@@ -2191,7 +2191,7 @@ CSS:
   color: foo1;
 }
 
-Dependencies: ./__fixtures__/reexports
+Dependencies: ./__fixtures__/reexports, ./__fixtures__/foo, ./__fixtures__/bar, ./__fixtures__/re-exports/constants
 
 `;
 
@@ -2261,7 +2261,7 @@ CSS:
   color: foo3;
 }
 
-Dependencies: ./__fixtures__/reexports
+Dependencies: ./__fixtures__/reexports, ./__fixtures__/foo, ./__fixtures__/bar, ./__fixtures__/re-exports/constants
 
 `;
 
@@ -2527,7 +2527,7 @@ CSS:
   color: bar;
 }
 
-Dependencies: ./__fixtures__/circular-imports
+Dependencies: ./__fixtures__/circular-imports, ./__fixtures__/circular-imports/bar, ./__fixtures__/circular-imports/foo, ./__fixtures__/circular-imports/constants
 
 `;
 
@@ -2698,7 +2698,7 @@ CSS:
   color: foo1;
 }
 
-Dependencies: ./__fixtures__/reexports
+Dependencies: ./__fixtures__/reexports, ./__fixtures__/foo, ./__fixtures__/bar, ./__fixtures__/re-exports/constants
 
 `;
 
