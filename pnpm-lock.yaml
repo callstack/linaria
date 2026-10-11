@@ -131,7 +131,7 @@ importers:
         version: 11.2.1
       tsup:
         specifier: ^7.2.0
-        version: 7.2.0(@swc/core@1.3.20)(postcss@8.5.19)(typescript@5.2.2)
+        version: 7.2.0(@swc/core@1.3.20)(postcss@8.5.23)(typescript@5.2.2)
       turbo:
         specifier: ^1.10.13
         version: 1.10.13
@@ -265,8 +265,6 @@ importers:
         specifier: ^0.4.54
         version: 0.4.54(vite@3.2.11(@types/node@26.1.1)(terser@5.49.0))
 
-  examples/vpssr-linaria-solid/dist/server: {}
-
   examples/webpack5:
     dependencies:
       linaria-website:
@@ -322,8 +320,8 @@ importers:
         specifier: ^0.24.0
         version: 0.24.0
       postcss:
-        specifier: ^8.4.31
-        version: 8.4.31
+        specifier: ^8.5.23
+        version: 8.5.23
       react:
         specifier: '>=16'
         version: 16.14.0
@@ -400,8 +398,8 @@ importers:
         specifier: ^7.20.4
         version: 7.20.4
       postcss:
-        specifier: ^8.4.31
-        version: 8.4.31
+        specifier: ^8.5.23
+        version: 8.5.23
 
   packages/react:
     dependencies:
@@ -443,8 +441,8 @@ importers:
   packages/server:
     dependencies:
       postcss:
-        specifier: ^8.4.31
-        version: 8.4.31
+        specifier: ^8.5.23
+        version: 8.5.23
     devDependencies:
       dedent:
         specifier: ^1.5.1
@@ -625,7 +623,7 @@ importers:
         version: 0.11.0
       webpack:
         specifier: ^5.104.1
-        version: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.19)(webpack-cli@4.9.2)
+        version: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.23)(webpack-cli@4.9.2)
       webpack-cli:
         specifier: ^4.9.2
         version: 4.9.2(webpack-dev-server@5.2.5)(webpack@5.104.1)
@@ -7330,6 +7328,11 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  nanoid@3.3.18:
+    resolution: {integrity: sha512-DTg4MJbGMWkfi6VZFdNt2/caMbQy4Ou+Op/hJQvGEWcnVfoA1QA+xzRKAzw9jD6+GVOOeYr/mIcuDSdug6F6+w==}
+    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
   nanoid@3.3.6:
     resolution: {integrity: sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -7840,6 +7843,10 @@ packages:
 
   postcss@8.5.19:
     resolution: {integrity: sha512-Mz8SaolMd8nB+G13WkORcxQKHZ/NE4xXevtkJHVuG+guo9/wYKlIMTKAqGdEmYOXR2ijPjTYNHssizdaVSUNdQ==}
+    engines: {node: ^10 || ^12 || >=14}
+
+  postcss@8.5.23:
+    resolution: {integrity: sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg==}
     engines: {node: ^10 || ^12 || >=14}
 
   preferred-pm@3.0.3:
@@ -9389,7 +9396,7 @@ packages:
 
   uuid@3.4.0:
     resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
-    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uuid@8.3.2:
@@ -11064,9 +11071,9 @@ snapshots:
     dependencies:
       find-up: 4.1.0
 
-  '@csstools/selector-specificity@2.0.2(postcss-selector-parser@6.0.10)(postcss@8.4.31)':
+  '@csstools/selector-specificity@2.0.2(postcss-selector-parser@6.0.10)(postcss@8.5.23)':
     dependencies:
-      postcss: 8.4.31
+      postcss: 8.5.23
       postcss-selector-parser: 6.0.10
 
   '@definitelytyped/dts-critic@0.0.176(typescript@5.2.2)':
@@ -12923,7 +12930,7 @@ snapshots:
 
   '@webpack-cli/configtest@1.1.1(webpack-cli@4.9.2)(webpack@5.104.1)':
     dependencies:
-      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.19)(webpack-cli@4.9.2)
+      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.23)(webpack-cli@4.9.2)
       webpack-cli: 4.9.2(webpack-dev-server@5.2.5)(webpack@5.104.1)
 
   '@webpack-cli/configtest@2.0.0(webpack-cli@5.0.0)(webpack@5.104.1)':
@@ -13434,7 +13441,7 @@ snapshots:
       loader-utils: 2.0.2
       make-dir: 3.1.0
       schema-utils: 2.7.1
-      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.19)(webpack-cli@4.9.2)
+      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.23)(webpack-cli@4.9.2)
 
   babel-loader@9.1.0(@babel/core@7.29.7)(webpack@5.104.1):
     dependencies:
@@ -15879,7 +15886,7 @@ snapshots:
       lodash: 4.17.21
       pretty-error: 4.0.0
       tapable: 2.2.1
-      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.19)(webpack-cli@4.9.2)
+      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.23)(webpack-cli@4.9.2)
 
   htmlparser2@6.1.0:
     dependencies:
@@ -17622,6 +17629,8 @@ snapshots:
 
   nanoid@3.3.16: {}
 
+  nanoid@3.3.18: {}
+
   nanoid@3.3.6: {}
 
   natural-compare-lite@1.4.0: {}
@@ -18128,12 +18137,12 @@ snapshots:
     optionalDependencies:
       postcss: 8.4.31
 
-  postcss-load-config@4.0.1(postcss@8.5.19):
+  postcss-load-config@4.0.1(postcss@8.5.23):
     dependencies:
       lilconfig: 2.1.0
       yaml: 2.3.1
     optionalDependencies:
-      postcss: 8.5.19
+      postcss: 8.5.23
 
   postcss-media-query-parser@0.2.3: {}
 
@@ -18160,9 +18169,9 @@ snapshots:
 
   postcss-resolve-nested-selector@0.1.1: {}
 
-  postcss-safe-parser@6.0.0(postcss@8.4.31):
+  postcss-safe-parser@6.0.0(postcss@8.5.23):
     dependencies:
-      postcss: 8.4.31
+      postcss: 8.5.23
 
   postcss-selector-parser@6.0.10:
     dependencies:
@@ -18180,6 +18189,12 @@ snapshots:
   postcss@8.5.19:
     dependencies:
       nanoid: 3.3.16
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+
+  postcss@8.5.23:
+    dependencies:
+      nanoid: 3.3.18
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -19362,7 +19377,7 @@ snapshots:
 
   stylelint@14.11.0:
     dependencies:
-      '@csstools/selector-specificity': 2.0.2(postcss-selector-parser@6.0.10)(postcss@8.4.31)
+      '@csstools/selector-specificity': 2.0.2(postcss-selector-parser@6.0.10)(postcss@8.5.23)
       balanced-match: 2.0.0
       colord: 2.9.3
       cosmiconfig: 7.0.1
@@ -19385,10 +19400,10 @@ snapshots:
       micromatch: 4.0.5
       normalize-path: 3.0.0
       picocolors: 1.0.0
-      postcss: 8.4.31
+      postcss: 8.5.23
       postcss-media-query-parser: 0.2.3
       postcss-resolve-nested-selector: 0.1.1
-      postcss-safe-parser: 6.0.0(postcss@8.4.31)
+      postcss-safe-parser: 6.0.0(postcss@8.5.23)
       postcss-selector-parser: 6.0.10
       postcss-value-parser: 4.2.0
       resolve-from: 5.0.0
@@ -19536,17 +19551,17 @@ snapshots:
       esbuild: 0.18.20
       postcss: 8.4.31
 
-  terser-webpack-plugin@5.6.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.19)(webpack@5.104.1):
+  terser-webpack-plugin@5.6.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.23)(webpack@5.104.1):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
       terser: 5.49.0
-      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.19)(webpack-cli@4.9.2)
+      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.23)(webpack-cli@4.9.2)
     optionalDependencies:
       '@swc/core': 1.3.20
       esbuild: 0.18.20
-      postcss: 8.5.19
+      postcss: 8.5.23
 
   terser@5.15.1:
     dependencies:
@@ -19707,7 +19722,7 @@ snapshots:
 
   tsscmp@1.0.6: {}
 
-  tsup@7.2.0(@swc/core@1.3.20)(postcss@8.5.19)(typescript@5.2.2):
+  tsup@7.2.0(@swc/core@1.3.20)(postcss@8.5.23)(typescript@5.2.2):
     dependencies:
       bundle-require: 4.0.1(esbuild@0.18.20)
       cac: 6.7.14
@@ -19717,7 +19732,7 @@ snapshots:
       execa: 5.1.1
       globby: 11.1.0
       joycon: 3.1.1
-      postcss-load-config: 4.0.1(postcss@8.5.19)
+      postcss-load-config: 4.0.1(postcss@8.5.23)
       resolve-from: 5.0.0
       rollup: 3.29.5
       source-map: 0.8.0-beta.0
@@ -19725,7 +19740,7 @@ snapshots:
       tree-kill: 1.2.2
     optionalDependencies:
       '@swc/core': 1.3.20
-      postcss: 8.5.19
+      postcss: 8.5.23
       typescript: 5.2.2
     transitivePeerDependencies:
       - supports-color
@@ -20199,7 +20214,7 @@ snapshots:
       import-local: 3.1.0
       interpret: 2.2.0
       rechoir: 0.7.1
-      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.19)(webpack-cli@4.9.2)
+      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.23)(webpack-cli@4.9.2)
       webpack-merge: 5.8.0
     optionalDependencies:
       webpack-dev-server: 5.2.5(tslib@2.8.1)(webpack-cli@4.9.2)(webpack@5.104.1)
@@ -20230,7 +20245,7 @@ snapshots:
       range-parser: 1.3.0
       schema-utils: 4.3.3
     optionalDependencies:
-      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.19)(webpack-cli@4.9.2)
+      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.23)(webpack-cli@4.9.2)
     transitivePeerDependencies:
       - tslib
 
@@ -20265,7 +20280,7 @@ snapshots:
       webpack-dev-middleware: 7.4.5(tslib@2.8.1)(webpack@5.104.1)
       ws: 8.21.1
     optionalDependencies:
-      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.19)(webpack-cli@4.9.2)
+      webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.23)(webpack-cli@4.9.2)
       webpack-cli: 4.9.2(webpack-dev-server@5.2.5)(webpack@5.104.1)
     transitivePeerDependencies:
       - bufferutil
@@ -20324,7 +20339,7 @@ snapshots:
       - postcss
       - uglify-js
 
-  webpack@5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.19)(webpack-cli@4.9.2):
+  webpack@5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.23)(webpack-cli@4.9.2):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.9
@@ -20348,7 +20363,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.3
-      terser-webpack-plugin: 5.6.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.19)(webpack@5.104.1)
+      terser-webpack-plugin: 5.6.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.5.23)(webpack@5.104.1)
       watchpack: 2.5.2
       webpack-sources: 3.5.1
     optionalDependencies:
