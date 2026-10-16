@@ -384,9 +384,10 @@ class LinariaStringifier extends Stringifier {
     ) {
       return node.raws.linariaBetween;
     }
-    // postcss 8.5 widens this to `boolean | string` (the `semicolon` raw is a
-    // boolean); 8.4 declares `string`. The base result is returned unchanged,
-    // and the raws this class reads through `raw` are strings.
+    // postcss 8.5 declares the result as `boolean | string`, 8.4 as `string`.
+    // At runtime it is a boolean for the `semicolon` raw that the inherited
+    // `body` reads, so `string` is only the signature that the calls in this
+    // class rely on. The base result is returned unchanged.
     return super.raw(node, own, detect) as string;
   }
 
@@ -403,9 +404,9 @@ class LinariaStringifier extends Stringifier {
       return `${node.raws[linariaProp]}`;
     }
 
-    // postcss 8.5 widens this to `number | string`; 8.4 declares `string`. The
-    // base result is returned unchanged, and the fields this class reads
-    // through `rawValue` are strings.
+    // postcss 8.5 declares the result as `number | string`, 8.4 as `string`.
+    // The base result is returned unchanged; the fields read through
+    // `rawValue` (`params`, `value` and `selector`) are strings.
     return super.rawValue(node, prop) as string;
   }
 
