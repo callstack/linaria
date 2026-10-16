@@ -93,7 +93,7 @@ export default function collect(
     let removedNodesFromOther = 0;
     criticalRule.each((childRule: ChildNode, index: number) => {
       if (isCritical(childRule)) {
-        otherRule.nodes[index - removedNodesFromOther]?.remove();
+        otherRule.nodes?.[index - removedNodesFromOther]?.remove();
         removedNodesFromOther += 1;
       } else {
         childRule.remove();
@@ -102,10 +102,10 @@ export default function collect(
 
     rule.remove();
 
-    if (criticalRule.nodes.length > 0) {
+    if (criticalRule.nodes?.length) {
       critical.append(criticalRule);
     }
-    if (otherRule.nodes.length > 0) {
+    if (otherRule.nodes?.length) {
       other.append(otherRule);
     }
   };
