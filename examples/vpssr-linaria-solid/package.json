@@ -13,7 +13,7 @@
     "@linaria/core": "workspace:^",
     "@wyw-in-js/vite": "2.4.0",
     "babel-preset-solid": "^1.6.2",
-    "compression": "^1.7.4",
+    "compression": "^1.8.2",
     "express": "^4.20.0",
     "sirv": "^2.0.2",
     "solid-js": "^1.9.4",
