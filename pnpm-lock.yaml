@@ -151,8 +151,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/core
       '@wyw-in-js/vite':
-        specifier: 2.6.0
-        version: 2.6.0(typescript@5.2.2)(vite@3.2.11(@types/node@26.1.1)(terser@5.49.0))
+        specifier: 2.7.0
+        version: 2.7.0(typescript@5.2.2)(vite@3.2.11(@types/node@26.1.1)(terser@5.49.0))
       astro:
         specifier: ^1.6.10
         version: 1.6.10(@types/node@26.1.1)(terser@5.49.0)
@@ -173,8 +173,8 @@ importers:
         version: link:../../website
     devDependencies:
       '@wyw-in-js/esbuild':
-        specifier: 2.6.0
-        version: 2.6.0(esbuild@0.15.16)(typescript@5.2.2)
+        specifier: 2.7.0
+        version: 2.7.0(esbuild@0.15.16)(typescript@5.2.2)
       esbuild:
         specifier: ^0.15.16
         version: 0.15.16
@@ -204,8 +204,8 @@ importers:
         specifier: ^15.2.1
         version: 15.2.1(rollup@4.56.0)
       '@wyw-in-js/rollup':
-        specifier: 2.6.0
-        version: 2.6.0(rollup@4.56.0)(typescript@5.2.2)
+        specifier: 2.7.0
+        version: 2.7.0(rollup@4.56.0)(typescript@5.2.2)
       rollup:
         specifier: ^4.0.0
         version: 4.56.0
@@ -226,8 +226,8 @@ importers:
         specifier: ^4.7.0
         version: 4.7.0(vite@6.4.3(@types/node@26.1.1)(terser@5.49.0))
       '@wyw-in-js/vite':
-        specifier: 2.6.0
-        version: 2.6.0(typescript@5.2.2)(vite@6.4.3(@types/node@26.1.1)(terser@5.49.0))
+        specifier: 2.7.0
+        version: 2.7.0(typescript@5.2.2)(vite@6.4.3(@types/node@26.1.1)(terser@5.49.0))
       vite:
         specifier: ^6.4.3
         version: 6.4.3(@types/node@26.1.1)(terser@5.49.0)
@@ -238,8 +238,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/core
       '@wyw-in-js/vite':
-        specifier: 2.6.0
-        version: 2.6.0(typescript@5.2.2)(vite@3.2.11(@types/node@26.1.1)(terser@5.49.0))
+        specifier: 2.7.0
+        version: 2.7.0(typescript@5.2.2)(vite@3.2.11(@types/node@26.1.1)(terser@5.49.0))
       babel-preset-solid:
         specifier: ^1.6.2
         version: 1.6.3(@babel/core@7.29.7)
@@ -277,8 +277,8 @@ importers:
         specifier: ^7.29.6
         version: 7.29.7
       '@wyw-in-js/webpack-loader':
-        specifier: 2.6.0
-        version: 2.6.0(typescript@5.2.2)(webpack@5.104.1)
+        specifier: 2.7.0
+        version: 2.7.0(typescript@5.2.2)(webpack@5.104.1)
       babel-loader:
         specifier: ^9.1.0
         version: 9.1.0(@babel/core@7.29.7)(webpack@5.104.1)
@@ -313,11 +313,11 @@ importers:
         specifier: workspace:^
         version: link:../react
       '@wyw-in-js/processor-utils':
-        specifier: 2.6.0
-        version: 2.6.0
+        specifier: 2.7.0
+        version: 2.7.0
       '@wyw-in-js/shared':
-        specifier: 2.6.0
-        version: 2.6.0
+        specifier: 2.7.0
+        version: 2.7.0
       known-css-properties:
         specifier: ^0.24.0
         version: 0.24.0
@@ -341,8 +341,8 @@ importers:
   packages/core:
     dependencies:
       '@wyw-in-js/processor-utils':
-        specifier: 2.6.0
-        version: 2.6.0
+        specifier: 2.7.0
+        version: 2.7.0
     devDependencies:
       '@types/node':
         specifier: ^17.0.39
@@ -412,11 +412,11 @@ importers:
         specifier: workspace:^
         version: link:../core
       '@wyw-in-js/processor-utils':
-        specifier: 2.6.0
-        version: 2.6.0
+        specifier: 2.7.0
+        version: 2.7.0
       '@wyw-in-js/shared':
-        specifier: 2.6.0
-        version: 2.6.0
+        specifier: 2.7.0
+        version: 2.7.0
       minimatch:
         specifier: ^9.0.3
         version: 9.0.3
@@ -456,11 +456,11 @@ importers:
   packages/stylelint:
     dependencies:
       '@wyw-in-js/shared':
-        specifier: 2.6.0
-        version: 2.6.0
+        specifier: 2.7.0
+        version: 2.7.0
       '@wyw-in-js/transform':
-        specifier: 2.6.0
-        version: 2.6.0(typescript@5.2.2)
+        specifier: 2.7.0
+        version: 2.7.0(typescript@5.2.2)
     devDependencies:
       '@types/node':
         specifier: ^17.0.39
@@ -487,11 +487,11 @@ importers:
         specifier: workspace:^
         version: link:../react
       '@wyw-in-js/shared':
-        specifier: 2.6.0
-        version: 2.6.0
+        specifier: 2.7.0
+        version: 2.7.0
       '@wyw-in-js/transform':
-        specifier: 2.6.0
-        version: 2.6.0(typescript@5.2.2)
+        specifier: 2.7.0
+        version: 2.7.0(typescript@5.2.2)
       dedent:
         specifier: ^1.5.1
         version: 1.5.1
@@ -585,11 +585,11 @@ importers:
         specifier: workspace:^
         version: link:../packages/stylelint
       '@wyw-in-js/babel-preset':
-        specifier: 2.6.0
-        version: 2.6.0(typescript@5.2.2)
+        specifier: 2.7.0
+        version: 2.7.0(typescript@5.2.2)
       '@wyw-in-js/webpack-loader':
-        specifier: 2.6.0
-        version: 2.6.0(typescript@5.2.2)(webpack@5.104.1)
+        specifier: 2.7.0
+        version: 2.7.0(typescript@5.2.2)(webpack@5.104.1)
       babel-loader:
         specifier: ^8.2.5
         version: 8.2.5(@babel/core@7.29.7)(webpack@5.104.1)
@@ -3469,42 +3469,42 @@ packages:
       webpack-dev-server:
         optional: true
 
-  '@wyw-in-js/babel-preset@2.6.0':
-    resolution: {integrity: sha512-KmPTdsUyoGko/VRz2OugkkJESwHqDRtIOIYQROYW10/Mr/eKrYMe+0f3eahX2BERO7PattuGXwc+Gex8DzBM+g==}
+  '@wyw-in-js/babel-preset@2.7.0':
+    resolution: {integrity: sha512-GM4Jk7/yrLaSn1HtnwUO4OWp9d51QO3twbrrQ8VThEMZAlX6e378ElZ86YZltm9IGbjCDwrd/Xc4RvsO4engfg==}
     engines: {node: '>=22.0.0'}
 
-  '@wyw-in-js/esbuild@2.6.0':
-    resolution: {integrity: sha512-hwKVh8Y2eBQ1geFp+N6dKFuTVtdf90QrIWeIcKHJL5/fvGXPkmGhn7R2jzZyD4ZuOSFe3kQ1t07Lkj+DegqJKA==}
+  '@wyw-in-js/esbuild@2.7.0':
+    resolution: {integrity: sha512-Jl4Ih3XLTNvJwMOcqseZcrx9htJHKQC8sfu4yFxBPRgKO33kcDGDZATfK51JWexQDqKtqWKRX80kAXOS5kdETA==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       esbuild: '>=0.12.0'
 
-  '@wyw-in-js/processor-utils@2.6.0':
-    resolution: {integrity: sha512-+lTv4G7y7+Xl86CQZ/j7jNVvc5LdZJiaMQniUpXLw5DZLxeIJWahvwSO3wxDhSPXqNLAsD/WagDoAqwnYTnIWg==}
+  '@wyw-in-js/processor-utils@2.7.0':
+    resolution: {integrity: sha512-ZkwmEga12teOgnqmeEDOmgZA4FbMHtkfz3eu+j2nkHq48ypn7Ut2nlgeNGToX6+54xyRa0ifWA5HyOQWCpRzTA==}
     engines: {node: '>=22.0.0'}
 
-  '@wyw-in-js/rollup@2.6.0':
-    resolution: {integrity: sha512-gZK5IPj8xhYZE5EwDBn4mKRJ6nsOUfR0VyBRMV4tR1YAe4YgCGbEAypri/28Z/A+on4J+L5dIJwqoxpNR4LF8A==}
+  '@wyw-in-js/rollup@2.7.0':
+    resolution: {integrity: sha512-bSCTx8Tqmb73ZgQHYRwpaRkDlbEj6VMsrzelj3SYYemU6IOkaLHUKVwSkISjwmyXps5cnTl1E/kveitk1CkXeA==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       rollup: 1.20.0||^2.0.0||^3.0.0||^4.0.0
 
-  '@wyw-in-js/shared@2.6.0':
-    resolution: {integrity: sha512-0u/F3mp3/NxB/EleCho6qyHo+0PdLyLKrtX2q6EfFerp8XCiFdqIlv1V6+5S9Yupq2dgSXIGaQPWvzdRVSN7qA==}
+  '@wyw-in-js/shared@2.7.0':
+    resolution: {integrity: sha512-hV+sbbGYBqKh/xbYfHHIkr3Ob8hAwtUvdHSRKICml46M+hlxVpUiH/O5vrTR65LDYEwr0ORiEDhsfW+MkrMwrQ==}
     engines: {node: '>=22.0.0'}
 
-  '@wyw-in-js/transform@2.6.0':
-    resolution: {integrity: sha512-pSV38tfSnsNhmZMTXxmcDq772vygmn/1X1red3TPRehBcFRyupZAXHQuLhAXQqBwjE+qZT5J36/JBiqq6mpL5A==}
+  '@wyw-in-js/transform@2.7.0':
+    resolution: {integrity: sha512-Hnqf6HdN0NQ8HQupN9BL+oVMQjQSqUPLEJVnZYC9sNZ26KckjJ0UcGU2G4bFXvRln0H2O8I95pwf68gOe+lubA==}
     engines: {node: '>=22.0.0'}
 
-  '@wyw-in-js/vite@2.6.0':
-    resolution: {integrity: sha512-15wopvgjCM+bdrr8c5uvXTgU9YbrpRovHnURPYPN+qmU0z34jjaOlc39FFjEmxBpPgzrIkYcIoTU6FgrFfl93w==}
+  '@wyw-in-js/vite@2.7.0':
+    resolution: {integrity: sha512-CQzNcYUaLTEK71yFqIX45TiwSNiEaSbDJbFClGBYBUJzqufBTLERYFHk4Cpch7gFaXQMiwu+/ytP46pTTHxtrQ==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       vite: '>=3.2.7'
 
-  '@wyw-in-js/webpack-loader@2.6.0':
-    resolution: {integrity: sha512-vjq5l9bJ7iDnToPx1K4fzpeqT45HLNvagrQ+62/Zie/pHt6gTpl+ThBE+mh7DMBvGRWMURwqi0L2y1mA9KsJnw==}
+  '@wyw-in-js/webpack-loader@2.7.0':
+    resolution: {integrity: sha512-wAvZLyBty9QeRj3y6mmwiygNBiPXKshZw09pf+GosEsUPSCKJ5GDAN7pABbd67hGKfUCOWyqRsCirvlTUON1/Q==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       webpack: ^5.76.0
@@ -12952,21 +12952,21 @@ snapshots:
       webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.4.31)(webpack-cli@5.0.0)
       webpack-cli: 5.0.0(webpack@5.104.1)
 
-  '@wyw-in-js/babel-preset@2.6.0(typescript@5.2.2)':
+  '@wyw-in-js/babel-preset@2.7.0(typescript@5.2.2)':
     dependencies:
       '@babel/core': 7.29.7
-      '@wyw-in-js/shared': 2.6.0
-      '@wyw-in-js/transform': 2.6.0(typescript@5.2.2)
+      '@wyw-in-js/shared': 2.7.0
+      '@wyw-in-js/transform': 2.7.0(typescript@5.2.2)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - typescript
       - utf-8-validate
 
-  '@wyw-in-js/esbuild@2.6.0(esbuild@0.15.16)(typescript@5.2.2)':
+  '@wyw-in-js/esbuild@2.7.0(esbuild@0.15.16)(typescript@5.2.2)':
     dependencies:
-      '@wyw-in-js/shared': 2.6.0
-      '@wyw-in-js/transform': 2.6.0(typescript@5.2.2)
+      '@wyw-in-js/shared': 2.7.0
+      '@wyw-in-js/transform': 2.7.0(typescript@5.2.2)
       esbuild: 0.15.16
       oxc-transform: 0.131.0
     transitivePeerDependencies:
@@ -12975,17 +12975,17 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@wyw-in-js/processor-utils@2.6.0':
+  '@wyw-in-js/processor-utils@2.7.0':
     dependencies:
-      '@wyw-in-js/shared': 2.6.0
+      '@wyw-in-js/shared': 2.7.0
     transitivePeerDependencies:
       - supports-color
 
-  '@wyw-in-js/rollup@2.6.0(rollup@4.56.0)(typescript@5.2.2)':
+  '@wyw-in-js/rollup@2.7.0(rollup@4.56.0)(typescript@5.2.2)':
     dependencies:
       '@rollup/pluginutils': 5.4.0(rollup@4.56.0)
-      '@wyw-in-js/shared': 2.6.0
-      '@wyw-in-js/transform': 2.6.0(typescript@5.2.2)
+      '@wyw-in-js/shared': 2.7.0
+      '@wyw-in-js/transform': 2.7.0(typescript@5.2.2)
       rollup: 4.56.0
     transitivePeerDependencies:
       - bufferutil
@@ -12993,7 +12993,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@wyw-in-js/shared@2.6.0':
+  '@wyw-in-js/shared@2.7.0':
     dependencies:
       debug: 4.4.3
       find-up: 5.0.0
@@ -13001,12 +13001,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@wyw-in-js/transform@2.6.0(typescript@5.2.2)':
+  '@wyw-in-js/transform@2.7.0(typescript@5.2.2)':
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@jridgewell/trace-mapping': 0.3.31
-      '@wyw-in-js/processor-utils': 2.6.0
-      '@wyw-in-js/shared': 2.6.0
+      '@wyw-in-js/processor-utils': 2.7.0
+      '@wyw-in-js/shared': 2.7.0
       cosmiconfig: 8.3.6(typescript@5.2.2)
       happy-dom: 20.10.6
       minimatch: 9.0.9
@@ -13022,10 +13022,10 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@wyw-in-js/vite@2.6.0(typescript@5.2.2)(vite@3.2.11(@types/node@26.1.1)(terser@5.49.0))':
+  '@wyw-in-js/vite@2.7.0(typescript@5.2.2)(vite@3.2.11(@types/node@26.1.1)(terser@5.49.0))':
     dependencies:
-      '@wyw-in-js/shared': 2.6.0
-      '@wyw-in-js/transform': 2.6.0(typescript@5.2.2)
+      '@wyw-in-js/shared': 2.7.0
+      '@wyw-in-js/transform': 2.7.0(typescript@5.2.2)
       vite: 3.2.11(@types/node@26.1.1)(terser@5.49.0)
     transitivePeerDependencies:
       - bufferutil
@@ -13033,10 +13033,10 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@wyw-in-js/vite@2.6.0(typescript@5.2.2)(vite@6.4.3(@types/node@26.1.1)(terser@5.49.0))':
+  '@wyw-in-js/vite@2.7.0(typescript@5.2.2)(vite@6.4.3(@types/node@26.1.1)(terser@5.49.0))':
     dependencies:
-      '@wyw-in-js/shared': 2.6.0
-      '@wyw-in-js/transform': 2.6.0(typescript@5.2.2)
+      '@wyw-in-js/shared': 2.7.0
+      '@wyw-in-js/transform': 2.7.0(typescript@5.2.2)
       vite: 6.4.3(@types/node@26.1.1)(terser@5.49.0)
     transitivePeerDependencies:
       - bufferutil
@@ -13044,10 +13044,10 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@wyw-in-js/webpack-loader@2.6.0(typescript@5.2.2)(webpack@5.104.1)':
+  '@wyw-in-js/webpack-loader@2.7.0(typescript@5.2.2)(webpack@5.104.1)':
     dependencies:
-      '@wyw-in-js/shared': 2.6.0
-      '@wyw-in-js/transform': 2.6.0(typescript@5.2.2)
+      '@wyw-in-js/shared': 2.7.0
+      '@wyw-in-js/transform': 2.7.0(typescript@5.2.2)
       webpack: 5.104.1(@swc/core@1.3.20)(esbuild@0.18.20)(postcss@8.4.31)(webpack-cli@5.0.0)
     transitivePeerDependencies:
       - bufferutil
