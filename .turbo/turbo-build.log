@@ -24,38 +24,37 @@
 
 
 Timings:
-  Total: 2724ms
+  Total: 2105ms
 
   By method:
     createEntrypoint: 1ms
-    transform:collect:applyProcessors: 13ms
-    transform:collect:applyProcessors:cleanup: 6ms
-    transform:collect:applyProcessors:processors: 6ms
-    transform:collect:normalize: 3ms
-    transform:collect:processorRuntime: 3ms
-    transform:collect:sourceMap: 1ms
-    transform:emitCommonJS: 1ms
-    transform:evalFile: 367ms
-    transform:evaluator: 8ms
-    transform:preeval: 47ms
+    transform:collect:applyProcessors: 11ms
+    transform:collect:applyProcessors:cleanup: 5ms
+    transform:collect:applyProcessors:processors: 5ms
+    transform:collect:normalize: 2ms
+    transform:collect:processorRuntime: 2ms
+    transform:collect:sourceMap: 0ms
+    transform:evalFile: 257ms
+    transform:evaluator: 4ms
+    transform:preeval: 17ms
     transform:preeval:importMetaEnv: 0ms
-    transform:preeval:processTemplate: 46ms
-    transform:preeval:processTemplate:deps: 9ms
-    transform:preeval:processTemplate:imports: 20ms
-    transform:preeval:processTemplate:imports:analysis: 1ms
-    transform:preeval:processTemplate:imports:lookup: 18ms
-    transform:preeval:processTemplate:processors: 6ms
-    transform:preeval:processTemplate:usages: 1ms
+    transform:preeval:processTemplate: 16ms
+    transform:preeval:processTemplate:deps: 5ms
+    transform:preeval:processTemplate:imports: 1ms
+    transform:preeval:processTemplate:imports:analysis: 0ms
+    transform:preeval:processTemplate:imports:lookup: 1ms
+    transform:preeval:processTemplate:processors: 3ms
+    transform:preeval:processTemplate:usages: 0ms
     transform:preeval:processTemplate:usedNames: 0ms
-    transform:preeval:removeDangerousCode: 6ms
-    transform:preeval:staticMetadata: 2ms
+    transform:preeval:removeDangerousCode: 1ms
+    transform:preeval:staticMetadata: 0ms
 
 Memory usage: {
-  rss: 260911104,
-  heapTotal: 146190336,
-  heapUsed: 112329016,
-  external: 4209681,
-  arrayBuffers: 1341094
+  rss: 243040256,
+  heapTotal: 143224832,
+  heapUsed: 109237800,
+  external: 6446697351,
+  arrayBuffers: 6443806412
 }
 assets by info 63.5 KiB [1m[32m[immutable][39m[22m
   asset [1m[32mc9d5cf961634b7622bef.png[39m[22m 59.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: assets/code-sample-v4.png] (auxiliary name: app)
@@ -66,27 +65,27 @@ assets by chunk 138 KiB (name: app)
   asset [1m[32mstyles.css[39m[22m 3.68 KiB [1m[32m[emitted][39m[22m (name: app)
 asset [1m[32mindex.html[39m[22m 242 bytes [1m[32m[emitted][39m[22m
 Entrypoint [1mapp[39m[22m 138 KiB (391 KiB) = [1m[32mstyles.css[39m[22m 3.68 KiB [1m[32mapp.bundle.js[39m[22m 134 KiB 4 auxiliary assets
-orphan modules 24.8 KiB (javascript) 939 bytes (asset) 4.72 KiB (runtime) [1m[33m[orphan][39m[22m 40 modules
+orphan modules 26.7 KiB (javascript) 939 bytes (asset) 4.72 KiB (runtime) [1m[33m[orphan][39m[22m 40 modules
 runtime modules 1.5 KiB 3 modules
-cacheable modules 148 KiB (javascript) 62.6 KiB (asset) 3.75 KiB (css/mini-extract)
-  modules by layer 148 KiB (javascript) 62.6 KiB (asset)
-    javascript modules 148 KiB 13 modules
+cacheable modules 150 KiB (javascript) 62.6 KiB (asset) 3.75 KiB (css/mini-extract)
+  modules by layer 150 KiB (javascript) 62.6 KiB (asset)
+    javascript modules 150 KiB 13 modules
     asset modules 62.6 KiB (asset) 84 bytes (javascript)
       [1m./assets/linaria-logo.svg[39m[22m 2.88 KiB (asset) 42 bytes (javascript) [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
       [1m./assets/code-sample-v4.png[39m[22m 59.7 KiB (asset) 42 bytes (javascript) [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
   css modules 3.75 KiB
     modules by path [1m./src/components/*.jsx[39m[22m 3.39 KiB
-      css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.4.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/components/App.jsx?wyw=wyw-in-js.css[39m[22m 205 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-      css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.4.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/components/Header.jsx?wyw=wyw-in-js.css[39m[22m 1.34 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-      css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.4.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/components/Hero.jsx?wyw=wyw-in-js.css[39m[22m 1.85 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-    css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.4.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/index.jsx?wyw=wyw-in-js.css[39m[22m 316 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-    css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.4.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?cacheProvider=&cacheProviderId=![1m./src/components/Container.js?wyw=wyw-in-js.css[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.104.1 compiled [1m[32msuccessfully[39m[22m in 2451 ms
+      css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.7.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?outputCssPayload=v1.PY3fCoIwHIVfZehNgcom-W-9RpfBmHPTpW6x_Sxl-O5RVHDO1fn4ToiE9xe5QkSjjMPM8pKRBXfzA4eWi7F3djEdnbSR3KW9452WBg5gUWsB7Iyc7gdIUNzmp6LJExQrUqiqOZ73q_kIq4ktZaWID8JO1tFYKfUfbyUj4yp8sYRZm3SQbxslGD-GP-M3RvJNi7oJIFdI_cA7-6TkvqJfXd_yA07QNxmuP__R_gI![1m./src/components/App.jsx?wyw=wyw-in-js.css[39m[22m 205 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+      css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.7.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?outputCssPayload=v1.tVNBjuIwEPyKhYQEEkZOxAbGXOYRe9yLsZukB8f22AbCIP6-SgIJMGG1h91jqqsr1dXt80iG8BOqOOKjuUmSj-JTrebykK9Ob59nhcFpceL0CJsdRrqx1foZ22q4A8vQAPfEhnDPpgo9yIjWcGn1vjTrW9v3ygt-74c6IXf8Yx8ibk-9UIMGJyTQDcQjQN905VJpTQQTn1h_rt40hMbcUIxQBi7BRPAPnppyV7h5ekAHFC7vJSgUJEgPYIgwikxKNPSIKhacZAvmqun5-5ZeZOvtcSjYGh6ALpdfZq7TgiVf6bkAzIvIs4Wr1qXwORqeZK4iYh9tt9eNtnL3t6aflBerXpl1img0GqCt8AF8RCn0NbYSldJwtblTqdtm__A8nVAKTc5Zb0pjiDTEkwZurIH_vPp6qmybW31-jHdrTaQBv4An8xTK9vvYhrhkrDOeLlxF6h11ZiJUkSqQ1otmyc0Qg6C02nqOpgCPse_3wgS8vTrrCZunYT2MDvSkjJUP9Ba4XMfkhT2APz_--vIe9s5ZHwOZdJkKucu93RtFpUbHST1CfVBtWndlLEUOvL4g4WnuhUIwcRIt8XVaM1IEPUlWbEYSxsYzsmTjaQtmixn5sRzPyCq9QR3rjY2n0_UrM7WX4ZGawZ3wYGJzs6PLbw![1m./src/components/Header.jsx?wyw=wyw-in-js.css[39m[22m 1.34 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+      css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.7.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?outputCssPayload=v1.jVXbbqMwEP0Vq6tKiRQol9zWfllpf2Ef-2LMAG6M7bVNQ4ry7ysMISQbtQ1B4Jnj8ZyZY9M9MWv_QOue8FNYxe4kDi7rtLLccSWxAUEdfwdy_lVDzimyzABIRGWOFjWXwZHnrsIojpK1bpfdLATNcy5LvF3rFkUko-xQGtXIPOA1LQE3RizC8CUMX6i14OyL4JIaTgOhSlVTcwjte7mczzOggTos1fhGgiNkB-6CGWZKPFPOqRoZXlaOfAk4n1_lNwmauNiatHjrcm61oCc8ZaFacm8rBMyMtfWGOdADLmgqeCkD7qC2mIF0YMgs-OCeHGOwW-sXETRlB_zWWMeL0zWCt1pNGQQZuCOAnCaN2IAp6UC6O9Tn3r6moaCpOWVvnYPW3RGYlQinUzY4JePju4p7sISAYuhpaI67TbM_fLV-cl0_IePjI-AyhxbHpA9U7TXsJHSFki44Qq8avIsi4seWfwDebHXroTmvnSh-djU1JZfBIDS8jUZ3Fpd_szhPJwFxKbiEIBOKHa5a0BqooZIBlkoCCWr18cBo_7Pdj6_aH8fK5GBwRC4bNN7qFvW1JEwJZTCXFRjuZsxuLPfcC1pzcZowvtDOUGkLZWrcaA2GUQsTMQ_IgSlD_T70ST009oq1Fc3VEXNpwaHIX4luEWuMAel-9wmvYt2iy23KjC6iFRr_YbRfjowDQ3PeWJz2fWCNscpgrfiNFnzew_Hga4GSKKrt6lrCwUC-iztPzcaVegfTDRX-kSfpZpt_RtCvoGlP8mt-1w73QqImKHuuIN3iVSL_c2o46FYXQ2XFIt5HKxRH0fMK7aLn5Y1vu16hze55hfbJnWeas18_LwfH0uuanSTs0l037M8eQ6pBK7Rxigy7YfgceLVd9Jf0Dbnt0Ua3pKbtuNUZFWzRx0MBWu91u5wXLtUt8nfyoDppcvMBGauf7Prr2-fLhddIwOfeny1P538![1m./src/components/Hero.jsx?wyw=wyw-in-js.css[39m[22m 1.85 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.7.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?outputCssPayload=v1.dZDBSsQwFEV_pQTcDInUQVHS3QiiCx2wzi6bpH1tH6YvJXnVdkr_XcZBwYW7ey8cONxFVCm9wcRCi457ny0uTCrhEanVLsQaonJhKjrAtmN9lecXxSfW3J3j6kI9Z0tvY4uk82KwdX0i8_-AJhCrxvboZ63sMHhQaU4Mvdx5pPdnW5Xf9SEQSyNKaANkhycj5GtwgYPcT3MLJA9uJB7lvSW2EbyXRuwHoKy0lIyQRjyC_wDGymYvMIIR8neQyVJSCSI2Z52ER9DbfJgKjwTqx_zyent3c1usm0xutIMmRDgl2zDEPzchdRCRi9WQWL8A![1m./src/index.jsx?wyw=wyw-in-js.css[39m[22m 316 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    css ../node_modules/.pnpm/css-loader@6.7.2_webpack@5.104.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/.pnpm/@wyw-in-js+webpack-loader@2.7.0_typescript@5.2.2_webpack@5.104.1/node_modules/@wyw-in-js/webpack-loader/esm/outputCssLoader.js?outputCssPayload=v1.q1ZKLi4OSa0oUbJS0ksuS7eotCyszk2s0C3PTCnJsDI0NDEoqLAuSExJycxLtzI0K6hQMDIpqLDOTSxKz8yzMlBILC3Jt66NyVOqBQA![1m./src/components/Container.js?wyw=wyw-in-js.css[39m[22m 60 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+webpack 5.104.1 compiled [1m[32msuccessfully[39m[22m in 1909 ms
 
 > linaria-website@6.3.3 build:server /home/runner/work/linaria/linaria/website
 > cross-env NODE_ENV=production babel src --out-dir build-jsx --config-file ./babel.server-jsx.config.js && cross-env NODE_ENV=production BABEL_ENV=server babel build-jsx --out-dir build && del-cli build-jsx
 
-Successfully compiled 11 files with Babel (165ms).
-(node:3727) [WYW_BABEL_PRESET_COMPATIBILITY] DeprecationWarning: [wyw-in-js] @wyw-in-js/babel-preset is a deprecated compatibility wrapper around the Oxc-backed transform. Prefer bundler integrations or the transform() API for new setups.
+Successfully compiled 11 files with Babel (126ms).
+(node:3756) [WYW_BABEL_PRESET_COMPATIBILITY] DeprecationWarning: [wyw-in-js] @wyw-in-js/babel-preset is a deprecated compatibility wrapper around the Oxc-backed transform. Prefer bundler integrations or the transform() API for new setups.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-Successfully compiled 11 files with Babel (2550ms).
+Successfully compiled 11 files with Babel (2227ms).
