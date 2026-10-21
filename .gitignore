@@ -70,6 +70,7 @@ types/
 dist/
 build/
 tsconfig.tsbuildinfo
+.astro/
 
 .linaria-cache
 .wyw-cache
