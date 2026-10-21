@@ -5,14 +5,14 @@
   "main": "index.js",
   "type": "module",
   "devDependencies": {
-    "@astrojs/solid-js": "^1.2.3",
+    "@astrojs/solid-js": "^7.1.0",
     "@babel/core": "^7.29.6",
     "@linaria/core": "workspace:^",
     "@wyw-in-js/vite": "2.7.0",
-    "astro": "^1.6.10",
-    "solid-js": "^1.9.4",
-    "vite": "^3",
-    "vite-plugin-inspect": "^0.7.33"
+    "astro": "^7.4.1",
+    "solid-js": "^1.9.17",
+    "vite": "^8.3.5",
+    "vite-plugin-inspect": "^12.1.0"
   },
   "scripts": {
     "dev": "astro dev --force",
