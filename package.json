@@ -60,7 +60,6 @@
     "@typescript-eslint/parser": "^6.6.0",
     "all-contributors-cli": "^6.20.0",
     "babel-jest": "^29.6.2",
-    "codecov": "^3.2.0",
     "commitlint": "^8.3.5",
     "cross-env": "^7.0.3",
     "del-cli": "^1.1.0",
