@@ -120,7 +120,7 @@ exports[`collects complex css critical 1`] = `
 
   .linaria::before,
   .linaria::after {
-    content: \\"\\";
+    content: "";
     object-fit: contain;
   }
 }
@@ -146,7 +146,7 @@ exports[`collects complex css critical 1`] = `
 .lily {
   color: #fff;
 }
-[data-theme=\\"dark\\"] .lily {
+[data-theme="dark"] .lily {
   color: #000;
 }
 .linaria ~ div {

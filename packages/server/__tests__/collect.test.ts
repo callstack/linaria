@@ -1,14 +1,19 @@
 import dedent from 'dedent';
-import prettier from 'prettier';
+import * as postcssPlugin from 'prettier/plugins/postcss';
+import { format } from 'prettier/standalone';
 
 import collect from '../src/collect';
 
-const prettyPrint = (src: string) => prettier.format(src, { parser: 'scss' });
+// prettier 3 formats asynchronously; the standalone build with an explicit plugin also runs without
+// --experimental-vm-modules
+const prettyPrint = (src: string) =>
+  format(src, { parser: 'scss', plugins: [postcssPlugin] });
 
 const testCollect = (html: string, css: string) => {
   const { critical, other } = collect(html, css);
-  test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
-  test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
+  test('critical', async () =>
+    expect(await prettyPrint(critical)).toMatchSnapshot());
+  test('other', async () => expect(await prettyPrint(other)).toMatchSnapshot());
 };
 
 const html = dedent`
@@ -195,8 +200,9 @@ describe('works with global css', () => {
 
   const { critical, other } = collect(html, css);
 
-  test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
-  test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
+  test('critical', async () =>
+    expect(await prettyPrint(critical)).toMatchSnapshot());
+  test('other', async () => expect(await prettyPrint(other)).toMatchSnapshot());
 });
 
 describe('handles top-level @font-face', () => {
@@ -210,8 +216,9 @@ describe('handles top-level @font-face', () => {
   `;
   const { critical, other } = collect(html, css);
 
-  test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
-  test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
+  test('critical', async () =>
+    expect(await prettyPrint(critical)).toMatchSnapshot());
+  test('other', async () => expect(await prettyPrint(other)).toMatchSnapshot());
 });
 
 // there was a bug when the whole atrule was included for each child rule
@@ -231,8 +238,9 @@ describe('include atrule once', () => {
   `;
   const { critical, other } = collect(html, css);
 
-  test('critical', () => expect(prettyPrint(critical)).toMatchSnapshot());
-  test('other', () => expect(prettyPrint(other)).toMatchSnapshot());
+  test('critical', async () =>
+    expect(await prettyPrint(critical)).toMatchSnapshot());
+  test('other', async () => expect(await prettyPrint(other)).toMatchSnapshot());
 });
 
 describe('ignore empty class attribute', () => {
