@@ -36,7 +36,8 @@
   },
   "resolutions": {
     "@typescript-eslint/experimental-utils": "^4.28.0",
-    "git-raw-commits": "^2.0.3"
+    "git-raw-commits": "^2.0.3",
+    "external-editor>tmp": "^0.2.6"
   },
   "dependencies": {},
   "devDependencies": {
