@@ -1,4 +1,5 @@
 import dedent from 'dedent';
+import postcss from 'postcss';
 import * as postcssPlugin from 'prettier/plugins/postcss';
 import { format } from 'prettier/standalone';
 
@@ -275,7 +276,10 @@ test('does not match selectors in ignoredClasses list', () => {
     ignoredClasses: ['ltr', 'dir'],
   });
   expect(critical).toMatchInlineSnapshot(`".lily {}"`);
-  expect(other).toMatchInlineSnapshot(`".linaria.dir {}.linaria.ltr {}"`);
+  expect(other).toMatchInlineSnapshot(`
+    ".linaria.dir {}
+    .linaria.ltr {}"
+  `);
 });
 
 test('does not match selectors in blockedClasses list', () => {
@@ -290,7 +294,10 @@ test('does not match selectors in blockedClasses list', () => {
   `;
 
   const { critical, other } = collect(code, css, { blockedClasses: ['rtl'] });
-  expect(critical).toMatchInlineSnapshot(`".linaria.ltr {}.lily {}"`);
+  expect(critical).toMatchInlineSnapshot(`
+    ".linaria.ltr {}
+    .lily {}"
+  `);
   expect(other).toMatchInlineSnapshot(`".linaria.rtl {}"`);
 });
 
@@ -330,4 +337,61 @@ test('does not match child selectors in blockedClasses list for media queries', 
       }
     }"
   `);
+});
+
+const selectorsOf = (css: string) => {
+  const selectors: string[] = [];
+  postcss.parse(css).walkRules((rule) => {
+    selectors.push(rule.selector);
+  });
+  return selectors;
+};
+
+test('splits rules of an at-rule between critical and other', () => {
+  const css = dedent`
+    @media (min-width: 600px) {
+      .unrelated { color: red; }
+      .linaria { color: blue; }
+      .unrelated2 { color: green; }
+    }
+  `;
+
+  const { critical, other } = collect(html, css);
+  expect(selectorsOf(critical)).toEqual(['.linaria']);
+  expect(selectorsOf(other)).toEqual(['.unrelated', '.unrelated2']);
+});
+
+test('excludes every rule with a blocked class', () => {
+  const css = dedent`
+    .linaria.rtl { color: red; }
+    .linaria.rtl { color: blue; }
+    .linaria.rtl { color: green; }
+    .linaria { color: black; }
+  `;
+
+  const { critical } = collect(html, css, { blockedClasses: ['rtl'] });
+  expect(selectorsOf(critical)).toEqual(['.linaria']);
+});
+
+test('keeps the order of rules in a large stylesheet', () => {
+  const rules: string[] = [];
+  const expectedCritical: string[] = [];
+  const expectedOther: string[] = [];
+  for (let i = 0; i < 20000; i += 1) {
+    if (i % 1000 === 0) {
+      rules.push(
+        `@media (min-width: ${i}px) { .linaria-${i} {} .other-${i} {} }`
+      );
+      expectedCritical.push(`.linaria-${i}`);
+      expectedOther.push(`.other-${i}`);
+    } else {
+      const selector = i % 2 ? `.linaria-${i}` : `.other-${i}`;
+      rules.push(`${selector} {}`);
+      (i % 2 ? expectedCritical : expectedOther).push(selector);
+    }
+  }
+
+  const { critical, other } = collect(html, rules.join('\n'));
+  expect(selectorsOf(critical)).toEqual(expectedCritical);
+  expect(selectorsOf(other)).toEqual(expectedOther);
 });

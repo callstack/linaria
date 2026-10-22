@@ -23,7 +23,7 @@ const extractClassesFromHtml = (
   html: string,
   ignoredClasses: string[]
 ): RegExp => {
-  const htmlClasses: string[] = [];
+  const htmlClasses = new Set<string>();
   const regex = /\s+class="([^"]+)"/gm;
   let match = regex.exec(html);
   const ignoredClassesDeduped = new Set(ignoredClasses);
@@ -33,13 +33,14 @@ const extractClassesFromHtml = (
       // eslint-disable-next-line no-param-reassign
       className = escapeRegex(className);
       if (className !== '' && !ignoredClassesDeduped.has(className)) {
-        htmlClasses.push(className);
+        htmlClasses.add(className);
       }
     });
     match = regex.exec(html);
   }
 
-  return new RegExp(htmlClasses.join('|'), 'gm');
+  // No `g` flag: `test` must not carry `lastIndex` over from one selector to the next
+  return new RegExp(Array.from(htmlClasses).join('|'), 'm');
 };
 
 /**
@@ -64,9 +65,10 @@ export default function collect(
 
   const htmlClassesRegExp = extractClassesFromHtml(html, ignoredClasses);
   const blockedClassesSanitized = blockedClasses.map(escapeRegex);
+  // No `g` flag: `test` must not carry `lastIndex` over from one selector to the next
   const blockedClassesRegExp = new RegExp(
     blockedClassesSanitized.join('|'),
-    'gm'
+    'm'
   );
 
   const isCritical = (rule: ChildNode) => {
@@ -76,11 +78,17 @@ export default function collect(
         blockedClasses.length > 0 && blockedClassesRegExp.test(rule.selector);
       if (isExcluded) return false;
 
-      return Boolean(rule.selector.match(htmlClassesRegExp));
+      return htmlClassesRegExp.test(rule.selector);
     }
 
     return true;
   };
+
+  // Nodes are collected first and moved to `critical` and `other` at the end. Moving a node with `append` removes
+  // it from its parent with `splice`, so moving top-level rules one by one made `collect` quadratic in their number.
+  const criticalNodes: ChildNode[] = [];
+  const otherNodes: ChildNode[] = [];
+  const handledTopLevelAtRules = new Set<AtRule>();
 
   const handleAtRule = (rule: AtRule) => {
     if (rule.name === 'keyframes') {
@@ -90,23 +98,29 @@ export default function collect(
     const criticalRule = rule.clone();
     const otherRule = rule.clone();
 
-    let removedNodesFromOther = 0;
-    criticalRule.each((childRule: ChildNode, index: number) => {
+    criticalRule.each((childRule: ChildNode) => {
+      if (!isCritical(childRule)) {
+        childRule.remove();
+      }
+    });
+    otherRule.each((childRule: ChildNode) => {
       if (isCritical(childRule)) {
-        otherRule.nodes?.[index - removedNodesFromOther]?.remove();
-        removedNodesFromOther += 1;
-      } else {
         childRule.remove();
       }
     });
 
-    rule.remove();
+    if (rule.parent?.type === 'root') {
+      // Detached together with the rest of the stylesheet below
+      handledTopLevelAtRules.add(rule);
+    } else {
+      rule.remove();
+    }
 
     if (criticalRule.nodes?.length) {
-      critical.append(criticalRule);
+      criticalNodes.push(criticalRule);
     }
     if (otherRule.nodes?.length) {
-      other.append(otherRule);
+      otherNodes.push(otherRule);
     }
   };
 
@@ -116,7 +130,7 @@ export default function collect(
      * we want only handle those from top-level, rest will be handled in stylesheet.walkRules
      */
     if (rule.parent?.type === 'root') {
-      critical.append(rule);
+      criticalNodes.push(rule);
     }
   });
 
@@ -140,21 +154,50 @@ export default function collect(
     }
 
     if (isCritical(rule)) {
-      critical.append(rule);
+      criticalNodes.push(rule);
     } else {
-      other.append(rule);
+      otherNodes.push(rule);
     }
   });
+
+  // Keyframes are looked up only where they used to stay in the stylesheet: in top-level at-rules that were not
+  // handled. Top-level rules and handled at-rules leave the stylesheet with their contents.
+  const keyframes: AtRule[] = [];
+  stylesheet.each((node) => {
+    if (node.type !== 'atrule' || handledTopLevelAtRules.has(node)) {
+      return;
+    }
+    if (node.name === 'keyframes') {
+      keyframes.push(node);
+    } else {
+      node.walkAtRules('keyframes', (rule) => {
+        keyframes.push(rule);
+      });
+    }
+  });
+
+  // Detach all top-level nodes at once, so `append` does not remove them from the stylesheet one by one
+  stylesheet.removeAll();
+  criticalNodes.forEach((node) => critical.append(node));
+  otherNodes.forEach((node) => other.append(node));
 
   critical.walkDecls(/animation/, (decl) => {
     animations.add(decl.value.split(' ')[0]);
   });
 
-  stylesheet.walkAtRules('keyframes', (rule) => {
+  keyframes.forEach((rule) => {
     if (animations.has(rule.params)) {
       critical.append(rule);
     }
   });
+
+  // The first node still has the whitespace that preceded it in the stylesheet
+  if (critical.first) {
+    critical.first.raws.before = '';
+  }
+  if (other.first) {
+    other.first.raws.before = '';
+  }
 
   return {
     critical: critical.toString(),
