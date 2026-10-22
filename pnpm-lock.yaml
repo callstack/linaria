@@ -416,8 +416,8 @@ importers:
         specifier: 2.7.0
         version: 2.7.0
       minimatch:
-        specifier: ^9.0.3
-        version: 9.0.3
+        specifier: ^9.0.7
+        version: 9.0.9
       react-html-attributes:
         specifier: ^1.4.6
         version: 1.4.6
