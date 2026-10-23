@@ -1,13 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { expect } from 'tstyche';
+
+import type { LinariaClassName } from '../src';
 import { css, cx } from '../src';
 
-// $ExpectType LinariaClassName
 const class1 = css``;
+expect(class1).type.toBe<LinariaClassName>();
 
 const activeClass = css``;
 
-// $ExpectType string
-const combined1 = cx(class1, 'active');
+expect(cx(class1, 'active')).type.toBe<string>();
 
-// $ExpectType LinariaClassName
-const combined2 = cx(class1, activeClass);
+expect(cx(class1, activeClass)).type.toBe<LinariaClassName>();

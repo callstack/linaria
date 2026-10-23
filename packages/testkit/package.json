@@ -26,7 +26,7 @@
     "@wyw-in-js/shared": "2.7.0",
     "@wyw-in-js/transform": "2.7.0",
     "dedent": "^1.5.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@babel/runtime": "^7.26.10",

@@ -51,7 +51,6 @@
     "@babel/preset-typescript": "^7.23.3",
     "@changesets/cli": "^2.22.0",
     "@commitlint/config-conventional": "^8.3.4",
-    "@definitelytyped/dtslint": "^0.0.176",
     "@emnapi/core": "^1.10.0",
     "@emnapi/runtime": "^1.10.0",
     "@types/jest": "^28.1.0",
@@ -79,9 +78,10 @@
     "prettier": "^3.0.3",
     "react": "^16.14.0",
     "syncpack": "^11.2.1",
+    "tstyche": "^7.2.5",
     "tsup": "^7.2.0",
     "turbo": "^1.10.13",
-    "typescript": "^5.2.2"
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=22.12.0",
