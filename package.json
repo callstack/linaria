@@ -81,7 +81,7 @@
     "syncpack": "^11.2.1",
     "tsup": "^7.2.0",
     "turbo": "^1.10.13",
-    "typescript": "^5.2.2"
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=22.12.0",
