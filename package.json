@@ -72,7 +72,7 @@
     "syncpack": "^11.2.1",
     "tstyche": "^7.2.5",
     "tsup": "^7.2.0",
-    "turbo": "^1.10.13",
+    "turbo": "^2.11.9",
     "typescript": "^5.9.3"
   },
   "engines": {
