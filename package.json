@@ -36,7 +36,8 @@
   },
   "resolutions": {
     "@typescript-eslint/experimental-utils": "^4.28.0",
-    "git-raw-commits": "^2.0.3"
+    "git-raw-commits": "^2.0.3",
+    "external-editor>tmp": "^0.2.6"
   },
   "dependencies": {},
   "devDependencies": {
@@ -60,10 +61,9 @@
     "@typescript-eslint/parser": "^6.6.0",
     "all-contributors-cli": "^6.20.0",
     "babel-jest": "^29.6.2",
-    "codecov": "^3.2.0",
     "commitlint": "^8.3.5",
     "cross-env": "^7.0.3",
-    "del-cli": "^1.1.0",
+    "del-cli": "^8.0.1",
     "eslint": "^8.48.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.1.0",

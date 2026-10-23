@@ -49,7 +49,7 @@
     "cross-env": "^7.0.3",
     "css-hot-loader": "^1.4.4",
     "css-loader": "^6.7.1",
-    "del-cli": "^1.1.0",
+    "del-cli": "^8.0.1",
     "html-webpack-plugin": "^5.5.3",
     "mini-css-extract-plugin": "^2.6.0",
     "stylelint": "^14.11.0",
