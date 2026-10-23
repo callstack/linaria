@@ -11,7 +11,7 @@
     "@wyw-in-js/vite": "2.7.0",
     "astro": "^7.4.1",
     "solid-js": "^1.9.17",
-    "vite": "^8.3.5",
+    "vite": "^6.4.4",
     "vite-plugin-inspect": "^12.1.0"
   },
   "scripts": {
