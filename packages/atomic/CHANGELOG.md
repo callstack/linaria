@@ -1,5 +1,19 @@
 # Change Log
 
+## 8.3.0
+
+### Minor Changes
+
+- da58d1a1: Update WyW dependencies to 2.7.0.
+
+### Patch Changes
+
+- 9fc8b2de: Build the type declarations with TypeScript 5.9, which writes the optional `className` of the atomize helper as `className?: string` and names the postcss `Document` and `Root` types through the `postcss` entry point instead of `postcss/lib/*`.
+- Updated dependencies [4bb1012c]
+- Updated dependencies [da58d1a1]
+  - @linaria/react@8.3.0
+  - @linaria/core@8.3.0
+
 ## 8.2.0
 
 ### Minor Changes

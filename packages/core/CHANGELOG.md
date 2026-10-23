@@ -1,5 +1,11 @@
 # Change Log
 
+## 8.3.0
+
+### Minor Changes
+
+- da58d1a1: Update WyW dependencies to 2.7.0.
+
 ## 8.2.0
 
 ### Minor Changes
