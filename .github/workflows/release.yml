@@ -16,6 +16,8 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    env:
+      HUSKY: 0
 
     steps:
       - name: Checkout Repo
