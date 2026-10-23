@@ -1,0 +1,3 @@
+{
+  "testFileMatch": ["__dtslint__/*.ts"]
+}

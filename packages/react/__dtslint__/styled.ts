@@ -1,6 +1,8 @@
-/* tslint:disable:no-unnecessary-generics */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as React from 'react';
+import type { Validator } from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { expect } from 'tstyche';
 
 import { css } from '@linaria/core';
 
@@ -24,8 +26,9 @@ const Generic = <T>(
 ) => React.createElement('h1', p);
 
 const StyledDiv = styled.div``;
-// $ExpectType "extends"
-isExtends<typeof StyledDiv, React.FC<React.DetailedHTMLProps<any, any>>>();
+expect(
+  isExtends<typeof StyledDiv, React.FC<React.DetailedHTMLProps<any, any>>>()
+).type.toBe<'extends'>();
 
 const StyledButton = styled.button``;
 StyledButton({ as: 'a', href: '/' });
@@ -55,8 +58,9 @@ styled(Fabric<{ a: string }>())``;
 styled(Fabric<{ className: number }>())``;
 
 const SimplestComponent = styled(Fabric<{ className: string }>())``;
-// $ExpectType "extends"
-isExtends<typeof SimplestComponent, React.FC<{ className: string }>>();
+expect(
+  isExtends<typeof SimplestComponent, React.FC<{ className: string }>>()
+).type.toBe<'extends'>();
 
 styled(Fabric<{ className: string }>())`
   // component should have style property
@@ -102,12 +106,10 @@ styled(Fabric<{ className: string; color: 'red' | 'blue'; style: {} }>())`
   }
 `;
 
-// $ExpectType number
-Generic({ children: 123 }).props.children;
+expect(Generic({ children: 123 }).props.children).type.toBe<number>();
 
 const StyledGeneric = styled(Generic)``;
-// $ExpectType number
-StyledGeneric({ children: 123 }).props.children;
+expect(StyledGeneric({ children: 123 }).props.children).type.toBe<number>();
 
 styled.a`
   & > ${SimplestComponent} {
@@ -120,8 +122,9 @@ styled.a`
     background: ${(props) => props.background};
   `;
 
-  // $ExpectType "extends"
-  isExtends<typeof Title, React.FC<{ background: string }>>();
+  expect(
+    isExtends<typeof Title, React.FC<{ background: string }>>()
+  ).type.toBe<'extends'>();
 
   css`
     ${Title} {
@@ -145,8 +148,7 @@ styled.a`
     }
   `;
 
-  // $ExpectType Validator<number> | undefined
-  Card.propTypes!.id;
+  expect(Card.propTypes!.id).type.toBe<Validator<number> | undefined>();
 
   const styledTag = styled(Wrapper);
 
@@ -156,11 +158,11 @@ styled.a`
     color: ${(props) => props.prop2};
   `;
 
-  // $ExpectType Validator<boolean> | undefined
-  NewWrapper.propTypes!.prop1;
+  const { propTypes } = NewWrapper;
 
-  // $ExpectType Validator<string> | undefined
-  NewWrapper.propTypes!.prop2;
+  expect(propTypes!.prop1).type.toBe<Validator<boolean> | undefined>();
+
+  expect(propTypes!.prop2).type.toBe<Validator<string> | undefined>();
 })();
 
 ((/* Issue #844 */) => {

@@ -1,0 +1,4 @@
+{
+  "checkSuppressedErrors": false,
+  "testFileMatch": ["__dtslint__/*.{ts,tsx}", "__dtslint-react17__/*.tsx"]
+}
