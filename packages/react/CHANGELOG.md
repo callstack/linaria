@@ -1,5 +1,17 @@
 # Change Log
 
+## 8.3.0
+
+### Minor Changes
+
+- da58d1a1: Update WyW dependencies to 2.7.0.
+
+### Patch Changes
+
+- 4bb1012c: Require minimatch ^9.0.7 so installs no longer resolve a minimatch version with known regular expression denial of service advisories.
+- Updated dependencies [da58d1a1]
+  - @linaria/core@8.3.0
+
 ## 8.2.0
 
 ### Minor Changes
