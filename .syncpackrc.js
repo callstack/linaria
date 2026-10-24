@@ -117,7 +117,7 @@ module.exports = {
     'preview',
     'markdown',
 
-    'tsup',
+    'tsdown',
   ],
   source: [],
   versionGroups: [

@@ -51,7 +51,7 @@
     "build": "pnpm build:dist && pnpm build:declarations",
     "build:corejs-test": "cross-env NODE_ENV=legacy babel src --out-dir lib --extensions '.js,.jsx,.ts,.tsx' --ignore \"src/processors/**/*\"",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
-    "build:dist": "tsup --format cjs,esm",
+    "build:dist": "tsdown --format cjs,esm",
     "test": "jest --config ../../jest.config.js --rootDir .",
     "test:dts": "tstyche",
     "typecheck": "tsc --noEmit --composite false",
@@ -81,13 +81,15 @@
   "publishConfig": {
     "access": "public"
   },
-  "tsup": {
+  "tsdown": {
     "entry": [
       "src/index.ts",
       "src/processors/styled.ts"
     ],
-    "splitting": false,
     "sourcemap": true,
-    "clean": true
+    "clean": true,
+    "cjsDefault": false,
+    "dts": false,
+    "fixedExtension": false
   }
 }
