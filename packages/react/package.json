@@ -81,15 +81,36 @@
   "publishConfig": {
     "access": "public"
   },
-  "tsdown": {
-    "entry": [
-      "src/index.ts",
-      "src/processors/styled.ts"
-    ],
-    "sourcemap": true,
-    "clean": true,
-    "cjsDefault": false,
-    "dts": false,
-    "fixedExtension": false
-  }
+  "tsdown": [
+    {
+      "entry": [
+        "src/index.ts"
+      ],
+      "root": "src",
+      "sourcemap": true,
+      "clean": true,
+      "cjsDefault": false,
+      "dts": false,
+      "fixedExtension": false,
+      "outputOptions": {
+        "esModule": true,
+        "strict": true
+      }
+    },
+    {
+      "entry": [
+        "src/processors/styled.ts"
+      ],
+      "root": "src",
+      "sourcemap": true,
+      "clean": true,
+      "cjsDefault": false,
+      "dts": false,
+      "fixedExtension": false,
+      "outputOptions": {
+        "esModule": true,
+        "strict": true
+      }
+    }
+  ]
 }
