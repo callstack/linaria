@@ -1,9 +1,6 @@
 module.exports = {
-  dependencyTypes: ['dev', 'overrides', 'pnpmOverrides', 'prod', 'resolutions'],
-  filter: '.',
   indent: '  ',
   semverGroups: [],
-  semverRange: '',
   sortAz: [
     'contributors',
     'dependencies',
@@ -119,8 +116,15 @@ module.exports = {
 
     'tsdown',
   ],
-  source: [],
+  // syncpack 15 finds no package through the './packages/*' and './website' globs of
+  // package.json#workspaces, so the manifests they name are listed here.
+  source: ['package.json', 'packages/*/package.json', 'website/package.json'],
   versionGroups: [
+    {
+      label: 'peerDependencies and the versions of local packages are not checked',
+      dependencyTypes: ['local', 'peer'],
+      isIgnored: true,
+    },
     {
       dependencies: [
         '@types/enhanced-resolve',
@@ -132,5 +136,4 @@ module.exports = {
       packages: ['@linaria/webpack4-loader', 'webpack4-example'],
     },
   ],
-  workspace: true,
 };
