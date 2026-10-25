@@ -44,7 +44,7 @@
   "scripts": {
     "build": "pnpm build:dist && pnpm build:declarations",
     "build:declarations": "tsc --emitDeclarationOnly --outDir types",
-    "build:dist": "tsup --format cjs,esm",
+    "build:dist": "tsdown --format cjs,esm",
     "typecheck": "tsc --noEmit --composite false",
     "watch": "pnpm build:dist --watch & pnpm build:declarations --watch"
   },
@@ -75,14 +75,51 @@
   "publishConfig": {
     "access": "public"
   },
-  "tsup": {
-    "entry": [
-      "src/index.ts",
-      "src/processors/css.ts",
-      "src/processors/styled.ts"
-    ],
-    "splitting": false,
-    "sourcemap": true,
-    "clean": true
-  }
+  "tsdown": [
+    {
+      "entry": [
+        "src/index.ts"
+      ],
+      "root": "src",
+      "sourcemap": true,
+      "clean": true,
+      "cjsDefault": false,
+      "dts": false,
+      "fixedExtension": false,
+      "outputOptions": {
+        "esModule": true,
+        "strict": true
+      }
+    },
+    {
+      "entry": [
+        "src/processors/css.ts"
+      ],
+      "root": "src",
+      "sourcemap": true,
+      "clean": true,
+      "cjsDefault": false,
+      "dts": false,
+      "fixedExtension": false,
+      "outputOptions": {
+        "esModule": true,
+        "strict": true
+      }
+    },
+    {
+      "entry": [
+        "src/processors/styled.ts"
+      ],
+      "root": "src",
+      "sourcemap": true,
+      "clean": true,
+      "cjsDefault": false,
+      "dts": false,
+      "fixedExtension": false,
+      "outputOptions": {
+        "esModule": true,
+        "strict": true
+      }
+    }
+  ]
 }
