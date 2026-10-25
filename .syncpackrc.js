@@ -121,7 +121,8 @@ module.exports = {
   source: ['package.json', 'packages/*/package.json', 'website/package.json'],
   versionGroups: [
     {
-      label: 'peerDependencies and the versions of local packages are not checked',
+      label:
+        'peerDependencies and the versions of local packages are not checked',
       dependencyTypes: ['local', 'peer'],
       isIgnored: true,
     },
