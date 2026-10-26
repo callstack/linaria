@@ -1,5 +1,15 @@
 # Change Log
 
+## 8.3.0
+
+### Minor Changes
+
+- da58d1a1: Update WyW dependencies to 2.7.0.
+
+### Patch Changes
+
+- 1f2df814: Switch the build of the published `dist` files to tsdown; the file list, the export names and the module specifiers of every entry stay the same.
+
 ## 8.2.0
 
 ### Minor Changes
