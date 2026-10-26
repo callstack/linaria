@@ -373,6 +373,13 @@ test('excludes every rule with a blocked class', () => {
   expect(selectorsOf(critical)).toEqual(['.linaria']);
 });
 
+test('keeps the whitespace between rules', () => {
+  const critical = '.linaria {}\n.lily {}\n\n.lotus {}\n\n\n.linaria .lily {}';
+  const other = '.other {}\n.other2 {}\n\n.other3 {}';
+
+  expect(collect(html, `${critical}\n\n${other}`)).toEqual({ critical, other });
+});
+
 test('keeps the order of rules in a large stylesheet', () => {
   const rules: string[] = [];
   const expectedCritical: string[] = [];

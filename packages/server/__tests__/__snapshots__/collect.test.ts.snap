@@ -161,10 +161,8 @@ exports[`collects complex css critical 1`] = `
 
 .linaria ~ div {
 }
-
 .linaria.linaria2 {
 }
-
 @keyframes custom-animation {
   0% {
     opacity: 0;
@@ -289,7 +287,6 @@ h1 {
 
 .linaria:active {
 }
-
 .linaria::before {
 }
 "

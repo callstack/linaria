@@ -178,8 +178,10 @@ export default function collect(
 
   // Detach all top-level nodes at once, so `append` does not remove them from the stylesheet one by one
   stylesheet.removeAll();
-  criticalNodes.forEach((node) => critical.append(node));
-  otherNodes.forEach((node) => other.append(node));
+  // One call per root, while it is empty: postcss 8.4 gives a node appended to a root of two or more nodes the
+  // whitespace of the last one, so appending one by one lost the source whitespace from the third rule on
+  critical.append(criticalNodes);
+  other.append(otherNodes);
 
   critical.walkDecls(/animation/, (decl) => {
     animations.add(decl.value.split(' ')[0]);
