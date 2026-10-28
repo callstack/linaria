@@ -273,6 +273,11 @@ type IntrinsicElementProps<TName extends keyof IntrinsicElements> =
   keyof IntrinsicElements extends TName ? unknown : IntrinsicElements[TName];
 
 type StyledComponentWithAs<TProps> = {
+  // Tried first so that inference in JSX does not have to go through the generic `as` overload.
+  (
+    props: TProps & { as?: undefined },
+    context?: any
+  ): ReturnType<React.FunctionComponent<TProps>>;
   <TAs extends keyof IntrinsicElements>(
     props: TProps & { as: TAs } & NoInfer<IntrinsicElementProps<TAs>>,
     context?: any
