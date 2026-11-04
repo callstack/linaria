@@ -188,7 +188,7 @@ export default class StyledProcessor extends TaggedTemplateProcessor {
 
     if (template[0] === 'call') {
       // It is already transformed styled-literal. Skip it.
-      // eslint-disable-next-line @typescript-eslint/no-throw-literal
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw TaggedTemplateProcessor.SKIP;
     }
 

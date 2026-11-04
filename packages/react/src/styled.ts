@@ -320,7 +320,7 @@ type ComponentStyledTagWithoutInterpolation<TOrigCmp> = (
   >
 ) => WYWEvalMeta & TOrigCmp;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
   strings: TemplateStringsArray,
   ...exprs: Array<
