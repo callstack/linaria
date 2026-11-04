@@ -378,6 +378,9 @@ const configs = [
       {
         languageOptions: {
           parserOptions: {
+            // The `node` environment of airbnb-base turns this on. With it typescript-eslint 8 puts
+            // the declarations of a module into a nested scope that `no-redeclare` does not check.
+            ecmaFeatures: { globalReturn: false },
             project: './tsconfig.eslint.json',
           },
         },
