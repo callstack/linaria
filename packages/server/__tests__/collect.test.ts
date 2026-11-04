@@ -380,6 +380,14 @@ test('keeps the whitespace between rules', () => {
   expect(collect(html, `${critical}\n\n${other}`)).toEqual({ critical, other });
 });
 
+test('puts no blank line before the keyframes appended after the last critical rule', () => {
+  const css = '.linaria { animation: spin }\n.lily {}\n\n@keyframes spin {}';
+
+  expect(collect(html, css).critical).toBe(
+    '.linaria { animation: spin }\n.lily {}\n@keyframes spin {}'
+  );
+});
+
 test('keeps the order of rules in a large stylesheet', () => {
   const rules: string[] = [];
   const expectedCritical: string[] = [];
