@@ -189,6 +189,13 @@ export default function collect(
 
   keyframes.forEach((rule) => {
     if (animations.has(rule.params)) {
+      // After two or more critical nodes, keyframes take the whitespace of the last one; after a single node they keep
+      // their own. Set here, because postcss 8.4 copies it on `append` and postcss 8.5.19+ keeps that of a detached node
+      const { first, last } = critical;
+      if (last && last !== first) {
+        // eslint-disable-next-line no-param-reassign
+        rule.raws.before = last.raws.before;
+      }
       critical.append(rule);
     }
   });
