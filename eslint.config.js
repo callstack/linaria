@@ -521,6 +521,18 @@ const configs = [
     ]
   ),
   {
+    // ESLint 9 relaxed the defaults of these two rules; keep what ESLint 8 reported
+    files: ['**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx'],
+    rules: {
+      'no-constant-condition': ['warn', { checkLoops: 'all' }],
+      'no-inner-declarations': [
+        'error',
+        'functions',
+        { blockScopedFunctions: 'disallow' },
+      ],
+    },
+  },
+  {
     files: ['website/**'],
     settings: {
       'import/core-modules': [],
