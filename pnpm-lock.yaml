@@ -317,8 +317,8 @@ importers:
         specifier: ^0.24.0
         version: 0.24.0
       postcss:
-        specifier: ^8.4.31
-        version: 8.4.31
+        specifier: ^8.5.23
+        version: 8.5.31
       react:
         specifier: '>=16'
         version: 16.14.0
@@ -392,8 +392,8 @@ importers:
         specifier: ^7.20.4
         version: 7.20.4
       postcss:
-        specifier: ^8.4.31
-        version: 8.4.31
+        specifier: ^8.5.23
+        version: 8.5.31
       stylelint:
         specifier: ^14.11.0
         version: 14.11.0
@@ -438,8 +438,8 @@ importers:
   packages/server:
     dependencies:
       postcss:
-        specifier: ^8.4.31
-        version: 8.4.31
+        specifier: ^8.5.23
+        version: 8.5.31
     devDependencies:
       dedent:
         specifier: ^1.5.1
@@ -10696,9 +10696,9 @@ snapshots:
 
   '@conventional-changelog/template@1.4.0': {}
 
-  '@csstools/selector-specificity@2.0.2(postcss-selector-parser@6.0.10)(postcss@8.4.31)':
+  '@csstools/selector-specificity@2.0.2(postcss-selector-parser@6.0.10)(postcss@8.5.31)':
     dependencies:
-      postcss: 8.4.31
+      postcss: 8.5.31
       postcss-selector-parser: 6.0.10
 
   '@devframes/hub@1.2.6(crossws@0.4.15(srvx@1.0.6))(devframe@1.2.6(cac@7.1.0)(srvx@1.0.6))':
@@ -16966,9 +16966,9 @@ snapshots:
 
   postcss-resolve-nested-selector@0.1.1: {}
 
-  postcss-safe-parser@6.0.0(postcss@8.4.31):
+  postcss-safe-parser@6.0.0(postcss@8.5.31):
     dependencies:
-      postcss: 8.4.31
+      postcss: 8.5.31
 
   postcss-selector-parser@6.0.10:
     dependencies:
@@ -18080,7 +18080,7 @@ snapshots:
 
   stylelint@14.11.0:
     dependencies:
-      '@csstools/selector-specificity': 2.0.2(postcss-selector-parser@6.0.10)(postcss@8.4.31)
+      '@csstools/selector-specificity': 2.0.2(postcss-selector-parser@6.0.10)(postcss@8.5.31)
       balanced-match: 2.0.0
       colord: 2.10.0
       cosmiconfig: 7.0.1
@@ -18103,10 +18103,10 @@ snapshots:
       micromatch: 4.0.8
       normalize-path: 3.0.0
       picocolors: 1.0.0
-      postcss: 8.4.31
+      postcss: 8.5.31
       postcss-media-query-parser: 0.2.3
       postcss-resolve-nested-selector: 0.1.1
-      postcss-safe-parser: 6.0.0(postcss@8.4.31)
+      postcss-safe-parser: 6.0.0(postcss@8.5.31)
       postcss-selector-parser: 6.0.10
       postcss-value-parser: 4.2.0
       resolve-from: 5.0.0
