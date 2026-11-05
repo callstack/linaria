@@ -8,7 +8,7 @@
     "@astrojs/solid-js": "^7.1.0",
     "@babel/core": "^7.29.6",
     "@linaria/core": "workspace:^",
-    "@wyw-in-js/vite": "2.7.0",
+    "@wyw-in-js/vite": "2.7.1",
     "astro": "^7.4.1",
     "solid-js": "^1.9.17",
     "vite": "^8.3.5",

@@ -5,4 +5,4 @@
 '@linaria/stylelint': minor
 ---
 
-Update WyW dependencies to 2.7.0.
+Update WyW dependencies to 2.7.1.
