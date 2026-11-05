@@ -22,5 +22,3 @@ export function Page() {
 		</>
 	)
 }
-
-export const hydrate = true

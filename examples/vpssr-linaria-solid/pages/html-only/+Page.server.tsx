@@ -17,7 +17,7 @@ export function Page() {
 				>
 					orange text
 				</span>
-				, CSS can be loaded in <code>.page.server.js</code> files.
+				, CSS can be loaded in <code>+Page.server.tsx</code> files.
 			</p>
 			<p>
 				If needed, we can add a little bit of browser-side JavaScipt to implement bits of interactivity,
