@@ -1,5 +1,12 @@
 # Change Log
 
+## 8.3.0
+
+### Patch Changes
+
+- 7c9d19cd: Stop installing Stylelint as a runtime dependency because it is only required by development tests.
+- 9fc8b2de: Build the type declarations with TypeScript 5.9, which writes the optional `className` of the atomize helper as `className?: string` and names the postcss `Document` and `Root` types through the `postcss` entry point instead of `postcss/lib/*`.
+
 ## 8.2.0
 
 ### Patch Changes
