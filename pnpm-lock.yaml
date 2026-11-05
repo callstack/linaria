@@ -218,13 +218,13 @@ importers:
         version: 15.2.1(rollup@3.30.0)
       '@vitejs/plugin-react':
         specifier: ^4.7.0
-        version: 4.7.0(vite@6.4.4(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1))
+        version: 4.7.0(vite@6.4.5(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1))
       '@wyw-in-js/vite':
         specifier: 2.7.0
-        version: 2.7.0(typescript@5.9.3)(vite@6.4.4(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1))
+        version: 2.7.0(typescript@5.9.3)(vite@6.4.5(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1))
       vite:
-        specifier: ^6.4.3
-        version: 6.4.4(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1)
+        specifier: ^6.4.5
+        version: 6.4.5(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1)
 
   examples/vpssr-linaria-solid:
     dependencies:
@@ -7444,10 +7444,6 @@ packages:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postcss@8.5.19:
-    resolution: {integrity: sha512-Mz8SaolMd8nB+G13WkORcxQKHZ/NE4xXevtkJHVuG+guo9/wYKlIMTKAqGdEmYOXR2ijPjTYNHssizdaVSUNdQ==}
-    engines: {node: ^10 || ^12 || >=14}
-
   postcss@8.5.31:
     resolution: {integrity: sha512-YUbWYCgErwnMAVkjUnYa+KlMBzGpHwiIt/DE7f0G33AuX2LH9UcTk6KgWxd3zRU+pN3u/C+Xl3EnMLM4Hea7Sg==}
     engines: {node: ^10 || ^12 || >=14}
@@ -8957,8 +8953,8 @@ packages:
     peerDependencies:
       vite: '>=7'
 
-  vite@6.4.4:
-    resolution: {integrity: sha512-xGjU/SyjeNyb0E4KxXBvYz/1C+3JXuujvf2hXNOtnlcE+58o5ajd9N2/n2VhkiJvpCP2qQasnUpx5PXNeI+p1Q==}
+  vite@6.4.5:
+    resolution: {integrity: sha512-4enwjFfi4IwtEh0w+jPzpLVOFQiPHmmzPxcHXQOyEur47o6u0jE573DmGpjA+7irXoMLYRZD5ZaFUEneS3abPg==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
@@ -12565,7 +12561,7 @@ snapshots:
       - ocache
       - srvx
 
-  '@vitejs/plugin-react@4.7.0(vite@6.4.4(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1))':
+  '@vitejs/plugin-react@4.7.0(vite@6.4.5(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1))':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/plugin-transform-react-jsx-self': 7.29.7(@babel/core@7.29.7)
@@ -12573,7 +12569,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 6.4.4(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1)
+      vite: 6.4.5(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -12754,11 +12750,11 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@wyw-in-js/vite@2.7.0(typescript@5.9.3)(vite@6.4.4(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1))':
+  '@wyw-in-js/vite@2.7.0(typescript@5.9.3)(vite@6.4.5(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1))':
     dependencies:
       '@wyw-in-js/shared': 2.7.0
       '@wyw-in-js/transform': 2.7.0(typescript@5.9.3)
-      vite: 6.4.4(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1)
+      vite: 6.4.5(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -14760,6 +14756,10 @@ snapshots:
   fdir@6.5.0(picomatch@4.0.5):
     optionalDependencies:
       picomatch: 4.0.5
+
+  fdir@6.5.0(picomatch@4.0.7):
+    optionalDependencies:
+      picomatch: 4.0.7
 
   figures@3.2.0:
     dependencies:
@@ -16983,12 +16983,6 @@ snapshots:
       picocolors: 1.0.0
       source-map-js: 1.2.2
 
-  postcss@8.5.19:
-    dependencies:
-      nanoid: 3.3.20
-      picocolors: 1.1.1
-      source-map-js: 1.2.2
-
   postcss@8.5.31:
     dependencies:
       nanoid: 3.3.20
@@ -18720,12 +18714,12 @@ snapshots:
     dependencies:
       vite: 8.3.5(@types/node@26.6.6)(jiti@2.6.1)(terser@5.49.0)(yaml@2.9.1)
 
-  vite@6.4.4(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1):
+  vite@6.4.5(@types/node@26.6.6)(jiti@2.6.1)(lightningcss@1.33.0)(terser@5.49.0)(yaml@2.9.1):
     dependencies:
       esbuild: 0.25.12
-      fdir: 6.5.0(picomatch@4.0.5)
-      picomatch: 4.0.5
-      postcss: 8.5.19
+      fdir: 6.5.0(picomatch@4.0.7)
+      picomatch: 4.0.7
+      postcss: 8.5.31
       rollup: 4.62.2
       tinyglobby: 0.2.17
     optionalDependencies:
