@@ -1,9 +1,8 @@
-import vite_ssr from 'vite-plugin-ssr/plugin';
+import vike from 'vike/plugin';
+import vikeSolid from 'vike-solid/vite';
 import vite_wyw from '@wyw-in-js/vite';
-import vite_solid from 'vite-plugin-solid';
 
-export default (/** @type import('vite').ConfigEnv */ { mode }) => {
-  const dev = mode === 'development';
+export default () => {
   /** @type import('vite').UserConfig */
   const config = {
     plugins: [
@@ -24,18 +23,8 @@ export default (/** @type import('vite').ConfigEnv */ { mode }) => {
         }),
         enforce: 'pre',
       },
-      vite_solid({
-        dev: dev,
-        hot: dev,
-        ssr: true,
-      }),
-      vite_ssr({
-        includeAssetsImportedByServer: true,
-        prerender: {
-          partial: true,
-          noExtraDir: true,
-        },
-      }),
+      vikeSolid(),
+      vike(),
     ],
   };
   return config;

@@ -1,24 +1,20 @@
-const express = require("express");
-const compression = require("compression");
-const { renderPage } = require("vite-plugin-ssr");
+import express from "express";
+import compression from "compression";
+import { createDevMiddleware, renderPage } from "vike/server";
 
 const isProduction = process.env.NODE_ENV === "production";
+const root = import.meta.dirname;
 
 const app = express();
 app.use(compression());
 
 async function main () {
   if (isProduction) {
-    const sirv = require("sirv")
-    app.use(sirv(`${__dirname}/dist/client`));
+    const { default: sirv } = await import("sirv");
+    app.use(sirv(`${root}/dist/client`));
   } else {
-    const vite = require("vite");
-    const server = await vite.createServer({
-      root: __dirname,
-      configFile: './vite.config.js',
-      server: { middlewareMode: true },
-    })
-    app.use(server.middlewares);
+    const { devMiddleware } = await createDevMiddleware({ root });
+    app.use(devMiddleware);
   }
 
   app.get("*", async (req, res, next) => {
@@ -28,10 +24,11 @@ async function main () {
     const pageContext = await renderPage(pageContextInit);
     const { httpResponse } = pageContext;
     if (!httpResponse) return next();
-    const { statusCode, contentType, earlyHints } = httpResponse;
+    const { statusCode, headers, earlyHints } = httpResponse;
     if (res.writeEarlyHints)
       res.writeEarlyHints({ link: earlyHints.map((e) => e.earlyHintLink) });
-    res.status(statusCode).type(contentType);
+    headers.forEach(([name, value]) => res.setHeader(name, value));
+    res.status(statusCode);
     httpResponse.pipe(res);
   });
 
