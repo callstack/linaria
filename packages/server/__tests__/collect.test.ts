@@ -418,3 +418,28 @@ test('keeps the order of rules in a large stylesheet', () => {
   expect(selectorsOf(critical)).toEqual(expectedCritical);
   expect(selectorsOf(other)).toEqual(expectedOther);
 });
+
+test.each([
+  ['animation', 'spin 1s linear', ['spin']],
+  ['animation', '1s linear spin', ['spin']],
+  ['animation', '1s spin linear', ['spin']],
+  ['animation', '1s\tlinear\nspin', ['spin']],
+  ['animation', 'spin 1s, fade 2s', ['spin', 'fade']],
+  ['animation', '1s steps(2, end) spin, 2s ease-in fade', ['spin', 'fade']],
+  ['animation-name', 'spin, fade', ['spin', 'fade']],
+])('collects keyframes for %s: %s', (property, value, expected) => {
+  const css = `
+    .linaria { ${property}: ${value}; }
+    .other { animation: unused 1s; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fade { to { opacity: 0; } }
+    @keyframes unused { to { opacity: 1; } }
+  `;
+  const { critical, other } = collect(html, css);
+  const names: string[] = [];
+  postcss.parse(critical).walkAtRules('keyframes', (rule) => {
+    names.push(rule.params);
+  });
+  expect(names).toEqual(expected);
+  expect(other).not.toContain('@keyframes');
+});
