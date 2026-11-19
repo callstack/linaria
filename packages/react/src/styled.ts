@@ -180,7 +180,11 @@ function styled(tag: any): any {
     }
 
     const render = (props: any, ref: any) => {
-      const { as: component = tag, class: className = mockedClass } = props;
+      const {
+        as: component = tag,
+        forwardedAs,
+        class: className = mockedClass,
+      } = props;
       const shouldKeepProps =
         options.propsAsIs === undefined
           ? !(
@@ -191,6 +195,7 @@ function styled(tag: any): any {
           : options.propsAsIs;
       const filteredProps: IProps = filterProps(shouldKeepProps, props, [
         'as',
+        'forwardedAs',
         'class',
       ]);
 
@@ -227,6 +232,18 @@ function styled(tag: any): any {
         }
 
         filteredProps.style = style;
+      }
+
+      if (
+        forwardedAs !== undefined &&
+        tag === component &&
+        typeof tag !== 'string'
+      ) {
+        // `forwardedAs` is handed to the wrapped component as its `as` prop,
+        // so `as` on this component can keep targeting the wrapper itself.
+        filteredProps.as = forwardedAs;
+
+        return createElement(tag, filteredProps);
       }
 
       if ((tag as any).__wyw_meta && tag !== component) {
@@ -275,15 +292,21 @@ type IntrinsicElementProps<TName extends keyof IntrinsicElements> =
 type StyledComponentWithAs<TProps> = {
   // Tried first so that inference in JSX does not have to go through the generic `as` overload.
   (
-    props: TProps & { as?: undefined },
+    props: TProps & { as?: undefined; forwardedAs?: React.ElementType },
     context?: any
   ): ReturnType<React.FunctionComponent<TProps>>;
   <TAs extends keyof IntrinsicElements>(
-    props: TProps & { as: TAs } & NoInfer<IntrinsicElementProps<TAs>>,
+    props: TProps & {
+      as: TAs;
+      forwardedAs?: React.ElementType;
+    } & NoInfer<IntrinsicElementProps<TAs>>,
     context?: any
   ): ReturnType<React.FunctionComponent>;
   (
-    props: TProps & { as?: React.ElementType },
+    props: TProps & {
+      as?: React.ElementType;
+      forwardedAs?: React.ElementType;
+    },
     context?: any
   ): ReturnType<React.FunctionComponent<TProps>>;
   contextTypes?: FunctionComponentStatic<TProps, 'contextTypes'>;
