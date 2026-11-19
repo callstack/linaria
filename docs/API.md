@@ -123,6 +123,21 @@ const Button = styled.button`
 </Button>;
 ```
 
+If you wrap another component with `styled`, the `as` prop replaces that component. Use `forwardedAs` to pass an `as` prop on to the wrapped component instead:
+
+```js
+const Link = ({ as: Tag = 'a', ...props }) => <Tag {...props} />;
+
+const StyledLink = styled(Link)`
+  color: rebeccapurple;
+`;
+
+// `Link` is still rendered, and it receives `as="button"`
+<StyledLink forwardedAs="button">Click me</StyledLink>;
+```
+
+`forwardedAs` is ignored when `as` is also set, and it has no effect on components created from an HTML tag, such as `styled.button`.
+
 You can also decorate another styled component with `styled`:
 
 ```js

@@ -18,3 +18,11 @@ const Input = styled.input``;
 
 // A spread of a generic call must not depend on the `as` overload.
 <Input {...getProps()} disabled />;
+
+declare const Link: React.FC<{ className?: string; to: string }>;
+const FancyButton = styled(Button)``;
+<FancyButton forwardedAs={Link} />;
+<Button forwardedAs="a" />;
+<Button as="a" href="/" forwardedAs={Link} />;
+// @ts-expect-error forwardedAs must be an element type
+<Button forwardedAs={1} />;

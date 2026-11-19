@@ -343,3 +343,70 @@ it('can get rest keys from complex object', () => {
   const { bool, object, arr, ...expectedRest } = obj;
   expect(rest).toEqual(expectedRest);
 });
+
+it('passes forwardedAs to a wrapped custom component as the as prop', () => {
+  const asValues: unknown[] = [];
+  const Custom: React.FC<any> = ({ as: As = 'div', ...props }) => {
+    asValues.push(As);
+    return <As {...props} />;
+  };
+
+  const Test = styled(Custom)({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  const tree = renderer.create(<Test forwardedAs="h1">This is a test</Test>);
+
+  expect(asValues).toEqual(['h1']);
+  expect(tree.toJSON().type).toBe('h1');
+  expect(tree.toJSON().props.forwardedAs).toBeUndefined();
+  expect(tree.toJSON().props.className).toContain('abcdefg');
+});
+
+it('drops forwardedAs when as replaces the wrapped component', () => {
+  const Inner: React.FC<any> = (props) => <div data-inner {...props} />;
+  const Replacement: React.FC<any> = (props) => (
+    <span data-replacement {...props} />
+  );
+
+  const Test = styled(Inner)({ name: 'TestComponent', class: 'abcdefg' });
+
+  const tree = renderer.create(<Test as={Replacement} forwardedAs="h2" />);
+
+  expect(tree.toJSON().type).toBe('span');
+  expect(tree.toJSON().props.forwardedAs).toBeUndefined();
+  expect(tree.toJSON().props.as).toBeUndefined();
+});
+
+it('passes forwardedAs to a wrapped styled component as the as prop', () => {
+  const First = styled('div')({
+    name: 'FirstComponent',
+    class: 'abcdefg',
+  });
+
+  const Second = styled(First)({
+    name: 'SecondComponent',
+    class: 'hijklmn',
+  });
+
+  const tree = renderer.create(<Second forwardedAs="a">This is a test</Second>);
+
+  expect(tree.toJSON().type).toBe('a');
+  expect(tree.toJSON().props.forwardedAs).toBeUndefined();
+  expect(tree.toJSON().props.className).toContain('abcdefg');
+  expect(tree.toJSON().props.className).toContain('hijklmn');
+});
+
+it('does not leak forwardedAs to an HTML tag', () => {
+  const Test = styled('div')({
+    name: 'TestComponent',
+    class: 'abcdefg',
+  });
+
+  const tree = renderer.create(<Test forwardedAs="a">This is a test</Test>);
+
+  expect(tree.toJSON().type).toBe('div');
+  expect(tree.toJSON().props.as).toBeUndefined();
+  expect(tree.toJSON().props.forwardedAs).toBeUndefined();
+});
