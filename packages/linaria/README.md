@@ -20,7 +20,7 @@ Zero-runtime CSS in JS library.
 - Use **JavaScript for logic**, no CSS preprocessor needed
 - Optionally use any **CSS preprocessor** such as Sass or PostCSS
 
-**[Why use Linaria](../../docs/BENEFITS.md)**
+**[Why use Linaria](https://github.com/callstack/linaria/blob/master/docs/BENEFITS.md)**
 
 ## Installation
 
