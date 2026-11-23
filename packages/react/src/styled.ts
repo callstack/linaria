@@ -148,7 +148,7 @@ function styled<
   TConstructor extends Component<TProps>,
 >(
   componentWithoutStyle: TConstructor & Component<TProps>
-): ComponentStyledTagWithoutInterpolation<TConstructor>;
+): ComponentStyledTagWithoutInterpolation<TProps, TConstructor>;
 function styled<TName extends keyof IntrinsicElements>(
   tag: TName
 ): HtmlStyledTag<TName>;
@@ -341,13 +341,36 @@ export type HtmlStyledTag<TName extends keyof IntrinsicElements> = <
   >
 ) => StyledComponent<IntrinsicElements[TName] & TAdditionalProps>;
 
-type ComponentStyledTagWithoutInterpolation<TOrigCmp> = (
+// `forwardedAs` reaches the wrapped component as its own `as` prop, so it is
+// accepted only by a component that has an `as` prop, and with that prop's type.
+// The wrapped component's own signatures stay first, which keeps its generics and
+// overloads for every call without `forwardedAs`. A styled component takes
+// `forwardedAs` in its own signatures already.
+type ForwardedAsProps<TProps> = TProps & {
+  forwardedAs?: TProps['as' & keyof TProps];
+};
+
+type WithForwardedAs<TProps, TOrigCmp> = [TOrigCmp] extends [WYWEvalMeta]
+  ? TOrigCmp
+  : 'as' extends keyof TProps
+  ? TOrigCmp &
+      ([TOrigCmp] extends [abstract new (...args: any) => infer TInstance]
+        ? new (
+            props: ForwardedAsProps<TProps>
+          ) => TInstance & { props: ForwardedAsProps<TProps> }
+        : (
+            props: ForwardedAsProps<TProps>,
+            context?: any
+          ) => ReturnType<React.FunctionComponent<TProps>>)
+  : TOrigCmp;
+
+type ComponentStyledTagWithoutInterpolation<TProps, TOrigCmp> = (
   strings: TemplateStringsArray,
   ...exprs: Array<
     | StaticPlaceholder
     | ((props: 'The target component should have a style prop') => never)
   >
-) => WYWEvalMeta & TOrigCmp;
+) => WYWEvalMeta & WithForwardedAs<TProps, TOrigCmp>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
@@ -357,7 +380,7 @@ type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
     | ((props: NoInfer<OwnProps & TTrgProps>) => string | number)
   >
 ) => keyof OwnProps extends never
-  ? WYWEvalMeta & TOrigCmp
+  ? WYWEvalMeta & WithForwardedAs<TTrgProps, TOrigCmp>
   : StyledComponent<OwnProps & TTrgProps>;
 
 export type StyledJSXIntrinsics = {

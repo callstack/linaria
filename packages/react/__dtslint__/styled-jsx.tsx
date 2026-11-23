@@ -26,3 +26,33 @@ const FancyButton = styled(Button)``;
 <Button as="a" href="/" forwardedAs={Link} />;
 // @ts-expect-error forwardedAs must be an element type
 <Button forwardedAs={1} />;
+
+// `forwardedAs` reaches a wrapped component as its own `as` prop.
+type PolymorphicLinkProps = {
+  as?: React.ElementType;
+  children?: React.ReactNode;
+  className?: string;
+};
+const PolymorphicLink = ({ as: Tag = 'a', ...props }: PolymorphicLinkProps) => (
+  <Tag {...props} />
+);
+const StyledPolymorphicLink = styled(PolymorphicLink)``;
+<StyledPolymorphicLink forwardedAs="button">Click me</StyledPolymorphicLink>;
+<StyledPolymorphicLink forwardedAs={Link} />;
+// @ts-expect-error forwardedAs must be an element type
+<StyledPolymorphicLink forwardedAs={1} />;
+
+declare const Box: React.FC<{
+  as?: 'div' | 'section';
+  className?: string;
+  style?: React.CSSProperties;
+}>;
+const StyledBox = styled(Box)``;
+<StyledBox forwardedAs="section" />;
+// @ts-expect-error forwardedAs has the type of the wrapped component's `as`
+<StyledBox forwardedAs="span" />;
+
+const StyledLink = styled(Link)``;
+<StyledLink to="/" />;
+// @ts-expect-error a wrapped component without `as` takes no forwardedAs
+<StyledLink to="/" forwardedAs="button" />;
