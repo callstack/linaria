@@ -53,11 +53,15 @@ yarn add @linaria/core @linaria/react @wyw-in-js/babel-preset
 
 Linaria is now built on top of [wyw-in-js.dev](https://wyw-in-js.dev/). It supports various bundlers to extract the CSS at build time. To configure your bundler, check the following guides on the wyw-in-js.dev site:
 
-- [webpack](https://wyw-in-js.dev/bundlers/webpack)
+- [Bun](https://wyw-in-js.dev/bundlers/bun)
 - [esbuild](https://wyw-in-js.dev/bundlers/esbuild)
+- [Next.js](https://wyw-in-js.dev/bundlers/nextjs)
+- [Parcel](https://wyw-in-js.dev/bundlers/parcel)
 - [Rollup](https://wyw-in-js.dev/bundlers/rollup)
-- [Vite](https://wyw-in-js.dev/bundlers/vite)
+- [Rspack](https://wyw-in-js.dev/bundlers/rspack)
 - [Svelte](https://wyw-in-js.dev/bundlers/svelte)
+- [Vite](https://wyw-in-js.dev/bundlers/vite)
+- [webpack](https://wyw-in-js.dev/bundlers/webpack)
 
 See [Configuration](https://wyw-in-js.dev/configuration) to customize how Linaria processes your files.
 
