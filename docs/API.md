@@ -136,7 +136,7 @@ const StyledLink = styled(Link)`
 <StyledLink forwardedAs="button">Click me</StyledLink>;
 ```
 
-`forwardedAs` is ignored when `as` is also set, and it has no effect on components created from an HTML tag, such as `styled.button`.
+`forwardedAs` always becomes the `as` prop of the component that is rendered: the wrapped one, or the one that `as` renders instead. It is never passed to an HTML tag, so it has no effect on components created from one, such as `styled.button`, or when `as` is a tag name.
 
 You can also decorate another styled component with `styled`:
 

@@ -234,25 +234,26 @@ function styled(tag: any): any {
         filteredProps.style = style;
       }
 
-      if (
-        forwardedAs !== undefined &&
-        tag === component &&
-        typeof tag !== 'string'
-      ) {
-        // `forwardedAs` is handed to the wrapped component as its `as` prop,
-        // so `as` on this component can keep targeting the wrapper itself.
-        filteredProps.as = forwardedAs;
-
-        return createElement(tag, filteredProps);
-      }
-
       if ((tag as any).__wyw_meta && tag !== component) {
         // If the underlying tag is a styled component, forward the `as` prop
         // Otherwise the styles from the underlying component will be ignored
         filteredProps.as = component;
+        // The underlying styled component renders `component`,
+        // so it is the one that hands `forwardedAs` on to it.
+        if (forwardedAs !== undefined) {
+          filteredProps.forwardedAs = forwardedAs;
+        }
 
         return createElement(tag, filteredProps);
       }
+
+      if (forwardedAs !== undefined && typeof component !== 'string') {
+        // `forwardedAs` becomes the `as` prop of the rendered component:
+        // the wrapped one, or the one that `as` renders instead.
+        // An HTML tag never receives it.
+        filteredProps.as = forwardedAs;
+      }
+
       return createElement(component, filteredProps);
     };
 

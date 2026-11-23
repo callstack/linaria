@@ -345,11 +345,9 @@ it('can get rest keys from complex object', () => {
 });
 
 it('passes forwardedAs to a wrapped custom component as the as prop', () => {
-  const asValues: unknown[] = [];
-  const Custom: React.FC<any> = ({ as: As = 'div', ...props }) => {
-    asValues.push(As);
-    return <As {...props} />;
-  };
+  const Custom: React.FC<any> = ({ as: As = 'div', ...props }) => (
+    <As data-custom {...props} />
+  );
 
   const Test = styled(Custom)({
     name: 'TestComponent',
@@ -358,25 +356,66 @@ it('passes forwardedAs to a wrapped custom component as the as prop', () => {
 
   const tree = renderer.create(<Test forwardedAs="h1">This is a test</Test>);
 
-  expect(asValues).toEqual(['h1']);
   expect(tree.toJSON().type).toBe('h1');
+  expect(tree.toJSON().props['data-custom']).toBe(true);
   expect(tree.toJSON().props.forwardedAs).toBeUndefined();
   expect(tree.toJSON().props.className).toContain('abcdefg');
 });
 
-it('drops forwardedAs when as replaces the wrapped component', () => {
+it('passes forwardedAs to the component that as renders instead', () => {
   const Inner: React.FC<any> = (props) => <div data-inner {...props} />;
-  const Replacement: React.FC<any> = (props) => (
-    <span data-replacement {...props} />
+  const Replacement: React.FC<any> = ({ as: As = 'span', ...props }) => (
+    <As data-replacement {...props} />
   );
 
   const Test = styled(Inner)({ name: 'TestComponent', class: 'abcdefg' });
 
   const tree = renderer.create(<Test as={Replacement} forwardedAs="h2" />);
 
-  expect(tree.toJSON().type).toBe('span');
+  expect(tree.toJSON().type).toBe('h2');
+  expect(tree.toJSON().props['data-replacement']).toBe(true);
+  expect(tree.toJSON().props['data-inner']).toBeUndefined();
   expect(tree.toJSON().props.forwardedAs).toBeUndefined();
+});
+
+it('passes forwardedAs through a wrapped styled component to the component that as renders', () => {
+  const Replacement: React.FC<any> = ({ as: As = 'span', ...props }) => (
+    <As data-replacement {...props} />
+  );
+
+  const First = styled('div')({
+    name: 'FirstComponent',
+    class: 'abcdefg',
+  });
+
+  const Second = styled(First)({
+    name: 'SecondComponent',
+    class: 'hijklmn',
+  });
+
+  const tree = renderer.create(
+    <Second as={Replacement} forwardedAs="h2">
+      This is a test
+    </Second>
+  );
+
+  expect(tree.toJSON().type).toBe('h2');
+  expect(tree.toJSON().props['data-replacement']).toBe(true);
+  expect(tree.toJSON().props.forwardedAs).toBeUndefined();
+  expect(tree.toJSON().props.className).toContain('abcdefg');
+  expect(tree.toJSON().props.className).toContain('hijklmn');
+});
+
+it('does not pass forwardedAs to an HTML tag that as renders', () => {
+  const Inner: React.FC<any> = (props) => <div data-inner {...props} />;
+
+  const Test = styled(Inner)({ name: 'TestComponent', class: 'abcdefg' });
+
+  const tree = renderer.create(<Test as="section" forwardedAs="h2" />);
+
+  expect(tree.toJSON().type).toBe('section');
   expect(tree.toJSON().props.as).toBeUndefined();
+  expect(tree.toJSON().props.forwardedAs).toBeUndefined();
 });
 
 it('passes forwardedAs to a wrapped styled component as the as prop', () => {
