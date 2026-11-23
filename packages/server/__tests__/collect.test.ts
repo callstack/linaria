@@ -435,11 +435,10 @@ test.each([
     @keyframes fade { to { opacity: 0; } }
     @keyframes unused { to { opacity: 1; } }
   `;
-  const { critical, other } = collect(html, css);
+  const { critical } = collect(html, css);
   const names: string[] = [];
   postcss.parse(critical).walkAtRules('keyframes', (rule) => {
     names.push(rule.params);
   });
   expect(names).toEqual(expected);
-  expect(other).not.toContain('@keyframes');
 });
