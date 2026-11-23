@@ -148,7 +148,7 @@ function styled<
   TConstructor extends Component<TProps>,
 >(
   componentWithoutStyle: TConstructor & Component<TProps>
-): ComponentStyledTagWithoutInterpolation<TConstructor>;
+): ComponentStyledTagWithoutInterpolation<TProps, TConstructor>;
 function styled<TName extends keyof IntrinsicElements>(
   tag: TName
 ): HtmlStyledTag<TName>;
@@ -180,7 +180,11 @@ function styled(tag: any): any {
     }
 
     const render = (props: any, ref: any) => {
-      const { as: component = tag, class: className = mockedClass } = props;
+      const {
+        as: component = tag,
+        forwardedAs,
+        class: className = mockedClass,
+      } = props;
       const shouldKeepProps =
         options.propsAsIs === undefined
           ? !(
@@ -191,6 +195,7 @@ function styled(tag: any): any {
           : options.propsAsIs;
       const filteredProps: IProps = filterProps(shouldKeepProps, props, [
         'as',
+        'forwardedAs',
         'class',
       ]);
 
@@ -233,9 +238,22 @@ function styled(tag: any): any {
         // If the underlying tag is a styled component, forward the `as` prop
         // Otherwise the styles from the underlying component will be ignored
         filteredProps.as = component;
+        // The underlying styled component renders `component`,
+        // so it is the one that hands `forwardedAs` on to it.
+        if (forwardedAs !== undefined) {
+          filteredProps.forwardedAs = forwardedAs;
+        }
 
         return createElement(tag, filteredProps);
       }
+
+      if (forwardedAs !== undefined && typeof component !== 'string') {
+        // `forwardedAs` becomes the `as` prop of the rendered component:
+        // the wrapped one, or the one that `as` renders instead.
+        // An HTML tag never receives it.
+        filteredProps.as = forwardedAs;
+      }
+
       return createElement(component, filteredProps);
     };
 
@@ -275,15 +293,21 @@ type IntrinsicElementProps<TName extends keyof IntrinsicElements> =
 type StyledComponentWithAs<TProps> = {
   // Tried first so that inference in JSX does not have to go through the generic `as` overload.
   (
-    props: TProps & { as?: undefined },
+    props: TProps & { as?: undefined; forwardedAs?: React.ElementType },
     context?: any
   ): ReturnType<React.FunctionComponent<TProps>>;
   <TAs extends keyof IntrinsicElements>(
-    props: TProps & { as: TAs } & NoInfer<IntrinsicElementProps<TAs>>,
+    props: TProps & {
+      as: TAs;
+      forwardedAs?: React.ElementType;
+    } & NoInfer<IntrinsicElementProps<TAs>>,
     context?: any
   ): ReturnType<React.FunctionComponent>;
   (
-    props: TProps & { as?: React.ElementType },
+    props: TProps & {
+      as?: React.ElementType;
+      forwardedAs?: React.ElementType;
+    },
     context?: any
   ): ReturnType<React.FunctionComponent<TProps>>;
   contextTypes?: FunctionComponentStatic<TProps, 'contextTypes'>;
@@ -317,13 +341,36 @@ export type HtmlStyledTag<TName extends keyof IntrinsicElements> = <
   >
 ) => StyledComponent<IntrinsicElements[TName] & TAdditionalProps>;
 
-type ComponentStyledTagWithoutInterpolation<TOrigCmp> = (
+// `forwardedAs` reaches the wrapped component as its own `as` prop, so it is
+// accepted only by a component that has an `as` prop, and with that prop's type.
+// The wrapped component's own signatures stay first, which keeps its generics and
+// overloads for every call without `forwardedAs`. A styled component takes
+// `forwardedAs` in its own signatures already.
+type ForwardedAsProps<TProps> = TProps & {
+  forwardedAs?: TProps['as' & keyof TProps];
+};
+
+type WithForwardedAs<TProps, TOrigCmp> = [TOrigCmp] extends [WYWEvalMeta]
+  ? TOrigCmp
+  : 'as' extends keyof TProps
+  ? TOrigCmp &
+      ([TOrigCmp] extends [abstract new (...args: any) => infer TInstance]
+        ? new (
+            props: ForwardedAsProps<TProps>
+          ) => TInstance & { props: ForwardedAsProps<TProps> }
+        : (
+            props: ForwardedAsProps<TProps>,
+            context?: any
+          ) => ReturnType<React.FunctionComponent<TProps>>)
+  : TOrigCmp;
+
+type ComponentStyledTagWithoutInterpolation<TProps, TOrigCmp> = (
   strings: TemplateStringsArray,
   ...exprs: Array<
     | StaticPlaceholder
     | ((props: 'The target component should have a style prop') => never)
   >
-) => WYWEvalMeta & TOrigCmp;
+) => WYWEvalMeta & WithForwardedAs<TProps, TOrigCmp>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
@@ -333,7 +380,7 @@ type ComponentStyledTagWithInterpolation<TTrgProps, TOrigCmp> = <OwnProps = {}>(
     | ((props: NoInfer<OwnProps & TTrgProps>) => string | number)
   >
 ) => keyof OwnProps extends never
-  ? WYWEvalMeta & TOrigCmp
+  ? WYWEvalMeta & WithForwardedAs<TTrgProps, TOrigCmp>
   : StyledComponent<OwnProps & TTrgProps>;
 
 export type StyledJSXIntrinsics = {

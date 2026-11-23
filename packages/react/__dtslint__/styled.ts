@@ -111,6 +111,16 @@ expect(Generic({ children: 123 }).props.children).type.toBe<number>();
 const StyledGeneric = styled(Generic)``;
 expect(StyledGeneric({ children: 123 }).props.children).type.toBe<number>();
 
+// A wrapped component with `as` keeps its generics next to `forwardedAs`.
+const PolymorphicGeneric = <T>(
+  p: T & { as?: React.ElementType; className?: string }
+) => React.createElement('h1', p);
+
+const StyledPolymorphicGeneric = styled(PolymorphicGeneric)``;
+expect(
+  StyledPolymorphicGeneric({ children: 123 }).props.children
+).type.toBe<number>();
+
 styled.a`
   & > ${SimplestComponent} {
     color: red;
