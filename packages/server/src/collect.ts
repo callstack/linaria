@@ -184,7 +184,12 @@ export default function collect(
   other.append(otherNodes);
 
   critical.walkDecls(/animation/, (decl) => {
-    animations.add(decl.value.split(' ')[0]);
+    // Names can appear anywhere in each shorthand, including after timing functions.
+    postcss.list.comma(decl.value).forEach((animation) => {
+      postcss.list.space(animation).forEach((token) => {
+        animations.add(token);
+      });
+    });
   });
 
   keyframes.forEach((rule) => {
