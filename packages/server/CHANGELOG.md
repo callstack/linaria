@@ -1,5 +1,11 @@
 # Change Log
 
+## 8.4.0
+
+### Patch Changes
+
+- c51dfe9b: Preserve critical keyframes when animation names follow other shorthand components or appear in comma-separated animation lists.
+
 ## 8.3.0
 
 ### Patch Changes
