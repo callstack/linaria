@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@wyw-in-js/esbuild": "2.7.2",
-    "esbuild": "^0.15.16"
+    "esbuild": "^0.28.1"
   },
   "scripts": {
     "build": "node build.js"
