@@ -1,5 +1,11 @@
 # Change Log
 
+## 8.4.0
+
+### Patch Changes
+
+- @linaria/postcss-linaria@8.4.0
+
 ## 8.3.0
 
 ### Patch Changes
